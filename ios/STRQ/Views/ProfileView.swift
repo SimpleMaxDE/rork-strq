@@ -29,8 +29,7 @@ struct ProfileView: View {
         .navigationBarTitleDisplayMode(.large)
         .alert("Reset All Data?", isPresented: $showResetAlert) {
             Button("Reset", role: .destructive) {
-                UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
-                vm.hasCompletedOnboarding = false
+                vm.resetAllData()
             }
             Button("Cancel", role: .cancel) {}
         } message: {

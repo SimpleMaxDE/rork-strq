@@ -60,10 +60,61 @@ class AppViewModel {
     var goalPace: GoalPaceStatus?
     private let nutritionEngine = NutritionCoachEngine()
 
+    private let persistence = PersistenceStore.shared
+    private var isHydrating: Bool = false
+
     init() {
-        let savedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
-        self.hasCompletedOnboarding = savedOnboarding
-        if savedOnboarding {
+        self.profile = UserProfile()
+        self.currentPlan = nil
+        self.workoutHistory = []
+        self.personalRecords = []
+        self.progressEntries = []
+        self.recommendations = []
+        self.favoriteExerciseIds = []
+        self.activeWorkout = nil
+
+        let legacyOnboardingFlag = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
+
+        if let saved = persistence.load() {
+            isHydrating = true
+            self.hasCompletedOnboarding = saved.hasCompletedOnboarding
+            self.profile = saved.profile
+            self.currentPlan = saved.currentPlan
+            self.workoutHistory = saved.workoutHistory
+            self.personalRecords = saved.personalRecords
+            self.progressEntries = saved.progressEntries
+            self.favoriteExerciseIds = Set(saved.favoriteExerciseIds)
+            self.progressionStates = saved.progressionStates
+            self.trainingPhaseState = saved.trainingPhaseState
+            self.coachAdjustments = saved.coachAdjustments
+            self.appliedActionIds = Set(saved.appliedActionIds)
+            self.weekAdjustmentActive = saved.weekAdjustmentActive
+            self.previousPlanBeforeWeekAction = saved.previousPlanBeforeWeekAction
+            self.weeklyReviewDismissed = saved.weeklyReviewDismissed
+            self.todaysReadiness = saved.todaysReadiness
+            self.readinessHistory = saved.readinessHistory
+            self.notificationSettings = saved.notificationSettings
+            self.nutritionTarget = saved.nutritionTarget
+            self.nutritionLogs = saved.nutritionLogs
+            self.bodyWeightEntries = saved.bodyWeightEntries
+            self.sleepEntries = saved.sleepEntries
+            if let draft = saved.activeWorkoutDraft {
+                self.activeWorkout = ActiveWorkoutState(
+                    session: draft.session,
+                    currentExerciseIndex: draft.currentExerciseIndex,
+                    currentSetIndex: draft.currentSetIndex,
+                    isResting: false,
+                    restTimeRemaining: 0,
+                    plannedExercises: draft.plannedExercises
+                )
+            }
+            isHydrating = false
+            refreshIntelligence()
+            refreshNutritionInsights()
+            refreshDailyState()
+        } else if legacyOnboardingFlag {
+            isHydrating = true
+            self.hasCompletedOnboarding = true
             self.profile = DemoData.profile
             self.workoutHistory = DemoData.workoutHistory
             self.personalRecords = DemoData.personalRecords
@@ -83,19 +134,88 @@ class AppViewModel {
                 recoveryScore: 78,
                 phase: DemoData.trainingPhaseState.currentPhase
             )
+            isHydrating = false
             refreshIntelligence()
             refreshNutritionInsights()
+            refreshDailyState()
+            persist()
         } else {
-            self.profile = UserProfile()
-            self.currentPlan = nil
-            self.workoutHistory = []
-            self.personalRecords = []
-            self.progressEntries = []
-            self.recommendations = []
-            self.favoriteExerciseIds = []
+            self.hasCompletedOnboarding = false
+            refreshDailyState()
         }
-        self.activeWorkout = nil
-        refreshDailyState()
+    }
+
+    func persist() {
+        guard !isHydrating else { return }
+        let draft: ActiveWorkoutDraft? = activeWorkout.map { state in
+            ActiveWorkoutDraft(
+                session: state.session,
+                currentExerciseIndex: state.currentExerciseIndex,
+                currentSetIndex: state.currentSetIndex,
+                plannedExercises: state.plannedExercises
+            )
+        }
+        let snapshot = PersistedAppState(
+            version: persistence.version,
+            hasCompletedOnboarding: hasCompletedOnboarding,
+            profile: profile,
+            currentPlan: currentPlan,
+            workoutHistory: workoutHistory,
+            personalRecords: personalRecords,
+            progressEntries: progressEntries,
+            favoriteExerciseIds: Array(favoriteExerciseIds),
+            progressionStates: progressionStates,
+            trainingPhaseState: trainingPhaseState,
+            coachAdjustments: coachAdjustments,
+            appliedActionIds: Array(appliedActionIds),
+            weekAdjustmentActive: weekAdjustmentActive,
+            previousPlanBeforeWeekAction: previousPlanBeforeWeekAction,
+            weeklyReviewDismissed: weeklyReviewDismissed,
+            todaysReadiness: todaysReadiness,
+            readinessHistory: readinessHistory,
+            notificationSettings: notificationSettings,
+            nutritionTarget: nutritionTarget,
+            nutritionLogs: nutritionLogs,
+            bodyWeightEntries: bodyWeightEntries,
+            sleepEntries: sleepEntries,
+            activeWorkoutDraft: draft
+        )
+        persistence.save(snapshot)
+    }
+
+    func resetAllData() {
+        persistence.clear()
+        hasCompletedOnboarding = false
+        profile = UserProfile()
+        currentPlan = nil
+        workoutHistory = []
+        personalRecords = []
+        progressEntries = []
+        recommendations = []
+        favoriteExerciseIds = []
+        progressionStates = []
+        trainingPhaseState = TrainingPhaseState()
+        coachAdjustments = []
+        appliedActionIds = []
+        weekAdjustmentActive = nil
+        previousPlanBeforeWeekAction = nil
+        weeklyReview = nil
+        showWeeklyReview = false
+        weeklyReviewDismissed = false
+        todaysReadiness = nil
+        readinessHistory = []
+        coachResponse = nil
+        dailyCoachMessage = nil
+        momentumData = nil
+        notificationSettings = NotificationSettings()
+        nutritionTarget = NutritionTarget()
+        nutritionLogs = []
+        bodyWeightEntries = []
+        sleepEntries = []
+        nutritionInsights = []
+        goalPace = nil
+        activeWorkout = nil
+        onboardingPhase = .form
     }
 
     func beginPlanGeneration() {
@@ -120,11 +240,12 @@ class AppViewModel {
         onboardingPhase = .form
         UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
         nutritionTarget = nutritionEngine.computeTargets(profile: profile)
-        nutritionLogs = DemoData.nutritionLogs
-        bodyWeightEntries = DemoData.bodyWeightEntries
-        sleepEntries = DemoData.sleepEntries
+        if nutritionLogs.isEmpty { nutritionLogs = DemoData.nutritionLogs }
+        if bodyWeightEntries.isEmpty { bodyWeightEntries = DemoData.bodyWeightEntries }
+        if sleepEntries.isEmpty { sleepEntries = DemoData.sleepEntries }
         refreshDailyState()
         refreshNutritionInsights()
+        persist()
     }
 
     func generatePlan() {
@@ -136,6 +257,7 @@ class AppViewModel {
             phase: trainingPhaseState.currentPhase
         )
         refreshPlanQuality()
+        persist()
     }
 
     func refreshCoachingInsights() {
@@ -253,6 +375,7 @@ class AppViewModel {
         } else {
             favoriteExerciseIds.insert(exerciseId)
         }
+        persist()
     }
 
     func loadSuggestion(for exerciseId: String, planned: PlannedExercise? = nil) -> StartingLoadEngine.LoadSuggestion? {
@@ -305,6 +428,11 @@ class AppViewModel {
             restTimeRemaining: 0,
             plannedExercises: day.exercises
         )
+        persist()
+    }
+
+    func saveActiveWorkoutDraft() {
+        persist()
     }
 
     func completeWorkout() {
@@ -327,6 +455,7 @@ class AppViewModel {
 
         activeWorkout = nil
         refreshIntelligence()
+        persist()
     }
 
     var todaysWorkout: WorkoutDay? {
@@ -460,6 +589,7 @@ class AppViewModel {
         if let adjustment = actionManager.applyVolumeReduction(plan: &plan, dayId: dayId, preview: preview) {
             currentPlan = plan
             coachAdjustments.append(adjustment)
+            persist()
         }
     }
 
@@ -473,6 +603,7 @@ class AppViewModel {
         if let adjustment = actionManager.applyLighterSession(plan: &plan, dayId: dayId) {
             currentPlan = plan
             coachAdjustments.append(adjustment)
+            persist()
         }
     }
 
@@ -486,6 +617,7 @@ class AppViewModel {
         if let adjustment = actionManager.applyExerciseSwap(plan: &plan, dayId: dayId, oldExerciseId: oldExerciseId, newExercise: newExercise) {
             currentPlan = plan
             coachAdjustments.append(adjustment)
+            persist()
         }
     }
 
@@ -496,6 +628,7 @@ class AppViewModel {
                 previousPlanBeforeWeekAction = nil
                 weekAdjustmentActive = nil
                 coachAdjustments.removeAll { $0.id == adjustment.id }
+                persist()
             }
             return
         }
@@ -503,6 +636,7 @@ class AppViewModel {
         if actionManager.undoAdjustment(plan: &plan, adjustment: adjustment) {
             currentPlan = plan
             coachAdjustments.removeAll { $0.id == adjustment.id }
+            persist()
         }
     }
 
@@ -548,6 +682,7 @@ class AppViewModel {
             currentPlan = plan
             weekAdjustmentActive = .weekRegenerated
             coachAdjustments.append(adjustment)
+            persist()
         }
     }
 
@@ -563,6 +698,7 @@ class AppViewModel {
             currentPlan = plan
             weekAdjustmentActive = .deloadWeek
             coachAdjustments.append(adjustment)
+            persist()
         }
     }
 
@@ -597,6 +733,7 @@ class AppViewModel {
               let idx = plan.days.firstIndex(where: { $0.id == dayId }) else { return }
         plan.days[idx].scheduledWeekday = weekday
         currentPlan = plan
+        persist()
     }
 
     func skipDay(dayId: String) {
@@ -604,6 +741,7 @@ class AppViewModel {
               let idx = plan.days.firstIndex(where: { $0.id == dayId }) else { return }
         plan.days[idx].isSkipped.toggle()
         currentPlan = plan
+        persist()
     }
 
     func moveDayToNext(dayId: String) {
@@ -612,6 +750,7 @@ class AppViewModel {
         let current = plan.days[idx].scheduledWeekday ?? (Calendar.current.component(.weekday, from: Date()))
         plan.days[idx].scheduledWeekday = (current % 7) + 1
         currentPlan = plan
+        persist()
     }
 
     func autoScheduleDays() {
@@ -625,6 +764,7 @@ class AppViewModel {
             }
         }
         currentPlan = plan
+        persist()
     }
 
     private func defaultTrainingDays(count: Int) -> [Int] {
@@ -971,6 +1111,7 @@ class AppViewModel {
     func dismissWeeklyReview() {
         showWeeklyReview = false
         weeklyReviewDismissed = true
+        persist()
     }
 
     func applyReviewAction(_ action: ReviewAction) {
@@ -1023,6 +1164,7 @@ class AppViewModel {
     func submitReadiness(_ readiness: DailyReadiness) {
         todaysReadiness = readiness
         readinessHistory.insert(readiness, at: 0)
+        defer { persist() }
 
         let response = dailyCoachEngine.generateCoachResponse(
             readiness: readiness,
@@ -1178,6 +1320,7 @@ class AppViewModel {
             nutritionLogs.insert(log, at: 0)
         }
         refreshNutritionInsights()
+        persist()
     }
 
     func logBodyWeight(weight: Double, bodyFat: Double? = nil) {
@@ -1188,12 +1331,14 @@ class AppViewModel {
             profile.bodyFatPercentage = bf
         }
         refreshNutritionInsights()
+        persist()
     }
 
     func logSleep(hours: Double, quality: ReadinessLevel) {
         let entry = SleepEntry(hoursSlept: hours, quality: quality)
         sleepEntries.insert(entry, at: 0)
         refreshNutritionInsights()
+        persist()
     }
 
     var nutritionCoachSummary: String {
@@ -1266,7 +1411,7 @@ class AppViewModel {
     }
 }
 
-struct ActiveWorkoutState {
+nonisolated struct ActiveWorkoutState: Codable, Sendable {
     var session: WorkoutSession
     var currentExerciseIndex: Int
     var currentSetIndex: Int

@@ -1,6 +1,6 @@
 import Foundation
 
-struct CoachAdjustment: Identifiable, Sendable {
+nonisolated struct CoachAdjustment: Identifiable, Codable, Sendable {
     let id: String
     let type: CoachAdjustmentType
     let dayId: String
@@ -20,7 +20,7 @@ struct CoachAdjustment: Identifiable, Sendable {
     }
 }
 
-nonisolated enum CoachAdjustmentType: String, Sendable {
+nonisolated enum CoachAdjustmentType: String, Codable, Sendable {
     case volumeReduced
     case exerciseSwapped
     case lighterSession
@@ -28,7 +28,7 @@ nonisolated enum CoachAdjustmentType: String, Sendable {
     case deloadWeek
 }
 
-struct AdjustmentDetail: Identifiable, Sendable {
+nonisolated struct AdjustmentDetail: Identifiable, Codable, Sendable {
     let id: String
     let exerciseName: String
     let change: String
@@ -40,7 +40,7 @@ struct AdjustmentDetail: Identifiable, Sendable {
     }
 }
 
-struct AdjustmentSnapshot: Sendable {
+nonisolated struct AdjustmentSnapshot: Codable, Sendable {
     let exercises: [PlannedExercise]
 }
 
