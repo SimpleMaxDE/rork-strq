@@ -14,10 +14,15 @@ struct CoachTabView: View {
         ScrollView {
             VStack(spacing: 22) {
                 authorityHero
-                directionCard
-                watchSection
-                momentumSection
-                liftTrackerSection
+                if vm.isEarlyStage {
+                    earlyStateCard
+                    calibrationChecklist
+                } else {
+                    directionCard
+                    watchSection
+                    momentumSection
+                    liftTrackerSection
+                }
                 weeklyCheckInRow
             }
             .padding(.horizontal, 16)
@@ -150,6 +155,9 @@ struct CoachTabView: View {
     }
 
     private var headline: String {
+        if let guidance = vm.earlyStateGuidance {
+            return guidance.headline
+        }
         if let action = vm.nextBestAction {
             return action.title
         }
@@ -160,6 +168,114 @@ struct CoachTabView: View {
             return "Momentum is yours. Keep pushing."
         }
         return "You're on plan. Stay the course."
+    }
+
+    // MARK: - Early State
+
+    @ViewBuilder
+    private var earlyStateCard: some View {
+        if let guidance = vm.earlyStateGuidance {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 6) {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(STRQBrand.accentGradient)
+                        .frame(width: 3, height: 14)
+                    Text("COACH CALIBRATION")
+                        .font(.system(size: 10, weight: .black))
+                        .tracking(1.2)
+                        .foregroundStyle(.primary)
+                    Spacer()
+                    Text(guidance.tier.label.uppercased())
+                        .font(.system(size: 9, weight: .bold))
+                        .tracking(0.4)
+                        .foregroundStyle(STRQBrand.steel)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+                }
+
+                HStack(alignment: .top, spacing: 14) {
+                    Image(systemName: guidance.icon)
+                        .font(.title3.weight(.medium))
+                        .foregroundStyle(.white)
+                        .frame(width: 46, height: 46)
+                        .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 12))
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(guidance.message)
+                            .font(.subheadline)
+                            .foregroundStyle(.primary.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
+                        if let unlocks = guidance.unlocksNext {
+                            HStack(spacing: 5) {
+                                Image(systemName: "lock.open.fill")
+                                    .font(.system(size: 9))
+                                Text(unlocks)
+                                    .font(.caption2.weight(.semibold))
+                            }
+                            .foregroundStyle(STRQBrand.steel)
+                        }
+                    }
+                    Spacer(minLength: 0)
+                }
+            }
+            .padding(16)
+            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+            )
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+            .animation(.easeOut(duration: 0.5).delay(0.05), value: appeared)
+        }
+    }
+
+    private var calibrationChecklist: some View {
+        let tier = vm.dataMaturityTier
+        let completed = vm.totalCompletedWorkouts
+        let weekSessions = vm.weeklyStats.sessions
+        let planned = vm.profile.daysPerWeek
+
+        let items: [(String, String, Bool)] = [
+            ("Plan generated", "doc.text.fill", vm.currentPlan != nil),
+            ("First session logged", "figure.strengthtraining.traditional", completed >= 1),
+            ("Baseline loads locked", "scalemass.fill", completed >= 2),
+            ("Weekly signal ready", "chart.line.uptrend.xyaxis", weekSessions >= max(1, planned - 1)),
+            ("Progression intelligence", "brain.head.profile.fill", tier == .established)
+        ]
+
+        return VStack(alignment: .leading, spacing: 10) {
+            ForgeSectionHeader(title: "Unlock Path")
+
+            VStack(spacing: 8) {
+                ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                    HStack(spacing: 12) {
+                        Image(systemName: item.2 ? "checkmark.circle.fill" : "circle")
+                            .font(.subheadline)
+                            .foregroundStyle(item.2 ? .green : STRQBrand.steel.opacity(0.55))
+                            .frame(width: 22)
+                        Image(systemName: item.1)
+                            .font(.caption)
+                            .foregroundStyle(item.2 ? .primary : .secondary)
+                            .frame(width: 20)
+                        Text(item.0)
+                            .font(.subheadline.weight(item.2 ? .semibold : .medium))
+                            .foregroundStyle(item.2 ? .primary : .secondary)
+                        Spacer()
+                    }
+                }
+            }
+            .padding(14)
+            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+            )
+        }
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 10)
+        .animation(.easeOut(duration: 0.5).delay(0.1), value: appeared)
     }
 
     // MARK: - Direction (Your Move)
@@ -368,46 +484,65 @@ struct CoachTabView: View {
 
     // MARK: - Weekly Check-In
 
+    @ViewBuilder
     private var weeklyCheckInRow: some View {
         VStack(spacing: 10) {
-            if let quality = vm.planQuality {
+            if !vm.isEarlyStage, let quality = vm.planQuality {
                 planQualityRow(quality)
             }
 
-            Button {
-                vm.generateWeeklyReview()
-                showWeeklyReview = true
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "doc.text.magnifyingglass")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(.white)
-                        .frame(width: 36, height: 36)
-                        .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Weekly Check-In")
-                            .font(.subheadline.weight(.semibold))
-                        Text("Review your week and adjust")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.quaternary)
+            if vm.isWeeklyReviewReady {
+                Button {
+                    vm.generateWeeklyReview()
+                    showWeeklyReview = true
+                } label: {
+                    weeklyReviewLabel(subtitle: "Review your week and adjust", ready: true)
                 }
-                .padding(14)
-                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-                )
+            } else if vm.isEarlyStage {
+                weeklyReviewLabel(subtitle: vm.sessionsUntilReviewReady == 0 ? "Log another session to unlock" : "Unlocks in \(vm.sessionsUntilReviewReady) more session\(vm.sessionsUntilReviewReady == 1 ? "" : "s") this week", ready: false)
+                    .opacity(0.7)
+            } else {
+                Button {
+                    vm.generateWeeklyReview()
+                    showWeeklyReview = true
+                } label: {
+                    weeklyReviewLabel(subtitle: "Review your week and adjust", ready: true)
+                }
             }
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(.easeOut(duration: 0.5).delay(0.18), value: appeared)
+    }
+
+    private func weeklyReviewLabel(subtitle: String, ready: Bool) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: ready ? "doc.text.magnifyingglass" : "lock.fill")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.white)
+                .frame(width: 36, height: 36)
+                .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Weekly Check-In")
+                    .font(.subheadline.weight(.semibold))
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            if ready {
+                Image(systemName: "chevron.right")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.quaternary)
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
     }
 
     private func planQualityRow(_ quality: PlanQualityScore) -> some View {

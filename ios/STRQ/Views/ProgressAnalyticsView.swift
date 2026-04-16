@@ -48,22 +48,41 @@ struct ProgressAnalyticsView: View {
             let cal = Calendar.current
             return vm.personalRecords.filter { cal.isDate($0.date, equalTo: Date(), toGranularity: .month) }.count
         }()
+        let tier = vm.dataMaturityTier
         let headline: (String, String) = {
-            if progressing > 0 {
-                return ("\(progressing)", "lifts progressing")
-            } else if prsThisMonth > 0 {
-                return ("\(prsThisMonth)", "PRs this month")
-            } else {
+            switch tier {
+            case .fresh:
+                return ("0", "baseline session")
+            case .firstSession:
+                return ("1", "session logged")
+            case .earlyWeek:
                 return ("\(vm.totalCompletedWorkouts)", "sessions logged")
+            case .established:
+                if progressing > 0 {
+                    return ("\(progressing)", "lifts progressing")
+                } else if prsThisMonth > 0 {
+                    return ("\(prsThisMonth)", "PRs this month")
+                } else {
+                    return ("\(vm.totalCompletedWorkouts)", "sessions logged")
+                }
             }
         }()
         let sub: String = {
-            if progressing > 0 && prsThisMonth > 0 {
-                return "\(prsThisMonth) PR\(prsThisMonth == 1 ? "" : "s") this month · \(vm.streak)-day streak"
-            } else if vm.streak > 0 {
-                return "\(vm.streak)-day streak · keep the signal strong"
-            } else {
-                return "Train to build your signal"
+            switch tier {
+            case .fresh:
+                return "Your first session sets the signal"
+            case .firstSession:
+                return "Log a few more — trends unlock next"
+            case .earlyWeek:
+                return "\(vm.streak)-day streak · coach is calibrating"
+            case .established:
+                if progressing > 0 && prsThisMonth > 0 {
+                    return "\(prsThisMonth) PR\(prsThisMonth == 1 ? "" : "s") this month · \(vm.streak)-day streak"
+                } else if vm.streak > 0 {
+                    return "\(vm.streak)-day streak · keep the signal strong"
+                } else {
+                    return "Train to build your signal"
+                }
             }
         }()
 
@@ -199,12 +218,65 @@ struct ProgressAnalyticsView: View {
     @ViewBuilder
     private var strengthSignals: some View {
         VStack(spacing: 14) {
-            strengthChart
+            if vm.hasEnoughDataForStrengthChart {
+                strengthChart
+            } else {
+                strengthBaselineCard
+            }
             prHighlights
             consistencyHeatmap
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
+    }
+
+    private var strengthBaselineCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForgeSectionHeader(title: "Estimated 1RM", trailing: "Locked")
+
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 10) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.title3)
+                        .foregroundStyle(STRQBrand.steel)
+                        .frame(width: 40, height: 40)
+                        .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 10))
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Baseline in progress")
+                            .font(.subheadline.weight(.semibold))
+                        Text(vm.totalCompletedWorkouts == 0
+                             ? "Your strength chart unlocks after your first two sessions on the main lifts."
+                             : "One more session with a main lift and your 1RM trend lights up.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 0)
+                }
+
+                HStack(spacing: 6) {
+                    ForEach(["Bench", "Squat", "Deadlift"], id: \.self) { lift in
+                        HStack(spacing: 4) {
+                            Image(systemName: "circle.dashed")
+                                .font(.system(size: 9))
+                            Text(lift)
+                                .font(.caption2.weight(.semibold))
+                        }
+                        .foregroundStyle(.tertiary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.white.opacity(0.04), in: Capsule())
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
     }
 
     private var strengthChart: some View {

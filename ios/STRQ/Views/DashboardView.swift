@@ -19,6 +19,11 @@ struct DashboardView: View {
                 todayAction
                     .padding(.horizontal, 16)
 
+                if let guidance = vm.earlyStateGuidance {
+                    earlyStageHint(guidance)
+                        .padding(.horizontal, 16)
+                }
+
                 scheduleTimeline
                     .padding(.horizontal, 16)
 
@@ -76,6 +81,45 @@ struct DashboardView: View {
                 .presentationDragIndicator(.hidden)
                 .presentationContentInteraction(.scrolls)
         }
+    }
+
+    private func earlyStageHint(_ guidance: EarlyStateGuidance) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: guidance.icon)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.white)
+                .frame(width: 36, height: 36)
+                .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(guidance.headline)
+                    .font(.subheadline.weight(.semibold))
+                Text(guidance.message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let unlocks = guidance.unlocksNext {
+                    HStack(spacing: 4) {
+                        Image(systemName: "lock.open.fill")
+                            .font(.system(size: 9))
+                        Text(unlocks)
+                            .font(.caption2.weight(.semibold))
+                    }
+                    .foregroundStyle(STRQBrand.steel)
+                    .padding(.top, 2)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+        .animation(.easeOut(duration: 0.5).delay(0.07), value: appeared)
     }
 
     private var todayHero: some View {

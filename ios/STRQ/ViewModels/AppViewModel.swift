@@ -1551,6 +1551,94 @@ class AppViewModel {
         let proteinHits = last7.filter { Double($0.proteinGrams) / Double(max(1, nutritionTarget.proteinGrams)) >= 0.8 }.count
         return Double(proteinHits) / Double(last7.count)
     }
+
+    // MARK: - Early-State Intelligence
+
+    var dataMaturityTier: DataMaturityTier {
+        let completed = totalCompletedWorkouts
+        if completed == 0 { return .fresh }
+        if completed == 1 { return .firstSession }
+        if completed <= 3 { return .earlyWeek }
+        return .established
+    }
+
+    var isEarlyStage: Bool { dataMaturityTier < .established }
+
+    var earlyStateGuidance: EarlyStateGuidance? {
+        let tier = dataMaturityTier
+        switch tier {
+        case .fresh:
+            return EarlyStateGuidance(
+                tier: tier,
+                headline: "Let's lock in your baseline",
+                message: "Your plan is built. Your first session is the starting point — STRQ calibrates from what you actually lift.",
+                primaryAction: todaysWorkout == nil ? "Open your plan" : "Start your first session",
+                unlocksNext: "First session unlocks real progression signals",
+                icon: "sparkles"
+            )
+        case .firstSession:
+            return EarlyStateGuidance(
+                tier: tier,
+                headline: "Baseline set. Build from here.",
+                message: "Your first session is in. A few more and STRQ will start spotting progression, balance, and fatigue patterns.",
+                primaryAction: "Log session 2",
+                unlocksNext: "Progression signals unlock around session 3",
+                icon: "chart.line.uptrend.xyaxis"
+            )
+        case .earlyWeek:
+            return EarlyStateGuidance(
+                tier: tier,
+                headline: "Coach is calibrating",
+                message: "A couple more sessions and your coach will start making sharper calls on load, reps, and recovery.",
+                primaryAction: "Keep the week going",
+                unlocksNext: "Weekly review unlocks after \(max(0, max(1, profile.daysPerWeek - 1) - weeklyStats.sessions)) more session\(max(0, max(1, profile.daysPerWeek - 1) - weeklyStats.sessions) == 1 ? "" : "s") this week",
+                icon: "waveform.path.ecg"
+            )
+        case .established:
+            return nil
+        }
+    }
+
+    var hasEnoughDataForStrengthChart: Bool {
+        strengthProgress.count >= 2
+    }
+
+    var hasEnoughDataForTrends: Bool {
+        dataMaturityTier >= .established
+    }
+
+    var sessionsUntilReviewReady: Int {
+        let needed = max(1, profile.daysPerWeek - 1)
+        let have = weeklyStats.sessions
+        return max(0, needed - have)
+    }
+}
+
+nonisolated enum DataMaturityTier: Int, Sendable, Comparable {
+    case fresh = 0
+    case firstSession = 1
+    case earlyWeek = 2
+    case established = 3
+
+    static func < (lhs: DataMaturityTier, rhs: DataMaturityTier) -> Bool { lhs.rawValue < rhs.rawValue }
+
+    var label: String {
+        switch self {
+        case .fresh: return "Getting started"
+        case .firstSession: return "First session logged"
+        case .earlyWeek: return "Building your baseline"
+        case .established: return "Signal locked in"
+        }
+    }
+}
+
+nonisolated struct EarlyStateGuidance: Sendable {
+    let tier: DataMaturityTier
+    let headline: String
+    let message: String
+    let primaryAction: String
+    let unlocksNext: String?
+    let icon: String
 }
 
 nonisolated struct ActiveWorkoutState: Codable, Sendable {
