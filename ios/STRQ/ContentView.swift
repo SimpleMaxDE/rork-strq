@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var vm = AppViewModel()
-    @State private var store = StoreViewModel()
+    @Bindable var vm: AppViewModel
+    var store: StoreViewModel
     @State private var selectedTab: Int = 0
 
     var body: some View {

@@ -384,12 +384,35 @@ struct ProfileView: View {
                     .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
             )
 
-            Text("STRQ v1.0")
-                .font(.caption)
+            legalLinks
+                .padding(.top, 4)
+
+            Text(appVersionString)
+                .font(.caption2)
                 .foregroundStyle(.quaternary)
                 .frame(maxWidth: .infinity)
                 .padding(.top, 6)
         }
+    }
+
+    private var legalLinks: some View {
+        HStack(spacing: 18) {
+            Link("Privacy", destination: URL(string: "https://rork.com/privacy")!)
+            Text("·").foregroundStyle(.quaternary)
+            Link("Terms", destination: URL(string: "https://rork.com/terms")!)
+            Text("·").foregroundStyle(.quaternary)
+            Link("Support", destination: URL(string: "mailto:support@rork.com")!)
+        }
+        .font(.caption.weight(.medium))
+        .foregroundStyle(.secondary)
+        .frame(maxWidth: .infinity)
+    }
+
+    private var appVersionString: String {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = info?["CFBundleVersion"] as? String ?? "1"
+        return "STRQ v\(version) (\(build))"
     }
 
     // MARK: - Components

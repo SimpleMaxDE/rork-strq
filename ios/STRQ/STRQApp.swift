@@ -5,6 +5,8 @@ import RevenueCat
 struct STRQApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var isFirstLaunch: Bool = !UserDefaults.standard.bool(forKey: "strq_has_launched_before")
+    @State private var vm = AppViewModel()
+    @State private var store = StoreViewModel()
 
     init() {
         let apiKey: String
@@ -31,7 +33,7 @@ struct STRQApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(vm: vm, store: store)
                 .onAppear {
                     Analytics.shared.appOpened(isFirstLaunch: isFirstLaunch)
                     if isFirstLaunch {
@@ -41,8 +43,16 @@ struct STRQApp: App {
                 }
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
+            switch phase {
+            case .active:
                 Analytics.shared.track(.app_became_active)
+            case .background, .inactive:
+                if vm.activeWorkout != nil {
+                    vm.saveActiveWorkoutDraft()
+                    ErrorReporter.shared.breadcrumb("Active workout draft saved on background", category: "training")
+                }
+            @unknown default:
+                break
             }
         }
     }
