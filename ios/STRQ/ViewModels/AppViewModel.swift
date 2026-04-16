@@ -116,32 +116,9 @@ class AppViewModel {
             refreshNutritionInsights()
             refreshDailyState()
         } else if legacyOnboardingFlag {
-            isHydrating = true
-            self.hasCompletedOnboarding = true
-            self.profile = DemoData.profile
-            self.workoutHistory = DemoData.workoutHistory
-            self.personalRecords = DemoData.personalRecords
-            self.progressEntries = DemoData.progressEntries
-            self.recommendations = DemoData.recommendations
-            self.favoriteExerciseIds = Set(["barbell-bench-press", "pull-up", "barbell-squat", "romanian-deadlift", "lateral-raise"])
-            self.trainingPhaseState = DemoData.trainingPhaseState
-            self.progressionStates = DemoData.progressionStates
-            self.nutritionTarget = DemoData.nutritionTarget
-            self.nutritionLogs = DemoData.nutritionLogs
-            self.bodyWeightEntries = DemoData.bodyWeightEntries
-            self.sleepEntries = DemoData.sleepEntries
-            self.currentPlan = PlanGenerator().generate(
-                for: DemoData.profile,
-                muscleBalance: DemoData.muscleBalance,
-                recentSessions: DemoData.workoutHistory,
-                recoveryScore: 78,
-                phase: DemoData.trainingPhaseState.currentPhase
-            )
-            isHydrating = false
-            refreshIntelligence()
-            refreshNutritionInsights()
+            self.hasCompletedOnboarding = false
+            UserDefaults.standard.removeObject(forKey: "hasCompletedOnboarding")
             refreshDailyState()
-            persist()
         } else {
             self.hasCompletedOnboarding = false
             refreshDailyState()
@@ -235,11 +212,11 @@ class AppViewModel {
     }
 
     func finishPlanGeneration() {
-        workoutHistory = DemoData.workoutHistory
-        personalRecords = DemoData.personalRecords
-        progressEntries = DemoData.progressEntries
-        trainingPhaseState = DemoData.trainingPhaseState
-        progressionStates = DemoData.progressionStates
+        workoutHistory = []
+        personalRecords = []
+        progressEntries = []
+        trainingPhaseState = TrainingPhaseState()
+        progressionStates = []
         generatePlan()
         refreshIntelligence()
         onboardingPhase = .reveal
@@ -263,9 +240,9 @@ class AppViewModel {
         Analytics.shared.track(.plan_reveal_started_training)
         ErrorReporter.shared.breadcrumb("Onboarding completed", category: "onboarding")
         nutritionTarget = nutritionEngine.computeTargets(profile: profile)
-        if nutritionLogs.isEmpty { nutritionLogs = DemoData.nutritionLogs }
-        if bodyWeightEntries.isEmpty { bodyWeightEntries = DemoData.bodyWeightEntries }
-        if sleepEntries.isEmpty { sleepEntries = DemoData.sleepEntries }
+        if bodyWeightEntries.isEmpty {
+            bodyWeightEntries = [BodyWeightEntry(weightKg: profile.weightKg, bodyFatPercent: profile.bodyFatPercentage)]
+        }
         refreshDailyState()
         refreshNutritionInsights()
         persist()
@@ -295,7 +272,7 @@ class AppViewModel {
             phase: trainingPhaseState.currentPhase,
             volumeLandmarks: volumeLandmarks
         )
-        _dynamicInsights = newInsights.isEmpty ? DemoData.insights : newInsights
+        _dynamicInsights = newInsights
 
         let newRecs = coachingEngine.generateRecommendations(
             profile: profile,
@@ -306,7 +283,7 @@ class AppViewModel {
             progressionStates: progressionStates,
             phase: trainingPhaseState.currentPhase
         )
-        recommendations = newRecs.isEmpty ? DemoData.recommendations : newRecs
+        recommendations = newRecs
     }
 
     func refreshIntelligence() {
@@ -321,10 +298,7 @@ class AppViewModel {
     private func refreshProgressionStates() {
         let exerciseIds = Set(workoutHistory.flatMap(\.exerciseLogs).map(\.exerciseId))
         progressionStates = exerciseIds.prefix(10).map { exId in
-            if let existing = DemoData.progressionStates.first(where: { $0.exerciseId == exId }) {
-                return existing
-            }
-            return progressionEngine.analyzeProgression(
+            progressionEngine.analyzeProgression(
                 exerciseId: exId,
                 sessions: workoutHistory,
                 profile: profile,
@@ -551,16 +525,99 @@ class AppViewModel {
                 break
             }
         }
-        return max(streakCount, DemoData.streak)
+        return streakCount
     }
 
     private var _dynamicInsights: [SmartInsight] = []
-    var insights: [SmartInsight] {
-        _dynamicInsights.isEmpty ? DemoData.insights : _dynamicInsights
+    var insights: [SmartInsight] { _dynamicInsights }
+
+    var weeklyActivity: [DayActivity] {
+        let calendar = Calendar.current
+        let weekdaySymbols = ["S", "M", "T", "W", "T", "F", "S"]
+        return (0..<7).reversed().map { offset in
+            let date = calendar.date(byAdding: .day, value: -offset, to: Date()) ?? Date()
+            let weekday = calendar.component(.weekday, from: date) - 1
+            let session = workoutHistory.first { calendar.isDate($0.startTime, inSameDayAs: date) && $0.isCompleted }
+            let duration: Int = {
+                guard let s = session, let end = s.endTime else { return 0 }
+                return Int(end.timeIntervalSince(s.startTime) / 60)
+            }()
+            return DayActivity(
+                label: weekdaySymbols[weekday],
+                date: date,
+                didTrain: session != nil,
+                volume: session?.totalVolume ?? 0,
+                duration: duration
+            )
+        }
     }
-    var weeklyActivity: [DayActivity] { DemoData.weeklyActivity }
-    var muscleBalance: [MuscleBalanceEntry] { DemoData.muscleBalance }
-    var strengthProgress: [StrengthEntry] { DemoData.strengthProgress }
+
+    var muscleBalance: [MuscleBalanceEntry] {
+        let calendar = Calendar.current
+        let weekAgo = calendar.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+        let fourWeeksAgo = calendar.date(byAdding: .day, value: -28, to: Date()) ?? Date()
+
+        let thisWeek = progressEntries.filter { $0.date > weekAgo }
+        let fourWeek = progressEntries.filter { $0.date > fourWeeksAgo }
+
+        let muscles = ["Chest", "Back", "Shoulders", "Quads", "Hamstrings", "Glutes", "Arms", "Abs"]
+        let keyMap: [String: String] = [
+            "Chest": "chest", "Back": "back", "Shoulders": "shoulders",
+            "Quads": "quads", "Hamstrings": "hamstrings", "Glutes": "glutes",
+            "Arms": "arms", "Abs": "abs"
+        ]
+
+        return muscles.map { name in
+            let key = keyMap[name] ?? name.lowercased()
+            let weekVol = thisWeek.reduce(0.0) { $0 + ($1.muscleGroupVolume[key] ?? 0) }
+            let totalVol = fourWeek.reduce(0.0) { $0 + ($1.muscleGroupVolume[key] ?? 0) }
+            let weeks = max(1, min(4, fourWeek.count / 7 + 1))
+            let avg = totalVol / Double(weeks)
+            return MuscleBalanceEntry(muscle: name, thisWeek: weekVol, average: avg)
+        }
+    }
+
+    var strengthProgress: [StrengthEntry] {
+        let calendar = Calendar.current
+        let benchIds: Set<String> = ["barbell-bench-press", "bench-press"]
+        let squatIds: Set<String> = ["barbell-squat", "back-squat"]
+        let deadliftIds: Set<String> = ["deadlift", "conventional-deadlift", "barbell-deadlift"]
+        let ohpIds: Set<String> = ["overhead-press", "barbell-overhead-press", "ohp"]
+
+        func best1RM(in sessions: [WorkoutSession], ids: Set<String>) -> Double {
+            var best: Double = 0
+            for s in sessions {
+                for log in s.exerciseLogs where ids.contains(log.exerciseId) {
+                    for set in log.sets where set.isCompleted && set.reps > 0 {
+                        let oneRM = set.weight * (1.0 + Double(set.reps) / 30.0)
+                        if oneRM > best { best = oneRM }
+                    }
+                }
+            }
+            return best
+        }
+
+        var lastKnown: (bench: Double, squat: Double, deadlift: Double, ohp: Double) = (0, 0, 0, 0)
+        var entries: [StrengthEntry] = []
+        for weekOffset in (0..<8).reversed() {
+            let weekStart = calendar.date(byAdding: .weekOfYear, value: -weekOffset, to: Date()) ?? Date()
+            let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart) ?? Date()
+            let weekSessions = workoutHistory.filter { $0.startTime >= weekStart && $0.startTime < weekEnd && $0.isCompleted }
+            let b = best1RM(in: weekSessions, ids: benchIds)
+            let s = best1RM(in: weekSessions, ids: squatIds)
+            let d = best1RM(in: weekSessions, ids: deadliftIds)
+            let o = best1RM(in: weekSessions, ids: ohpIds)
+            let bench = b > 0 ? b : lastKnown.bench
+            let squat = s > 0 ? s : lastKnown.squat
+            let dead = d > 0 ? d : lastKnown.deadlift
+            let ohp = o > 0 ? o : lastKnown.ohp
+            lastKnown = (bench, squat, dead, ohp)
+            if bench + squat + dead + ohp > 0 {
+                entries.append(StrengthEntry(date: weekStart, bench: bench, squat: squat, deadlift: dead, ohp: ohp))
+            }
+        }
+        return entries
+    }
 
     var highPriorityInsights: [SmartInsight] {
         insights.filter { $0.severity == .high || $0.severity == .medium }
