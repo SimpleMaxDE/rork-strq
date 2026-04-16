@@ -249,13 +249,22 @@ class AppViewModel {
     }
 
     func generatePlan() {
-        currentPlan = PlanGenerator().generate(
+        var plan = PlanGenerator().generate(
             for: profile,
             muscleBalance: muscleBalance,
             recentSessions: workoutHistory,
             recoveryScore: recoveryScore,
             phase: trainingPhaseState.currentPhase
         )
+        let preferred = profile.preferredTrainingDays.isEmpty
+            ? defaultTrainingDays(count: plan.days.count)
+            : Array(profile.preferredTrainingDays.prefix(plan.days.count))
+        for i in plan.days.indices where i < preferred.count {
+            if plan.days[i].scheduledWeekday == nil {
+                plan.days[i].scheduledWeekday = preferred[i]
+            }
+        }
+        currentPlan = plan
         refreshPlanQuality()
         persist()
     }
@@ -489,8 +498,14 @@ class AppViewModel {
 
     var todaysWorkout: WorkoutDay? {
         guard let plan = currentPlan else { return nil }
-        let dayIndex = Calendar.current.component(.weekday, from: Date()) % plan.days.count
-        return plan.days[dayIndex]
+        let todayWeekday = Calendar.current.component(.weekday, from: Date())
+        if plan.days.contains(where: { $0.scheduledWeekday != nil }) {
+            return plan.days.first { $0.scheduledWeekday == todayWeekday && !$0.isSkipped }
+        }
+        let active = plan.days.filter { !$0.isSkipped }
+        guard !active.isEmpty else { return nil }
+        let dayIndex = todayWeekday % active.count
+        return active[dayIndex]
     }
 
     var weeklyStats: (sessions: Int, volume: Double, sets: Int) {

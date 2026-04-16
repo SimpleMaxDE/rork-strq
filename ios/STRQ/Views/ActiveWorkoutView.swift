@@ -316,6 +316,10 @@ struct ActiveWorkoutView: View {
                     }
 
                     HStack(spacing: 24) {
+                        let exerciseForIncrement = vm.library.exercise(byId: log.exerciseId)
+                        let increment = weightIncrement(for: exerciseForIncrement)
+                        let isBodyweight = increment <= 0
+
                         VStack(spacing: 8) {
                             Text("WEIGHT")
                                 .font(.system(size: 9, weight: .bold))
@@ -323,20 +327,27 @@ struct ActiveWorkoutView: View {
                                 .tracking(0.5)
 
                             HStack(spacing: 0) {
-                                Button { updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: max(0, setLog.weight - 2.5), reps: setLog.reps) } label: {
+                                Button {
+                                    let step = isBodyweight ? 1.0 : increment
+                                    updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: max(0, setLog.weight - step), reps: setLog.reps)
+                                } label: {
                                     Image(systemName: "minus")
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
                                         .frame(width: 44, height: 56)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
                                 }
+                                .disabled(isBodyweight && setLog.weight <= 0)
 
-                                Text(String(format: "%.1f", setLog.weight))
+                                Text(isBodyweight && setLog.weight <= 0 ? "BW" : formatWeight(setLog.weight, increment: increment))
                                     .font(.system(size: 48, weight: .heavy, design: .rounded).monospacedDigit())
                                     .frame(minWidth: 96)
                                     .contentTransition(.numericText())
 
-                                Button { updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight + 2.5, reps: setLog.reps) } label: {
+                                Button {
+                                    let step = isBodyweight ? 1.0 : increment
+                                    updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight + step, reps: setLog.reps)
+                                } label: {
                                     Image(systemName: "plus")
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
@@ -345,7 +356,7 @@ struct ActiveWorkoutView: View {
                                 }
                             }
 
-                            Text("kg")
+                            Text(isBodyweight ? "added load" : "kg")
                                 .font(.system(size: 10, weight: .medium))
                                 .foregroundStyle(.tertiary)
                         }
@@ -875,6 +886,26 @@ struct ActiveWorkoutView: View {
         let mins = seconds / 60
         let secs = seconds % 60
         return String(format: "%02d:%02d", mins, secs)
+    }
+
+    private func weightIncrement(for exercise: Exercise?) -> Double {
+        guard let ex = exercise else { return 2.5 }
+        if ex.category == .bodyweight { return 0 }
+        if ex.equipment.contains(.kettlebell) { return 4.0 }
+        if ex.equipment.contains(.barbell) { return 2.5 }
+        if ex.equipment.contains(.dumbbell) { return 2.0 }
+        if ex.equipment.contains(.machine) || ex.equipment.contains(.cable) {
+            return ex.category == .isolation ? 2.5 : 2.5
+        }
+        if ex.category == .isolation { return 1.25 }
+        return 2.5
+    }
+
+    private func formatWeight(_ weight: Double, increment: Double) -> String {
+        if increment > 0 && increment.truncatingRemainder(dividingBy: 1) == 0 && weight.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(format: "%.0f", weight)
+        }
+        return String(format: "%.1f", weight)
     }
 
     private func guidanceColor(_ name: String) -> Color {
