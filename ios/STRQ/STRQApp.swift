@@ -3,6 +3,9 @@ import RevenueCat
 
 @main
 struct STRQApp: App {
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var isFirstLaunch: Bool = !UserDefaults.standard.bool(forKey: "strq_has_launched_before")
+
     init() {
         let apiKey: String
         #if DEBUG
@@ -15,6 +18,7 @@ struct STRQApp: App {
 
         guard !apiKey.isEmpty else {
             print("[STRQ] RevenueCat API key not configured — skipping initialization")
+            ErrorReporter.shared.breadcrumb("RevenueCat not configured", category: "subscription")
             return
         }
 
@@ -22,11 +26,24 @@ struct STRQApp: App {
         Purchases.logLevel = .debug
         #endif
         Purchases.configure(withAPIKey: apiKey)
+        ErrorReporter.shared.breadcrumb("RevenueCat configured", category: "subscription")
     }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    Analytics.shared.appOpened(isFirstLaunch: isFirstLaunch)
+                    if isFirstLaunch {
+                        UserDefaults.standard.set(true, forKey: "strq_has_launched_before")
+                        isFirstLaunch = false
+                    }
+                }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Analytics.shared.track(.app_became_active)
+            }
         }
     }
 }

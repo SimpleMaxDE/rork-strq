@@ -27,6 +27,12 @@ struct ProfileView: View {
         .background(Color(.systemBackground))
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.large)
+        .onAppear {
+            Analytics.shared.track(.profile_viewed, ["pro": store.isPro ? "true" : "false"])
+            if store.isPro {
+                Analytics.shared.track(.subscription_active_viewed)
+            }
+        }
         .alert("Reset All Data?", isPresented: $showResetAlert) {
             Button("Reset", role: .destructive) {
                 vm.resetAllData()
@@ -94,7 +100,10 @@ struct ProfileView: View {
 
                     Divider().opacity(0.3).padding(.horizontal, 14)
 
-                    Button { showManageSubscription = true } label: {
+                    Button {
+                    Analytics.shared.track(.manage_subscription_opened)
+                    showManageSubscription = true
+                } label: {
                         HStack(spacing: 10) {
                             Image(systemName: "creditcard.fill")
                                 .font(.caption)
@@ -117,7 +126,10 @@ struct ProfileView: View {
                         .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
                 )
             } else {
-                Button { showPaywall = true } label: {
+                Button {
+                    Analytics.shared.track(.paywall_viewed, ["source": "profile"])
+                    showPaywall = true
+                } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "bolt.fill")
                             .font(.subheadline.weight(.semibold))

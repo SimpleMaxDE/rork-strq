@@ -30,6 +30,7 @@ struct CoachTabView: View {
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
             lastAppliedCount = vm.appliedActionIds.count
+            Analytics.shared.track(.coach_viewed)
         }
         .onChange(of: vm.appliedActionIds.count) { old, new in
             if new > old {

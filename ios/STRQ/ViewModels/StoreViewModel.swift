@@ -52,6 +52,7 @@ class StoreViewModel {
         guard isConfigured else { return }
         isLoading = true
         defer { isLoading = false }
+        ErrorReporter.shared.breadcrumb("Fetching offerings", category: "subscription")
         do {
             offerings = try await Purchases.shared.offerings()
             let info = try await Purchases.shared.customerInfo()
@@ -59,6 +60,7 @@ class StoreViewModel {
             isPro = info.entitlements["pro"]?.isActive == true
         } catch {
             self.error = error.localizedDescription
+            ErrorReporter.shared.report(error, context: ["flow": "fetchOfferings"])
         }
     }
 
@@ -66,31 +68,54 @@ class StoreViewModel {
         guard isConfigured else { return }
         isPurchasing = true
         defer { isPurchasing = false }
+        Analytics.shared.track(.purchase_started, [
+            "package": package.identifier,
+            "product": package.storeProduct.productIdentifier
+        ])
+        ErrorReporter.shared.breadcrumb("Purchase started \(package.identifier)", category: "subscription")
         do {
             let result = try await Purchases.shared.purchase(package: package)
             if !result.userCancelled {
                 isPro = result.customerInfo.entitlements["pro"]?.isActive == true
                 customerInfo = result.customerInfo
+                Analytics.shared.track(.purchase_completed, [
+                    "package": package.identifier,
+                    "is_pro": isPro ? "true" : "false"
+                ])
+            } else {
+                Analytics.shared.track(.purchase_failed, ["reason": "cancelled"])
             }
         } catch ErrorCode.purchaseCancelledError {
+            Analytics.shared.track(.purchase_failed, ["reason": "cancelled"])
         } catch ErrorCode.paymentPendingError {
+            Analytics.shared.track(.purchase_failed, ["reason": "pending"])
         } catch {
             self.error = error.localizedDescription
+            Analytics.shared.track(.purchase_failed, ["reason": "error"])
+            ErrorReporter.shared.report(error, context: ["flow": "purchase", "package": package.identifier])
         }
     }
 
     func restore() async {
-        guard isConfigured else { return }
+        guard isConfigured else {
+            restoreMessage = "Subscriptions are not available in this environment."
+            Analytics.shared.track(.restore_failed, ["reason": "unconfigured"])
+            return
+        }
         isLoading = true
         restoreMessage = nil
         defer { isLoading = false }
+        Analytics.shared.track(.restore_started)
         do {
             let info = try await Purchases.shared.restorePurchases()
             isPro = info.entitlements["pro"]?.isActive == true
             customerInfo = info
             restoreMessage = isPro ? "Purchases restored successfully." : "No active subscriptions found."
+            Analytics.shared.track(.restore_completed, ["is_pro": isPro ? "true" : "false"])
         } catch {
             self.error = error.localizedDescription
+            Analytics.shared.track(.restore_failed, ["reason": "error"])
+            ErrorReporter.shared.report(error, context: ["flow": "restore"])
         }
     }
 

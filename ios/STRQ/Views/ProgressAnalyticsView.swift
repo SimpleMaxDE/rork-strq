@@ -36,6 +36,7 @@ struct ProgressAnalyticsView: View {
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
+            Analytics.shared.track(.progress_viewed)
         }
     }
 

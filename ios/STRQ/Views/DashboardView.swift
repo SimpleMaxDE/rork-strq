@@ -44,6 +44,7 @@ struct DashboardView: View {
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
             vm.refreshDailyState()
+            Analytics.shared.track(.today_viewed)
         }
         .sheet(isPresented: $showReadinessCheckIn) {
             ReadinessCheckInView(vm: vm) { readiness in

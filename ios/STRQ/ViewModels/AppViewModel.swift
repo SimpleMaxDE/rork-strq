@@ -76,6 +76,8 @@ class AppViewModel {
         let legacyOnboardingFlag = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
 
         if let saved = persistence.load() {
+            Analytics.shared.track(.persistence_loaded, ["source": "v1"])
+            ErrorReporter.shared.breadcrumb("Persistence loaded", category: "persistence")
             isHydrating = true
             self.hasCompletedOnboarding = saved.hasCompletedOnboarding
             self.profile = saved.profile
@@ -107,6 +109,7 @@ class AppViewModel {
                     restTimeRemaining: 0,
                     plannedExercises: draft.plannedExercises
                 )
+                Analytics.shared.track(.active_workout_restored, ["day": draft.session.dayName])
             }
             isHydrating = false
             refreshIntelligence()
@@ -184,6 +187,8 @@ class AppViewModel {
     }
 
     func resetAllData() {
+        Analytics.shared.track(.persistence_reset)
+        ErrorReporter.shared.breadcrumb("Reset all data", category: "persistence")
         persistence.clear()
         hasCompletedOnboarding = false
         profile = UserProfile()
@@ -221,6 +226,12 @@ class AppViewModel {
     func beginPlanGeneration() {
         profile.startWeightKg = profile.weightKg
         onboardingPhase = .generating
+        Analytics.shared.track(.plan_generation_started, [
+            "goal": profile.goal.displayName,
+            "level": profile.trainingLevel.shortName,
+            "days_per_week": String(profile.daysPerWeek)
+        ])
+        ErrorReporter.shared.breadcrumb("Plan generation started", category: "onboarding")
     }
 
     func finishPlanGeneration() {
@@ -232,6 +243,11 @@ class AppViewModel {
         generatePlan()
         refreshIntelligence()
         onboardingPhase = .reveal
+        Analytics.shared.track(.plan_generation_completed, [
+            "exercises": String(currentPlan?.days.flatMap(\.exercises).count ?? 0),
+            "days": String(currentPlan?.days.count ?? 0)
+        ])
+        Analytics.shared.track(.plan_reveal_viewed)
     }
 
     func completeOnboarding() {
@@ -239,6 +255,13 @@ class AppViewModel {
         hasCompletedOnboarding = true
         onboardingPhase = .form
         UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+        Analytics.shared.track(.onboarding_completed, [
+            "goal": profile.goal.displayName,
+            "level": profile.trainingLevel.shortName,
+            "days_per_week": String(profile.daysPerWeek)
+        ])
+        Analytics.shared.track(.plan_reveal_started_training)
+        ErrorReporter.shared.breadcrumb("Onboarding completed", category: "onboarding")
         nutritionTarget = nutritionEngine.computeTargets(profile: profile)
         if nutritionLogs.isEmpty { nutritionLogs = DemoData.nutritionLogs }
         if bodyWeightEntries.isEmpty { bodyWeightEntries = DemoData.bodyWeightEntries }
@@ -412,7 +435,17 @@ class AppViewModel {
     }
 
     func startWorkout(day: WorkoutDay) {
-        guard let plan = currentPlan else { return }
+        guard let plan = currentPlan else {
+            ErrorReporter.shared.reportMessage("startWorkout called without plan", level: .warning)
+            return
+        }
+        Analytics.shared.track(.workout_started, [
+            "day": day.name,
+            "exercises": String(day.exercises.count),
+            "phase": String(describing: trainingPhaseState.currentPhase),
+            "readiness": readinessBucket
+        ])
+        ErrorReporter.shared.breadcrumb("Workout started: \(day.name)", category: "training")
         let exerciseLogs = day.exercises.map { planned -> ExerciseLog in
             let today = todayPrescription(for: planned)
             let prefillWeight = today.suggestedWeight
@@ -436,7 +469,10 @@ class AppViewModel {
     }
 
     func completeWorkout() {
-        guard var workout = activeWorkout else { return }
+        guard var workout = activeWorkout else {
+            ErrorReporter.shared.reportMessage("completeWorkout called without active workout", level: .warning)
+            return
+        }
         workout.session.isCompleted = true
         workout.session.endTime = Date()
         workout.session.totalVolume = workout.session.exerciseLogs.reduce(0.0) { total, log in
@@ -456,6 +492,25 @@ class AppViewModel {
         activeWorkout = nil
         refreshIntelligence()
         persist()
+        Analytics.shared.track(.workout_completed, [
+            "day": workout.session.dayName,
+            "sets": String(entry.totalSets),
+            "reps": String(entry.totalReps),
+            "volume": String(Int(entry.totalVolume)),
+            "duration_min": String(entry.workoutDuration)
+        ])
+        ErrorReporter.shared.breadcrumb("Workout completed: \(workout.session.dayName)", category: "training")
+    }
+
+    var readinessBucket: String {
+        let score = effectiveRecoveryScore
+        switch score {
+        case 85...: return "peak"
+        case 70..<85: return "high"
+        case 55..<70: return "moderate"
+        case 40..<55: return "low"
+        default: return "very_low"
+        }
     }
 
     var todaysWorkout: WorkoutDay? {
@@ -590,6 +645,7 @@ class AppViewModel {
             currentPlan = plan
             coachAdjustments.append(adjustment)
             persist()
+            Analytics.shared.track(.coach_action_applied, ["type": "volume_reduced", "day_id": dayId])
         }
     }
 
@@ -604,6 +660,7 @@ class AppViewModel {
             currentPlan = plan
             coachAdjustments.append(adjustment)
             persist()
+            Analytics.shared.track(.coach_action_applied, ["type": "lighter_session", "day_id": dayId])
         }
     }
 
@@ -618,10 +675,17 @@ class AppViewModel {
             currentPlan = plan
             coachAdjustments.append(adjustment)
             persist()
+            Analytics.shared.track(.coach_action_applied, [
+                "type": "exercise_swapped",
+                "day_id": dayId,
+                "old": oldExerciseId,
+                "new": newExercise.id
+            ])
         }
     }
 
     func undoAdjustment(_ adjustment: CoachAdjustment) {
+        Analytics.shared.track(.coach_action_undone, ["type": String(describing: adjustment.type)])
         if adjustment.type == .weekRegenerated || adjustment.type == .deloadWeek {
             if let oldPlan = previousPlanBeforeWeekAction {
                 currentPlan = oldPlan
@@ -671,6 +735,7 @@ class AppViewModel {
 
     func applyWeekRegeneration() {
         guard var plan = currentPlan else { return }
+        Analytics.shared.track(.coach_action_applied, ["type": "week_regenerated"])
         if let (adjustment, oldPlan) = actionManager.applyWeekRegeneration(
             plan: &plan,
             profile: profile,
@@ -693,6 +758,7 @@ class AppViewModel {
 
     func applyDeloadWeek() {
         guard var plan = currentPlan else { return }
+        Analytics.shared.track(.coach_action_applied, ["type": "deload_week"])
         if let (adjustment, oldPlan) = actionManager.applyDeloadWeek(plan: &plan) {
             previousPlanBeforeWeekAction = oldPlan
             currentPlan = plan
@@ -740,8 +806,10 @@ class AppViewModel {
         guard var plan = currentPlan,
               let idx = plan.days.firstIndex(where: { $0.id == dayId }) else { return }
         plan.days[idx].isSkipped.toggle()
+        let event: AnalyticsEvent = plan.days[idx].isSkipped ? .workout_skipped : .workout_unskipped
         currentPlan = plan
         persist()
+        Analytics.shared.track(event, ["day_id": dayId])
     }
 
     func moveDayToNext(dayId: String) {
@@ -751,6 +819,7 @@ class AppViewModel {
         plan.days[idx].scheduledWeekday = (current % 7) + 1
         currentPlan = plan
         persist()
+        Analytics.shared.track(.workout_moved, ["day_id": dayId])
     }
 
     func autoScheduleDays() {
@@ -765,6 +834,7 @@ class AppViewModel {
         }
         currentPlan = plan
         persist()
+        Analytics.shared.track(.auto_schedule_used, ["days": String(plan.days.count)])
     }
 
     private func defaultTrainingDays(count: Int) -> [Int] {
@@ -1106,6 +1176,7 @@ class AppViewModel {
     func openWeeklyReview() {
         generateWeeklyReview()
         showWeeklyReview = true
+        Analytics.shared.track(.weekly_review_opened)
     }
 
     func dismissWeeklyReview() {
@@ -1115,6 +1186,7 @@ class AppViewModel {
     }
 
     func applyReviewAction(_ action: ReviewAction) {
+        Analytics.shared.track(.weekly_review_action_applied, ["type": String(describing: action.type)])
         switch action.type {
         case .keepAsIs:
             break
@@ -1165,6 +1237,10 @@ class AppViewModel {
         todaysReadiness = readiness
         readinessHistory.insert(readiness, at: 0)
         defer { persist() }
+        Analytics.shared.track(.readiness_logged, [
+            "score": String(readiness.readinessScore),
+            "bucket": readinessBucket
+        ])
 
         let response = dailyCoachEngine.generateCoachResponse(
             readiness: readiness,
@@ -1321,6 +1397,10 @@ class AppViewModel {
         }
         refreshNutritionInsights()
         persist()
+        Analytics.shared.track(.nutrition_logged, [
+            "calories": String(log.calories),
+            "protein_g": String(log.proteinGrams)
+        ])
     }
 
     func logBodyWeight(weight: Double, bodyFat: Double? = nil) {
@@ -1332,6 +1412,7 @@ class AppViewModel {
         }
         refreshNutritionInsights()
         persist()
+        Analytics.shared.track(.weight_logged, ["has_bf": bodyFat != nil ? "true" : "false"])
     }
 
     func logSleep(hours: Double, quality: ReadinessLevel) {
@@ -1339,6 +1420,10 @@ class AppViewModel {
         sleepEntries.insert(entry, at: 0)
         refreshNutritionInsights()
         persist()
+        Analytics.shared.track(.sleep_logged, [
+            "hours": String(format: "%.1f", hours),
+            "quality": String(describing: quality)
+        ])
     }
 
     var nutritionCoachSummary: String {

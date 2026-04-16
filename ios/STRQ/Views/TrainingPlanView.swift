@@ -87,6 +87,7 @@ struct TrainingPlanView: View {
             if let plan = vm.currentPlan {
                 autoSelectToday(plan)
             }
+            Analytics.shared.track(.train_viewed)
         }
     }
 
