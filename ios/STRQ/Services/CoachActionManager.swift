@@ -1,0 +1,569 @@
+import Foundation
+
+struct CoachAdjustment: Identifiable, Sendable {
+    let id: String
+    let type: CoachAdjustmentType
+    let dayId: String
+    let appliedAt: Date
+    let description: String
+    let details: [AdjustmentDetail]
+    let originalState: AdjustmentSnapshot?
+
+    init(id: String = UUID().uuidString, type: CoachAdjustmentType, dayId: String, appliedAt: Date = Date(), description: String, details: [AdjustmentDetail], originalState: AdjustmentSnapshot? = nil) {
+        self.id = id
+        self.type = type
+        self.dayId = dayId
+        self.appliedAt = appliedAt
+        self.description = description
+        self.details = details
+        self.originalState = originalState
+    }
+}
+
+nonisolated enum CoachAdjustmentType: String, Sendable {
+    case volumeReduced
+    case exerciseSwapped
+    case lighterSession
+    case weekRegenerated
+    case deloadWeek
+}
+
+struct AdjustmentDetail: Identifiable, Sendable {
+    let id: String
+    let exerciseName: String
+    let change: String
+
+    init(id: String = UUID().uuidString, exerciseName: String, change: String) {
+        self.id = id
+        self.exerciseName = exerciseName
+        self.change = change
+    }
+}
+
+struct AdjustmentSnapshot: Sendable {
+    let exercises: [PlannedExercise]
+}
+
+struct VolumeReductionPreview: Sendable {
+    let dayName: String
+    let reductions: [ExerciseReduction]
+    let originalTotalSets: Int
+    let newTotalSets: Int
+    let estimatedTimeSaved: Int
+}
+
+struct ExerciseReduction: Identifiable, Sendable {
+    let id: String
+    let exerciseName: String
+    let exerciseId: String
+    let originalSets: Int
+    let newSets: Int
+    let isAccessory: Bool
+
+    init(id: String = UUID().uuidString, exerciseName: String, exerciseId: String, originalSets: Int, newSets: Int, isAccessory: Bool) {
+        self.id = id
+        self.exerciseName = exerciseName
+        self.exerciseId = exerciseId
+        self.originalSets = originalSets
+        self.newSets = newSets
+        self.isAccessory = isAccessory
+    }
+}
+
+struct LighterSessionPreview: Sendable {
+    let dayName: String
+    let changes: [LighterChange]
+    let rpeReduction: Double
+    let estimatedTimeSaved: Int
+}
+
+struct LighterChange: Identifiable, Sendable {
+    let id: String
+    let exerciseName: String
+    let change: String
+
+    init(id: String = UUID().uuidString, exerciseName: String, change: String) {
+        self.id = id
+        self.exerciseName = exerciseName
+        self.change = change
+    }
+}
+
+struct WeekRegenerationPreview: Sendable {
+    let originalDays: [DayPreviewSummary]
+    let newDays: [DayPreviewSummary]
+    let changes: [WeekChangeItem]
+    let reason: String
+}
+
+struct DeloadWeekPreview: Sendable {
+    let originalDays: [DayPreviewSummary]
+    let deloadDays: [DayPreviewSummary]
+    let volumeReductionPercent: Int
+    let rpeReduction: Double
+    let estimatedTimeSaved: Int
+    let reason: String
+}
+
+struct DayPreviewSummary: Identifiable, Sendable {
+    let id: String
+    let name: String
+    let exerciseCount: Int
+    let totalSets: Int
+    let estimatedMinutes: Int
+    let muscles: [String]
+
+    init(id: String = UUID().uuidString, name: String, exerciseCount: Int, totalSets: Int, estimatedMinutes: Int, muscles: [String]) {
+        self.id = id
+        self.name = name
+        self.exerciseCount = exerciseCount
+        self.totalSets = totalSets
+        self.estimatedMinutes = estimatedMinutes
+        self.muscles = muscles
+    }
+}
+
+struct WeekChangeItem: Identifiable, Sendable {
+    let id: String
+    let dayName: String
+    let change: String
+    let type: WeekChangeType
+
+    init(id: String = UUID().uuidString, dayName: String, change: String, type: WeekChangeType) {
+        self.id = id
+        self.dayName = dayName
+        self.change = change
+        self.type = type
+    }
+}
+
+nonisolated enum WeekChangeType: Sendable {
+    case exerciseChanged
+    case volumeChanged
+    case emphasisChanged
+    case removed
+    case added
+}
+
+struct ExerciseSwapOption: Identifiable, Sendable {
+    let id: String
+    let exercise: Exercise
+    let reason: String
+    let tags: [String]
+
+    init(id: String = UUID().uuidString, exercise: Exercise, reason: String, tags: [String]) {
+        self.id = id
+        self.exercise = exercise
+        self.reason = reason
+        self.tags = tags
+    }
+}
+
+struct CoachActionManager {
+    private let library = ExerciseLibrary.shared
+
+    func previewVolumeReduction(plan: WorkoutPlan, dayId: String, recoveryScore: Int) -> VolumeReductionPreview? {
+        guard let dayIndex = plan.days.firstIndex(where: { $0.id == dayId }) else { return nil }
+        let day = plan.days[dayIndex]
+
+        var reductions: [ExerciseReduction] = []
+        var totalRemoved = 0
+
+        let classified = day.exercises.map { planned -> (PlannedExercise, Bool) in
+            let exercise = library.exercise(byId: planned.exerciseId)
+            let isCompound = exercise?.category == .compound
+            return (planned, !isCompound)
+        }
+
+        let accessories = classified.filter(\.1).map(\.0)
+        let maxReductions = recoveryScore < 50 ? 3 : 2
+
+        for accessory in accessories.suffix(maxReductions) {
+            let exercise = library.exercise(byId: accessory.exerciseId)
+            let setsToRemove = accessory.sets > 2 ? 1 : 0
+            if setsToRemove > 0 {
+                reductions.append(ExerciseReduction(
+                    exerciseName: exercise?.name ?? accessory.exerciseId,
+                    exerciseId: accessory.exerciseId,
+                    originalSets: accessory.sets,
+                    newSets: accessory.sets - setsToRemove,
+                    isAccessory: true
+                ))
+                totalRemoved += setsToRemove
+            }
+        }
+
+        if reductions.isEmpty { return nil }
+
+        let originalTotal = day.exercises.reduce(0) { $0 + $1.sets }
+        return VolumeReductionPreview(
+            dayName: day.name,
+            reductions: reductions,
+            originalTotalSets: originalTotal,
+            newTotalSets: originalTotal - totalRemoved,
+            estimatedTimeSaved: totalRemoved * 3
+        )
+    }
+
+    func applyVolumeReduction(plan: inout WorkoutPlan, dayId: String, preview: VolumeReductionPreview) -> CoachAdjustment? {
+        guard let dayIndex = plan.days.firstIndex(where: { $0.id == dayId }) else { return nil }
+        let snapshot = AdjustmentSnapshot(exercises: plan.days[dayIndex].exercises)
+
+        var details: [AdjustmentDetail] = []
+        for reduction in preview.reductions {
+            if let exIdx = plan.days[dayIndex].exercises.firstIndex(where: { $0.exerciseId == reduction.exerciseId }) {
+                plan.days[dayIndex].exercises[exIdx].sets = reduction.newSets
+                details.append(AdjustmentDetail(
+                    exerciseName: reduction.exerciseName,
+                    change: "\(reduction.originalSets) → \(reduction.newSets) sets"
+                ))
+            }
+        }
+
+        return CoachAdjustment(
+            type: .volumeReduced,
+            dayId: dayId,
+            description: "Volume reduced: \(preview.originalTotalSets) → \(preview.newTotalSets) sets",
+            details: details,
+            originalState: snapshot
+        )
+    }
+
+    func previewLighterSession(plan: WorkoutPlan, dayId: String) -> LighterSessionPreview? {
+        guard let dayIndex = plan.days.firstIndex(where: { $0.id == dayId }) else { return nil }
+        let day = plan.days[dayIndex]
+
+        var changes: [LighterChange] = []
+        var accessoryReduction = 0
+
+        for planned in day.exercises {
+            let exercise = library.exercise(byId: planned.exerciseId)
+            let name = exercise?.name ?? planned.exerciseId
+            let isCompound = exercise?.category == .compound
+
+            if isCompound {
+                if let rpe = planned.rpe, rpe > 6 {
+                    changes.append(LighterChange(exerciseName: name, change: "RPE \(Int(rpe)) → \(Int(rpe - 1))"))
+                } else {
+                    changes.append(LighterChange(exerciseName: name, change: "Reduce load ~15%"))
+                }
+            } else {
+                if planned.sets > 2 {
+                    changes.append(LighterChange(exerciseName: name, change: "\(planned.sets) → \(planned.sets - 1) sets"))
+                    accessoryReduction += 1
+                }
+            }
+        }
+
+        if changes.isEmpty { return nil }
+
+        return LighterSessionPreview(
+            dayName: day.name,
+            changes: changes,
+            rpeReduction: 1.0,
+            estimatedTimeSaved: accessoryReduction * 3 + 5
+        )
+    }
+
+    func applyLighterSession(plan: inout WorkoutPlan, dayId: String) -> CoachAdjustment? {
+        guard let dayIndex = plan.days.firstIndex(where: { $0.id == dayId }) else { return nil }
+        let snapshot = AdjustmentSnapshot(exercises: plan.days[dayIndex].exercises)
+
+        var details: [AdjustmentDetail] = []
+
+        for i in plan.days[dayIndex].exercises.indices {
+            let exercise = library.exercise(byId: plan.days[dayIndex].exercises[i].exerciseId)
+            let name = exercise?.name ?? plan.days[dayIndex].exercises[i].exerciseId
+            let isCompound = exercise?.category == .compound
+
+            if isCompound {
+                if let rpe = plan.days[dayIndex].exercises[i].rpe, rpe > 6 {
+                    let newRpe = rpe - 1
+                    plan.days[dayIndex].exercises[i].rpe = newRpe
+                    details.append(AdjustmentDetail(exerciseName: name, change: "RPE \(Int(rpe)) → \(Int(newRpe))"))
+                } else {
+                    plan.days[dayIndex].exercises[i].notes = "Coach: reduce load ~15%"
+                    details.append(AdjustmentDetail(exerciseName: name, change: "Reduce load ~15%"))
+                }
+            } else {
+                if plan.days[dayIndex].exercises[i].sets > 2 {
+                    let oldSets = plan.days[dayIndex].exercises[i].sets
+                    plan.days[dayIndex].exercises[i].sets = oldSets - 1
+                    details.append(AdjustmentDetail(exerciseName: name, change: "\(oldSets) → \(oldSets - 1) sets"))
+                }
+            }
+        }
+
+        return CoachAdjustment(
+            type: .lighterSession,
+            dayId: dayId,
+            description: "Lighter session applied",
+            details: details,
+            originalState: snapshot
+        )
+    }
+
+    func swapExerciseOptions(for exerciseId: String, in plan: WorkoutPlan, dayId: String, profile: UserProfile) -> [ExerciseSwapOption] {
+        guard let exercise = library.exercise(byId: exerciseId) else { return [] }
+
+        let engine = CoachingEngine()
+        let candidates = engine.suggestExerciseReplacement(for: exercise, profile: profile, reason: .general)
+
+        return candidates.map { candidate in
+            var tags: [String] = []
+            var reason = "Same muscle target"
+
+            if candidate.primaryMuscle == exercise.primaryMuscle {
+                tags.append("Same target")
+            }
+            if candidate.movementPattern == exercise.movementPattern {
+                tags.append("Same pattern")
+                reason = "Same movement pattern and muscle target"
+            }
+            if candidate.isJointFriendly {
+                tags.append("Joint-friendly")
+                if !exercise.isJointFriendly {
+                    reason = "Lower joint stress alternative"
+                }
+            }
+            if candidate.locationType == .anywhere || candidate.locationType == .homeNoEquipment {
+                tags.append("Minimal equipment")
+            }
+            if candidate.difficulty.rawValue < exercise.difficulty.rawValue {
+                tags.append("Easier")
+            }
+
+            return ExerciseSwapOption(exercise: candidate, reason: reason, tags: tags)
+        }
+    }
+
+    func applyExerciseSwap(plan: inout WorkoutPlan, dayId: String, oldExerciseId: String, newExercise: Exercise) -> CoachAdjustment? {
+        guard let dayIndex = plan.days.firstIndex(where: { $0.id == dayId }) else { return nil }
+        guard let exIndex = plan.days[dayIndex].exercises.firstIndex(where: { $0.exerciseId == oldExerciseId }) else { return nil }
+
+        let snapshot = AdjustmentSnapshot(exercises: plan.days[dayIndex].exercises)
+        let oldName = library.exercise(byId: oldExerciseId)?.name ?? oldExerciseId
+
+        plan.days[dayIndex].exercises[exIndex].exerciseId = newExercise.id
+
+        return CoachAdjustment(
+            type: .exerciseSwapped,
+            dayId: dayId,
+            description: "Swapped \(oldName) → \(newExercise.name)",
+            details: [AdjustmentDetail(exerciseName: newExercise.name, change: "Replaced \(oldName)")],
+            originalState: snapshot
+        )
+    }
+
+    func undoAdjustment(plan: inout WorkoutPlan, adjustment: CoachAdjustment) -> Bool {
+        guard let snapshot = adjustment.originalState else { return false }
+        guard let dayIndex = plan.days.firstIndex(where: { $0.id == adjustment.dayId }) else { return false }
+        plan.days[dayIndex].exercises = snapshot.exercises
+        return true
+    }
+
+    // MARK: - Week-Level Actions
+
+    func previewWeekRegeneration(plan: WorkoutPlan, profile: UserProfile, muscleBalance: [MuscleBalanceEntry], recentSessions: [WorkoutSession], recoveryScore: Int) -> WeekRegenerationPreview {
+        let generator = PlanGenerator()
+        let newPlan = generator.generate(for: profile, muscleBalance: muscleBalance, recentSessions: recentSessions, recoveryScore: recoveryScore)
+
+        let originalSummaries = plan.days.map { daySummary($0) }
+        let newSummaries = newPlan.days.map { daySummary($0) }
+
+        var changes: [WeekChangeItem] = []
+
+        for (index, newDay) in newPlan.days.enumerated() {
+            if index < plan.days.count {
+                let oldDay = plan.days[index]
+                let oldSets = oldDay.exercises.reduce(0) { $0 + $1.sets }
+                let newSets = newDay.exercises.reduce(0) { $0 + $1.sets }
+                if oldSets != newSets {
+                    changes.append(WeekChangeItem(dayName: newDay.name, change: "\(oldSets) → \(newSets) sets", type: .volumeChanged))
+                }
+                let oldIds = Set(oldDay.exercises.map(\.exerciseId))
+                let newIds = Set(newDay.exercises.map(\.exerciseId))
+                let swapped = newIds.subtracting(oldIds)
+                for exId in swapped.prefix(2) {
+                    let name = library.exercise(byId: exId)?.name ?? exId
+                    changes.append(WeekChangeItem(dayName: newDay.name, change: "Added \(name)", type: .exerciseChanged))
+                }
+                let oldMuscles = Set(oldDay.focusMuscles.map(\.displayName))
+                let newMuscles = Set(newDay.focusMuscles.map(\.displayName))
+                if oldMuscles != newMuscles {
+                    let added = newMuscles.subtracting(oldMuscles)
+                    if !added.isEmpty {
+                        changes.append(WeekChangeItem(dayName: newDay.name, change: "+\(added.joined(separator: ", "))", type: .emphasisChanged))
+                    }
+                }
+            }
+        }
+
+        if changes.isEmpty {
+            changes.append(WeekChangeItem(dayName: "Overall", change: "Optimized exercise selection and volume", type: .volumeChanged))
+        }
+
+        var reasons: [String] = []
+        let undertrained = muscleBalance.filter { $0.percentOfAverage < 0.8 }
+        if !undertrained.isEmpty {
+            reasons.append("\(undertrained.first!.muscle) volume is below average")
+        }
+        if recoveryScore < 60 {
+            reasons.append("recovery score is low (\(recoveryScore)%)")
+        }
+        if reasons.isEmpty {
+            reasons.append("optimizing for your current progress and balance")
+        }
+
+        return WeekRegenerationPreview(
+            originalDays: originalSummaries,
+            newDays: newSummaries,
+            changes: changes,
+            reason: "Regenerating because " + reasons.joined(separator: " and ") + "."
+        )
+    }
+
+    func applyWeekRegeneration(plan: inout WorkoutPlan, profile: UserProfile, muscleBalance: [MuscleBalanceEntry], recentSessions: [WorkoutSession], recoveryScore: Int) -> (CoachAdjustment, WorkoutPlan)? {
+        let generator = PlanGenerator()
+        let oldPlan = plan
+        let newPlan = generator.generate(for: profile, muscleBalance: muscleBalance, recentSessions: recentSessions, recoveryScore: recoveryScore)
+
+        var details: [AdjustmentDetail] = []
+        for (index, newDay) in newPlan.days.enumerated() {
+            if index < oldPlan.days.count {
+                let oldSets = oldPlan.days[index].exercises.reduce(0) { $0 + $1.sets }
+                let newSets = newDay.exercises.reduce(0) { $0 + $1.sets }
+                if oldSets != newSets {
+                    details.append(AdjustmentDetail(exerciseName: newDay.name, change: "\(oldSets) → \(newSets) sets"))
+                }
+            }
+        }
+        if details.isEmpty {
+            details.append(AdjustmentDetail(exerciseName: "Week", change: "Regenerated with updated intelligence"))
+        }
+
+        plan = newPlan
+
+        let adjustment = CoachAdjustment(
+            type: .weekRegenerated,
+            dayId: "week-all",
+            description: "Week regenerated by Coach",
+            details: details,
+            originalState: nil
+        )
+
+        return (adjustment, oldPlan)
+    }
+
+    func previewDeloadWeek(plan: WorkoutPlan) -> DeloadWeekPreview {
+        let originalSummaries = plan.days.map { daySummary($0) }
+        var deloadSummaries: [DayPreviewSummary] = []
+        var totalOriginalSets = 0
+        var totalDeloadSets = 0
+
+        for day in plan.days {
+            let origSets = day.exercises.reduce(0) { $0 + $1.sets }
+            totalOriginalSets += origSets
+
+            var deloadExCount = day.exercises.count
+            var deloadSetCount = 0
+            for ex in day.exercises {
+                let isCompound = library.exercise(byId: ex.exerciseId)?.category == .compound
+                if isCompound {
+                    deloadSetCount += max(2, ex.sets - 1)
+                } else {
+                    let newSets = max(1, ex.sets - 1)
+                    if newSets <= 1 && ex.sets > 2 {
+                        deloadExCount -= 1
+                    } else {
+                        deloadSetCount += newSets
+                    }
+                }
+            }
+            totalDeloadSets += deloadSetCount
+
+            deloadSummaries.append(DayPreviewSummary(
+                name: day.name,
+                exerciseCount: deloadExCount,
+                totalSets: deloadSetCount,
+                estimatedMinutes: max(20, day.estimatedMinutes - 15),
+                muscles: day.focusMuscles.map(\.displayName)
+            ))
+        }
+
+        let reductionPercent = totalOriginalSets > 0 ? Int(Double(totalOriginalSets - totalDeloadSets) / Double(totalOriginalSets) * 100) : 40
+        let timeSaved = plan.days.count * 12
+
+        return DeloadWeekPreview(
+            originalDays: originalSummaries,
+            deloadDays: deloadSummaries,
+            volumeReductionPercent: reductionPercent,
+            rpeReduction: 1.5,
+            estimatedTimeSaved: timeSaved,
+            reason: "A deload week reduces accumulated fatigue and lets your body supercompensate for stronger performance next week."
+        )
+    }
+
+    func applyDeloadWeek(plan: inout WorkoutPlan) -> (CoachAdjustment, WorkoutPlan)? {
+        let oldPlan = plan
+        var details: [AdjustmentDetail] = []
+
+        for dayIndex in plan.days.indices {
+            var indicesToRemove: [Int] = []
+            for exIndex in plan.days[dayIndex].exercises.indices {
+                let ex = plan.days[dayIndex].exercises[exIndex]
+                let exercise = library.exercise(byId: ex.exerciseId)
+                let isCompound = exercise?.category == .compound
+
+                if isCompound {
+                    let oldSets = plan.days[dayIndex].exercises[exIndex].sets
+                    plan.days[dayIndex].exercises[exIndex].sets = max(2, oldSets - 1)
+                    if let rpe = plan.days[dayIndex].exercises[exIndex].rpe, rpe > 5 {
+                        plan.days[dayIndex].exercises[exIndex].rpe = rpe - 1.5
+                    }
+                    let name = exercise?.name ?? ex.exerciseId
+                    details.append(AdjustmentDetail(exerciseName: name, change: "\(oldSets) → \(max(2, oldSets - 1)) sets, lower effort"))
+                } else {
+                    let oldSets = plan.days[dayIndex].exercises[exIndex].sets
+                    let newSets = max(1, oldSets - 1)
+                    if newSets <= 1 && oldSets > 2 {
+                        indicesToRemove.append(exIndex)
+                    } else {
+                        plan.days[dayIndex].exercises[exIndex].sets = newSets
+                        if let rpe = plan.days[dayIndex].exercises[exIndex].rpe, rpe > 5 {
+                            plan.days[dayIndex].exercises[exIndex].rpe = rpe - 1.5
+                        }
+                    }
+                }
+            }
+
+            for idx in indicesToRemove.sorted().reversed() {
+                let name = library.exercise(byId: plan.days[dayIndex].exercises[idx].exerciseId)?.name ?? "Accessory"
+                details.append(AdjustmentDetail(exerciseName: name, change: "Removed for deload"))
+                plan.days[dayIndex].exercises.remove(at: idx)
+            }
+
+            plan.days[dayIndex].estimatedMinutes = max(20, plan.days[dayIndex].estimatedMinutes - 15)
+        }
+
+        let adjustment = CoachAdjustment(
+            type: .deloadWeek,
+            dayId: "week-all",
+            description: "Deload week applied",
+            details: details,
+            originalState: nil
+        )
+
+        return (adjustment, oldPlan)
+    }
+
+    private func daySummary(_ day: WorkoutDay) -> DayPreviewSummary {
+        DayPreviewSummary(
+            name: day.name,
+            exerciseCount: day.exercises.count,
+            totalSets: day.exercises.reduce(0) { $0 + $1.sets },
+            estimatedMinutes: day.estimatedMinutes,
+            muscles: day.focusMuscles.map(\.displayName)
+        )
+    }
+}
