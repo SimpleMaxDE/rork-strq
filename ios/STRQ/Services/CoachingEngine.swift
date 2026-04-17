@@ -14,27 +14,61 @@ struct CoachingEngine {
         muscleBalance: [MuscleBalanceEntry],
         progressionStates: [ExerciseProgressionState] = [],
         phase: TrainingPhase = .build,
-        volumeLandmarks: [VolumeLandmark] = []
+        volumeLandmarks: [VolumeLandmark] = [],
+        confidence: CoachingConfidence = .high
     ) -> [SmartInsight] {
         var insights: [SmartInsight] = []
 
-        insights.append(contentsOf: volumeImbalanceInsights(muscleBalance: muscleBalance, profile: profile))
-        insights.append(contentsOf: pushPullBalanceInsights(workoutHistory: workoutHistory))
-        insights.append(contentsOf: upperLowerBalanceInsights(muscleBalance: muscleBalance))
-        insights.append(contentsOf: recoveryInsights(workoutHistory: workoutHistory, profile: profile))
-        insights.append(contentsOf: frequencyInsights(workoutHistory: workoutHistory, profile: profile))
-        insights.append(contentsOf: progressionInsights(personalRecords: personalRecords, workoutHistory: workoutHistory))
-        insights.append(contentsOf: consistencyInsights(workoutHistory: workoutHistory))
-        insights.append(contentsOf: bodyweightInsights(progressEntries: progressEntries, profile: profile))
-        insights.append(contentsOf: fatigueInsights(workoutHistory: workoutHistory, progressEntries: progressEntries))
-        insights.append(contentsOf: deloadInsights(workoutHistory: workoutHistory, progressEntries: progressEntries))
-        insights.append(contentsOf: plateauInsights(progressionStates: progressionStates))
-        insights.append(contentsOf: phaseInsights(phase: phase, profile: profile))
-        insights.append(contentsOf: volumeLandmarkInsights(landmarks: volumeLandmarks, profile: profile))
-        insights.append(contentsOf: exerciseSpecificProgressionInsights(progressionStates: progressionStates, profile: profile))
+        // When confidence is low, we deliberately stay quieter — only recovery / phase /
+        // plateau signals that survive on thin data. Volume imbalance, push/pull ratio,
+        // and 1-week frequency comparisons need more data to be credible.
+        let completedCount = workoutHistory.filter(\.isCompleted).count
 
-        return insights
-            .sorted { $0.severityRank > $1.severityRank }
+        if confidence >= .moderate {
+            insights.append(contentsOf: volumeImbalanceInsights(muscleBalance: muscleBalance, profile: profile))
+            insights.append(contentsOf: pushPullBalanceInsights(workoutHistory: workoutHistory))
+            insights.append(contentsOf: upperLowerBalanceInsights(muscleBalance: muscleBalance))
+            insights.append(contentsOf: frequencyInsights(workoutHistory: workoutHistory, profile: profile))
+            insights.append(contentsOf: bodyweightInsights(progressEntries: progressEntries, profile: profile))
+        }
+        insights.append(contentsOf: recoveryInsights(workoutHistory: workoutHistory, profile: profile))
+        insights.append(contentsOf: progressionInsights(personalRecords: personalRecords, workoutHistory: workoutHistory))
+        if confidence >= .moderate {
+            insights.append(contentsOf: consistencyInsights(workoutHistory: workoutHistory))
+            insights.append(contentsOf: fatigueInsights(workoutHistory: workoutHistory, progressEntries: progressEntries))
+            insights.append(contentsOf: deloadInsights(workoutHistory: workoutHistory, progressEntries: progressEntries))
+        }
+        if completedCount >= 3 {
+            insights.append(contentsOf: plateauInsights(progressionStates: progressionStates))
+        }
+        insights.append(contentsOf: phaseInsights(phase: phase, profile: profile))
+        if confidence >= .moderate {
+            insights.append(contentsOf: volumeLandmarkInsights(landmarks: volumeLandmarks, profile: profile))
+            insights.append(contentsOf: exerciseSpecificProgressionInsights(progressionStates: progressionStates, profile: profile))
+        }
+
+        // Trim thin-signal cases: cap total and soften severity when confidence is low.
+        let sorted = insights.sorted { $0.severityRank > $1.severityRank }
+        if confidence == .low {
+            return Array(sorted.prefix(3)).map { softenForLowConfidence($0) }
+        }
+        if confidence == .moderate {
+            return Array(sorted.prefix(6))
+        }
+        return sorted
+    }
+
+    private func softenForLowConfidence(_ insight: SmartInsight) -> SmartInsight {
+        let severity: InsightSeverity = insight.severity == .high ? .medium : insight.severity
+        return SmartInsight(
+            id: insight.id,
+            icon: insight.icon,
+            color: insight.color,
+            title: insight.title,
+            message: insight.message + " STRQ is still calibrating — treat this as directional.",
+            severity: severity,
+            category: insight.category
+        )
     }
 
     func generateRecommendations(
@@ -44,19 +78,27 @@ struct CoachingEngine {
         personalRecords: [PersonalRecord],
         muscleBalance: [MuscleBalanceEntry],
         progressionStates: [ExerciseProgressionState] = [],
-        phase: TrainingPhase = .build
+        phase: TrainingPhase = .build,
+        confidence: CoachingConfidence = .high
     ) -> [Recommendation] {
         var recs: [Recommendation] = []
 
-        recs.append(contentsOf: volumeRecommendations(muscleBalance: muscleBalance, profile: profile))
+        if confidence >= .moderate {
+            recs.append(contentsOf: volumeRecommendations(muscleBalance: muscleBalance, profile: profile))
+            recs.append(contentsOf: exerciseSwapRecommendations(workoutHistory: workoutHistory, profile: profile))
+            recs.append(contentsOf: planRecommendations(profile: profile, workoutHistory: workoutHistory))
+        }
         recs.append(contentsOf: progressionRecommendations(personalRecords: personalRecords, workoutHistory: workoutHistory))
         recs.append(contentsOf: recoveryRecommendations(workoutHistory: workoutHistory, profile: profile))
-        recs.append(contentsOf: exerciseSwapRecommendations(workoutHistory: workoutHistory, profile: profile))
-        recs.append(contentsOf: planRecommendations(profile: profile, workoutHistory: workoutHistory))
-        recs.append(contentsOf: smartProgressionRecommendations(progressionStates: progressionStates, phase: phase))
-        recs.append(contentsOf: plateauRecommendations(progressionStates: progressionStates))
+        if confidence >= .moderate {
+            recs.append(contentsOf: smartProgressionRecommendations(progressionStates: progressionStates, phase: phase))
+            recs.append(contentsOf: plateauRecommendations(progressionStates: progressionStates))
+        }
 
-        return recs.sorted { $0.priority > $1.priority }
+        let sorted = recs.sorted { $0.priority > $1.priority }
+        if confidence == .low { return Array(sorted.prefix(2)) }
+        if confidence == .moderate { return Array(sorted.prefix(5)) }
+        return sorted
     }
 
     func suggestExerciseReplacement(

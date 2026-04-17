@@ -270,6 +270,7 @@ class AppViewModel {
     }
 
     func refreshCoachingInsights() {
+        let confidence = coachingConfidence
         let newInsights = coachingEngine.generateInsights(
             profile: profile,
             workoutHistory: workoutHistory,
@@ -279,7 +280,8 @@ class AppViewModel {
             muscleBalance: muscleBalance,
             progressionStates: progressionStates,
             phase: trainingPhaseState.currentPhase,
-            volumeLandmarks: volumeLandmarks
+            volumeLandmarks: volumeLandmarks,
+            confidence: confidence
         )
         _dynamicInsights = newInsights
 
@@ -290,7 +292,8 @@ class AppViewModel {
             personalRecords: personalRecords,
             muscleBalance: muscleBalance,
             progressionStates: progressionStates,
-            phase: trainingPhaseState.currentPhase
+            phase: trainingPhaseState.currentPhase,
+            confidence: confidence
         )
         recommendations = newRecs
     }
@@ -604,12 +607,30 @@ class AppViewModel {
 
     var strengthProgress: [StrengthEntry] {
         let calendar = Calendar.current
-        let benchIds: Set<String> = ["barbell-bench-press", "bench-press"]
-        let squatIds: Set<String> = ["barbell-squat", "back-squat"]
-        let deadliftIds: Set<String> = ["deadlift", "conventional-deadlift", "barbell-deadlift"]
-        let ohpIds: Set<String> = ["overhead-press", "barbell-overhead-press", "ohp"]
+
+        // Pattern-based anchor lift detection. Any compound lift tagged with the right
+        // movement pattern counts — barbell, dumbbell, machine, cable, hack squat, leg
+        // press, pulldown, row — not just the classic barbell 4.
+        func anchorIds(for patterns: Set<MovementPattern>, allowIsolation: Bool = false) -> Set<String> {
+            var ids: Set<String> = []
+            for session in workoutHistory where session.isCompleted {
+                for log in session.exerciseLogs {
+                    guard let ex = library.exercise(byId: log.exerciseId) else { continue }
+                    guard patterns.contains(ex.movementPattern) else { continue }
+                    if !allowIsolation && ex.category != .compound { continue }
+                    ids.insert(ex.id)
+                }
+            }
+            return ids
+        }
+
+        let pushIds = anchorIds(for: [.horizontalPush])
+        let squatIds = anchorIds(for: [.squat])
+        let hingeIds = anchorIds(for: [.hipHinge])
+        let pullIds = anchorIds(for: [.verticalPull, .horizontalPull])
 
         func best1RM(in sessions: [WorkoutSession], ids: Set<String>) -> Double {
+            guard !ids.isEmpty else { return 0 }
             var best: Double = 0
             for s in sessions {
                 for log in s.exerciseLogs where ids.contains(log.exerciseId) {
@@ -628,10 +649,10 @@ class AppViewModel {
             let weekStart = calendar.date(byAdding: .weekOfYear, value: -weekOffset, to: Date()) ?? Date()
             let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart) ?? Date()
             let weekSessions = workoutHistory.filter { $0.startTime >= weekStart && $0.startTime < weekEnd && $0.isCompleted }
-            let b = best1RM(in: weekSessions, ids: benchIds)
+            let b = best1RM(in: weekSessions, ids: pushIds)
             let s = best1RM(in: weekSessions, ids: squatIds)
-            let d = best1RM(in: weekSessions, ids: deadliftIds)
-            let o = best1RM(in: weekSessions, ids: ohpIds)
+            let d = best1RM(in: weekSessions, ids: hingeIds)
+            let o = best1RM(in: weekSessions, ids: pullIds)
             let bench = b > 0 ? b : lastKnown.bench
             let squat = s > 0 ? s : lastKnown.squat
             let dead = d > 0 ? d : lastKnown.deadlift
@@ -642,6 +663,32 @@ class AppViewModel {
             }
         }
         return entries
+    }
+
+    // MARK: - Coaching Confidence
+
+    private let confidenceAssessor = ConfidenceAssessor()
+
+    var coachingConfidence: CoachingConfidence {
+        let calendar = Calendar.current
+        let fourWeeksAgo = calendar.date(byAdding: .day, value: -28, to: Date()) ?? Date()
+        let completed = workoutHistory.filter { $0.startTime > fourWeeksAgo && $0.isCompleted }.count
+        let readinessCount = readinessHistory.prefix(14).count
+        let sleepCount = sleepEntries.prefix(7).count
+        let weightCount = bodyWeightEntries.prefix(14).count
+        let firstSession = workoutHistory.filter(\.isCompleted).last?.startTime
+        let weeksTrained: Int = {
+            guard let first = firstSession else { return 0 }
+            let days = calendar.dateComponents([.day], from: first, to: Date()).day ?? 0
+            return max(0, days / 7)
+        }()
+        return confidenceAssessor.assess(
+            completedWorkouts: completed,
+            readinessCheckIns: readinessCount,
+            sleepLogs: sleepCount,
+            weeksTrained: weeksTrained,
+            weightLogs: weightCount
+        )
     }
 
     var highPriorityInsights: [SmartInsight] {
@@ -697,14 +744,70 @@ class AppViewModel {
     }
 
     var recoveryScore: Int {
-        let twoDaysAgo = Calendar.current.date(byAdding: .day, value: -2, to: Date()) ?? Date()
-        let recentCount = workoutHistory.filter { $0.startTime > twoDaysAgo && $0.isCompleted }.count
-        switch recentCount {
-        case 0: return 95
-        case 1: return 78
-        case 2: return 55
-        default: return 35
+        let calendar = Calendar.current
+        let now = Date()
+        let twoDaysAgo = calendar.date(byAdding: .day, value: -2, to: now) ?? now
+        let sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: now) ?? now
+
+        let last48Count = workoutHistory.filter { $0.startTime > twoDaysAgo && $0.isCompleted }.count
+        let weekSessions = workoutHistory.filter { $0.startTime > sevenDaysAgo && $0.isCompleted }
+        let weekCount = weekSessions.count
+
+        // Density baseline (last 48h dominates short-term fatigue).
+        var score: Double = {
+            switch last48Count {
+            case 0: return 90
+            case 1: return 78
+            case 2: return 58
+            default: return 38
+            }
+        }()
+
+        // Weekly load vs. planned — sustained over/under-training shifts baseline.
+        let planned = max(1, profile.daysPerWeek)
+        let loadRatio = Double(weekCount) / Double(planned)
+        if loadRatio > 1.3 { score -= 10 }
+        else if loadRatio > 1.1 { score -= 5 }
+        else if loadRatio < 0.4 && weekCount > 0 { score += 3 }
+
+        // Recent volume spike vs. prior week (crude CNS proxy).
+        let twoWeeksAgo = calendar.date(byAdding: .day, value: -14, to: now) ?? now
+        let priorWeekVolume = workoutHistory
+            .filter { $0.startTime > twoWeeksAgo && $0.startTime <= sevenDaysAgo && $0.isCompleted }
+            .reduce(0.0) { $0 + $1.totalVolume }
+        let thisWeekVolume = weekSessions.reduce(0.0) { $0 + $1.totalVolume }
+        if priorWeekVolume > 0 {
+            let spike = (thisWeekVolume - priorWeekVolume) / priorWeekVolume
+            if spike > 0.35 { score -= 8 }
+            else if spike > 0.2 { score -= 4 }
         }
+
+        // Sleep signal (last 3 nights).
+        let recentSleep = sleepEntries.prefix(3)
+        if !recentSleep.isEmpty {
+            let avgHours = recentSleep.map(\.hoursSlept).reduce(0, +) / Double(recentSleep.count)
+            let avgQuality = Double(recentSleep.map { $0.quality.rawValue }.reduce(0, +)) / Double(recentSleep.count)
+            if avgHours < 6.0 || avgQuality <= 2.0 { score -= 10 }
+            else if avgHours < 6.8 || avgQuality <= 2.5 { score -= 5 }
+            else if avgHours >= 7.5 && avgQuality >= 4.0 { score += 4 }
+        }
+
+        // Today's readiness check-in, if present, nudges the score lightly.
+        if let r = todaysReadiness {
+            let delta = Double(r.readinessScore) - 70.0
+            score += delta * 0.15
+            if r.painOrRestriction { score -= 6 }
+        }
+
+        // Phase-aware cushion.
+        switch trainingPhaseState.currentPhase {
+        case .deload: score += 5
+        case .fatigueManagement: score += 2
+        case .push: score -= 2
+        default: break
+        }
+
+        return max(10, min(98, Int(score.rounded())))
     }
 
     var nextWorkout: WorkoutDay? {
@@ -1643,7 +1746,14 @@ class AppViewModel {
     }
 
     var hasEnoughDataForStrengthChart: Bool {
-        strengthProgress.count >= 2
+        let entries = strengthProgress
+        guard entries.count >= 2 else { return false }
+        // Require at least one anchor series to have two real data points.
+        let benchPoints = entries.filter { $0.bench > 0 }.count
+        let squatPoints = entries.filter { $0.squat > 0 }.count
+        let deadPoints = entries.filter { $0.deadlift > 0 }.count
+        let ohpPoints = entries.filter { $0.ohp > 0 }.count
+        return [benchPoints, squatPoints, deadPoints, ohpPoints].contains { $0 >= 2 }
     }
 
     var hasEnoughDataForTrends: Bool {
