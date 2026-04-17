@@ -13,6 +13,7 @@ struct ActiveWorkoutView: View {
     @State private var setCompletedTrigger: Bool = false
     @State private var showExerciseList: Bool = false
     @State private var exerciseTransition: Bool = false
+    @State private var lastLoggedSet: (exerciseIndex: Int, setIndex: Int)?
 
     private var workout: ActiveWorkoutState? { vm.activeWorkout }
 
@@ -686,6 +687,44 @@ struct ActiveWorkoutView: View {
                     }
                 }
 
+                if let last = lastLoggedSet,
+                   last.exerciseIndex < workout.session.exerciseLogs.count,
+                   last.setIndex < workout.session.exerciseLogs[last.exerciseIndex].sets.count {
+                    let currentQuality = workout.session.exerciseLogs[last.exerciseIndex].sets[last.setIndex].quality
+                    VStack(spacing: 10) {
+                        Text("HOW DID THAT SET FEEL?")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.4))
+                            .tracking(1.0)
+                        HStack(spacing: 6) {
+                            ForEach(SetQuality.allCases, id: \.self) { quality in
+                                let isSelected = currentQuality == quality
+                                Button {
+                                    setQuality(exerciseIndex: last.exerciseIndex, setIndex: last.setIndex, quality: isSelected ? nil : quality)
+                                } label: {
+                                    VStack(spacing: 4) {
+                                        Image(systemName: quality.icon)
+                                            .font(.system(size: 13, weight: .semibold))
+                                        Text(quality.shortLabel)
+                                            .font(.system(size: 9, weight: .bold))
+                                    }
+                                    .foregroundStyle(isSelected ? .black : .white.opacity(0.7))
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 52)
+                                    .background(
+                                        isSelected
+                                            ? AnyShapeStyle(qualityColor(quality.colorName))
+                                            : AnyShapeStyle(Color.white.opacity(0.06)),
+                                        in: .rect(cornerRadius: 12)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 4)
+                }
+
                 HStack(spacing: 16) {
                     Button { restTimeRemaining = max(0, restTimeRemaining - 15) } label: {
                         Text("-15s")
@@ -816,6 +855,7 @@ struct ActiveWorkoutView: View {
 
         workout.session.exerciseLogs[exerciseIndex].sets[setIndex].isCompleted = true
         setCompletedTrigger.toggle()
+        lastLoggedSet = (exerciseIndex, setIndex)
 
         let allDone = workout.session.exerciseLogs[exerciseIndex].sets.allSatisfy(\.isCompleted)
         if allDone {
@@ -833,6 +873,26 @@ struct ActiveWorkoutView: View {
         let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
         restTimeRemaining = planned?.restSeconds ?? 90
         restTimerActive = true
+    }
+
+    private func setQuality(exerciseIndex: Int, setIndex: Int, quality: SetQuality?) {
+        guard var workout = vm.activeWorkout,
+              exerciseIndex < workout.session.exerciseLogs.count,
+              setIndex < workout.session.exerciseLogs[exerciseIndex].sets.count else { return }
+        workout.session.exerciseLogs[exerciseIndex].sets[setIndex].quality = quality
+        vm.activeWorkout = workout
+        setCompletedTrigger.toggle()
+    }
+
+    private func qualityColor(_ name: String) -> Color {
+        switch name {
+        case "green": return .green
+        case "blue": return .blue
+        case "orange": return .orange
+        case "yellow": return .yellow
+        case "red": return .red
+        default: return .white
+        }
     }
 
     private func jumpToSet(exerciseIndex: Int, setIndex: Int) {

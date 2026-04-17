@@ -48,8 +48,9 @@ nonisolated struct SetLog: Codable, Identifiable, Sendable {
     var isCompleted: Bool
     var isPR: Bool
     var rpe: Double?
+    var quality: SetQuality?
 
-    init(id: String = UUID().uuidString, setNumber: Int, weight: Double = 0, reps: Int = 0, isCompleted: Bool = false, isPR: Bool = false, rpe: Double? = nil) {
+    init(id: String = UUID().uuidString, setNumber: Int, weight: Double = 0, reps: Int = 0, isCompleted: Bool = false, isPR: Bool = false, rpe: Double? = nil, quality: SetQuality? = nil) {
         self.id = id
         self.setNumber = setNumber
         self.weight = weight
@@ -57,6 +58,86 @@ nonisolated struct SetLog: Codable, Identifiable, Sendable {
         self.isCompleted = isCompleted
         self.isPR = isPR
         self.rpe = rpe
+        self.quality = quality
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, setNumber, weight, reps, isCompleted, isPR, rpe, quality
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decode(String.self, forKey: .id)
+        self.setNumber = try c.decode(Int.self, forKey: .setNumber)
+        self.weight = try c.decode(Double.self, forKey: .weight)
+        self.reps = try c.decode(Int.self, forKey: .reps)
+        self.isCompleted = try c.decode(Bool.self, forKey: .isCompleted)
+        self.isPR = try c.decode(Bool.self, forKey: .isPR)
+        self.rpe = try c.decodeIfPresent(Double.self, forKey: .rpe)
+        self.quality = try c.decodeIfPresent(SetQuality.self, forKey: .quality)
+    }
+}
+
+nonisolated enum SetQuality: String, Codable, Sendable, CaseIterable {
+    case tooEasy
+    case onTarget
+    case grinder
+    case formBreakdown
+    case pain
+
+    var label: String {
+        switch self {
+        case .tooEasy: "Too easy"
+        case .onTarget: "On target"
+        case .grinder: "Grinder"
+        case .formBreakdown: "Form broke"
+        case .pain: "Pain"
+        }
+    }
+
+    var shortLabel: String {
+        switch self {
+        case .tooEasy: "Easy"
+        case .onTarget: "Clean"
+        case .grinder: "Grind"
+        case .formBreakdown: "Form"
+        case .pain: "Pain"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .tooEasy: "arrow.up.circle"
+        case .onTarget: "checkmark.circle.fill"
+        case .grinder: "flame.fill"
+        case .formBreakdown: "exclamationmark.triangle.fill"
+        case .pain: "cross.case.fill"
+        }
+    }
+
+    var colorName: String {
+        switch self {
+        case .tooEasy: "blue"
+        case .onTarget: "green"
+        case .grinder: "orange"
+        case .formBreakdown: "yellow"
+        case .pain: "red"
+        }
+    }
+
+    /// Approximate reps in reserve — used as a soft signal into progression.
+    var rirEstimate: Double? {
+        switch self {
+        case .tooEasy: 3.5
+        case .onTarget: 1.5
+        case .grinder: 0
+        case .formBreakdown: 0
+        case .pain: nil
+        }
+    }
+
+    var isNegative: Bool {
+        self == .grinder || self == .formBreakdown || self == .pain
     }
 }
 

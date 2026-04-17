@@ -109,22 +109,41 @@ struct AdaptivePrescriptionEngine {
         let maxReps = lastCompletedSets.map(\.reps).max() ?? 0
         let completedCount = lastCompletedSets.count
         let stalls = countStalls(logs: logs, lowerBound: lower)
+        let qualityBias = analyzeQuality(logs: logs)
 
         var decision: ProgressionDecision
         var nextWeight: Double
         var nextRange = "\(lower)-\(upper)"
 
-        if stalls >= 3 && lastWeight > 0 {
+        if qualityBias.hasPainFlag {
+            decision = .holdRecovery
+            nextWeight = lastWeight
+        } else if stalls >= 3 && lastWeight > 0 {
             decision = .rebuild
             nextWeight = roundTo(lastWeight * 0.9, increment: increment)
         } else if minReps >= upper && completedCount >= planned.sets {
             decision = .increaseLoad
-            nextWeight = lastWeight + increment
+            // Quality-aware bump: sustained "too easy" earns a double increment; form breakdown holds instead.
+            if qualityBias.repeatedBreakdown {
+                decision = .hold
+                nextWeight = lastWeight
+            } else if qualityBias.repeatedTooEasy {
+                nextWeight = lastWeight + (increment * 2)
+            } else {
+                nextWeight = lastWeight + increment
+            }
             nextRange = "\(max(lower - 1, max(1, upper - 3)))-\(upper)"
         } else if minReps < lower && stalls >= 2 {
             decision = .reduceLoad
             nextWeight = max(0, lastWeight - increment)
         } else if minReps < lower {
+            decision = .hold
+            nextWeight = lastWeight
+        } else if qualityBias.repeatedTooEasy && minReps >= max(1, upper - 1) {
+            // Within range but consistently too easy — nudge load up a notch.
+            decision = .increaseLoad
+            nextWeight = lastWeight + increment
+        } else if qualityBias.repeatedGrinder || qualityBias.repeatedBreakdown {
             decision = .hold
             nextWeight = lastWeight
         } else {
@@ -159,6 +178,16 @@ struct AdaptivePrescriptionEngine {
             decision = .hold
             nextWeight = lastWeight
             readinessNote = "Fatigue management phase — consolidating instead of pushing."
+        }
+
+        // Quality may also override readiness branch results — if readiness held but quality was strong, keep hold; if quality is poor on top of low readiness, drop a set.
+        if qualityBias.repeatedBreakdown || qualityBias.repeatedGrinder {
+            if suggestedSets == planned.sets && planned.sets >= 3 {
+                suggestedSets = planned.sets - 1
+                if readinessNote == nil {
+                    readinessNote = "Last sessions showed \(qualityBias.repeatedBreakdown ? "form breakdown" : "heavy grind") — dropping a set to protect quality."
+                }
+            }
         }
 
         let weightDelta = nextWeight - lastWeight
@@ -264,6 +293,41 @@ struct AdaptivePrescriptionEngine {
         var counts: [Double: Int] = [:]
         for w in weights { counts[w, default: 0] += 1 }
         return counts.max(by: { $0.value < $1.value })?.key ?? weights.first ?? 0
+    }
+
+    private struct QualityBias {
+        var repeatedTooEasy: Bool
+        var repeatedGrinder: Bool
+        var repeatedBreakdown: Bool
+        var hasPainFlag: Bool
+    }
+
+    private func analyzeQuality(logs: [ExerciseLog]) -> QualityBias {
+        let recent = Array(logs.prefix(3))
+        guard !recent.isEmpty else { return QualityBias(repeatedTooEasy: false, repeatedGrinder: false, repeatedBreakdown: false, hasPainFlag: false) }
+
+        func hasQuality(_ log: ExerciseLog, _ q: SetQuality) -> Bool {
+            log.sets.contains { $0.isCompleted && $0.quality == q }
+        }
+
+        // Pain flag on the most recent session is enough to hold.
+        let hasPain = recent.first.map { hasQuality($0, .pain) } ?? false
+
+        // “Repeated” means showing up in ≥ 2 of the last 3 sessions (or both of the last 2).
+        let sample = max(2, min(3, recent.count))
+        let window = Array(recent.prefix(sample))
+        let needed = window.count >= 3 ? 2 : window.count
+
+        let easyCount = window.filter { hasQuality($0, .tooEasy) }.count
+        let grindCount = window.filter { hasQuality($0, .grinder) }.count
+        let formCount = window.filter { hasQuality($0, .formBreakdown) }.count
+
+        return QualityBias(
+            repeatedTooEasy: easyCount >= needed,
+            repeatedGrinder: grindCount >= needed,
+            repeatedBreakdown: formCount >= needed,
+            hasPainFlag: hasPain
+        )
     }
 
     private func countStalls(logs: [ExerciseLog], lowerBound: Int) -> Int {
