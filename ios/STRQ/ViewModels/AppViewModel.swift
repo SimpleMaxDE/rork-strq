@@ -20,6 +20,8 @@ class AppViewModel {
     private let volumeEngine = SmartVolumeEngine()
     let startingLoadEngine = StartingLoadEngine()
     private let adaptiveEngine = AdaptivePrescriptionEngine()
+    private let planEvolutionEngine = PlanEvolutionEngine()
+    var planEvolutionSignals: [PlanEvolutionSignal] = []
 
     var coachAdjustments: [CoachAdjustment] = []
     var appliedActionIds: Set<String> = []
@@ -271,7 +273,7 @@ class AppViewModel {
 
     func refreshCoachingInsights() {
         let confidence = coachingConfidence
-        let newInsights = coachingEngine.generateInsights(
+        var newInsights = coachingEngine.generateInsights(
             profile: profile,
             workoutHistory: workoutHistory,
             progressEntries: progressEntries,
@@ -283,9 +285,8 @@ class AppViewModel {
             volumeLandmarks: volumeLandmarks,
             confidence: confidence
         )
-        _dynamicInsights = newInsights
 
-        let newRecs = coachingEngine.generateRecommendations(
+        var newRecs = coachingEngine.generateRecommendations(
             profile: profile,
             workoutHistory: workoutHistory,
             progressEntries: progressEntries,
@@ -295,7 +296,43 @@ class AppViewModel {
             phase: trainingPhaseState.currentPhase,
             confidence: confidence
         )
-        recommendations = newRecs
+
+        // Plan-level evolution layer — reads multi-week signals and routes outputs
+        // through existing insights/recommendations surfaces so no new UI is needed.
+        let trend = recoveryTrendData.map(\.score)
+        let weeksTrained: Int = {
+            guard let first = workoutHistory.filter(\.isCompleted).last?.startTime else { return 0 }
+            let days = Calendar.current.dateComponents([.day], from: first, to: Date()).day ?? 0
+            return max(0, days / 7)
+        }()
+        let signals = planEvolutionEngine.analyze(
+            profile: profile,
+            currentPlan: currentPlan,
+            workoutHistory: workoutHistory,
+            progressionStates: progressionStates,
+            muscleBalance: muscleBalance,
+            recoveryTrend: trend,
+            weeksTrained: weeksTrained,
+            phase: trainingPhaseState.currentPhase,
+            baseConfidence: confidence
+        )
+        planEvolutionSignals = signals
+
+        // Gate by plan-evolution confidence — low-confidence signals observe silently.
+        let confidentSignals = signals.filter { $0.confidence != .low }
+        let existingTitles = Set(newInsights.map(\.title))
+        for signal in confidentSignals where !existingTitles.contains(signal.insight.title) {
+            newInsights.append(signal.insight)
+        }
+        let existingRecTitles = Set(newRecs.map(\.title))
+        for signal in confidentSignals {
+            if let rec = signal.recommendation, !existingRecTitles.contains(rec.title) {
+                newRecs.append(rec)
+            }
+        }
+
+        _dynamicInsights = newInsights.sorted { $0.severityRank > $1.severityRank }
+        recommendations = newRecs.sorted { $0.priority > $1.priority }
     }
 
     func refreshIntelligence() {
