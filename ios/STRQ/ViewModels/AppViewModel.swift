@@ -305,8 +305,18 @@ class AppViewModel {
     }
 
     private func refreshProgressionStates() {
-        let exerciseIds = Set(workoutHistory.flatMap(\.exerciseLogs).map(\.exerciseId))
-        progressionStates = exerciseIds.prefix(10).map { exId in
+        var counts: [String: Int] = [:]
+        for session in workoutHistory where session.isCompleted {
+            for log in session.exerciseLogs {
+                counts[log.exerciseId, default: 0] += 1
+            }
+        }
+        let plannedIds = Set(currentPlan?.days.flatMap(\.exercises).map(\.exerciseId) ?? [])
+        let historyIds = Set(counts.keys)
+        let relevantIds = plannedIds.union(historyIds)
+        let ordered = relevantIds.sorted { (counts[$0] ?? 0) > (counts[$1] ?? 0) }
+        let cap = 60
+        progressionStates = ordered.prefix(cap).map { exId in
             progressionEngine.analyzeProgression(
                 exerciseId: exId,
                 sessions: workoutHistory,
@@ -698,10 +708,26 @@ class AppViewModel {
     }
 
     var nextWorkout: WorkoutDay? {
+        nextScheduledWorkout(after: Date())
+    }
+
+    private func nextScheduledWorkout(after date: Date) -> WorkoutDay? {
         guard let plan = currentPlan else { return nil }
+        let active = plan.days.filter { !$0.isSkipped }
+        guard !active.isEmpty else { return nil }
         let calendar = Calendar.current
-        let tomorrowIndex = (calendar.component(.weekday, from: Date()) + 1) % plan.days.count
-        return plan.days[tomorrowIndex]
+        let todayWeekday = calendar.component(.weekday, from: date)
+
+        if active.contains(where: { $0.scheduledWeekday != nil }) {
+            let scheduled = active.filter { $0.scheduledWeekday != nil }
+            let future = scheduled
+                .filter { ($0.scheduledWeekday ?? 0) > todayWeekday }
+                .sorted { ($0.scheduledWeekday ?? 0) < ($1.scheduledWeekday ?? 0) }
+            if let next = future.first { return next }
+            return scheduled.sorted { ($0.scheduledWeekday ?? 0) < ($1.scheduledWeekday ?? 0) }.first
+        }
+        let tomorrowIndex = (todayWeekday) % active.count
+        return active[tomorrowIndex]
     }
 
     // MARK: - Coach Actions
@@ -841,7 +867,9 @@ class AppViewModel {
     }
 
     var nextSessionDayId: String? {
-        todaysWorkout?.id ?? currentPlan?.days.first?.id
+        if let today = todaysWorkout { return today.id }
+        if let next = nextScheduledWorkout(after: Date()) { return next.id }
+        return currentPlan?.days.first(where: { !$0.isSkipped })?.id ?? currentPlan?.days.first?.id
     }
 
     var showPreWorkoutHandoff: Bool = false
