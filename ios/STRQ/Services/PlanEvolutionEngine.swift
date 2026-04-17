@@ -30,6 +30,7 @@ nonisolated struct PlanEvolutionSignal: Sendable {
 
 struct PlanEvolutionEngine {
     private let library = ExerciseLibrary.shared
+    private let selection = ExerciseSelectionEngine()
 
     func analyze(
         profile: UserProfile,
@@ -40,11 +41,20 @@ struct PlanEvolutionEngine {
         recoveryTrend: [Int],
         weeksTrained: Int,
         phase: TrainingPhase,
-        baseConfidence: CoachingConfidence
+        baseConfidence: CoachingConfidence,
+        recoveryScore: Int = 75
     ) -> [PlanEvolutionSignal] {
         // We need at least ~2 weeks of usage before reshaping the plan. Under that,
         // observe silently.
         guard weeksTrained >= 2, baseConfidence >= .moderate else { return [] }
+
+        let context = ExerciseSelectionContext(
+            profile: profile,
+            progressionStates: progressionStates,
+            workoutHistory: workoutHistory,
+            recoveryScore: recoveryScore,
+            phase: phase
+        )
 
         var signals: [PlanEvolutionSignal] = []
 
@@ -54,13 +64,16 @@ struct PlanEvolutionEngine {
         if let s = analyzeMuscleDrift(muscleBalance: muscleBalance, profile: profile, weeksTrained: weeksTrained) {
             signals.append(s)
         }
-        if let s = analyzeStallVsProgress(progressionStates: progressionStates, weeksTrained: weeksTrained) {
+        if let s = analyzeAnchorSwap(context: context, weeksTrained: weeksTrained) {
             signals.append(s)
         }
         if let s = analyzeRecoveryTrend(recoveryTrend: recoveryTrend, workoutHistory: workoutHistory, weeksTrained: weeksTrained, phase: phase) {
             signals.append(s)
         }
         if let s = analyzeMaintainPush(recoveryTrend: recoveryTrend, progressionStates: progressionStates, weeksTrained: weeksTrained, phase: phase) {
+            signals.append(s)
+        }
+        if let plan = currentPlan, let s = analyzeExerciseOrder(plan: plan, context: context, weeksTrained: weeksTrained) {
             signals.append(s)
         }
 
@@ -156,28 +169,28 @@ struct PlanEvolutionEngine {
 
     // MARK: - Anchor Lift Swap
 
-    private func analyzeStallVsProgress(
-        progressionStates: [ExerciseProgressionState],
+    private func analyzeAnchorSwap(
+        context: ExerciseSelectionContext,
         weeksTrained: Int
     ) -> PlanEvolutionSignal? {
-        // Find a stalled lift whose muscle group has another exercise that is clearly progressing.
-        let stalled = progressionStates.filter {
+        // Find a stalled lift and let the selection engine propose the best
+        // progressing anchor candidate that shares its movement pattern.
+        let stalled = context.progressionStates.filter {
             ($0.plateauStatus == .plateaued || $0.plateauStatus == .regressing) && $0.sessionCount >= 4
         }
         guard !stalled.isEmpty else { return nil }
 
         for stall in stalled {
-            guard let stalledEx = library.exercise(byId: stall.exerciseId) else { continue }
-            // Look for a progressing exercise sharing the same primary muscle.
-            let progressingSameMuscle = progressionStates.first { state in
-                state.plateauStatus == .progressing &&
-                state.sessionCount >= 3 &&
-                state.exerciseId != stall.exerciseId &&
-                (library.exercise(byId: state.exerciseId)?.primaryMuscle == stalledEx.primaryMuscle)
-            }
-            guard let alt = progressingSameMuscle, let altEx = library.exercise(byId: alt.exerciseId) else { continue }
-
-            let confidence: PlanEvolutionConfidence = (stall.sessionCount >= 6 && weeksTrained >= 3) ? .high : .moderate
+            guard let result = selection.anchorSwapSuggestion(currentAnchorId: stall.exerciseId, context: context) else { continue }
+            let stalledEx = result.current
+            let altEx = result.alternative
+            let bumpedConfidence: PlanEvolutionConfidence = {
+                switch result.confidence {
+                case .low: return weeksTrained >= 3 ? .moderate : .low
+                case .moderate: return weeksTrained >= 4 ? .high : .moderate
+                case .high: return .high
+                }
+            }()
             let insight = SmartInsight(
                 icon: "arrow.triangle.swap",
                 color: "blue",
@@ -194,13 +207,50 @@ struct PlanEvolutionEngine {
             )
             return PlanEvolutionSignal(
                 kind: .swapAnchorLift(from: stalledEx.name, to: altEx.name, muscle: stalledEx.primaryMuscle.displayName),
-                confidence: confidence,
+                confidence: bumpedConfidence,
                 insight: insight,
                 recommendation: rec
             )
         }
 
         return nil
+    }
+
+    // MARK: - Exercise Order
+
+    private func analyzeExerciseOrder(
+        plan: WorkoutPlan,
+        context: ExerciseSelectionContext,
+        weeksTrained: Int
+    ) -> PlanEvolutionSignal? {
+        let suggestions = selection.reorderSuggestions(for: plan, context: context)
+        guard let top = suggestions.first else { return nil }
+
+        let confidence: PlanEvolutionConfidence = {
+            if weeksTrained >= 4 && top.confidence == .moderate { return .moderate }
+            return top.confidence
+        }()
+
+        let insight = SmartInsight(
+            icon: "arrow.up.arrow.down.circle",
+            color: "blue",
+            title: "Reorder \(top.dayName): Lead With \(top.exerciseName)",
+            message: top.reason,
+            severity: .low,
+            category: .progression
+        )
+        let rec = Recommendation(
+            type: .exerciseSwap,
+            title: "Move \(top.exerciseName) Earlier",
+            message: "Placing \(top.exerciseName) earlier in \(top.dayName) lets it benefit from fresh energy — you've been progressing on it and it belongs near the front.",
+            priority: 2
+        )
+        return PlanEvolutionSignal(
+            kind: .reorderDayEmphasis(muscle: top.exerciseName),
+            confidence: confidence,
+            insight: insight,
+            recommendation: rec
+        )
     }
 
     // MARK: - Recovery Trend

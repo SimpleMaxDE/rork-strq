@@ -314,7 +314,8 @@ class AppViewModel {
             recoveryTrend: trend,
             weeksTrained: weeksTrained,
             phase: trainingPhaseState.currentPhase,
-            baseConfidence: confidence
+            baseConfidence: confidence,
+            recoveryScore: recoveryScore
         )
         planEvolutionSignals = signals
 
@@ -904,7 +905,16 @@ class AppViewModel {
 
     func swapExerciseOptions(for exerciseId: String, dayId: String) -> [ExerciseSwapOption] {
         guard let plan = currentPlan else { return [] }
-        return actionManager.swapExerciseOptions(for: exerciseId, in: plan, dayId: dayId, profile: profile)
+        return actionManager.swapExerciseOptions(
+            for: exerciseId,
+            in: plan,
+            dayId: dayId,
+            profile: profile,
+            progressionStates: progressionStates,
+            workoutHistory: workoutHistory,
+            recoveryScore: recoveryScore,
+            phase: trainingPhaseState.currentPhase
+        )
     }
 
     func applyExerciseSwap(dayId: String, oldExerciseId: String, newExercise: Exercise) {

@@ -303,37 +303,34 @@ struct CoachActionManager {
         )
     }
 
-    func swapExerciseOptions(for exerciseId: String, in plan: WorkoutPlan, dayId: String, profile: UserProfile) -> [ExerciseSwapOption] {
-        guard let exercise = library.exercise(byId: exerciseId) else { return [] }
+    func swapExerciseOptions(
+        for exerciseId: String,
+        in plan: WorkoutPlan,
+        dayId: String,
+        profile: UserProfile,
+        progressionStates: [ExerciseProgressionState] = [],
+        workoutHistory: [WorkoutSession] = [],
+        recoveryScore: Int = 75,
+        phase: TrainingPhase = .build
+    ) -> [ExerciseSwapOption] {
+        guard library.exercise(byId: exerciseId) != nil else { return [] }
 
-        let engine = CoachingEngine()
-        let candidates = engine.suggestExerciseReplacement(for: exercise, profile: profile, reason: .general)
+        let selection = ExerciseSelectionEngine()
+        let context = ExerciseSelectionContext(
+            profile: profile,
+            progressionStates: progressionStates,
+            workoutHistory: workoutHistory,
+            recoveryScore: recoveryScore,
+            phase: phase
+        )
+        let ranked = selection.rankedSubstitutes(for: exerciseId, context: context, reason: .general, limit: 6)
 
-        return candidates.map { candidate in
-            var tags: [String] = []
-            var reason = "Same muscle target"
-
-            if candidate.primaryMuscle == exercise.primaryMuscle {
-                tags.append("Same target")
-            }
-            if candidate.movementPattern == exercise.movementPattern {
-                tags.append("Same pattern")
-                reason = "Same movement pattern and muscle target"
-            }
-            if candidate.isJointFriendly {
-                tags.append("Joint-friendly")
-                if !exercise.isJointFriendly {
-                    reason = "Lower joint stress alternative"
-                }
-            }
-            if candidate.locationType == .anywhere || candidate.locationType == .homeNoEquipment {
-                tags.append("Minimal equipment")
-            }
-            if candidate.difficulty.rawValue < exercise.difficulty.rawValue {
-                tags.append("Easier")
-            }
-
-            return ExerciseSwapOption(exercise: candidate, reason: reason, tags: tags)
+        return ranked.map { scored in
+            ExerciseSwapOption(
+                exercise: scored.exercise,
+                reason: scored.reasons.first ?? "Alternative",
+                tags: scored.tags
+            )
         }
     }
 
