@@ -4,5 +4,19 @@
 <dict>
 	<key>com.apple.developer.in-app-payments</key>
 	<array/>
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+	<key>com.apple.developer.icloud-services</key>
+	<array>
+		<string>CloudKit</string>
+	</array>
+	<key>com.apple.developer.icloud-container-identifiers</key>
+	<array>
+		<string>iCloud.app.rork.40gfu7dywfru7n82xfoy4</string>
+	</array>
+	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
+	<string>$(TeamIdentifierPrefix)app.rork.40gfu7dywfru7n82xfoy4</string>
 </dict>
 </plist>

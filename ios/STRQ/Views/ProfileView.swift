@@ -1,5 +1,6 @@
 import SwiftUI
 import StoreKit
+import AuthenticationServices
 
 struct ProfileView: View {
     @Bindable var vm: AppViewModel
@@ -10,11 +11,16 @@ struct ProfileView: View {
     @State private var showPaywall: Bool = false
     @State private var showManageSubscription: Bool = false
     @State private var showRestoreMessage: Bool = false
+    @State private var showSignOutAlert: Bool = false
+    @State private var showCloudRestoreConfirm: Bool = false
+    @State private var cloudRestoreMessage: String?
+    @State private var showCloudRestoreMessage: Bool = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
                 profileHeader
+                accountSection
                 subscriptionSection
                 fitnessIdentity
                 trainingSetup
@@ -59,6 +65,31 @@ struct ProfileView: View {
             STRQPaywallView(store: store)
                 .presentationDragIndicator(.visible)
         }
+        .alert("Sign Out?", isPresented: $showSignOutAlert) {
+            Button("Sign Out", role: .destructive) {
+                vm.account.signOut()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Your data stays on this device. Sign back in anytime to restore from iCloud.")
+        }
+        .alert("Restore from iCloud?", isPresented: $showCloudRestoreConfirm) {
+            Button("Restore", role: .destructive) {
+                let ok = vm.restoreFromCloud()
+                cloudRestoreMessage = ok
+                    ? "Your training data has been restored."
+                    : "No cloud snapshot found yet. Train on this device and it will sync automatically."
+                showCloudRestoreMessage = true
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will replace data on this device with your most recent iCloud snapshot.")
+        }
+        .alert("iCloud", isPresented: $showCloudRestoreMessage) {
+            Button("OK") { cloudRestoreMessage = nil }
+        } message: {
+            Text(cloudRestoreMessage ?? "")
+        }
         .alert("Restore Purchases", isPresented: $showRestoreMessage) {
             Button("OK") {
                 store.restoreMessage = nil
@@ -67,6 +98,149 @@ struct ProfileView: View {
         } message: {
             Text(store.restoreMessage ?? store.error ?? "No active subscriptions found.")
         }
+    }
+
+    // MARK: - Account
+
+    private var accountSection: some View {
+        VStack(spacing: 10) {
+            if let account = vm.account.account {
+                VStack(spacing: 0) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "icloud.fill")
+                            .font(.subheadline)
+                            .foregroundStyle(.white)
+                            .frame(width: 34, height: 34)
+                            .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(account.displayName ?? "Signed in with Apple")
+                                .font(.subheadline.weight(.bold))
+                                .lineLimit(1)
+                            Text(cloudStatusText)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        cloudStatusBadge
+                    }
+                    .padding(14)
+
+                    Divider().opacity(0.3).padding(.horizontal, 14)
+
+                    Button {
+                        showCloudRestoreConfirm = true
+                    } label: {
+                        accountActionRow(icon: "arrow.clockwise.icloud.fill", label: "Restore from iCloud")
+                    }
+
+                    Divider().opacity(0.3).padding(.horizontal, 14)
+
+                    Button {
+                        showSignOutAlert = true
+                    } label: {
+                        accountActionRow(icon: "rectangle.portrait.and.arrow.right", label: "Sign Out", tint: .red)
+                    }
+                }
+                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                )
+            } else {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "person.crop.circle.badge.checkmark")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 34, height: 34)
+                            .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Sync across devices")
+                                .font(.subheadline.weight(.bold))
+                            Text("Sign in with Apple to back up your training to iCloud.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: 0)
+                    }
+
+                    SignInWithAppleButton(.signIn) { request in
+                        vm.account.configureRequest(request)
+                    } onCompletion: { result in
+                        vm.account.handleCompletion(result)
+                        if vm.account.isSignedIn {
+                            if vm.cloudSync.hasRemoteSnapshot, vm.workoutHistory.isEmpty {
+                                _ = vm.restoreFromCloud()
+                            } else {
+                                vm.uploadToCloud()
+                            }
+                        }
+                    }
+                    .signInWithAppleButtonStyle(.white)
+                    .frame(height: 44)
+                    .clipShape(.rect(cornerRadius: 11))
+                }
+                .padding(14)
+                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                )
+            }
+        }
+    }
+
+    private func accountActionRow(icon: String, label: String, tint: Color = STRQBrand.steel) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.caption)
+                .foregroundStyle(tint)
+                .frame(width: 24)
+            Text(label)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(label == "Sign Out" ? .red : .primary)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+    }
+
+    private var cloudStatusText: String {
+        guard vm.cloudSync.isAvailable else {
+            return "iCloud unavailable on this device"
+        }
+        switch vm.cloudSync.status {
+        case .syncing: return "Syncing…"
+        case .failed(let reason): return "Sync issue · \(reason)"
+        case .unavailable: return "iCloud unavailable"
+        case .success, .idle:
+            if let text = vm.cloudSync.lastSyncText {
+                return "Synced \(text)"
+            }
+            return "Ready to sync"
+        }
+    }
+
+    private var cloudStatusBadge: some View {
+        let (label, color): (String, Color) = {
+            guard vm.cloudSync.isAvailable else { return ("OFF", .gray) }
+            switch vm.cloudSync.status {
+            case .syncing: return ("SYNC", STRQBrand.steel)
+            case .failed: return ("RETRY", .orange)
+            case .unavailable: return ("OFF", .gray)
+            case .success, .idle: return ("ON", .green)
+            }
+        }()
+        return Text(label)
+            .font(.system(size: 10, weight: .bold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.8), in: Capsule())
     }
 
     // MARK: - Subscription

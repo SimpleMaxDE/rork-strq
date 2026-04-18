@@ -65,6 +65,8 @@ class AppViewModel {
     private let nutritionEngine = NutritionCoachEngine()
 
     private let persistence = PersistenceStore.shared
+    let account = AccountManager.shared
+    let cloudSync = CloudSyncService.shared
     private var isHydrating: Bool = false
     private var lastScheduledSignature: String = ""
 
@@ -168,6 +170,99 @@ class AppViewModel {
         )
         persistence.save(snapshot)
         scheduleSmartRemindersIfNeeded()
+        if account.isSignedIn {
+            cloudSync.upload(snapshot, isSignedIn: true)
+        }
+    }
+
+    // MARK: - Cloud Sync
+
+    func restoreFromCloud() -> Bool {
+        guard let payload = cloudSync.loadRemoteSnapshot() else { return false }
+        applySnapshot(payload.state)
+        Analytics.shared.track(.cloud_sync_restored)
+        ErrorReporter.shared.breadcrumb("Cloud snapshot restored", category: "sync")
+        return true
+    }
+
+    func uploadToCloud() {
+        guard account.isSignedIn else { return }
+        let draft: ActiveWorkoutDraft? = activeWorkout.map { state in
+            ActiveWorkoutDraft(
+                session: state.session,
+                currentExerciseIndex: state.currentExerciseIndex,
+                currentSetIndex: state.currentSetIndex,
+                plannedExercises: state.plannedExercises
+            )
+        }
+        let snapshot = PersistedAppState(
+            version: persistence.version,
+            hasCompletedOnboarding: hasCompletedOnboarding,
+            profile: profile,
+            currentPlan: currentPlan,
+            workoutHistory: workoutHistory,
+            personalRecords: personalRecords,
+            progressEntries: progressEntries,
+            favoriteExerciseIds: Array(favoriteExerciseIds),
+            progressionStates: progressionStates,
+            trainingPhaseState: trainingPhaseState,
+            coachAdjustments: coachAdjustments,
+            appliedActionIds: Array(appliedActionIds),
+            weekAdjustmentActive: weekAdjustmentActive,
+            previousPlanBeforeWeekAction: previousPlanBeforeWeekAction,
+            weeklyReviewDismissed: weeklyReviewDismissed,
+            todaysReadiness: todaysReadiness,
+            readinessHistory: readinessHistory,
+            notificationSettings: notificationSettings,
+            nutritionTarget: nutritionTarget,
+            nutritionLogs: nutritionLogs,
+            bodyWeightEntries: bodyWeightEntries,
+            sleepEntries: sleepEntries,
+            activeWorkoutDraft: draft
+        )
+        cloudSync.upload(snapshot, isSignedIn: true)
+    }
+
+    private func applySnapshot(_ saved: PersistedAppState) {
+        isHydrating = true
+        hasCompletedOnboarding = saved.hasCompletedOnboarding
+        profile = saved.profile
+        currentPlan = saved.currentPlan
+        workoutHistory = saved.workoutHistory
+        personalRecords = saved.personalRecords
+        progressEntries = saved.progressEntries
+        favoriteExerciseIds = Set(saved.favoriteExerciseIds)
+        progressionStates = saved.progressionStates
+        trainingPhaseState = saved.trainingPhaseState
+        coachAdjustments = saved.coachAdjustments
+        appliedActionIds = Set(saved.appliedActionIds)
+        weekAdjustmentActive = saved.weekAdjustmentActive
+        previousPlanBeforeWeekAction = saved.previousPlanBeforeWeekAction
+        weeklyReviewDismissed = saved.weeklyReviewDismissed
+        todaysReadiness = saved.todaysReadiness
+        readinessHistory = saved.readinessHistory
+        notificationSettings = saved.notificationSettings
+        nutritionTarget = saved.nutritionTarget
+        nutritionLogs = saved.nutritionLogs
+        bodyWeightEntries = saved.bodyWeightEntries
+        sleepEntries = saved.sleepEntries
+        if let draft = saved.activeWorkoutDraft {
+            activeWorkout = ActiveWorkoutState(
+                session: draft.session,
+                currentExerciseIndex: draft.currentExerciseIndex,
+                currentSetIndex: draft.currentSetIndex,
+                isResting: false,
+                restTimeRemaining: 0,
+                plannedExercises: draft.plannedExercises
+            )
+        } else {
+            activeWorkout = nil
+        }
+        isHydrating = false
+        refreshIntelligence()
+        refreshNutritionInsights()
+        refreshDailyState()
+        persist()
     }
 
     // MARK: - Smart Reminders

@@ -142,4 +142,12 @@ nonisolated enum AnalyticsEvent: String {
     case persistence_loaded
     case persistence_reset
     case persistence_load_failed
+
+    // Account
+    case account_signed_in
+    case account_signed_out
+    case account_sign_in_failed
+    case cloud_sync_uploaded
+    case cloud_sync_restored
+    case cloud_sync_failed
 }

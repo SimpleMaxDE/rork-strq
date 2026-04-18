@@ -47,6 +47,7 @@ struct STRQApp: App {
             case .active:
                 Analytics.shared.track(.app_became_active)
                 vm.rescheduleSmartReminders()
+                vm.account.refreshCredentialState()
             case .background, .inactive:
                 if vm.activeWorkout != nil {
                     vm.saveActiveWorkoutDraft()
