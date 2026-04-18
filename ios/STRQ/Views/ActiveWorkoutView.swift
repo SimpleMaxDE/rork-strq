@@ -871,8 +871,10 @@ struct ActiveWorkoutView: View {
         vm.activeWorkout = workout
 
         let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
-        restTimeRemaining = planned?.restSeconds ?? 90
+        let rest = planned?.restSeconds ?? 90
+        restTimeRemaining = rest
         restTimerActive = true
+        vm.updateLiveActivity(restEndsAt: Date().addingTimeInterval(TimeInterval(rest)))
     }
 
     private func setQuality(exerciseIndex: Int, setIndex: Int, quality: SetQuality?) {
@@ -899,6 +901,7 @@ struct ActiveWorkoutView: View {
         guard var workout = vm.activeWorkout else { return }
         workout.currentSetIndex = setIndex
         vm.activeWorkout = workout
+        vm.updateLiveActivity(restEndsAt: liveRestEndsAt())
     }
 
     private func moveToNextExercise() {
@@ -907,6 +910,7 @@ struct ActiveWorkoutView: View {
             workout.currentExerciseIndex += 1
             workout.currentSetIndex = 0
             vm.activeWorkout = workout
+            vm.updateLiveActivity(restEndsAt: liveRestEndsAt())
         }
     }
 
@@ -916,6 +920,7 @@ struct ActiveWorkoutView: View {
             workout.currentExerciseIndex -= 1
             workout.currentSetIndex = 0
             vm.activeWorkout = workout
+            vm.updateLiveActivity(restEndsAt: liveRestEndsAt())
         }
     }
 
@@ -924,6 +929,12 @@ struct ActiveWorkoutView: View {
         workout.currentExerciseIndex = index
         workout.currentSetIndex = 0
         vm.activeWorkout = workout
+        vm.updateLiveActivity(restEndsAt: liveRestEndsAt())
+    }
+
+    private func liveRestEndsAt() -> Date? {
+        guard restTimerActive, restTimeRemaining > 0 else { return nil }
+        return Date().addingTimeInterval(TimeInterval(restTimeRemaining))
     }
 
     private func startTimer() {

@@ -75,6 +75,11 @@
 				XX69A5D956E301F44ABA23XX /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
 			);
 		};
+		XX88195F5A75E2A60C49E8XX /* STRQShared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = STRQShared;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +141,7 @@
 				105FC5962E9EAD3200EA8BCF /* STRQUITests */,
 				105FC57B2E9EAD3100EA8BCF /* Products */,
 				XX88195F5A75E2A60C49E7XX /* STRQWidget */,
+				XX88195F5A75E2A60C49E8XX /* STRQShared */,
 			);
 			sourceTree = "<group>";
 		};
@@ -169,6 +175,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				105FC57C2E9EAD3100EA8BCF /* STRQ */,
+				XX88195F5A75E2A60C49E8XX /* STRQShared */,
 			);
 			name = STRQ;
 			packageProductDependencies = (
@@ -242,6 +249,7 @@
 			productType = "com.apple.product-type.app-extension";
 			fileSystemSynchronizedGroups = (
 				XX88195F5A75E2A60C49E7XX /* STRQWidget */,
+				XX88195F5A75E2A60C49E8XX /* STRQShared */,
 			);
 		};
 /* End PBXNativeTarget section */
@@ -510,6 +518,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "STRQ reads your body weight and sleep data to personalize your training, recovery, and nutrition.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "STRQ saves your logged body weight and completed workouts to Apple Health.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -546,6 +555,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "STRQ reads your body weight and sleep data to personalize your training, recovery, and nutrition.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "STRQ saves your logged body weight and completed workouts to Apple Health.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -740,7 +740,61 @@ class AppViewModel {
             restTimeRemaining: 0,
             plannedExercises: day.exercises
         )
+        startLiveActivityForActiveWorkout()
         persist()
+    }
+
+    // MARK: - Live Activity
+
+    private func buildLiveActivityState(restEndsAt: Date? = nil) -> WorkoutActivityAttributes.ContentState? {
+        guard let workout = activeWorkout else { return nil }
+        let logs = workout.session.exerciseLogs
+        guard !logs.isEmpty else { return nil }
+        let idx = min(workout.currentExerciseIndex, logs.count - 1)
+        let log = logs[idx]
+        let exerciseName = library.exercise(byId: log.exerciseId)?.name ?? log.exerciseId
+        let completedSetsInCurrent = log.sets.filter(\.isCompleted).count
+        let currentSetNumber = min(log.sets.count, completedSetsInCurrent + 1)
+        let totalCompleted = logs.flatMap(\.sets).filter(\.isCompleted).count
+        let totalSessionSets = logs.flatMap(\.sets).count
+        let nextIdx = idx + 1
+        let nextName: String? = nextIdx < logs.count
+            ? (library.exercise(byId: logs[nextIdx].exerciseId)?.name ?? logs[nextIdx].exerciseId)
+            : nil
+        let allDone = logs.allSatisfy(\.isCompleted)
+        return WorkoutActivityAttributes.ContentState(
+            dayName: workout.session.dayName,
+            exerciseName: exerciseName,
+            currentExerciseIndex: idx,
+            totalExercises: logs.count,
+            currentSetNumber: currentSetNumber,
+            totalSets: log.sets.count,
+            completedSets: totalCompleted,
+            totalSessionSets: totalSessionSets,
+            startedAt: workout.session.startTime,
+            restEndsAt: restEndsAt,
+            nextExerciseName: nextName,
+            isCompleted: allDone
+        )
+    }
+
+    func startLiveActivityForActiveWorkout() {
+        guard let workout = activeWorkout, let state = buildLiveActivityState() else { return }
+        WorkoutLiveActivityManager.shared.start(state: state, workoutId: workout.session.id)
+    }
+
+    func updateLiveActivity(restEndsAt: Date? = nil) {
+        guard let state = buildLiveActivityState(restEndsAt: restEndsAt) else { return }
+        WorkoutLiveActivityManager.shared.update(state: state)
+    }
+
+    func endLiveActivity(completed: Bool) {
+        var finalState = buildLiveActivityState()
+        if completed, finalState != nil {
+            finalState?.isCompleted = true
+            finalState?.restEndsAt = nil
+        }
+        WorkoutLiveActivityManager.shared.end(finalState: finalState, immediate: !completed)
     }
 
     func saveActiveWorkoutDraft() {
@@ -771,6 +825,7 @@ class AppViewModel {
         let sessionStart = workout.session.startTime
         let sessionEnd = workout.session.endTime ?? Date()
         let sessionVolume = workout.session.totalVolume
+        endLiveActivity(completed: true)
         activeWorkout = nil
         refreshIntelligence()
         persist()
