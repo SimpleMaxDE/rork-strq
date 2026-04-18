@@ -170,6 +170,7 @@ class AppViewModel {
         )
         persistence.save(snapshot)
         scheduleSmartRemindersIfNeeded()
+        refreshWidgetSnapshot()
         if account.isSignedIn {
             cloudSync.upload(snapshot, isSignedIn: true)
         }
@@ -278,6 +279,35 @@ class AppViewModel {
 
     func rescheduleSmartReminders() {
         scheduleSmartRemindersIfNeeded(force: true)
+    }
+
+    // MARK: - Widget Snapshot
+
+    func refreshWidgetSnapshot() {
+        let today = todaysWorkout
+        let isRestDay = today == nil
+        let focus = today?.focusMuscles.prefix(2).map(\.displayName).joined(separator: " & ")
+        let planned = max(1, profile.daysPerWeek)
+        let weeklyCompleted = weeklyStats.sessions
+        let nextTitle: String = {
+            if let action = nextBestAction { return action.title }
+            if isRestDay { return "Recovery day" }
+            return "Ready to train"
+        }()
+        let snapshot = WidgetBridge.Snapshot(
+            todayWorkoutName: today?.name,
+            todayFocus: focus,
+            isRestDay: isRestDay,
+            hasCheckedIn: hasCheckedInToday,
+            readinessScore: effectiveRecoveryScore,
+            readinessLabel: readinessBasedRecoveryStatus,
+            nextActionTitle: nextTitle,
+            streak: streak,
+            weeklyCompleted: weeklyCompleted,
+            weeklyTarget: planned,
+            updatedAt: Date()
+        )
+        WidgetBridge.write(snapshot)
     }
 
     private func buildReminderInput() -> NotificationScheduler.ScheduleInput {
@@ -738,9 +768,15 @@ class AppViewModel {
         )
         progressEntries.insert(entry, at: 0)
 
+        let sessionStart = workout.session.startTime
+        let sessionEnd = workout.session.endTime ?? Date()
+        let sessionVolume = workout.session.totalVolume
         activeWorkout = nil
         refreshIntelligence()
         persist()
+        if notificationSettings.healthKitSyncEnabled {
+            Task { await HealthKitService.shared.saveWorkout(start: sessionStart, end: sessionEnd, totalVolumeKg: sessionVolume) }
+        }
         Analytics.shared.track(.workout_completed, [
             "day": workout.session.dayName,
             "sets": String(entry.totalSets),
@@ -1911,6 +1947,9 @@ class AppViewModel {
         refreshNutritionInsights()
         persist()
         Analytics.shared.track(.weight_logged, ["has_bf": bodyFat != nil ? "true" : "false"])
+        if notificationSettings.healthKitSyncEnabled {
+            Task { await HealthKitService.shared.saveBodyWeight(kg: weight) }
+        }
     }
 
     func logSleep(hours: Double, quality: ReadinessLevel) {
@@ -1922,6 +1961,33 @@ class AppViewModel {
             "hours": String(format: "%.1f", hours),
             "quality": String(describing: quality)
         ])
+    }
+
+    // MARK: - HealthKit
+
+    func syncHealthKitOnEnable() async {
+        let hk = HealthKitService.shared
+        guard hk.authState == .authorized else { return }
+        if let latest = await hk.readLatestBodyWeight() {
+            let alreadyLogged = bodyWeightEntries.contains { Calendar.current.isDate($0.date, inSameDayAs: latest.date) }
+            if !alreadyLogged {
+                let entry = BodyWeightEntry(date: latest.date, weightKg: latest.kg, bodyFatPercent: nil)
+                bodyWeightEntries.insert(entry, at: 0)
+                profile.weightKg = latest.kg
+                refreshNutritionInsights()
+                persist()
+            }
+        }
+        if let hours = await hk.readRecentSleepHours(days: 1) {
+            let alreadyLogged = sleepEntries.contains { Calendar.current.isDateInToday($0.date) }
+            if !alreadyLogged, hours >= 2 {
+                let quality: ReadinessLevel = hours >= 7.5 ? .great : hours >= 6.5 ? .good : hours >= 5.5 ? .okay : .poor
+                let entry = SleepEntry(hoursSlept: hours, quality: quality)
+                sleepEntries.insert(entry, at: 0)
+                refreshNutritionInsights()
+                persist()
+            }
+        }
     }
 
     var nutritionCoachSummary: String {

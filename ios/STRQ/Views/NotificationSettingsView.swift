@@ -17,6 +17,7 @@ struct NotificationSettingsView: View {
                 weeklyReviewReminders
                 coachNudges
                 streakReminders
+                healthKitSection
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 32)
@@ -236,6 +237,50 @@ struct NotificationSettingsView: View {
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(.easeOut(duration: 0.4).delay(0.25), value: appeared)
+    }
+
+    @ViewBuilder
+    private var healthKitSection: some View {
+        if HealthKitService.shared.isAvailable {
+            VStack(alignment: .leading, spacing: 12) {
+                sectionHeader("Apple Health", icon: "heart.fill", color: .pink)
+
+                VStack(spacing: 1) {
+                    Toggle(isOn: Binding(
+                        get: { vm.notificationSettings.healthKitSyncEnabled },
+                        set: { newValue in
+                            vm.notificationSettings.healthKitSyncEnabled = newValue
+                            if newValue {
+                                Task {
+                                    let ok = await HealthKitService.shared.requestAuthorization()
+                                    if !ok {
+                                        vm.notificationSettings.healthKitSyncEnabled = false
+                                    } else {
+                                        await vm.syncHealthKitOnEnable()
+                                    }
+                                }
+                            }
+                        }
+                    )) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Sync with Apple Health")
+                                .font(.subheadline)
+                            Text("Read body weight and sleep, write workouts and weigh-ins")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .tint(STRQBrand.steel)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                    .background(Color(.secondarySystemGroupedBackground))
+                }
+                .clipShape(.rect(cornerRadius: 14))
+            }
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+            .animation(.easeOut(duration: 0.4).delay(0.3), value: appeared)
+        }
     }
 
     private func sectionHeader(_ title: String, icon: String, color: Color) -> some View {
