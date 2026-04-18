@@ -22,6 +22,8 @@ class AppViewModel {
     private let adaptiveEngine = AdaptivePrescriptionEngine()
     private let planEvolutionEngine = PlanEvolutionEngine()
     var planEvolutionSignals: [PlanEvolutionSignal] = []
+    private let toleranceEngine = ToleranceEngine()
+    var toleranceSignals: [ToleranceSignal] = []
 
     var coachAdjustments: [CoachAdjustment] = []
     var appliedActionIds: Set<String> = []
@@ -321,14 +323,46 @@ class AppViewModel {
 
         // Gate by plan-evolution confidence — low-confidence signals observe silently.
         let confidentSignals = signals.filter { $0.confidence != .low }
-        let existingTitles = Set(newInsights.map(\.title))
+        var existingTitles = Set(newInsights.map(\.title))
         for signal in confidentSignals where !existingTitles.contains(signal.insight.title) {
             newInsights.append(signal.insight)
+            existingTitles.insert(signal.insight.title)
         }
-        let existingRecTitles = Set(newRecs.map(\.title))
+        var existingRecTitles = Set(newRecs.map(\.title))
         for signal in confidentSignals {
             if let rec = signal.recommendation, !existingRecTitles.contains(rec.title) {
                 newRecs.append(rec)
+                existingRecTitles.insert(rec.title)
+            }
+        }
+
+        // Tolerance / execution-adjustment layer — converts repeated set-quality
+        // patterns (pain / breakdown / grind / too-easy / alternative outperforms)
+        // into earned, confidence-aware coaching actions. Routed through the
+        // existing insights + recommendations streams — no new UI.
+        let tolerance = toleranceEngine.analyze(
+            profile: profile,
+            workoutHistory: workoutHistory,
+            progressionStates: progressionStates,
+            recoveryScore: recoveryScore,
+            phase: trainingPhaseState.currentPhase,
+            baseConfidence: confidence
+        )
+        toleranceSignals = tolerance
+        let actionableTolerance = tolerance.filter { signal in
+            switch signal.confidence {
+            case .low: return false
+            case .moderate, .high: return true
+            }
+        }
+        for signal in actionableTolerance where !existingTitles.contains(signal.insight.title) {
+            newInsights.append(signal.insight)
+            existingTitles.insert(signal.insight.title)
+        }
+        for signal in actionableTolerance {
+            if let rec = signal.recommendation, !existingRecTitles.contains(rec.title) {
+                newRecs.append(rec)
+                existingRecTitles.insert(rec.title)
             }
         }
 
