@@ -46,6 +46,7 @@ struct STRQApp: App {
             switch phase {
             case .active:
                 Analytics.shared.track(.app_became_active)
+                vm.rescheduleSmartReminders()
             case .background, .inactive:
                 if vm.activeWorkout != nil {
                     vm.saveActiveWorkoutDraft()

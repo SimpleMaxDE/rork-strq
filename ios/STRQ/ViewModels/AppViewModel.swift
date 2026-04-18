@@ -66,6 +66,7 @@ class AppViewModel {
 
     private let persistence = PersistenceStore.shared
     private var isHydrating: Bool = false
+    private var lastScheduledSignature: String = ""
 
     init() {
         self.profile = UserProfile()
@@ -119,6 +120,7 @@ class AppViewModel {
             refreshIntelligence()
             refreshNutritionInsights()
             refreshDailyState()
+            scheduleSmartRemindersIfNeeded(force: true)
         } else if legacyOnboardingFlag {
             self.hasCompletedOnboarding = false
             UserDefaults.standard.removeObject(forKey: "hasCompletedOnboarding")
@@ -165,6 +167,90 @@ class AppViewModel {
             activeWorkoutDraft: draft
         )
         persistence.save(snapshot)
+        scheduleSmartRemindersIfNeeded()
+    }
+
+    // MARK: - Smart Reminders
+
+    func scheduleSmartRemindersIfNeeded(force: Bool = false) {
+        guard hasCompletedOnboarding else { return }
+        let input = buildReminderInput()
+        let signature = reminderSignature(input)
+        if !force && signature == lastScheduledSignature { return }
+        lastScheduledSignature = signature
+        Task { await NotificationScheduler.shared.reschedule(with: input) }
+    }
+
+    func rescheduleSmartReminders() {
+        scheduleSmartRemindersIfNeeded(force: true)
+    }
+
+    private func buildReminderInput() -> NotificationScheduler.ScheduleInput {
+        let calendar = Calendar.current
+        let today = todaysWorkout
+        let next = nextScheduledWorkout(after: Date())
+        let nextDate = nextScheduledWorkoutDate
+        let lastWorkout = workoutHistory.first(where: \.isCompleted)?.startTime
+        let lastReadiness = readinessHistory.first?.date
+        let lastActive: Date? = [lastWorkout, lastReadiness].compactMap { $0 }.max()
+        let missingWeightDays: Int = {
+            guard let last = bodyWeightEntries.first?.date else { return 99 }
+            return calendar.dateComponents([.day], from: last, to: Date()).day ?? 0
+        }()
+        let missingSleepDays: Int = {
+            guard let last = sleepEntries.first?.date else { return 99 }
+            return calendar.dateComponents([.day], from: last, to: Date()).day ?? 0
+        }()
+        let totalCompleted = totalCompletedWorkouts
+        let isEarlyStage = totalCompleted < 4
+        let isRestDay = today == nil
+
+        return NotificationScheduler.ScheduleInput(
+            settings: notificationSettings,
+            todaysWorkoutName: today?.name,
+            todaysFocus: today?.focusMuscles.prefix(2).map(\.displayName).joined(separator: " & "),
+            nextScheduledDate: nextDate,
+            nextScheduledWorkoutName: next?.name,
+            hasCheckedInToday: hasCheckedInToday,
+            isWeeklyReviewReady: isWeeklyReviewReady,
+            streak: streak,
+            completedWorkoutsTotal: totalCompleted,
+            isEarlyStage: isEarlyStage,
+            isRestDay: isRestDay,
+            lastActiveDate: lastActive,
+            missingBodyWeightDays: missingWeightDays,
+            missingSleepDays: missingSleepDays,
+            readinessBucket: readinessBucket,
+            weeklyReviewDay: notificationSettings.weeklyReviewDay
+        )
+    }
+
+    private func reminderSignature(_ input: NotificationScheduler.ScheduleInput) -> String {
+        let s = input.settings
+        let df = ISO8601DateFormatter()
+        df.formatOptions = [.withFullDate]
+        let today = df.string(from: Date())
+        return [
+            today,
+            s.workoutRemindersEnabled ? "1" : "0",
+            s.readinessCheckInEnabled ? "1" : "0",
+            s.weeklyReviewEnabled ? "1" : "0",
+            s.coachNudgesEnabled ? "1" : "0",
+            s.streakReminderEnabled ? "1" : "0",
+            String(Int(s.workoutReminderTime.timeIntervalSinceReferenceDate / 60).description.hashValue),
+            String(Int(s.readinessCheckInTime.timeIntervalSinceReferenceDate / 60).description.hashValue),
+            String(s.weeklyReviewDay),
+            input.todaysWorkoutName ?? "-",
+            input.nextScheduledWorkoutName ?? "-",
+            input.nextScheduledDate.map { df.string(from: $0) } ?? "-",
+            input.hasCheckedInToday ? "1" : "0",
+            String(input.streak),
+            String(input.completedWorkoutsTotal),
+            input.isWeeklyReviewReady ? "1" : "0",
+            input.readinessBucket,
+            String(input.missingBodyWeightDays),
+            String(input.missingSleepDays)
+        ].joined(separator: "|")
     }
 
     func resetAllData() {
@@ -884,6 +970,39 @@ class AppViewModel {
 
     var nextWorkout: WorkoutDay? {
         nextScheduledWorkout(after: Date())
+    }
+
+    var nextScheduledWorkoutDate: Date? {
+        guard let plan = currentPlan else { return nil }
+        let active = plan.days.filter { !$0.isSkipped && $0.scheduledWeekday != nil }
+        guard !active.isEmpty else { return nil }
+        let calendar = Calendar.current
+        let now = Date()
+        let todayWeekday = calendar.component(.weekday, from: now)
+
+        func date(forWeekday wd: Int, addWeek: Bool) -> Date? {
+            var diff = wd - todayWeekday
+            if addWeek { diff += 7 } else if diff < 0 { diff += 7 }
+            return calendar.date(byAdding: .day, value: diff, to: calendar.startOfDay(for: now))
+        }
+
+        // Prefer today if still scheduled and not yet started
+            let todayHasSession = active.contains { $0.scheduledWeekday == todayWeekday }
+            if todayHasSession { return calendar.startOfDay(for: now) }
+
+        let future = active.compactMap { day -> (Int, Date)? in
+            guard let wd = day.scheduledWeekday else { return nil }
+            guard let d = date(forWeekday: wd, addWeek: false), d >= calendar.startOfDay(for: now) else { return nil }
+            return (wd, d)
+        }.sorted { $0.1 < $1.1 }
+        if let next = future.first { return next.1 }
+
+        // Wrap around next week
+        let wrapped = active.compactMap { day -> Date? in
+            guard let wd = day.scheduledWeekday else { return nil }
+            return date(forWeekday: wd, addWeek: true)
+        }.sorted()
+        return wrapped.first
     }
 
     private func nextScheduledWorkout(after date: Date) -> WorkoutDay? {

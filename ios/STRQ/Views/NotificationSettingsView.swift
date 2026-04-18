@@ -1,8 +1,10 @@
 import SwiftUI
+import UserNotifications
 
 struct NotificationSettingsView: View {
     @Bindable var vm: AppViewModel
     @State private var appeared: Bool = false
+    @State private var authStatus: UNAuthorizationStatus = .notDetermined
 
     private let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -24,30 +26,78 @@ struct NotificationSettingsView: View {
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             withAnimation(.easeOut(duration: 0.4)) { appeared = true }
+            Task {
+                await NotificationScheduler.shared.refreshAuthorizationStatus()
+                authStatus = NotificationScheduler.shared.authorizationStatus
+            }
         }
+        .onChange(of: vm.notificationSettings.workoutRemindersEnabled) { _, _ in vm.rescheduleSmartReminders() }
+        .onChange(of: vm.notificationSettings.readinessCheckInEnabled) { _, _ in vm.rescheduleSmartReminders() }
+        .onChange(of: vm.notificationSettings.weeklyReviewEnabled) { _, _ in vm.rescheduleSmartReminders() }
+        .onChange(of: vm.notificationSettings.coachNudgesEnabled) { _, _ in vm.rescheduleSmartReminders() }
+        .onChange(of: vm.notificationSettings.streakReminderEnabled) { _, _ in vm.rescheduleSmartReminders() }
+        .onChange(of: vm.notificationSettings.workoutReminderTime) { _, _ in vm.rescheduleSmartReminders() }
+        .onChange(of: vm.notificationSettings.readinessCheckInTime) { _, _ in vm.rescheduleSmartReminders() }
+        .onChange(of: vm.notificationSettings.weeklyReviewDay) { _, _ in vm.rescheduleSmartReminders() }
     }
 
     private var permissionBanner: some View {
         HStack(spacing: 12) {
-            Image(systemName: "bell.badge.fill")
+            Image(systemName: authStatus == .authorized ? "bell.badge.fill" : "bell.slash.fill")
                 .font(.body.weight(.medium))
                 .foregroundStyle(.white)
                 .frame(width: 40, height: 40)
                 .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("Stay on Track")
+                Text(bannerTitle)
                     .font(.subheadline.weight(.semibold))
-                Text("Smart reminders to keep your training consistent")
+                Text(bannerSubtitle)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             Spacer()
+            if authStatus == .notDetermined {
+                Button("Enable") {
+                    Task {
+                        _ = await NotificationScheduler.shared.requestAuthorizationIfNeeded()
+                        authStatus = NotificationScheduler.shared.authorizationStatus
+                        vm.rescheduleSmartReminders()
+                    }
+                }
+                .font(.subheadline.weight(.semibold))
+                .buttonStyle(.borderedProminent)
+                .tint(STRQBrand.steel)
+            } else if authStatus == .denied {
+                Button("Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                .font(.subheadline.weight(.semibold))
+                .buttonStyle(.bordered)
+            }
         }
         .padding(14)
         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
+    }
+
+    private var bannerTitle: String {
+        switch authStatus {
+        case .authorized, .provisional, .ephemeral: return "Stay on Track"
+        case .denied: return "Notifications Off"
+        default: return "Enable Reminders"
+        }
+    }
+
+    private var bannerSubtitle: String {
+        switch authStatus {
+        case .authorized, .provisional, .ephemeral: return "Smart reminders timed to your real schedule"
+        case .denied: return "Turn on in Settings to receive STRQ reminders"
+        default: return "Let STRQ remind you at the right moments"
+        }
     }
 
     private var workoutReminders: some View {
