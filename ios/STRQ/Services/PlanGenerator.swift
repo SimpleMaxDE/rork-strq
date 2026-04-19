@@ -177,7 +177,9 @@ struct PlanGenerator {
             for ex in candidates.prefix(count) {
                 guard selected.count < maxExercises else { break }
                 let (baseSets, reps, rest) = setsRepsRest(for: ex, profile: profile)
-                let adjustedSets = max(2, Int(Double(baseSets) * volumeMultiplier))
+                let scaled = (Double(baseSets) * volumeMultiplier).rounded()
+                let floor = minimumSets(for: profile, phase: context.phase, exercise: ex)
+                let adjustedSets = max(floor, Int(scaled))
                 let rpe = rpeForContext(exercise: ex, context: context)
                 selected.append(PlannedExercise(
                     exerciseId: ex.id,
@@ -192,6 +194,25 @@ struct PlanGenerator {
         }
 
         return selected
+    }
+
+    private func minimumSets(for profile: UserProfile, phase: TrainingPhase, exercise: Exercise) -> Int {
+        switch phase {
+        case .deload, .fatigueManagement:
+            return 2
+        case .build, .push, .rebalance:
+            break
+        }
+
+        switch profile.goal {
+        case .endurance:
+            return 2
+        case .flexibility, .rehabilitation:
+            return 2
+        case .muscleGain, .strength, .generalFitness, .athleticPerformance, .fatLoss:
+            if exercise.category == .mobility || exercise.category == .pilates { return 2 }
+            return 3
+        }
     }
 
     private func muscleBalanceRatio(for muscle: MuscleGroup, context: PlanContext) -> Double {

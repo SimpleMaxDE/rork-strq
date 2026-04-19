@@ -5,6 +5,8 @@ struct OnboardingView: View {
     @State private var step: Int = 0
     @State private var appeared: Bool = false
     @State private var selectionPulse: Bool = false
+    @FocusState private var nameFocused: Bool
+    @State private var editingMetric: MetricEdit?
 
     private let totalSteps = 9
 
@@ -40,7 +42,22 @@ struct OnboardingView: View {
         }
         .preferredColorScheme(.dark)
         .onAppear { withAnimation(.easeOut(duration: 0.8)) { appeared = true } }
+        .onChange(of: step) { _, newValue in
+            if newValue == 1 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    nameFocused = true
+                }
+            } else {
+                nameFocused = false
+            }
+        }
         .sensoryFeedback(.selection, trigger: step)
+        .sheet(item: $editingMetric) { metric in
+            MetricEditSheet(metric: metric, profile: $vm.profile)
+                .presentationDetents([.height(320)])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(.ultraThinMaterial)
+        }
     }
 
     private var backgroundGradient: some View {
@@ -109,11 +126,7 @@ struct OnboardingView: View {
     private var navigationButtons: some View {
         VStack(spacing: 10) {
             Button {
-                if step < totalSteps - 1 {
-                    withAnimation(.smooth(duration: 0.35)) { step += 1 }
-                } else {
-                    vm.beginPlanGeneration()
-                }
+                advance()
             } label: {
                 HStack(spacing: 8) {
                     Text(primaryButtonLabel)
@@ -151,6 +164,15 @@ struct OnboardingView: View {
                         .frame(height: 32)
                 }
             }
+        }
+    }
+
+    private func advance() {
+        nameFocused = false
+        if step < totalSteps - 1 {
+            withAnimation(.smooth(duration: 0.35)) { step += 1 }
+        } else {
+            vm.beginPlanGeneration()
         }
     }
 
@@ -249,6 +271,13 @@ struct OnboardingView: View {
                     TextField("Enter your name", text: $vm.profile.name)
                         .textFieldStyle(.plain)
                         .font(.body)
+                        .focused($nameFocused)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            if canAdvance { advance() }
+                        }
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.words)
                         .padding(16)
                         .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 14))
                 }
@@ -268,30 +297,16 @@ struct OnboardingView: View {
                 )
 
                 fieldGroup("Height") {
-                    HStack {
-                        Text("\(Int(vm.profile.heightCm))")
-                            .font(.system(.title2, design: .rounded, weight: .bold))
-                            .foregroundStyle(.white)
-                            .monospacedDigit()
-                        Text("cm")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Spacer()
+                    metricValueButton(value: "\(Int(vm.profile.heightCm))", unit: "cm") {
+                        editingMetric = .height
                     }
                     Slider(value: $vm.profile.heightCm, in: 140...220, step: 1)
                         .tint(.white)
                 }
 
                 fieldGroup("Age") {
-                    HStack {
-                        Text("\(vm.profile.age)")
-                            .font(.system(.title2, design: .rounded, weight: .bold))
-                            .foregroundStyle(.white)
-                            .monospacedDigit()
-                        Text("years")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Spacer()
+                    metricValueButton(value: "\(vm.profile.age)", unit: "years") {
+                        editingMetric = .age
                     }
                     Slider(value: Binding(get: { Double(vm.profile.age) }, set: { vm.profile.age = Int($0) }), in: 14...80, step: 1)
                         .tint(.white)
@@ -320,17 +335,28 @@ struct OnboardingView: View {
                     subtitle: "This is your baseline. STRQ tracks progress from here."
                 )
 
-                VStack(spacing: 6) {
-                    Text(String(format: "%.1f", vm.profile.weightKg))
-                        .font(.system(size: 56, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .monospacedDigit()
-                    Text("kg")
-                        .font(.title3.weight(.medium))
-                        .foregroundStyle(.secondary)
+                Button {
+                    editingMetric = .weight
+                } label: {
+                    VStack(spacing: 6) {
+                        Text(String(format: "%.1f", vm.profile.weightKg))
+                            .font(.system(size: 56, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .monospacedDigit()
+                        HStack(spacing: 6) {
+                            Text("kg")
+                                .font(.title3.weight(.medium))
+                                .foregroundStyle(.secondary)
+                            Image(systemName: "pencil")
+                                .font(.caption)
+                                .foregroundStyle(.white.opacity(0.35))
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .contentShape(.rect)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
+                .buttonStyle(.plain)
 
                 Slider(value: $vm.profile.weightKg, in: 40...200, step: 0.5)
                     .tint(.white)
@@ -338,9 +364,20 @@ struct OnboardingView: View {
 
                 fieldGroup("Target Weight (optional)") {
                     HStack {
-                        Text(vm.profile.targetWeightKg.map { String(format: "%.1f kg", $0) } ?? "Not set")
-                            .font(.system(.title3, design: .rounded, weight: .semibold))
-                            .foregroundStyle(vm.profile.targetWeightKg != nil ? .white : .secondary)
+                        Button {
+                            editingMetric = .targetWeight
+                        } label: {
+                            HStack(spacing: 8) {
+                                Text(vm.profile.targetWeightKg.map { String(format: "%.1f kg", $0) } ?? "Tap to set")
+                                    .font(.system(.title3, design: .rounded, weight: .semibold))
+                                    .foregroundStyle(vm.profile.targetWeightKg != nil ? .white : .secondary)
+                                Image(systemName: "pencil")
+                                    .font(.caption2)
+                                    .foregroundStyle(.white.opacity(0.35))
+                            }
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                         Spacer()
                         if vm.profile.targetWeightKg != nil {
                             Button {
@@ -376,9 +413,20 @@ struct OnboardingView: View {
 
                 fieldGroup("Body Fat % (optional)") {
                     HStack {
-                        Text(vm.profile.bodyFatPercentage.map { "\(Int($0))%" } ?? "Not set")
-                            .font(.system(.title3, design: .rounded, weight: .semibold))
-                            .foregroundStyle(vm.profile.bodyFatPercentage != nil ? .white : .secondary)
+                        Button {
+                            editingMetric = .bodyFat
+                        } label: {
+                            HStack(spacing: 8) {
+                                Text(vm.profile.bodyFatPercentage.map { "\(Int($0))%" } ?? "Tap to set")
+                                    .font(.system(.title3, design: .rounded, weight: .semibold))
+                                    .foregroundStyle(vm.profile.bodyFatPercentage != nil ? .white : .secondary)
+                                Image(systemName: "pencil")
+                                    .font(.caption2)
+                                    .foregroundStyle(.white.opacity(0.35))
+                            }
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                         Spacer()
                     }
                     Slider(value: Binding(get: { vm.profile.bodyFatPercentage ?? 20 }, set: { vm.profile.bodyFatPercentage = $0 }), in: 5...50, step: 1)
@@ -733,6 +781,27 @@ struct OnboardingView: View {
                 .foregroundStyle(.white.opacity(0.7))
             content()
         }
+    }
+
+    @ViewBuilder
+    private func metricValueButton(value: String, unit: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Text(value)
+                    .font(.system(.title2, design: .rounded, weight: .bold))
+                    .foregroundStyle(.white)
+                    .monospacedDigit()
+                Text(unit)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Image(systemName: "pencil")
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.35))
+                Spacer()
+            }
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder
