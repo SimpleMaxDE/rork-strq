@@ -14,15 +14,10 @@ class AppViewModel {
     var hasCompletedOnboarding: Bool
 
     let library = ExerciseLibrary.shared
-    private let coachingEngine = CoachingEngine()
     private let actionManager = CoachActionManager()
     private let progressionEngine = ProgressionEngine()
-    private let volumeEngine = SmartVolumeEngine()
     let startingLoadEngine = StartingLoadEngine()
-    private let adaptiveEngine = AdaptivePrescriptionEngine()
-    private let planEvolutionEngine = PlanEvolutionEngine()
     var planEvolutionSignals: [PlanEvolutionSignal] = []
-    private let toleranceEngine = ToleranceEngine()
     var toleranceSignals: [ToleranceSignal] = []
 
     var coachAdjustments: [CoachAdjustment] = []
@@ -34,6 +29,7 @@ class AppViewModel {
     var showWeeklyReview: Bool = false
     var weeklyReviewDismissed: Bool = false
     private let reviewGenerator = WeeklyReviewGenerator()
+
 
     var progressionStates: [ExerciseProgressionState] = []
     var trainingPhaseState: TrainingPhaseState = TrainingPhaseState()
@@ -53,7 +49,7 @@ class AppViewModel {
     var dailyCoachMessage: DailyCoachMessage?
     var momentumData: MomentumData?
     var notificationSettings: NotificationSettings = NotificationSettings()
-    private let dailyCoachEngine = DailyCoachEngine()
+
 
     // MARK: - Nutrition & Recovery
     var nutritionTarget: NutritionTarget = NutritionTarget()
@@ -62,16 +58,14 @@ class AppViewModel {
     var sleepEntries: [SleepEntry] = []
     var nutritionInsights: [NutritionCoachInsight] = []
     var goalPace: GoalPaceStatus?
-    private let nutritionEngine = NutritionCoachEngine()
-    private let physiqueEngine = PhysiqueIntelligenceEngine()
     var physiqueOutcome: PhysiqueOutcome?
 
     private let persistence = PersistenceStore.shared
     let account = AccountManager.shared
     let cloudSync = CloudSyncService.shared
     private var isHydrating: Bool = false
-    private var lastScheduledSignature: String = ""
 
+    // MARK: - Domain coordinators (composition root)
     private var _workoutController: WorkoutController?
     var workoutController: WorkoutController {
         if let c = _workoutController { return c }
@@ -79,9 +73,27 @@ class AppViewModel {
         _workoutController = c
         return c
     }
+    @ObservationIgnored private var _coachingCoordinator: CoachingCoordinator!
+    @ObservationIgnored private var _nutritionCoordinator: NutritionPhysiqueCoordinator!
+    @ObservationIgnored private var _dailyStateCoordinator: DailyStateCoordinator!
+    @ObservationIgnored private var _continuityCoordinator: ContinuityCoordinator!
+    @ObservationIgnored private var _reminderWidgetCoordinator: ReminderWidgetCoordinator!
+    private var coachingCoordinator: CoachingCoordinator { _coachingCoordinator }
+    private var nutritionCoordinator: NutritionPhysiqueCoordinator { _nutritionCoordinator }
+    private var dailyStateCoordinator: DailyStateCoordinator { _dailyStateCoordinator }
+    private var continuityCoordinator: ContinuityCoordinator { _continuityCoordinator }
+    private var reminderWidgetCoordinator: ReminderWidgetCoordinator { _reminderWidgetCoordinator }
 
     init() {
         self.profile = UserProfile()
+        self._coachingCoordinator = nil
+        defer {
+            self._coachingCoordinator = CoachingCoordinator(vm: self)
+            self._nutritionCoordinator = NutritionPhysiqueCoordinator(vm: self)
+            self._dailyStateCoordinator = DailyStateCoordinator(vm: self)
+            self._continuityCoordinator = ContinuityCoordinator(vm: self)
+            self._reminderWidgetCoordinator = ReminderWidgetCoordinator(vm: self)
+        }
         self.currentPlan = nil
         self.workoutHistory = []
         self.personalRecords = []
@@ -146,47 +158,25 @@ class AppViewModel {
     func persist() {
         guard !isHydrating else { return }
         let snapshot = SnapshotBuilder.build(from: self, version: persistence.version)
-        persistence.save(snapshot)
-        scheduleSmartRemindersIfNeeded()
-        refreshWidgetSnapshot()
+        continuityCoordinator.save(snapshot: snapshot)
+        reminderWidgetCoordinator.scheduleIfNeeded()
+        reminderWidgetCoordinator.refreshWidgetSnapshot()
         WatchConnectivityService.shared.pushActiveWorkoutState()
-        if account.isSignedIn {
-            cloudSync.upload(snapshot, isSignedIn: true)
-        }
+        continuityCoordinator.uploadIfSignedIn(snapshot)
     }
 
     // MARK: - Cloud Sync
 
     @discardableResult
     func restoreFromCloud(force: Bool = false) -> CloudRestoreOutcome {
-        guard cloudSync.isAvailable else { return .unavailable }
-        guard let payload = cloudSync.loadRemoteSnapshot() else { return .noSnapshot }
-        let local = SnapshotBuilder.build(from: self, version: persistence.version)
-        let localScore = SnapshotBuilder.maturityScore(local)
-        let remoteScore = SnapshotBuilder.maturityScore(payload.state)
-        // Guard against overwriting a richer local snapshot with a stale
-        // remote one unless the caller explicitly forces it.
-        if !force, localScore > remoteScore + 5 {
-            Analytics.shared.track(.cloud_sync_failed, ["reason": "local_richer"])
-            ErrorReporter.shared.breadcrumb(
-                "Cloud restore skipped: local richer (\(localScore) vs \(remoteScore))",
-                category: "sync"
-            )
-            return .staleIgnored
-        }
-        applySnapshot(payload.state)
-        Analytics.shared.track(.cloud_sync_restored)
-        ErrorReporter.shared.breadcrumb("Cloud snapshot restored", category: "sync")
-        return .restored
+        continuityCoordinator.restore(force: force)
     }
 
     func uploadToCloud() {
-        guard account.isSignedIn else { return }
-        let snapshot = SnapshotBuilder.build(from: self, version: persistence.version)
-        cloudSync.upload(snapshot, isSignedIn: true)
+        continuityCoordinator.uploadNow()
     }
 
-    private func applySnapshot(_ saved: PersistedAppState) {
+    func apply(snapshot saved: PersistedAppState) {
         isHydrating = true
         hasCompletedOnboarding = saved.hasCompletedOnboarding
         profile = saved.profile
@@ -228,116 +218,18 @@ class AppViewModel {
         persist()
     }
 
-    // MARK: - Smart Reminders
+    // MARK: - Smart Reminders / Widgets (delegated)
 
     func scheduleSmartRemindersIfNeeded(force: Bool = false) {
-        guard hasCompletedOnboarding else { return }
-        let input = buildReminderInput()
-        let signature = reminderSignature(input)
-        if !force && signature == lastScheduledSignature { return }
-        lastScheduledSignature = signature
-        Task { await NotificationScheduler.shared.reschedule(with: input) }
+        reminderWidgetCoordinator.scheduleIfNeeded(force: force)
     }
 
     func rescheduleSmartReminders() {
-        scheduleSmartRemindersIfNeeded(force: true)
+        reminderWidgetCoordinator.scheduleIfNeeded(force: true)
     }
-
-    // MARK: - Widget Snapshot
 
     func refreshWidgetSnapshot() {
-        let today = todaysWorkout
-        let isRestDay = today == nil
-        let focus = today?.focusMuscles.prefix(2).map(\.displayName).joined(separator: " & ")
-        let planned = max(1, profile.daysPerWeek)
-        let weeklyCompleted = weeklyStats.sessions
-        let nextTitle: String = {
-            if let action = nextBestAction { return action.title }
-            if isRestDay { return "Recovery day" }
-            return "Ready to train"
-        }()
-        let snapshot = WidgetBridge.Snapshot(
-            todayWorkoutName: today?.name,
-            todayFocus: focus,
-            isRestDay: isRestDay,
-            hasCheckedIn: hasCheckedInToday,
-            readinessScore: effectiveRecoveryScore,
-            readinessLabel: readinessBasedRecoveryStatus,
-            nextActionTitle: nextTitle,
-            streak: streak,
-            weeklyCompleted: weeklyCompleted,
-            weeklyTarget: planned,
-            updatedAt: Date()
-        )
-        WidgetBridge.write(snapshot)
-    }
-
-    private func buildReminderInput() -> NotificationScheduler.ScheduleInput {
-        let calendar = Calendar.current
-        let today = todaysWorkout
-        let next = nextScheduledWorkout(after: Date())
-        let nextDate = nextScheduledWorkoutDate
-        let lastWorkout = workoutHistory.first(where: \.isCompleted)?.startTime
-        let lastReadiness = readinessHistory.first?.date
-        let lastActive: Date? = [lastWorkout, lastReadiness].compactMap { $0 }.max()
-        let missingWeightDays: Int = {
-            guard let last = bodyWeightEntries.first?.date else { return 99 }
-            return calendar.dateComponents([.day], from: last, to: Date()).day ?? 0
-        }()
-        let missingSleepDays: Int = {
-            guard let last = sleepEntries.first?.date else { return 99 }
-            return calendar.dateComponents([.day], from: last, to: Date()).day ?? 0
-        }()
-        let totalCompleted = totalCompletedWorkouts
-        let isEarlyStage = totalCompleted < 4
-        let isRestDay = today == nil
-
-        return NotificationScheduler.ScheduleInput(
-            settings: notificationSettings,
-            todaysWorkoutName: today?.name,
-            todaysFocus: today?.focusMuscles.prefix(2).map(\.displayName).joined(separator: " & "),
-            nextScheduledDate: nextDate,
-            nextScheduledWorkoutName: next?.name,
-            hasCheckedInToday: hasCheckedInToday,
-            isWeeklyReviewReady: isWeeklyReviewReady,
-            streak: streak,
-            completedWorkoutsTotal: totalCompleted,
-            isEarlyStage: isEarlyStage,
-            isRestDay: isRestDay,
-            lastActiveDate: lastActive,
-            missingBodyWeightDays: missingWeightDays,
-            missingSleepDays: missingSleepDays,
-            readinessBucket: readinessBucket,
-            weeklyReviewDay: notificationSettings.weeklyReviewDay
-        )
-    }
-
-    private func reminderSignature(_ input: NotificationScheduler.ScheduleInput) -> String {
-        let s = input.settings
-        let df = ISO8601DateFormatter()
-        df.formatOptions = [.withFullDate]
-        let today = df.string(from: Date())
-        return [
-            today,
-            s.workoutRemindersEnabled ? "1" : "0",
-            s.readinessCheckInEnabled ? "1" : "0",
-            s.weeklyReviewEnabled ? "1" : "0",
-            s.coachNudgesEnabled ? "1" : "0",
-            s.streakReminderEnabled ? "1" : "0",
-            String(Int(s.workoutReminderTime.timeIntervalSinceReferenceDate / 60).description.hashValue),
-            String(Int(s.readinessCheckInTime.timeIntervalSinceReferenceDate / 60).description.hashValue),
-            String(s.weeklyReviewDay),
-            input.todaysWorkoutName ?? "-",
-            input.nextScheduledWorkoutName ?? "-",
-            input.nextScheduledDate.map { df.string(from: $0) } ?? "-",
-            input.hasCheckedInToday ? "1" : "0",
-            String(input.streak),
-            String(input.completedWorkoutsTotal),
-            input.isWeeklyReviewReady ? "1" : "0",
-            input.readinessBucket,
-            String(input.missingBodyWeightDays),
-            String(input.missingSleepDays)
-        ].joined(separator: "|")
+        reminderWidgetCoordinator.refreshWidgetSnapshot()
     }
 
     func resetAllData() {
@@ -417,7 +309,7 @@ class AppViewModel {
         ])
         Analytics.shared.track(.plan_reveal_started_training)
         ErrorReporter.shared.breadcrumb("Onboarding completed", category: "onboarding")
-        nutritionTarget = nutritionEngine.computeTargets(profile: profile)
+        nutritionTarget = nutritionCoordinator.computeTargets()
         if bodyWeightEntries.isEmpty {
             bodyWeightEntries = [BodyWeightEntry(weightKg: profile.weightKg, bodyFatPercent: profile.bodyFatPercentage)]
         }
@@ -448,195 +340,15 @@ class AppViewModel {
     }
 
     func refreshCoachingInsights() {
-        let confidence = coachingConfidence
-        var newInsights = coachingEngine.generateInsights(
-            profile: profile,
-            workoutHistory: workoutHistory,
-            progressEntries: progressEntries,
-            personalRecords: personalRecords,
-            currentPlan: currentPlan,
-            muscleBalance: muscleBalance,
-            progressionStates: progressionStates,
-            phase: trainingPhaseState.currentPhase,
-            volumeLandmarks: volumeLandmarks,
-            confidence: confidence
-        )
-
-        var newRecs = coachingEngine.generateRecommendations(
-            profile: profile,
-            workoutHistory: workoutHistory,
-            progressEntries: progressEntries,
-            personalRecords: personalRecords,
-            muscleBalance: muscleBalance,
-            progressionStates: progressionStates,
-            phase: trainingPhaseState.currentPhase,
-            confidence: confidence
-        )
-
-        // Plan-level evolution layer — reads multi-week signals and routes outputs
-        // through existing insights/recommendations surfaces so no new UI is needed.
-        let trend = recoveryTrendData.map(\.score)
-        let weeksTrained: Int = {
-            guard let first = workoutHistory.filter(\.isCompleted).last?.startTime else { return 0 }
-            let days = Calendar.current.dateComponents([.day], from: first, to: Date()).day ?? 0
-            return max(0, days / 7)
-        }()
-        let signals = planEvolutionEngine.analyze(
-            profile: profile,
-            currentPlan: currentPlan,
-            workoutHistory: workoutHistory,
-            progressionStates: progressionStates,
-            muscleBalance: muscleBalance,
-            recoveryTrend: trend,
-            weeksTrained: weeksTrained,
-            phase: trainingPhaseState.currentPhase,
-            baseConfidence: confidence,
-            recoveryScore: recoveryScore
-        )
-        planEvolutionSignals = signals
-
-        // Gate by plan-evolution confidence — low-confidence signals observe silently.
-        let confidentSignals = signals.filter { $0.confidence != .low }
-        var existingTitles = Set(newInsights.map(\.title))
-        for signal in confidentSignals where !existingTitles.contains(signal.insight.title) {
-            newInsights.append(signal.insight)
-            existingTitles.insert(signal.insight.title)
-        }
-        var existingRecTitles = Set(newRecs.map(\.title))
-        for signal in confidentSignals {
-            if let rec = signal.recommendation, !existingRecTitles.contains(rec.title) {
-                newRecs.append(rec)
-                existingRecTitles.insert(rec.title)
-            }
-        }
-
-        // Tolerance / execution-adjustment layer — converts repeated set-quality
-        // patterns (pain / breakdown / grind / too-easy / alternative outperforms)
-        // into earned, confidence-aware coaching actions. Routed through the
-        // existing insights + recommendations streams — no new UI.
-        let tolerance = toleranceEngine.analyze(
-            profile: profile,
-            workoutHistory: workoutHistory,
-            progressionStates: progressionStates,
-            recoveryScore: recoveryScore,
-            phase: trainingPhaseState.currentPhase,
-            baseConfidence: confidence
-        )
-        toleranceSignals = tolerance
-        let actionableTolerance = tolerance.filter { signal in
-            switch signal.confidence {
-            case .low: return false
-            case .moderate, .high: return true
-            }
-        }
-        for signal in actionableTolerance where !existingTitles.contains(signal.insight.title) {
-            newInsights.append(signal.insight)
-            existingTitles.insert(signal.insight.title)
-        }
-        for signal in actionableTolerance {
-            if let rec = signal.recommendation, !existingRecTitles.contains(rec.title) {
-                newRecs.append(rec)
-                existingRecTitles.insert(rec.title)
-            }
-        }
-
-        // Physique-outcome intelligence layer — bodyweight trend + nutrition
-        // adherence vs declared goal. Routes through the existing insights +
-        // recommendations streams so no new UI surface is required.
-        let outcome = physiqueEngine.analyze(
-            profile: profile,
-            target: nutritionTarget,
-            weightEntries: bodyWeightEntries,
-            nutritionLogs: nutritionLogs,
-            recoveryScore: effectiveRecoveryScore,
-            baseConfidence: confidence
-        )
-        physiqueOutcome = outcome
-        for insight in outcome.insights where !existingTitles.contains(insight.title) {
-            newInsights.append(insight)
-            existingTitles.insert(insight.title)
-        }
-        for rec in outcome.recommendations where !existingRecTitles.contains(rec.title) {
-            newRecs.append(rec)
-            existingRecTitles.insert(rec.title)
-        }
-
-        _dynamicInsights = newInsights.sorted { $0.severityRank > $1.severityRank }
-        recommendations = newRecs.sorted { $0.priority > $1.priority }
+        coachingCoordinator.refreshCoachingInsights()
     }
 
     func refreshIntelligence() {
-        refreshProgressionStates()
-        refreshVolumeLandmarks()
-        refreshBalanceInsights()
-        refreshNextBestAction()
-        refreshCoachingInsights()
-        refreshPlanQuality()
+        coachingCoordinator.refreshIntelligence()
     }
 
-    private func refreshProgressionStates() {
-        var counts: [String: Int] = [:]
-        for session in workoutHistory where session.isCompleted {
-            for log in session.exerciseLogs {
-                counts[log.exerciseId, default: 0] += 1
-            }
-        }
-        let plannedIds = Set(currentPlan?.days.flatMap(\.exercises).map(\.exerciseId) ?? [])
-        let historyIds = Set(counts.keys)
-        let relevantIds = plannedIds.union(historyIds)
-        let ordered = relevantIds.sorted { (counts[$0] ?? 0) > (counts[$1] ?? 0) }
-        let cap = 60
-        progressionStates = ordered.prefix(cap).map { exId in
-            progressionEngine.analyzeProgression(
-                exerciseId: exId,
-                sessions: workoutHistory,
-                profile: profile,
-                currentPhase: trainingPhaseState.currentPhase
-            )
-        }
-    }
-
-    private func refreshVolumeLandmarks() {
-        volumeLandmarks = volumeEngine.volumeLandmarks(
-            for: profile,
-            muscleBalance: muscleBalance,
-            sessions: workoutHistory
-        )
-        volumeGuidance = volumeEngine.weeklyVolumeGuidance(
-            landmarks: volumeLandmarks,
-            profile: profile,
-            phase: trainingPhaseState.currentPhase
-        )
-    }
-
-    private func refreshBalanceInsights() {
-        balanceInsights = volumeEngine.analyzeBalance(
-            muscleBalance: muscleBalance,
-            profile: profile
-        )
-    }
-
-    private func refreshNextBestAction() {
-        nextBestAction = progressionEngine.computeNextBestAction(
-            profile: profile,
-            sessions: workoutHistory,
-            recoveryScore: recoveryScore,
-            muscleBalance: muscleBalance,
-            progressionStates: progressionStates,
-            phase: trainingPhaseState.currentPhase
-        )
-    }
-
-    private func refreshPlanQuality() {
-        guard let plan = currentPlan else { return }
-        planQuality = progressionEngine.assessPlanQuality(
-            plan: plan,
-            profile: profile,
-            muscleBalance: muscleBalance,
-            recoveryScore: recoveryScore,
-            progressionStates: progressionStates,
-            phase: trainingPhaseState.currentPhase
-        )
+    func refreshPlanQuality() {
+        coachingCoordinator.refreshPlanQuality()
     }
 
     var currentPhase: TrainingPhase {
@@ -652,7 +364,7 @@ class AppViewModel {
     }
 
     func exerciseReplacements(for exercise: Exercise, reason: ReplacementReason = .general) -> [Exercise] {
-        coachingEngine.suggestExerciseReplacement(for: exercise, profile: profile, reason: reason)
+        coachingCoordinator.exerciseReplacements(for: exercise, reason: reason)
     }
 
     func toggleFavorite(_ exerciseId: String) {
@@ -675,16 +387,7 @@ class AppViewModel {
     }
 
     func todayPrescription(for planned: PlannedExercise) -> TodayPrescription {
-        let exercise = library.exercise(byId: planned.exerciseId)
-        let fallback = loadSuggestion(for: planned.exerciseId, planned: planned)?.suggestedWeight
-        return adaptiveEngine.prescribe(
-            planned: planned,
-            exercise: exercise,
-            sessions: workoutHistory,
-            effectiveRecoveryScore: effectiveRecoveryScore,
-            phase: currentPhase,
-            fallbackSuggestedWeight: fallback
-        )
+        coachingCoordinator.todayPrescription(for: planned)
     }
 
     func nextSessionGuidance(for exerciseId: String) -> NextSessionGuidance? {
@@ -806,7 +509,7 @@ class AppViewModel {
         return streakCount
     }
 
-    private var _dynamicInsights: [SmartInsight] = []
+    var _dynamicInsights: [SmartInsight] = []
     var insights: [SmartInsight] { _dynamicInsights }
 
     var weeklyActivity: [DayActivity] {
@@ -1737,76 +1440,12 @@ class AppViewModel {
             "bucket": readinessBucket
         ])
 
-        let response = dailyCoachEngine.generateCoachResponse(
-            readiness: readiness,
-            recoveryScore: recoveryScore,
-            todaysWorkout: todaysWorkout,
-            recentSessions: workoutHistory,
-            phase: currentPhase
-        )
-        coachResponse = response
+        coachResponse = dailyStateCoordinator.makeCoachResponse(for: readiness)
         refreshDailyState()
     }
 
     func refreshDailyState() {
-        let weeklyCompleted = weeklyStats.sessions
-        dailyCoachMessage = dailyCoachEngine.dailyCoachMessage(
-            readiness: todaysReadiness,
-            recoveryScore: recoveryScore,
-            streak: streak,
-            weeklySessionsCompleted: weeklyCompleted,
-            weeklySessionsPlanned: profile.daysPerWeek,
-            phase: currentPhase,
-            hasWorkoutToday: todaysWorkout != nil
-        )
-        refreshMomentum()
-    }
-
-    private func refreshMomentum() {
-        let weeklyCompleted = weeklyStats.sessions
-        let planned = profile.daysPerWeek
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: Date())
-        let daysIntoWeek = max(1, weekday - 1)
-        let expectedByNow = (planned * daysIntoWeek) / 7
-
-        let pace: WeeklyPace = {
-            if weeklyCompleted == 0 { return .missed }
-            if weeklyCompleted >= planned { return .ahead }
-            if weeklyCompleted >= expectedByNow { return .onTrack }
-            return .behind
-        }()
-
-        let fourWeeksAgo = calendar.date(byAdding: .day, value: -28, to: Date()) ?? Date()
-        let monthSessions = workoutHistory.filter { $0.startTime > fourWeeksAgo && $0.isCompleted }.count
-        let possibleSessions = planned * 4
-        let consistency = possibleSessions > 0 ? min(100, (monthSessions * 100) / possibleSessions) : 0
-
-        var recentWins: [String] = []
-        let recentPRs = personalRecords.filter { $0.date > (calendar.date(byAdding: .day, value: -7, to: Date()) ?? Date()) }
-        if !recentPRs.isEmpty {
-            recentWins.append("\(recentPRs.count) new PR\(recentPRs.count == 1 ? "" : "s") this week")
-        }
-        if weeklyCompleted >= planned {
-            recentWins.append("Weekly target completed")
-        }
-        if streak >= 7 {
-            recentWins.append("\(streak)-day streak")
-        }
-        let progressing = progressionStates.filter { $0.plateauStatus == .progressing }.count
-        if progressing >= 3 {
-            recentWins.append("\(progressing) exercises progressing")
-        }
-
-        momentumData = MomentumData(
-            currentStreak: streak,
-            longestStreak: max(streak, 14),
-            weeklyPace: pace,
-            weeklySessionsCompleted: weeklyCompleted,
-            weeklySessionsPlanned: planned,
-            consistencyPercent: consistency,
-            recentWins: recentWins
-        )
+        dailyStateCoordinator.refresh()
     }
 
     var effectiveRecoveryScore: Int {
@@ -1819,35 +1458,7 @@ class AppViewModel {
     // MARK: - Nutrition & Recovery Methods
 
     func refreshNutritionInsights() {
-        nutritionInsights = nutritionEngine.generateInsights(
-            target: nutritionTarget,
-            recentLogs: nutritionLogs,
-            weightEntries: bodyWeightEntries,
-            sleepEntries: sleepEntries,
-            profile: profile,
-            recoveryScore: recoveryScore
-        )
-
-        let last14Weights = bodyWeightEntries.filter {
-            let days = Calendar.current.dateComponents([.day], from: $0.date, to: Date()).day ?? 0
-            return days <= 14
-        }.sorted { $0.date < $1.date }
-
-        if last14Weights.count >= 3 {
-            let first3Avg = last14Weights.prefix(3).map(\.weightKg).reduce(0, +) / 3.0
-            let last3Avg = last14Weights.suffix(3).map(\.weightKg).reduce(0, +) / 3.0
-            let weeklyChange = (last3Avg - first3Avg) / 2.0
-            goalPace = nutritionEngine.goalPaceStatus(target: nutritionTarget, weeklyChange: weeklyChange)
-        }
-
-        physiqueOutcome = physiqueEngine.analyze(
-            profile: profile,
-            target: nutritionTarget,
-            weightEntries: bodyWeightEntries,
-            nutritionLogs: nutritionLogs,
-            recoveryScore: effectiveRecoveryScore,
-            baseConfidence: coachingConfidence
-        )
+        nutritionCoordinator.refresh()
     }
 
     var todaysNutritionLog: DailyNutritionLog? {
@@ -1961,7 +1572,7 @@ class AppViewModel {
     }
 
     var nutritionCoachSummary: String {
-        nutritionEngine.dailyNutritionSummary(todayLog: todaysNutritionLog, target: nutritionTarget)
+        nutritionCoordinator.dailyNutritionSummary()
     }
 
     var readinessBasedRecoveryStatus: String {
