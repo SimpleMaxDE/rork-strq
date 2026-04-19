@@ -173,21 +173,30 @@ struct OnboardingView: View {
                         .offset(y: appeared ? 0 : 16)
                         .animation(.easeOut(duration: 0.6).delay(0.35), value: appeared)
 
-                    Text("Your intelligent training companion")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
+                    Text("A training system built around you.")
+                        .font(.title3.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.9))
+                        .multilineTextAlignment(.center)
                         .opacity(appeared ? 1 : 0)
                         .offset(y: appeared ? 0 : 12)
                         .animation(.easeOut(duration: 0.6).delay(0.5), value: appeared)
+
+                    Text("A few questions. Then a plan that actually fits.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .opacity(appeared ? 1 : 0)
+                        .offset(y: appeared ? 0 : 10)
+                        .animation(.easeOut(duration: 0.6).delay(0.6), value: appeared)
                 }
             }
 
             Spacer()
 
-            VStack(spacing: 16) {
-                welcomeFeatureRow(icon: "brain.head.profile.fill", text: "Adaptive coaching that learns from you")
-                welcomeFeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Smart progression & plateau detection")
-                welcomeFeatureRow(icon: "calendar.badge.clock", text: "Plans that evolve week by week")
+            VStack(spacing: 14) {
+                welcomeFeatureRow(icon: "slider.horizontal.3", text: "Calibrated to your body, goal, and schedule")
+                welcomeFeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Progression that adapts after every session")
+                welcomeFeatureRow(icon: "waveform.path.ecg", text: "Recovery-aware. No guesswork on load or volume")
             }
             .padding(.horizontal, 24)
             .opacity(appeared ? 1 : 0)

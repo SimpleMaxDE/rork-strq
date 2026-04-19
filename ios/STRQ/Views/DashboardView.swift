@@ -88,32 +88,53 @@ struct DashboardView: View {
     }
 
     private func earlyStageHint(_ guidance: EarlyStateGuidance) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: guidance.icon)
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.white)
-                .frame(width: 36, height: 36)
-                .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
+        let tierIndex = max(0, min(3, guidance.tier.rawValue))
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: guidance.icon)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(guidance.headline)
-                    .font(.subheadline.weight(.semibold))
-                Text(guidance.message)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                if let unlocks = guidance.unlocksNext {
-                    HStack(spacing: 4) {
-                        Image(systemName: "lock.open.fill")
-                            .font(.system(size: 9))
-                        Text(unlocks)
-                            .font(.caption2.weight(.semibold))
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        Text("GETTING STARTED")
+                            .font(.system(size: 9, weight: .black))
+                            .tracking(1.1)
+                            .foregroundStyle(STRQBrand.steel)
+                        Spacer()
+                        Text("Step \(tierIndex + 1) of 4")
+                            .font(.system(size: 9, weight: .bold).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.5))
                     }
-                    .foregroundStyle(STRQBrand.steel)
-                    .padding(.top, 2)
+                    Text(guidance.headline)
+                        .font(.subheadline.weight(.semibold))
+                    Text(guidance.message)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let unlocks = guidance.unlocksNext {
+                        HStack(spacing: 4) {
+                            Image(systemName: "lock.open.fill")
+                                .font(.system(size: 9))
+                            Text(unlocks)
+                                .font(.caption2.weight(.semibold))
+                        }
+                        .foregroundStyle(STRQBrand.steel)
+                        .padding(.top, 2)
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+
+            HStack(spacing: 4) {
+                ForEach(0..<4, id: \.self) { i in
+                    Capsule()
+                        .fill(i <= tierIndex ? AnyShapeStyle(STRQBrand.accentGradient) : AnyShapeStyle(Color.white.opacity(0.08)))
+                        .frame(height: 3)
                 }
             }
-            Spacer(minLength: 0)
         }
         .padding(12)
         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))

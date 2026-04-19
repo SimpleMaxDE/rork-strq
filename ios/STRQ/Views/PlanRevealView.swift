@@ -28,9 +28,10 @@ struct PlanRevealView: View {
             .ignoresSafeArea()
 
             ScrollView {
-                VStack(spacing: 28) {
+                VStack(spacing: 24) {
                     heroSection
                     planOverviewCard
+                    firstWeekRoadmap
                     onboardingImpactSection
                     weekPreview
                     if let quality = planQuality {
@@ -373,5 +374,81 @@ struct PlanRevealView: View {
 
     private func qualityColor(_ name: String) -> Color {
         ForgeTheme.color(for: name)
+    }
+
+    private var firstWeekRoadmap: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 8) {
+                Image(systemName: "map.fill")
+                    .font(.caption)
+                    .foregroundStyle(STRQBrand.steel)
+                Text("WHAT HAPPENS NEXT")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(STRQBrand.steel)
+                    .tracking(0.5)
+            }
+
+            VStack(spacing: 0) {
+                roadmapRow(
+                    index: 1,
+                    title: "Your first session",
+                    detail: "Lock in your baseline. STRQ calibrates every load from what you actually lift.",
+                    isLast: false
+                )
+                roadmapRow(
+                    index: 2,
+                    title: "Session 2 — progression starts",
+                    detail: "Real progression signals unlock. The coach begins adjusting load and volume.",
+                    isLast: false
+                )
+                roadmapRow(
+                    index: 3,
+                    title: "Week 1 review",
+                    detail: "Weekly signal, balance, and recovery lock in. Coach sharpens to you.",
+                    isLast: true
+                )
+            }
+        }
+        .padding(18)
+        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+        )
+        .opacity(showDays ? 1 : 0)
+        .offset(y: showDays ? 0 : 12)
+    }
+
+    private func roadmapRow(index: Int, title: String, detail: String, isLast: Bool) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            VStack(spacing: 0) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white.opacity(0.08))
+                        .frame(width: 26, height: 26)
+                    Text("\(index)")
+                        .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white.opacity(0.85))
+                }
+                if !isLast {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.08))
+                        .frame(width: 1)
+                        .frame(maxHeight: .infinity)
+                }
+            }
+            .frame(width: 26)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.bottom, isLast ? 0 : 14)
+            Spacer(minLength: 0)
+        }
     }
 }
