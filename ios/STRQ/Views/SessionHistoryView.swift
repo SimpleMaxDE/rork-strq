@@ -178,7 +178,7 @@ struct SessionHistoryView: View {
                     if hasPR {
                         Image(systemName: "trophy.fill")
                             .font(.system(size: 9))
-                            .foregroundStyle(.yellow.opacity(0.9))
+                            .foregroundStyle(STRQPalette.gold)
                     }
                 }
                 HStack(spacing: 6) {
@@ -377,7 +377,7 @@ struct SessionDetailView: View {
                                 if set.isPR {
                                     Image(systemName: "trophy.fill")
                                         .font(.system(size: 8))
-                                        .foregroundStyle(.yellow.opacity(0.9))
+                                        .foregroundStyle(STRQPalette.gold)
                                 }
                             }
                             .frame(maxWidth: .infinity)
