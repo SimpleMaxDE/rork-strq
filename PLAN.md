@@ -1,27 +1,23 @@
-# Phase 5 — Exercise Library / Detail Depth
+# Phase 6 — Completion Highlight Ordering + Progress Bridge
 
-Turn the exercise library + detail system into a deeper, more curated training database.
+Make the post-workout moment more useful, ranked, and better connected to progress + next session.
 
-**Library: database-grade scanning**
-- [x] Add Movement Pattern menu chip (push, pull, squat, hinge, lunge, carry, core) alongside existing filters
-- [x] Show exercise family name on each row (replaces/augments generic "Compound/Isolation" label)
-- [x] Add "Families" quick stat to the library hero (count of movement families)
-- [x] Tighten row density so rows scan faster as a database list
+**Ranked highlights**
+- [x] Add explicit score to each highlight in `WorkoutHighlightBuilder` and sort by score
+- [x] Promote the top highlight into a "session verdict" consumed by the completion hero
+- [x] Demote lower-value context (streak/sets milestones) below meaningful performance wins
+- [x] Mark one highlight as the primary so the UI can style it distinctly
 
-**Detail top: answer faster**
-- [x] Replace the scattered quick-info strip with a dense classification row: Role · Family · Pattern · Difficulty
-- [x] Move plan-context card directly under the header so "why STRQ picked this" is instantly visible
-- [x] Add "why here" rationale line to plan-context card (role reasoning, when STRQ would swap)
+**What improved — instant**
+- [x] Replace generic "Session Logged" eyebrow with the actual win (PR / Best Set / Volume Up / First Session / Consolidated)
+- [x] Add a single-line summary beneath hero: "beat last [exercise]" / "most volume yet" / "baseline set"
+- [x] Style the primary highlight row so the strongest achievement clearly wins
 
-**Execution: sharper coaching**
-- [x] Split instructions into Setup → Execute hierarchy (first 2 steps = setup, rest = execute)
-- [x] Tighten the coaching cues and mistakes cards with more compact, scannable rows
-
-**Variations: family-first**
-- [x] Make the progression chain the hero of Variations (clear regression ← current → progression)
-- [x] Add "why this swap" reason tags across alternatives (same pattern, joint-friendly, home-option, etc.)
-- [x] Consolidate home-alternatives and joint-friendly rails into the main alternatives rail with reason chips
+**Progress bridge**
+- [x] Add a "Next session" card: day name, what STRQ will push/hold/drop, based on this session's data
+- [x] Surface 1–2 exercises that confirmed progression (or suggest hold) from progressionStates delta
+- [x] Keep celebration premium but disciplined — no clutter, no gamification
 
 **System consistency**
-- [x] Align section header treatment across library and detail
-- [x] Keep STRQ dark premium identity; no hero-first sprawl
+- [x] Keep STRQ dark premium identity, semantic palette, calm motion
+- [x] Align section header treatment with the rest of STRQ

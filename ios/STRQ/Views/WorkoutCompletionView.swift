@@ -14,9 +14,14 @@ struct WorkoutCompletionView: View {
     @State private var hapticTick: Int = 0
     @State private var celebrationTrigger: Bool = false
 
-    private var highlights: [WorkoutHighlight] {
-        guard let session else { return [] }
-        return WorkoutHighlightBuilder.build(
+    private var result: WorkoutHighlightBuilder.Result {
+        guard let session else {
+            return WorkoutHighlightBuilder.Result(
+                highlights: [],
+                verdict: SessionVerdict(kind: .consolidated, eyebrow: "SESSION LOGGED", summary: "Work put in")
+            )
+        }
+        return WorkoutHighlightBuilder.buildResult(
             session: session,
             history: vm.workoutHistory,
             streak: vm.streak,
@@ -24,8 +29,29 @@ struct WorkoutCompletionView: View {
         )
     }
 
-    private var hasPR: Bool {
-        highlights.contains { $0.kind == .personalRecord }
+    private var highlights: [WorkoutHighlight] { result.highlights }
+    private var verdict: SessionVerdict { result.verdict }
+    private var hasPR: Bool { verdict.kind == .personalRecord }
+
+    private var primaryAccent: Color {
+        switch verdict.kind {
+        case .personalRecord: return STRQPalette.gold
+        case .bestSet, .volumeUp: return STRQPalette.success
+        case .firstSession: return STRQPalette.info
+        case .consolidated: return STRQBrand.steel
+        case .volumeDown: return STRQPalette.warning
+        }
+    }
+
+    private var verdictIcon: String {
+        switch verdict.kind {
+        case .personalRecord: return "trophy.fill"
+        case .bestSet: return "bolt.fill"
+        case .volumeUp: return "arrow.up.right.circle.fill"
+        case .volumeDown: return "equal.circle.fill"
+        case .firstSession: return "sparkles"
+        case .consolidated: return "checkmark.seal.fill"
+        }
     }
 
     var body: some View {
@@ -33,18 +59,19 @@ struct WorkoutCompletionView: View {
             backgroundLayer
 
             if !reduceMotion {
-                SparkField(trigger: sparkTrigger, intensity: hasPR ? 1.0 : 0.6)
+                SparkField(trigger: sparkTrigger, intensity: hasPR ? 1.0 : 0.55, accent: primaryAccent)
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
             }
 
             ScrollView {
-                VStack(spacing: 28) {
-                    Spacer(minLength: 32)
+                VStack(spacing: 24) {
+                    Spacer(minLength: 28)
                     heroSection
                     statsSection
                     highlightsSection
-                    Color.clear.frame(height: 100)
+                    nextSessionBridge
+                    Color.clear.frame(height: 110)
                 }
             }
             .scrollIndicators(.hidden)
@@ -66,10 +93,7 @@ struct WorkoutCompletionView: View {
         ZStack {
             Color.black.ignoresSafeArea()
             RadialGradient(
-                colors: [
-                    (hasPR ? STRQPalette.gold.opacity(0.18) : Color.white.opacity(0.08)),
-                    Color.clear
-                ],
+                colors: [primaryAccent.opacity(hasPR ? 0.20 : 0.12), Color.clear],
                 center: .top,
                 startRadius: 10,
                 endRadius: 520
@@ -88,30 +112,28 @@ struct WorkoutCompletionView: View {
     // MARK: - Hero
 
     private var heroSection: some View {
-        VStack(spacing: 22) {
+        VStack(spacing: 18) {
             ZStack {
                 Circle()
                     .fill(Color.white.opacity(0.04))
-                    .frame(width: 148, height: 148)
+                    .frame(width: 132, height: 132)
                 Circle()
                     .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
-                    .frame(width: 148, height: 148)
+                    .frame(width: 132, height: 132)
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: hasPR
-                                ? [STRQPalette.gold.opacity(0.32), Color.clear]
-                                : [STRQPalette.success.opacity(0.22), Color.clear],
+                            colors: [primaryAccent.opacity(hasPR ? 0.32 : 0.22), Color.clear],
                             center: .center,
                             startRadius: 4,
-                            endRadius: 80
+                            endRadius: 72
                         )
                     )
-                    .frame(width: 148, height: 148)
+                    .frame(width: 132, height: 132)
 
-                Image(systemName: hasPR ? "trophy.fill" : "checkmark.seal.fill")
-                    .font(.system(size: 56, weight: .semibold))
-                    .foregroundStyle(hasPR ? AnyShapeStyle(STRQPalette.goldGradient) : AnyShapeStyle(STRQPalette.success.gradient))
+                Image(systemName: verdictIcon)
+                    .font(.system(size: 50, weight: .semibold))
+                    .foregroundStyle(hasPR ? AnyShapeStyle(STRQPalette.goldGradient) : AnyShapeStyle(primaryAccent.gradient))
                     .scaleEffect(trophyPulse ? 1.04 : 1.0)
                     .animation(reduceMotion ? nil : .easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: trophyPulse)
             }
@@ -119,21 +141,24 @@ struct WorkoutCompletionView: View {
             .opacity(appeared ? 1 : 0)
             .animation(reduceMotion ? .easeOut(duration: 0.2) : .spring(response: 0.55, dampingFraction: 0.7), value: appeared)
 
-            VStack(spacing: 8) {
-                Text(hasPR ? "NEW PERSONAL RECORD" : "COMPLETE")
+            VStack(spacing: 6) {
+                Text(verdict.eyebrow)
                     .font(.system(size: 11, weight: .black))
-                    .foregroundStyle(hasPR ? STRQPalette.gold : STRQPalette.success)
+                    .foregroundStyle(primaryAccent)
                     .tracking(3)
-                Text("Session Logged")
-                    .font(.system(size: 32, weight: .bold))
+                Text(verdict.summary)
+                    .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .padding(.horizontal, 28)
                 if let day = session?.dayName, !day.isEmpty {
                     Text(day)
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.55))
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.5))
                 }
             }
-            .multilineTextAlignment(.center)
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
             .animation(.easeOut(duration: 0.5).delay(0.15), value: appeared)
@@ -150,9 +175,9 @@ struct WorkoutCompletionView: View {
             let totalReps = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).reduce(0) { $0 + $1.reps }
             let completedExercises = session.exerciseLogs.filter(\.isCompleted).count
 
-            VStack(spacing: 12) {
-                HStack(spacing: 10) {
-                    completionStat("Duration", value: "\(duration)", unit: "min")
+            VStack(spacing: 10) {
+                HStack(spacing: 8) {
+                    completionStat("Time", value: "\(duration)", unit: "min")
                     completionStat("Exercises", value: "\(completedExercises)", unit: nil)
                     completionStat("Sets", value: "\(totalSets)", unit: nil)
                     completionStat("Reps", value: "\(totalReps)", unit: nil)
@@ -160,25 +185,25 @@ struct WorkoutCompletionView: View {
 
                 if session.totalVolume > 0 {
                     HStack {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 3) {
                             Text("TOTAL VOLUME")
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundStyle(.white.opacity(0.42))
                                 .tracking(1.2)
                             Text(String(format: "%.0f kg", session.totalVolume))
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .font(.system(size: 26, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                         }
                         Spacer()
                         Image(systemName: "chart.bar.fill")
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(.system(size: 20, weight: .semibold))
                             .foregroundStyle(STRQBrand.steel.opacity(0.6))
                     }
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 18)
-                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 16))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: 14)
                             .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
                     )
                 }
@@ -195,18 +220,8 @@ struct WorkoutCompletionView: View {
     @ViewBuilder
     private var highlightsSection: some View {
         if !highlights.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 8) {
-                    Text("HIGHLIGHTS")
-                        .font(.system(size: 11, weight: .black))
-                        .tracking(1.4)
-                        .foregroundStyle(.white.opacity(0.55))
-                    Spacer()
-                    Text("\(highlights.count)")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.35))
-                }
-                .padding(.horizontal, 4)
+            VStack(alignment: .leading, spacing: 10) {
+                sectionHeader(title: "WHAT IMPROVED", count: highlights.count)
 
                 VStack(spacing: 8) {
                     ForEach(Array(highlights.enumerated()), id: \.element.id) { idx, h in
@@ -216,7 +231,7 @@ struct WorkoutCompletionView: View {
                             .animation(
                                 reduceMotion
                                     ? .easeOut(duration: 0.2)
-                                    : .spring(response: 0.5, dampingFraction: 0.82).delay(0.5 + Double(idx) * 0.08),
+                                    : .spring(response: 0.5, dampingFraction: 0.82).delay(0.45 + Double(idx) * 0.07),
                                 value: highlightsAppeared
                             )
                     }
@@ -224,6 +239,188 @@ struct WorkoutCompletionView: View {
             }
             .padding(.horizontal, 20)
         }
+    }
+
+    // MARK: - Next session bridge
+
+    @ViewBuilder
+    private var nextSessionBridge: some View {
+        let items = nextSessionItems()
+        if !items.isEmpty || nextDayName != nil {
+            VStack(alignment: .leading, spacing: 10) {
+                sectionHeader(title: "NEXT SESSION", count: nil)
+
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(alignment: .center, spacing: 10) {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.75))
+                            .frame(width: 28, height: 28)
+                            .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 8))
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(nextDayName ?? "Upcoming session")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(.white)
+                            Text(nextDaySubtitle)
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.5))
+                                .lineLimit(1)
+                        }
+                        Spacer()
+                    }
+
+                    if !items.isEmpty {
+                        Divider()
+                            .overlay(Color.white.opacity(0.06))
+
+                        VStack(spacing: 6) {
+                            ForEach(items) { item in
+                                HStack(spacing: 10) {
+                                    Image(systemName: item.icon)
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundStyle(item.color)
+                                        .frame(width: 16)
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text(item.exerciseName)
+                                            .font(.system(size: 12, weight: .semibold))
+                                            .foregroundStyle(.white.opacity(0.9))
+                                            .lineLimit(1)
+                                        Text(item.detail)
+                                            .font(.system(size: 10.5, weight: .medium))
+                                            .foregroundStyle(.white.opacity(0.55))
+                                            .lineLimit(1)
+                                    }
+                                    Spacer(minLength: 4)
+                                    Text(item.tag)
+                                        .font(.system(size: 9, weight: .black))
+                                        .tracking(0.8)
+                                        .foregroundStyle(item.color)
+                                        .padding(.horizontal, 7)
+                                        .padding(.vertical, 3)
+                                        .background(item.color.opacity(0.12), in: Capsule())
+                                        .overlay(Capsule().strokeBorder(item.color.opacity(0.22), lineWidth: 0.5))
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 14)
+                .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+                )
+            }
+            .padding(.horizontal, 20)
+            .opacity(highlightsAppeared ? 1 : 0)
+            .offset(y: highlightsAppeared ? 0 : 14)
+            .animation(
+                reduceMotion ? .easeOut(duration: 0.2) : .spring(response: 0.5, dampingFraction: 0.82).delay(0.7),
+                value: highlightsAppeared
+            )
+        }
+    }
+
+    private var nextDayName: String? {
+        guard let plan = vm.currentPlan else { return nil }
+        guard let id = vm.nextSessionDayId, let day = plan.days.first(where: { $0.id == id }) else { return nil }
+        // Avoid trivially naming the same session they just finished if another day exists.
+        if day.id == session?.dayId, let other = plan.days.first(where: { $0.id != day.id && !$0.isSkipped }) {
+            return other.name
+        }
+        return day.name
+    }
+
+    private var nextDaySubtitle: String {
+        if let date = vm.nextScheduledWorkoutDate {
+            let cal = Calendar.current
+            if cal.isDateInToday(date) { return "scheduled today" }
+            if cal.isDateInTomorrow(date) { return "scheduled tomorrow" }
+            let days = cal.dateComponents([.day], from: cal.startOfDay(for: Date()), to: cal.startOfDay(for: date)).day ?? 0
+            if days > 0 && days < 7 {
+                let f = DateFormatter()
+                f.dateFormat = "EEEE"
+                return "scheduled \(f.string(from: date).lowercased())"
+            }
+        }
+        return "STRQ will adapt from today's data"
+    }
+
+    private struct BridgeItem: Identifiable {
+        let id = UUID()
+        let exerciseName: String
+        let detail: String
+        let tag: String
+        let icon: String
+        let color: Color
+    }
+
+    private func nextSessionItems() -> [BridgeItem] {
+        guard let session else { return [] }
+        var items: [BridgeItem] = []
+
+        // Priority 1: PR or best-set exercises from this session → PUSH next time
+        var pushed: Set<String> = []
+        for h in highlights.prefix(3) where h.kind == .personalRecord || h.kind == .bestSet {
+            guard let name = h.subtitle else { continue }
+            if pushed.contains(name) { continue }
+            pushed.insert(name)
+            let detail: String
+            if h.kind == .personalRecord {
+                detail = "Confirmed progression — load up next time"
+            } else {
+                detail = "Beat last session — push next time"
+            }
+            items.append(BridgeItem(
+                exerciseName: name,
+                detail: detail,
+                tag: "PUSH",
+                icon: "arrow.up.right.circle.fill",
+                color: STRQPalette.success
+            ))
+            if items.count >= 2 { return items }
+        }
+
+        // Priority 2: exercises in this session with hold/deload guidance
+        for log in session.exerciseLogs.prefix(6) {
+            guard let state = vm.progressionStates.first(where: { $0.exerciseId == log.exerciseId }) else { continue }
+            guard let ex = vm.library.exercise(byId: log.exerciseId) else { continue }
+            if pushed.contains(ex.name) { continue }
+
+            switch state.recommendedStrategy {
+            case .loadFirst where state.plateauStatus == .progressing:
+                items.append(BridgeItem(
+                    exerciseName: ex.name,
+                    detail: "Next: \(String(format: "%.1f", state.lastWeight + 2.5)) kg × \(state.lastReps)",
+                    tag: "PUSH",
+                    icon: "arrow.up.right.circle.fill",
+                    color: STRQPalette.success
+                ))
+            case .holdAndConsolidate:
+                items.append(BridgeItem(
+                    exerciseName: ex.name,
+                    detail: "Hold load — consolidate technique",
+                    tag: "HOLD",
+                    icon: "pause.circle.fill",
+                    color: STRQPalette.warning
+                ))
+            case .deloadAndRebuild:
+                items.append(BridgeItem(
+                    exerciseName: ex.name,
+                    detail: String(format: "Deload to %.1f kg — rebuild clean", state.lastWeight * 0.85),
+                    tag: "DROP",
+                    icon: "arrow.down.circle.fill",
+                    color: STRQPalette.danger
+                ))
+            default:
+                continue
+            }
+            pushed.insert(ex.name)
+            if items.count >= 2 { return items }
+        }
+
+        return items
     }
 
     // MARK: - Bottom actions
@@ -238,7 +435,7 @@ struct WorkoutCompletionView: View {
                         .font(.body.weight(.bold))
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 56)
+                        .frame(height: 54)
                         .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 18))
                 }
                 .buttonStyle(.strqPressable)
@@ -253,15 +450,31 @@ struct WorkoutCompletionView: View {
 
     // MARK: - Helpers
 
+    private func sectionHeader(title: String, count: Int?) -> some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .font(.system(size: 11, weight: .black))
+                .tracking(1.4)
+                .foregroundStyle(.white.opacity(0.55))
+            Spacer()
+            if let count {
+                Text("\(count)")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.35))
+            }
+        }
+        .padding(.horizontal, 4)
+    }
+
     private func completionStat(_ title: String, value: String, unit: String?) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 5) {
             HStack(alignment: .lastTextBaseline, spacing: 2) {
                 Text(value)
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                 if let unit {
                     Text(unit)
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.4))
                 }
             }
@@ -271,10 +484,10 @@ struct WorkoutCompletionView: View {
                 .tracking(1.0)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
+        .padding(.vertical, 14)
+        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 12))
         .overlay(
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
         )
     }
@@ -289,7 +502,6 @@ struct WorkoutCompletionView: View {
             return
         }
 
-        // Sequential haptic pulses to sell the moment
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(120))
             sparkTrigger &+= 1
@@ -323,6 +535,8 @@ private struct HighlightRow: View {
             return (STRQPalette.warning, STRQPalette.warningSoft, "arrow.down.right.circle.fill")
         case .firstTime:
             return (STRQPalette.info, STRQPalette.infoSoft, "sparkles")
+        case .consolidation:
+            return (STRQBrand.steel, STRQBrand.steel.opacity(0.18), "checkmark.seal.fill")
         case .longestSession:
             return (STRQPalette.gold, STRQPalette.goldSoft, "timer")
         case .streakMilestone:
@@ -337,20 +551,31 @@ private struct HighlightRow: View {
             ZStack {
                 Circle()
                     .fill(palette.soft)
-                    .frame(width: 40, height: 40)
+                    .frame(width: highlight.isPrimary ? 44 : 38, height: highlight.isPrimary ? 44 : 38)
                 Image(systemName: palette.icon)
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.system(size: highlight.isPrimary ? 18 : 15, weight: .bold))
                     .foregroundStyle(palette.color)
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(highlight.title)
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(.white)
+                HStack(spacing: 6) {
+                    Text(highlight.title)
+                        .font(.system(size: highlight.isPrimary ? 14 : 13, weight: highlight.isPrimary ? .heavy : .bold))
+                        .foregroundStyle(.white)
+                    if highlight.isPrimary {
+                        Text("TOP")
+                            .font(.system(size: 8, weight: .black))
+                            .tracking(0.8)
+                            .foregroundStyle(palette.color)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(palette.color.opacity(0.14), in: Capsule())
+                    }
+                }
                 if let subtitle = highlight.subtitle {
                     Text(subtitle)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.white.opacity(0.55))
                         .lineLimit(1)
                 }
             }
@@ -359,21 +584,27 @@ private struct HighlightRow: View {
 
             VStack(alignment: .trailing, spacing: 2) {
                 Text(highlight.valuePrimary)
-                    .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                    .font(.system(size: highlight.isPrimary ? 15 : 14, weight: .bold, design: .rounded).monospacedDigit())
                     .foregroundStyle(palette.color)
                 if let secondary = highlight.valueSecondary {
                     Text(secondary)
                         .font(.system(size: 10, weight: .semibold).monospacedDigit())
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(.white.opacity(0.42))
                 }
             }
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 14))
+        .padding(.vertical, highlight.isPrimary ? 14 : 11)
+        .background(
+            Color.white.opacity(highlight.isPrimary ? 0.055 : 0.03),
+            in: .rect(cornerRadius: 14)
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(palette.color.opacity(0.18), lineWidth: 0.7)
+                .strokeBorder(
+                    palette.color.opacity(highlight.isPrimary ? 0.32 : 0.16),
+                    lineWidth: highlight.isPrimary ? 1.0 : 0.7
+                )
         )
     }
 }
@@ -383,6 +614,7 @@ private struct HighlightRow: View {
 private struct SparkField: View {
     let trigger: Int
     let intensity: Double
+    let accent: Color
 
     @State private var particles: [Particle] = []
 
@@ -396,24 +628,24 @@ private struct SparkField: View {
         var life: Double
         var maxLife: Double
         var hue: Double
-        var isGold: Bool
+        var isAccent: Bool
     }
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { context in
-            Canvas { ctx, size in
+            Canvas { ctx, _ in
                 let now = context.date.timeIntervalSinceReferenceDate
                 for p in particles {
                     let alpha = max(0, 1.0 - (now - p.life) / p.maxLife)
                     guard alpha > 0 else { continue }
-                    let color: Color = p.isGold
-                        ? STRQPalette.gold.opacity(alpha)
+                    let color: Color = p.isAccent
+                        ? accent.opacity(alpha)
                         : Color.white.opacity(alpha * 0.85)
                     let rect = CGRect(x: p.x - p.size / 2, y: p.y - p.size / 2, width: p.size, height: p.size)
                     ctx.fill(Path(ellipseIn: rect), with: .color(color))
-                    if p.isGold {
+                    if p.isAccent {
                         let glow = CGRect(x: p.x - p.size, y: p.y - p.size, width: p.size * 2, height: p.size * 2)
-                        ctx.fill(Path(ellipseIn: glow), with: .color(STRQPalette.gold.opacity(alpha * 0.18)))
+                        ctx.fill(Path(ellipseIn: glow), with: .color(accent.opacity(alpha * 0.18)))
                     }
                 }
             }
@@ -435,7 +667,7 @@ private struct SparkField: View {
         for _ in 0..<count {
             let angle = Double.random(in: 0...(2 * .pi))
             let speed = CGFloat.random(in: 90...260)
-            let isGold = Double.random(in: 0...1) < 0.55
+            let isAccent = Double.random(in: 0...1) < 0.55
             new.append(Particle(
                 x: originX,
                 y: originY,
@@ -445,7 +677,7 @@ private struct SparkField: View {
                 life: now,
                 maxLife: Double.random(in: 0.8...1.6),
                 hue: 0,
-                isGold: isGold
+                isAccent: isAccent
             ))
         }
         particles.append(contentsOf: new)
