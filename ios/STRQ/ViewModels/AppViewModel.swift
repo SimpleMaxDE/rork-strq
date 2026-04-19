@@ -72,6 +72,14 @@ class AppViewModel {
     private var isHydrating: Bool = false
     private var lastScheduledSignature: String = ""
 
+    private var _workoutController: WorkoutController?
+    var workoutController: WorkoutController {
+        if let c = _workoutController { return c }
+        let c = WorkoutController(vm: self)
+        _workoutController = c
+        return c
+    }
+
     init() {
         self.profile = UserProfile()
         self.currentPlan = nil
@@ -689,173 +697,55 @@ class AppViewModel {
         )
     }
 
+    // MARK: - Workout subsystem (delegated to WorkoutController)
+
     func startWorkout(day: WorkoutDay) {
-        guard let plan = currentPlan else {
-            ErrorReporter.shared.reportMessage("startWorkout called without plan", level: .warning)
-            return
-        }
-        Analytics.shared.track(.workout_started, [
-            "day": day.name,
-            "exercises": String(day.exercises.count),
-            "phase": String(describing: trainingPhaseState.currentPhase),
-            "readiness": readinessBucket
-        ])
-        ErrorReporter.shared.breadcrumb("Workout started: \(day.name)", category: "training")
-        let exerciseLogs = day.exercises.map { planned -> ExerciseLog in
-            let today = todayPrescription(for: planned)
-            let prefillWeight = today.suggestedWeight
-            let setCount = max(1, today.suggestedSets)
-            let sets = (1...setCount).map { SetLog(setNumber: $0, weight: prefillWeight) }
-            return ExerciseLog(exerciseId: planned.exerciseId, sets: sets)
-        }
-        activeWorkout = ActiveWorkoutState(
-            session: WorkoutSession(planId: plan.id, dayId: day.id, dayName: day.name, exerciseLogs: exerciseLogs),
-            currentExerciseIndex: 0,
-            currentSetIndex: 0,
-            isResting: false,
-            restTimeRemaining: 0,
-            plannedExercises: day.exercises
-        )
-        startLiveActivityForActiveWorkout()
-        persist()
-    }
-
-    // MARK: - Live Activity
-
-    private func buildLiveActivityState(restEndsAt: Date? = nil) -> WorkoutActivityAttributes.ContentState? {
-        guard let workout = activeWorkout else { return nil }
-        let logs = workout.session.exerciseLogs
-        guard !logs.isEmpty else { return nil }
-        let idx = min(workout.currentExerciseIndex, logs.count - 1)
-        let log = logs[idx]
-        let exerciseName = library.exercise(byId: log.exerciseId)?.name ?? log.exerciseId
-        let completedSetsInCurrent = log.sets.filter(\.isCompleted).count
-        let currentSetNumber = min(log.sets.count, completedSetsInCurrent + 1)
-        let totalCompleted = logs.flatMap(\.sets).filter(\.isCompleted).count
-        let totalSessionSets = logs.flatMap(\.sets).count
-        let nextIdx = idx + 1
-        let nextName: String? = nextIdx < logs.count
-            ? (library.exercise(byId: logs[nextIdx].exerciseId)?.name ?? logs[nextIdx].exerciseId)
-            : nil
-        let allDone = logs.allSatisfy(\.isCompleted)
-        return WorkoutActivityAttributes.ContentState(
-            dayName: workout.session.dayName,
-            exerciseName: exerciseName,
-            currentExerciseIndex: idx,
-            totalExercises: logs.count,
-            currentSetNumber: currentSetNumber,
-            totalSets: log.sets.count,
-            completedSets: totalCompleted,
-            totalSessionSets: totalSessionSets,
-            startedAt: workout.session.startTime,
-            restEndsAt: restEndsAt,
-            nextExerciseName: nextName,
-            isCompleted: allDone
-        )
-    }
-
-    func startLiveActivityForActiveWorkout() {
-        guard let workout = activeWorkout, let state = buildLiveActivityState() else { return }
-        WorkoutLiveActivityManager.shared.start(state: state, workoutId: workout.session.id)
-    }
-
-    func updateLiveActivity(restEndsAt: Date? = nil) {
-        guard let state = buildLiveActivityState(restEndsAt: restEndsAt) else { return }
-        WorkoutLiveActivityManager.shared.update(state: state)
-    }
-
-    func endLiveActivity(completed: Bool) {
-        var finalState = buildLiveActivityState()
-        if completed, finalState != nil {
-            finalState?.isCompleted = true
-            finalState?.restEndsAt = nil
-        }
-        WorkoutLiveActivityManager.shared.end(finalState: finalState, immediate: !completed)
-    }
-
-    func saveActiveWorkoutDraft() {
-        persist()
-    }
-
-    // MARK: - Watch Actions
-
-    func handleWatchAction(_ action: String, payload: [String: Any]) {
-        guard let workout = activeWorkout, !workout.session.exerciseLogs.isEmpty else { return }
-        let exIdx = min(workout.currentExerciseIndex, workout.session.exerciseLogs.count - 1)
-        let log = workout.session.exerciseLogs[exIdx]
-
-        switch action {
-        case "completeSet":
-            guard let setIdx = log.sets.firstIndex(where: { !$0.isCompleted }) else { return }
-            let weight = (payload["weight"] as? Double) ?? log.sets[setIdx].weight
-            let reps = (payload["reps"] as? Int) ?? log.sets[setIdx].reps
-            updateSetLoad(exerciseIndex: exIdx, setIndex: setIdx, weight: weight, reps: reps)
-            _ = completeCurrentSet(exerciseIndex: exIdx, setIndex: setIdx)
-            persist()
-        case "nextExercise":
-            moveToNextExercise()
-            persist()
-        case "adjustWeight":
-            let delta = (payload["delta"] as? Double) ?? 0
-            guard let setIdx = log.sets.firstIndex(where: { !$0.isCompleted }) else { return }
-            let current = log.sets[setIdx]
-            updateSetLoad(exerciseIndex: exIdx, setIndex: setIdx, weight: current.weight + delta, reps: current.reps)
-            persist()
-        case "adjustReps":
-            let delta = (payload["delta"] as? Int) ?? 0
-            guard let setIdx = log.sets.firstIndex(where: { !$0.isCompleted }) else { return }
-            let current = log.sets[setIdx]
-            updateSetLoad(exerciseIndex: exIdx, setIndex: setIdx, weight: current.weight, reps: current.reps + delta)
-            persist()
-        case "setQuality":
-            guard let raw = payload["quality"] as? String, let q = SetQuality(rawValue: raw) else { return }
-            guard let setIdx = log.sets.lastIndex(where: { $0.isCompleted }) else { return }
-            setSetQuality(exerciseIndex: exIdx, setIndex: setIdx, quality: q)
-            persist()
-        default:
-            break
-        }
+        workoutController.startWorkout(day: day)
     }
 
     func completeWorkout() {
-        guard var workout = activeWorkout else {
-            ErrorReporter.shared.reportMessage("completeWorkout called without active workout", level: .warning)
-            return
-        }
-        workout.session.isCompleted = true
-        workout.session.endTime = Date()
-        workout.session.totalVolume = workout.session.exerciseLogs.reduce(0.0) { total, log in
-            total + log.sets.filter(\.isCompleted).reduce(0.0) { $0 + $1.weight * Double($1.reps) }
-        }
-        workoutHistory.insert(workout.session, at: 0)
+        workoutController.completeWorkout()
+    }
 
-        let entry = ProgressEntry(
-            date: Date(),
-            totalSets: workout.session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count,
-            totalReps: workout.session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).reduce(0) { $0 + $1.reps },
-            totalVolume: workout.session.totalVolume,
-            workoutDuration: Int(Date().timeIntervalSince(workout.session.startTime) / 60)
-        )
-        progressEntries.insert(entry, at: 0)
+    func saveActiveWorkoutDraft() {
+        workoutController.saveDraft()
+    }
 
-        let sessionStart = workout.session.startTime
-        let sessionEnd = workout.session.endTime ?? Date()
-        let sessionVolume = workout.session.totalVolume
-        endLiveActivity(completed: true)
-        activeWorkout = nil
-        refreshIntelligence()
-        persist()
-        if notificationSettings.healthKitSyncEnabled {
-            Task { await HealthKitService.shared.saveWorkout(start: sessionStart, end: sessionEnd, totalVolumeKg: sessionVolume) }
-        }
-        Analytics.shared.track(.workout_completed, [
-            "day": workout.session.dayName,
-            "sets": String(entry.totalSets),
-            "reps": String(entry.totalReps),
-            "volume": String(Int(entry.totalVolume)),
-            "duration_min": String(entry.workoutDuration)
-        ])
-        ErrorReporter.shared.breadcrumb("Workout completed: \(workout.session.dayName)", category: "training")
+    func updateSetLoad(exerciseIndex: Int, setIndex: Int, weight: Double, reps: Int) {
+        workoutController.updateSetLoad(exerciseIndex: exerciseIndex, setIndex: setIndex, weight: weight, reps: reps)
+    }
+
+    @discardableResult
+    func completeCurrentSet(exerciseIndex: Int, setIndex: Int) -> Int {
+        workoutController.completeCurrentSet(exerciseIndex: exerciseIndex, setIndex: setIndex)
+    }
+
+    func setSetQuality(exerciseIndex: Int, setIndex: Int, quality: SetQuality?) {
+        workoutController.setSetQuality(exerciseIndex: exerciseIndex, setIndex: setIndex, quality: quality)
+    }
+
+    func jumpToSet(exerciseIndex: Int, setIndex: Int) {
+        workoutController.jumpToSet(exerciseIndex: exerciseIndex, setIndex: setIndex)
+    }
+
+    func moveToNextExercise() {
+        workoutController.moveToNextExercise()
+    }
+
+    func moveToPreviousExercise() {
+        workoutController.moveToPreviousExercise()
+    }
+
+    func jumpToExercise(_ index: Int) {
+        workoutController.jumpToExercise(index)
+    }
+
+    func handleWatchAction(_ action: String, payload: [String: Any]) {
+        workoutController.handleWatchAction(action, payload: payload)
+    }
+
+    func updateLiveActivity(restEndsAt: Date? = nil) {
+        workoutController.updateLiveActivity(restEndsAt: restEndsAt)
     }
 
     var readinessBucket: String {
