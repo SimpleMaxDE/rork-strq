@@ -226,7 +226,7 @@ struct TrainingPlanView: View {
                 if isSkipped {
                     Text("Skipped")
                         .font(.system(size: 8, weight: .bold))
-                        .foregroundStyle(.red.opacity(0.7))
+                        .foregroundStyle(STRQPalette.danger.opacity(0.8))
                 } else if hasAdj {
                     Image(systemName: "brain.head.profile.fill")
                         .font(.system(size: 8))
@@ -469,7 +469,7 @@ struct TrainingPlanView: View {
                         if let suggestion = vm.loadSuggestion(for: planned.exerciseId, planned: planned), suggestion.suggestedWeight > 0 {
                             Text(suggestion.formattedWeight)
                                 .font(.system(size: 10, weight: .bold))
-                                .foregroundStyle(.green)
+                                .foregroundStyle(STRQPalette.success)
                         }
                     }
                 }
@@ -583,7 +583,7 @@ struct TrainingPlanView: View {
                     Text(day.isSkipped ? "Unskip" : "Skip")
                         .font(.caption2.weight(.semibold))
                 }
-                .foregroundStyle(day.isSkipped ? .green : .secondary)
+                .foregroundStyle(day.isSkipped ? STRQPalette.success : .secondary)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
                 .background(Color(.tertiarySystemGroupedBackground), in: Capsule())
@@ -630,8 +630,8 @@ struct TrainingPlanView: View {
         case .keyLift: .white
         case .supportLift: STRQBrand.steel
         case .accessory: .secondary
-        case .warmup: .yellow
-        case .saferSubstitute: .green
+        case .warmup: STRQPalette.warning
+        case .saferSubstitute: STRQPalette.success
         }
     }
 

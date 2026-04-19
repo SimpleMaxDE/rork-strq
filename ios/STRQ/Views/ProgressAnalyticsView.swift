@@ -391,28 +391,18 @@ struct ProgressAnalyticsView: View {
         HStack(alignment: .center, spacing: 14) {
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.yellow.opacity(0.22), Color.yellow.opacity(0.06)],
-                            startPoint: .topLeading, endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(STRQPalette.goldSoft)
                     .frame(width: 44, height: 44)
                 Image(systemName: "trophy.fill")
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color(red: 1.0, green: 0.86, blue: 0.42), Color(red: 0.95, green: 0.72, blue: 0.24)],
-                            startPoint: .top, endPoint: .bottom
-                        )
-                    )
+                    .foregroundStyle(STRQPalette.goldGradient)
             }
 
             VStack(alignment: .leading, spacing: 3) {
                 Text("LATEST PR")
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.2)
-                    .foregroundStyle(.yellow.opacity(0.8))
+                    .foregroundStyle(STRQPalette.gold)
                 Text(vm.library.exercise(byId: pr.exerciseId)?.name ?? pr.exerciseId)
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
@@ -441,7 +431,7 @@ struct ProgressAnalyticsView: View {
         HStack(spacing: 10) {
             Image(systemName: "trophy.fill")
                 .font(.system(size: 10))
-                .foregroundStyle(STRQBrand.steel)
+                .foregroundStyle(STRQPalette.gold)
                 .frame(width: 20)
             Text(vm.library.exercise(byId: pr.exerciseId)?.name ?? pr.exerciseId)
                 .font(.caption.weight(.medium))
@@ -525,7 +515,7 @@ struct ProgressAnalyticsView: View {
     }
 
     private func improvementCell(label: String, delta: String, unit: String?, positive: Bool, negative: Bool) -> some View {
-        let color: Color = positive ? .green : (negative ? .red : .secondary)
+        let color: Color = positive ? STRQPalette.success : (negative ? STRQPalette.warning : .secondary)
         return VStack(alignment: .leading, spacing: 3) {
             HStack(alignment: .lastTextBaseline, spacing: 1) {
                 Text(delta)

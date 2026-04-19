@@ -97,7 +97,7 @@ struct ExercisePrescriptionSheet: View {
                 HStack(alignment: .top, spacing: 8) {
                     Image(systemName: "heart.circle.fill")
                         .font(.system(size: 11))
-                        .foregroundStyle(.yellow)
+                        .foregroundStyle(STRQPalette.warning)
                     Text(note)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -126,10 +126,10 @@ struct ExercisePrescriptionSheet: View {
 
     private func decisionColor(_ name: String) -> Color {
         switch name {
-        case "green": .green
-        case "red": .red
-        case "yellow": .yellow
-        case "blue": .blue
+        case "green": STRQPalette.success
+        case "red": STRQPalette.danger
+        case "yellow": STRQPalette.warning
+        case "blue": STRQPalette.info
         default: STRQBrand.steel
         }
     }
@@ -177,7 +177,7 @@ struct ExercisePrescriptionSheet: View {
                 statItem(value: "\(planned.restSeconds)s", label: "Rest")
                 if let weight = prescription.suggestedWeight {
                     Divider().frame(height: 28).opacity(0.3)
-                    statItem(value: weight, label: "Load", valueColor: .green)
+                    statItem(value: weight, label: "Load", valueColor: STRQPalette.success)
                 }
             }
             .padding(.vertical, 14)
@@ -214,21 +214,21 @@ struct ExercisePrescriptionSheet: View {
                 icon: "questionmark.circle.fill",
                 label: "WHY THIS EXERCISE",
                 text: prescription.whyThisExercise,
-                color: .blue
+                color: STRQPalette.info
             )
 
             prescriptionCard(
                 icon: "rectangle.stack.fill",
                 label: "SETS & REPS",
                 text: prescription.whySetsReps,
-                color: .purple
+                color: STRQBrand.slate
             )
 
             prescriptionCard(
                 icon: "scalemass.fill",
                 label: "SUGGESTED WEIGHT",
                 text: prescription.whyWeight,
-                color: .green
+                color: STRQPalette.success
             )
 
             prescriptionCard(
@@ -276,20 +276,20 @@ struct ExercisePrescriptionSheet: View {
     private var roleColor: Color {
         switch prescription.role {
         case .keyLift: .white
-        case .supportLift: .blue
+        case .supportLift: STRQPalette.info
         case .accessory: STRQBrand.steel
-        case .warmup: .yellow
-        case .saferSubstitute: .green
+        case .warmup: STRQPalette.warning
+        case .saferSubstitute: STRQPalette.success
         }
     }
 
     private var guidanceColorValue: Color {
         switch prescription.guidanceColor {
-        case "green": .green
-        case "blue": .blue
-        case "red": .red
-        case "purple": .purple
-        case "teal": .teal
+        case "green": STRQPalette.success
+        case "blue": STRQPalette.info
+        case "red": STRQPalette.danger
+        case "purple": STRQBrand.slate
+        case "teal": STRQPalette.info
         default: STRQBrand.steel
         }
     }

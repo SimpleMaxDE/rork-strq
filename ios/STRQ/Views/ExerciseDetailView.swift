@@ -217,15 +217,15 @@ struct ExerciseDetailView: View {
             HStack(spacing: 8) {
                 infoChip(exercise.difficulty.displayName, icon: difficultyIcon, color: diffColor)
                 infoChip(exercise.category.displayName, icon: categoryIcon, color: categoryColor)
-                infoChip(exercise.movementPattern.displayName, icon: "arrow.triangle.2.circlepath", color: .purple)
+                infoChip(exercise.movementPattern.displayName, icon: "arrow.triangle.2.circlepath", color: STRQBrand.slate)
                 if exercise.isBodyweight {
-                    infoChip("Bodyweight", icon: "figure.stand", color: .green)
+                    infoChip("Bodyweight", icon: "figure.stand", color: STRQPalette.success)
                 }
                 if exercise.isJointFriendly {
-                    infoChip("Joint-Friendly", icon: "hand.thumbsup.fill", color: .mint)
+                    infoChip("Joint-Friendly", icon: "hand.thumbsup.fill", color: STRQPalette.info)
                 }
                 if exercise.isBeginnerFriendly {
-                    infoChip("Beginner OK", icon: "star.fill", color: .yellow)
+                    infoChip("Beginner OK", icon: "star.fill", color: STRQPalette.warning)
                 }
             }
         }
@@ -252,18 +252,18 @@ struct ExerciseDetailView: View {
             HStack(spacing: 6) {
                 Image(systemName: "calendar.badge.clock")
                     .font(.caption)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(STRQPalette.info)
                 Text("IN YOUR PLAN")
                     .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(STRQPalette.info)
                     .tracking(0.5)
                 Spacer()
                 Text(ctx.role.displayName)
                     .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(STRQPalette.info)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
-                    .background(Color.blue.opacity(0.1), in: Capsule())
+                    .background(STRQPalette.infoSoft, in: Capsule())
             }
 
             Text(ctx.reason)
@@ -283,7 +283,7 @@ struct ExerciseDetailView: View {
             .foregroundStyle(.secondary)
         }
         .padding(14)
-        .background(Color.blue.opacity(0.04), in: .rect(cornerRadius: 14))
+        .background(STRQPalette.info.opacity(0.05), in: .rect(cornerRadius: 14))
     }
 
     private func loadSuggestionCard(_ suggestion: StartingLoadEngine.LoadSuggestion) -> some View {
@@ -291,7 +291,7 @@ struct ExerciseDetailView: View {
             HStack(spacing: 6) {
                 Image(systemName: "scalemass.fill")
                     .font(.caption)
-                    .foregroundStyle(.green)
+                    .foregroundStyle(STRQPalette.success)
                 Text("SUGGESTED LOAD")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
@@ -299,10 +299,10 @@ struct ExerciseDetailView: View {
                 Spacer()
                 Text(suggestion.confidence.label)
                     .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.green)
+                    .foregroundStyle(STRQPalette.success)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
-                    .background(Color.green.opacity(0.1), in: Capsule())
+                    .background(STRQPalette.successSoft, in: Capsule())
             }
 
             HStack(spacing: 16) {
@@ -312,7 +312,7 @@ struct ExerciseDetailView: View {
                         .foregroundStyle(.tertiary)
                     Text(suggestion.formattedWeight)
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.green)
+                        .foregroundStyle(STRQPalette.success)
                 }
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Reps")
@@ -329,7 +329,7 @@ struct ExerciseDetailView: View {
                 .foregroundStyle(.secondary)
         }
         .padding(14)
-        .background(Color.green.opacity(0.04), in: .rect(cornerRadius: 14))
+        .background(STRQPalette.successSoft.opacity(0.4), in: .rect(cornerRadius: 14))
     }
 
     private func nextSessionCard(_ g: NextSessionGuidance) -> some View {
@@ -360,12 +360,12 @@ struct ExerciseDetailView: View {
 
     private func guidanceColorValue(_ name: String) -> Color {
         switch name {
-        case "green": return .green
-        case "blue": return .blue
-        case "orange": return STRQBrand.steel
-        case "red": return .red
-        case "purple": return .purple
-        case "teal": return .teal
+        case "green": return STRQPalette.success
+        case "blue": return STRQPalette.info
+        case "orange": return STRQPalette.warning
+        case "red": return STRQPalette.danger
+        case "purple": return STRQBrand.slate
+        case "teal": return STRQPalette.info
         default: return STRQBrand.steel
         }
     }
@@ -527,7 +527,7 @@ struct ExerciseDetailView: View {
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.subheadline)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(STRQPalette.success)
                         Text(cue)
                             .font(.subheadline)
                             .foregroundStyle(.primary)
@@ -550,7 +550,7 @@ struct ExerciseDetailView: View {
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: "xmark.circle.fill")
                             .font(.subheadline)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(STRQPalette.danger)
                         Text(mistake)
                             .font(.subheadline)
                             .foregroundStyle(.primary)
@@ -631,9 +631,9 @@ struct ExerciseDetailView: View {
 
     private func alternativeReasonColor(_ reason: String) -> Color {
         switch reason {
-        case "Same pattern": return .purple
-        case "Same target": return .blue
-        case "Joint-friendly": return .green
+        case "Same pattern": return STRQBrand.slate
+        case "Same target": return STRQPalette.info
+        case "Joint-friendly": return STRQPalette.success
         case "No equipment": return STRQBrand.steel
         default: return .secondary
         }
@@ -650,7 +650,7 @@ struct ExerciseDetailView: View {
 
                 VStack(spacing: 4) {
                     ForEach(regressions) { reg in
-                        progressionRow(reg, label: "Easier", color: .green, icon: "arrow.down.circle.fill")
+                        progressionRow(reg, label: "Easier", color: STRQPalette.success, icon: "arrow.down.circle.fill")
                     }
 
                     HStack(spacing: 10) {
@@ -670,7 +670,7 @@ struct ExerciseDetailView: View {
                     .background(STRQBrand.steel.opacity(0.08), in: .rect(cornerRadius: 12))
 
                     ForEach(progressions) { prog in
-                        progressionRow(prog, label: "Harder", color: .red, icon: "arrow.up.circle.fill")
+                        progressionRow(prog, label: "Harder", color: STRQPalette.warning, icon: "arrow.up.circle.fill")
                     }
                 }
             }
@@ -962,21 +962,21 @@ struct ExerciseDetailView: View {
     private var categoryColor: Color {
         switch exercise.category {
         case .compound: return STRQBrand.steel
-        case .isolation: return .blue
-        case .bodyweight: return .green
-        case .cardio: return .red
-        case .mobility: return .teal
-        case .warmup: return .yellow
-        case .recovery: return .mint
-        case .pilates: return .pink
+        case .isolation: return STRQPalette.info
+        case .bodyweight: return STRQPalette.success
+        case .cardio: return STRQPalette.danger
+        case .mobility: return STRQPalette.info
+        case .warmup: return STRQPalette.warning
+        case .recovery: return STRQPalette.success
+        case .pilates: return STRQBrand.slate
         }
     }
 
     private var diffColor: Color {
         switch exercise.difficulty {
-        case .beginner: .green
+        case .beginner: STRQPalette.success
         case .intermediate: STRQBrand.steel
-        case .advanced: .red
+        case .advanced: STRQPalette.warning
         }
     }
 
@@ -1003,10 +1003,10 @@ struct ExerciseDetailView: View {
 
     private func plateauColor(_ status: PlateauStatus) -> Color {
         switch status {
-        case .progressing: .green
-        case .stalling: .yellow
+        case .progressing: STRQPalette.success
+        case .stalling: STRQPalette.warning
         case .plateaued: STRQBrand.steel
-        case .regressing: .red
+        case .regressing: STRQPalette.danger
         }
     }
 
@@ -1020,9 +1020,9 @@ struct ExerciseDetailView: View {
 
     private func altDiffColor(_ ex: Exercise) -> Color {
         switch ex.difficulty {
-        case .beginner: .green
+        case .beginner: STRQPalette.success
         case .intermediate: STRQBrand.steel
-        case .advanced: .red
+        case .advanced: STRQPalette.warning
         }
     }
 }

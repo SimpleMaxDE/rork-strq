@@ -20,11 +20,11 @@ struct ExpandableInsightCard: View {
 
     private var accentColor: Color {
         switch insight.color {
-        case "orange": return STRQBrand.steel
-        case "yellow": return .yellow
-        case "green": return .green
-        case "red": return .red
-        case "blue": return STRQBrand.steel
+        case "orange": return STRQPalette.warning
+        case "yellow": return STRQPalette.warning
+        case "green": return STRQPalette.success
+        case "red": return STRQPalette.danger
+        case "blue": return STRQPalette.info
         case "purple": return STRQBrand.slate
         default: return STRQBrand.steel
         }
@@ -32,10 +32,10 @@ struct ExpandableInsightCard: View {
 
     private var severityColor: Color {
         switch insight.severity {
-        case .high: return .red
-        case .medium: return .yellow
+        case .high: return STRQPalette.danger
+        case .medium: return STRQPalette.warning
         case .low: return STRQBrand.steel
-        case .positive: return .green
+        case .positive: return STRQPalette.success
         }
     }
 
@@ -147,10 +147,10 @@ struct ExpandableInsightCard: View {
             Text("Applied")
                 .font(.system(size: 9, weight: .semibold))
         }
-        .foregroundStyle(.green)
+        .foregroundStyle(STRQPalette.success)
         .padding(.horizontal, 6)
         .padding(.vertical, 2)
-        .background(Color.green.opacity(0.12), in: Capsule())
+        .background(STRQPalette.successSoft, in: Capsule())
     }
 
     @ViewBuilder
@@ -343,7 +343,7 @@ struct ExpandableInsightCard: View {
                 Text("Applied")
                     .font(.caption.weight(.semibold))
             }
-            .foregroundStyle(.green)
+            .foregroundStyle(STRQPalette.success)
 
             Spacer()
 
@@ -527,11 +527,11 @@ struct ExpandableRecommendationCard: View {
     private var accentColor: Color {
         switch recommendation.type {
         case .volumeImbalance: return STRQBrand.steel
-        case .progressionSuggestion: return .green
-        case .recoveryConcern: return .red
+        case .progressionSuggestion: return STRQPalette.success
+        case .recoveryConcern: return STRQPalette.danger
         case .exerciseSwap: return STRQBrand.steel
         case .splitSuggestion: return STRQBrand.slate
-        case .prCongrats: return .yellow
+        case .prCongrats: return STRQPalette.gold
         case .general: return .white.opacity(0.6)
         }
     }
@@ -629,10 +629,10 @@ struct ExpandableRecommendationCard: View {
                             Text("Applied")
                                 .font(.system(size: 9, weight: .semibold))
                         }
-                        .foregroundStyle(.green)
+                        .foregroundStyle(STRQPalette.success)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(Color.green.opacity(0.12), in: Capsule())
+                        .background(STRQPalette.successSoft, in: Capsule())
                     }
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .font(.caption2.weight(.semibold))
@@ -757,7 +757,7 @@ struct ExpandableRecommendationCard: View {
                 Text("Applied")
                     .font(.caption.weight(.semibold))
             }
-            .foregroundStyle(.green)
+            .foregroundStyle(STRQPalette.success)
 
             Spacer()
 

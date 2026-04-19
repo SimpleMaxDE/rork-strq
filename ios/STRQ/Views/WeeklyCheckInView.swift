@@ -190,11 +190,11 @@ struct WeeklyCheckInView: View {
                 if let trend {
                     Text(trend)
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(trend.hasPrefix("+") ? .green : .red)
+                        .foregroundStyle(trend.hasPrefix("+") ? STRQPalette.success : STRQPalette.danger)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
                         .background(
-                            (trend.hasPrefix("+") ? Color.green : Color.red).opacity(0.15),
+                            (trend.hasPrefix("+") ? STRQPalette.success : STRQPalette.danger).opacity(0.15),
                             in: Capsule()
                         )
                 }
@@ -452,10 +452,10 @@ struct WeeklyCheckInView: View {
             Spacer()
         }
         .padding(16)
-        .background(Color.yellow.opacity(0.06), in: .rect(cornerRadius: 16))
+        .background(STRQPalette.warning.opacity(0.06), in: .rect(cornerRadius: 16))
         .overlay {
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.yellow.opacity(0.12), lineWidth: 1)
+                .stroke(STRQPalette.warning.opacity(0.12), lineWidth: 1)
         }
     }
 
@@ -605,40 +605,41 @@ struct WeeklyCheckInView: View {
 
     private func highlightColor(_ name: String) -> Color {
         switch name {
-        case "green": return .green
-        case "yellow": return .yellow
-        case "orange": return STRQBrand.steel
-        case "red": return .red
-        case "blue": return .blue
-        case "purple": return .purple
+        case "green": return STRQPalette.success
+        case "yellow": return STRQPalette.warning
+        case "orange": return STRQPalette.warning
+        case "red": return STRQPalette.danger
+        case "blue": return STRQPalette.info
+        case "purple": return STRQBrand.slate
+        case "gold": return STRQPalette.gold
         default: return STRQBrand.steel
         }
     }
 
     private func recoveryColor(_ trend: RecoveryTrend) -> Color {
         switch trend {
-        case .improving: return .green
+        case .improving: return STRQPalette.success
         case .stable: return STRQBrand.steel
-        case .declining: return .yellow
-        case .critical: return .red
+        case .declining: return STRQPalette.warning
+        case .critical: return STRQPalette.danger
         }
     }
 
     private func conclusionColor(_ tone: ConclusionTone) -> Color {
         switch tone {
-        case .positive: return .green
+        case .positive: return STRQPalette.success
         case .encouraging: return STRQBrand.steel
-        case .cautious: return .yellow
-        case .urgent: return .red
+        case .cautious: return STRQPalette.warning
+        case .urgent: return STRQPalette.danger
         }
     }
 
     private func recoveryTrendColor(_ trend: RecoveryTrend) -> Color {
         switch trend {
-        case .improving: return .green
+        case .improving: return STRQPalette.success
         case .stable: return STRQBrand.steel
-        case .declining: return .yellow
-        case .critical: return .red
+        case .declining: return STRQPalette.warning
+        case .critical: return STRQPalette.danger
         }
     }
 }

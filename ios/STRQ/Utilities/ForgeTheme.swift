@@ -39,32 +39,24 @@ enum ForgeTheme {
 
     static func color(for name: String) -> Color {
         switch name {
-        case "orange": return STRQBrand.steel
-        case "yellow": return .yellow
-        case "green": return .green
-        case "red": return .red
-        case "blue": return STRQBrand.steel
+        case "green", "mint": return STRQPalette.success
+        case "yellow": return STRQPalette.warning
+        case "orange": return STRQPalette.warning
+        case "red": return STRQPalette.danger
+        case "blue", "cyan", "teal": return STRQPalette.info
         case "purple": return STRQBrand.slate
-        case "cyan": return STRQBrand.steel
-        case "mint": return STRQBrand.steel
-        case "teal": return STRQBrand.steel
-        case "pink": return STRQBrand.steel
+        case "pink": return STRQPalette.info
+        case "gold": return STRQPalette.gold
         default: return STRQBrand.steel
         }
     }
 
     static func recoveryColor(for score: Int) -> Color {
-        switch score {
-        case 80...: return .green
-        case 60..<80: return .yellow
-        default: return .red
-        }
+        STRQPalette.recovery(for: score)
     }
 
     static func sleepColor(for hours: Double) -> Color {
-        if hours >= 7.5 { return .green }
-        if hours >= 6.5 { return .yellow }
-        return .red
+        STRQPalette.sleep(for: hours)
     }
 
     static func formatVolume(_ v: Double) -> String {

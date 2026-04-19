@@ -357,9 +357,9 @@ struct DashboardView: View {
         HStack(spacing: 14) {
             Image(systemName: "leaf.fill")
                 .font(.title3)
-                .foregroundStyle(.green)
+                .foregroundStyle(STRQPalette.success)
                 .frame(width: 44, height: 44)
-                .background(.green.opacity(0.1), in: .rect(cornerRadius: 12))
+                .background(STRQPalette.successSoft, in: .rect(cornerRadius: 12))
 
             VStack(alignment: .leading, spacing: 3) {
                 Text("Recovery Day")
@@ -613,9 +613,9 @@ struct DashboardView: View {
 
     private func weightChangeColor(_ change: Double) -> Color {
         switch vm.nutritionTarget.weightGoalDirection {
-        case .gaining: return change > 0 ? .green : STRQBrand.steel
-        case .losing: return change < 0 ? .green : STRQBrand.steel
-        case .maintaining: return abs(change) < 1 ? .green : .yellow
+        case .gaining: return change > 0 ? STRQPalette.success : STRQBrand.steel
+        case .losing: return change < 0 ? STRQPalette.success : STRQBrand.steel
+        case .maintaining: return abs(change) < 1 ? STRQPalette.success : STRQPalette.warning
         }
     }
 

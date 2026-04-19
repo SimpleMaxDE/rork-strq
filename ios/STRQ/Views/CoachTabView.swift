@@ -264,7 +264,7 @@ struct CoachTabView: View {
                     HStack(spacing: 12) {
                         Image(systemName: item.2 ? "checkmark.circle.fill" : "circle")
                             .font(.subheadline)
-                            .foregroundStyle(item.2 ? .green : STRQBrand.steel.opacity(0.55))
+                            .foregroundStyle(item.2 ? STRQPalette.success : STRQBrand.steel.opacity(0.55))
                             .frame(width: 22)
                         Image(systemName: item.1)
                             .font(.caption)
@@ -398,11 +398,11 @@ struct CoachTabView: View {
                 HStack(spacing: 12) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.green.opacity(0.12))
+                            .fill(STRQPalette.successSoft)
                             .frame(width: 38, height: 38)
                         Image(systemName: win.icon)
                             .font(.subheadline)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(STRQPalette.success)
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
@@ -454,7 +454,7 @@ struct CoachTabView: View {
 
     private func liftRow(state: ExerciseProgressionState, isStalled: Bool) -> some View {
         let exercise = vm.library.exercise(byId: state.exerciseId)
-        let color: Color = isStalled ? (state.plateauStatus == .regressing ? .red : .yellow) : .green
+        let color: Color = isStalled ? (state.plateauStatus == .regressing ? STRQPalette.danger : STRQPalette.warning) : STRQPalette.success
 
         return HStack(spacing: 12) {
             Image(systemName: isStalled ? state.plateauStatus.icon : "arrow.up.right")

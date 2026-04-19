@@ -142,10 +142,10 @@ struct ScheduleEditorSheet: View {
                 if day.isSkipped {
                     Text("Skipped")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(.red)
+                        .foregroundStyle(STRQPalette.danger)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)
-                        .background(Color.red.opacity(0.1), in: Capsule())
+                        .background(STRQPalette.dangerSoft, in: Capsule())
                 }
             }
 

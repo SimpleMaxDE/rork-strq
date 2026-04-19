@@ -212,10 +212,10 @@ struct ExerciseLibraryView: View {
 
     private func plateauStatusColor(_ status: PlateauStatus) -> Color {
         switch status {
-        case .progressing: .green
-        case .stalling: .yellow
+        case .progressing: STRQPalette.success
+        case .stalling: STRQPalette.warning
         case .plateaued: STRQBrand.steel
-        case .regressing: .red
+        case .regressing: STRQPalette.danger
         }
     }
 

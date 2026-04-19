@@ -285,7 +285,7 @@ struct PreWorkoutHandoffView: View {
                                 if let s = suggestion, s.suggestedWeight > 0 {
                                     Text(s.formattedWeight)
                                         .font(.system(size: 10, weight: .bold))
-                                        .foregroundStyle(.green)
+                                        .foregroundStyle(STRQPalette.success)
                                 }
                             }
                         }
@@ -330,10 +330,10 @@ struct PreWorkoutHandoffView: View {
                          text: "\(phase.displayName): \(phase.description)")
 
                 if recovery >= 80 {
-                    reasonRow(icon: "heart.circle.fill", color: .green,
+                    reasonRow(icon: "heart.circle.fill", color: STRQPalette.success,
                              text: "Recovery is strong — good day to push intensity.")
                 } else if recovery < 60 {
-                    reasonRow(icon: "exclamationmark.heart", color: .red,
+                    reasonRow(icon: "exclamationmark.heart", color: STRQPalette.danger,
                              text: "Recovery is low — session adjusted for safer training.")
                 }
 
@@ -418,9 +418,9 @@ struct PreWorkoutHandoffView: View {
 
     private var recoveryColor: Color {
         switch briefing.recoveryScore {
-        case 80...: return .green
-        case 60..<80: return .yellow
-        default: return .red
+        case 80...: return STRQPalette.success
+        case 60..<80: return STRQPalette.warning
+        default: return STRQPalette.danger
         }
     }
 
@@ -439,10 +439,10 @@ struct PreWorkoutHandoffView: View {
 
     private var intensityColor: Color {
         switch briefing.intensityLabel {
-        case "Light": return .green
-        case "Moderate": return .blue
+        case "Light": return STRQPalette.success
+        case "Moderate": return STRQPalette.info
         case "Hard": return STRQBrand.steel
-        default: return .red
+        default: return STRQPalette.warning
         }
     }
 }

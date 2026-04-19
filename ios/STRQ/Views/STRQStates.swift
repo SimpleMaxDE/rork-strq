@@ -89,9 +89,9 @@ enum STRQToastStyle {
 
     var tint: Color {
         switch self {
-        case .applied: return .green
-        case .success: return .green
-        case .info: return STRQBrand.steel
+        case .applied: return STRQPalette.success
+        case .success: return STRQPalette.success
+        case .info: return STRQPalette.info
         case .undo: return STRQBrand.slate
         }
     }
@@ -203,10 +203,10 @@ struct STRQAppliedPill: View {
             Text(label)
                 .font(.system(size: 10, weight: .bold))
         }
-        .foregroundStyle(.green)
+        .foregroundStyle(STRQPalette.success)
         .padding(.horizontal, 8)
         .padding(.vertical, 3)
-        .background(.green.opacity(0.14), in: Capsule())
-        .overlay(Capsule().strokeBorder(.green.opacity(0.2), lineWidth: 0.5))
+        .background(STRQPalette.successSoft, in: Capsule())
+        .overlay(Capsule().strokeBorder(STRQPalette.success.opacity(0.2), lineWidth: 0.5))
     }
 }

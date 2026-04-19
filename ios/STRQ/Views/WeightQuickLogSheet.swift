@@ -178,7 +178,7 @@ struct WeightQuickLogSheet: View {
                 .frame(height: 50)
                 .background(
                     saved
-                        ? AnyShapeStyle(Color.green.gradient)
+                        ? AnyShapeStyle(STRQPalette.success.gradient)
                         : AnyShapeStyle(STRQBrand.accentGradient),
                     in: .rect(cornerRadius: 14)
                 )
@@ -243,17 +243,17 @@ struct WeightQuickLogSheet: View {
 
     private func changeColor(_ change: Double) -> Color {
         switch vm.nutritionTarget.weightGoalDirection {
-        case .gaining: return change > 0 ? .green : STRQBrand.steel
-        case .losing: return change < 0 ? .green : STRQBrand.steel
-        case .maintaining: return abs(change) < 1 ? .green : .yellow
+        case .gaining: return change > 0 ? STRQPalette.success : STRQBrand.steel
+        case .losing: return change < 0 ? STRQPalette.success : STRQBrand.steel
+        case .maintaining: return abs(change) < 1 ? STRQPalette.success : STRQPalette.warning
         }
     }
 
     private func trendColor(_ trend: Double) -> Color {
         switch vm.nutritionTarget.weightGoalDirection {
-        case .gaining: return trend > 0 ? .green : .yellow
-        case .losing: return trend < 0 ? .green : .yellow
-        case .maintaining: return abs(trend) < 0.1 ? .green : .yellow
+        case .gaining: return trend > 0 ? STRQPalette.success : STRQPalette.warning
+        case .losing: return trend < 0 ? STRQPalette.success : STRQPalette.warning
+        case .maintaining: return abs(trend) < 0.1 ? STRQPalette.success : STRQPalette.warning
         }
     }
 

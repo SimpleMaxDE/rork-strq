@@ -451,7 +451,7 @@ struct ActiveWorkoutView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.title)
-                        .foregroundStyle(.green)
+                        .foregroundStyle(STRQPalette.success)
                     Text("All sets complete")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.secondary)
@@ -546,7 +546,7 @@ struct ActiveWorkoutView: View {
 
                 ZStack {
                     if completed {
-                        Circle().fill(Color.green).frame(width: 22, height: 22)
+                        Circle().fill(STRQPalette.success).frame(width: 22, height: 22)
                         Image(systemName: "checkmark")
                             .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(.black)
@@ -881,7 +881,7 @@ struct ActiveWorkoutView: View {
                         Circle()
                             .trim(from: 0, to: progress)
                             .stroke(
-                                restTimeRemaining <= 10 ? Color.red : Color.white,
+                                restTimeRemaining <= 10 ? STRQPalette.warning : Color.white,
                                 style: StrokeStyle(lineWidth: 6, lineCap: .round)
                             )
                             .frame(width: 196, height: 196)
@@ -891,7 +891,7 @@ struct ActiveWorkoutView: View {
                         VStack(spacing: 6) {
                             Text(formatTime(restTimeRemaining))
                                 .font(.system(size: 52, weight: .bold, design: .monospaced))
-                                .foregroundStyle(restTimeRemaining <= 10 ? .red : .white)
+                                .foregroundStyle(restTimeRemaining <= 10 ? STRQPalette.warning : .white)
                                 .contentTransition(.numericText(countsDown: true))
                             Text("remaining")
                                 .font(.system(size: 11, weight: .medium))
@@ -1034,7 +1034,7 @@ struct ActiveWorkoutView: View {
                         HStack(spacing: 12) {
                             ZStack {
                                 Circle()
-                                    .fill(log.isCompleted ? Color.green : isCurrent ? Color.white : Color.white.opacity(0.08))
+                                    .fill(log.isCompleted ? STRQPalette.success : isCurrent ? Color.white : Color.white.opacity(0.08))
                                     .frame(width: 30, height: 30)
                                 if log.isCompleted {
                                     Image(systemName: "checkmark")
@@ -1104,11 +1104,11 @@ struct ActiveWorkoutView: View {
 
     private func qualityColor(_ name: String) -> Color {
         switch name {
-        case "green": return .green
-        case "blue": return .blue
-        case "orange": return .orange
-        case "yellow": return .yellow
-        case "red": return .red
+        case "green": return STRQPalette.success
+        case "blue": return STRQPalette.info
+        case "orange": return STRQPalette.warning
+        case "yellow": return STRQPalette.warning
+        case "red": return STRQPalette.danger
         default: return .white
         }
     }
@@ -1179,12 +1179,12 @@ struct ActiveWorkoutView: View {
 
     private func guidanceColor(_ name: String) -> Color {
         switch name {
-        case "green": return .green
-        case "blue": return .blue
-        case "orange": return STRQBrand.steel
-        case "red": return .red
-        case "purple": return .purple
-        case "teal": return .teal
+        case "green": return STRQPalette.success
+        case "blue": return STRQPalette.info
+        case "orange": return STRQPalette.warning
+        case "red": return STRQPalette.danger
+        case "purple": return STRQBrand.slate
+        case "teal": return STRQPalette.info
         default: return STRQBrand.steel
         }
     }

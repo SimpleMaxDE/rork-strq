@@ -253,9 +253,9 @@ struct ProfileView: View {
             guard vm.cloudSync.isAvailable else { return ("OFF", .gray) }
             switch vm.cloudSync.status {
             case .syncing: return ("SYNC", STRQBrand.steel)
-            case .failed: return ("RETRY", .orange)
+            case .failed: return ("RETRY", STRQPalette.warning)
             case .unavailable: return ("OFF", .gray)
-            case .success, .idle: return ("ON", .green)
+            case .success, .idle: return ("ON", STRQPalette.success)
             }
         }()
         return Text(label)
@@ -291,7 +291,7 @@ struct ProfileView: View {
                             .foregroundStyle(.white)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(.green.opacity(0.8), in: Capsule())
+                            .background(STRQPalette.success.opacity(0.8), in: Capsule())
                     }
                     .padding(14)
 
@@ -449,7 +449,7 @@ struct ProfileView: View {
                     icon: "fork.knife",
                     value: "\(Int(vm.weeklyNutritionAdherence * 100))%",
                     label: "Nutrition",
-                    color: vm.weeklyNutritionAdherence >= 0.8 ? .green : STRQBrand.steel
+                    color: vm.weeklyNutritionAdherence >= 0.8 ? STRQPalette.success : STRQBrand.steel
                 )
             }
         }

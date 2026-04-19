@@ -228,7 +228,7 @@ struct PlanRevealView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.system(size: 10))
-                                .foregroundStyle(.green)
+                                .foregroundStyle(STRQPalette.success)
                             Text(strength)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -315,9 +315,9 @@ struct PlanRevealView: View {
     private func impactColor(_ name: String) -> Color {
         switch name {
         case "blue": return STRQBrand.steel
-        case "green": return .green
+        case "green": return STRQPalette.success
         case "purple": return STRQBrand.slate
-        case "red": return .red
+        case "red": return STRQPalette.danger
         case "cyan": return STRQBrand.steel
         case "steel": return STRQBrand.steel
         default: return STRQBrand.steel
