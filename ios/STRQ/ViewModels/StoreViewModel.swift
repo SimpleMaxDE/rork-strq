@@ -141,11 +141,31 @@ class StoreViewModel {
         guard isPro, let entitlement = customerInfo?.entitlements["pro"], entitlement.isActive else {
             return "Free"
         }
-        let id = entitlement.productIdentifier
-        if id.contains("yearly") || id.contains("annual") {
+        // Prefer the real StoreKit package type from the current offering when we
+        // can resolve the user's product back to a RevenueCat Package. Falls back
+        // to product-id string matching only as a last resort so we're not
+        // depending on naming conventions in production.
+        let productId = entitlement.productIdentifier
+        if let offering = offerings?.current {
+            if let pkg = offering.availablePackages.first(where: { $0.storeProduct.productIdentifier == productId }) {
+                switch pkg.packageType {
+                case .annual, .sixMonth: return "Yearly"
+                case .threeMonth, .twoMonth, .monthly: return "Monthly"
+                case .weekly: return "Weekly"
+                case .lifetime: return "Lifetime"
+                default: break
+                }
+            }
+        }
+        let id = productId.lowercased()
+        if id.contains("year") || id.contains("annual") {
             return "Yearly"
-        } else if id.contains("monthly") {
+        } else if id.contains("month") {
             return "Monthly"
+        } else if id.contains("week") {
+            return "Weekly"
+        } else if id.contains("life") {
+            return "Lifetime"
         }
         return "Pro"
     }

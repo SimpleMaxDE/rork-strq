@@ -137,39 +137,7 @@ class AppViewModel {
 
     func persist() {
         guard !isHydrating else { return }
-        let draft: ActiveWorkoutDraft? = activeWorkout.map { state in
-            ActiveWorkoutDraft(
-                session: state.session,
-                currentExerciseIndex: state.currentExerciseIndex,
-                currentSetIndex: state.currentSetIndex,
-                plannedExercises: state.plannedExercises
-            )
-        }
-        let snapshot = PersistedAppState(
-            version: persistence.version,
-            hasCompletedOnboarding: hasCompletedOnboarding,
-            profile: profile,
-            currentPlan: currentPlan,
-            workoutHistory: workoutHistory,
-            personalRecords: personalRecords,
-            progressEntries: progressEntries,
-            favoriteExerciseIds: Array(favoriteExerciseIds),
-            progressionStates: progressionStates,
-            trainingPhaseState: trainingPhaseState,
-            coachAdjustments: coachAdjustments,
-            appliedActionIds: Array(appliedActionIds),
-            weekAdjustmentActive: weekAdjustmentActive,
-            previousPlanBeforeWeekAction: previousPlanBeforeWeekAction,
-            weeklyReviewDismissed: weeklyReviewDismissed,
-            todaysReadiness: todaysReadiness,
-            readinessHistory: readinessHistory,
-            notificationSettings: notificationSettings,
-            nutritionTarget: nutritionTarget,
-            nutritionLogs: nutritionLogs,
-            bodyWeightEntries: bodyWeightEntries,
-            sleepEntries: sleepEntries,
-            activeWorkoutDraft: draft
-        )
+        let snapshot = SnapshotBuilder.build(from: self, version: persistence.version)
         persistence.save(snapshot)
         scheduleSmartRemindersIfNeeded()
         refreshWidgetSnapshot()
@@ -181,49 +149,32 @@ class AppViewModel {
 
     // MARK: - Cloud Sync
 
-    func restoreFromCloud() -> Bool {
-        guard let payload = cloudSync.loadRemoteSnapshot() else { return false }
+    @discardableResult
+    func restoreFromCloud(force: Bool = false) -> CloudRestoreOutcome {
+        guard cloudSync.isAvailable else { return .unavailable }
+        guard let payload = cloudSync.loadRemoteSnapshot() else { return .noSnapshot }
+        let local = SnapshotBuilder.build(from: self, version: persistence.version)
+        let localScore = SnapshotBuilder.maturityScore(local)
+        let remoteScore = SnapshotBuilder.maturityScore(payload.state)
+        // Guard against overwriting a richer local snapshot with a stale
+        // remote one unless the caller explicitly forces it.
+        if !force, localScore > remoteScore + 5 {
+            Analytics.shared.track(.cloud_sync_failed, ["reason": "local_richer"])
+            ErrorReporter.shared.breadcrumb(
+                "Cloud restore skipped: local richer (\(localScore) vs \(remoteScore))",
+                category: "sync"
+            )
+            return .staleIgnored
+        }
         applySnapshot(payload.state)
         Analytics.shared.track(.cloud_sync_restored)
         ErrorReporter.shared.breadcrumb("Cloud snapshot restored", category: "sync")
-        return true
+        return .restored
     }
 
     func uploadToCloud() {
         guard account.isSignedIn else { return }
-        let draft: ActiveWorkoutDraft? = activeWorkout.map { state in
-            ActiveWorkoutDraft(
-                session: state.session,
-                currentExerciseIndex: state.currentExerciseIndex,
-                currentSetIndex: state.currentSetIndex,
-                plannedExercises: state.plannedExercises
-            )
-        }
-        let snapshot = PersistedAppState(
-            version: persistence.version,
-            hasCompletedOnboarding: hasCompletedOnboarding,
-            profile: profile,
-            currentPlan: currentPlan,
-            workoutHistory: workoutHistory,
-            personalRecords: personalRecords,
-            progressEntries: progressEntries,
-            favoriteExerciseIds: Array(favoriteExerciseIds),
-            progressionStates: progressionStates,
-            trainingPhaseState: trainingPhaseState,
-            coachAdjustments: coachAdjustments,
-            appliedActionIds: Array(appliedActionIds),
-            weekAdjustmentActive: weekAdjustmentActive,
-            previousPlanBeforeWeekAction: previousPlanBeforeWeekAction,
-            weeklyReviewDismissed: weeklyReviewDismissed,
-            todaysReadiness: todaysReadiness,
-            readinessHistory: readinessHistory,
-            notificationSettings: notificationSettings,
-            nutritionTarget: nutritionTarget,
-            nutritionLogs: nutritionLogs,
-            bodyWeightEntries: bodyWeightEntries,
-            sleepEntries: sleepEntries,
-            activeWorkoutDraft: draft
-        )
+        let snapshot = SnapshotBuilder.build(from: self, version: persistence.version)
         cloudSync.upload(snapshot, isSignedIn: true)
     }
 
@@ -829,67 +780,37 @@ class AppViewModel {
     // MARK: - Watch Actions
 
     func handleWatchAction(_ action: String, payload: [String: Any]) {
-        guard var workout = activeWorkout else { return }
+        guard let workout = activeWorkout, !workout.session.exerciseLogs.isEmpty else { return }
+        let exIdx = min(workout.currentExerciseIndex, workout.session.exerciseLogs.count - 1)
+        let log = workout.session.exerciseLogs[exIdx]
+
         switch action {
         case "completeSet":
-            guard !workout.session.exerciseLogs.isEmpty else { return }
-            let exIdx = min(workout.currentExerciseIndex, workout.session.exerciseLogs.count - 1)
-            var log = workout.session.exerciseLogs[exIdx]
             guard let setIdx = log.sets.firstIndex(where: { !$0.isCompleted }) else { return }
-            if let w = payload["weight"] as? Double { log.sets[setIdx].weight = w }
-            if let r = payload["reps"] as? Int { log.sets[setIdx].reps = r }
-            log.sets[setIdx].isCompleted = true
-            let allDone = log.sets.allSatisfy(\.isCompleted)
-            log.isCompleted = allDone
-            workout.session.exerciseLogs[exIdx] = log
-            if allDone, exIdx < workout.session.exerciseLogs.count - 1 {
-                workout.currentExerciseIndex = exIdx + 1
-                workout.currentSetIndex = 0
-            } else if !allDone {
-                workout.currentSetIndex = setIdx + 1
-            }
-            activeWorkout = workout
-            let planned = exIdx < workout.plannedExercises.count ? workout.plannedExercises[exIdx] : nil
-            let rest = planned?.restSeconds ?? 90
-            updateLiveActivity(restEndsAt: Date().addingTimeInterval(TimeInterval(rest)))
+            let weight = (payload["weight"] as? Double) ?? log.sets[setIdx].weight
+            let reps = (payload["reps"] as? Int) ?? log.sets[setIdx].reps
+            updateSetLoad(exerciseIndex: exIdx, setIndex: setIdx, weight: weight, reps: reps)
+            _ = completeCurrentSet(exerciseIndex: exIdx, setIndex: setIdx)
             persist()
         case "nextExercise":
-            if workout.currentExerciseIndex < workout.session.exerciseLogs.count - 1 {
-                workout.currentExerciseIndex += 1
-                workout.currentSetIndex = 0
-                activeWorkout = workout
-                updateLiveActivity()
-                persist()
-            }
+            moveToNextExercise()
+            persist()
         case "adjustWeight":
             let delta = (payload["delta"] as? Double) ?? 0
-            let exIdx = min(workout.currentExerciseIndex, workout.session.exerciseLogs.count - 1)
-            guard exIdx >= 0 else { return }
-            var log = workout.session.exerciseLogs[exIdx]
             guard let setIdx = log.sets.firstIndex(where: { !$0.isCompleted }) else { return }
-            log.sets[setIdx].weight = max(0, log.sets[setIdx].weight + delta)
-            workout.session.exerciseLogs[exIdx] = log
-            activeWorkout = workout
+            let current = log.sets[setIdx]
+            updateSetLoad(exerciseIndex: exIdx, setIndex: setIdx, weight: current.weight + delta, reps: current.reps)
             persist()
         case "adjustReps":
             let delta = (payload["delta"] as? Int) ?? 0
-            let exIdx = min(workout.currentExerciseIndex, workout.session.exerciseLogs.count - 1)
-            guard exIdx >= 0 else { return }
-            var log = workout.session.exerciseLogs[exIdx]
             guard let setIdx = log.sets.firstIndex(where: { !$0.isCompleted }) else { return }
-            log.sets[setIdx].reps = max(0, log.sets[setIdx].reps + delta)
-            workout.session.exerciseLogs[exIdx] = log
-            activeWorkout = workout
+            let current = log.sets[setIdx]
+            updateSetLoad(exerciseIndex: exIdx, setIndex: setIdx, weight: current.weight, reps: current.reps + delta)
             persist()
         case "setQuality":
             guard let raw = payload["quality"] as? String, let q = SetQuality(rawValue: raw) else { return }
-            let exIdx = min(workout.currentExerciseIndex, workout.session.exerciseLogs.count - 1)
-            var log = workout.session.exerciseLogs[exIdx]
-            // apply to last completed set
             guard let setIdx = log.sets.lastIndex(where: { $0.isCompleted }) else { return }
-            log.sets[setIdx].quality = q
-            workout.session.exerciseLogs[exIdx] = log
-            activeWorkout = workout
+            setSetQuality(exerciseIndex: exIdx, setIndex: setIdx, quality: q)
             persist()
         default:
             break

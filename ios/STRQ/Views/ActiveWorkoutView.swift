@@ -911,51 +911,22 @@ struct ActiveWorkoutView: View {
     // MARK: - Actions
 
     private func updateSet(exerciseIndex: Int, setIndex: Int, weight: Double, reps: Int) {
-        guard var workout = vm.activeWorkout,
-              exerciseIndex < workout.session.exerciseLogs.count,
-              setIndex < workout.session.exerciseLogs[exerciseIndex].sets.count else { return }
         withAnimation(.snappy(duration: 0.15)) {
-            workout.session.exerciseLogs[exerciseIndex].sets[setIndex].weight = weight
-            workout.session.exerciseLogs[exerciseIndex].sets[setIndex].reps = reps
-            vm.activeWorkout = workout
+            vm.updateSetLoad(exerciseIndex: exerciseIndex, setIndex: setIndex, weight: weight, reps: reps)
         }
     }
 
     private func completeSet(exerciseIndex: Int, setIndex: Int) {
-        guard var workout = vm.activeWorkout,
-              exerciseIndex < workout.session.exerciseLogs.count,
-              setIndex < workout.session.exerciseLogs[exerciseIndex].sets.count else { return }
-
-        workout.session.exerciseLogs[exerciseIndex].sets[setIndex].isCompleted = true
+        let rest = vm.completeCurrentSet(exerciseIndex: exerciseIndex, setIndex: setIndex)
+        guard rest > 0 else { return }
         setCompletedTrigger.toggle()
         lastLoggedSet = (exerciseIndex, setIndex)
-
-        let allDone = workout.session.exerciseLogs[exerciseIndex].sets.allSatisfy(\.isCompleted)
-        if allDone {
-            workout.session.exerciseLogs[exerciseIndex].isCompleted = true
-            if exerciseIndex < workout.session.exerciseLogs.count - 1 {
-                workout.currentExerciseIndex = exerciseIndex + 1
-                workout.currentSetIndex = 0
-            }
-        } else {
-            workout.currentSetIndex = setIndex + 1
-        }
-
-        vm.activeWorkout = workout
-
-        let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
-        let rest = planned?.restSeconds ?? 90
         restTimeRemaining = rest
         restTimerActive = true
-        vm.updateLiveActivity(restEndsAt: Date().addingTimeInterval(TimeInterval(rest)))
     }
 
     private func setQuality(exerciseIndex: Int, setIndex: Int, quality: SetQuality?) {
-        guard var workout = vm.activeWorkout,
-              exerciseIndex < workout.session.exerciseLogs.count,
-              setIndex < workout.session.exerciseLogs[exerciseIndex].sets.count else { return }
-        workout.session.exerciseLogs[exerciseIndex].sets[setIndex].quality = quality
-        vm.activeWorkout = workout
+        vm.setSetQuality(exerciseIndex: exerciseIndex, setIndex: setIndex, quality: quality)
         setCompletedTrigger.toggle()
     }
 
@@ -971,38 +942,19 @@ struct ActiveWorkoutView: View {
     }
 
     private func jumpToSet(exerciseIndex: Int, setIndex: Int) {
-        guard var workout = vm.activeWorkout else { return }
-        workout.currentSetIndex = setIndex
-        vm.activeWorkout = workout
-        vm.updateLiveActivity(restEndsAt: liveRestEndsAt())
+        vm.jumpToSet(exerciseIndex: exerciseIndex, setIndex: setIndex)
     }
 
     private func moveToNextExercise() {
-        guard var workout = vm.activeWorkout else { return }
-        if workout.currentExerciseIndex < workout.session.exerciseLogs.count - 1 {
-            workout.currentExerciseIndex += 1
-            workout.currentSetIndex = 0
-            vm.activeWorkout = workout
-            vm.updateLiveActivity(restEndsAt: liveRestEndsAt())
-        }
+        vm.moveToNextExercise()
     }
 
     private func moveToPreviousExercise() {
-        guard var workout = vm.activeWorkout else { return }
-        if workout.currentExerciseIndex > 0 {
-            workout.currentExerciseIndex -= 1
-            workout.currentSetIndex = 0
-            vm.activeWorkout = workout
-            vm.updateLiveActivity(restEndsAt: liveRestEndsAt())
-        }
+        vm.moveToPreviousExercise()
     }
 
     private func jumpToExercise(_ index: Int) {
-        guard var workout = vm.activeWorkout else { return }
-        workout.currentExerciseIndex = index
-        workout.currentSetIndex = 0
-        vm.activeWorkout = workout
-        vm.updateLiveActivity(restEndsAt: liveRestEndsAt())
+        vm.jumpToExercise(index)
     }
 
     private func liveRestEndsAt() -> Date? {

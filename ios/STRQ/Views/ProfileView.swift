@@ -75,10 +75,16 @@ struct ProfileView: View {
         }
         .alert("Restore from iCloud?", isPresented: $showCloudRestoreConfirm) {
             Button("Restore", role: .destructive) {
-                let ok = vm.restoreFromCloud()
-                cloudRestoreMessage = ok
-                    ? "Your training data has been restored."
-                    : "No cloud snapshot found yet. Train on this device and it will sync automatically."
+                let outcome = vm.restoreFromCloud(force: true)
+                cloudRestoreMessage = {
+                    switch outcome {
+                    case .restored: return "Your training data has been restored."
+                    case .noSnapshot: return "No cloud snapshot found yet. Train on this device and it will sync automatically."
+                    case .unavailable: return "iCloud is unavailable right now. Check your connection and try again."
+                    case .staleIgnored: return "Your device already has the most recent data."
+                    case .decodeFailed: return "We couldn't read the cloud snapshot. Try again shortly."
+                    }
+                }()
                 showCloudRestoreMessage = true
             }
             Button("Cancel", role: .cancel) {}
@@ -171,7 +177,7 @@ struct ProfileView: View {
                         vm.account.handleCompletion(result)
                         if vm.account.isSignedIn {
                             if vm.cloudSync.hasRemoteSnapshot, vm.workoutHistory.isEmpty {
-                                _ = vm.restoreFromCloud()
+                                _ = vm.restoreFromCloud(force: false)
                             } else {
                                 vm.uploadToCloud()
                             }
@@ -602,11 +608,11 @@ struct ProfileView: View {
 
     private var legalLinks: some View {
         HStack(spacing: 18) {
-            Link("Privacy", destination: URL(string: "https://rork.com/privacy")!)
+            Link("Privacy", destination: STRQLinks.privacy)
             Text("·").foregroundStyle(.quaternary)
-            Link("Terms", destination: URL(string: "https://rork.com/terms")!)
+            Link("Terms", destination: STRQLinks.terms)
             Text("·").foregroundStyle(.quaternary)
-            Link("Support", destination: URL(string: "mailto:support@rork.com")!)
+            Link("Support", destination: STRQLinks.support)
         }
         .font(.caption.weight(.medium))
         .foregroundStyle(.secondary)
