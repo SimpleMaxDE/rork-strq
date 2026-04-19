@@ -31,12 +31,12 @@ struct ActiveWorkoutView: View {
                     progressStrip(workout)
 
                     ScrollView {
-                        VStack(spacing: 20) {
+                        VStack(spacing: 26) {
                             exerciseFocusHero(workout)
                                 .padding(.horizontal, 16)
-                                .padding(.top, 18)
+                                .padding(.top, 22)
 
-                            VStack(spacing: 10) {
+                            VStack(spacing: 14) {
                                 activeSetCard(workout)
                                 remainingSetsStrip(workout)
                             }
@@ -47,7 +47,7 @@ struct ActiveWorkoutView: View {
 
                             upNextPreview(workout)
                                 .padding(.horizontal, 16)
-                                .padding(.top, 4)
+                                .padding(.top, 10)
                         }
                         .padding(.bottom, 120)
                     }
@@ -90,8 +90,8 @@ struct ActiveWorkoutView: View {
     private func workoutHeader(_ workout: ActiveWorkoutState) -> some View {
         let total = workout.session.exerciseLogs.count
         let done = workout.session.exerciseLogs.filter(\.isCompleted).count
-        return HStack(alignment: .center, spacing: 10) {
-            VStack(alignment: .leading, spacing: 3) {
+        return HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(workout.session.dayName.uppercased())
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.4)
@@ -104,7 +104,7 @@ struct ActiveWorkoutView: View {
                     .contentTransition(.numericText())
             }
 
-            Spacer(minLength: 8)
+            Spacer(minLength: 12)
 
             Button { showExerciseList = true } label: {
                 HStack(spacing: 6) {
@@ -118,6 +118,7 @@ struct ActiveWorkoutView: View {
                 .padding(.vertical, 8)
                 .background(Color.white.opacity(0.06), in: Capsule())
             }
+            .padding(.trailing, 2)
 
             Button {
                 vm.completeWorkout()
@@ -132,8 +133,8 @@ struct ActiveWorkoutView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 34)
-        .padding(.bottom, 18)
+        .padding(.top, 42)
+        .padding(.bottom, 22)
     }
 
     private func progressStrip(_ workout: ActiveWorkoutState) -> some View {
@@ -301,17 +302,19 @@ struct ActiveWorkoutView: View {
                         }
                         Spacer()
                         let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
-                        if let suggestion = vm.loadSuggestion(for: log.exerciseId, planned: planned), suggestion.suggestedWeight > 0 {
+                        if let suggestion = vm.loadSuggestion(for: log.exerciseId, planned: planned),
+                           suggestion.suggestedWeight > 0,
+                           abs(suggestion.suggestedWeight - setLog.weight) > 0.01 {
                             HStack(spacing: 4) {
                                 Image(systemName: "scope")
                                     .font(.system(size: 9, weight: .bold))
-                                Text(suggestion.formattedWeight)
-                                    .font(.system(size: 10, weight: .black).monospacedDigit())
+                                Text("target \(suggestion.formattedWeight)")
+                                    .font(.system(size: 10, weight: .bold).monospacedDigit())
                             }
-                            .foregroundStyle(.white.opacity(0.8))
+                            .foregroundStyle(.white.opacity(0.45))
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
-                            .background(Color.white.opacity(0.08), in: Capsule())
+                            .background(Color.white.opacity(0.05), in: Capsule())
                         }
                     }
 
@@ -558,21 +561,21 @@ struct ActiveWorkoutView: View {
             let remaining = Array(workout.session.exerciseLogs[nextIndex...].prefix(2))
             let total = workout.session.exerciseLogs.count - nextIndex
 
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 10) {
                     Text("UP NEXT")
-                        .font(.system(size: 10, weight: .black))
-                        .foregroundStyle(STRQBrand.steel)
-                        .tracking(1.4)
+                        .font(.system(size: 11, weight: .black))
+                        .foregroundStyle(.white.opacity(0.85))
+                        .tracking(1.6)
                     Rectangle()
-                        .fill(Color.white.opacity(0.06))
+                        .fill(Color.white.opacity(0.08))
                         .frame(height: 1)
                     Text("\(total) left")
                         .font(.system(size: 10, weight: .bold).monospacedDigit())
-                        .foregroundStyle(.white.opacity(0.35))
+                        .foregroundStyle(.white.opacity(0.5))
                 }
 
-                VStack(spacing: 8) {
+                VStack(spacing: 10) {
                     ForEach(Array(remaining.enumerated()), id: \.element.id) { offset, log in
                         upNextRow(log: log, isImmediate: offset == 0, positionLabel: offset == 0 ? "NEXT" : "THEN")
                     }
