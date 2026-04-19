@@ -118,7 +118,7 @@ struct ActiveWorkoutView: View {
                 .padding(.vertical, 8)
                 .background(Color.white.opacity(0.06), in: Capsule())
             }
-            .padding(.trailing, 2)
+            .padding(.trailing, 10)
 
             Button {
                 vm.completeWorkout()
@@ -565,14 +565,14 @@ struct ActiveWorkoutView: View {
                 HStack(spacing: 10) {
                     Text("UP NEXT")
                         .font(.system(size: 11, weight: .black))
-                        .foregroundStyle(.white.opacity(0.85))
+                        .foregroundStyle(.white.opacity(0.95))
                         .tracking(1.6)
                     Rectangle()
-                        .fill(Color.white.opacity(0.08))
+                        .fill(Color.white.opacity(0.12))
                         .frame(height: 1)
                     Text("\(total) left")
                         .font(.system(size: 10, weight: .bold).monospacedDigit())
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(.white.opacity(0.6))
                 }
 
                 VStack(spacing: 10) {
@@ -610,28 +610,28 @@ struct ActiveWorkoutView: View {
                 Text(positionLabel)
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.2)
-                    .foregroundStyle(isImmediate ? STRQBrand.steel : .white.opacity(0.3))
+                    .foregroundStyle(isImmediate ? STRQBrand.steel : .white.opacity(0.4))
                 Text(exercise?.name ?? log.exerciseId)
                     .font(isImmediate ? .subheadline.weight(.semibold) : .subheadline.weight(.medium))
-                    .foregroundStyle(isImmediate ? .white.opacity(0.9) : .white.opacity(0.55))
+                    .foregroundStyle(isImmediate ? .white : .white.opacity(0.7))
                     .lineLimit(1)
                 if let ex = exercise {
                     Text("\(ex.primaryMuscle.displayName) · \(log.sets.count) sets")
                         .font(.caption2.weight(.medium))
-                        .foregroundStyle(.white.opacity(0.35))
+                        .foregroundStyle(.white.opacity(isImmediate ? 0.5 : 0.4))
                 }
             }
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.caption2.weight(.bold))
-                .foregroundStyle(.white.opacity(isImmediate ? 0.3 : 0.18))
+                .foregroundStyle(.white.opacity(isImmediate ? 0.4 : 0.22))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, isImmediate ? 12 : 10)
-        .background(Color.white.opacity(isImmediate ? 0.045 : 0.02), in: .rect(cornerRadius: 14))
+        .background(Color.white.opacity(isImmediate ? 0.07 : 0.035), in: .rect(cornerRadius: 14))
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(Color.white.opacity(isImmediate ? 0.06 : 0), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(isImmediate ? 0.09 : 0.04), lineWidth: 1)
         )
     }
 
