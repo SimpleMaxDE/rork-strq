@@ -126,44 +126,46 @@ struct SessionEditorSheet: View {
     private func exerciseRow(planned: PlannedExercise, index: Int) -> some View {
         let exercise = vm.library.exercise(byId: planned.exerciseId)
         let isAnchor = exercise?.category == .compound && index < 2
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
+            Text("\(index + 1)")
+                .font(.system(size: 11, weight: .black, design: .rounded).monospacedDigit())
+                .foregroundStyle(isAnchor ? .primary : .tertiary)
+                .frame(width: 18, alignment: .leading)
+
             if let ex = exercise {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 9)
-                        .fill(STRQBrand.steel.opacity(0.12))
-                        .frame(width: 38, height: 38)
-                    Image(systemName: ex.primaryMuscle.symbolName)
-                        .font(.subheadline)
-                        .foregroundStyle(STRQBrand.steel)
-                }
+                Image(systemName: ex.primaryMuscle.symbolName)
+                    .font(.footnote)
+                    .foregroundStyle(STRQBrand.steel)
+                    .frame(width: 28, height: 28)
+                    .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 7))
             }
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 1) {
                 HStack(spacing: 5) {
                     Text(exercise?.name ?? planned.exerciseId)
                         .font(.subheadline.weight(.semibold))
                         .lineLimit(1)
                     if isAnchor {
-                        Text("ANCHOR")
-                            .font(.system(size: 8, weight: .black))
+                        Text("KEY")
+                            .font(.system(size: 7, weight: .black))
                             .tracking(0.4)
                             .foregroundStyle(.white)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 1.5)
+                            .padding(.horizontal, 3.5)
+                            .padding(.vertical, 1)
                             .background(STRQBrand.steelGradient, in: Capsule())
                     }
                 }
-                HStack(spacing: 6) {
-                    Text("\(planned.sets) × \(planned.reps)")
-                        .font(.caption.monospacedDigit())
+                HStack(spacing: 5) {
+                    Text("\(planned.sets)×\(planned.reps)")
+                        .font(.system(size: 11, weight: .semibold).monospacedDigit())
                         .foregroundStyle(.secondary)
                     if let rpe = planned.rpe {
-                        Text("· RPE \(Int(rpe))")
-                            .font(.caption)
+                        Text("· RPE\(Int(rpe))")
+                            .font(.system(size: 10, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
-                    Text("· \(planned.restSeconds)s")
-                        .font(.caption)
+                    Text("· \(formatRestShort(planned.restSeconds))")
+                        .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -188,17 +190,27 @@ struct SessionEditorSheet: View {
                     Label("Remove", systemImage: "trash")
                 }
             } label: {
-                Image(systemName: "ellipsis.circle")
-                    .font(.body)
+                Image(systemName: "ellipsis")
+                    .font(.footnote.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .frame(width: 32, height: 32)
+                    .frame(width: 28, height: 28)
                     .contentShape(Rectangle())
             }
         }
+        .padding(.vertical, 2)
         .contentShape(Rectangle())
         .onTapGesture {
             editingPlanned = planned
         }
+    }
+
+    private func formatRestShort(_ seconds: Int) -> String {
+        if seconds >= 60 {
+            let m = seconds / 60
+            let s = seconds % 60
+            return s == 0 ? "\(m)m" : "\(m):\(String(format: "%02d", s))"
+        }
+        return "\(seconds)s"
     }
 }
 

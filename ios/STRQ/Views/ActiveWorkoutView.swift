@@ -31,12 +31,12 @@ struct ActiveWorkoutView: View {
                     progressStrip(workout)
 
                     ScrollView {
-                        VStack(spacing: 18) {
+                        VStack(spacing: 12) {
                             exerciseFocusHero(workout)
                                 .padding(.horizontal, 16)
-                                .padding(.top, 14)
+                                .padding(.top, 8)
 
-                            VStack(spacing: 10) {
+                            VStack(spacing: 8) {
                                 activeSetCard(workout)
                                 setLogTable(workout)
                                 previousSessionTable(workout)
@@ -48,7 +48,6 @@ struct ActiveWorkoutView: View {
 
                             upNextPreview(workout)
                                 .padding(.horizontal, 16)
-                                .padding(.top, 4)
                         }
                         .padding(.bottom, 110)
                     }
@@ -135,7 +134,7 @@ struct ActiveWorkoutView: View {
         }
         .padding(.horizontal, 16)
         .padding(.top, 38)
-        .padding(.bottom, 14)
+        .padding(.bottom, 10)
     }
 
     private func progressStrip(_ workout: ActiveWorkoutState) -> some View {
@@ -171,7 +170,7 @@ struct ActiveWorkoutView: View {
                     let heroSymbol = mediaProvider.heroSymbol(for: ex)
 
                     ZStack {
-                        RoundedRectangle(cornerRadius: 18)
+                        RoundedRectangle(cornerRadius: 14)
                             .fill(
                                 LinearGradient(
                                     colors: [gradientColors[0], gradientColors[1]],
@@ -179,75 +178,71 @@ struct ActiveWorkoutView: View {
                                     endPoint: .bottomTrailing
                                 )
                             )
-                            .frame(height: 118)
+                            .frame(height: 76)
 
-                        HStack(spacing: 14) {
-                            ZStack {
-                                Circle()
-                                    .fill(.white.opacity(0.08))
-                                    .frame(width: 60, height: 60)
-                                    .blur(radius: 8)
+                        HStack(spacing: 12) {
+                            Image(systemName: heroSymbol)
+                                .font(.system(size: 22, weight: .thin))
+                                .foregroundStyle(.white.opacity(0.9))
+                                .frame(width: 44, height: 44)
+                                .background(.white.opacity(0.1), in: .rect(cornerRadius: 10))
 
-                                Image(systemName: heroSymbol)
-                                    .font(.system(size: 30, weight: .thin))
-                                    .foregroundStyle(.white.opacity(0.9))
-                            }
-
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("EXERCISE \(exerciseIndex + 1) OF \(workout.session.exerciseLogs.count)")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .foregroundStyle(.white.opacity(0.5))
-                                    .tracking(0.8)
+                            VStack(alignment: .leading, spacing: 3) {
+                                HStack(spacing: 6) {
+                                    Text("\(exerciseIndex + 1)/\(workout.session.exerciseLogs.count)")
+                                        .font(.system(size: 9, weight: .black).monospacedDigit())
+                                        .foregroundStyle(.white.opacity(0.55))
+                                        .tracking(0.8)
+                                    Text("·")
+                                        .foregroundStyle(.white.opacity(0.3))
+                                    Text(ex.primaryMuscle.displayName.uppercased())
+                                        .font(.system(size: 9, weight: .black))
+                                        .foregroundStyle(.white.opacity(0.55))
+                                        .tracking(0.8)
+                                }
 
                                 Text(ex.name)
-                                    .font(.title3.bold())
+                                    .font(.system(size: 17, weight: .heavy))
                                     .foregroundStyle(.white)
-                                    .lineLimit(2)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
 
-                                HStack(spacing: 6) {
-                                    Text(ex.primaryMuscle.displayName)
-                                        .font(.caption2.weight(.semibold))
-                                        .foregroundStyle(.white.opacity(0.8))
-                                        .padding(.horizontal, 7)
-                                        .padding(.vertical, 2.5)
-                                        .background(.white.opacity(0.15), in: Capsule())
-
+                                HStack(spacing: 8) {
                                     if let p = planned {
                                         Text("\(p.sets) × \(p.reps)")
-                                            .font(.caption.weight(.bold))
-                                            .foregroundStyle(.white.opacity(0.7))
+                                            .font(.system(size: 11, weight: .bold).monospacedDigit())
+                                            .foregroundStyle(.white.opacity(0.75))
                                     }
-
                                     if let p = planned, let rpe = p.rpe {
                                         Text("RPE \(Int(rpe))")
                                             .font(.system(size: 10, weight: .bold))
-                                            .foregroundStyle(.white.opacity(0.6))
+                                            .foregroundStyle(.white.opacity(0.55))
                                     }
                                 }
                             }
 
                             Spacer(minLength: 0)
                         }
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, 12)
                     }
-                    .clipShape(.rect(cornerRadius: 18))
+                    .clipShape(.rect(cornerRadius: 14))
                 }
 
                 if let guidance = vm.nextSessionGuidance(for: log.exerciseId) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 6) {
                         Image(systemName: guidance.icon)
-                            .font(.system(size: 10))
+                            .font(.system(size: 9))
                             .foregroundStyle(guidanceColor(guidance.color))
                         Text(guidance.action)
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(.primary)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.75))
                             .lineLimit(1)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 12))
-                    .padding(.top, 6)
+                    .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 9))
+                    .padding(.top, 4)
                 }
             }
             .opacity(appeared ? 1 : 0)
@@ -270,7 +265,7 @@ struct ActiveWorkoutView: View {
             let activeSetIndex = currentSet.flatMap { s in log.sets.firstIndex(where: { $0.id == s.id }) } ?? currentSetIdx
 
             if let setLog = currentSet {
-                VStack(spacing: 16) {
+                VStack(spacing: 12) {
                     HStack(alignment: .firstTextBaseline) {
                         HStack(spacing: 6) {
                             Text("SET")
@@ -312,7 +307,7 @@ struct ActiveWorkoutView: View {
                         let increment = weightIncrement(for: exerciseForIncrement)
                         let isBodyweight = exerciseForIncrement?.category == .bodyweight || (exerciseForIncrement?.isBodyweight ?? false)
 
-                        VStack(spacing: 6) {
+                        VStack(spacing: 4) {
                             Text("WEIGHT")
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundStyle(.tertiary)
@@ -325,15 +320,15 @@ struct ActiveWorkoutView: View {
                                     updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: max(0, setLog.weight - step), reps: setLog.reps)
                                 } label: {
                                     Image(systemName: "minus")
-                                        .font(.system(size: 13, weight: .medium))
+                                        .font(.system(size: 12, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 36, height: 48)
-                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
+                                        .frame(width: 32, height: 40)
+                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
                                 }
                                 .disabled(isBodyweight && setLog.weight <= 0)
 
                                 Text(isBodyweight && setLog.weight <= 0 ? "BW" : formatWeight(setLog.weight, increment: increment))
-                                    .font(.system(size: 36, weight: .heavy, design: .rounded).monospacedDigit())
+                                    .font(.system(size: 30, weight: .heavy, design: .rounded).monospacedDigit())
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.7)
                                     .frame(maxWidth: .infinity)
@@ -345,24 +340,24 @@ struct ActiveWorkoutView: View {
                                     updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight + step, reps: setLog.reps)
                                 } label: {
                                     Image(systemName: "plus")
-                                        .font(.system(size: 13, weight: .medium))
+                                        .font(.system(size: 12, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 36, height: 48)
-                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
+                                        .frame(width: 32, height: 40)
+                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
                                 }
                             }
 
                             Text(isBodyweight ? "added load" : "kg")
-                                .font(.system(size: 10, weight: .medium))
+                                .font(.system(size: 9, weight: .medium))
                                 .foregroundStyle(.tertiary)
                         }
                         .frame(maxWidth: .infinity)
 
                         Rectangle()
                             .fill(Color.white.opacity(0.06))
-                            .frame(width: 1, height: 68)
+                            .frame(width: 1, height: 56)
 
-                        VStack(spacing: 6) {
+                        VStack(spacing: 4) {
                             Text("REPS")
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundStyle(.tertiary)
@@ -371,14 +366,14 @@ struct ActiveWorkoutView: View {
                             HStack(spacing: 0) {
                                 Button { updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight, reps: max(0, setLog.reps - 1)) } label: {
                                     Image(systemName: "minus")
-                                        .font(.system(size: 13, weight: .medium))
+                                        .font(.system(size: 12, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 36, height: 48)
-                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
+                                        .frame(width: 32, height: 40)
+                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
                                 }
 
                                 Text("\(setLog.reps)")
-                                    .font(.system(size: 36, weight: .heavy, design: .rounded).monospacedDigit())
+                                    .font(.system(size: 30, weight: .heavy, design: .rounded).monospacedDigit())
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.7)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -387,15 +382,15 @@ struct ActiveWorkoutView: View {
 
                                 Button { updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight, reps: setLog.reps + 1) } label: {
                                     Image(systemName: "plus")
-                                        .font(.system(size: 13, weight: .medium))
+                                        .font(.system(size: 12, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 36, height: 48)
-                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
+                                        .frame(width: 32, height: 40)
+                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
                                 }
                             }
 
                             Text("reps")
-                                .font(.system(size: 10, weight: .medium))
+                                .font(.system(size: 9, weight: .medium))
                                 .foregroundStyle(.tertiary)
                         }
                         .frame(maxWidth: .infinity)
@@ -412,22 +407,22 @@ struct ActiveWorkoutView: View {
                         }
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 14))
+                        .frame(height: 46)
+                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 12))
                         .shadow(color: .white.opacity(0.12), radius: 10, y: 2)
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 16)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 13)
                 .background(
                     LinearGradient(
                         colors: [Color.white.opacity(0.07), Color.white.opacity(0.03)],
                         startPoint: .topLeading, endPoint: .bottomTrailing
                     ),
-                    in: .rect(cornerRadius: 24)
+                    in: .rect(cornerRadius: 20)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 24)
+                    RoundedRectangle(cornerRadius: 20)
                         .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
                 )
             } else {

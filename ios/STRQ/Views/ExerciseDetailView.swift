@@ -29,7 +29,9 @@ struct ExerciseDetailView: View {
                 heroSection
                 summaryStatsRow
                     .padding(.horizontal, 16)
-                    .padding(.top, 18)
+                    .padding(.top, 12)
+                quickInfoStrip
+                    .padding(.top, 8)
 
                 // SECTION 1 — TODAY
                 sectionGroup("Today") {
@@ -135,7 +137,7 @@ struct ExerciseDetailView: View {
             }
             .padding(.horizontal, 16)
         }
-        .padding(.top, 22)
+        .padding(.top, 18)
     }
 
     private var summaryStatsRow: some View {
@@ -168,24 +170,24 @@ struct ExerciseDetailView: View {
                 summaryStatCell(value: "0", label: "Sessions")
             }
         }
-        .padding(.vertical, 12)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .padding(.vertical, 9)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
     }
 
     private func summaryStatCell(value: String, label: String) -> some View {
-        VStack(spacing: 3) {
+        VStack(spacing: 2) {
             Text(value)
-                .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                .font(.system(size: 13, weight: .bold, design: .rounded).monospacedDigit())
                 .foregroundStyle(.primary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             Text(label.uppercased())
-                .font(.system(size: 9, weight: .bold))
+                .font(.system(size: 8, weight: .bold))
                 .tracking(0.6)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, 6)
+        .padding(.horizontal, 4)
     }
 
     private var summaryDivider: some View {
