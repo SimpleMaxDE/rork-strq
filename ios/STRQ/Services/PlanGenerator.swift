@@ -496,14 +496,22 @@ struct PlanGenerator {
     }
 
     private func makePlanned(exercise: Exercise, prescription: Prescription, role: PlanExerciseRole, order: Int) -> PlannedExercise {
-        PlannedExercise(
+        let coachDefault = CoachDefault(
+            sets: prescription.sets,
+            reps: prescription.reps,
+            restSeconds: prescription.rest,
+            rpe: prescription.rpe,
+            role: role.label
+        )
+        return PlannedExercise(
             exerciseId: exercise.id,
             sets: prescription.sets,
             reps: prescription.reps,
             restSeconds: prescription.rest,
             rpe: prescription.rpe,
             notes: "",
-            order: order
+            order: order,
+            coachDefault: coachDefault
         )
     }
 

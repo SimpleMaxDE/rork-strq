@@ -46,6 +46,14 @@ nonisolated struct WorkoutDay: Codable, Identifiable, Sendable {
     }
 }
 
+nonisolated struct CoachDefault: Codable, Sendable, Equatable {
+    var sets: Int
+    var reps: String
+    var restSeconds: Int
+    var rpe: Double?
+    var role: String
+}
+
 nonisolated struct PlannedExercise: Codable, Identifiable, Sendable {
     let id: String
     var exerciseId: String
@@ -55,8 +63,9 @@ nonisolated struct PlannedExercise: Codable, Identifiable, Sendable {
     var rpe: Double?
     var notes: String
     var order: Int
+    var coachDefault: CoachDefault?
 
-    init(id: String = UUID().uuidString, exerciseId: String, sets: Int, reps: String, restSeconds: Int, rpe: Double? = nil, notes: String = "", order: Int = 0) {
+    init(id: String = UUID().uuidString, exerciseId: String, sets: Int, reps: String, restSeconds: Int, rpe: Double? = nil, notes: String = "", order: Int = 0, coachDefault: CoachDefault? = nil) {
         self.id = id
         self.exerciseId = exerciseId
         self.sets = sets
@@ -65,5 +74,13 @@ nonisolated struct PlannedExercise: Codable, Identifiable, Sendable {
         self.rpe = rpe
         self.notes = notes
         self.order = order
+        self.coachDefault = coachDefault
     }
+
+    var isCustomized: Bool {
+        guard let cd = coachDefault else { return false }
+        return cd.sets != sets || cd.reps != reps || cd.restSeconds != restSeconds || cd.rpe != rpe
+    }
+
+    var plannedRole: String? { coachDefault?.role }
 }

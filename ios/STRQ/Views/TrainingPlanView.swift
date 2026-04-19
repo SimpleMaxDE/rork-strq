@@ -10,6 +10,7 @@ struct TrainingPlanView: View {
     @State private var showScheduleEditor: Bool = false
     @State private var selectedPrescriptionIndex: Int?
     @State private var showSessionEditor: Bool = false
+    @State private var swapTargetPlanned: PlannedExercise?
 
     var body: some View {
         ScrollView {
@@ -85,6 +86,16 @@ struct TrainingPlanView: View {
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
                 .presentationContentInteraction(.scrolls)
+        }
+        .sheet(item: $swapTargetPlanned) { planned in
+            if let plan = vm.currentPlan, selectedDayIndex < plan.days.count {
+                let dayId = plan.days[selectedDayIndex].id
+                SwapExerciseSheet(vm: vm, dayId: dayId, exerciseId: planned.exerciseId) { newExercise in
+                    vm.applyExerciseSwap(dayId: dayId, oldExerciseId: planned.exerciseId, newExercise: newExercise)
+                }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+            }
         }
         .sheet(item: $selectedPrescriptionIndex) { index in
             if let plan = vm.currentPlan, selectedDayIndex < plan.days.count {
@@ -314,7 +325,7 @@ struct TrainingPlanView: View {
             }
             .allowsHitTesting(false)
 
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 6) {
                     Text(vm.currentPhase.displayName.uppercased())
                         .font(.system(size: 9, weight: .black))
@@ -329,41 +340,28 @@ struct TrainingPlanView: View {
                     }
                 }
 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(day.name)
-                        .font(.system(size: 26, weight: .heavy, design: .rounded))
-                        .foregroundStyle(.white)
+                Text(day.name)
+                    .font(.system(size: 22, weight: .heavy, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+
+                if !vm.isEarlyStage {
+                    Text(briefing.dayExplanation)
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.55))
                         .lineLimit(2)
-                        .minimumScaleFactor(0.7)
-
-                    if !vm.isEarlyStage {
-                        Text(briefing.dayExplanation)
-                            .font(.footnote)
-                            .foregroundStyle(.white.opacity(0.6))
-                            .lineLimit(2)
-                    }
                 }
-
-                ScrollView(.horizontal) {
-                    HStack(spacing: 6) {
-                        ForEach(briefing.focusMuscles.prefix(3)) { muscle in
-                            ForgeChip(text: muscle.displayName)
-                        }
-                    }
-                }
-                .contentMargins(.horizontal, 0)
-                .scrollIndicators(.hidden)
-
-                Divider().opacity(0.2)
 
                 HStack(spacing: 0) {
                     ForgeStatCell(value: "\(briefing.exerciseCount)", label: "Exercises")
                     ForgeStatCell(value: "\(briefing.totalSets)", label: "Sets")
-                    ForgeStatCell(value: "~\(briefing.estimatedMinutes)m", label: "Duration")
+                    ForgeStatCell(value: "~\(briefing.estimatedMinutes)m", label: "Time")
                     ForgeStatCell(value: briefing.intensityLabel, label: "Effort", valueColor: STRQBrand.steel)
                 }
+                .padding(.top, 2)
             }
-            .padding(16)
+            .padding(14)
         }
         .background(
             LinearGradient(
@@ -390,9 +388,17 @@ struct TrainingPlanView: View {
     // MARK: - Exercise Stack
 
     private func exerciseStack(day: WorkoutDay) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
-            ForEach(Array(day.exercises.enumerated()), id: \.element.id) { index, planned in
-                exerciseRow(planned, index: index, day: day)
+        let groups = groupedByRole(day: day)
+        return VStack(alignment: .leading, spacing: 14) {
+            ForEach(groups, id: \.title) { group in
+                VStack(alignment: .leading, spacing: 4) {
+                    roleSectionHeader(title: group.title, count: group.items.count, sets: group.totalSets, color: group.color)
+                    VStack(spacing: 4) {
+                        ForEach(group.items, id: \.planned.id) { item in
+                            exerciseRow(item.planned, index: item.index, day: day, role: item.role)
+                        }
+                    }
+                }
             }
         }
         .opacity(appeared ? 1 : 0)
@@ -400,36 +406,75 @@ struct TrainingPlanView: View {
         .animation(.easeOut(duration: 0.5).delay(0.1), value: appeared)
     }
 
+    private struct RoleGroup {
+        let title: String
+        let color: Color
+        let items: [(planned: PlannedExercise, index: Int, role: ExerciseRole)]
+        var totalSets: Int { items.reduce(0) { $0 + $1.planned.sets } }
+    }
+
+    private func groupedByRole(day: WorkoutDay) -> [RoleGroup] {
+        var key: [(planned: PlannedExercise, index: Int, role: ExerciseRole)] = []
+        var support: [(planned: PlannedExercise, index: Int, role: ExerciseRole)] = []
+        var accessory: [(planned: PlannedExercise, index: Int, role: ExerciseRole)] = []
+        var warm: [(planned: PlannedExercise, index: Int, role: ExerciseRole)] = []
+        for (idx, pe) in day.exercises.enumerated() {
+            let role = exerciseRole(pe, index: idx, day: day)
+            let entry = (planned: pe, index: idx, role: role)
+            switch role {
+            case .keyLift: key.append(entry)
+            case .supportLift: support.append(entry)
+            case .accessory, .saferSubstitute: accessory.append(entry)
+            case .warmup: warm.append(entry)
+            }
+        }
+        var out: [RoleGroup] = []
+        if !warm.isEmpty { out.append(RoleGroup(title: "Warm-Up", color: STRQPalette.warning, items: warm)) }
+        if !key.isEmpty { out.append(RoleGroup(title: "Key Lifts", color: .white, items: key)) }
+        if !support.isEmpty { out.append(RoleGroup(title: "Support", color: STRQPalette.info, items: support)) }
+        if !accessory.isEmpty { out.append(RoleGroup(title: "Accessory", color: STRQBrand.steel, items: accessory)) }
+        return out
+    }
+
+    private func roleSectionHeader(title: String, count: Int, sets: Int, color: Color) -> some View {
+        HStack(spacing: 6) {
+            RoundedRectangle(cornerRadius: 1.5)
+                .fill(color)
+                .frame(width: 3, height: 10)
+            Text(title.uppercased())
+                .font(.system(size: 10, weight: .black))
+                .tracking(0.8)
+                .foregroundStyle(color == .white ? Color.primary : color)
+            Spacer()
+            Text("\(count) · \(sets) sets")
+                .font(.system(size: 10, weight: .semibold).monospacedDigit())
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 2)
+    }
+
     @ViewBuilder
-    private func exerciseRow(_ planned: PlannedExercise, index: Int, day: WorkoutDay) -> some View {
+    private func exerciseRow(_ planned: PlannedExercise, index: Int, day: WorkoutDay, role: ExerciseRole) -> some View {
         let exercise = vm.library.exercise(byId: planned.exerciseId)
-        let role = exerciseRole(planned, index: index, day: day)
         let progression = vm.progressionStates.first(where: { $0.exerciseId == planned.exerciseId })
         let hasCoachNote = !planned.notes.isEmpty && planned.notes.hasPrefix("Coach:")
-        let mediaProvider = ExerciseMediaProvider.shared
+        let isCustom = planned.isCustomized
 
         Button {
             selectedPrescriptionIndex = index
         } label: {
             HStack(spacing: 10) {
-                if let ex = exercise {
-                    let colors = mediaProvider.heroGradient(for: ex)
-                    let symbol = mediaProvider.heroSymbol(for: ex)
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(LinearGradient(colors: [colors[0], colors[1]], startPoint: .topLeading, endPoint: .bottomTrailing))
-                            .frame(width: 40, height: 40)
-                        Image(systemName: symbol)
-                            .font(.system(size: 18, weight: .thin))
-                            .foregroundStyle(.white.opacity(0.85))
-                    }
-                } else {
+                // Ordinal + role accent bar
+                HStack(spacing: 8) {
+                    Rectangle()
+                        .fill(roleColor(role))
+                        .frame(width: 2.5)
                     Text("\(index + 1)")
-                        .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
-                        .foregroundStyle(roleColor(role))
-                        .frame(width: 40, height: 40)
-                        .background(roleColor(role).opacity(0.1), in: .rect(cornerRadius: 10))
+                        .font(.system(size: 12, weight: .black, design: .rounded).monospacedDigit())
+                        .foregroundStyle(role == .keyLift ? .primary : .secondary)
+                        .frame(width: 16, alignment: .leading)
                 }
+                .frame(height: 38)
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 5) {
@@ -437,18 +482,19 @@ struct TrainingPlanView: View {
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.primary)
                             .lineLimit(1)
-                        if role == .keyLift {
-                            Text("KEY")
-                                .font(.system(size: 7, weight: .black))
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 4)
-                                .padding(.vertical, 1.5)
-                                .background(STRQBrand.steelGradient, in: Capsule())
-                        }
                         if hasCoachNote {
                             Image(systemName: "brain.head.profile.fill")
                                 .font(.system(size: 8))
                                 .foregroundStyle(STRQBrand.steel)
+                        }
+                        if isCustom {
+                            Text("CUSTOM")
+                                .font(.system(size: 7, weight: .black))
+                                .tracking(0.4)
+                                .foregroundStyle(STRQPalette.warning)
+                                .padding(.horizontal, 4)
+                                .padding(.vertical, 1.5)
+                                .background(STRQPalette.warning.opacity(0.14), in: Capsule())
                         }
                         if let p = progression, p.plateauStatus != .progressing {
                             Image(systemName: p.plateauStatus.icon)
@@ -457,38 +503,77 @@ struct TrainingPlanView: View {
                         }
                     }
 
-                    HStack(spacing: 8) {
-                        Text("\(planned.sets) × \(planned.reps)")
-                            .font(.caption)
+                    HStack(spacing: 6) {
+                        Text("\(planned.sets)×\(planned.reps)")
+                            .font(.system(size: 11, weight: .bold).monospacedDigit())
+                            .foregroundStyle(.primary)
+                        Text("·")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                        Text(formatRestShort(planned.restSeconds))
+                            .font(.system(size: 10, weight: .medium).monospacedDigit())
                             .foregroundStyle(.secondary)
                         if let rpe = planned.rpe {
-                            Text("RPE \(Int(rpe))")
-                                .font(.system(size: 10, weight: .bold))
+                            Text("·")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                            Text("RPE\(Int(rpe))")
+                                .font(.system(size: 10, weight: .bold).monospacedDigit())
                                 .foregroundStyle(STRQBrand.steel)
                         }
                         if let suggestion = vm.loadSuggestion(for: planned.exerciseId, planned: planned), suggestion.suggestedWeight > 0 {
+                            Text("·")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
                             Text(suggestion.formattedWeight)
-                                .font(.system(size: 10, weight: .bold))
+                                .font(.system(size: 10, weight: .bold).monospacedDigit())
                                 .foregroundStyle(STRQPalette.success)
                         }
                     }
                 }
 
-                Spacer()
+                Spacer(minLength: 4)
 
                 Image(systemName: "chevron.right")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.quaternary)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 9)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 11))
+            .padding(.leading, 0)
+            .padding(.trailing, 12)
+            .padding(.vertical, 7)
+            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 10))
             .overlay(
-                RoundedRectangle(cornerRadius: 11)
+                RoundedRectangle(cornerRadius: 10)
                     .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            Button {
+                selectedPrescriptionIndex = index
+            } label: { Label("Edit Prescription", systemImage: "slider.horizontal.3") }
+            Button {
+                swapTargetPlanned = planned
+            } label: { Label("Swap Exercise", systemImage: "arrow.triangle.2.circlepath") }
+            if planned.isCustomized {
+                Button {
+                    vm.restoreCoachDefault(dayId: day.id, plannedId: planned.id)
+                } label: { Label("Restore Coach Default", systemImage: "arrow.uturn.backward") }
+            }
+            Divider()
+            Button(role: .destructive) {
+                vm.removePlannedExercise(dayId: day.id, plannedId: planned.id)
+            } label: { Label("Remove", systemImage: "trash") }
+        }
+    }
+
+    private func formatRestShort(_ seconds: Int) -> String {
+        if seconds >= 60 {
+            let m = seconds / 60
+            let s = seconds % 60
+            return s == 0 ? "\(m)m" : "\(m):\(String(format: "%02d", s))"
+        }
+        return "\(seconds)s"
     }
 
     // MARK: - Coach Banners

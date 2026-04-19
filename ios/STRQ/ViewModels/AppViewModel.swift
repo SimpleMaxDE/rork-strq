@@ -969,6 +969,14 @@ class AppViewModel {
             }
         }()
         let order = plan.days[dayIdx].exercises.count
+        let roleLabel: String = isWarmup ? "Warm-Up" : (isCompound ? "Custom Compound" : "Custom Accessory")
+        let coachDefault = CoachDefault(
+            sets: defaults.sets,
+            reps: defaults.reps,
+            restSeconds: defaults.rest,
+            rpe: defaults.rpe,
+            role: roleLabel
+        )
         let new = PlannedExercise(
             exerciseId: exercise.id,
             sets: defaults.sets,
@@ -976,7 +984,8 @@ class AppViewModel {
             restSeconds: defaults.rest,
             rpe: defaults.rpe,
             notes: "",
-            order: order
+            order: order,
+            coachDefault: coachDefault
         )
         plan.days[dayIdx].exercises.append(new)
         currentPlan = plan
@@ -1003,6 +1012,21 @@ class AppViewModel {
         currentPlan = plan
         persist()
         Analytics.shared.track(.plan_edited, ["action": "prescription", "day_id": dayId])
+    }
+
+    /// Restore a planned exercise to its coach-default prescription.
+    func restoreCoachDefault(dayId: String, plannedId: String) {
+        guard var plan = currentPlan,
+              let dayIdx = plan.days.firstIndex(where: { $0.id == dayId }),
+              let exIdx = plan.days[dayIdx].exercises.firstIndex(where: { $0.id == plannedId }),
+              let cd = plan.days[dayIdx].exercises[exIdx].coachDefault else { return }
+        plan.days[dayIdx].exercises[exIdx].sets = cd.sets
+        plan.days[dayIdx].exercises[exIdx].reps = cd.reps
+        plan.days[dayIdx].exercises[exIdx].restSeconds = cd.restSeconds
+        plan.days[dayIdx].exercises[exIdx].rpe = cd.rpe
+        currentPlan = plan
+        persist()
+        Analytics.shared.track(.plan_edited, ["action": "restore_default", "day_id": dayId])
     }
 
     /// True when the user has manually customized exercises for this day

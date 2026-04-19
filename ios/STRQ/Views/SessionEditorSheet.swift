@@ -5,10 +5,10 @@ struct SessionEditorSheet: View {
     let dayId: String
 
     @Environment(\.dismiss) private var dismiss
-    @State private var editMode: EditMode = .active
     @State private var showAddExercise: Bool = false
     @State private var editingPlanned: PlannedExercise?
     @State private var swapTarget: PlannedExercise?
+    @State private var reorderMode: Bool = false
 
     private var day: WorkoutDay? {
         vm.currentPlan?.days.first { $0.id == dayId }
@@ -26,16 +26,25 @@ struct SessionEditorSheet: View {
                                 .fontWeight(.semibold)
                         }
                         ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                showAddExercise = true
-                            } label: {
-                                Image(systemName: "plus")
+                            HStack(spacing: 14) {
+                                Button {
+                                    withAnimation(.snappy) { reorderMode.toggle() }
+                                } label: {
+                                    Image(systemName: reorderMode ? "checkmark" : "arrow.up.arrow.down")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(reorderMode ? STRQPalette.success : STRQBrand.steel)
+                                }
+                                Button {
+                                    showAddExercise = true
+                                } label: {
+                                    Image(systemName: "plus")
+                                        .font(.subheadline.weight(.bold))
+                                }
                             }
                         }
                     }
-                    .environment(\.editMode, $editMode)
                     .sheet(isPresented: $showAddExercise) {
-                        AddExerciseSheet(vm: vm) { exercise in
+                        AddExerciseSheet(vm: vm, day: day) { exercise in
                             vm.addExercise(dayId: dayId, exercise: exercise)
                         }
                         .presentationDetents([.large])
@@ -43,7 +52,7 @@ struct SessionEditorSheet: View {
                     }
                     .sheet(item: $editingPlanned) { planned in
                         PrescriptionEditSheet(vm: vm, dayId: dayId, planned: planned)
-                            .presentationDetents([.medium])
+                            .presentationDetents([.medium, .large])
                             .presentationDragIndicator(.visible)
                     }
                     .sheet(item: $swapTarget) { planned in
@@ -59,150 +68,325 @@ struct SessionEditorSheet: View {
         }
     }
 
+    // MARK: - Content
+
     @ViewBuilder
     private func content(for day: WorkoutDay) -> some View {
-        List {
-            Section {
-                HStack(spacing: 10) {
-                    Image(systemName: "square.and.pencil")
-                        .font(.subheadline)
-                        .foregroundStyle(STRQBrand.steel)
-                        .frame(width: 30, height: 30)
-                        .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 8))
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(day.name)
-                            .font(.subheadline.weight(.semibold))
-                        Text("\(day.exercises.count) exercises · \(day.exercises.reduce(0) { $0 + $1.sets }) sets")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                }
-                .listRowBackground(Color(.secondarySystemGroupedBackground))
-            }
+        ScrollView {
+            VStack(spacing: 14) {
+                headerSummary(day: day)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 6)
 
-            Section {
-                ForEach(Array(day.exercises.enumerated()), id: \.element.id) { index, planned in
-                    exerciseRow(planned: planned, index: index)
-                }
-                .onMove { source, dest in
-                    vm.reorderExercises(dayId: dayId, from: source, to: dest)
-                }
-                .onDelete { offsets in
-                    for idx in offsets {
-                        if idx < day.exercises.count {
-                            vm.removePlannedExercise(dayId: dayId, plannedId: day.exercises[idx].id)
-                        }
-                    }
-                }
-            } header: {
-                HStack {
-                    Text("EXERCISES")
-                    Spacer()
-                    Text("Drag to reorder · swipe to remove")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.tertiary)
-                        .textCase(.none)
-                }
-            } footer: {
-                Text("Key lifts appear first. Reordering changes session flow but keeps coach intelligence on weight, set, and rep prescription.")
-                    .font(.caption)
-            }
+                groupedRows(day: day)
+                    .padding(.horizontal, 16)
 
-            Section {
                 Button {
                     showAddExercise = true
                 } label: {
-                    Label("Add Exercise", systemImage: "plus.circle.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(STRQBrand.steel)
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Add Exercise")
+                            .font(.subheadline.weight(.bold))
+                    }
+                    .foregroundStyle(STRQBrand.steel)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(STRQBrand.steel.opacity(0.08), in: .rect(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(STRQBrand.steel.opacity(0.2), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                    )
                 }
+                .buttonStyle(.strqPressable)
+                .padding(.horizontal, 16)
+                .padding(.top, 4)
             }
+            .padding(.bottom, 32)
         }
-        .listStyle(.insetGrouped)
+        .background(Color(.systemGroupedBackground))
     }
 
-    @ViewBuilder
-    private func exerciseRow(planned: PlannedExercise, index: Int) -> some View {
-        let exercise = vm.library.exercise(byId: planned.exerciseId)
-        let isAnchor = exercise?.category == .compound && index < 2
-        HStack(spacing: 9) {
-            Text("\(index + 1)")
-                .font(.system(size: 11, weight: .black, design: .rounded).monospacedDigit())
-                .foregroundStyle(isAnchor ? .primary : .tertiary)
-                .frame(width: 16, alignment: .leading)
+    // MARK: - Header Summary
 
-            if let ex = exercise {
-                Image(systemName: ex.primaryMuscle.symbolName)
-                    .font(.footnote)
-                    .foregroundStyle(STRQBrand.steel)
-                    .frame(width: 26, height: 26)
-                    .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 7))
-            }
-
-            VStack(alignment: .leading, spacing: 1) {
-                HStack(spacing: 5) {
-                    Text(exercise?.name ?? planned.exerciseId)
-                        .font(.subheadline.weight(.semibold))
+    private func headerSummary(day: WorkoutDay) -> some View {
+        let counts = roleCounts(day: day)
+        let totalSets = day.exercises.reduce(0) { $0 + $1.sets }
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(day.name)
+                        .font(.headline)
                         .lineLimit(1)
-                    if isAnchor {
-                        Text("KEY")
-                            .font(.system(size: 7, weight: .black))
-                            .tracking(0.4)
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 3.5)
-                            .padding(.vertical, 1)
-                            .background(STRQBrand.steelGradient, in: Capsule())
-                    }
-                }
-                HStack(spacing: 5) {
-                    Text("\(planned.sets)×\(planned.reps)")
-                        .font(.system(size: 11, weight: .semibold).monospacedDigit())
+                    Text("\(day.exercises.count) exercises · \(totalSets) sets · ~\(day.estimatedMinutes)m")
+                        .font(.caption)
                         .foregroundStyle(.secondary)
-                    if let rpe = planned.rpe {
-                        Text("· RPE\(Int(rpe))")
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                }
+                Spacer()
+            }
+
+            HStack(spacing: 6) {
+                if counts.key > 0 { roleSummaryChip(label: "\(counts.key) Key", color: .primary, bg: STRQBrand.steel.opacity(0.18)) }
+                if counts.support > 0 { roleSummaryChip(label: "\(counts.support) Support", color: STRQPalette.info, bg: STRQPalette.info.opacity(0.12)) }
+                if counts.accessory > 0 { roleSummaryChip(label: "\(counts.accessory) Accessory", color: STRQBrand.steel, bg: STRQBrand.steel.opacity(0.12)) }
+                if counts.warm > 0 { roleSummaryChip(label: "\(counts.warm) Warm-Up", color: STRQPalette.warning, bg: STRQPalette.warning.opacity(0.12)) }
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+    }
+
+    private func roleSummaryChip(label: String, color: Color, bg: Color) -> some View {
+        Text(label)
+            .font(.system(size: 10, weight: .bold))
+            .tracking(0.3)
+            .foregroundStyle(color)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(bg, in: Capsule())
+    }
+
+    // MARK: - Grouped Rows
+
+    @ViewBuilder
+    private func groupedRows(day: WorkoutDay) -> some View {
+        let groups = roleGroups(day: day)
+        VStack(spacing: 14) {
+            ForEach(groups, id: \.title) { group in
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 6) {
+                        RoundedRectangle(cornerRadius: 1.5)
+                            .fill(group.color)
+                            .frame(width: 3, height: 11)
+                        Text(group.title.uppercased())
+                            .font(.system(size: 10, weight: .black))
+                            .tracking(0.8)
+                            .foregroundStyle(group.color == .white ? Color.primary : group.color)
+                        Spacer()
+                        Text("\(group.items.count) · \(group.totalSets) sets")
+                            .font(.system(size: 10, weight: .semibold).monospacedDigit())
+                            .foregroundStyle(.tertiary)
                     }
-                    Text("· \(formatRestShort(planned.restSeconds))")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(.tertiary)
+                    .padding(.horizontal, 2)
+
+                    VStack(spacing: 5) {
+                        ForEach(group.items, id: \.planned.id) { item in
+                            builderRow(planned: item.planned, index: item.index, role: item.role, day: day)
+                        }
+                    }
                 }
             }
+        }
+    }
 
-            Spacer()
+    // MARK: - Builder Row
 
-            Menu {
+    @ViewBuilder
+    private func builderRow(planned: PlannedExercise, index: Int, role: ExerciseRole, day: WorkoutDay) -> some View {
+        let exercise = vm.library.exercise(byId: planned.exerciseId)
+        let isCustom = planned.isCustomized
+        let hasCoachNote = !planned.notes.isEmpty && planned.notes.hasPrefix("Coach:")
+
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 10) {
+                Rectangle()
+                    .fill(roleAccent(role))
+                    .frame(width: 2.5)
+                    .frame(maxHeight: .infinity)
+
+                Text("\(index + 1)")
+                    .font(.system(size: 12, weight: .black, design: .rounded).monospacedDigit())
+                    .foregroundStyle(role == .keyLift ? .primary : .secondary)
+                    .frame(width: 18, alignment: .leading)
+                    .padding(.leading, 6)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 5) {
+                        Text(exercise?.name ?? planned.exerciseId)
+                            .font(.subheadline.weight(.semibold))
+                            .lineLimit(1)
+                        if hasCoachNote {
+                            Image(systemName: "brain.head.profile.fill")
+                                .font(.system(size: 8))
+                                .foregroundStyle(STRQBrand.steel)
+                        }
+                        if isCustom {
+                            Text("CUSTOM")
+                                .font(.system(size: 7, weight: .black))
+                                .tracking(0.4)
+                                .foregroundStyle(STRQPalette.warning)
+                                .padding(.horizontal, 4)
+                                .padding(.vertical, 1.5)
+                                .background(STRQPalette.warning.opacity(0.14), in: Capsule())
+                        }
+                    }
+
+                    HStack(spacing: 5) {
+                        Text("\(planned.sets)×\(planned.reps)")
+                            .font(.system(size: 11, weight: .bold).monospacedDigit())
+                            .foregroundStyle(.primary)
+                        Text("·")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                        Text(formatRestShort(planned.restSeconds))
+                            .font(.system(size: 10, weight: .medium).monospacedDigit())
+                            .foregroundStyle(.secondary)
+                        if let rpe = planned.rpe {
+                            Text("·")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                            Text("RPE\(Int(rpe))")
+                                .font(.system(size: 10, weight: .bold).monospacedDigit())
+                                .foregroundStyle(STRQBrand.steel)
+                        }
+                    }
+                }
+
+                Spacer(minLength: 4)
+
+                if reorderMode {
+                    VStack(spacing: 2) {
+                        Button {
+                            withAnimation(.snappy) {
+                                vm.reorderExercises(dayId: dayId, from: IndexSet(integer: index), to: max(0, index - 1))
+                            }
+                        } label: {
+                            Image(systemName: "chevron.up")
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(index > 0 ? STRQBrand.steel : Color.gray.opacity(0.3))
+                                .frame(width: 30, height: 18)
+                                .background(Color(.tertiarySystemGroupedBackground), in: .rect(cornerRadius: 5))
+                        }
+                        .disabled(index == 0)
+                        Button {
+                            withAnimation(.snappy) {
+                                vm.reorderExercises(dayId: dayId, from: IndexSet(integer: index), to: index + 2)
+                            }
+                        } label: {
+                            Image(systemName: "chevron.down")
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(index < day.exercises.count - 1 ? STRQBrand.steel : Color.gray.opacity(0.3))
+                                .frame(width: 30, height: 18)
+                                .background(Color(.tertiarySystemGroupedBackground), in: .rect(cornerRadius: 5))
+                        }
+                        .disabled(index >= day.exercises.count - 1)
+                    }
+                    .padding(.trailing, 8)
+                } else {
+                    HStack(spacing: 6) {
+                        inlineActionButton(icon: "slider.horizontal.3", color: STRQBrand.steel) {
+                            editingPlanned = planned
+                        }
+                        inlineActionButton(icon: "arrow.triangle.2.circlepath", color: STRQPalette.info) {
+                            swapTarget = planned
+                        }
+                    }
+                    .padding(.trailing, 8)
+                }
+            }
+            .padding(.vertical, 8)
+        }
+        .frame(minHeight: 52)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(isCustom ? STRQPalette.warning.opacity(0.25) : STRQBrand.cardBorder, lineWidth: 1)
+        )
+        .contextMenu {
+            Button { editingPlanned = planned } label: { Label("Edit Prescription", systemImage: "slider.horizontal.3") }
+            Button { swapTarget = planned } label: { Label("Swap Exercise", systemImage: "arrow.triangle.2.circlepath") }
+            if isCustom {
                 Button {
-                    editingPlanned = planned
-                } label: {
-                    Label("Edit Sets · Reps · Rest", systemImage: "slider.horizontal.3")
-                }
-                Button {
-                    swapTarget = planned
-                } label: {
-                    Label("Swap Exercise", systemImage: "arrow.triangle.2.circlepath")
-                }
-                Divider()
-                Button(role: .destructive) {
-                    vm.removePlannedExercise(dayId: dayId, plannedId: planned.id)
-                } label: {
-                    Label("Remove", systemImage: "trash")
-                }
-            } label: {
-                Image(systemName: "ellipsis")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .frame(width: 26, height: 26)
-                    .contentShape(Rectangle())
+                    vm.restoreCoachDefault(dayId: dayId, plannedId: planned.id)
+                } label: { Label("Restore Coach Default", systemImage: "arrow.uturn.backward") }
+            }
+            Divider()
+            Button(role: .destructive) {
+                vm.removePlannedExercise(dayId: dayId, plannedId: planned.id)
+            } label: { Label("Remove", systemImage: "trash") }
+        }
+    }
+
+    private func inlineActionButton(icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(color)
+                .frame(width: 32, height: 32)
+                .background(color.opacity(0.12), in: .rect(cornerRadius: 8))
+        }
+        .buttonStyle(.strqPressable)
+    }
+
+    // MARK: - Helpers
+
+    private struct BuilderGroup {
+        let title: String
+        let color: Color
+        let items: [(planned: PlannedExercise, index: Int, role: ExerciseRole)]
+        var totalSets: Int { items.reduce(0) { $0 + $1.planned.sets } }
+    }
+
+    private func roleGroups(day: WorkoutDay) -> [BuilderGroup] {
+        var key: [(planned: PlannedExercise, index: Int, role: ExerciseRole)] = []
+        var support: [(planned: PlannedExercise, index: Int, role: ExerciseRole)] = []
+        var accessory: [(planned: PlannedExercise, index: Int, role: ExerciseRole)] = []
+        var warm: [(planned: PlannedExercise, index: Int, role: ExerciseRole)] = []
+        for (idx, pe) in day.exercises.enumerated() {
+            let role = classifyRole(pe, index: idx, day: day)
+            let entry = (planned: pe, index: idx, role: role)
+            switch role {
+            case .keyLift: key.append(entry)
+            case .supportLift: support.append(entry)
+            case .accessory, .saferSubstitute: accessory.append(entry)
+            case .warmup: warm.append(entry)
             }
         }
-        .padding(.vertical, 1)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            editingPlanned = planned
+        var out: [BuilderGroup] = []
+        if !warm.isEmpty { out.append(BuilderGroup(title: "Warm-Up", color: STRQPalette.warning, items: warm)) }
+        if !key.isEmpty { out.append(BuilderGroup(title: "Key Lifts", color: .white, items: key)) }
+        if !support.isEmpty { out.append(BuilderGroup(title: "Support", color: STRQPalette.info, items: support)) }
+        if !accessory.isEmpty { out.append(BuilderGroup(title: "Accessory", color: STRQBrand.steel, items: accessory)) }
+        return out
+    }
+
+    private func classifyRole(_ planned: PlannedExercise, index: Int, day: WorkoutDay) -> ExerciseRole {
+        guard let exercise = vm.library.exercise(byId: planned.exerciseId) else { return .accessory }
+        if exercise.category == .warmup || exercise.category == .mobility { return .warmup }
+        if exercise.category == .compound && index < 2 { return .keyLift }
+        if exercise.category == .compound { return .supportLift }
+        return .accessory
+    }
+
+    private func roleAccent(_ role: ExerciseRole) -> Color {
+        switch role {
+        case .keyLift: .white
+        case .supportLift: STRQPalette.info
+        case .accessory: STRQBrand.steel
+        case .warmup: STRQPalette.warning
+        case .saferSubstitute: STRQPalette.success
         }
-        .sensoryFeedback(.selection, trigger: editingPlanned?.id)
+    }
+
+    private func roleCounts(day: WorkoutDay) -> (key: Int, support: Int, accessory: Int, warm: Int) {
+        var k = 0, s = 0, a = 0, w = 0
+        for (idx, pe) in day.exercises.enumerated() {
+            let r = classifyRole(pe, index: idx, day: day)
+            switch r {
+            case .keyLift: k += 1
+            case .supportLift: s += 1
+            case .accessory, .saferSubstitute: a += 1
+            case .warmup: w += 1
+            }
+        }
+        return (k, s, a, w)
     }
 
     private func formatRestShort(_ seconds: Int) -> String {
@@ -233,124 +417,32 @@ struct PrescriptionEditSheet: View {
         vm.library.exercise(byId: planned.exerciseId)
     }
 
+    private var coachDefault: CoachDefault? { planned.coachDefault }
+
+    private var isCustom: Bool {
+        guard let cd = coachDefault else { return false }
+        let currentRPE: Double? = rpeEnabled ? rpeValue : nil
+        return cd.sets != sets || cd.reps != repsText || cd.restSeconds != restSeconds || cd.rpe != currentRPE
+    }
+
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    HStack(spacing: 12) {
-                        if let ex = exercise {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(STRQBrand.steel.opacity(0.12))
-                                    .frame(width: 44, height: 44)
-                                Image(systemName: ex.primaryMuscle.symbolName)
-                                    .font(.body)
-                                    .foregroundStyle(STRQBrand.steel)
-                            }
-                        }
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(exercise?.name ?? planned.exerciseId)
-                                .font(.subheadline.weight(.semibold))
-                            Text(exercise?.primaryMuscle.displayName ?? "")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
+            ScrollView {
+                VStack(spacing: 14) {
+                    headerCard
+                    if isCustom, coachDefault != nil {
+                        restoreBanner
                     }
+                    setsCard
+                    repsCard
+                    restCard
+                    rpeCard
                 }
-
-                Section("Sets") {
-                    Stepper(value: $sets, in: 1...10) {
-                        HStack {
-                            Text("Sets")
-                            Spacer()
-                            Text("\(sets)")
-                                .font(.body.monospacedDigit().weight(.semibold))
-                                .foregroundStyle(STRQBrand.steel)
-                        }
-                    }
-                }
-
-                Section("Reps") {
-                    HStack {
-                        Text("Range")
-                        Spacer()
-                        TextField("8-10", text: $repsText)
-                            .multilineTextAlignment(.trailing)
-                            .keyboardType(.asciiCapable)
-                            .foregroundStyle(STRQBrand.steel)
-                            .frame(width: 100)
-                    }
-                    HStack(spacing: 8) {
-                        ForEach(["3-5", "6-8", "8-10", "10-12", "12-15", "15-20"], id: \.self) { preset in
-                            Button {
-                                withAnimation(STRQMotion.tap) { repsText = preset }
-                            } label: {
-                                Text(preset)
-                                    .font(.caption.monospacedDigit().weight(.semibold))
-                                    .foregroundStyle(repsText == preset ? .white : .primary)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 6)
-                                    .background(repsText == preset ? STRQBrand.steel : Color(.tertiarySystemGroupedBackground), in: Capsule())
-                                    .contentShape(Capsule())
-                            }
-                            .buttonStyle(.strqPressable)
-                            .sensoryFeedback(.selection, trigger: repsText)
-                        }
-                    }
-                }
-
-                Section("Rest between sets") {
-                    Stepper(value: $restSeconds, in: 15...600, step: 15) {
-                        HStack {
-                            Text("Rest")
-                            Spacer()
-                            Text(formatRest(restSeconds))
-                                .font(.body.monospacedDigit().weight(.semibold))
-                                .foregroundStyle(STRQBrand.steel)
-                        }
-                    }
-                    HStack(spacing: 8) {
-                        ForEach([60, 90, 120, 180], id: \.self) { preset in
-                            Button {
-                                withAnimation(STRQMotion.tap) { restSeconds = preset }
-                            } label: {
-                                Text(formatRest(preset))
-                                    .font(.caption.monospacedDigit().weight(.semibold))
-                                    .foregroundStyle(restSeconds == preset ? .white : .primary)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 6)
-                                    .background(restSeconds == preset ? STRQBrand.steel : Color(.tertiarySystemGroupedBackground), in: Capsule())
-                                    .contentShape(Capsule())
-                            }
-                            .buttonStyle(.strqPressable)
-                            .sensoryFeedback(.selection, trigger: restSeconds)
-                        }
-                    }
-                }
-
-                Section {
-                    Toggle("Target RPE", isOn: $rpeEnabled)
-                        .tint(STRQBrand.steel)
-                    if rpeEnabled {
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Text("RPE")
-                                Spacer()
-                                Text(String(format: "%.1f", rpeValue))
-                                    .font(.body.monospacedDigit().weight(.semibold))
-                                    .foregroundStyle(STRQBrand.steel)
-                            }
-                            Slider(value: $rpeValue, in: 5...10, step: 0.5)
-                                .tint(STRQBrand.steel)
-                        }
-                    }
-                } header: {
-                    Text("Target Effort")
-                } footer: {
-                    Text("RPE 7 = 3 reps in reserve. RPE 9 = 1 rep in reserve. Leave off to let the coach choose.")
-                        .font(.caption)
-                }
+                .padding(.horizontal, 16)
+                .padding(.top, 6)
+                .padding(.bottom, 32)
             }
+            .background(Color(.systemGroupedBackground))
             .navigationTitle("Prescription")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -386,11 +478,229 @@ struct PrescriptionEditSheet: View {
         }
     }
 
+    private var headerCard: some View {
+        HStack(spacing: 12) {
+            if let ex = exercise {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(STRQBrand.steel.opacity(0.14))
+                        .frame(width: 42, height: 42)
+                    Image(systemName: ex.primaryMuscle.symbolName)
+                        .font(.subheadline)
+                        .foregroundStyle(STRQBrand.steel)
+                }
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(exercise?.name ?? planned.exerciseId)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+                HStack(spacing: 5) {
+                    Text(exercise?.primaryMuscle.displayName ?? "")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    if isCustom {
+                        Text("CUSTOM")
+                            .font(.system(size: 8, weight: .black))
+                            .tracking(0.4)
+                            .foregroundStyle(STRQPalette.warning)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1.5)
+                            .background(STRQPalette.warning.opacity(0.14), in: Capsule())
+                    } else if coachDefault != nil {
+                        Text("COACH DEFAULT")
+                            .font(.system(size: 8, weight: .black))
+                            .tracking(0.4)
+                            .foregroundStyle(STRQBrand.steel)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1.5)
+                            .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+                    }
+                }
+            }
+            Spacer()
+        }
+        .padding(12)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+    }
+
+    private var restoreBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "arrow.uturn.backward.circle.fill")
+                .font(.subheadline)
+                .foregroundStyle(STRQPalette.warning)
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Customized from coach default")
+                    .font(.caption.weight(.semibold))
+                if let cd = coachDefault {
+                    Text("Was \(cd.sets)×\(cd.reps) · \(formatRest(cd.restSeconds))\(cd.rpe.map { " · RPE\(Int($0))" } ?? "")")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+            Button {
+                if let cd = coachDefault {
+                    withAnimation(.snappy) {
+                        sets = cd.sets
+                        repsText = cd.reps
+                        restSeconds = cd.restSeconds
+                        if let r = cd.rpe {
+                            rpeValue = r
+                            rpeEnabled = true
+                        } else {
+                            rpeEnabled = false
+                        }
+                    }
+                }
+            } label: {
+                Text("Restore")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(STRQPalette.warning, in: Capsule())
+            }
+            .buttonStyle(.strqPressable)
+        }
+        .padding(12)
+        .background(STRQPalette.warning.opacity(0.08), in: .rect(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(STRQPalette.warning.opacity(0.25), lineWidth: 1)
+        )
+    }
+
+    private var setsCard: some View {
+        builderCard(title: "SETS", trailing: "\(sets)") {
+            HStack(spacing: 6) {
+                ForEach([1, 2, 3, 4, 5, 6], id: \.self) { n in
+                    Button {
+                        withAnimation(STRQMotion.tap) { sets = n }
+                    } label: {
+                        Text("\(n)")
+                            .font(.system(size: 14, weight: .bold).monospacedDigit())
+                            .foregroundStyle(sets == n ? .white : .primary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 38)
+                            .background(sets == n ? STRQBrand.steel : Color(.tertiarySystemGroupedBackground), in: .rect(cornerRadius: 9))
+                    }
+                    .buttonStyle(.strqPressable)
+                    .sensoryFeedback(.selection, trigger: sets)
+                }
+            }
+        }
+    }
+
+    private var repsCard: some View {
+        builderCard(title: "REPS", trailing: repsText) {
+            VStack(spacing: 8) {
+                HStack(spacing: 6) {
+                    ForEach(["3-5", "6-8", "8-10", "10-12"], id: \.self) { preset in
+                        repsPresetButton(preset)
+                    }
+                }
+                HStack(spacing: 6) {
+                    ForEach(["12-15", "15-20", "AMRAP"], id: \.self) { preset in
+                        repsPresetButton(preset)
+                    }
+                    TextField("Custom", text: $repsText)
+                        .multilineTextAlignment(.center)
+                        .keyboardType(.asciiCapable)
+                        .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 34)
+                        .background(Color(.tertiarySystemGroupedBackground), in: .rect(cornerRadius: 9))
+                }
+            }
+        }
+    }
+
+    private func repsPresetButton(_ preset: String) -> some View {
+        Button {
+            withAnimation(STRQMotion.tap) { repsText = preset }
+        } label: {
+            Text(preset)
+                .font(.system(size: 12, weight: .bold).monospacedDigit())
+                .foregroundStyle(repsText == preset ? .white : .primary)
+                .frame(maxWidth: .infinity)
+                .frame(height: 34)
+                .background(repsText == preset ? STRQBrand.steel : Color(.tertiarySystemGroupedBackground), in: .rect(cornerRadius: 9))
+        }
+        .buttonStyle(.strqPressable)
+        .sensoryFeedback(.selection, trigger: repsText)
+    }
+
+    private var restCard: some View {
+        builderCard(title: "REST", trailing: formatRest(restSeconds)) {
+            HStack(spacing: 6) {
+                ForEach([45, 60, 90, 120, 180, 240], id: \.self) { preset in
+                    Button {
+                        withAnimation(STRQMotion.tap) { restSeconds = preset }
+                    } label: {
+                        Text(formatRestShort(preset))
+                            .font(.system(size: 12, weight: .bold).monospacedDigit())
+                            .foregroundStyle(restSeconds == preset ? .white : .primary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 34)
+                            .background(restSeconds == preset ? STRQBrand.steel : Color(.tertiarySystemGroupedBackground), in: .rect(cornerRadius: 9))
+                    }
+                    .buttonStyle(.strqPressable)
+                    .sensoryFeedback(.selection, trigger: restSeconds)
+                }
+            }
+        }
+    }
+
+    private var rpeCard: some View {
+        builderCard(title: "EFFORT", trailing: rpeEnabled ? "RPE \(String(format: "%.1f", rpeValue))" : "Coach") {
+            VStack(spacing: 10) {
+                Toggle("Target RPE", isOn: $rpeEnabled)
+                    .tint(STRQBrand.steel)
+                    .font(.caption.weight(.semibold))
+                if rpeEnabled {
+                    Slider(value: $rpeValue, in: 5...10, step: 0.5)
+                        .tint(STRQBrand.steel)
+                    Text("RPE 7 = 3 in reserve · RPE 9 = 1 in reserve")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        }
+    }
+
+    private func builderCard<Content: View>(title: String, trailing: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(0.8)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(trailing)
+                    .font(.system(size: 13, weight: .bold).monospacedDigit())
+                    .foregroundStyle(STRQBrand.steel)
+            }
+            content()
+        }
+        .padding(12)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+    }
+
     private func formatRest(_ seconds: Int) -> String {
         if seconds >= 60 {
             let m = seconds / 60
             let s = seconds % 60
             return s == 0 ? "\(m) min" : "\(m):\(String(format: "%02d", s))"
+        }
+        return "\(seconds)s"
+    }
+
+    private func formatRestShort(_ seconds: Int) -> String {
+        if seconds >= 60 {
+            let m = seconds / 60
+            let s = seconds % 60
+            return s == 0 ? "\(m)m" : "\(m):\(String(format: "%02d", s))"
         }
         return "\(seconds)s"
     }
@@ -400,6 +710,7 @@ struct PrescriptionEditSheet: View {
 
 struct AddExerciseSheet: View {
     let vm: AppViewModel
+    let day: WorkoutDay?
     let onSelect: (Exercise) -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -407,6 +718,12 @@ struct AddExerciseSheet: View {
     @State private var selectedMuscle: MuscleGroup?
 
     private let library = ExerciseLibrary.shared
+
+    init(vm: AppViewModel, day: WorkoutDay? = nil, onSelect: @escaping (Exercise) -> Void) {
+        self.vm = vm
+        self.day = day
+        self.onSelect = onSelect
+    }
 
     private var results: [Exercise] {
         var list: [Exercise]
@@ -418,6 +735,30 @@ struct AddExerciseSheet: View {
             list = library.exercises
         }
         return list
+    }
+
+    private var contextualPicks: [Exercise] {
+        guard searchText.isEmpty, selectedMuscle == nil, let day = day else { return [] }
+        let focusMuscles = Set(day.focusMuscles)
+        let existingIds = Set(day.exercises.map(\.exerciseId))
+        let existingMuscles = Set(day.exercises.compactMap { vm.library.exercise(byId: $0.exerciseId)?.primaryMuscle })
+        let missingFocus = focusMuscles.subtracting(existingMuscles)
+
+        let matches = library.exercises.filter { ex in
+            guard !existingIds.contains(ex.id) else { return false }
+            return focusMuscles.contains(ex.primaryMuscle) || !missingFocus.isDisjoint(with: Set([ex.primaryMuscle]))
+        }
+
+        func score(_ ex: Exercise) -> Double {
+            var s: Double = 0
+            if missingFocus.contains(ex.primaryMuscle) { s += 10 }
+            if focusMuscles.contains(ex.primaryMuscle) { s += 5 }
+            if ex.category == .compound { s += 2 }
+            if day.exercises.count < 3 && ex.category == .compound { s += 3 }
+            return s
+        }
+
+        return Array(matches.sorted { score($0) > score($1) }.prefix(6))
     }
 
     private var grouped: [(MuscleGroup, [Exercise])] {
@@ -432,7 +773,7 @@ struct AddExerciseSheet: View {
         NavigationStack {
             VStack(spacing: 0) {
                 ScrollView(.horizontal) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 6) {
                         Button {
                             selectedMuscle = nil
                         } label: {
@@ -449,48 +790,31 @@ struct AddExerciseSheet: View {
                 }
                 .contentMargins(.horizontal, 16)
                 .scrollIndicators(.hidden)
-                .padding(.vertical, 10)
+                .padding(.vertical, 8)
 
                 List {
+                    if !contextualPicks.isEmpty {
+                        Section {
+                            ForEach(contextualPicks) { ex in
+                                contextualRow(ex)
+                            }
+                        } header: {
+                            HStack(spacing: 5) {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(STRQBrand.steel)
+                                Text("Fits this session")
+                            }
+                        } footer: {
+                            Text("Suggestions based on this session's focus muscles and gaps.")
+                                .font(.caption2)
+                        }
+                    }
+
                     ForEach(grouped, id: \.0) { muscle, exercises in
                         Section(muscle.displayName) {
                             ForEach(exercises) { ex in
-                                Button {
-                                    onSelect(ex)
-                                    dismiss()
-                                } label: {
-                                    HStack(spacing: 12) {
-                                        Image(systemName: ex.primaryMuscle.symbolName)
-                                            .font(.subheadline)
-                                            .foregroundStyle(STRQBrand.steel)
-                                            .frame(width: 32, height: 32)
-                                            .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 8))
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(ex.name)
-                                                .font(.subheadline.weight(.semibold))
-                                                .foregroundStyle(.primary)
-                                                .lineLimit(1)
-                                            HStack(spacing: 6) {
-                                                Text(ex.category.displayName)
-                                                    .font(.caption)
-                                                    .foregroundStyle(.secondary)
-                                                if let eq = ex.equipment.first(where: { $0 != .none }) {
-                                                    Text("·")
-                                                        .font(.caption)
-                                                        .foregroundStyle(.tertiary)
-                                                    Text(eq.displayName)
-                                                        .font(.caption)
-                                                        .foregroundStyle(.secondary)
-                                                }
-                                            }
-                                        }
-                                        Spacer()
-                                        Image(systemName: "plus.circle.fill")
-                                            .font(.body)
-                                            .foregroundStyle(STRQBrand.steel)
-                                    }
-                                }
-                                .buttonStyle(.plain)
+                                resultRow(ex)
                             }
                         }
                     }
@@ -508,11 +832,93 @@ struct AddExerciseSheet: View {
         }
     }
 
+    private func contextualRow(_ ex: Exercise) -> some View {
+        let focus = Set(day?.focusMuscles ?? [])
+        let existing = Set((day?.exercises ?? []).compactMap { vm.library.exercise(byId: $0.exerciseId)?.primaryMuscle })
+        let isMissing = focus.contains(ex.primaryMuscle) && !existing.contains(ex.primaryMuscle)
+        let hint: String = isMissing ? "Fills \(ex.primaryMuscle.displayName) gap" : "Matches \(ex.primaryMuscle.displayName) focus"
+        let hintColor: Color = isMissing ? STRQPalette.warning : STRQPalette.success
+
+        return Button {
+            onSelect(ex)
+            dismiss()
+        } label: {
+            HStack(spacing: 11) {
+                Image(systemName: ex.primaryMuscle.symbolName)
+                    .font(.subheadline)
+                    .foregroundStyle(STRQBrand.steel)
+                    .frame(width: 32, height: 32)
+                    .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 8))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(ex.name)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                    HStack(spacing: 4) {
+                        Text(hint)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(hintColor)
+                        Text("·")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                        Text(ex.category.displayName)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                Spacer()
+                Image(systemName: "plus.circle.fill")
+                    .font(.body)
+                    .foregroundStyle(STRQBrand.steel)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func resultRow(_ ex: Exercise) -> some View {
+        Button {
+            onSelect(ex)
+            dismiss()
+        } label: {
+            HStack(spacing: 11) {
+                Image(systemName: ex.primaryMuscle.symbolName)
+                    .font(.subheadline)
+                    .foregroundStyle(STRQBrand.steel)
+                    .frame(width: 32, height: 32)
+                    .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 8))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(ex.name)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                    HStack(spacing: 5) {
+                        Text(ex.category.displayName)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        if let eq = ex.equipment.first(where: { $0 != .none }) {
+                            Text("·")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                            Text(eq.displayName)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                Spacer()
+                Image(systemName: "plus.circle.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(STRQBrand.steel)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
     private func chipLabel(_ text: String, active: Bool) -> some View {
         Text(text)
             .font(.caption.weight(.semibold))
             .foregroundStyle(active ? .white : .primary)
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 11)
             .padding(.vertical, 6)
             .background(active ? STRQBrand.steel : Color(.secondarySystemGroupedBackground), in: Capsule())
     }
