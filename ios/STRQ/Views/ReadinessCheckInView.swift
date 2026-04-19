@@ -158,12 +158,12 @@ struct ReadinessCheckInView: View {
                             }
                             Text(optionLabel(option))
                                 .font(.body.weight(isSelected ? .semibold : .regular))
-                                .foregroundStyle(isSelected ? .white : .primary)
+                                .foregroundStyle(isSelected ? .black : .primary)
                             Spacer()
                             if isSelected {
                                 Image(systemName: "checkmark")
                                     .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(.black)
                             }
                         }
                         .padding(.horizontal, 18)
@@ -173,6 +173,10 @@ struct ReadinessCheckInView: View {
                             AnyShapeStyle(STRQBrand.accentGradient) :
                             AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
                             in: .rect(cornerRadius: 14)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .strokeBorder(isSelected ? .clear : Color.white.opacity(0.06), lineWidth: 1)
                         )
                     }
                     .sensoryFeedback(.selection, trigger: isSelected)
@@ -208,12 +212,12 @@ struct ReadinessCheckInView: View {
                         HStack(spacing: 14) {
                             Text(level.label)
                                 .font(.body.weight(isSelected ? .semibold : .regular))
-                                .foregroundStyle(isSelected ? .white : .primary)
+                                .foregroundStyle(isSelected ? .black : .primary)
                             Spacer()
                             if isSelected {
                                 Image(systemName: "checkmark")
                                     .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(.black)
                             }
                         }
                         .padding(.horizontal, 18)
@@ -223,6 +227,10 @@ struct ReadinessCheckInView: View {
                             AnyShapeStyle(STRQBrand.accentGradient) :
                             AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
                             in: .rect(cornerRadius: 14)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .strokeBorder(isSelected ? .clear : Color.white.opacity(0.06), lineWidth: 1)
                         )
                     }
                     .sensoryFeedback(.selection, trigger: isSelected)
@@ -248,7 +256,7 @@ struct ReadinessCheckInView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
-                            .foregroundStyle(isSelected ? .white : .primary)
+                            .foregroundStyle(isSelected ? .black : .primary)
                             .background(
                                 isSelected ?
                                 AnyShapeStyle(STRQBrand.accentGradient) :
@@ -287,6 +295,11 @@ struct ReadinessCheckInView: View {
                             .font(.body.weight(!painOrRestriction ? .semibold : .regular))
                             .foregroundStyle(!painOrRestriction ? .white : .primary)
                         Spacer()
+                        if !painOrRestriction {
+                            Image(systemName: "checkmark")
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(.white)
+                        }
                     }
                     .padding(.horizontal, 18)
                     .padding(.vertical, 16)
@@ -296,6 +309,10 @@ struct ReadinessCheckInView: View {
                         AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
                         in: .rect(cornerRadius: 14)
                     )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(!painOrRestriction ? .clear : Color.white.opacity(0.06), lineWidth: 1)
+                    )
                 }
 
                 Button {
@@ -304,11 +321,16 @@ struct ReadinessCheckInView: View {
                     HStack(spacing: 14) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.title3)
-                            .foregroundStyle(painOrRestriction ? .white : STRQBrand.steel)
+                            .foregroundStyle(painOrRestriction ? .black : STRQBrand.steel)
                         Text("Yes, something feels off")
                             .font(.body.weight(painOrRestriction ? .semibold : .regular))
-                            .foregroundStyle(painOrRestriction ? .white : .primary)
+                            .foregroundStyle(painOrRestriction ? .black : .primary)
                         Spacer()
+                        if painOrRestriction {
+                            Image(systemName: "checkmark")
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(.black)
+                        }
                     }
                     .padding(.horizontal, 18)
                     .padding(.vertical, 16)
@@ -317,6 +339,10 @@ struct ReadinessCheckInView: View {
                         AnyShapeStyle(STRQBrand.accentGradient) :
                         AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
                         in: .rect(cornerRadius: 14)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(painOrRestriction ? .clear : Color.white.opacity(0.06), lineWidth: 1)
                     )
                 }
             }
@@ -443,7 +469,7 @@ struct ReadinessCheckInView: View {
                 } label: {
                     Text(currentStep == totalSteps - 1 ? "Get Results" : "Next")
                         .font(.body.weight(.semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.black)
                         .padding(.horizontal, 28)
                         .padding(.vertical, 12)
                         .background(STRQBrand.accentGradient, in: Capsule())
