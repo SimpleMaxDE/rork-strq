@@ -318,7 +318,7 @@ struct ActiveWorkoutView: View {
                     HStack(spacing: 24) {
                         let exerciseForIncrement = vm.library.exercise(byId: log.exerciseId)
                         let increment = weightIncrement(for: exerciseForIncrement)
-                        let isBodyweight = increment <= 0
+                        let isBodyweight = exerciseForIncrement?.category == .bodyweight || (exerciseForIncrement?.isBodyweight ?? false)
 
                         VStack(spacing: 8) {
                             Text("WEIGHT")
@@ -329,6 +329,7 @@ struct ActiveWorkoutView: View {
                             HStack(spacing: 0) {
                                 Button {
                                     let step = isBodyweight ? 1.0 : increment
+                                    guard step > 0 else { return }
                                     updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: max(0, setLog.weight - step), reps: setLog.reps)
                                 } label: {
                                     Image(systemName: "minus")
@@ -346,6 +347,7 @@ struct ActiveWorkoutView: View {
 
                                 Button {
                                     let step = isBodyweight ? 1.0 : increment
+                                    guard step > 0 else { return }
                                     updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight + step, reps: setLog.reps)
                                 } label: {
                                     Image(systemName: "plus")
