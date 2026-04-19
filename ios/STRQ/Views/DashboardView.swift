@@ -27,7 +27,7 @@ struct DashboardView: View {
                 scheduleTimeline
                     .padding(.horizontal, 16)
 
-                if let bridge = scienceBridge, !bridge.isEmpty {
+                if vm.earlyStateGuidance == nil, let bridge = scienceBridge, !bridge.isEmpty {
                     scienceNoteCard(bridge)
                         .padding(.horizontal, 16)
                 }
@@ -35,11 +35,15 @@ struct DashboardView: View {
                 signalsRow
                     .padding(.horizontal, 16)
 
-                weekPulse
-                    .padding(.horizontal, 16)
+                if !vm.isEarlyStage {
+                    weekPulse
+                        .padding(.horizontal, 16)
+                }
 
-                weightSnapshotCard
-                    .padding(.horizontal, 16)
+                if vm.latestWeight != nil || !vm.isEarlyStage {
+                    weightSnapshotCard
+                        .padding(.horizontal, 16)
+                }
             }
             .padding(.bottom, 32)
         }

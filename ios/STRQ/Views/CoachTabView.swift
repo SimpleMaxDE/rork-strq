@@ -19,9 +19,20 @@ struct CoachTabView: View {
                     calibrationChecklist
                 } else {
                     directionCard
-                    watchSection
-                    momentumSection
-                    liftTrackerSection
+
+                    // Single strongest secondary message: only surface Watch when there's a real concern.
+                    // Momentum is a celebratory signal — suppress it if there's already a watchpoint.
+                    let hasWatch = vm.highPriorityInsights.first != nil || vm.recommendations.first != nil
+                    if hasWatch {
+                        watchSection
+                    } else {
+                        momentumSection
+                    }
+
+                    // Lift tracker is deeper detail — only show when coach has strong enough signal.
+                    if vm.coachingConfidence >= .moderate {
+                        liftTrackerSection
+                    }
                 }
                 weeklyCheckInRow
             }
