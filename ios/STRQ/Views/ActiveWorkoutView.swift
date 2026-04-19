@@ -31,12 +31,12 @@ struct ActiveWorkoutView: View {
                     progressStrip(workout)
 
                     ScrollView {
-                        VStack(spacing: 26) {
+                        VStack(spacing: 18) {
                             exerciseFocusHero(workout)
                                 .padding(.horizontal, 16)
-                                .padding(.top, 22)
+                                .padding(.top, 14)
 
-                            VStack(spacing: 14) {
+                            VStack(spacing: 10) {
                                 activeSetCard(workout)
                                 setLogTable(workout)
                                 previousSessionTable(workout)
@@ -48,9 +48,9 @@ struct ActiveWorkoutView: View {
 
                             upNextPreview(workout)
                                 .padding(.horizontal, 16)
-                                .padding(.top, 10)
+                                .padding(.top, 4)
                         }
-                        .padding(.bottom, 120)
+                        .padding(.bottom, 110)
                     }
                 }
 
@@ -134,8 +134,8 @@ struct ActiveWorkoutView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 42)
-        .padding(.bottom, 22)
+        .padding(.top, 38)
+        .padding(.bottom, 14)
     }
 
     private func progressStrip(_ workout: ActiveWorkoutState) -> some View {
@@ -171,7 +171,7 @@ struct ActiveWorkoutView: View {
                     let heroSymbol = mediaProvider.heroSymbol(for: ex)
 
                     ZStack {
-                        RoundedRectangle(cornerRadius: 20)
+                        RoundedRectangle(cornerRadius: 18)
                             .fill(
                                 LinearGradient(
                                     colors: [gradientColors[0], gradientColors[1]],
@@ -179,38 +179,21 @@ struct ActiveWorkoutView: View {
                                     endPoint: .bottomTrailing
                                 )
                             )
-                            .frame(height: 160)
+                            .frame(height: 118)
 
-                        Canvas { context, size in
-                            for i in 0..<3 {
-                                let xFraction: [CGFloat] = [0.2, 0.6, 0.85]
-                                let yFraction: [CGFloat] = [0.3, 0.65, 0.25]
-                                let radius = CGFloat(20 + i * 15)
-                                let circle = Path(ellipseIn: CGRect(
-                                    x: xFraction[i] * size.width - radius,
-                                    y: yFraction[i] * size.height - radius,
-                                    width: radius * 2, height: radius * 2
-                                ))
-                                context.fill(circle, with: .color(.white.opacity(0.03)))
-                            }
-                        }
-                        .frame(height: 160)
-                        .clipShape(.rect(cornerRadius: 20))
-                        .allowsHitTesting(false)
-
-                        HStack(spacing: 20) {
+                        HStack(spacing: 14) {
                             ZStack {
                                 Circle()
                                     .fill(.white.opacity(0.08))
-                                    .frame(width: 80, height: 80)
-                                    .blur(radius: 10)
+                                    .frame(width: 60, height: 60)
+                                    .blur(radius: 8)
 
                                 Image(systemName: heroSymbol)
-                                    .font(.system(size: 40, weight: .thin))
+                                    .font(.system(size: 30, weight: .thin))
                                     .foregroundStyle(.white.opacity(0.9))
                             }
 
-                            VStack(alignment: .leading, spacing: 6) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text("EXERCISE \(exerciseIndex + 1) OF \(workout.session.exerciseLogs.count)")
                                     .font(.system(size: 9, weight: .bold))
                                     .foregroundStyle(.white.opacity(0.5))
@@ -221,12 +204,12 @@ struct ActiveWorkoutView: View {
                                     .foregroundStyle(.white)
                                     .lineLimit(2)
 
-                                HStack(spacing: 8) {
+                                HStack(spacing: 6) {
                                     Text(ex.primaryMuscle.displayName)
                                         .font(.caption2.weight(.semibold))
                                         .foregroundStyle(.white.opacity(0.8))
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 3)
+                                        .padding(.horizontal, 7)
+                                        .padding(.vertical, 2.5)
                                         .background(.white.opacity(0.15), in: Capsule())
 
                                     if let p = planned {
@@ -245,26 +228,26 @@ struct ActiveWorkoutView: View {
 
                             Spacer(minLength: 0)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 16)
                     }
-                    .clipShape(.rect(cornerRadius: 20))
+                    .clipShape(.rect(cornerRadius: 18))
                 }
 
                 if let guidance = vm.nextSessionGuidance(for: log.exerciseId) {
                     HStack(spacing: 8) {
                         Image(systemName: guidance.icon)
-                            .font(.system(size: 11))
+                            .font(.system(size: 10))
                             .foregroundStyle(guidanceColor(guidance.color))
                         Text(guidance.action)
                             .font(.caption.weight(.medium))
                             .foregroundStyle(.primary)
                             .lineLimit(1)
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
-                    .padding(.top, 8)
+                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 12))
+                    .padding(.top, 6)
                 }
             }
             .opacity(appeared ? 1 : 0)
@@ -329,7 +312,7 @@ struct ActiveWorkoutView: View {
                         let increment = weightIncrement(for: exerciseForIncrement)
                         let isBodyweight = exerciseForIncrement?.category == .bodyweight || (exerciseForIncrement?.isBodyweight ?? false)
 
-                        VStack(spacing: 8) {
+                        VStack(spacing: 6) {
                             Text("WEIGHT")
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundStyle(.tertiary)
@@ -342,15 +325,15 @@ struct ActiveWorkoutView: View {
                                     updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: max(0, setLog.weight - step), reps: setLog.reps)
                                 } label: {
                                     Image(systemName: "minus")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .font(.system(size: 13, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 38, height: 56)
+                                        .frame(width: 36, height: 48)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
                                 }
                                 .disabled(isBodyweight && setLog.weight <= 0)
 
                                 Text(isBodyweight && setLog.weight <= 0 ? "BW" : formatWeight(setLog.weight, increment: increment))
-                                    .font(.system(size: 42, weight: .heavy, design: .rounded).monospacedDigit())
+                                    .font(.system(size: 36, weight: .heavy, design: .rounded).monospacedDigit())
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.7)
                                     .frame(maxWidth: .infinity)
@@ -362,9 +345,9 @@ struct ActiveWorkoutView: View {
                                     updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight + step, reps: setLog.reps)
                                 } label: {
                                     Image(systemName: "plus")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .font(.system(size: 13, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 38, height: 56)
+                                        .frame(width: 36, height: 48)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
                                 }
                             }
@@ -377,9 +360,9 @@ struct ActiveWorkoutView: View {
 
                         Rectangle()
                             .fill(Color.white.opacity(0.06))
-                            .frame(width: 1, height: 80)
+                            .frame(width: 1, height: 68)
 
-                        VStack(spacing: 8) {
+                        VStack(spacing: 6) {
                             Text("REPS")
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundStyle(.tertiary)
@@ -388,14 +371,14 @@ struct ActiveWorkoutView: View {
                             HStack(spacing: 0) {
                                 Button { updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight, reps: max(0, setLog.reps - 1)) } label: {
                                     Image(systemName: "minus")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .font(.system(size: 13, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 38, height: 56)
+                                        .frame(width: 36, height: 48)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
                                 }
 
                                 Text("\(setLog.reps)")
-                                    .font(.system(size: 42, weight: .heavy, design: .rounded).monospacedDigit())
+                                    .font(.system(size: 36, weight: .heavy, design: .rounded).monospacedDigit())
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.7)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -404,9 +387,9 @@ struct ActiveWorkoutView: View {
 
                                 Button { updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight, reps: setLog.reps + 1) } label: {
                                     Image(systemName: "plus")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .font(.system(size: 13, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 38, height: 56)
+                                        .frame(width: 36, height: 48)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
                                 }
                             }
@@ -429,13 +412,13 @@ struct ActiveWorkoutView: View {
                         }
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
-                        .shadow(color: .white.opacity(0.15), radius: 14, y: 3)
+                        .frame(height: 50)
+                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 14))
+                        .shadow(color: .white.opacity(0.12), radius: 10, y: 2)
                     }
                 }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 22)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 16)
                 .background(
                     LinearGradient(
                         colors: [Color.white.opacity(0.07), Color.white.opacity(0.03)],
@@ -724,21 +707,21 @@ struct ActiveWorkoutView: View {
             let remaining = Array(workout.session.exerciseLogs[nextIndex...].prefix(2))
             let total = workout.session.exerciseLogs.count - nextIndex
 
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 10) {
                     Text("UP NEXT")
-                        .font(.system(size: 11, weight: .black))
-                        .foregroundStyle(.white.opacity(0.95))
-                        .tracking(1.6)
+                        .font(.system(size: 10, weight: .black))
+                        .foregroundStyle(.white.opacity(0.9))
+                        .tracking(1.4)
                     Rectangle()
-                        .fill(Color.white.opacity(0.12))
-                        .frame(height: 1)
+                        .fill(Color.white.opacity(0.1))
+                        .frame(height: 0.5)
                     Text("\(total) left")
                         .font(.system(size: 10, weight: .bold).monospacedDigit())
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.white.opacity(0.55))
                 }
 
-                VStack(spacing: 10) {
+                VStack(spacing: 6) {
                     ForEach(Array(remaining.enumerated()), id: \.element.id) { offset, log in
                         upNextRow(log: log, isImmediate: offset == 0, positionLabel: offset == 0 ? "NEXT" : "THEN")
                     }
@@ -751,37 +734,37 @@ struct ActiveWorkoutView: View {
     private func upNextRow(log: ExerciseLog, isImmediate: Bool, positionLabel: String) -> some View {
         let exercise = vm.library.exercise(byId: log.exerciseId)
         let mediaProvider = ExerciseMediaProvider.shared
-        let tileSize: CGFloat = isImmediate ? 46 : 36
+        let tileSize: CGFloat = isImmediate ? 36 : 30
 
-        HStack(spacing: 14) {
+        HStack(spacing: 12) {
             if let ex = exercise {
                 let colors = mediaProvider.heroGradient(for: ex)
                 let symbol = mediaProvider.heroSymbol(for: ex)
                 ZStack {
-                    RoundedRectangle(cornerRadius: 11)
+                    RoundedRectangle(cornerRadius: 9)
                         .fill(LinearGradient(colors: [colors[0], colors[1]], startPoint: .topLeading, endPoint: .bottomTrailing))
                         .frame(width: tileSize, height: tileSize)
-                        .opacity(isImmediate ? 1 : 0.65)
+                        .opacity(isImmediate ? 1 : 0.7)
                     Image(systemName: symbol)
-                        .font(.system(size: isImmediate ? 20 : 16, weight: .thin))
+                        .font(.system(size: isImmediate ? 16 : 13, weight: .thin))
                         .foregroundStyle(.white.opacity(isImmediate ? 0.9 : 0.75))
                 }
-                .frame(width: 46, alignment: .leading)
+                .frame(width: 36, alignment: .leading)
             }
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 1) {
                 Text(positionLabel)
                     .font(.system(size: 9, weight: .black))
-                    .tracking(1.2)
+                    .tracking(1.0)
                     .foregroundStyle(isImmediate ? STRQBrand.steel : .white.opacity(0.4))
                 Text(exercise?.name ?? log.exerciseId)
-                    .font(isImmediate ? .subheadline.weight(.semibold) : .subheadline.weight(.medium))
-                    .foregroundStyle(isImmediate ? .white : .white.opacity(0.7))
+                    .font(.subheadline.weight(isImmediate ? .semibold : .medium))
+                    .foregroundStyle(isImmediate ? .white : .white.opacity(0.75))
                     .lineLimit(1)
                 if let ex = exercise {
                     Text("\(ex.primaryMuscle.displayName) · \(log.sets.count) sets")
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(.white.opacity(isImmediate ? 0.5 : 0.4))
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(.white.opacity(isImmediate ? 0.55 : 0.42))
                 }
             }
             Spacer()
@@ -789,11 +772,11 @@ struct ActiveWorkoutView: View {
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(.white.opacity(isImmediate ? 0.4 : 0.22))
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, isImmediate ? 12 : 10)
-        .background(Color.white.opacity(isImmediate ? 0.07 : 0.035), in: .rect(cornerRadius: 14))
+        .padding(.horizontal, 12)
+        .padding(.vertical, isImmediate ? 9 : 7)
+        .background(Color.white.opacity(isImmediate ? 0.07 : 0.035), in: .rect(cornerRadius: 12))
         .overlay(
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(Color.white.opacity(isImmediate ? 0.09 : 0.04), lineWidth: 1)
         )
     }

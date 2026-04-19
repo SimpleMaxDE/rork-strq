@@ -265,7 +265,7 @@ struct TrainingPlanView: View {
             let day = plan.days[selectedDayIndex]
             let briefing = vm.sessionBriefing(for: day)
 
-            VStack(spacing: 20) {
+            VStack(spacing: 14) {
                 missionCard(day: day, briefing: briefing)
                     .padding(.horizontal, 16)
 
@@ -314,7 +314,7 @@ struct TrainingPlanView: View {
             }
             .allowsHitTesting(false)
 
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 6) {
                     Text(vm.currentPhase.displayName.uppercased())
                         .font(.system(size: 9, weight: .black))
@@ -329,17 +329,17 @@ struct TrainingPlanView: View {
                     }
                 }
 
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(day.name)
-                        .font(.system(size: 32, weight: .heavy, design: .rounded))
+                        .font(.system(size: 26, weight: .heavy, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(2)
                         .minimumScaleFactor(0.7)
 
                     if !vm.isEarlyStage {
                         Text(briefing.dayExplanation)
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.65))
+                            .font(.footnote)
+                            .foregroundStyle(.white.opacity(0.6))
                             .lineLimit(2)
                     }
                 }
@@ -354,7 +354,7 @@ struct TrainingPlanView: View {
                 .contentMargins(.horizontal, 0)
                 .scrollIndicators(.hidden)
 
-                Divider().opacity(0.25)
+                Divider().opacity(0.2)
 
                 HStack(spacing: 0) {
                     ForgeStatCell(value: "\(briefing.exerciseCount)", label: "Exercises")
@@ -363,7 +363,7 @@ struct TrainingPlanView: View {
                     ForgeStatCell(value: briefing.intensityLabel, label: "Effort", valueColor: STRQBrand.steel)
                 }
             }
-            .padding(20)
+            .padding(16)
         }
         .background(
             LinearGradient(
@@ -390,7 +390,7 @@ struct TrainingPlanView: View {
     // MARK: - Exercise Stack
 
     private func exerciseStack(day: WorkoutDay) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 5) {
             ForEach(Array(day.exercises.enumerated()), id: \.element.id) { index, planned in
                 exerciseRow(planned, index: index, day: day)
             }
@@ -480,11 +480,11 @@ struct TrainingPlanView: View {
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.quaternary)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 9)
+            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 11))
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 11)
                     .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
             )
         }
