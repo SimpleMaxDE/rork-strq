@@ -29,6 +29,7 @@ struct STRQApp: App {
         #endif
         Purchases.configure(withAPIKey: apiKey)
         ErrorReporter.shared.breadcrumb("RevenueCat configured", category: "subscription")
+        EnvironmentValidator.validateAndLog()
     }
 
     var body: some Scene {

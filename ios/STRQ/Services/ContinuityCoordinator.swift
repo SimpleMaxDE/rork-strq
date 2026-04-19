@@ -33,21 +33,32 @@ final class ContinuityCoordinator {
     @discardableResult
     func restore(force: Bool) -> CloudRestoreOutcome {
         guard cloudSync.isAvailable else { return .unavailable }
-        guard let payload = cloudSync.loadRemoteSnapshot() else { return .noSnapshot }
-        let local = SnapshotBuilder.build(from: vm, version: persistence.version)
-        let localScore = SnapshotBuilder.maturityScore(local)
-        let remoteScore = SnapshotBuilder.maturityScore(payload.state)
-        if !force, localScore > remoteScore + 5 {
-            Analytics.shared.track(.cloud_sync_failed, ["reason": "local_richer"])
-            ErrorReporter.shared.breadcrumb(
-                "Cloud restore skipped: local richer (\(localScore) vs \(remoteScore))",
-                category: "sync"
-            )
+        // Never clobber an in-progress workout with a remote snapshot.
+        if vm.activeWorkout != nil {
+            ErrorReporter.shared.breadcrumb("Cloud restore skipped: active workout", category: "sync")
             return .staleIgnored
         }
-        vm.apply(snapshot: payload.state)
-        Analytics.shared.track(.cloud_sync_restored)
-        ErrorReporter.shared.breadcrumb("Cloud snapshot restored", category: "sync")
-        return .restored
+        let result = cloudSync.loadRemoteSnapshotResult()
+        switch result {
+        case .unavailable: return .unavailable
+        case .empty: return .noSnapshot
+        case .decodeFailed: return .decodeFailed
+        case .success(let state, _):
+            let local = SnapshotBuilder.build(from: vm, version: persistence.version)
+            let localScore = SnapshotBuilder.maturityScore(local)
+            let remoteScore = SnapshotBuilder.maturityScore(state)
+            if !force, localScore > remoteScore + 5 {
+                Analytics.shared.track(.cloud_sync_failed, ["reason": "local_richer"])
+                ErrorReporter.shared.breadcrumb(
+                    "Cloud restore skipped: local richer (\(localScore) vs \(remoteScore))",
+                    category: "sync"
+                )
+                return .staleIgnored
+            }
+            vm.apply(snapshot: state)
+            Analytics.shared.track(.cloud_sync_restored)
+            ErrorReporter.shared.breadcrumb("Cloud snapshot restored", category: "sync")
+            return .restored
+        }
     }
 }

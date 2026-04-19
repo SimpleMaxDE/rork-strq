@@ -177,6 +177,10 @@ class AppViewModel {
     }
 
     func apply(snapshot saved: PersistedAppState) {
+        // Preserve an in-progress workout across a snapshot apply.
+        // Restore should never yank the user out of the session they're
+        // currently logging — even if the remote snapshot is richer overall.
+        let preservedActive = activeWorkout
         isHydrating = true
         hasCompletedOnboarding = saved.hasCompletedOnboarding
         profile = saved.profile
@@ -199,7 +203,10 @@ class AppViewModel {
         nutritionLogs = saved.nutritionLogs
         bodyWeightEntries = saved.bodyWeightEntries
         sleepEntries = saved.sleepEntries
-        if let draft = saved.activeWorkoutDraft {
+        if let preservedActive {
+            activeWorkout = preservedActive
+            ErrorReporter.shared.breadcrumb("Snapshot applied — active workout preserved", category: "sync")
+        } else if let draft = saved.activeWorkoutDraft {
             activeWorkout = ActiveWorkoutState(
                 session: draft.session,
                 currentExerciseIndex: draft.currentExerciseIndex,

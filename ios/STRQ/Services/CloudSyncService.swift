@@ -88,20 +88,35 @@ final class CloudSyncService {
         }
     }
 
+    enum RemoteSnapshotLoad {
+        case success(state: PersistedAppState, timestamp: Date)
+        case empty
+        case decodeFailed
+        case unavailable
+    }
+
     func loadRemoteSnapshot() -> (state: PersistedAppState, timestamp: Date)? {
-        guard isAvailable else { return nil }
+        if case .success(let state, let timestamp) = loadRemoteSnapshotResult() {
+            return (state, timestamp)
+        }
+        return nil
+    }
+
+    func loadRemoteSnapshotResult() -> RemoteSnapshotLoad {
+        guard isAvailable else { return .unavailable }
         store.synchronize()
-        guard let data = store.data(forKey: snapshotKey) else { return nil }
+        guard let data = store.data(forKey: snapshotKey) else { return .empty }
         let ts = store.double(forKey: snapshotTimestampKey)
         let timestamp = ts > 0 ? Date(timeIntervalSince1970: ts) : Date()
         do {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
             let state = try decoder.decode(PersistedAppState.self, from: data)
-            return (state, timestamp)
+            return .success(state: state, timestamp: timestamp)
         } catch {
             ErrorReporter.shared.breadcrumb("Cloud decode failed: \(error.localizedDescription)", category: "sync")
-            return nil
+            Analytics.shared.track(.cloud_sync_failed, ["reason": "decode"])
+            return .decodeFailed
         }
     }
 
