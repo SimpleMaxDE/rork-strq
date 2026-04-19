@@ -927,6 +927,26 @@ struct EnvironmentValidatorTests {
         #expect(URL(string: STRQLinks.support.absoluteString) != nil)
     }
 
+    @Test func legalLinksUseApprovedSchemes() {
+        // App Review rejects raw custom schemes or empty hosts on legal links.
+        // Guardrail: any override must resolve to http(s) or mailto with a real target.
+        let approved: Set<String> = ["https", "http", "mailto"]
+        for link in [STRQLinks.privacy, STRQLinks.terms, STRQLinks.support] {
+            let scheme = link.scheme?.lowercased() ?? ""
+            #expect(approved.contains(scheme))
+            if scheme != "mailto" {
+                #expect(!(link.host?.isEmpty ?? true))
+            }
+        }
+    }
+
+    @Test func validatorFlagsMissingBundleIdOnlyAsWarning() {
+        // Missing bundle id must never be a hard launch issue — the app still
+        // runs for the user, integrations just no-op.
+        let report = EnvironmentValidator.validate()
+        #expect(!report.issues.contains { $0.contains("Bundle identifier") })
+    }
+
     #if DEBUG
     @Test func debugBuildTreatsMissingRevenueCatAsWarningNotIssue() {
         // In the sandbox both RevenueCat keys are empty; in DEBUG this must be

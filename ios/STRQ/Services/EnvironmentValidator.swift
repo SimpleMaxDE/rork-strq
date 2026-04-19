@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// Central, one-shot validation of production-critical configuration.
 ///
@@ -27,14 +30,18 @@ enum EnvironmentValidator {
         }
         #endif
 
-        // Legal/support URLs — must parse as URLs, otherwise settings screens break.
+        // Legal/support URLs — must parse, use http(s) or mailto, and have a host.
+        // A malformed release override would otherwise silently 404 from Profile.
         for (label, url) in [
-            ("privacy", STRQLinks.privacy.absoluteString),
-            ("terms", STRQLinks.terms.absoluteString),
-            ("support", STRQLinks.support.absoluteString)
+            ("privacy", STRQLinks.privacy),
+            ("terms", STRQLinks.terms),
+            ("support", STRQLinks.support)
         ] {
-            if URL(string: url) == nil {
-                report.issues.append("\(label) URL invalid: \(url)")
+            let scheme = url.scheme?.lowercased() ?? ""
+            let validScheme = ["https", "http", "mailto"].contains(scheme)
+            let hasTarget = !(url.host?.isEmpty ?? true) || scheme == "mailto"
+            if !validScheme || !hasTarget {
+                report.issues.append("\(label) URL invalid: \(url.absoluteString)")
             }
         }
 
@@ -42,6 +49,20 @@ enum EnvironmentValidator {
         if FileManager.default.ubiquityIdentityToken == nil {
             report.warnings.append("iCloud unavailable — cloud sync will remain idle")
         }
+
+        // Bundle identity — required for RevenueCat / StoreKit / WatchConnectivity
+        // to wire correctly. Missing in unusual test harnesses only.
+        if (Bundle.main.bundleIdentifier ?? "").isEmpty {
+            report.warnings.append("Bundle identifier missing — integrations may misbehave")
+        }
+
+        // Low power mode — not a failure, but useful breadcrumb for launch telemetry
+        // so slow-feeling sessions can be explained after the fact.
+        #if canImport(UIKit)
+        if ProcessInfo.processInfo.isLowPowerModeEnabled {
+            report.warnings.append("Low Power Mode enabled")
+        }
+        #endif
 
         return report
     }
