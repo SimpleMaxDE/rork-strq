@@ -126,17 +126,17 @@ struct SessionEditorSheet: View {
     private func exerciseRow(planned: PlannedExercise, index: Int) -> some View {
         let exercise = vm.library.exercise(byId: planned.exerciseId)
         let isAnchor = exercise?.category == .compound && index < 2
-        HStack(spacing: 10) {
+        HStack(spacing: 9) {
             Text("\(index + 1)")
                 .font(.system(size: 11, weight: .black, design: .rounded).monospacedDigit())
                 .foregroundStyle(isAnchor ? .primary : .tertiary)
-                .frame(width: 18, alignment: .leading)
+                .frame(width: 16, alignment: .leading)
 
             if let ex = exercise {
                 Image(systemName: ex.primaryMuscle.symbolName)
                     .font(.footnote)
                     .foregroundStyle(STRQBrand.steel)
-                    .frame(width: 28, height: 28)
+                    .frame(width: 26, height: 26)
                     .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 7))
             }
 
@@ -193,11 +193,11 @@ struct SessionEditorSheet: View {
                 Image(systemName: "ellipsis")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .frame(width: 28, height: 28)
+                    .frame(width: 26, height: 26)
                     .contentShape(Rectangle())
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 1)
         .contentShape(Rectangle())
         .onTapGesture {
             editingPlanned = planned

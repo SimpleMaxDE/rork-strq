@@ -29,9 +29,9 @@ struct ExerciseDetailView: View {
                 heroSection
                 summaryStatsRow
                     .padding(.horizontal, 16)
-                    .padding(.top, 12)
+                    .padding(.top, 10)
                 quickInfoStrip
-                    .padding(.top, 8)
+                    .padding(.top, 6)
 
                 // SECTION 1 — TODAY
                 sectionGroup("Today") {
@@ -120,10 +120,10 @@ struct ExerciseDetailView: View {
 
     @ViewBuilder
     private func sectionGroup<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 9) {
             HStack(spacing: 8) {
                 Text(title.uppercased())
-                    .font(.system(size: 11, weight: .black))
+                    .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(.secondary)
                 Rectangle()
@@ -132,12 +132,12 @@ struct ExerciseDetailView: View {
             }
             .padding(.horizontal, 16)
 
-            VStack(spacing: 10) {
+            VStack(spacing: 8) {
                 content()
             }
             .padding(.horizontal, 16)
         }
-        .padding(.top, 18)
+        .padding(.top, 14)
     }
 
     private var summaryStatsRow: some View {
@@ -170,7 +170,7 @@ struct ExerciseDetailView: View {
                 summaryStatCell(value: "0", label: "Sessions")
             }
         }
-        .padding(.vertical, 9)
+        .padding(.vertical, 8)
         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
     }
 

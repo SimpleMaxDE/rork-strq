@@ -36,9 +36,9 @@ struct SessionHistoryView: View {
                     emptyState
                         .padding(.top, 60)
                 } else {
-                    LazyVStack(spacing: 18, pinnedViews: []) {
+                    LazyVStack(spacing: 14, pinnedViews: []) {
                         ForEach(groupedSessions, id: \.0) { month, monthSessions in
-                            VStack(alignment: .leading, spacing: 10) {
+                            VStack(alignment: .leading, spacing: 8) {
                                 HStack {
                                     Text(month.uppercased())
                                         .font(.system(size: 10, weight: .black))
@@ -155,20 +155,20 @@ struct SessionHistoryView: View {
         let reps = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).reduce(0) { $0 + $1.reps }
         let hasPR = session.exerciseLogs.flatMap(\.sets).contains(where: \.isPR)
 
-        return HStack(spacing: 12) {
-            VStack(spacing: 1) {
+        return HStack(spacing: 10) {
+            VStack(spacing: 0) {
                 Text(session.startTime.formatted(.dateTime.day()))
-                    .font(.system(size: 18, weight: .heavy, design: .rounded).monospacedDigit())
+                    .font(.system(size: 16, weight: .heavy, design: .rounded).monospacedDigit())
                     .foregroundStyle(.white)
                 Text(session.startTime.formatted(.dateTime.weekday(.abbreviated)))
-                    .font(.system(size: 9, weight: .bold))
+                    .font(.system(size: 8, weight: .bold))
                     .foregroundStyle(.tertiary)
                     .textCase(.uppercase)
                     .tracking(0.3)
             }
-            .frame(width: 36)
+            .frame(width: 32)
 
-            Rectangle().fill(Color.white.opacity(0.06)).frame(width: 0.5, height: 36)
+            Rectangle().fill(Color.white.opacity(0.06)).frame(width: 0.5, height: 30)
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
@@ -209,8 +209,8 @@ struct SessionHistoryView: View {
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(.quaternary)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 9)
         .contentShape(.rect)
     }
 

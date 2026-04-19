@@ -31,25 +31,25 @@ struct ActiveWorkoutView: View {
                     progressStrip(workout)
 
                     ScrollView {
-                        VStack(spacing: 12) {
+                        VStack(spacing: 10) {
                             exerciseFocusHero(workout)
-                                .padding(.horizontal, 16)
-                                .padding(.top, 8)
+                                .padding(.horizontal, 14)
+                                .padding(.top, 4)
 
-                            VStack(spacing: 8) {
+                            VStack(spacing: 6) {
                                 activeSetCard(workout)
                                 setLogTable(workout)
                                 previousSessionTable(workout)
                             }
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal, 14)
 
                             exerciseActions(workout)
-                                .padding(.horizontal, 16)
+                                .padding(.horizontal, 14)
 
                             upNextPreview(workout)
-                                .padding(.horizontal, 16)
+                                .padding(.horizontal, 14)
                         }
-                        .padding(.bottom, 110)
+                        .padding(.bottom, 100)
                     }
                 }
 
@@ -132,9 +132,9 @@ struct ActiveWorkoutView: View {
                     .background(STRQBrand.accentGradient, in: Capsule())
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 38)
-        .padding(.bottom, 10)
+        .padding(.horizontal, 14)
+        .padding(.top, 30)
+        .padding(.bottom, 8)
     }
 
     private func progressStrip(_ workout: ActiveWorkoutState) -> some View {
@@ -178,14 +178,14 @@ struct ActiveWorkoutView: View {
                                     endPoint: .bottomTrailing
                                 )
                             )
-                            .frame(height: 76)
+                            .frame(height: 66)
 
-                        HStack(spacing: 12) {
+                        HStack(spacing: 11) {
                             Image(systemName: heroSymbol)
-                                .font(.system(size: 22, weight: .thin))
+                                .font(.system(size: 20, weight: .thin))
                                 .foregroundStyle(.white.opacity(0.9))
-                                .frame(width: 44, height: 44)
-                                .background(.white.opacity(0.1), in: .rect(cornerRadius: 10))
+                                .frame(width: 38, height: 38)
+                                .background(.white.opacity(0.1), in: .rect(cornerRadius: 9))
 
                             VStack(alignment: .leading, spacing: 3) {
                                 HStack(spacing: 6) {
@@ -412,17 +412,17 @@ struct ActiveWorkoutView: View {
                         .shadow(color: .white.opacity(0.12), radius: 10, y: 2)
                     }
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 13)
+                .padding(.horizontal, 13)
+                .padding(.vertical, 11)
                 .background(
                     LinearGradient(
                         colors: [Color.white.opacity(0.07), Color.white.opacity(0.03)],
                         startPoint: .topLeading, endPoint: .bottomTrailing
                     ),
-                    in: .rect(cornerRadius: 20)
+                    in: .rect(cornerRadius: 18)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: 18)
                         .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
                 )
             } else {
@@ -789,7 +789,7 @@ struct ActiveWorkoutView: View {
 
         return VStack(spacing: 0) {
             LinearGradient(colors: [Color.black.opacity(0), Color.black], startPoint: .top, endPoint: .bottom)
-                .frame(height: 50)
+                .frame(height: 40)
 
             Group {
                 if allDone {

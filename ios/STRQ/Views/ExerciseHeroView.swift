@@ -8,7 +8,7 @@ struct ExerciseHeroView: View {
     @State private var appeared: Bool = false
 
     private let mediaProvider = ExerciseMediaProvider.shared
-    private var height: CGFloat { compact ? 140 : 240 }
+    private var height: CGFloat { compact ? 120 : 200 }
     private var gradientColors: [Color] { mediaProvider.heroGradient(for: exercise) }
     private var heroSymbol: String { mediaProvider.heroSymbol(for: exercise) }
     private var media: ExerciseMedia { mediaProvider.media(for: exercise) }
