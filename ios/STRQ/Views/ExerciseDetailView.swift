@@ -30,8 +30,6 @@ struct ExerciseDetailView: View {
                 summaryStatsRow
                     .padding(.horizontal, 16)
                     .padding(.top, 18)
-                quickInfoStrip
-                    .padding(.top, 12)
 
                 // SECTION 1 — TODAY
                 sectionGroup("Today") {
@@ -84,6 +82,7 @@ struct ExerciseDetailView: View {
         }
         .background(Color(.systemBackground))
         .navigationTitle(exercise.name)
+        .toolbarTitleDisplayMode(.inline)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {

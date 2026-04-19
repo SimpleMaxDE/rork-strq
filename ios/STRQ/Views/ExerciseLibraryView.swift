@@ -67,14 +67,9 @@ struct ExerciseLibraryView: View {
             VStack(spacing: 0) {
                 if searchText.isEmpty && selectedWorld == nil && selectedMuscle == nil && !favoritesOnly {
                     libraryHero
-                    if !progressingExercises.isEmpty {
-                        progressingSection
+                    if !progressingExercises.isEmpty || !stalledExercises.isEmpty {
+                        yourExercisesSection
                     }
-                    if !stalledExercises.isEmpty {
-                        needsAttentionSection
-                    }
-                    exerciseFamiliesSection
-                    featuredSection
                 }
 
                 trainingWorldsSection
@@ -122,6 +117,106 @@ struct ExerciseLibraryView: View {
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 6)
         .animation(.easeOut(duration: 0.5), value: appeared)
+    }
+
+    @ViewBuilder
+    private var yourExercisesSection: some View {
+        let combined: [(Exercise, ExerciseProgressionState?)] =
+            progressingExercises.prefix(3).map { ex in (ex, vm.progressionStates.first(where: { $0.exerciseId == ex.id })) }
+            + stalledExercises.prefix(2).map { ex in (ex, vm.progressionStates.first(where: { $0.exerciseId == ex.id })) }
+
+        if !combined.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 8) {
+                    Text("YOUR EXERCISES")
+                        .font(.system(size: 10, weight: .black))
+                        .tracking(1.2)
+                        .foregroundStyle(.secondary)
+                    Rectangle()
+                        .fill(Color(.separator).opacity(0.4))
+                        .frame(height: 0.5)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+                .padding(.bottom, 10)
+
+                VStack(spacing: 0) {
+                    ForEach(Array(combined.enumerated()), id: \.offset) { idx, pair in
+                        yourExerciseRow(pair.0, progression: pair.1)
+                        if idx < combined.count - 1 {
+                            Rectangle()
+                                .fill(Color(.separator).opacity(0.3))
+                                .frame(height: 0.5)
+                                .padding(.leading, 52)
+                        }
+                    }
+                }
+                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+                .padding(.horizontal, 16)
+            }
+            .opacity(appeared ? 1 : 0)
+            .animation(.easeOut(duration: 0.5).delay(0.05), value: appeared)
+        }
+    }
+
+    private func yourExerciseRow(_ exercise: Exercise, progression: ExerciseProgressionState?) -> some View {
+        Button { selectedExercise = exercise } label: {
+            HStack(spacing: 12) {
+                Image(systemName: exercise.primaryMuscle.symbolName)
+                    .font(.system(size: 15))
+                    .foregroundStyle(STRQBrand.steel)
+                    .frame(width: 32, height: 32)
+                    .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 8))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(exercise.name)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                    HStack(spacing: 6) {
+                        Text(exercise.primaryMuscle.displayName)
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                        if let p = progression {
+                            Circle().fill(Color(.separator)).frame(width: 2, height: 2)
+                            Text("\(p.sessionCount) sessions")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                }
+                Spacer()
+                if let p = progression {
+                    let c = plateauStatusColor(p.plateauStatus)
+                    HStack(spacing: 4) {
+                        Image(systemName: p.plateauStatus.icon)
+                            .font(.system(size: 9, weight: .bold))
+                        Text(p.plateauStatus.displayName)
+                            .font(.system(size: 10, weight: .semibold))
+                    }
+                    .foregroundStyle(c)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(c.opacity(0.12), in: Capsule())
+                }
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.quaternary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func plateauStatusColor(_ status: PlateauStatus) -> Color {
+        switch status {
+        case .progressing: .green
+        case .stalling: .yellow
+        case .plateaued: STRQBrand.steel
+        case .regressing: .red
+        }
     }
 
     private func libraryStatColumn(value: String, label: String) -> some View {

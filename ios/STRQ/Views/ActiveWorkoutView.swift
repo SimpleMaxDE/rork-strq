@@ -38,7 +38,8 @@ struct ActiveWorkoutView: View {
 
                             VStack(spacing: 14) {
                                 activeSetCard(workout)
-                                remainingSetsStrip(workout)
+                                setLogTable(workout)
+                                previousSessionTable(workout)
                             }
                             .padding(.horizontal, 16)
 
@@ -323,8 +324,6 @@ struct ActiveWorkoutView: View {
                         }
                     }
 
-                    loggerComparisonRow(log: log, currentSet: setLog, exerciseIndex: exerciseIndex, workout: workout)
-
                     HStack(spacing: 14) {
                         let exerciseForIncrement = vm.library.exercise(byId: log.exerciseId)
                         let increment = weightIncrement(for: exerciseForIncrement)
@@ -464,107 +463,211 @@ struct ActiveWorkoutView: View {
         }
     }
 
-    // MARK: - Comparison Row
+    // MARK: - Set Log Table (Alpha-inspired precision table)
 
     @ViewBuilder
-    private func loggerComparisonRow(log: ExerciseLog, currentSet: SetLog, exerciseIndex: Int, workout: ActiveWorkoutState) -> some View {
-        let last = vm.lastPerformance(for: log.exerciseId)
-        let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
-        let targetReps = planned?.reps ?? "—"
-
-        HStack(spacing: 0) {
-            comparisonCell(
-                label: "LAST",
-                value: last.map { "\(formatWeight($0.topWeight, increment: 0.5))×\($0.topReps)" } ?? "—",
-                emphasis: false
-            )
-            comparisonDivider
-            comparisonCell(
-                label: "TARGET",
-                value: "\(targetReps) reps",
-                emphasis: false
-            )
-            comparisonDivider
-            comparisonCell(
-                label: "NOW",
-                value: "\(formatWeight(currentSet.weight, increment: 0.5))×\(currentSet.reps)",
-                emphasis: true
-            )
-        }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 4)
-        .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 10))
-    }
-
-    private func comparisonCell(label: String, value: String, emphasis: Bool) -> some View {
-        VStack(spacing: 3) {
-            Text(label)
-                .font(.system(size: 8, weight: .black))
-                .tracking(0.8)
-                .foregroundStyle(.white.opacity(emphasis ? 0.55 : 0.32))
-            Text(value)
-                .font(.system(size: 12, weight: .bold, design: .rounded).monospacedDigit())
-                .foregroundStyle(.white.opacity(emphasis ? 1.0 : 0.55))
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private var comparisonDivider: some View {
-        Rectangle()
-            .fill(Color.white.opacity(0.06))
-            .frame(width: 1, height: 22)
-    }
-
-    // MARK: - Remaining Sets Strip
-
-    @ViewBuilder
-    private func remainingSetsStrip(_ workout: ActiveWorkoutState) -> some View {
+    private func setLogTable(_ workout: ActiveWorkoutState) -> some View {
         let exerciseIndex = workout.currentExerciseIndex
         if exerciseIndex < workout.session.exerciseLogs.count {
             let log = workout.session.exerciseLogs[exerciseIndex]
+            let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
+            let targetReps = planned?.reps ?? "—"
 
-            HStack(spacing: 6) {
+            VStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    tableHeader("#", width: 28, alignment: .leading)
+                    tableHeader("KG")
+                    tableHeader("REPS")
+                    tableHeader("e1RM")
+                    Color.clear.frame(width: 32)
+                }
+                .padding(.horizontal, 14)
+                .padding(.top, 10)
+                .padding(.bottom, 6)
+
+                Rectangle().fill(Color.white.opacity(0.05)).frame(height: 0.5)
+
                 ForEach(Array(log.sets.enumerated()), id: \.element.id) { idx, setLog in
-                    let isActive = idx == workout.currentSetIndex && !setLog.isCompleted
-                    let isCompleted = setLog.isCompleted
-
-                    Button {
-                        if !isCompleted && !isActive {
-                            jumpToSet(exerciseIndex: exerciseIndex, setIndex: idx)
-                        }
-                    } label: {
-                        VStack(spacing: 3) {
-                            ZStack {
-                                Circle()
-                                    .fill(isCompleted ? Color.green : isActive ? Color.white : Color.white.opacity(0.08))
-                                    .frame(width: 32, height: 32)
-                                if isCompleted {
-                                    Image(systemName: "checkmark")
-                                        .font(.system(size: 10, weight: .bold))
-                                        .foregroundStyle(.black)
-                                } else {
-                                    Text("\(setLog.setNumber)")
-                                        .font(.caption2.weight(.bold).monospacedDigit())
-                                        .foregroundStyle(isActive ? .black : .secondary)
-                                }
-                            }
-                            if isCompleted && setLog.weight > 0 {
-                                Text("\(String(format: "%.0f", setLog.weight))×\(setLog.reps)")
-                                    .font(.system(size: 8, weight: .medium).monospacedDigit())
-                                    .foregroundStyle(.tertiary)
-                            }
-                        }
+                    let isActive = idx == workout.currentSetIndex && !setLog.isCompleted && !log.sets.prefix(idx).contains(where: { !$0.isCompleted })
+                    setLogRow(setLog: setLog, idx: idx, isActive: isActive, exerciseIndex: exerciseIndex, targetReps: targetReps)
+                    if idx < log.sets.count - 1 {
+                        Rectangle().fill(Color.white.opacity(0.04)).frame(height: 0.5).padding(.leading, 14)
                     }
-                    .disabled(isCompleted)
-                    .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.vertical, 10)
-            .padding(.horizontal, 12)
-            .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 14))
+            .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+            )
         }
+    }
+
+    private func tableHeader(_ text: String, width: CGFloat? = nil, alignment: Alignment = .center) -> some View {
+        Text(text)
+            .font(.system(size: 9, weight: .black))
+            .tracking(1.0)
+            .foregroundStyle(.white.opacity(0.35))
+            .frame(maxWidth: width == nil ? .infinity : nil, alignment: alignment)
+            .frame(width: width)
+    }
+
+    @ViewBuilder
+    private func setLogRow(setLog: SetLog, idx: Int, isActive: Bool, exerciseIndex: Int, targetReps: String) -> some View {
+        let completed = setLog.isCompleted
+        let e1rm = estimatedOneRM(weight: setLog.weight, reps: setLog.reps)
+        let rowOpacity: Double = completed ? 0.85 : (isActive ? 1.0 : 0.45)
+
+        Button {
+            if !completed && !isActive {
+                jumpToSet(exerciseIndex: exerciseIndex, setIndex: idx)
+            }
+        } label: {
+            HStack(spacing: 0) {
+                Text("\(setLog.setNumber)")
+                    .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
+                    .foregroundStyle(isActive ? STRQBrand.steel : .white.opacity(0.55))
+                    .frame(width: 28, alignment: .leading)
+
+                Text(completed || setLog.weight > 0 ? formatWeight(setLog.weight, increment: 0.5) : "—")
+                    .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                    .foregroundStyle(.white.opacity(rowOpacity))
+                    .frame(maxWidth: .infinity)
+
+                Text(completed || setLog.reps > 0 ? "\(setLog.reps)" : targetReps)
+                    .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                    .foregroundStyle(.white.opacity(rowOpacity))
+                    .frame(maxWidth: .infinity)
+
+                Text(e1rm > 0 ? String(format: "%.1f", e1rm) : "—")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded).monospacedDigit())
+                    .foregroundStyle(.white.opacity(completed ? 0.55 : 0.3))
+                    .frame(maxWidth: .infinity)
+
+                ZStack {
+                    if completed {
+                        Circle().fill(Color.green).frame(width: 22, height: 22)
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(.black)
+                    } else if isActive {
+                        Circle().strokeBorder(Color.white.opacity(0.5), lineWidth: 1.2).frame(width: 22, height: 22)
+                    } else {
+                        Circle().fill(Color.white.opacity(0.06)).frame(width: 22, height: 22)
+                    }
+                }
+                .frame(width: 32)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+            .background(isActive ? Color.white.opacity(0.04) : Color.clear)
+        }
+        .buttonStyle(.plain)
+        .disabled(completed)
+    }
+
+    // MARK: - Previous Session Table
+
+    @ViewBuilder
+    private func previousSessionTable(_ workout: ActiveWorkoutState) -> some View {
+        let exerciseIndex = workout.currentExerciseIndex
+        if exerciseIndex < workout.session.exerciseLogs.count {
+            let log = workout.session.exerciseLogs[exerciseIndex]
+            if let prev = previousSessionLog(for: log.exerciseId) {
+                let completedSets = prev.session.exerciseLogs.first(where: { $0.exerciseId == log.exerciseId })?.sets.filter(\.isCompleted) ?? []
+                if !completedSets.isEmpty {
+                    VStack(spacing: 0) {
+                        HStack(spacing: 6) {
+                            Text("LAST SESSION")
+                                .font(.system(size: 9, weight: .black))
+                                .tracking(1.2)
+                                .foregroundStyle(.white.opacity(0.45))
+                            Text("·")
+                                .foregroundStyle(.white.opacity(0.25))
+                            Text(formatRelativeDate(prev.session.startTime))
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.45))
+                            Spacer()
+                            Text(prev.session.dayName)
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.35))
+                                .lineLimit(1)
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.top, 10)
+                        .padding(.bottom, 8)
+
+                        Rectangle().fill(Color.white.opacity(0.04)).frame(height: 0.5)
+
+                        HStack(spacing: 0) {
+                            tableHeader("#", width: 28, alignment: .leading)
+                            tableHeader("KG")
+                            tableHeader("REPS")
+                            tableHeader("e1RM")
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.top, 8)
+                        .padding(.bottom, 4)
+
+                        ForEach(Array(completedSets.enumerated()), id: \.element.id) { _, s in
+                            HStack(spacing: 0) {
+                                Text("\(s.setNumber)")
+                                    .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
+                                    .foregroundStyle(.white.opacity(0.35))
+                                    .frame(width: 28, alignment: .leading)
+                                Text(formatWeight(s.weight, increment: 0.5))
+                                    .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
+                                    .foregroundStyle(.white.opacity(0.5))
+                                    .frame(maxWidth: .infinity)
+                                Text("\(s.reps)")
+                                    .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
+                                    .foregroundStyle(.white.opacity(0.5))
+                                    .frame(maxWidth: .infinity)
+                                Text(String(format: "%.1f", estimatedOneRM(weight: s.weight, reps: s.reps)))
+                                    .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
+                                    .foregroundStyle(.white.opacity(0.4))
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 5)
+                        }
+                    }
+                    .padding(.bottom, 10)
+                    .background(Color.white.opacity(0.02), in: .rect(cornerRadius: 12))
+                }
+            }
+        }
+    }
+
+    private struct PreviousSessionRef {
+        let session: WorkoutSession
+    }
+
+    private func previousSessionLog(for exerciseId: String) -> PreviousSessionRef? {
+        for session in vm.workoutHistory where session.isCompleted {
+            if let log = session.exerciseLogs.first(where: { $0.exerciseId == exerciseId }), log.sets.contains(where: { $0.isCompleted }) {
+                return PreviousSessionRef(session: session)
+            }
+        }
+        return nil
+    }
+
+    private func estimatedOneRM(weight: Double, reps: Int) -> Double {
+        guard weight > 0, reps > 0 else { return 0 }
+        if reps == 1 { return weight }
+        // Epley
+        return weight * (1.0 + Double(reps) / 30.0)
+    }
+
+    private func formatRelativeDate(_ date: Date) -> String {
+        let days = Calendar.current.dateComponents([.day], from: date, to: Date()).day ?? 0
+        if days <= 0 { return "today" }
+        if days == 1 { return "yesterday" }
+        if days < 7 { return "\(days)d ago" }
+        if days < 30 { return "\(days / 7)w ago" }
+        let f = DateFormatter()
+        f.dateFormat = "d MMM"
+        return f.string(from: date)
     }
 
     // MARK: - Exercise Actions
