@@ -40,6 +40,12 @@ struct STRQApp: App {
                         UserDefaults.standard.set(true, forKey: "strq_has_launched_before")
                         isFirstLaunch = false
                     }
+                    WatchConnectivityService.shared.vm = vm
+                    WatchConnectivityService.shared.activate()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: .watchWorkoutAction)) { note in
+                    guard let info = note.userInfo, let action = info["action"] as? String else { return }
+                    vm.handleWatchAction(action, payload: info["payload"] as? [String: Any] ?? [:])
                 }
         }
         .onChange(of: scenePhase) { _, phase in

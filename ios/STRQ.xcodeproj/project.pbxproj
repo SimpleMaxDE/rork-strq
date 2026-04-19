@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		XX298127CFBB2CF3FA631BXX /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = XXDCC169DE7B2F3C1C8B10XX /* RevenueCat */; };
 		XX5FBFA462C5DE5C3E750DXX /* STRQWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = XXC14A59B473A9FEE6F8FEXX /* STRQWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		XX8451EF78AEA171966CE9XX /* STRQWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = XXCFEF158FDFEC6E487025XX /* STRQWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,6 +26,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 105FC5792E9EAD3100EA8BCF;
 			remoteInfo = STRQ;
+		};
+		XXB5DEC4BDFCC3933AF809XX /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 105FC5722E9EAD3100EA8BCF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = XX2044DAD7C2C197A8FE84XX;
+			remoteInfo = STRQWatch;
 		};
 		XXBAEBCEE2FDBAC23DCBB9XX /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -47,6 +55,17 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		XXD2322832C53152E4F134XX /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				XX8451EF78AEA171966CE9XX /* STRQWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +73,7 @@
 		105FC5892E9EAD3200EA8BCF /* STRQTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = STRQTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		105FC5932E9EAD3200EA8BCF /* STRQUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = STRQUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		XXC14A59B473A9FEE6F8FEXX /* STRQWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = STRQWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		XXCFEF158FDFEC6E487025XX /* STRQWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = STRQWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -67,17 +87,24 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		XX88195F5A75E2A60C49E7XX /* STRQWidget */ = {
+		105FC57C2E9EAD3100EA8BCF /* STRQ */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = STRQWidget;
+			path = STRQ;
 			sourceTree = "<group>";
-			exceptions = (
-				XX69A5D956E301F44ABA23XX /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
-			);
 		};
-		XX88195F5A75E2A60C49E8XX /* STRQShared */ = {
+		105FC58C2E9EAD3200EA8BCF /* STRQTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = STRQShared;
+			path = STRQTests;
+			sourceTree = "<group>";
+		};
+		105FC5962E9EAD3200EA8BCF /* STRQUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = STRQUITests;
+			sourceTree = "<group>";
+		};
+		XX81B968EFAE5F96409E05XX /* STRQWatch */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = STRQWatch;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -105,6 +132,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		XX28A9A27FCA465D91AA27XX /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		XX75B8358D2242CEB782C5XX /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -115,19 +149,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		105FC57C2E9EAD3100EA8BCF /* STRQ */ = {
+		XX88195F5A75E2A60C49E7XX /* STRQWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = STRQ;
+			path = STRQWidget;
 			sourceTree = "<group>";
+			exceptions = (
+				XX69A5D956E301F44ABA23XX /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
 		};
-		105FC58C2E9EAD3200EA8BCF /* STRQTests */ = {
+		XX88195F5A75E2A60C49E8XX /* STRQShared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = STRQTests;
-			sourceTree = "<group>";
-		};
-		105FC5962E9EAD3200EA8BCF /* STRQUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = STRQUITests;
+			path = STRQShared;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -142,6 +174,7 @@
 				105FC57B2E9EAD3100EA8BCF /* Products */,
 				XX88195F5A75E2A60C49E7XX /* STRQWidget */,
 				XX88195F5A75E2A60C49E8XX /* STRQShared */,
+				XX81B968EFAE5F96409E05XX /* STRQWatch */,
 			);
 			sourceTree = "<group>";
 		};
@@ -152,6 +185,7 @@
 				105FC5892E9EAD3200EA8BCF /* STRQTests.xctest */,
 				105FC5932E9EAD3200EA8BCF /* STRQUITests.xctest */,
 				XXC14A59B473A9FEE6F8FEXX /* STRQWidget.appex */,
+				XXCFEF158FDFEC6E487025XX /* STRQWatch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -167,11 +201,13 @@
 				105FC5772E9EAD3100EA8BCF /* Frameworks */,
 				105FC5782E9EAD3100EA8BCF /* Resources */,
 				XX45B9C72CCD9F4745C22AXX /* Embed Foundation Extensions */,
+				XXD2322832C53152E4F134XX /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				XX990DC7F40C522AA04848XX /* PBXTargetDependency */,
+				XXC1ED917C41DA561862F7XX /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				105FC57C2E9EAD3100EA8BCF /* STRQ */,
@@ -230,6 +266,26 @@
 			productName = STRQUITests;
 			productReference = 105FC5932E9EAD3200EA8BCF /* STRQUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		XX2044DAD7C2C197A8FE84XX /* STRQWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = XXB9B4D9CD098ED7BF04D6XX /* Build configuration list for PBXNativeTarget "STRQWatch" */;
+			buildPhases = (
+				XX178B45C53EB340DB4155XX /* Sources */,
+				XX28A9A27FCA465D91AA27XX /* Frameworks */,
+				XX4FEB6E8356710642DD83XX /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = STRQWatch;
+			productName = STRQWatch;
+			productReference = XXCFEF158FDFEC6E487025XX /* STRQWatch.app */;
+			productType = "com.apple.product-type.application";
+			fileSystemSynchronizedGroups = (
+				XX81B968EFAE5F96409E05XX /* STRQWatch */,
+			);
 		};
 		XXA976FC0EF4851E751927XX /* STRQWidget */ = {
 			isa = PBXNativeTarget;
@@ -295,6 +351,7 @@
 				105FC5882E9EAD3200EA8BCF /* STRQTests */,
 				105FC5922E9EAD3200EA8BCF /* STRQUITests */,
 				XXA976FC0EF4851E751927XX /* STRQWidget */,
+				XX2044DAD7C2C197A8FE84XX /* STRQWatch */,
 			);
 			packageReferences = (
 				XX4AC81916604C4344ADC0XX /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
@@ -318,6 +375,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		105FC5912E9EAD3200EA8BCF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		XX4FEB6E8356710642DD83XX /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -355,6 +419,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		XX178B45C53EB340DB4155XX /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		XXE0FD6AFA7551401BFCEBXX /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -379,6 +450,11 @@
 			isa = PBXTargetDependency;
 			target = XXA976FC0EF4851E751927XX /* STRQWidget */;
 			targetProxy = XXBAEBCEE2FDBAC23DCBB9XX /* PBXContainerItemProxy */;
+		};
+		XXC1ED917C41DA561862F7XX /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = XX2044DAD7C2C197A8FE84XX /* STRQWatch */;
+			targetProxy = XXB5DEC4BDFCC3933AF809XX /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -685,6 +761,34 @@
 			};
 			name = Debug;
 		};
+		XX2A79CA4C482CC5CBDC1BXX /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.40gfu7dywfru7n82xfoy4.strqwatch;
+				PRODUCT_NAME = STRQWatch;
+				SWIFT_VERSION = 5.0;
+				SDKROOT = watchos;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				GENERATE_INFOPLIST_FILE = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				TARGETED_DEVICE_FAMILY = 4;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				ENABLE_PREVIEWS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = app.rork.40gfu7dywfru7n82xfoy4;
+			};
+			name = Release;
+		};
 		XX71FFDAAC2DBE3D5C91C4XX /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -707,6 +811,34 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
 			};
 			name = Release;
+		};
+		XX8F196DF3377B747A8434XX /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_BUNDLE_IDENTIFIER = app.rork.40gfu7dywfru7n82xfoy4.strqwatch;
+				PRODUCT_NAME = STRQWatch;
+				SWIFT_VERSION = 5.0;
+				SDKROOT = watchos;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				GENERATE_INFOPLIST_FILE = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				TARGETED_DEVICE_FAMILY = 4;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				ENABLE_PREVIEWS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = app.rork.40gfu7dywfru7n82xfoy4;
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
@@ -752,6 +884,15 @@
 			buildConfigurations = (
 				XX2475832EC602F83F2D70XX /* Debug */,
 				XX71FFDAAC2DBE3D5C91C4XX /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		XXB9B4D9CD098ED7BF04D6XX /* Build configuration list for PBXNativeTarget "STRQWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				XX8F196DF3377B747A8434XX /* Debug */,
+				XX2A79CA4C482CC5CBDC1BXX /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
