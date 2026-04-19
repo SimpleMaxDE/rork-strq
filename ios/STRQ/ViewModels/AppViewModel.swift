@@ -86,14 +86,6 @@ class AppViewModel {
 
     init() {
         self.profile = UserProfile()
-        self._coachingCoordinator = nil
-        defer {
-            self._coachingCoordinator = CoachingCoordinator(vm: self)
-            self._nutritionCoordinator = NutritionPhysiqueCoordinator(vm: self)
-            self._dailyStateCoordinator = DailyStateCoordinator(vm: self)
-            self._continuityCoordinator = ContinuityCoordinator(vm: self)
-            self._reminderWidgetCoordinator = ReminderWidgetCoordinator(vm: self)
-        }
         self.currentPlan = nil
         self.workoutHistory = []
         self.personalRecords = []
@@ -101,6 +93,13 @@ class AppViewModel {
         self.recommendations = []
         self.favoriteExerciseIds = []
         self.activeWorkout = nil
+        self.hasCompletedOnboarding = false
+
+        self._coachingCoordinator = CoachingCoordinator(vm: self)
+        self._nutritionCoordinator = NutritionPhysiqueCoordinator(vm: self)
+        self._dailyStateCoordinator = DailyStateCoordinator(vm: self)
+        self._continuityCoordinator = ContinuityCoordinator(vm: self)
+        self._reminderWidgetCoordinator = ReminderWidgetCoordinator(vm: self)
 
         let legacyOnboardingFlag = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
 
