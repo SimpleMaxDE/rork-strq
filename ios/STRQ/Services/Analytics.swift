@@ -121,6 +121,7 @@ nonisolated enum AnalyticsEvent: String {
     case workout_skipped
     case workout_unskipped
     case auto_schedule_used
+    case plan_edited
 
     // Subscription
     case paywall_viewed

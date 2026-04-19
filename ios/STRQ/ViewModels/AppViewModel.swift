@@ -914,6 +914,105 @@ class AppViewModel {
         }
     }
 
+    // MARK: - Plan Editing (User Control)
+
+    /// Reorder exercises within a day.
+    func reorderExercises(dayId: String, from source: IndexSet, to destination: Int) {
+        guard var plan = currentPlan,
+              let dayIdx = plan.days.firstIndex(where: { $0.id == dayId }) else { return }
+        plan.days[dayIdx].exercises.move(fromOffsets: source, toOffset: destination)
+        for i in plan.days[dayIdx].exercises.indices {
+            plan.days[dayIdx].exercises[i].order = i
+        }
+        currentPlan = plan
+        persist()
+        Analytics.shared.track(.plan_edited, ["action": "reorder", "day_id": dayId])
+    }
+
+    /// Remove a planned exercise from a day.
+    func removePlannedExercise(dayId: String, plannedId: String) {
+        guard var plan = currentPlan,
+              let dayIdx = plan.days.firstIndex(where: { $0.id == dayId }) else { return }
+        plan.days[dayIdx].exercises.removeAll { $0.id == plannedId }
+        for i in plan.days[dayIdx].exercises.indices {
+            plan.days[dayIdx].exercises[i].order = i
+        }
+        currentPlan = plan
+        persist()
+        Analytics.shared.track(.plan_edited, ["action": "remove", "day_id": dayId])
+    }
+
+    /// Add a new exercise to a day. Uses sensible defaults based on category.
+    func addExercise(dayId: String, exercise: Exercise) {
+        guard var plan = currentPlan,
+              let dayIdx = plan.days.firstIndex(where: { $0.id == dayId }) else { return }
+        let isCompound = exercise.category == .compound
+        let isWarmup = exercise.category == .warmup || exercise.category == .mobility
+        let defaults: (sets: Int, reps: String, rest: Int, rpe: Double?) = {
+            if isWarmup { return (2, "10-12", 45, nil) }
+            if isCompound {
+                switch profile.goal {
+                case .strength: return (4, "4-6", 180, 8.0)
+                case .muscleGain: return (4, "6-10", 120, 8.0)
+                case .fatLoss: return (3, "8-12", 90, 7.5)
+                case .endurance: return (3, "12-15", 75, 7.0)
+                default: return (3, "8-10", 120, 7.5)
+                }
+            } else {
+                switch profile.goal {
+                case .strength: return (3, "6-8", 90, 8.0)
+                case .muscleGain: return (3, "10-12", 75, 8.5)
+                case .fatLoss: return (3, "12-15", 60, 8.0)
+                case .endurance: return (3, "15-20", 45, 7.5)
+                default: return (3, "10-12", 75, 8.0)
+                }
+            }
+        }()
+        let order = plan.days[dayIdx].exercises.count
+        let new = PlannedExercise(
+            exerciseId: exercise.id,
+            sets: defaults.sets,
+            reps: defaults.reps,
+            restSeconds: defaults.rest,
+            rpe: defaults.rpe,
+            notes: "",
+            order: order
+        )
+        plan.days[dayIdx].exercises.append(new)
+        currentPlan = plan
+        persist()
+        Analytics.shared.track(.plan_edited, ["action": "add", "day_id": dayId, "exercise": exercise.id])
+    }
+
+    /// Update prescription values for a planned exercise.
+    func updatePrescription(
+        dayId: String,
+        plannedId: String,
+        sets: Int? = nil,
+        reps: String? = nil,
+        restSeconds: Int? = nil,
+        rpe: Double?? = nil
+    ) {
+        guard var plan = currentPlan,
+              let dayIdx = plan.days.firstIndex(where: { $0.id == dayId }),
+              let exIdx = plan.days[dayIdx].exercises.firstIndex(where: { $0.id == plannedId }) else { return }
+        if let sets { plan.days[dayIdx].exercises[exIdx].sets = max(1, min(10, sets)) }
+        if let reps, !reps.isEmpty { plan.days[dayIdx].exercises[exIdx].reps = reps }
+        if let restSeconds { plan.days[dayIdx].exercises[exIdx].restSeconds = max(15, min(600, restSeconds)) }
+        if let rpe { plan.days[dayIdx].exercises[exIdx].rpe = rpe }
+        currentPlan = plan
+        persist()
+        Analytics.shared.track(.plan_edited, ["action": "prescription", "day_id": dayId])
+    }
+
+    /// True when the user has manually customized exercises for this day
+    /// beyond the coach's default structure (approximate: any non-zero
+    /// coach adjustment not applied implies original ordering).
+    func isAnchorExercise(_ planned: PlannedExercise, in day: WorkoutDay, index: Int) -> Bool {
+        guard let ex = library.exercise(byId: planned.exerciseId) else { return false }
+        return ex.category == .compound && index < 2
+    }
+
     func undoAdjustment(_ adjustment: CoachAdjustment) {
         Analytics.shared.track(.coach_action_undone, ["type": String(describing: adjustment.type)])
         if adjustment.type == .weekRegenerated || adjustment.type == .deloadWeek {

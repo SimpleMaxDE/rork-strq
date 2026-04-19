@@ -9,6 +9,7 @@ struct TrainingPlanView: View {
     @State private var appeared: Bool = false
     @State private var showScheduleEditor: Bool = false
     @State private var selectedPrescriptionIndex: Int?
+    @State private var showSessionEditor: Bool = false
 
     var body: some View {
         ScrollView {
@@ -29,16 +30,32 @@ struct TrainingPlanView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 12) {
-                    Button { showScheduleEditor = true } label: {
-                        Image(systemName: "calendar.badge.clock").font(.body)
+                Menu {
+                    if let plan = vm.currentPlan, selectedDayIndex < plan.days.count {
+                        Button {
+                            showSessionEditor = true
+                        } label: {
+                            Label("Edit Session", systemImage: "slider.horizontal.3")
+                        }
                     }
-                    Button { showLibrary = true } label: {
-                        Image(systemName: "books.vertical.fill").font(.body)
+                    Button {
+                        showScheduleEditor = true
+                    } label: {
+                        Label("Schedule", systemImage: "calendar.badge.clock")
                     }
-                    Button { vm.generatePlan() } label: {
-                        Image(systemName: "arrow.triangle.2.circlepath").font(.body)
+                    Button {
+                        showLibrary = true
+                    } label: {
+                        Label("Exercise Library", systemImage: "books.vertical.fill")
                     }
+                    Divider()
+                    Button {
+                        vm.generatePlan()
+                    } label: {
+                        Label("Regenerate Plan", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle").font(.body)
                 }
             }
         }
@@ -55,6 +72,13 @@ struct TrainingPlanView: View {
             }
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showSessionEditor) {
+            if let plan = vm.currentPlan, selectedDayIndex < plan.days.count {
+                SessionEditorSheet(vm: vm, dayId: plan.days[selectedDayIndex].id)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+            }
         }
         .sheet(isPresented: $showScheduleEditor) {
             ScheduleEditorSheet(vm: vm)
