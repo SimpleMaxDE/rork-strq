@@ -241,7 +241,7 @@ struct TrainingPlanView: View {
             let day = plan.days[selectedDayIndex]
             let briefing = vm.sessionBriefing(for: day)
 
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 missionCard(day: day, briefing: briefing)
                     .padding(.horizontal, 16)
 
@@ -264,10 +264,10 @@ struct TrainingPlanView: View {
                         vm.prepareWorkoutHandoff(day: day)
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 4)
+                    .padding(.top, 6)
                 }
             }
-            .padding(.top, 16)
+            .padding(.top, 20)
         }
     }
 
@@ -366,7 +366,7 @@ struct TrainingPlanView: View {
     // MARK: - Exercise Stack
 
     private func exerciseStack(day: WorkoutDay) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 8) {
             ForEach(Array(day.exercises.enumerated()), id: \.element.id) { index, planned in
                 exerciseRow(planned, index: index, day: day)
             }
@@ -457,7 +457,7 @@ struct TrainingPlanView: View {
                     .foregroundStyle(.quaternary)
             }
             .padding(.horizontal, 14)
-            .padding(.vertical, 10)
+            .padding(.vertical, 12)
             .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)

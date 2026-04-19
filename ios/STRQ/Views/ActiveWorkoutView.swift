@@ -132,8 +132,8 @@ struct ActiveWorkoutView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 26)
-        .padding(.bottom, 16)
+        .padding(.top, 34)
+        .padding(.bottom, 18)
     }
 
     private func progressStrip(_ workout: ActiveWorkoutState) -> some View {
@@ -315,7 +315,7 @@ struct ActiveWorkoutView: View {
                         }
                     }
 
-                    HStack(spacing: 24) {
+                    HStack(spacing: 14) {
                         let exerciseForIncrement = vm.library.exercise(byId: log.exerciseId)
                         let increment = weightIncrement(for: exerciseForIncrement)
                         let isBodyweight = exerciseForIncrement?.category == .bodyweight || (exerciseForIncrement?.isBodyweight ?? false)
@@ -335,14 +335,16 @@ struct ActiveWorkoutView: View {
                                     Image(systemName: "minus")
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 44, height: 56)
+                                        .frame(width: 38, height: 56)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
                                 }
                                 .disabled(isBodyweight && setLog.weight <= 0)
 
                                 Text(isBodyweight && setLog.weight <= 0 ? "BW" : formatWeight(setLog.weight, increment: increment))
-                                    .font(.system(size: 48, weight: .heavy, design: .rounded).monospacedDigit())
-                                    .frame(minWidth: 96)
+                                    .font(.system(size: 42, weight: .heavy, design: .rounded).monospacedDigit())
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                                    .frame(maxWidth: .infinity)
                                     .contentTransition(.numericText())
 
                                 Button {
@@ -353,7 +355,7 @@ struct ActiveWorkoutView: View {
                                     Image(systemName: "plus")
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 44, height: 56)
+                                        .frame(width: 38, height: 56)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
                                 }
                             }
@@ -379,20 +381,23 @@ struct ActiveWorkoutView: View {
                                     Image(systemName: "minus")
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 44, height: 56)
+                                        .frame(width: 38, height: 56)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
                                 }
 
                                 Text("\(setLog.reps)")
-                                    .font(.system(size: 48, weight: .heavy, design: .rounded).monospacedDigit())
-                                    .frame(minWidth: 60)
+                                    .font(.system(size: 42, weight: .heavy, design: .rounded).monospacedDigit())
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: .infinity)
                                     .contentTransition(.numericText())
 
                                 Button { updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight, reps: setLog.reps + 1) } label: {
                                     Image(systemName: "plus")
                                         .font(.system(size: 14, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 44, height: 56)
+                                        .frame(width: 38, height: 56)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
                                 }
                             }
@@ -420,7 +425,8 @@ struct ActiveWorkoutView: View {
                         .shadow(color: .white.opacity(0.15), radius: 14, y: 3)
                     }
                 }
-                .padding(22)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 22)
                 .background(
                     LinearGradient(
                         colors: [Color.white.opacity(0.07), Color.white.opacity(0.03)],
