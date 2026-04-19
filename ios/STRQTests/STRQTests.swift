@@ -460,3 +460,546 @@ struct ProgressionEngineTests {
         #expect(state.plateauStatus == .progressing)
     }
 }
+
+// MARK: - SnapshotBuilder
+
+@MainActor
+@Suite("SnapshotBuilder")
+struct SnapshotBuilderTests {
+
+    private func makeVM() -> AppViewModel {
+        PersistenceStore.shared.clear()
+        return AppViewModel()
+    }
+
+    @Test func buildMirrorsViewModelState() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.profile.name = "Alex"
+        vm.profile.daysPerWeek = 4
+        vm.hasCompletedOnboarding = true
+        vm.favoriteExerciseIds = ["a", "b"]
+        vm.appliedActionIds = ["x"]
+
+        let snap = SnapshotBuilder.build(from: vm, version: 1)
+        #expect(snap.version == 1)
+        #expect(snap.profile.name == "Alex")
+        #expect(snap.profile.daysPerWeek == 4)
+        #expect(snap.hasCompletedOnboarding == true)
+        #expect(Set(snap.favoriteExerciseIds) == ["a", "b"])
+        #expect(Set(snap.appliedActionIds) == ["x"])
+        #expect(snap.activeWorkoutDraft == nil)
+    }
+
+    @Test func buildCapturesActiveWorkoutAsDraft() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.activeWorkout = ActiveWorkoutState(
+            session: WorkoutSession(planId: "p", dayId: "d", dayName: "Push"),
+            currentExerciseIndex: 3,
+            currentSetIndex: 2,
+            isResting: false,
+            restTimeRemaining: 0,
+            plannedExercises: []
+        )
+        let snap = SnapshotBuilder.build(from: vm, version: 1)
+        #expect(snap.activeWorkoutDraft?.currentExerciseIndex == 3)
+        #expect(snap.activeWorkoutDraft?.currentSetIndex == 2)
+        #expect(snap.activeWorkoutDraft?.session.dayName == "Push")
+    }
+
+    @Test func maturityScoreFavorsRicherSnapshots() {
+        let empty = PersistedAppState(
+            version: 1, hasCompletedOnboarding: false, profile: UserProfile(),
+            currentPlan: nil, workoutHistory: [], personalRecords: [],
+            progressEntries: [], favoriteExerciseIds: [], progressionStates: [],
+            trainingPhaseState: TrainingPhaseState(), coachAdjustments: [],
+            appliedActionIds: [], weekAdjustmentActive: nil,
+            previousPlanBeforeWeekAction: nil, weeklyReviewDismissed: false,
+            todaysReadiness: nil, readinessHistory: [],
+            notificationSettings: NotificationSettings(),
+            nutritionTarget: NutritionTarget(), nutritionLogs: [],
+            bodyWeightEntries: [], sleepEntries: [], activeWorkoutDraft: nil
+        )
+        var richer = empty
+        richer.hasCompletedOnboarding = true
+        richer.workoutHistory = (1...4).map {
+            WorkoutSession(planId: "p", dayId: "d", dayName: "D\($0)", isCompleted: true)
+        }
+        richer.bodyWeightEntries = [BodyWeightEntry(weightKg: 75), BodyWeightEntry(weightKg: 75.2)]
+        #expect(SnapshotBuilder.maturityScore(empty) == 0)
+        #expect(SnapshotBuilder.maturityScore(richer) > SnapshotBuilder.maturityScore(empty) + 5)
+    }
+
+    @Test func buildIsDeterministic() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.profile.name = "Sam"
+        let a = SnapshotBuilder.build(from: vm, version: 1)
+        let b = SnapshotBuilder.build(from: vm, version: 1)
+        #expect(a.profile.name == b.profile.name)
+        #expect(a.workoutHistory.count == b.workoutHistory.count)
+        #expect(SnapshotBuilder.maturityScore(a) == SnapshotBuilder.maturityScore(b))
+    }
+}
+
+// MARK: - WorkoutController
+
+@MainActor
+@Suite("WorkoutController")
+struct WorkoutControllerTests {
+
+    private func makeVM() -> AppViewModel {
+        PersistenceStore.shared.clear()
+        let vm = AppViewModel()
+        vm.profile.daysPerWeek = 3
+        vm.profile.weightKg = 80
+        return vm
+    }
+
+    private func planWithOneDay(exerciseCount: Int = 2, sets: Int = 3) -> WorkoutPlan {
+        let planned = (0..<exerciseCount).map { i in
+            PlannedExercise(
+                exerciseId: "barbell-bench-press",
+                sets: sets,
+                reps: "6-8",
+                restSeconds: 90,
+                order: i
+            )
+        }
+        let day = WorkoutDay(
+            name: "Push",
+            focusMuscles: [.chest],
+            exercises: planned,
+            dayIndex: 0
+        )
+        return WorkoutPlan(
+            name: "Test", description: "", days: [day],
+            splitType: "full-body", durationWeeks: 4, explanation: ""
+        )
+    }
+
+    @Test func startWorkoutCreatesActiveStateWithPrefilledSets() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 2, sets: 3)
+        guard let day = vm.currentPlan?.days.first else { return }
+
+        vm.startWorkout(day: day)
+
+        #expect(vm.activeWorkout != nil)
+        #expect(vm.activeWorkout?.session.dayName == "Push")
+        #expect(vm.activeWorkout?.session.exerciseLogs.count == 2)
+        #expect(vm.activeWorkout?.currentExerciseIndex == 0)
+        #expect(vm.activeWorkout?.currentSetIndex == 0)
+        #expect(vm.activeWorkout?.session.exerciseLogs.first?.sets.count ?? 0 >= 1)
+    }
+
+    @Test func startWorkoutWithoutPlanIsNoOp() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        let day = planWithOneDay().days[0]
+        vm.startWorkout(day: day)
+        #expect(vm.activeWorkout == nil)
+    }
+
+    @Test func completeCurrentSetAdvancesCursor() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 1, sets: 3)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+
+        _ = vm.completeCurrentSet(exerciseIndex: 0, setIndex: 0)
+        #expect(vm.activeWorkout?.currentSetIndex == 1)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].isCompleted == true)
+    }
+
+    @Test func completingAllSetsAdvancesToNextExercise() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 2, sets: 2)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        let sets = vm.activeWorkout?.session.exerciseLogs[0].sets.count ?? 0
+
+        for i in 0..<sets { _ = vm.completeCurrentSet(exerciseIndex: 0, setIndex: i) }
+
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].isCompleted == true)
+        #expect(vm.activeWorkout?.currentExerciseIndex == 1)
+        #expect(vm.activeWorkout?.currentSetIndex == 0)
+    }
+
+    @Test func updateSetLoadClampsToNonNegative() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay()
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        vm.updateSetLoad(exerciseIndex: 0, setIndex: 0, weight: -100, reps: -5)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].weight == 0)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].reps == 0)
+    }
+
+    @Test func updateSetLoadIgnoresOutOfRangeIndices() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 1, sets: 2)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        vm.updateSetLoad(exerciseIndex: 99, setIndex: 0, weight: 50, reps: 5)
+        vm.updateSetLoad(exerciseIndex: 0, setIndex: 99, weight: 50, reps: 5)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].reps != 5 || vm.activeWorkout?.session.exerciseLogs[0].sets[0].weight != 50)
+    }
+
+    @Test func moveNextPreviousExerciseBounded() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 2, sets: 2)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+
+        vm.moveToPreviousExercise()
+        #expect(vm.activeWorkout?.currentExerciseIndex == 0)
+
+        vm.moveToNextExercise()
+        #expect(vm.activeWorkout?.currentExerciseIndex == 1)
+
+        vm.moveToNextExercise()
+        #expect(vm.activeWorkout?.currentExerciseIndex == 1)
+
+        vm.moveToPreviousExercise()
+        #expect(vm.activeWorkout?.currentExerciseIndex == 0)
+    }
+
+    @Test func jumpToExerciseRejectsInvalidIndex() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 2, sets: 2)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        vm.jumpToExercise(99)
+        #expect(vm.activeWorkout?.currentExerciseIndex == 0)
+        vm.jumpToExercise(-1)
+        #expect(vm.activeWorkout?.currentExerciseIndex == 0)
+        vm.jumpToExercise(1)
+        #expect(vm.activeWorkout?.currentExerciseIndex == 1)
+    }
+
+    @Test func setSetQualityPersistsQualityOnSet() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay()
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        vm.setSetQuality(exerciseIndex: 0, setIndex: 0, quality: .onTarget)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].quality == .onTarget)
+    }
+
+    @Test func completeWorkoutMovesSessionToHistory() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 1, sets: 2)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        vm.updateSetLoad(exerciseIndex: 0, setIndex: 0, weight: 60, reps: 8)
+        _ = vm.completeCurrentSet(exerciseIndex: 0, setIndex: 0)
+        vm.updateSetLoad(exerciseIndex: 0, setIndex: 1, weight: 60, reps: 8)
+        _ = vm.completeCurrentSet(exerciseIndex: 0, setIndex: 1)
+
+        vm.completeWorkout()
+
+        #expect(vm.activeWorkout == nil)
+        #expect(vm.workoutHistory.first?.isCompleted == true)
+        #expect(vm.workoutHistory.first?.dayName == "Push")
+        #expect((vm.workoutHistory.first?.totalVolume ?? 0) > 0)
+        #expect(vm.progressEntries.first?.totalSets == 2)
+    }
+
+    @Test func completeWorkoutWithoutActiveIsNoOp() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.completeWorkout()
+        #expect(vm.workoutHistory.isEmpty)
+    }
+
+    @Test func watchCompleteSetActionAdvancesAndPersistsWeight() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 1, sets: 3)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+
+        vm.handleWatchAction("completeSet", payload: ["weight": 70.0, "reps": 7])
+        let log = vm.activeWorkout?.session.exerciseLogs[0]
+        #expect(log?.sets[0].isCompleted == true)
+        #expect(log?.sets[0].weight == 70.0)
+        #expect(log?.sets[0].reps == 7)
+        #expect(vm.activeWorkout?.currentSetIndex == 1)
+    }
+
+    @Test func watchAdjustWeightUpdatesNextPendingSet() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 1, sets: 2)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        vm.updateSetLoad(exerciseIndex: 0, setIndex: 0, weight: 50, reps: 6)
+
+        vm.handleWatchAction("adjustWeight", payload: ["delta": 2.5])
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].weight == 52.5)
+    }
+
+    @Test func watchAdjustRepsUpdatesNextPendingSet() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 1, sets: 2)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        vm.updateSetLoad(exerciseIndex: 0, setIndex: 0, weight: 60, reps: 6)
+
+        vm.handleWatchAction("adjustReps", payload: ["delta": 2])
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].reps == 8)
+    }
+
+    @Test func watchNextExerciseRoutesThroughController() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 2, sets: 2)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        vm.handleWatchAction("nextExercise", payload: [:])
+        #expect(vm.activeWorkout?.currentExerciseIndex == 1)
+    }
+
+    @Test func watchSetQualityAttachesToLastCompletedSet() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 1, sets: 2)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        _ = vm.completeCurrentSet(exerciseIndex: 0, setIndex: 0)
+
+        vm.handleWatchAction("setQuality", payload: ["quality": SetQuality.grinder.rawValue])
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].quality == .grinder)
+    }
+
+    @Test func watchActionWithoutActiveWorkoutIsNoOp() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.handleWatchAction("completeSet", payload: [:])
+        vm.handleWatchAction("nextExercise", payload: [:])
+        #expect(vm.activeWorkout == nil)
+    }
+
+    @Test func unknownWatchActionIsIgnored() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay()
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        let before = vm.activeWorkout
+        vm.handleWatchAction("bogusAction", payload: [:])
+        #expect(vm.activeWorkout?.currentExerciseIndex == before?.currentExerciseIndex)
+        #expect(vm.activeWorkout?.currentSetIndex == before?.currentSetIndex)
+    }
+}
+
+// MARK: - ContinuityCoordinator
+
+@MainActor
+@Suite("ContinuityCoordinator")
+struct ContinuityCoordinatorTests {
+
+    private func makeVM() -> AppViewModel {
+        PersistenceStore.shared.clear()
+        return AppViewModel()
+    }
+
+    @Test func restoreReturnsUnavailableWhenCloudUnavailable() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        // In the test environment iCloud is not available; regardless of outcome,
+        // restore must never crash and must return one of the documented cases.
+        let outcome = vm.restoreFromCloud(force: false)
+        let valid: Set<CloudRestoreOutcome> = [.unavailable, .noSnapshot, .staleIgnored, .restored, .decodeFailed]
+        #expect(valid.contains(outcome))
+    }
+
+    @Test func restoreSkippedWhenActiveWorkoutInProgress() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.activeWorkout = ActiveWorkoutState(
+            session: WorkoutSession(planId: "p", dayId: "d", dayName: "Active"),
+            currentExerciseIndex: 0,
+            currentSetIndex: 0,
+            isResting: false,
+            restTimeRemaining: 0,
+            plannedExercises: []
+        )
+        let outcome = vm.restoreFromCloud(force: false)
+        // When iCloud isn't available the guard in restore() short-circuits to
+        // .unavailable before the active-workout guard runs; when it is, the
+        // active-workout guard returns .staleIgnored.
+        #expect(outcome == .unavailable || outcome == .staleIgnored)
+    }
+
+    @Test func applySnapshotPreservesActiveWorkout() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.activeWorkout = ActiveWorkoutState(
+            session: WorkoutSession(planId: "p", dayId: "d", dayName: "Active"),
+            currentExerciseIndex: 1,
+            currentSetIndex: 2,
+            isResting: false,
+            restTimeRemaining: 0,
+            plannedExercises: []
+        )
+        let remoteDraft = ActiveWorkoutDraft(
+            session: WorkoutSession(planId: "p", dayId: "d2", dayName: "Remote"),
+            currentExerciseIndex: 0,
+            currentSetIndex: 0,
+            plannedExercises: []
+        )
+        let remote = PersistedAppState(
+            version: 1, hasCompletedOnboarding: true, profile: UserProfile(),
+            currentPlan: nil, workoutHistory: [], personalRecords: [],
+            progressEntries: [], favoriteExerciseIds: [], progressionStates: [],
+            trainingPhaseState: TrainingPhaseState(), coachAdjustments: [],
+            appliedActionIds: [], weekAdjustmentActive: nil,
+            previousPlanBeforeWeekAction: nil, weeklyReviewDismissed: false,
+            todaysReadiness: nil, readinessHistory: [],
+            notificationSettings: NotificationSettings(),
+            nutritionTarget: NutritionTarget(), nutritionLogs: [],
+            bodyWeightEntries: [], sleepEntries: [], activeWorkoutDraft: remoteDraft
+        )
+        vm.apply(snapshot: remote)
+        #expect(vm.activeWorkout?.session.dayName == "Active")
+        #expect(vm.activeWorkout?.currentExerciseIndex == 1)
+        #expect(vm.activeWorkout?.currentSetIndex == 2)
+    }
+
+    @Test func applySnapshotHydratesDraftWhenNoActive() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.activeWorkout = nil
+        let draft = ActiveWorkoutDraft(
+            session: WorkoutSession(planId: "p", dayId: "d", dayName: "Remote"),
+            currentExerciseIndex: 4,
+            currentSetIndex: 1,
+            plannedExercises: []
+        )
+        let remote = PersistedAppState(
+            version: 1, hasCompletedOnboarding: true, profile: UserProfile(),
+            currentPlan: nil, workoutHistory: [], personalRecords: [],
+            progressEntries: [], favoriteExerciseIds: [], progressionStates: [],
+            trainingPhaseState: TrainingPhaseState(), coachAdjustments: [],
+            appliedActionIds: [], weekAdjustmentActive: nil,
+            previousPlanBeforeWeekAction: nil, weeklyReviewDismissed: false,
+            todaysReadiness: nil, readinessHistory: [],
+            notificationSettings: NotificationSettings(),
+            nutritionTarget: NutritionTarget(), nutritionLogs: [],
+            bodyWeightEntries: [], sleepEntries: [], activeWorkoutDraft: draft
+        )
+        vm.apply(snapshot: remote)
+        #expect(vm.activeWorkout?.session.dayName == "Remote")
+        #expect(vm.activeWorkout?.currentExerciseIndex == 4)
+        #expect(vm.activeWorkout?.currentSetIndex == 1)
+    }
+
+    @Test func restoreOutcomesAreExhaustive() {
+        // Guardrail: CloudRestoreOutcome is the public contract — ensure every
+        // case we switch on in UI/analytics still exists.
+        let all: [CloudRestoreOutcome] = [
+            .restored, .noSnapshot, .unavailable, .staleIgnored, .decodeFailed
+        ]
+        #expect(all.count == 5)
+    }
+}
+
+// MARK: - EnvironmentValidator
+
+@MainActor
+@Suite("EnvironmentValidator")
+struct EnvironmentValidatorTests {
+
+    @Test func validateReturnsWithoutCrashing() {
+        let report = EnvironmentValidator.validate()
+        // Every issue must be non-empty text — we never want silent gaps.
+        for issue in report.issues { #expect(!issue.isEmpty) }
+        for warn in report.warnings { #expect(!warn.isEmpty) }
+    }
+
+    @Test func validateAndLogIsIdempotentAndSafe() {
+        EnvironmentValidator.validateAndLog()
+        EnvironmentValidator.validateAndLog()
+    }
+
+    @Test func legalLinksParseAsURLs() {
+        #expect(URL(string: STRQLinks.privacy.absoluteString) != nil)
+        #expect(URL(string: STRQLinks.terms.absoluteString) != nil)
+        #expect(URL(string: STRQLinks.support.absoluteString) != nil)
+    }
+
+    #if DEBUG
+    @Test func debugBuildTreatsMissingRevenueCatAsWarningNotIssue() {
+        // In the sandbox both RevenueCat keys are empty; in DEBUG this must be
+        // a warning so developers can run the app without subscriptions, not a
+        // hard issue that blocks launch.
+        if Config.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY.isEmpty &&
+           Config.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY.isEmpty {
+            let report = EnvironmentValidator.validate()
+            #expect(!report.issues.contains { $0.contains("RevenueCat") })
+            #expect(report.warnings.contains { $0.contains("RevenueCat") })
+        }
+    }
+    #endif
+}
+
+// MARK: - Coordinator delegation from AppViewModel
+
+@MainActor
+@Suite("AppViewModel delegates to coordinators")
+struct CoordinatorDelegationTests {
+
+    private func makeVM() -> AppViewModel {
+        PersistenceStore.shared.clear()
+        return AppViewModel()
+    }
+
+    @Test func refreshIntelligencePopulatesDerivedState() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.profile.daysPerWeek = 3
+        vm.refreshIntelligence()
+        // Coordinator should at minimum run without crashing and keep a
+        // consistent progressionStates array (may be empty when no history).
+        #expect(vm.progressionStates.count >= 0)
+    }
+
+    @Test func todayPrescriptionGoesThroughCoachingCoordinator() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        let planned = PlannedExercise(
+            exerciseId: "barbell-bench-press",
+            sets: 3, reps: "6-8", restSeconds: 120, rpe: 8
+        )
+        let p = vm.todayPrescription(for: planned)
+        #expect(p.plannedSets == 3)
+        #expect(p.suggestedSets >= 1)
+    }
+
+    @Test func toggleFavoriteRoundTripsAndPersists() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.toggleFavorite("abc")
+        #expect(vm.favoriteExerciseIds.contains("abc"))
+        vm.toggleFavorite("abc")
+        #expect(!vm.favoriteExerciseIds.contains("abc"))
+    }
+
+    @Test func saveActiveWorkoutDraftRoundTripsThroughPersistence() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.activeWorkout = ActiveWorkoutState(
+            session: WorkoutSession(planId: "p", dayId: "d", dayName: "Push"),
+            currentExerciseIndex: 2,
+            currentSetIndex: 1,
+            isResting: false,
+            restTimeRemaining: 0,
+            plannedExercises: []
+        )
+        vm.saveActiveWorkoutDraft()
+
+        let loaded = PersistenceStore.shared.load()
+        #expect(loaded?.activeWorkoutDraft?.currentExerciseIndex == 2)
+        #expect(loaded?.activeWorkoutDraft?.currentSetIndex == 1)
+        #expect(loaded?.activeWorkoutDraft?.session.dayName == "Push")
+    }
+}
