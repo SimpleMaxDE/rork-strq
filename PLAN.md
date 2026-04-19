@@ -1,27 +1,28 @@
-# Phase 3 — Train / Session Editor Density
+# Phase 4 — Active Logger Exactness
 
-Turn Train + Session Editor into a denser, more professional program-builder.
+Turn ActiveWorkoutView into a precise, fast, confident real-time training tool.
 
-**Train screen (TrainingPlanView)**
-- [x] Group exercises by role (Key / Support / Accessory / Warm-Up) with compact section headers showing set totals
-- [x] Denser role-aware rows (role accent bar, ordinal, compact prescription line with rest/RPE/load)
-- [x] Quick-edit affordance via context menu (Edit / Swap / Restore / Remove)
-- [x] Mission card compressed (tighter padding, single-line title, smaller stats)
+**Hero / current-task clarity**
+- [x] Fuse exercise hero + active-set header into one compact "current task" block (exercise · set X/Y · planned reps × RPE)
+- [x] Add always-visible context strip: previous best · last session · target — inline, numeric, monospaced
+- [x] Move progression guidance (coach "do this now") into the current-task block, not a separate row below
 
-**Session Editor (SessionEditorSheet)**
-- [x] Replace plain List rows with builder-style role-grouped rows
-- [x] Role accent, prescription line (sets×reps · rest · RPE), and coach/custom indicator on every row
-- [x] Surface primary inline actions (Edit / Swap buttons) visible per row
-- [x] Tighter row height with monospaced prescription line
-- [x] Header summary shows volume by role (Key · Support · Accessory · Warm-Up)
-- [x] Reorder mode with up/down chevrons replacing hidden drag handles
+**Set table precision**
+- [x] Active row gets strong accent (bright border + subtle glow), completed rows drop opacity, pending rows get dotted/ghost state
+- [x] Show target column (planned reps / suggested kg) next to actual logged value so drift is visible
+- [x] Compact delta indicator on completed rows (+2.5, +1 rep vs last session) — small semantic chip
 
-**Prescription Edit Sheet**
-- [x] Denser builder cards — sets/reps/rest/RPE presets prominent
-- [x] Clear "Coach default" vs "Custom" state with one-tap restore banner
-- [x] CoachDefault model added to PlannedExercise; restore preserves original prescription
+**Inputs: faster, more deliberate**
+- [x] Tap the active weight/reps number → quick numeric edit sheet for direct typing (keeps steppers for nudges)
+- [x] Long-press +/- for ±5 step; plate-math helper label under weight (2×20+1×2.5)
+- [x] "Match last" and "Match target" one-tap chips above inputs when their values differ from current
 
-**Add Exercise Sheet**
-- [x] Contextual "Fits this session" section at top (role gaps + primary muscle matches)
-- [x] Compact result rows with role/equipment hints
-- [x] Muscle filter chips; grouped results by muscle
+**Rest / between-set context**
+- [x] Rest overlay leads with "Just logged: X kg × Y reps · e1RM Z" — not abstract
+- [x] Next-set recommendation block: explicit suggested kg × reps for the next set based on last set quality/RPE
+- [x] Keep SET FEEL chips but move them above the timer (highest-value action first)
+
+**Compression / utility-first**
+- [x] Collapse "Up Next" preview while a set is active; only show between exercises or after all sets done
+- [x] Previous session table becomes a single compact strip (not full table) under set table
+- [x] Reduce vertical space before the active-set block (trim hero height, tighten spacing)

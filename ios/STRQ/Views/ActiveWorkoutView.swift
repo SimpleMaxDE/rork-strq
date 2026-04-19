@@ -6,14 +6,13 @@ struct ActiveWorkoutView: View {
     @State private var restTimerActive: Bool = false
     @State private var restTimeRemaining: Int = 0
     @State private var showCompletion: Bool = false
-    @State private var showSwapSheet: Bool = false
     @State private var showExerciseInfo: Exercise?
     @State private var timerTask: Task<Void, Never>?
     @State private var appeared: Bool = false
     @State private var setCompletedTrigger: Bool = false
     @State private var showExerciseList: Bool = false
-    @State private var exerciseTransition: Bool = false
     @State private var lastLoggedSet: (exerciseIndex: Int, setIndex: Int)?
+    @State private var numericEdit: NumericEditContext?
 
     private var workout: ActiveWorkoutState? { vm.activeWorkout }
 
@@ -32,22 +31,26 @@ struct ActiveWorkoutView: View {
 
                     ScrollView {
                         VStack(spacing: 10) {
-                            exerciseFocusHero(workout)
+                            currentTaskBlock(workout)
                                 .padding(.horizontal, 14)
-                                .padding(.top, 4)
+                                .padding(.top, 6)
 
-                            VStack(spacing: 6) {
-                                activeSetCard(workout)
-                                setLogTable(workout)
-                                previousSessionTable(workout)
-                            }
-                            .padding(.horizontal, 14)
+                            activeSetCard(workout)
+                                .padding(.horizontal, 14)
+
+                            setLogTable(workout)
+                                .padding(.horizontal, 14)
+
+                            previousSessionStrip(workout)
+                                .padding(.horizontal, 14)
 
                             exerciseActions(workout)
                                 .padding(.horizontal, 14)
 
-                            upNextPreview(workout)
-                                .padding(.horizontal, 14)
+                            if shouldShowUpNext(workout) {
+                                upNextPreview(workout)
+                                    .padding(.horizontal, 14)
+                            }
                         }
                         .padding(.bottom, 100)
                     }
@@ -81,6 +84,13 @@ struct ActiveWorkoutView: View {
                     .presentationDragIndicator(.visible)
                     .presentationContentInteraction(.scrolls)
             }
+            .sheet(item: $numericEdit) { ctx in
+                NumericInputSheet(context: ctx) { newValue in
+                    applyNumericEdit(ctx: ctx, newValue: newValue)
+                }
+                .presentationDetents([.height(280)])
+                .presentationDragIndicator(.visible)
+            }
             .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.6), trigger: setCompletedTrigger)
         }
     }
@@ -91,7 +101,7 @@ struct ActiveWorkoutView: View {
         let total = workout.session.exerciseLogs.count
         let done = workout.session.exerciseLogs.filter(\.isCompleted).count
         return HStack(alignment: .center, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(workout.session.dayName.uppercased())
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.4)
@@ -99,7 +109,7 @@ struct ActiveWorkoutView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
                 Text(formatTime(elapsedSeconds))
-                    .font(.system(size: 22, weight: .bold, design: .rounded).monospacedDigit())
+                    .font(.system(size: 20, weight: .bold, design: .rounded).monospacedDigit())
                     .foregroundStyle(.white)
                     .contentTransition(.numericText())
             }
@@ -113,13 +123,12 @@ struct ActiveWorkoutView: View {
                     Image(systemName: "list.bullet")
                         .font(.caption2)
                 }
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.white.opacity(0.75))
                 .padding(.horizontal, 11)
-                .padding(.vertical, 8)
+                .padding(.vertical, 7)
                 .background(Color.white.opacity(0.06), in: Capsule())
             }
             .buttonStyle(.strqPressable)
-            .padding(.trailing, 10)
 
             Button {
                 vm.completeWorkout()
@@ -128,14 +137,14 @@ struct ActiveWorkoutView: View {
                 Text("Finish")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.black)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 9)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
                     .background(STRQBrand.accentGradient, in: Capsule())
             }
         }
         .padding(.horizontal, 14)
-        .padding(.top, 30)
-        .padding(.bottom, 8)
+        .padding(.top, 28)
+        .padding(.bottom, 6)
     }
 
     private func progressStrip(_ workout: ActiveWorkoutState) -> some View {
@@ -151,25 +160,28 @@ struct ActiveWorkoutView: View {
                     .animation(.spring(response: 0.4), value: progress)
             }
         }
-        .frame(height: 3)
+        .frame(height: 2)
     }
 
-    // MARK: - Exercise Focus Hero
+    // MARK: - Current Task Block (fused hero + meta + context)
 
     @ViewBuilder
-    private func exerciseFocusHero(_ workout: ActiveWorkoutState) -> some View {
+    private func currentTaskBlock(_ workout: ActiveWorkoutState) -> some View {
         let exerciseIndex = workout.currentExerciseIndex
         if exerciseIndex < workout.session.exerciseLogs.count {
             let log = workout.session.exerciseLogs[exerciseIndex]
             let exercise = vm.library.exercise(byId: log.exerciseId)
             let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
             let mediaProvider = ExerciseMediaProvider.shared
+            let currentSet = activeSetFor(log: log, workout: workout)
+            let activeSetNumber = currentSet?.setNumber ?? (log.sets.filter(\.isCompleted).count + 1)
+            let guidance = vm.nextSessionGuidance(for: log.exerciseId)
 
-            VStack(spacing: 0) {
-                if let ex = exercise {
-                    let gradientColors = mediaProvider.heroGradient(for: ex)
-                    let heroSymbol = mediaProvider.heroSymbol(for: ex)
+            if let ex = exercise {
+                let gradientColors = mediaProvider.heroGradient(for: ex)
+                let heroSymbol = mediaProvider.heroSymbol(for: ex)
 
+                VStack(spacing: 0) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 14)
                             .fill(
@@ -179,77 +191,160 @@ struct ActiveWorkoutView: View {
                                     endPoint: .bottomTrailing
                                 )
                             )
-                            .frame(height: 66)
 
-                        HStack(spacing: 11) {
-                            Image(systemName: heroSymbol)
-                                .font(.system(size: 20, weight: .thin))
-                                .foregroundStyle(.white.opacity(0.9))
-                                .frame(width: 38, height: 38)
-                                .background(.white.opacity(0.1), in: .rect(cornerRadius: 9))
-
-                            VStack(alignment: .leading, spacing: 3) {
-                                HStack(spacing: 6) {
-                                    Text("\(exerciseIndex + 1)/\(workout.session.exerciseLogs.count)")
-                                        .font(.system(size: 9, weight: .black).monospacedDigit())
-                                        .foregroundStyle(.white.opacity(0.55))
-                                        .tracking(0.8)
-                                    Text("·")
-                                        .foregroundStyle(.white.opacity(0.3))
-                                    Text(ex.primaryMuscle.displayName.uppercased())
-                                        .font(.system(size: 9, weight: .black))
-                                        .foregroundStyle(.white.opacity(0.55))
-                                        .tracking(0.8)
-                                }
-
-                                Text(ex.name)
-                                    .font(.system(size: 17, weight: .heavy))
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(spacing: 8) {
+                                Text("EX \(exerciseIndex + 1)/\(workout.session.exerciseLogs.count)")
+                                    .font(.system(size: 9, weight: .black).monospacedDigit())
+                                    .foregroundStyle(.white.opacity(0.6))
+                                    .tracking(0.8)
+                                Text("·")
+                                    .foregroundStyle(.white.opacity(0.3))
+                                Text(ex.primaryMuscle.displayName.uppercased())
+                                    .font(.system(size: 9, weight: .black))
+                                    .foregroundStyle(.white.opacity(0.6))
+                                    .tracking(0.8)
+                                Spacer()
+                                Text("SET \(activeSetNumber)/\(log.sets.count)")
+                                    .font(.system(size: 10, weight: .heavy).monospacedDigit())
+                                    .tracking(0.8)
                                     .foregroundStyle(.white)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
-
-                                HStack(spacing: 8) {
-                                    if let p = planned {
-                                        Text("\(p.sets) × \(p.reps)")
-                                            .font(.system(size: 11, weight: .bold).monospacedDigit())
-                                            .foregroundStyle(.white.opacity(0.75))
-                                    }
-                                    if let p = planned, let rpe = p.rpe {
-                                        Text("RPE \(Int(rpe))")
-                                            .font(.system(size: 10, weight: .bold))
-                                            .foregroundStyle(.white.opacity(0.55))
-                                    }
-                                }
+                                    .padding(.horizontal, 7)
+                                    .padding(.vertical, 3)
+                                    .background(Color.white.opacity(0.15), in: Capsule())
                             }
 
-                            Spacer(minLength: 0)
+                            HStack(spacing: 10) {
+                                Image(systemName: heroSymbol)
+                                    .font(.system(size: 18, weight: .thin))
+                                    .foregroundStyle(.white.opacity(0.92))
+                                    .frame(width: 34, height: 34)
+                                    .background(.white.opacity(0.12), in: .rect(cornerRadius: 8))
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(ex.name)
+                                        .font(.system(size: 17, weight: .heavy))
+                                        .foregroundStyle(.white)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.7)
+
+                                    HStack(spacing: 6) {
+                                        if let p = planned {
+                                            Text("Target \(p.reps)")
+                                                .font(.system(size: 10, weight: .bold).monospacedDigit())
+                                                .foregroundStyle(.white.opacity(0.78))
+                                            if let rpe = p.rpe {
+                                                Text("·").foregroundStyle(.white.opacity(0.3))
+                                                Text("RPE \(formatRPE(rpe))")
+                                                    .font(.system(size: 10, weight: .bold).monospacedDigit())
+                                                    .foregroundStyle(.white.opacity(0.6))
+                                            }
+                                            Text("·").foregroundStyle(.white.opacity(0.3))
+                                            Text("\(p.restSeconds)s rest")
+                                                .font(.system(size: 10, weight: .semibold).monospacedDigit())
+                                                .foregroundStyle(.white.opacity(0.55))
+                                        }
+                                    }
+                                }
+                                Spacer(minLength: 0)
+                            }
                         }
                         .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
                     }
                     .clipShape(.rect(cornerRadius: 14))
-                }
 
-                if let guidance = vm.nextSessionGuidance(for: log.exerciseId) {
-                    HStack(spacing: 6) {
-                        Image(systemName: guidance.icon)
-                            .font(.system(size: 9))
-                            .foregroundStyle(guidanceColor(guidance.color))
-                        Text(guidance.action)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.75))
-                            .lineLimit(1)
+                    // Context strip: PREV · BEST · TARGET
+                    contextStrip(log: log, planned: planned)
+                        .padding(.top, 6)
+
+                    if let g = guidance {
+                        HStack(spacing: 6) {
+                            Image(systemName: g.icon)
+                                .font(.system(size: 10))
+                                .foregroundStyle(guidanceColor(g.color))
+                            Text(g.action)
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.82))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.85)
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(guidanceColor(g.color).opacity(0.10), in: .rect(cornerRadius: 9))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 9)
+                                .strokeBorder(guidanceColor(g.color).opacity(0.22), lineWidth: 1)
+                        )
+                        .padding(.top, 6)
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 9))
-                    .padding(.top, 4)
                 }
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 10)
+                .animation(.easeOut(duration: 0.4), value: appeared)
             }
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.4), value: appeared)
         }
+    }
+
+    @ViewBuilder
+    private func contextStrip(log: ExerciseLog, planned: PlannedExercise?) -> some View {
+        let last = vm.lastPerformance(for: log.exerciseId)
+        let best = personalBest(for: log.exerciseId)
+        let suggestion = vm.loadSuggestion(for: log.exerciseId, planned: planned)
+
+        HStack(spacing: 0) {
+            contextCell(
+                label: "PREV",
+                primary: last.map { "\(formatWeight($0.topWeight, increment: 0.5))×\($0.topReps)" } ?? "—",
+                secondary: last.map { formatRelativeDate($0.date) } ?? "no data"
+            )
+            contextDivider()
+            contextCell(
+                label: "BEST",
+                primary: best.map { "\(formatWeight($0.weight, increment: 0.5))×\($0.reps)" } ?? "—",
+                secondary: best.map { String(format: "e1RM %.0f", $0.e1rm) } ?? "—"
+            )
+            contextDivider()
+            contextCell(
+                label: "TARGET",
+                primary: suggestion.map { $0.suggestedWeight > 0 ? formatWeight($0.suggestedWeight, increment: 0.5) : "BW" } ?? "—",
+                secondary: planned.map { "× \($0.reps)" } ?? "—"
+            )
+        }
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
+        )
+    }
+
+    private func contextCell(label: String, primary: String, secondary: String) -> some View {
+        VStack(alignment: .center, spacing: 2) {
+            Text(label)
+                .font(.system(size: 8, weight: .black))
+                .tracking(1.2)
+                .foregroundStyle(.white.opacity(0.4))
+            Text(primary)
+                .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
+                .foregroundStyle(.white.opacity(0.92))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Text(secondary)
+                .font(.system(size: 9, weight: .semibold).monospacedDigit())
+                .foregroundStyle(.white.opacity(0.42))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func contextDivider() -> some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.06))
+            .frame(width: 1, height: 30)
     }
 
     // MARK: - Active Set Card
@@ -259,149 +354,90 @@ struct ActiveWorkoutView: View {
         let exerciseIndex = workout.currentExerciseIndex
         if exerciseIndex < workout.session.exerciseLogs.count {
             let log = workout.session.exerciseLogs[exerciseIndex]
-            let currentSetIdx = workout.currentSetIndex
-            let currentSet: SetLog? = currentSetIdx < log.sets.count && !log.sets[currentSetIdx].isCompleted
-                ? log.sets[currentSetIdx]
-                : log.sets.first(where: { !$0.isCompleted })
-            let activeSetIndex = currentSet.flatMap { s in log.sets.firstIndex(where: { $0.id == s.id }) } ?? currentSetIdx
+            let currentSet = activeSetFor(log: log, workout: workout)
+            let activeSetIndex = currentSet.flatMap { s in log.sets.firstIndex(where: { $0.id == s.id }) } ?? workout.currentSetIndex
+            let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
+            let lastPerf = vm.lastPerformance(for: log.exerciseId)
+            let suggestion = vm.loadSuggestion(for: log.exerciseId, planned: planned)
 
             if let setLog = currentSet {
-                VStack(spacing: 12) {
-                    HStack(alignment: .firstTextBaseline) {
-                        HStack(spacing: 6) {
-                            Text("SET")
-                                .font(.system(size: 10, weight: .black))
-                                .tracking(1.2)
-                                .foregroundStyle(STRQBrand.steel)
-                            Text("\(setLog.setNumber)")
-                                .font(.system(size: 20, weight: .heavy, design: .rounded).monospacedDigit())
-                                .foregroundStyle(.white)
-                            Text("of \(log.sets.count)")
-                                .font(.system(size: 12, weight: .semibold).monospacedDigit())
-                                .foregroundStyle(.white.opacity(0.4))
-                        }
-                        Spacer()
-                        let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
-                        if let suggestion = vm.loadSuggestion(for: log.exerciseId, planned: planned),
-                           suggestion.suggestedWeight > 0,
-                           abs(suggestion.suggestedWeight - setLog.weight) > 0.01 {
-                            Button {
-                                updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: suggestion.suggestedWeight, reps: setLog.reps)
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "scope")
-                                        .font(.system(size: 9, weight: .bold))
-                                    Text("target \(suggestion.formattedWeight)")
-                                        .font(.system(size: 10, weight: .bold).monospacedDigit())
-                                }
-                                .foregroundStyle(.white.opacity(0.5))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.white.opacity(0.05), in: Capsule())
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
+                let exerciseForIncrement = vm.library.exercise(byId: log.exerciseId)
+                let increment = weightIncrement(for: exerciseForIncrement)
+                let isBodyweight = exerciseForIncrement?.category == .bodyweight || (exerciseForIncrement?.isBodyweight ?? false)
+
+                VStack(spacing: 10) {
+                    // Match chips
+                    matchChipsRow(
+                        setLog: setLog,
+                        exerciseIndex: exerciseIndex,
+                        setIndex: activeSetIndex,
+                        lastWeight: lastPerf?.topWeight,
+                        lastReps: lastPerf?.topReps,
+                        targetWeight: suggestion?.suggestedWeight,
+                        targetReps: parsePlannedReps(planned?.reps)
+                    )
 
                     HStack(spacing: 14) {
-                        let exerciseForIncrement = vm.library.exercise(byId: log.exerciseId)
-                        let increment = weightIncrement(for: exerciseForIncrement)
-                        let isBodyweight = exerciseForIncrement?.category == .bodyweight || (exerciseForIncrement?.isBodyweight ?? false)
-
-                        VStack(spacing: 4) {
-                            Text("WEIGHT")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundStyle(.tertiary)
-                                .tracking(0.5)
-
-                            HStack(spacing: 0) {
-                                Button {
-                                    let step = isBodyweight ? 1.0 : increment
-                                    guard step > 0 else { return }
-                                    updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: max(0, setLog.weight - step), reps: setLog.reps)
-                                } label: {
-                                    Image(systemName: "minus")
-                                        .font(.system(size: 12, weight: .medium))
-                                        .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 44, height: 44)
-                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
-                                        .contentShape(.rect)
-                                }
-                                .buttonStyle(.strqStepper)
-                                .disabled(isBodyweight && setLog.weight <= 0)
-
-                                Text(isBodyweight && setLog.weight <= 0 ? "BW" : formatWeight(setLog.weight, increment: increment))
-                                    .font(.system(size: 30, weight: .heavy, design: .rounded).monospacedDigit())
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
-                                    .frame(maxWidth: .infinity)
-                                    .contentTransition(.numericText())
-
-                                Button {
-                                    let step = isBodyweight ? 1.0 : increment
-                                    guard step > 0 else { return }
-                                    updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight + step, reps: setLog.reps)
-                                } label: {
-                                    Image(systemName: "plus")
-                                        .font(.system(size: 12, weight: .medium))
-                                        .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 44, height: 44)
-                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
-                                        .contentShape(.rect)
-                                }
-                                .buttonStyle(.strqStepper)
-                            }
-
-                            Text(isBodyweight ? "added load" : "kg")
-                                .font(.system(size: 9, weight: .medium))
-                                .foregroundStyle(.tertiary)
-                        }
+                        inputColumn(
+                            label: isBodyweight ? "ADDED LOAD" : "WEIGHT",
+                            value: isBodyweight && setLog.weight <= 0 ? "BW" : formatWeight(setLog.weight, increment: increment),
+                            unit: isBodyweight ? "kg added" : "kg",
+                            disableMinus: isBodyweight && setLog.weight <= 0,
+                            onMinus: { step in
+                                let s = isBodyweight ? 1.0 : (step ?? increment)
+                                guard s > 0 else { return }
+                                updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: max(0, setLog.weight - s), reps: setLog.reps)
+                            },
+                            onPlus: { step in
+                                let s = isBodyweight ? 1.0 : (step ?? increment)
+                                guard s > 0 else { return }
+                                updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight + s, reps: setLog.reps)
+                            },
+                            onTapValue: {
+                                numericEdit = NumericEditContext(
+                                    field: .weight,
+                                    exerciseIndex: exerciseIndex,
+                                    setIndex: activeSetIndex,
+                                    currentWeight: setLog.weight,
+                                    currentReps: setLog.reps,
+                                    title: "Edit Weight",
+                                    unit: isBodyweight ? "kg added" : "kg"
+                                )
+                            },
+                            plateMath: plateMathLabel(weight: setLog.weight, exercise: exerciseForIncrement)
+                        )
                         .frame(maxWidth: .infinity)
 
                         Rectangle()
                             .fill(Color.white.opacity(0.06))
-                            .frame(width: 1, height: 56)
+                            .frame(width: 1, height: 64)
 
-                        VStack(spacing: 4) {
-                            Text("REPS")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundStyle(.tertiary)
-                                .tracking(0.5)
-
-                            HStack(spacing: 0) {
-                                Button { updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight, reps: max(0, setLog.reps - 1)) } label: {
-                                    Image(systemName: "minus")
-                                        .font(.system(size: 12, weight: .medium))
-                                        .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 44, height: 44)
-                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
-                                        .contentShape(.rect)
-                                }
-                                .buttonStyle(.strqStepper)
-
-                                Text("\(setLog.reps)")
-                                    .font(.system(size: 30, weight: .heavy, design: .rounded).monospacedDigit())
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    .frame(maxWidth: .infinity)
-                                    .contentTransition(.numericText())
-
-                                Button { updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight, reps: setLog.reps + 1) } label: {
-                                    Image(systemName: "plus")
-                                        .font(.system(size: 12, weight: .medium))
-                                        .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 44, height: 44)
-                                        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
-                                        .contentShape(.rect)
-                                }
-                                .buttonStyle(.strqStepper)
-                            }
-
-                            Text("reps")
-                                .font(.system(size: 9, weight: .medium))
-                                .foregroundStyle(.tertiary)
-                        }
+                        inputColumn(
+                            label: "REPS",
+                            value: "\(setLog.reps)",
+                            unit: "reps",
+                            disableMinus: setLog.reps <= 0,
+                            onMinus: { step in
+                                let s = Int(step ?? 1)
+                                updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight, reps: max(0, setLog.reps - s))
+                            },
+                            onPlus: { step in
+                                let s = Int(step ?? 1)
+                                updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: setLog.weight, reps: setLog.reps + s)
+                            },
+                            onTapValue: {
+                                numericEdit = NumericEditContext(
+                                    field: .reps,
+                                    exerciseIndex: exerciseIndex,
+                                    setIndex: activeSetIndex,
+                                    currentWeight: setLog.weight,
+                                    currentReps: setLog.reps,
+                                    title: "Edit Reps",
+                                    unit: "reps"
+                                )
+                            },
+                            plateMath: nil
+                        )
                         .frame(maxWidth: .infinity)
                     }
 
@@ -423,20 +459,20 @@ struct ActiveWorkoutView: View {
                     .buttonStyle(.strqPressable)
                 }
                 .padding(.horizontal, 13)
-                .padding(.vertical, 11)
+                .padding(.vertical, 12)
                 .background(
                     LinearGradient(
-                        colors: [Color.white.opacity(0.07), Color.white.opacity(0.03)],
+                        colors: [Color.white.opacity(0.08), Color.white.opacity(0.03)],
                         startPoint: .topLeading, endPoint: .bottomTrailing
                     ),
-                    in: .rect(cornerRadius: 18)
+                    in: .rect(cornerRadius: 16)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 18)
-                        .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
                 )
             } else {
-                VStack(spacing: 12) {
+                VStack(spacing: 10) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.title)
                         .foregroundStyle(STRQPalette.success)
@@ -445,13 +481,150 @@ struct ActiveWorkoutView: View {
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
-                .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 22))
+                .padding(.vertical, 22)
+                .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 16))
             }
         }
     }
 
-    // MARK: - Set Log Table (Alpha-inspired precision table)
+    // MARK: - Match chips
+
+    @ViewBuilder
+    private func matchChipsRow(
+        setLog: SetLog,
+        exerciseIndex: Int,
+        setIndex: Int,
+        lastWeight: Double?,
+        lastReps: Int?,
+        targetWeight: Double?,
+        targetReps: Int?
+    ) -> some View {
+        let showLast = lastWeight.map { abs($0 - setLog.weight) > 0.01 } ?? false
+        let showTarget: Bool = {
+            guard let tw = targetWeight, tw > 0 else { return false }
+            return abs(tw - setLog.weight) > 0.01
+        }()
+
+        if showLast || showTarget {
+            HStack(spacing: 6) {
+                if showLast, let lw = lastWeight {
+                    matchChip(
+                        icon: "arrow.uturn.backward",
+                        label: "Match last",
+                        value: "\(formatWeight(lw, increment: 0.5))\(lastReps.map { "×\($0)" } ?? "")"
+                    ) {
+                        updateSet(
+                            exerciseIndex: exerciseIndex,
+                            setIndex: setIndex,
+                            weight: lw,
+                            reps: lastReps ?? setLog.reps
+                        )
+                    }
+                }
+                if showTarget, let tw = targetWeight {
+                    matchChip(
+                        icon: "scope",
+                        label: "Target",
+                        value: "\(formatWeight(tw, increment: 0.5))\(targetReps.map { "×\($0)" } ?? "")"
+                    ) {
+                        updateSet(
+                            exerciseIndex: exerciseIndex,
+                            setIndex: setIndex,
+                            weight: tw,
+                            reps: targetReps ?? setLog.reps
+                        )
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    private func matchChip(icon: String, label: String, value: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 9, weight: .bold))
+                Text(label)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.55))
+                Text(value)
+                    .font(.system(size: 10, weight: .heavy, design: .rounded).monospacedDigit())
+                    .foregroundStyle(.white)
+            }
+            .foregroundStyle(.white.opacity(0.75))
+            .padding(.horizontal, 9)
+            .padding(.vertical, 5)
+            .background(Color.white.opacity(0.06), in: Capsule())
+            .overlay(Capsule().strokeBorder(Color.white.opacity(0.09), lineWidth: 1))
+        }
+        .buttonStyle(.strqPressable)
+    }
+
+    // MARK: - Input column
+
+    @ViewBuilder
+    private func inputColumn(
+        label: String,
+        value: String,
+        unit: String,
+        disableMinus: Bool,
+        onMinus: @escaping (Double?) -> Void,
+        onPlus: @escaping (Double?) -> Void,
+        onTapValue: @escaping () -> Void,
+        plateMath: String?
+    ) -> some View {
+        VStack(spacing: 3) {
+            Text(label)
+                .font(.system(size: 9, weight: .black))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.45))
+
+            HStack(spacing: 0) {
+                stepperButton(icon: "minus", disabled: disableMinus, onTap: { onMinus(nil) }, onLongStep: { onMinus(5) })
+                Button(action: onTapValue) {
+                    Text(value)
+                        .font(.system(size: 30, weight: .heavy, design: .rounded).monospacedDigit())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 44)
+                        .contentTransition(.numericText())
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                stepperButton(icon: "plus", disabled: false, onTap: { onPlus(nil) }, onLongStep: { onPlus(5) })
+            }
+
+            Text(plateMath ?? unit)
+                .font(.system(size: 9, weight: plateMath != nil ? .semibold : .medium, design: plateMath != nil ? .monospaced : .default))
+                .foregroundStyle(.white.opacity(plateMath != nil ? 0.55 : 0.4))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+    }
+
+    private func stepperButton(icon: String, disabled: Bool, onTap: @escaping () -> Void, onLongStep: @escaping () -> Void) -> some View {
+        Button(action: onTap) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(.white.opacity(disabled ? 0.25 : 0.55))
+                .frame(width: 44, height: 44)
+                .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
+                .contentShape(.rect)
+        }
+        .buttonStyle(.strqStepper)
+        .disabled(disabled)
+        .simultaneousGesture(
+            LongPressGesture(minimumDuration: 0.4)
+                .onEnded { _ in
+                    guard !disabled else { return }
+                    onLongStep()
+                }
+        )
+    }
+
+    // MARK: - Set Log Table
 
     @ViewBuilder
     private func setLogTable(_ workout: ActiveWorkoutState) -> some View {
@@ -460,26 +633,42 @@ struct ActiveWorkoutView: View {
             let log = workout.session.exerciseLogs[exerciseIndex]
             let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
             let targetReps = planned?.reps ?? "—"
+            let suggestion = vm.loadSuggestion(for: log.exerciseId, planned: planned)
+            let targetWeight: String = {
+                guard let s = suggestion, s.suggestedWeight > 0 else { return "—" }
+                return formatWeight(s.suggestedWeight, increment: 0.5)
+            }()
+            let lastSessionSets = previousSetsMap(for: log.exerciseId)
+            let firstActiveIdx = log.sets.firstIndex(where: { !$0.isCompleted })
 
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
-                    tableHeader("#", width: 28, alignment: .leading)
+                    tableHeader("#", width: 22, alignment: .leading)
                     tableHeader("KG")
                     tableHeader("REPS")
+                    tableHeader("TGT")
                     tableHeader("e1RM")
-                    Color.clear.frame(width: 32)
+                    Color.clear.frame(width: 28)
                 }
-                .padding(.horizontal, 14)
-                .padding(.top, 10)
-                .padding(.bottom, 6)
+                .padding(.horizontal, 12)
+                .padding(.top, 9)
+                .padding(.bottom, 5)
 
                 Rectangle().fill(Color.white.opacity(0.05)).frame(height: 0.5)
 
                 ForEach(Array(log.sets.enumerated()), id: \.element.id) { idx, setLog in
-                    let isActive = idx == workout.currentSetIndex && !setLog.isCompleted && !log.sets.prefix(idx).contains(where: { !$0.isCompleted })
-                    setLogRow(setLog: setLog, idx: idx, isActive: isActive, exerciseIndex: exerciseIndex, targetReps: targetReps)
+                    let isActive = idx == firstActiveIdx
+                    setLogRow(
+                        setLog: setLog,
+                        idx: idx,
+                        isActive: isActive,
+                        exerciseIndex: exerciseIndex,
+                        targetReps: targetReps,
+                        targetWeight: targetWeight,
+                        previousSet: lastSessionSets[setLog.setNumber]
+                    )
                     if idx < log.sets.count - 1 {
-                        Rectangle().fill(Color.white.opacity(0.04)).frame(height: 0.5).padding(.leading, 14)
+                        Rectangle().fill(Color.white.opacity(0.04)).frame(height: 0.5).padding(.leading, 12)
                     }
                 }
             }
@@ -501,10 +690,19 @@ struct ActiveWorkoutView: View {
     }
 
     @ViewBuilder
-    private func setLogRow(setLog: SetLog, idx: Int, isActive: Bool, exerciseIndex: Int, targetReps: String) -> some View {
+    private func setLogRow(
+        setLog: SetLog,
+        idx: Int,
+        isActive: Bool,
+        exerciseIndex: Int,
+        targetReps: String,
+        targetWeight: String,
+        previousSet: SetLog?
+    ) -> some View {
         let completed = setLog.isCompleted
         let e1rm = estimatedOneRM(weight: setLog.weight, reps: setLog.reps)
-        let rowOpacity: Double = completed ? 0.85 : (isActive ? 1.0 : 0.45)
+        let rowOpacity: Double = completed ? 0.9 : (isActive ? 1.0 : 0.38)
+        let delta = completed ? deltaChip(current: setLog, previous: previousSet) : nil
 
         Button {
             if !completed && !isActive {
@@ -514,114 +712,137 @@ struct ActiveWorkoutView: View {
             HStack(spacing: 0) {
                 Text("\(setLog.setNumber)")
                     .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
-                    .foregroundStyle(isActive ? STRQBrand.steel : .white.opacity(0.55))
-                    .frame(width: 28, alignment: .leading)
+                    .foregroundStyle(isActive ? .white : .white.opacity(0.5))
+                    .frame(width: 22, alignment: .leading)
 
-                Text(completed || setLog.weight > 0 ? formatWeight(setLog.weight, increment: 0.5) : "—")
-                    .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
-                    .foregroundStyle(.white.opacity(rowOpacity))
+                HStack(spacing: 3) {
+                    Text(completed || setLog.weight > 0 ? formatWeight(setLog.weight, increment: 0.5) : "—")
+                        .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white.opacity(rowOpacity))
+                }
+                .frame(maxWidth: .infinity)
+
+                HStack(spacing: 3) {
+                    if completed || setLog.reps > 0 {
+                        Text("\(setLog.reps)")
+                            .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.white.opacity(rowOpacity))
+                    } else {
+                        Text(targetReps)
+                            .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.25))
+                    }
+                }
+                .frame(maxWidth: .infinity)
+
+                Text(targetWeight)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded).monospacedDigit())
+                    .foregroundStyle(.white.opacity(isActive ? 0.55 : 0.3))
                     .frame(maxWidth: .infinity)
 
-                Text(completed || setLog.reps > 0 ? "\(setLog.reps)" : targetReps)
-                    .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
-                    .foregroundStyle(.white.opacity(rowOpacity))
-                    .frame(maxWidth: .infinity)
-
-                Text(e1rm > 0 ? String(format: "%.1f", e1rm) : "—")
-                    .font(.system(size: 13, weight: .semibold, design: .rounded).monospacedDigit())
-                    .foregroundStyle(.white.opacity(completed ? 0.55 : 0.3))
-                    .frame(maxWidth: .infinity)
+                HStack(spacing: 4) {
+                    Text(e1rm > 0 ? String(format: "%.0f", e1rm) : "—")
+                        .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white.opacity(completed ? 0.55 : 0.25))
+                    if let d = delta {
+                        Text(d.text)
+                            .font(.system(size: 9, weight: .heavy).monospacedDigit())
+                            .foregroundStyle(d.color)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1.5)
+                            .background(d.color.opacity(0.14), in: Capsule())
+                    }
+                }
+                .frame(maxWidth: .infinity)
 
                 ZStack {
                     if completed {
-                        Circle().fill(STRQPalette.success).frame(width: 22, height: 22)
+                        Circle().fill(STRQPalette.success).frame(width: 20, height: 20)
                         Image(systemName: "checkmark")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: 9, weight: .bold))
                             .foregroundStyle(.black)
                     } else if isActive {
-                        Circle().strokeBorder(Color.white.opacity(0.5), lineWidth: 1.2).frame(width: 22, height: 22)
+                        Circle().strokeBorder(Color.white, lineWidth: 1.4).frame(width: 20, height: 20)
+                        Circle().fill(Color.white).frame(width: 6, height: 6)
                     } else {
-                        Circle().fill(Color.white.opacity(0.06)).frame(width: 22, height: 22)
+                        Circle()
+                            .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [2, 2]))
+                            .foregroundStyle(Color.white.opacity(0.2))
+                            .frame(width: 20, height: 20)
                     }
                 }
-                .frame(width: 32)
+                .frame(width: 28)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 11)
-            .background(isActive ? Color.white.opacity(0.04) : Color.clear)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(
+                ZStack {
+                    if isActive {
+                        RoundedRectangle(cornerRadius: 0)
+                            .fill(Color.white.opacity(0.05))
+                        RoundedRectangle(cornerRadius: 0)
+                            .strokeBorder(Color.white.opacity(0.18), lineWidth: 1)
+                    }
+                }
+            )
         }
         .buttonStyle(.plain)
         .disabled(completed)
     }
 
-    // MARK: - Previous Session Table
+    private struct DeltaChip {
+        let text: String
+        let color: Color
+    }
+
+    private func deltaChip(current: SetLog, previous: SetLog?) -> DeltaChip? {
+        guard let prev = previous, prev.weight > 0 || prev.reps > 0 else { return nil }
+        let dw = current.weight - prev.weight
+        let dr = current.reps - prev.reps
+        if abs(dw) < 0.01 && dr == 0 {
+            return DeltaChip(text: "=", color: .white.opacity(0.4))
+        }
+        if abs(dw) >= 0.01 {
+            let sign = dw > 0 ? "+" : "−"
+            let val = formatWeight(abs(dw), increment: 0.5)
+            return DeltaChip(text: "\(sign)\(val)", color: dw > 0 ? STRQPalette.success : STRQPalette.warning)
+        }
+        let sign = dr > 0 ? "+" : "−"
+        return DeltaChip(text: "\(sign)\(abs(dr))r", color: dr > 0 ? STRQPalette.success : STRQPalette.warning)
+    }
+
+    // MARK: - Previous Session Strip (compact)
 
     @ViewBuilder
-    private func previousSessionTable(_ workout: ActiveWorkoutState) -> some View {
+    private func previousSessionStrip(_ workout: ActiveWorkoutState) -> some View {
         let exerciseIndex = workout.currentExerciseIndex
         if exerciseIndex < workout.session.exerciseLogs.count {
             let log = workout.session.exerciseLogs[exerciseIndex]
             if let prev = previousSessionLog(for: log.exerciseId) {
                 let completedSets = prev.session.exerciseLogs.first(where: { $0.exerciseId == log.exerciseId })?.sets.filter(\.isCompleted) ?? []
                 if !completedSets.isEmpty {
-                    VStack(spacing: 0) {
-                        HStack(spacing: 6) {
-                            Text("LAST SESSION")
-                                .font(.system(size: 9, weight: .black))
-                                .tracking(1.2)
-                                .foregroundStyle(.white.opacity(0.45))
-                            Text("·")
-                                .foregroundStyle(.white.opacity(0.25))
-                            Text(formatRelativeDate(prev.session.startTime))
-                                .font(.system(size: 10, weight: .semibold))
-                                .foregroundStyle(.white.opacity(0.45))
-                            Spacer()
-                            Text(prev.session.dayName)
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.35))
-                                .lineLimit(1)
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.top, 10)
-                        .padding(.bottom, 8)
-
-                        Rectangle().fill(Color.white.opacity(0.04)).frame(height: 0.5)
-
-                        HStack(spacing: 0) {
-                            tableHeader("#", width: 28, alignment: .leading)
-                            tableHeader("KG")
-                            tableHeader("REPS")
-                            tableHeader("e1RM")
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.top, 8)
-                        .padding(.bottom, 4)
-
-                        ForEach(Array(completedSets.enumerated()), id: \.element.id) { _, s in
-                            HStack(spacing: 0) {
-                                Text("\(s.setNumber)")
-                                    .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
-                                    .foregroundStyle(.white.opacity(0.35))
-                                    .frame(width: 28, alignment: .leading)
-                                Text(formatWeight(s.weight, increment: 0.5))
-                                    .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
-                                    .foregroundStyle(.white.opacity(0.5))
-                                    .frame(maxWidth: .infinity)
-                                Text("\(s.reps)")
-                                    .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
-                                    .foregroundStyle(.white.opacity(0.5))
-                                    .frame(maxWidth: .infinity)
-                                Text(String(format: "%.1f", estimatedOneRM(weight: s.weight, reps: s.reps)))
-                                    .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
-                                    .foregroundStyle(.white.opacity(0.4))
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 5)
-                        }
+                    let summary = completedSets
+                        .map { "\(formatWeight($0.weight, increment: 0.5))×\($0.reps)" }
+                        .joined(separator: "  ")
+                    HStack(spacing: 8) {
+                        Text("LAST")
+                            .font(.system(size: 9, weight: .black))
+                            .tracking(1.2)
+                            .foregroundStyle(.white.opacity(0.45))
+                        Text(formatRelativeDate(prev.session.startTime))
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.45))
+                        Rectangle().fill(Color.white.opacity(0.08)).frame(width: 1, height: 12)
+                        Text(summary)
+                            .font(.system(size: 11, weight: .semibold, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.7))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                        Spacer(minLength: 0)
                     }
-                    .padding(.bottom, 10)
-                    .background(Color.white.opacity(0.02), in: .rect(cornerRadius: 12))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Color.white.opacity(0.02), in: .rect(cornerRadius: 9))
                 }
             }
         }
@@ -640,10 +861,37 @@ struct ActiveWorkoutView: View {
         return nil
     }
 
+    private func previousSetsMap(for exerciseId: String) -> [Int: SetLog] {
+        guard let prev = previousSessionLog(for: exerciseId) else { return [:] }
+        let sets = prev.session.exerciseLogs.first(where: { $0.exerciseId == exerciseId })?.sets.filter(\.isCompleted) ?? []
+        var map: [Int: SetLog] = [:]
+        for s in sets { map[s.setNumber] = s }
+        return map
+    }
+
+    private struct PersonalBest {
+        let weight: Double
+        let reps: Int
+        let e1rm: Double
+    }
+
+    private func personalBest(for exerciseId: String) -> PersonalBest? {
+        var best: PersonalBest?
+        for session in vm.workoutHistory where session.isCompleted {
+            guard let log = session.exerciseLogs.first(where: { $0.exerciseId == exerciseId }) else { continue }
+            for s in log.sets where s.isCompleted && s.weight > 0 && s.reps > 0 {
+                let e = estimatedOneRM(weight: s.weight, reps: s.reps)
+                if best == nil || e > best!.e1rm {
+                    best = PersonalBest(weight: s.weight, reps: s.reps, e1rm: e)
+                }
+            }
+        }
+        return best
+    }
+
     private func estimatedOneRM(weight: Double, reps: Int) -> Double {
         guard weight > 0, reps > 0 else { return 0 }
         if reps == 1 { return weight }
-        // Epley
         return weight * (1.0 + Double(reps) / 30.0)
     }
 
@@ -666,13 +914,13 @@ struct ActiveWorkoutView: View {
                 Image(systemName: "chevron.left")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(workout.currentExerciseIndex == 0 ? AnyShapeStyle(.quaternary) : AnyShapeStyle(Color.white.opacity(0.55)))
-                    .frame(width: 44, height: 40)
+                    .frame(width: 44, height: 38)
             }
             .disabled(workout.currentExerciseIndex == 0)
 
             Rectangle()
                 .fill(Color.white.opacity(0.05))
-                .frame(width: 1, height: 20)
+                .frame(width: 1, height: 18)
 
             if let exercise = vm.library.exercise(byId: workout.session.exerciseLogs[workout.currentExerciseIndex].exerciseId) {
                 Button { showExerciseInfo = exercise } label: {
@@ -684,19 +932,19 @@ struct ActiveWorkoutView: View {
                     }
                     .foregroundStyle(.white.opacity(0.55))
                     .frame(maxWidth: .infinity)
-                    .frame(height: 40)
+                    .frame(height: 38)
                 }
             }
 
             Rectangle()
                 .fill(Color.white.opacity(0.05))
-                .frame(width: 1, height: 20)
+                .frame(width: 1, height: 18)
 
             Button { moveToNextExercise() } label: {
                 Image(systemName: "chevron.right")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(workout.currentExerciseIndex >= workout.session.exerciseLogs.count - 1 ? AnyShapeStyle(.quaternary) : AnyShapeStyle(Color.white.opacity(0.55)))
-                    .frame(width: 44, height: 40)
+                    .frame(width: 44, height: 38)
             }
             .disabled(workout.currentExerciseIndex >= workout.session.exerciseLogs.count - 1)
         }
@@ -704,6 +952,13 @@ struct ActiveWorkoutView: View {
     }
 
     // MARK: - Up Next Preview
+
+    private func shouldShowUpNext(_ workout: ActiveWorkoutState) -> Bool {
+        let idx = workout.currentExerciseIndex
+        guard idx < workout.session.exerciseLogs.count else { return false }
+        // Only show when all sets of current exercise are done (i.e. between exercises)
+        return workout.session.exerciseLogs[idx].sets.allSatisfy(\.isCompleted)
+    }
 
     @ViewBuilder
     private func upNextPreview(_ workout: ActiveWorkoutState) -> some View {
@@ -841,12 +1096,12 @@ struct ActiveWorkoutView: View {
         }
     }
 
-    // MARK: - Rest Timer
+    // MARK: - Rest Timer Overlay
 
     @ViewBuilder
     private func restTimerOverlay(_ workout: ActiveWorkoutState) -> some View {
         ZStack {
-            Color.black.opacity(0.94).ignoresSafeArea()
+            Color.black.opacity(0.95).ignoresSafeArea()
                 .onTapGesture { }
 
             let planned = workout.currentExerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[workout.currentExerciseIndex] : nil
@@ -856,49 +1111,44 @@ struct ActiveWorkoutView: View {
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
 
-                VStack(spacing: 14) {
-                    Text("REST")
-                        .font(.system(size: 11, weight: .black))
-                        .foregroundStyle(STRQBrand.steel)
-                        .tracking(2.5)
-
-                    ZStack {
-                        Circle()
-                            .stroke(Color.white.opacity(0.06), lineWidth: 6)
-                            .frame(width: 196, height: 196)
-                        Circle()
-                            .trim(from: 0, to: progress)
-                            .stroke(
-                                restTimeRemaining <= 10 ? STRQPalette.warning : Color.white,
-                                style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                            )
-                            .frame(width: 196, height: 196)
-                            .rotationEffect(.degrees(-90))
-                            .animation(.linear(duration: 1), value: restTimeRemaining)
-
-                        VStack(spacing: 6) {
-                            Text(formatTime(restTimeRemaining))
-                                .font(.system(size: 52, weight: .bold, design: .monospaced))
-                                .foregroundStyle(restTimeRemaining <= 10 ? STRQPalette.warning : .white)
-                                .contentTransition(.numericText(countsDown: true))
-                            Text("remaining")
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.35))
-                                .tracking(0.5)
+                // Just logged summary
+                if let last = lastLoggedSet,
+                   last.exerciseIndex < workout.session.exerciseLogs.count,
+                   last.setIndex < workout.session.exerciseLogs[last.exerciseIndex].sets.count {
+                    let loggedSet = workout.session.exerciseLogs[last.exerciseIndex].sets[last.setIndex]
+                    let e1rm = estimatedOneRM(weight: loggedSet.weight, reps: loggedSet.reps)
+                    VStack(spacing: 4) {
+                        Text("JUST LOGGED")
+                            .font(.system(size: 9, weight: .black))
+                            .tracking(1.5)
+                            .foregroundStyle(STRQBrand.steel)
+                        HStack(spacing: 10) {
+                            Text("Set \(loggedSet.setNumber)")
+                                .font(.system(size: 11, weight: .heavy).monospacedDigit())
+                                .foregroundStyle(.white.opacity(0.55))
+                            Text("\(formatWeight(loggedSet.weight, increment: 0.5)) × \(loggedSet.reps)")
+                                .font(.system(size: 20, weight: .heavy, design: .rounded).monospacedDigit())
+                                .foregroundStyle(.white)
+                            if e1rm > 0 {
+                                Rectangle().fill(Color.white.opacity(0.15)).frame(width: 1, height: 14)
+                                Text(String(format: "e1RM %.0f", e1rm))
+                                    .font(.system(size: 11, weight: .bold).monospacedDigit())
+                                    .foregroundStyle(.white.opacity(0.6))
+                            }
                         }
                     }
+                    .padding(.bottom, 14)
                 }
 
-                Spacer(minLength: 24)
-
+                // SET FEEL (moved above timer)
                 if let last = lastLoggedSet,
                    last.exerciseIndex < workout.session.exerciseLogs.count,
                    last.setIndex < workout.session.exerciseLogs[last.exerciseIndex].sets.count {
                     let currentQuality = workout.session.exerciseLogs[last.exerciseIndex].sets[last.setIndex].quality
-                    VStack(spacing: 12) {
-                        Text("SET FEEL")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(.white.opacity(0.35))
+                    VStack(spacing: 8) {
+                        Text("HOW DID THAT FEEL?")
+                            .font(.system(size: 9, weight: .black))
+                            .foregroundStyle(.white.opacity(0.4))
                             .tracking(1.5)
                         HStack(spacing: 6) {
                             ForEach(SetQuality.allCases, id: \.self) { quality in
@@ -906,35 +1156,93 @@ struct ActiveWorkoutView: View {
                                 Button {
                                     setQuality(exerciseIndex: last.exerciseIndex, setIndex: last.setIndex, quality: isSelected ? nil : quality)
                                 } label: {
-                                    VStack(spacing: 5) {
+                                    VStack(spacing: 4) {
                                         Image(systemName: quality.icon)
-                                            .font(.system(size: 14, weight: .semibold))
+                                            .font(.system(size: 13, weight: .semibold))
                                         Text(quality.shortLabel)
                                             .font(.system(size: 9, weight: .bold))
                                     }
-                                    .foregroundStyle(isSelected ? .black : .white.opacity(0.65))
+                                    .foregroundStyle(isSelected ? .black : .white.opacity(0.7))
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: 54)
+                                    .frame(height: 48)
                                     .background(
                                         isSelected
                                             ? AnyShapeStyle(qualityColor(quality.colorName))
                                             : AnyShapeStyle(Color.white.opacity(0.05)),
-                                        in: .rect(cornerRadius: 12)
+                                        in: .rect(cornerRadius: 11)
                                     )
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
+                                        RoundedRectangle(cornerRadius: 11)
                                             .strokeBorder(Color.white.opacity(isSelected ? 0 : 0.06), lineWidth: 1)
                                     )
                                 }
+                                .buttonStyle(.strqPressable)
                             }
                         }
                     }
                     .padding(.horizontal, 20)
+                    .padding(.bottom, 18)
                 }
 
-                Spacer(minLength: 28)
+                // Timer ring (smaller, more utility-focused)
+                ZStack {
+                    Circle()
+                        .stroke(Color.white.opacity(0.06), lineWidth: 5)
+                        .frame(width: 168, height: 168)
+                    Circle()
+                        .trim(from: 0, to: progress)
+                        .stroke(
+                            restTimeRemaining <= 10 ? STRQPalette.warning : Color.white,
+                            style: StrokeStyle(lineWidth: 5, lineCap: .round)
+                        )
+                        .frame(width: 168, height: 168)
+                        .rotationEffect(.degrees(-90))
+                        .animation(.linear(duration: 1), value: restTimeRemaining)
 
-                HStack(spacing: 14) {
+                    VStack(spacing: 4) {
+                        Text("REST")
+                            .font(.system(size: 10, weight: .black))
+                            .tracking(2.0)
+                            .foregroundStyle(.white.opacity(0.5))
+                        Text(formatTime(restTimeRemaining))
+                            .font(.system(size: 42, weight: .bold, design: .monospaced))
+                            .foregroundStyle(restTimeRemaining <= 10 ? STRQPalette.warning : .white)
+                            .contentTransition(.numericText(countsDown: true))
+                    }
+                }
+
+                Spacer(minLength: 20)
+
+                // Next set recommendation
+                if let nextRec = nextSetRecommendation(workout) {
+                    VStack(spacing: 5) {
+                        Text("NEXT SET")
+                            .font(.system(size: 9, weight: .black))
+                            .foregroundStyle(.white.opacity(0.4))
+                            .tracking(1.5)
+                        Text(nextRec.primary)
+                            .font(.system(size: 18, weight: .heavy, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.white)
+                        Text(nextRec.detail)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.55))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 18)
+                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+                    )
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 14)
+                }
+
+                // Timer controls
+                HStack(spacing: 12) {
                     Button { restTimeRemaining = max(0, restTimeRemaining - 15) } label: {
                         Text("−15s")
                             .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -970,41 +1278,84 @@ struct ActiveWorkoutView: View {
                 }
                 .padding(.horizontal, 20)
 
-                if let nextUp = nextUpPreview(workout) {
-                    VStack(spacing: 6) {
-                        Text("UP NEXT")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(.white.opacity(0.28))
-                            .tracking(1.5)
-                        Text(nextUp)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.white.opacity(0.7))
-                            .lineLimit(1)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .padding(.horizontal, 20)
-                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
-                    )
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
-                }
-
-                Spacer(minLength: 24)
+                Spacer(minLength: 20)
             }
-            .padding(.top, 40)
+            .padding(.top, 36)
             .padding(.bottom, 20)
         }
     }
 
-    private func nextUpPreview(_ workout: ActiveWorkoutState) -> String? {
-        let nextIdx = workout.currentExerciseIndex + 1
-        guard nextIdx < workout.session.exerciseLogs.count else { return nil }
-        let nextLog = workout.session.exerciseLogs[nextIdx]
-        return vm.library.exercise(byId: nextLog.exerciseId)?.name ?? nextLog.exerciseId
+    private struct NextSetRec {
+        let primary: String
+        let detail: String
+    }
+
+    private func nextSetRecommendation(_ workout: ActiveWorkoutState) -> NextSetRec? {
+        guard let last = lastLoggedSet,
+              last.exerciseIndex < workout.session.exerciseLogs.count else { return nil }
+        let log = workout.session.exerciseLogs[last.exerciseIndex]
+        guard last.setIndex < log.sets.count else { return nil }
+        let justLogged = log.sets[last.setIndex]
+        // find next pending set
+        let nextPending = log.sets.dropFirst(last.setIndex + 1).first(where: { !$0.isCompleted })
+        guard let next = nextPending else {
+            // Last set — recommend moving on
+            let nextIdx = last.exerciseIndex + 1
+            if nextIdx < workout.session.exerciseLogs.count {
+                let nextEx = vm.library.exercise(byId: workout.session.exerciseLogs[nextIdx].exerciseId)
+                return NextSetRec(
+                    primary: nextEx?.name ?? "Next exercise",
+                    detail: "All sets done — move on when ready"
+                )
+            }
+            return nil
+        }
+
+        let planned = last.exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[last.exerciseIndex] : nil
+        let quality = justLogged.quality
+        var targetWeight = next.weight > 0 ? next.weight : justLogged.weight
+        var targetReps = next.reps > 0 ? next.reps : justLogged.reps
+        var guidance = "Match the last set"
+
+        let exercise = vm.library.exercise(byId: log.exerciseId)
+        let increment = weightIncrement(for: exercise)
+
+        if let q = quality {
+            switch q {
+            case .tooEasy:
+                targetWeight = roundTo(targetWeight + max(increment, 2.5), step: increment)
+                guidance = "Last set felt easy — add load"
+            case .onTarget:
+                guidance = "Hold steady — same load & reps"
+            case .grinder:
+                guidance = "Tough finish — hold load, aim for same reps"
+            case .formBreakdown:
+                targetWeight = roundTo(max(0, targetWeight - max(increment, 2.5)), step: increment)
+                guidance = "Form broke — drop load to clean it up"
+            case .pain:
+                guidance = "Pain signal — swap or skip the next set"
+            }
+        } else if let p = planned, let plannedTopReps = parsePlannedReps(p.reps), justLogged.reps >= plannedTopReps {
+            targetWeight = roundTo(targetWeight + increment, step: increment)
+            guidance = "Hit target reps — nudge weight up"
+        }
+
+        let primary: String
+        if targetWeight <= 0 && (exercise?.isBodyweight ?? false) {
+            primary = "Set \(next.setNumber) · BW × \(targetReps)"
+        } else {
+            primary = "Set \(next.setNumber) · \(formatWeight(targetWeight, increment: increment)) × \(targetReps)"
+        }
+        // Apply suggestion to the set so inputs pre-fill
+        if next.weight != targetWeight || next.reps != targetReps {
+            let setIndex = last.setIndex + 1 + (log.sets.dropFirst(last.setIndex + 1).firstIndex(where: { !$0.isCompleted }) ?? 0)
+            if setIndex < log.sets.count {
+                vm.updateSetLoad(exerciseIndex: last.exerciseIndex, setIndex: setIndex, weight: targetWeight, reps: targetReps)
+            }
+            _ = targetReps
+        }
+
+        return NextSetRec(primary: primary, detail: guidance)
     }
 
     // MARK: - Exercise List Sheet
@@ -1071,7 +1422,15 @@ struct ActiveWorkoutView: View {
         }
     }
 
-    // MARK: - Actions
+    // MARK: - Actions & helpers
+
+    private func activeSetFor(log: ExerciseLog, workout: ActiveWorkoutState) -> SetLog? {
+        let currentSetIdx = workout.currentSetIndex
+        if currentSetIdx < log.sets.count && !log.sets[currentSetIdx].isCompleted {
+            return log.sets[currentSetIdx]
+        }
+        return log.sets.first(where: { !$0.isCompleted })
+    }
 
     private func updateSet(exerciseIndex: Int, setIndex: Int, weight: Double, reps: Int) {
         withAnimation(.snappy(duration: 0.15)) {
@@ -1081,9 +1440,9 @@ struct ActiveWorkoutView: View {
 
     private func completeSet(exerciseIndex: Int, setIndex: Int) {
         let rest = vm.completeCurrentSet(exerciseIndex: exerciseIndex, setIndex: setIndex)
-        guard rest > 0 else { return }
         setCompletedTrigger.toggle()
         lastLoggedSet = (exerciseIndex, setIndex)
+        guard rest > 0 else { return }
         restTimeRemaining = rest
         restTimerActive = true
     }
@@ -1120,9 +1479,13 @@ struct ActiveWorkoutView: View {
         vm.jumpToExercise(index)
     }
 
-    private func liveRestEndsAt() -> Date? {
-        guard restTimerActive, restTimeRemaining > 0 else { return nil }
-        return Date().addingTimeInterval(TimeInterval(restTimeRemaining))
+    private func applyNumericEdit(ctx: NumericEditContext, newValue: Double) {
+        switch ctx.field {
+        case .weight:
+            updateSet(exerciseIndex: ctx.exerciseIndex, setIndex: ctx.setIndex, weight: max(0, newValue), reps: ctx.currentReps)
+        case .reps:
+            updateSet(exerciseIndex: ctx.exerciseIndex, setIndex: ctx.setIndex, weight: ctx.currentWeight, reps: max(0, Int(newValue.rounded())))
+        }
     }
 
     private func startTimer() {
@@ -1168,6 +1531,49 @@ struct ActiveWorkoutView: View {
         return String(format: "%.1f", weight)
     }
 
+    private func formatRPE(_ rpe: Double) -> String {
+        if rpe.truncatingRemainder(dividingBy: 1) == 0 { return "\(Int(rpe))" }
+        return String(format: "%.1f", rpe)
+    }
+
+    private func roundTo(_ value: Double, step: Double) -> Double {
+        guard step > 0 else { return value }
+        return (value / step).rounded() * step
+    }
+
+    private func parsePlannedReps(_ reps: String?) -> Int? {
+        guard let r = reps else { return nil }
+        let parts = r.split(whereSeparator: { !$0.isNumber })
+        // Use the top of the rep range (e.g. "8-10" → 10) for "target" comparison
+        if parts.count >= 2, let top = Int(parts[1]) { return top }
+        if let only = parts.first.flatMap({ Int($0) }) { return only }
+        return nil
+    }
+
+    private func plateMathLabel(weight: Double, exercise: Exercise?) -> String? {
+        guard let ex = exercise, ex.equipment.contains(.barbell) else { return nil }
+        let barWeight: Double = 20
+        guard weight >= barWeight + 2.5 else { return nil }
+        let perSide = (weight - barWeight) / 2.0
+        let plates: [Double] = [25, 20, 15, 10, 5, 2.5, 1.25]
+        var remaining = perSide
+        var counts: [(Double, Int)] = []
+        for p in plates {
+            let c = Int(remaining / p)
+            if c > 0 {
+                counts.append((p, c))
+                remaining -= Double(c) * p
+            }
+            if remaining < 0.01 { break }
+        }
+        guard !counts.isEmpty, remaining < 0.1 else { return nil }
+        let parts = counts.map { plate, count -> String in
+            let pStr = plate.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(plate))" : String(format: "%.2g", plate)
+            return count > 1 ? "\(count)×\(pStr)" : pStr
+        }
+        return parts.joined(separator: "+") + " /side"
+    }
+
     private func guidanceColor(_ name: String) -> Color {
         switch name {
         case "green": return STRQPalette.success
@@ -1181,3 +1587,78 @@ struct ActiveWorkoutView: View {
     }
 }
 
+// MARK: - Numeric Input Sheet
+
+struct NumericEditContext: Identifiable {
+    enum Field { case weight, reps }
+    let id = UUID()
+    let field: Field
+    let exerciseIndex: Int
+    let setIndex: Int
+    let currentWeight: Double
+    let currentReps: Int
+    let title: String
+    let unit: String
+}
+
+private struct NumericInputSheet: View {
+    let context: NumericEditContext
+    let onSave: (Double) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var text: String = ""
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Text(context.unit.uppercased())
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.5)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 8)
+
+                TextField("", text: $text)
+                    .keyboardType(context.field == .weight ? .decimalPad : .numberPad)
+                    .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.primary)
+                    .focused($focused)
+
+                HStack(spacing: 12) {
+                    Button("Cancel") { dismiss() }
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(Color(.tertiarySystemFill), in: .rect(cornerRadius: 14))
+
+                    Button("Save") {
+                        let normalized = text.replacingOccurrences(of: ",", with: ".")
+                        if let value = Double(normalized) {
+                            onSave(value)
+                        }
+                        dismiss()
+                    }
+                    .font(.body.weight(.heavy))
+                    .foregroundStyle(.black)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 14))
+                }
+                .padding(.horizontal)
+            }
+            .padding()
+            .navigationTitle(context.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                text = context.field == .weight
+                    ? (context.currentWeight.truncatingRemainder(dividingBy: 1) == 0
+                        ? "\(Int(context.currentWeight))"
+                        : String(format: "%.1f", context.currentWeight))
+                    : "\(context.currentReps)"
+                focused = true
+            }
+        }
+    }
+}
