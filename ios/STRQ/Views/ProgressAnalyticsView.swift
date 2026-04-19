@@ -1,6 +1,10 @@
 import SwiftUI
 import Charts
 
+enum ProgressRoute: Hashable {
+    case history
+}
+
 struct ProgressAnalyticsView: View {
     let vm: AppViewModel
     @State private var selectedTab: Int = 0
@@ -15,6 +19,11 @@ struct ProgressAnalyticsView: View {
 
                 signalStrip
                     .padding(.horizontal, 16)
+
+                if !vm.isEarlyStage {
+                    recentImprovementCard
+                        .padding(.horizontal, 16)
+                }
 
                 tabSelector
                     .padding(.horizontal, 16)
@@ -224,6 +233,7 @@ struct ProgressAnalyticsView: View {
                 strengthBaselineCard
             }
             prHighlights
+            recentSessionsCard
             consistencyHeatmap
         }
         .opacity(appeared ? 1 : 0)
@@ -331,40 +341,40 @@ struct ProgressAnalyticsView: View {
     }
 
     private var prHighlights: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Recent PRs")
+        let sortedPRs = vm.personalRecords.sorted { $0.date > $1.date }
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                ForgeSectionHeader(title: "Personal Records")
+                Spacer()
+                if !sortedPRs.isEmpty {
+                    Text("\(sortedPRs.count)")
+                        .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
+                        .foregroundStyle(STRQBrand.steel)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+                }
+            }
 
-            let sortedPRs = vm.personalRecords.sorted { $0.date > $1.date }
             if sortedPRs.isEmpty {
-                HStack(spacing: 8) {
+                HStack(spacing: 10) {
                     Image(systemName: "trophy")
-                        .foregroundStyle(.secondary)
-                    Text("No personal records yet. Keep training!")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    Text("No personal records yet. Log a heavy set to earn your first.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(.vertical, 6)
-            } else {
-                ForEach(Array(sortedPRs.prefix(3).enumerated()), id: \.element.id) { _, pr in
-                    HStack(spacing: 12) {
-                        Image(systemName: "trophy.fill")
-                            .font(.caption)
-                            .foregroundStyle(STRQBrand.steel)
-                            .frame(width: 28, height: 28)
-                            .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 8))
-
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(vm.library.exercise(byId: pr.exerciseId)?.name ?? pr.exerciseId)
-                                .font(.subheadline.weight(.semibold))
-                                .lineLimit(1)
-                            Text("\(Int(pr.weight))kg × \(pr.reps) · \(pr.date.formatted(.dateTime.month(.abbreviated).day()))")
-                                .font(.caption)
-                                .foregroundStyle(.tertiary)
+                .padding(.vertical, 4)
+            } else if let top = sortedPRs.first {
+                featuredPRRow(top)
+                if sortedPRs.count > 1 {
+                    Rectangle().fill(Color.white.opacity(0.05)).frame(height: 0.5)
+                    VStack(spacing: 8) {
+                        ForEach(Array(sortedPRs.dropFirst().prefix(3)), id: \.id) { pr in
+                            compactPRRow(pr)
                         }
-                        Spacer()
-                        Text("\(Int(pr.estimatedOneRepMax))kg")
-                            .font(.system(.subheadline, design: .rounded, weight: .bold).monospacedDigit())
-                            .foregroundStyle(.white)
                     }
                 }
             }
@@ -375,6 +385,269 @@ struct ProgressAnalyticsView: View {
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
         )
+    }
+
+    private func featuredPRRow(_ pr: PersonalRecord) -> some View {
+        HStack(alignment: .center, spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.yellow.opacity(0.22), Color.yellow.opacity(0.06)],
+                            startPoint: .topLeading, endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 44, height: 44)
+                Image(systemName: "trophy.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Color(red: 1.0, green: 0.86, blue: 0.42), Color(red: 0.95, green: 0.72, blue: 0.24)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+            }
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text("LATEST PR")
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(1.2)
+                    .foregroundStyle(.yellow.opacity(0.8))
+                Text(vm.library.exercise(byId: pr.exerciseId)?.name ?? pr.exerciseId)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+                Text(pr.date.formatted(.dateTime.month(.abbreviated).day().year()))
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+            Spacer(minLength: 0)
+            VStack(alignment: .trailing, spacing: 2) {
+                HStack(alignment: .lastTextBaseline, spacing: 3) {
+                    Text("\(Int(pr.weight))")
+                        .font(.system(size: 22, weight: .heavy, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white)
+                    Text("kg")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+                Text("× \(pr.reps) · e1RM \(Int(pr.estimatedOneRepMax))")
+                    .font(.caption2.weight(.medium).monospacedDigit())
+                    .foregroundStyle(.tertiary)
+            }
+        }
+    }
+
+    private func compactPRRow(_ pr: PersonalRecord) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "trophy.fill")
+                .font(.system(size: 10))
+                .foregroundStyle(STRQBrand.steel)
+                .frame(width: 20)
+            Text(vm.library.exercise(byId: pr.exerciseId)?.name ?? pr.exerciseId)
+                .font(.caption.weight(.medium))
+                .lineLimit(1)
+            Spacer(minLength: 8)
+            Text("\(Int(pr.weight))kg × \(pr.reps)")
+                .font(.system(size: 11, weight: .semibold, design: .rounded).monospacedDigit())
+                .foregroundStyle(.secondary)
+            Text(pr.date.formatted(.dateTime.month(.abbreviated).day()))
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(.tertiary)
+                .frame(width: 52, alignment: .trailing)
+        }
+    }
+
+    // MARK: - Recent Improvement
+
+    private var recentImprovementCard: some View {
+        let calendar = Calendar.current
+        let now = Date()
+        let weekAgo = calendar.date(byAdding: .day, value: -7, to: now) ?? now
+        let twoWeeksAgo = calendar.date(byAdding: .day, value: -14, to: now) ?? now
+        let thisWeek = vm.workoutHistory.filter { $0.startTime > weekAgo && $0.isCompleted }
+        let lastWeek = vm.workoutHistory.filter { $0.startTime > twoWeeksAgo && $0.startTime <= weekAgo && $0.isCompleted }
+        let volumeThis = thisWeek.reduce(0.0) { $0 + $1.totalVolume }
+        let volumeLast = lastWeek.reduce(0.0) { $0 + $1.totalVolume }
+        let volumeDelta = volumeThis - volumeLast
+        let sessionsDelta = thisWeek.count - lastWeek.count
+        let prsThisWeek = vm.personalRecords.filter { $0.date > weekAgo }.count
+        let progressing = vm.progressingExercises.count
+
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                Text("RECENT IMPROVEMENT")
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.2)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("vs last week")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.tertiary)
+            }
+
+            HStack(spacing: 8) {
+                improvementCell(
+                    label: "Volume",
+                    delta: volumeDelta == 0 ? "—" : String(format: "%@%@", volumeDelta > 0 ? "+" : "", ForgeTheme.formatVolume(volumeDelta)),
+                    unit: volumeDelta == 0 ? nil : "kg",
+                    positive: volumeDelta > 0,
+                    negative: volumeDelta < 0 && volumeLast > 0
+                )
+                improvementCell(
+                    label: "Sessions",
+                    delta: sessionsDelta == 0 ? "\(thisWeek.count)" : String(format: "%@%d", sessionsDelta > 0 ? "+" : "", sessionsDelta),
+                    unit: nil,
+                    positive: sessionsDelta > 0,
+                    negative: sessionsDelta < 0
+                )
+                improvementCell(
+                    label: "New PRs",
+                    delta: "\(prsThisWeek)",
+                    unit: nil,
+                    positive: prsThisWeek > 0,
+                    negative: false
+                )
+                improvementCell(
+                    label: "Progressing",
+                    delta: "\(progressing)",
+                    unit: nil,
+                    positive: progressing > 0,
+                    negative: false
+                )
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+    }
+
+    private func improvementCell(label: String, delta: String, unit: String?, positive: Bool, negative: Bool) -> some View {
+        let color: Color = positive ? .green : (negative ? .red : .secondary)
+        return VStack(alignment: .leading, spacing: 3) {
+            HStack(alignment: .lastTextBaseline, spacing: 1) {
+                Text(delta)
+                    .font(.system(size: 15, weight: .heavy, design: .rounded).monospacedDigit())
+                    .foregroundStyle(color)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                if let unit {
+                    Text(unit)
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(color.opacity(0.6))
+                }
+            }
+            Text(label)
+                .font(.system(size: 9, weight: .bold))
+                .tracking(0.3)
+                .foregroundStyle(.tertiary)
+                .textCase(.uppercase)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 10)
+        .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 10))
+    }
+
+    // MARK: - Recent Sessions
+
+    private var recentSessionsCard: some View {
+        let recent = vm.workoutHistory
+            .filter(\.isCompleted)
+            .sorted { $0.startTime > $1.startTime }
+            .prefix(3)
+
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                ForgeSectionHeader(title: "Recent Sessions")
+                Spacer()
+                if !recent.isEmpty {
+                    NavigationLink(value: ProgressRoute.history) {
+                        HStack(spacing: 3) {
+                            Text("All")
+                                .font(.caption.weight(.semibold))
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 9, weight: .bold))
+                        }
+                        .foregroundStyle(STRQBrand.steel)
+                    }
+                }
+            }
+
+            if recent.isEmpty {
+                HStack(spacing: 10) {
+                    Image(systemName: "figure.strengthtraining.traditional")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("Sessions will appear here once you complete your first workout.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.vertical, 4)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(Array(recent.enumerated()), id: \.element.id) { index, session in
+                        sessionLogRow(session)
+                        if index < recent.count - 1 {
+                            Rectangle().fill(Color.white.opacity(0.04)).frame(height: 0.5)
+                                .padding(.leading, 42)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+        .navigationDestination(for: ProgressRoute.self) { route in
+            switch route {
+            case .history: SessionHistoryView(vm: vm)
+            }
+        }
+    }
+
+    private func sessionLogRow(_ session: WorkoutSession) -> some View {
+        let duration = session.endTime.map { Int($0.timeIntervalSince(session.startTime) / 60) } ?? 0
+        let sets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
+        return HStack(spacing: 12) {
+            VStack(spacing: 1) {
+                Text(session.startTime.formatted(.dateTime.day()))
+                    .font(.system(size: 14, weight: .heavy, design: .rounded).monospacedDigit())
+                    .foregroundStyle(.white)
+                Text(session.startTime.formatted(.dateTime.month(.abbreviated)))
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundStyle(.tertiary)
+                    .textCase(.uppercase)
+                    .tracking(0.3)
+            }
+            .frame(width: 30)
+            .padding(.vertical, 4)
+
+            Rectangle().fill(Color.white.opacity(0.06)).frame(width: 0.5, height: 30)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(session.dayName)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Text("\(duration)min")
+                    Text("·").foregroundStyle(.quaternary)
+                    Text("\(sets) sets")
+                    Text("·").foregroundStyle(.quaternary)
+                    Text(ForgeTheme.formatVolume(session.totalVolume) + "kg")
+                }
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(.tertiary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 8)
     }
 
     @ViewBuilder
