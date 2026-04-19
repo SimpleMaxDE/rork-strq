@@ -286,7 +286,7 @@ struct ActiveWorkoutView: View {
             let activeSetIndex = currentSet.flatMap { s in log.sets.firstIndex(where: { $0.id == s.id }) } ?? currentSetIdx
 
             if let setLog = currentSet {
-                VStack(spacing: 18) {
+                VStack(spacing: 16) {
                     HStack(alignment: .firstTextBaseline) {
                         HStack(spacing: 6) {
                             Text("SET")
@@ -305,18 +305,25 @@ struct ActiveWorkoutView: View {
                         if let suggestion = vm.loadSuggestion(for: log.exerciseId, planned: planned),
                            suggestion.suggestedWeight > 0,
                            abs(suggestion.suggestedWeight - setLog.weight) > 0.01 {
-                            HStack(spacing: 4) {
-                                Image(systemName: "scope")
-                                    .font(.system(size: 9, weight: .bold))
-                                Text("target \(suggestion.formattedWeight)")
-                                    .font(.system(size: 10, weight: .bold).monospacedDigit())
+                            Button {
+                                updateSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex, weight: suggestion.suggestedWeight, reps: setLog.reps)
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "scope")
+                                        .font(.system(size: 9, weight: .bold))
+                                    Text("target \(suggestion.formattedWeight)")
+                                        .font(.system(size: 10, weight: .bold).monospacedDigit())
+                                }
+                                .foregroundStyle(.white.opacity(0.5))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.white.opacity(0.05), in: Capsule())
                             }
-                            .foregroundStyle(.white.opacity(0.45))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.white.opacity(0.05), in: Capsule())
+                            .buttonStyle(.plain)
                         }
                     }
+
+                    loggerComparisonRow(log: log, currentSet: setLog, exerciseIndex: exerciseIndex, workout: workout)
 
                     HStack(spacing: 14) {
                         let exerciseForIncrement = vm.library.exercise(byId: log.exerciseId)
@@ -455,6 +462,59 @@ struct ActiveWorkoutView: View {
                 .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 22))
             }
         }
+    }
+
+    // MARK: - Comparison Row
+
+    @ViewBuilder
+    private func loggerComparisonRow(log: ExerciseLog, currentSet: SetLog, exerciseIndex: Int, workout: ActiveWorkoutState) -> some View {
+        let last = vm.lastPerformance(for: log.exerciseId)
+        let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
+        let targetReps = planned?.reps ?? "—"
+
+        HStack(spacing: 0) {
+            comparisonCell(
+                label: "LAST",
+                value: last.map { "\(formatWeight($0.topWeight, increment: 0.5))×\($0.topReps)" } ?? "—",
+                emphasis: false
+            )
+            comparisonDivider
+            comparisonCell(
+                label: "TARGET",
+                value: "\(targetReps) reps",
+                emphasis: false
+            )
+            comparisonDivider
+            comparisonCell(
+                label: "NOW",
+                value: "\(formatWeight(currentSet.weight, increment: 0.5))×\(currentSet.reps)",
+                emphasis: true
+            )
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 4)
+        .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 10))
+    }
+
+    private func comparisonCell(label: String, value: String, emphasis: Bool) -> some View {
+        VStack(spacing: 3) {
+            Text(label)
+                .font(.system(size: 8, weight: .black))
+                .tracking(0.8)
+                .foregroundStyle(.white.opacity(emphasis ? 0.55 : 0.32))
+            Text(value)
+                .font(.system(size: 12, weight: .bold, design: .rounded).monospacedDigit())
+                .foregroundStyle(.white.opacity(emphasis ? 1.0 : 0.55))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var comparisonDivider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.06))
+            .frame(width: 1, height: 22)
     }
 
     // MARK: - Remaining Sets Strip

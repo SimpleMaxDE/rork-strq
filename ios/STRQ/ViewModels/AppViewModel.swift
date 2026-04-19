@@ -396,6 +396,34 @@ class AppViewModel {
         coachingCoordinator.todayPrescription(for: planned)
     }
 
+    struct LastPerformance {
+        let date: Date
+        let topWeight: Double
+        let topReps: Int
+        let totalSets: Int
+        let totalReps: Int
+        let bestVolume: Double
+    }
+
+    func lastPerformance(for exerciseId: String) -> LastPerformance? {
+        for session in workoutHistory where session.isCompleted {
+            guard let log = session.exerciseLogs.first(where: { $0.exerciseId == exerciseId }) else { continue }
+            let doneSets = log.sets.filter(\.isCompleted)
+            guard !doneSets.isEmpty else { continue }
+            let top = doneSets.max(by: { $0.weight < $1.weight }) ?? doneSets[0]
+            let volume = doneSets.reduce(0.0) { $0 + $1.weight * Double($1.reps) }
+            return LastPerformance(
+                date: session.startTime,
+                topWeight: top.weight,
+                topReps: top.reps,
+                totalSets: doneSets.count,
+                totalReps: doneSets.reduce(0) { $0 + $1.reps },
+                bestVolume: volume
+            )
+        }
+        return nil
+    }
+
     func nextSessionGuidance(for exerciseId: String) -> NextSessionGuidance? {
         startingLoadEngine.nextSessionSuggestion(
             exerciseId: exerciseId,

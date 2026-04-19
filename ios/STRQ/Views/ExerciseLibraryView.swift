@@ -105,52 +105,42 @@ struct ExerciseLibraryView: View {
     }
 
     private var libraryHero: some View {
-        VStack(spacing: 16) {
-            HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "books.vertical.fill")
-                            .font(.caption)
-                            .foregroundStyle(STRQBrand.steel)
-                        Text("CURATED LIBRARY")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(STRQBrand.steel)
-                            .tracking(0.5)
-                    }
-
-                    Text("\(library.exercises.count)")
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
-                        .foregroundStyle(.primary)
-                    + Text(" exercises")
-                        .font(.title3.weight(.medium))
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-
-                VStack(alignment: .trailing, spacing: 8) {
-                    libraryStatChip("\(TrainingWorld.allCases.count) worlds", icon: "globe", color: .blue)
-                    libraryStatChip("\(MuscleGroup.allCases.count) muscles", icon: "figure.strengthtraining.traditional", color: .green)
-                    if !vm.favoriteExerciseIds.isEmpty {
-                        libraryStatChip("\(vm.favoriteExerciseIds.count) favorites", icon: "heart.fill", color: .red)
-                    }
-                }
-            }
+        HStack(alignment: .center, spacing: 0) {
+            libraryStatColumn(value: "\(library.exercises.count)", label: "Exercises")
+            libraryDivider
+            libraryStatColumn(value: "\(MuscleGroup.allCases.count)", label: "Muscles")
+            libraryDivider
+            libraryStatColumn(value: "\(TrainingWorld.allCases.count)", label: "Worlds")
+            libraryDivider
+            libraryStatColumn(value: "\(vm.favoriteExerciseIds.count)", label: "Favorites")
         }
-        .padding(18)
-        .background(
-            LinearGradient(
-                colors: [STRQBrand.steel.opacity(0.06), Color.clear],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(.rect(cornerRadius: 20))
+        .padding(.vertical, 14)
+        .padding(.horizontal, 4)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 10)
+        .offset(y: appeared ? 0 : 6)
         .animation(.easeOut(duration: 0.5), value: appeared)
+    }
+
+    private func libraryStatColumn(value: String, label: String) -> some View {
+        VStack(spacing: 4) {
+            Text(value)
+                .font(.system(size: 22, weight: .bold, design: .rounded).monospacedDigit())
+                .foregroundStyle(.primary)
+            Text(label.uppercased())
+                .font(.system(size: 9, weight: .bold))
+                .tracking(0.8)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var libraryDivider: some View {
+        Rectangle()
+            .fill(Color(.separator).opacity(0.6))
+            .frame(width: 1, height: 28)
     }
 
     private func libraryStatChip(_ text: String, icon: String, color: Color) -> some View {
@@ -570,11 +560,11 @@ struct ExerciseLibraryView: View {
     }
 
     private var exerciseList: some View {
-        LazyVStack(spacing: 20, pinnedViews: [.sectionHeaders]) {
+        LazyVStack(spacing: 14, pinnedViews: [.sectionHeaders]) {
             ForEach(groupedExercises, id: \.0) { muscle, exercises in
                 Section {
-                    LazyVStack(spacing: 6) {
-                        ForEach(exercises) { exercise in
+                    LazyVStack(spacing: 2) {
+                        ForEach(Array(exercises.enumerated()), id: \.element.id) { index, exercise in
                             ExerciseCard(
                                 exercise: exercise,
                                 isFavorite: vm.favoriteExerciseIds.contains(exercise.id),
@@ -584,26 +574,36 @@ struct ExerciseLibraryView: View {
                             } onFavorite: {
                                 vm.toggleFavorite(exercise.id)
                             }
+                            if index < exercises.count - 1 {
+                                Rectangle()
+                                    .fill(Color(.separator).opacity(0.35))
+                                    .frame(height: 0.5)
+                                    .padding(.leading, 76)
+                            }
                         }
                     }
+                    .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
                     .padding(.horizontal, 16)
                 } header: {
                     HStack(spacing: 8) {
                         Image(systemName: muscle.symbolName)
-                            .font(.subheadline)
-                            .foregroundStyle(STRQBrand.steel)
-                        Text(muscle.displayName)
-                            .font(.subheadline.weight(.semibold))
-                        Text("\(exercises.count)")
                             .font(.caption)
+                            .foregroundStyle(STRQBrand.steel)
+                        Text(muscle.displayName.uppercased())
+                            .font(.system(size: 11, weight: .black))
+                            .tracking(1.0)
+                            .foregroundStyle(.secondary)
+                        Text("\(exercises.count)")
+                            .font(.system(size: 10, weight: .bold).monospacedDigit())
                             .foregroundStyle(.tertiary)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color(.tertiarySystemGroupedBackground), in: Capsule())
                         Spacer()
+                        Rectangle()
+                            .fill(Color(.separator).opacity(0.4))
+                            .frame(height: 0.5)
                     }
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
+                    .padding(.top, 10)
+                    .padding(.bottom, 6)
                     .background(Color(.systemBackground))
                 }
             }
@@ -731,21 +731,20 @@ struct ExerciseCard: View {
         Button(action: onTap) {
             HStack(spacing: 12) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(exerciseAccentColor.opacity(0.1))
-                        .frame(width: 48, height: 48)
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(exerciseAccentColor.opacity(0.09))
+                        .frame(width: 44, height: 44)
                     Image(systemName: exercise.primaryMuscle.symbolName)
-                        .font(.title3)
+                        .font(.system(size: 18, weight: .regular))
                         .foregroundStyle(exerciseAccentColor)
                 }
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 5) {
                         Text(exercise.name)
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.primary)
                             .lineLimit(1)
-
                         if let p = progression {
                             Image(systemName: p.plateauStatus.icon)
                                 .font(.system(size: 9))
@@ -755,49 +754,46 @@ struct ExerciseCard: View {
 
                     HStack(spacing: 6) {
                         Text(exercise.primaryMuscle.displayName)
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(STRQBrand.steel)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(.secondary)
 
-                        if exercise.category == .compound {
-                            Text("Compound")
-                                .font(.system(size: 9, weight: .semibold))
-                                .foregroundStyle(STRQBrand.steel)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 1)
-                                .background(STRQBrand.steel.opacity(0.1), in: Capsule())
-                        }
+                        Circle().fill(Color(.separator)).frame(width: 2, height: 2)
 
-                        if !exercise.equipment.filter({ $0 != .none }).isEmpty {
-                            Text(exercise.equipment.filter { $0 != .none }.first?.displayName ?? "")
-                                .font(.caption2)
+                        Text(exercise.category == .compound ? "Compound" : exercise.category.displayName)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(.secondary)
+
+                        if let equip = exercise.equipment.first(where: { $0 != .none }) {
+                            Circle().fill(Color(.separator)).frame(width: 2, height: 2)
+                            Text(equip.displayName)
+                                .font(.system(size: 11))
                                 .foregroundStyle(.tertiary)
+                                .lineLimit(1)
                         }
+                    }
+                }
 
-                        Spacer()
+                Spacer(minLength: 6)
 
-                        HStack(spacing: 2) {
-                            ForEach(0..<3, id: \.self) { i in
-                                Circle()
-                                    .fill(i < diffLevel ? diffColor : Color(.separator))
-                                    .frame(width: 4, height: 4)
-                            }
-                        }
+                HStack(spacing: 2) {
+                    ForEach(0..<3, id: \.self) { i in
+                        Capsule()
+                            .fill(i < diffLevel ? diffColor : Color(.separator).opacity(0.5))
+                            .frame(width: 3, height: 9)
                     }
                 }
 
                 Button(action: onFavorite) {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
-                        .font(.body)
-                        .foregroundStyle(isFavorite ? STRQBrand.steel : Color.secondary.opacity(0.4))
+                        .font(.system(size: 14))
+                        .foregroundStyle(isFavorite ? STRQBrand.steel : Color.secondary.opacity(0.35))
+                        .frame(width: 28, height: 28)
                 }
                 .buttonStyle(.plain)
-
-                Image(systemName: "chevron.right")
-                    .font(.caption2)
-                    .foregroundStyle(Color.secondary.opacity(0.3))
             }
-            .padding(12)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
