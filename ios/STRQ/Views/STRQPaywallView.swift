@@ -55,89 +55,145 @@ struct STRQPaywallView: View {
     }
 
     private var paywallContent: some View {
-        VStack(spacing: 0) {
-            Spacer()
+        ScrollView {
+            VStack(spacing: 0) {
+                heroSection
+                    .padding(.top, 24)
 
-            heroSection
+                Spacer().frame(height: 28)
 
-            Spacer().frame(height: 32)
+                pillarList
 
-            featureList
+                Spacer().frame(height: 22)
 
-            Spacer().frame(height: 28)
+                packageSelector
 
-            packageSelector
+                Spacer().frame(height: 6)
 
-            Spacer().frame(height: 20)
+                trialReassurance
 
-            purchaseButton
+                Spacer().frame(height: 18)
 
-            Spacer().frame(height: 14)
+                purchaseButton
 
-            restoreButton
+                Spacer().frame(height: 12)
 
-            Spacer().frame(height: 8)
+                restoreButton
 
-            legalText
+                Spacer().frame(height: 10)
 
-            Spacer().frame(height: 16)
+                legalText
+
+                Spacer().frame(height: 24)
+            }
+            .padding(.horizontal, 24)
         }
-        .padding(.horizontal, 24)
+        .scrollIndicators(.hidden)
     }
 
     private var heroSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 14) {
             ZStack {
                 Circle()
                     .fill(STRQBrand.steelGradient)
-                    .frame(width: 72, height: 72)
+                    .frame(width: 68, height: 68)
                     .overlay(
                         Circle()
                             .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
                     )
                 Image(systemName: "bolt.fill")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(.white)
             }
 
-            VStack(spacing: 8) {
-                Text("STRQ Pro")
-                    .font(.system(.title, design: .rounded, weight: .bold))
-                    .tracking(0.5)
+            VStack(spacing: 6) {
+                Text("STRQ PRO")
+                    .font(.system(size: 11, weight: .black))
+                    .tracking(2.4)
+                    .foregroundStyle(STRQBrand.steel)
 
-                Text("Unlock the full training system")
+                Text("Training that keeps adapting to you")
+                    .font(.system(.title2, design: .rounded, weight: .bold))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text("Deeper coaching, evolving plans, and your training safely synced across devices.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 2)
             }
         }
     }
 
-    private var featureList: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            featureRow(icon: "brain.head.profile.fill", text: "Advanced coach insights")
-            featureRow(icon: "chart.line.uptrend.xyaxis", text: "Weekly performance reviews")
-            featureRow(icon: "arrow.triangle.2.circlepath", text: "Adaptive plan adjustments")
-            featureRow(icon: "moon.zzz.fill", text: "Recovery & sleep intelligence")
-            featureRow(icon: "scalemass.fill", text: "Nutrition coaching")
+    private var pillarList: some View {
+        VStack(spacing: 10) {
+            pillarRow(
+                icon: "brain.head.profile.fill",
+                title: "Adaptive Coaching",
+                detail: "Readiness-aware adjustments, weekly reviews, and deeper plan reasoning."
+            )
+            pillarRow(
+                icon: "arrow.triangle.2.circlepath",
+                title: "Plans That Evolve",
+                detail: "Automatic progression, smart swaps, and training that responds to your signals."
+            )
+            pillarRow(
+                icon: "scalemass.fill",
+                title: "Physique Intelligence",
+                detail: "Bodyweight trend, protein and calorie guidance tuned to your goal."
+            )
+            pillarRow(
+                icon: "icloud.fill",
+                title: "Ecosystem Access",
+                detail: "iCloud sync, Apple Watch companion, widgets, and Live Activity."
+            )
         }
-        .padding(18)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+    }
+
+    private func pillarRow(icon: String, title: String, detail: String) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 38, height: 38)
+                .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                )
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.subheadline.weight(.bold))
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
         )
     }
 
-    private func featureRow(icon: String, text: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 14))
-                .foregroundStyle(STRQBrand.steel)
-                .frame(width: 28, height: 28)
-                .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 7))
-            Text(text)
-                .font(.subheadline.weight(.medium))
-            Spacer()
+    @ViewBuilder
+    private var trialReassurance: some View {
+        if let pkg = selectedPackage, pkg.storeProduct.introductoryDiscount != nil {
+            HStack(spacing: 6) {
+                Image(systemName: "lock.open.fill")
+                    .font(.system(size: 10, weight: .bold))
+                Text("Try free, cancel anytime before it renews")
+                    .font(.caption2.weight(.semibold))
+            }
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity)
+            .padding(.top, 10)
         }
     }
 
@@ -148,7 +204,7 @@ struct STRQPaywallView: View {
                     package: annual,
                     title: "Yearly",
                     subtitle: annualSubtitle(annual),
-                    badge: trialBadge(annual),
+                    badge: trialBadge(annual) ?? savingsBadge(),
                     isSelected: selectedPackage?.identifier == annual.identifier
                 )
             }
@@ -156,12 +212,24 @@ struct STRQPaywallView: View {
                 packageCard(
                     package: monthly,
                     title: "Monthly",
-                    subtitle: monthly.storeProduct.localizedPriceString,
+                    subtitle: "\(monthly.storeProduct.localizedPriceString)/month",
                     badge: nil,
                     isSelected: selectedPackage?.identifier == monthly.identifier
                 )
             }
         }
+    }
+
+    private func savingsBadge() -> String? {
+        guard let annual = store.annualPackage,
+              let monthly = store.monthlyPackage else { return nil }
+        let annualPrice = annual.storeProduct.price as NSDecimalNumber
+        let monthlyPrice = monthly.storeProduct.price as NSDecimalNumber
+        let monthlyAsYear = monthlyPrice.doubleValue * 12
+        guard monthlyAsYear > 0 else { return nil }
+        let saved = 1.0 - (annualPrice.doubleValue / monthlyAsYear)
+        guard saved > 0.1 else { return nil }
+        return "Save \(Int(saved * 100))%"
     }
 
     private func annualSubtitle(_ package: Package) -> String {
@@ -369,7 +437,7 @@ struct STRQPaywallView: View {
 
             Spacer().frame(height: 24)
 
-            featureList
+            pillarList
                 .padding(.horizontal, 24)
 
             Spacer().frame(height: 28)
@@ -406,7 +474,7 @@ struct STRQPaywallView: View {
 
             Spacer().frame(height: 24)
 
-            featureList
+            pillarList
                 .padding(.horizontal, 24)
 
             Spacer().frame(height: 28)

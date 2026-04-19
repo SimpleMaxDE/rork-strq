@@ -191,6 +191,23 @@ struct ProfileView: View {
         }
     }
 
+    private func proPillarChip(icon: String, label: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .semibold))
+            Text(label)
+                .font(.system(size: 10, weight: .semibold))
+        }
+        .foregroundStyle(STRQBrand.steel)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+        .overlay(
+            Capsule()
+                .strokeBorder(STRQBrand.steel.opacity(0.15), lineWidth: 0.5)
+        )
+    }
+
     private func accountActionRow(icon: String, label: String, tint: Color = STRQBrand.steel) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
@@ -304,23 +321,34 @@ struct ProfileView: View {
                     Analytics.shared.track(.paywall_viewed, ["source": "profile"])
                     showPaywall = true
                 } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "bolt.fill")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.black)
-                            .frame(width: 34, height: 34)
-                            .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 9))
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Upgrade to STRQ Pro")
-                                .font(.subheadline.weight(.bold))
-                            Text("Unlock the full training system")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "bolt.fill")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.black)
+                                .frame(width: 34, height: 34)
+                                .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 9))
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("STRQ Pro")
+                                    .font(.subheadline.weight(.bold))
+                                Text("Deeper coaching, plans that evolve, full ecosystem.")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            Spacer(minLength: 0)
+                            Image(systemName: "chevron.right")
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(.tertiary)
                         }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(.tertiary)
+
+                        HStack(spacing: 6) {
+                            proPillarChip(icon: "brain.head.profile.fill", label: "Adaptive")
+                            proPillarChip(icon: "arrow.triangle.2.circlepath", label: "Evolving")
+                            proPillarChip(icon: "icloud.fill", label: "Sync")
+                            proPillarChip(icon: "applewatch", label: "Watch")
+                        }
                     }
                     .padding(14)
                     .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
@@ -329,6 +357,7 @@ struct ProfileView: View {
                             .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
                     )
                 }
+                .buttonStyle(.plain)
             }
         }
         .manageSubscriptionsSheet(isPresented: $showManageSubscription)
