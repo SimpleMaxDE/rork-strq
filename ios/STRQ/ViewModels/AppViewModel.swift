@@ -63,6 +63,8 @@ class AppViewModel {
     var nutritionInsights: [NutritionCoachInsight] = []
     var goalPace: GoalPaceStatus?
     private let nutritionEngine = NutritionCoachEngine()
+    private let physiqueEngine = PhysiqueIntelligenceEngine()
+    var physiqueOutcome: PhysiqueOutcome?
 
     private let persistence = PersistenceStore.shared
     let account = AccountManager.shared
@@ -412,6 +414,7 @@ class AppViewModel {
         sleepEntries = []
         nutritionInsights = []
         goalPace = nil
+        physiqueOutcome = nil
         activeWorkout = nil
         onboardingPhase = .form
     }
@@ -576,6 +579,27 @@ class AppViewModel {
                 newRecs.append(rec)
                 existingRecTitles.insert(rec.title)
             }
+        }
+
+        // Physique-outcome intelligence layer — bodyweight trend + nutrition
+        // adherence vs declared goal. Routes through the existing insights +
+        // recommendations streams so no new UI surface is required.
+        let outcome = physiqueEngine.analyze(
+            profile: profile,
+            target: nutritionTarget,
+            weightEntries: bodyWeightEntries,
+            nutritionLogs: nutritionLogs,
+            recoveryScore: effectiveRecoveryScore,
+            baseConfidence: confidence
+        )
+        physiqueOutcome = outcome
+        for insight in outcome.insights where !existingTitles.contains(insight.title) {
+            newInsights.append(insight)
+            existingTitles.insert(insight.title)
+        }
+        for rec in outcome.recommendations where !existingRecTitles.contains(rec.title) {
+            newRecs.append(rec)
+            existingRecTitles.insert(rec.title)
         }
 
         _dynamicInsights = newInsights.sorted { $0.severityRank > $1.severityRank }
@@ -2004,6 +2028,15 @@ class AppViewModel {
             let weeklyChange = (last3Avg - first3Avg) / 2.0
             goalPace = nutritionEngine.goalPaceStatus(target: nutritionTarget, weeklyChange: weeklyChange)
         }
+
+        physiqueOutcome = physiqueEngine.analyze(
+            profile: profile,
+            target: nutritionTarget,
+            weightEntries: bodyWeightEntries,
+            nutritionLogs: nutritionLogs,
+            recoveryScore: effectiveRecoveryScore,
+            baseConfidence: coachingConfidence
+        )
     }
 
     var todaysNutritionLog: DailyNutritionLog? {
@@ -2148,6 +2181,9 @@ class AppViewModel {
         }
         if recovery < 50 {
             return "Recovery is low. Prioritize sleep and protein to get back on track for your next session."
+        }
+        if let summary = physiqueOutcome?.summary, !summary.isEmpty {
+            return summary
         }
         if let pace = goalPace, !pace.isOnTrack {
             return "\(pace.headline) — adjust nutrition to better match your \(goal.displayName) goal."
