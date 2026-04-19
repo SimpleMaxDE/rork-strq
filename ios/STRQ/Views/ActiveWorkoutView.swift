@@ -995,14 +995,15 @@ struct ActiveWorkoutView: View {
 
     private func weightIncrement(for exercise: Exercise?) -> Double {
         guard let ex = exercise else { return 2.5 }
-        if ex.category == .bodyweight { return 0 }
+        if ex.category == .bodyweight { return ex.isBodyweight ? 1.0 : 0 }
+        if ex.category == .isolation {
+            if ex.equipment.contains(.dumbbell) { return 1.0 }
+            return 1.25
+        }
         if ex.equipment.contains(.kettlebell) { return 4.0 }
         if ex.equipment.contains(.barbell) { return 2.5 }
         if ex.equipment.contains(.dumbbell) { return 2.0 }
-        if ex.equipment.contains(.machine) || ex.equipment.contains(.cable) {
-            return ex.category == .isolation ? 2.5 : 2.5
-        }
-        if ex.category == .isolation { return 1.25 }
+        if ex.equipment.contains(.machine) || ex.equipment.contains(.cable) { return 2.5 }
         return 2.5
     }
 
