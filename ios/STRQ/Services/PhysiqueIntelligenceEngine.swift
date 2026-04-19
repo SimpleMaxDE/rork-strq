@@ -11,8 +11,6 @@ import Foundation
 // - low signal → gentle guidance only
 // - moderate signal → small, directional adjustments
 // - high signal → direct recommendations
-//
-// It does not build a meal planner, recipe catalog, or macro obsession UI.
 
 nonisolated enum PhysiqueTrendDirection: Sendable {
     case rising
@@ -37,6 +35,12 @@ nonisolated enum PhysiquePaceVerdict: Sendable {
     case noSignal
 }
 
+nonisolated enum PhysiqueConfidenceTier: Sendable {
+    case calibrating
+    case directional
+    case confident
+}
+
 nonisolated struct BodyweightTrend: Sendable {
     let direction: PhysiqueTrendDirection
     let weeklyChangeKg: Double
@@ -44,6 +48,10 @@ nonisolated struct BodyweightTrend: Sendable {
     let entryCount: Int
     let noiseKg: Double
     let strength: PhysiqueSignalStrength
+    // Projected change in kg if current slope persists 4 weeks.
+    let projected4wKg: Double
+    // Smoothed latest weight (3-point trailing mean), for visualization anchors.
+    let smoothedLatestKg: Double?
 }
 
 nonisolated struct NutritionAdherence: Sendable {
@@ -55,10 +63,59 @@ nonisolated struct NutritionAdherence: Sendable {
     let strength: PhysiqueSignalStrength
 }
 
+/// A single explanatory driver behind the verdict. Ordered by weight.
+nonisolated struct PhysiqueDriver: Identifiable, Sendable {
+    let id: String
+    let icon: String
+    let label: String       // short label, e.g. "Protein"
+    let detail: String      // compact explanation, e.g. "42% of days hit floor"
+    let weight: Int         // relative contribution (higher = more dominant)
+    let polarity: Polarity  // supports / limits / neutral
+    let state: DriverState  // palette state for color
+
+    nonisolated enum Polarity: Sendable { case supports, limits, neutral }
+    nonisolated enum DriverState: Sendable { case success, warning, danger, info, neutral }
+
+    init(
+        id: String = UUID().uuidString,
+        icon: String,
+        label: String,
+        detail: String,
+        weight: Int,
+        polarity: Polarity,
+        state: DriverState
+    ) {
+        self.id = id
+        self.icon = icon
+        self.label = label
+        self.detail = detail
+        self.weight = weight
+        self.polarity = polarity
+        self.state = state
+    }
+}
+
+/// The single highest-leverage next step for the user this week.
+nonisolated struct PhysiquePriority: Sendable {
+    enum Kind: Sendable {
+        case tightenCalories, easeDeficit, addCalories, easeSurplus
+        case fixProtein, holdPattern, logMoreData, logWeight, logNutrition
+        case protectRecovery
+    }
+    let kind: Kind
+    let headline: String   // ~28 chars, imperative
+    let detail: String     // one line, concrete
+    let icon: String
+}
+
 nonisolated struct PhysiqueOutcome: Sendable {
     let trend: BodyweightTrend
     let nutrition: NutritionAdherence
     let paceVerdict: PhysiquePaceVerdict
+    let confidence: PhysiqueConfidenceTier
+    let drivers: [PhysiqueDriver]
+    let priority: PhysiquePriority?
+    let trainingBridge: String?
     let insights: [SmartInsight]
     let recommendations: [Recommendation]
     let summary: String?
@@ -77,6 +134,33 @@ struct PhysiqueIntelligenceEngine {
         let trend = analyzeTrend(weightEntries: weightEntries)
         let nutrition = analyzeNutrition(target: target, logs: nutritionLogs)
         let verdict = verdict(for: target, trend: trend)
+        let confidence = confidenceTier(trend: trend, nutrition: nutrition, verdict: verdict)
+
+        let drivers = buildDrivers(
+            target: target,
+            trend: trend,
+            nutrition: nutrition,
+            verdict: verdict,
+            recoveryScore: recoveryScore
+        )
+
+        let priority = buildPriority(
+            target: target,
+            trend: trend,
+            nutrition: nutrition,
+            verdict: verdict,
+            recoveryScore: recoveryScore,
+            confidence: confidence
+        )
+
+        let trainingBridge = buildTrainingBridge(
+            target: target,
+            trend: trend,
+            nutrition: nutrition,
+            verdict: verdict,
+            recoveryScore: recoveryScore,
+            confidence: confidence
+        )
 
         let insights = buildInsights(
             profile: profile,
@@ -109,6 +193,10 @@ struct PhysiqueIntelligenceEngine {
             trend: trend,
             nutrition: nutrition,
             paceVerdict: verdict,
+            confidence: confidence,
+            drivers: drivers,
+            priority: priority,
+            trainingBridge: trainingBridge,
             insights: insights,
             recommendations: recs,
             summary: summary
@@ -129,7 +217,9 @@ struct PhysiqueIntelligenceEngine {
                 spanDays: 0,
                 entryCount: recent.count,
                 noiseKg: 0,
-                strength: .insufficient
+                strength: .insufficient,
+                projected4wKg: 0,
+                smoothedLatestKg: recent.last?.weightKg
             )
         }
 
@@ -150,11 +240,16 @@ struct PhysiqueIntelligenceEngine {
         }()
 
         let direction: PhysiqueTrendDirection = {
-            // Treat change as meaningful only if it clears noise and a minimum threshold.
             let threshold = max(0.08, noise * 0.4)
             if weeklyChange > threshold { return .rising }
             if weeklyChange < -threshold { return .falling }
             return .stable
+        }()
+
+        let smoothed: Double? = {
+            guard recent.count >= 3 else { return recent.last?.weightKg }
+            let tail = recent.suffix(3).map(\.weightKg)
+            return tail.reduce(0, +) / Double(tail.count)
         }()
 
         return BodyweightTrend(
@@ -163,7 +258,9 @@ struct PhysiqueIntelligenceEngine {
             spanDays: spanDays,
             entryCount: recent.count,
             noiseKg: noise,
-            strength: strength
+            strength: strength,
+            projected4wKg: weeklyChange * 4.0,
+            smoothedLatestKg: smoothed
         )
     }
 
@@ -260,6 +357,314 @@ struct PhysiqueIntelligenceEngine {
         }
     }
 
+    // MARK: - Confidence tier
+
+    private func confidenceTier(
+        trend: BodyweightTrend,
+        nutrition: NutritionAdherence,
+        verdict: PhysiquePaceVerdict
+    ) -> PhysiqueConfidenceTier {
+        if verdict == .noSignal { return .calibrating }
+        if trend.strength == .strong && nutrition.strength != .insufficient {
+            return .confident
+        }
+        if trend.strength == .moderate || trend.strength == .strong {
+            return .directional
+        }
+        return .calibrating
+    }
+
+    // MARK: - Drivers
+
+    private func buildDrivers(
+        target: NutritionTarget,
+        trend: BodyweightTrend,
+        nutrition: NutritionAdherence,
+        verdict: PhysiquePaceVerdict,
+        recoveryScore: Int
+    ) -> [PhysiqueDriver] {
+        var drivers: [PhysiqueDriver] = []
+
+        // Bodyweight slope
+        if trend.strength != .insufficient {
+            let rate = trend.weeklyChangeKg
+            let targetRate = target.targetWeeklyChangeKg
+            let delta = rate - targetRate
+            let slopeState: PhysiqueDriver.DriverState
+            let polarity: PhysiqueDriver.Polarity
+            switch verdict {
+            case .onTrack, .aligned:
+                slopeState = .success; polarity = .supports
+            case .drifting:
+                slopeState = .warning; polarity = .limits
+            case .tooSlow:
+                slopeState = .warning; polarity = .limits
+            case .tooFast:
+                slopeState = .danger; polarity = .limits
+            case .noSignal:
+                slopeState = .info; polarity = .neutral
+            }
+            drivers.append(PhysiqueDriver(
+                icon: "chart.line.uptrend.xyaxis",
+                label: "Bodyweight slope",
+                detail: String(format: "%+.2f kg/wk vs %+.2f target", rate, targetRate) + (abs(delta) >= 0.15 ? " · \(delta > 0 ? "above" : "below")" : ""),
+                weight: abs(delta) > 0.15 ? 90 : 60,
+                polarity: polarity,
+                state: slopeState
+            ))
+        } else {
+            drivers.append(PhysiqueDriver(
+                icon: "scalemass",
+                label: "Weigh-in signal",
+                detail: "\(trend.entryCount) entries · need a week of data",
+                weight: 40,
+                polarity: .neutral,
+                state: .info
+            ))
+        }
+
+        // Protein
+        if nutrition.strength != .insufficient {
+            let rate = nutrition.proteinHitRate
+            let state: PhysiqueDriver.DriverState
+            let polarity: PhysiqueDriver.Polarity
+            if rate >= 0.75 { state = .success; polarity = .supports }
+            else if rate >= 0.5 { state = .warning; polarity = .limits }
+            else { state = .danger; polarity = .limits }
+
+            let contextSuffix: String
+            switch target.nutritionGoal {
+            case .leanBulk, .muscleGain: contextSuffix = "· limits muscle gain"
+            case .fatLoss, .aggressiveCut: contextSuffix = "· protects muscle in cut"
+            default: contextSuffix = ""
+            }
+
+            drivers.append(PhysiqueDriver(
+                icon: "fork.knife",
+                label: "Protein",
+                detail: "\(Int(rate * 100))% of \(nutrition.loggedDays) days hit floor \(rate < 0.5 ? contextSuffix : "")".trimmingCharacters(in: .whitespaces),
+                weight: rate < 0.5 ? 85 : (rate >= 0.8 ? 50 : 60),
+                polarity: polarity,
+                state: state
+            ))
+        } else {
+            drivers.append(PhysiqueDriver(
+                icon: "fork.knife",
+                label: "Protein",
+                detail: "No logs yet",
+                weight: 30,
+                polarity: .neutral,
+                state: .info
+            ))
+        }
+
+        // Calorie adherence vs direction
+        if nutrition.strength != .insufficient && target.calories > 0 {
+            let gap = nutrition.avgCalories - target.calories
+            let absGap = abs(gap)
+            let mismatched: Bool
+            switch target.nutritionGoal {
+            case .fatLoss, .aggressiveCut: mismatched = gap > 150
+            case .leanBulk, .muscleGain: mismatched = gap < -150
+            case .maintenance, .recomp: mismatched = absGap > 200
+            }
+            let state: PhysiqueDriver.DriverState
+            let polarity: PhysiqueDriver.Polarity
+            if mismatched { state = .warning; polarity = .limits }
+            else if absGap <= 120 { state = .success; polarity = .supports }
+            else { state = .neutral; polarity = .neutral }
+
+            let dir = gap >= 0 ? "+" : "−"
+            drivers.append(PhysiqueDriver(
+                icon: "flame",
+                label: "Calories",
+                detail: "\(nutrition.avgCalories) kcal avg (\(dir)\(absGap) vs \(target.calories))",
+                weight: mismatched ? 75 : 45,
+                polarity: polarity,
+                state: state
+            ))
+        }
+
+        // Recovery (how the body is responding to nutrition)
+        let recState: PhysiqueDriver.DriverState
+        let recPolarity: PhysiqueDriver.Polarity
+        switch recoveryScore {
+        case 80...: recState = .success; recPolarity = .supports
+        case 60..<80: recState = .warning; recPolarity = .neutral
+        default: recState = .danger; recPolarity = .limits
+        }
+        let recContext: String = {
+            switch (target.nutritionGoal, verdict) {
+            case (.fatLoss, _), (.aggressiveCut, _):
+                return recoveryScore < 60 ? "low · cut may be too aggressive" : "sustaining the cut"
+            case (.leanBulk, _), (.muscleGain, _):
+                return recoveryScore < 60 ? "low · under-fueled risk" : "supports overload"
+            default:
+                return "\(recoveryScore) score"
+            }
+        }()
+        drivers.append(PhysiqueDriver(
+            icon: "heart.fill",
+            label: "Recovery",
+            detail: recContext,
+            weight: recoveryScore < 55 ? 70 : 40,
+            polarity: recPolarity,
+            state: recState
+        ))
+
+        // Sort by relative weight — strongest drivers first
+        return drivers.sorted { $0.weight > $1.weight }
+    }
+
+    // MARK: - Priority focus
+
+    private func buildPriority(
+        target: NutritionTarget,
+        trend: BodyweightTrend,
+        nutrition: NutritionAdherence,
+        verdict: PhysiquePaceVerdict,
+        recoveryScore: Int,
+        confidence: PhysiqueConfidenceTier
+    ) -> PhysiquePriority? {
+        // Data gaps first — these are the limiting factor before verdict quality.
+        if trend.strength == .insufficient && nutrition.strength == .insufficient {
+            return PhysiquePriority(
+                kind: .logMoreData,
+                headline: "Start the signal",
+                detail: "Log a weigh-in and a few nutrition days — verdict unlocks in about a week.",
+                icon: "waveform.path"
+            )
+        }
+        if trend.strength == .insufficient {
+            return PhysiquePriority(
+                kind: .logWeight,
+                headline: "Weigh in this week",
+                detail: "Three weigh-ins across the week gives STRQ a real trend line.",
+                icon: "scalemass"
+            )
+        }
+        if nutrition.strength == .insufficient {
+            return PhysiquePriority(
+                kind: .logNutrition,
+                headline: "Log a few days",
+                detail: "A handful of nutrition days lets STRQ tell calorie drift from bodyweight noise.",
+                icon: "square.and.pencil"
+            )
+        }
+
+        // Aggressive cut with low recovery — protect performance before anything else.
+        if (target.nutritionGoal == .fatLoss || target.nutritionGoal == .aggressiveCut) &&
+            verdict == .tooFast && recoveryScore < 60 {
+            return PhysiquePriority(
+                kind: .protectRecovery,
+                headline: "Protect recovery first",
+                detail: "Cut is outpacing plan and recovery is dropping. Add ~200 kcal back this week.",
+                icon: "shield.lefthalf.filled"
+            )
+        }
+
+        // Protein is limiting
+        if nutrition.proteinHitRate < 0.5 {
+            return PhysiquePriority(
+                kind: .fixProtein,
+                headline: "Fix protein first",
+                detail: "Only \(Int(nutrition.proteinHitRate * 100))% of days hit \(target.proteinGrams)g. Hit it 5 of 7 this week.",
+                icon: "fork.knife"
+            )
+        }
+
+        // Verdict-driven priority
+        switch (target.nutritionGoal, verdict) {
+        case (.leanBulk, .tooSlow), (.muscleGain, .tooSlow):
+            return PhysiquePriority(
+                kind: .addCalories,
+                headline: "Add 150–200 kcal",
+                detail: "Gain has stalled — nudge intake up and hold for two weeks before reassessing.",
+                icon: "plus.circle"
+            )
+        case (.leanBulk, .tooFast), (.muscleGain, .tooFast):
+            return PhysiquePriority(
+                kind: .easeSurplus,
+                headline: "Trim the surplus",
+                detail: "Gaining too fast. Pull ~200 kcal to land near \(formatRate(target.targetWeeklyChangeKg))/wk.",
+                icon: "minus.circle"
+            )
+        case (.fatLoss, .tooSlow), (.aggressiveCut, .tooSlow):
+            return PhysiquePriority(
+                kind: .tightenCalories,
+                headline: "Tighten the deficit",
+                detail: "Weight isn't moving. Audit a full week of logs before adjusting training.",
+                icon: "gauge.with.dots.needle.33percent"
+            )
+        case (.fatLoss, .tooFast), (.aggressiveCut, .tooFast):
+            return PhysiquePriority(
+                kind: .easeDeficit,
+                headline: "Ease the deficit",
+                detail: "Add ~150 kcal to land at \(formatRate(target.targetWeeklyChangeKg))/wk and preserve muscle.",
+                icon: "tortoise.fill"
+            )
+        case (.maintenance, .drifting), (.recomp, .drifting):
+            let dir = trend.weeklyChangeKg > 0 ? "Trim" : "Add"
+            return PhysiquePriority(
+                kind: dir == "Trim" ? .easeSurplus : .addCalories,
+                headline: "\(dir) ~150 kcal",
+                detail: "Bring intake back to maintenance to hold the line.",
+                icon: "equal.circle"
+            )
+        case (_, .onTrack), (_, .aligned):
+            if confidence == .confident {
+                return PhysiquePriority(
+                    kind: .holdPattern,
+                    headline: "Hold the pattern",
+                    detail: "Intake and trend are aligned. Keep this week identical and let training compound.",
+                    icon: "checkmark.seal.fill"
+                )
+            }
+            return nil
+        default:
+            return nil
+        }
+    }
+
+    // MARK: - Training bridge
+
+    private func buildTrainingBridge(
+        target: NutritionTarget,
+        trend: BodyweightTrend,
+        nutrition: NutritionAdherence,
+        verdict: PhysiquePaceVerdict,
+        recoveryScore: Int,
+        confidence: PhysiqueConfidenceTier
+    ) -> String? {
+        guard confidence != .calibrating else { return nil }
+
+        switch (target.nutritionGoal, verdict) {
+        case (.leanBulk, .tooSlow), (.muscleGain, .tooSlow):
+            if nutrition.avgCalories < target.calories - 150 {
+                return "Under-fuelled gain — progression confidence will stay capped until intake lands."
+            }
+            return "Gain has stalled — expect STRQ to hold training pressure instead of pushing load."
+        case (.leanBulk, .tooFast), (.muscleGain, .tooFast):
+            return "Gaining fast — training can push, but weight is outpacing lean-gain range."
+        case (.fatLoss, .tooFast), (.aggressiveCut, .tooFast):
+            if recoveryScore < 60 {
+                return "Aggressive cut is eroding recovery — session quality and PR odds will suffer this week."
+            }
+            return "Cut is moving fast — expect heavier sets to feel harder; ease intensity if bar speed drops."
+        case (.fatLoss, .tooSlow), (.aggressiveCut, .tooSlow):
+            return "Deficit isn't landing — training won't drive visible change until intake tightens."
+        case (_, .onTrack) where nutrition.proteinHitRate >= 0.8 && recoveryScore >= 75:
+            return "Nutrition and recovery are aligned — a strong week to push progression."
+        case (.leanBulk, .onTrack), (.muscleGain, .onTrack):
+            if nutrition.proteinHitRate < 0.6 {
+                return "Gaining on plan, but protein consistency is the next lever for muscle conversion."
+            }
+            return nil
+        default:
+            return nil
+        }
+    }
+
     // MARK: - Insights
 
     private func buildInsights(
@@ -273,7 +678,6 @@ struct PhysiqueIntelligenceEngine {
     ) -> [SmartInsight] {
         var results: [SmartInsight] = []
 
-        // Too little signal — one calm nudge to keep logging, nothing more.
         if trend.strength == .insufficient {
             if baseConfidence >= .moderate && nutrition.strength == .insufficient {
                 results.append(SmartInsight(
@@ -288,7 +692,6 @@ struct PhysiqueIntelligenceEngine {
             return results
         }
 
-        // Goal-pace verdict insight.
         switch (target.nutritionGoal, verdict) {
         case (.leanBulk, .tooSlow), (.muscleGain, .tooSlow):
             let sev: InsightSeverity = trend.strength == .strong ? .medium : .low
@@ -360,7 +763,6 @@ struct PhysiqueIntelligenceEngine {
             break
         }
 
-        // Nutrition-signal quality insights. These cap confidence in the goal verdict.
         if nutrition.strength != .insufficient {
             if nutrition.proteinHitRate < 0.5 && (target.nutritionGoal == .leanBulk || target.nutritionGoal == .muscleGain) {
                 results.append(SmartInsight(
@@ -382,7 +784,6 @@ struct PhysiqueIntelligenceEngine {
                 ))
             }
 
-            // Calorie mismatch against goal direction — only if we have a trend to corroborate.
             if trend.strength != .insufficient {
                 let calGap = nutrition.avgCalories - target.calories
                 if (target.nutritionGoal == .fatLoss || target.nutritionGoal == .aggressiveCut) && calGap > 200 && verdict == .tooSlow {
@@ -423,7 +824,6 @@ struct PhysiqueIntelligenceEngine {
     ) -> [Recommendation] {
         var recs: [Recommendation] = []
 
-        // Only emit recommendations when we actually have a signal.
         guard trend.strength != .insufficient else { return recs }
         guard baseConfidence >= .moderate || verdict != .noSignal else { return recs }
 
@@ -479,7 +879,6 @@ struct PhysiqueIntelligenceEngine {
             break
         }
 
-        // Protein adherence when it's capping goal progress.
         if nutrition.strength != .insufficient && nutrition.proteinHitRate < 0.5 {
             if target.nutritionGoal == .leanBulk || target.nutritionGoal == .muscleGain {
                 recs.append(Recommendation(
@@ -501,7 +900,7 @@ struct PhysiqueIntelligenceEngine {
         return recs
     }
 
-    // MARK: - Summary (for existing recoveryTrainingBridge / coach summaries)
+    // MARK: - Summary
 
     private func buildSummary(
         target: NutritionTarget,

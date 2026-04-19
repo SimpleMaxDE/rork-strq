@@ -52,3 +52,39 @@ Training intelligence must stay fully strong for users who don't want to track f
 **Language**
 - [x] Insufficient data uses "calibrating" / "not enough data" — never negative
 - [x] Non-tracking users see no "off track" verdicts from missing data
+
+---
+
+# Phase 9.2 — Physique Depth For Opt-In Users
+
+Build forward from the gated foundation so opted-in users feel a clearly deeper, more decisive coaching layer.
+
+**Engine depth (`PhysiqueIntelligenceEngine`)**
+- [x] `PhysiqueConfidenceTier` (calibrating / directional / confident) derived from trend + nutrition strength
+- [x] `PhysiqueDriver` model — ranked drivers (bodyweight slope, protein, calories, recovery) with polarity & state
+- [x] `PhysiquePriority` — the single highest-leverage next step for the week (data gap / fix protein / tighten / ease / hold)
+- [x] Projected 4-week delta on `BodyweightTrend` (if current slope holds)
+- [x] Smoothed latest weight (3-point trailing) as chart projection anchor
+- [x] Training-bridge string explaining what the verdict means for this week's training
+
+**Verdict card (`PhysiqueVerdictCard`)**
+- [x] "Why" section — top 3 drivers with icon, label, compact detail, polarity glyph
+- [x] "This week" priority block — icon + headline + concrete detail
+- [x] Training-bridge line below priority
+- [x] Confidence tier badge (CALIBRATING / DIRECTIONAL / CONFIDENT) replaces raw calibrating pill
+- [x] Projection line in headline area ("Projects +0.8 kg over 4 weeks…")
+
+**Body Progress (`BodyWeightLogView`)**
+- [x] Chart line + area tinted by verdict state color (replaces neutral steel)
+- [x] Dashed 4-week projection segment from smoothed latest weight
+- [x] Trend chips: actual kg/wk · target kg/wk · projected 4w delta
+- [x] Target ruleline uses `STRQPalette.success`
+
+**Nutrition (`NutritionLogView`)**
+- [x] "This week" priority card above target overview — pulls from engine priority
+- [x] Training bridge line on the priority card
+- [x] Confidence tier badge on the priority card
+
+**Identity**
+- [x] Opt-out users unaffected — priority / drivers / projection only render when tracking is on
+- [x] No new color maps — all new surfaces use `STRQPalette` state colors

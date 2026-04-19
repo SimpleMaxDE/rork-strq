@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Hero verdict card that answers "am I on track?" in one glance.
+/// Hero verdict card that answers "am I on track?" in one glance,
+/// then explains the dominant drivers and the single next-step priority.
 ///
 /// Reads from `PhysiqueIntelligenceEngine` output (already computed on the
 /// view-model) so Body Progress and Nutrition share a single source of truth.
@@ -77,6 +78,15 @@ struct PhysiqueVerdictCard: View {
             headline(outcome: outcome, state: state)
             metricStrip(outcome: outcome, color: color)
             if !compact {
+                if let outcome, !outcome.drivers.isEmpty {
+                    driversSection(drivers: outcome.drivers)
+                }
+                if let outcome, let priority = outcome.priority {
+                    prioritySection(priority: priority, state: state, color: color)
+                }
+                if let bridge = outcome?.trainingBridge, !bridge.isEmpty {
+                    trainingBridgeSection(text: bridge, color: color)
+                }
                 confidenceFooter(outcome: outcome, color: color)
             }
         }
@@ -120,7 +130,6 @@ struct PhysiqueVerdictCard: View {
 
     @ViewBuilder
     private func headline(outcome: PhysiqueOutcome?, state: STRQPalette.State) -> some View {
-        let color = STRQPalette.color(for: state)
         VStack(alignment: .leading, spacing: 4) {
             Text(headlineText(for: outcome))
                 .font(.title3.weight(.semibold))
@@ -132,18 +141,11 @@ struct PhysiqueVerdictCard: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            if let bridge = bridgeText() {
-                HStack(alignment: .top, spacing: 6) {
-                    Image(systemName: "link")
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(color)
-                        .padding(.top, 3)
-                    Text(bridge)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(.top, 2)
+            if let projection = projectionText(for: outcome) {
+                Text(projection)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -206,6 +208,98 @@ struct PhysiqueVerdictCard: View {
         .frame(maxWidth: .infinity)
     }
 
+    // MARK: - Drivers
+
+    private func driversSection(drivers: [PhysiqueDriver]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("WHY")
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(.secondary)
+                .tracking(0.8)
+            VStack(spacing: 6) {
+                ForEach(drivers.prefix(3)) { driver in
+                    driverRow(driver)
+                }
+            }
+        }
+    }
+
+    private func driverRow(_ driver: PhysiqueDriver) -> some View {
+        let color = STRQPalette.color(for: paletteState(for: driver.state))
+        return HStack(spacing: 10) {
+            Image(systemName: driver.icon)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(color)
+                .frame(width: 20, height: 20)
+                .background(color.opacity(0.14), in: .rect(cornerRadius: 6))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(driver.label)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Text(driver.detail)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+            Spacer(minLength: 0)
+            Image(systemName: polarityIcon(driver.polarity))
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(color.opacity(0.9))
+        }
+    }
+
+    // MARK: - Priority
+
+    private func prioritySection(priority: PhysiquePriority, state: STRQPalette.State, color: Color) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: priority.icon)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(color)
+                .frame(width: 28, height: 28)
+                .background(color.opacity(0.16), in: .rect(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
+                    Text("THIS WEEK")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(color)
+                        .tracking(0.8)
+                    Rectangle()
+                        .fill(color.opacity(0.3))
+                        .frame(height: 0.5)
+                }
+                Text(priority.headline)
+                    .font(.subheadline.weight(.semibold))
+                Text(priority.detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(12)
+        .background(color.opacity(0.08), in: .rect(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(color.opacity(0.22), lineWidth: 0.5)
+        )
+    }
+
+    // MARK: - Training bridge
+
+    private func trainingBridgeSection(text: String, color: Color) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "link")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(color.opacity(0.85))
+                .padding(.top, 2)
+            Text(text)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+    }
+
     // MARK: - Confidence footer
 
     private func confidenceFooter(outcome: PhysiqueOutcome?, color: Color) -> some View {
@@ -213,6 +307,7 @@ struct PhysiqueVerdictCard: View {
         let nutStr = strengthLabel(outcome?.nutrition.strength)
         let trendCount = outcome?.trend.entryCount ?? 0
         let nutCount = outcome?.nutrition.loggedDays ?? 0
+        let tier = outcome?.confidence ?? .calibrating
 
         return HStack(spacing: 6) {
             Image(systemName: "waveform.path.ecg")
@@ -221,16 +316,32 @@ struct PhysiqueVerdictCard: View {
             Text("Signal · weigh-ins \(trendStr) (\(trendCount)) · nutrition \(nutStr) (\(nutCount))")
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
             Spacer()
-            if outcome?.trend.strength == .insufficient || outcome?.nutrition.strength == .insufficient {
-                Text("CALIBRATING")
-                    .font(.system(size: 8, weight: .bold))
-                    .foregroundStyle(STRQPalette.info)
-                    .tracking(0.6)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(STRQPalette.infoSoft, in: Capsule())
-            }
+            Text(tierBadge(tier))
+                .font(.system(size: 8, weight: .bold))
+                .foregroundStyle(tierColor(tier))
+                .tracking(0.6)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(tierColor(tier).opacity(0.16), in: Capsule())
+        }
+    }
+
+    private func tierBadge(_ tier: PhysiqueConfidenceTier) -> String {
+        switch tier {
+        case .calibrating: return "CALIBRATING"
+        case .directional: return "DIRECTIONAL"
+        case .confident:   return "CONFIDENT"
+        }
+    }
+
+    private func tierColor(_ tier: PhysiqueConfidenceTier) -> Color {
+        switch tier {
+        case .calibrating: return STRQPalette.info
+        case .directional: return STRQPalette.warning
+        case .confident:   return STRQPalette.success
         }
     }
 
@@ -243,6 +354,24 @@ struct PhysiqueVerdictCard: View {
         case .tooSlow, .drifting: return .warning
         case .tooFast: return .danger
         case .noSignal: return .info
+        }
+    }
+
+    private func paletteState(for s: PhysiqueDriver.DriverState) -> STRQPalette.State {
+        switch s {
+        case .success: return .success
+        case .warning: return .warning
+        case .danger:  return .danger
+        case .info:    return .info
+        case .neutral: return .neutral
+        }
+    }
+
+    private func polarityIcon(_ p: PhysiqueDriver.Polarity) -> String {
+        switch p {
+        case .supports: return "arrow.up.right"
+        case .limits:   return "arrow.down.right"
+        case .neutral:  return "equal"
         }
     }
 
@@ -317,9 +446,23 @@ struct PhysiqueVerdictCard: View {
         }
     }
 
-    private func bridgeText() -> String? {
-        let s = vm.recoveryTrainingBridge
-        return s.isEmpty ? nil : s
+    private func projectionText(for outcome: PhysiqueOutcome?) -> String? {
+        guard let outcome, outcome.trend.strength != .insufficient else { return nil }
+        let proj = outcome.trend.projected4wKg
+        guard abs(proj) >= 0.1 else {
+            return "Projects to hold within ±0.1 kg over the next 4 weeks at this pace."
+        }
+        let verb: String = {
+            switch vm.nutritionTarget.nutritionGoal {
+            case .leanBulk, .muscleGain:
+                return proj > 0 ? "Projects" : "Projects to lose"
+            case .fatLoss, .aggressiveCut:
+                return proj < 0 ? "Projects to drop" : "Projects to gain"
+            case .maintenance, .recomp:
+                return "Projects to drift"
+            }
+        }()
+        return "\(verb) \(String(format: "%+.1f", proj)) kg over 4 weeks if this pace holds."
     }
 
     private func trendValue(outcome: PhysiqueOutcome?) -> String {

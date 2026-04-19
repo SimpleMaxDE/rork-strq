@@ -16,6 +16,7 @@ struct NutritionLogView: View {
                 PhysiqueVerdictCard(vm: vm)
                     .opacity(appeared ? 1 : 0)
                     .offset(y: appeared ? 0 : 10)
+                weekPriorityCard
                 targetOverview
                 todayProgress
                 quickLogSection
@@ -30,6 +31,77 @@ struct NutritionLogView: View {
         .onAppear {
             prefillToday()
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
+        }
+    }
+
+    @ViewBuilder
+    private var weekPriorityCard: some View {
+        if let outcome = vm.physiqueOutcome, let priority = outcome.priority {
+            let state = priorityState(outcome)
+            let color = STRQPalette.color(for: state)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 6) {
+                    Image(systemName: priority.icon)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(color)
+                    Text("THIS WEEK")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(color)
+                        .tracking(0.8)
+                    Spacer()
+                    Text(confidenceBadge(outcome.confidence))
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(color)
+                        .tracking(0.5)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(color.opacity(0.14), in: Capsule())
+                }
+                Text(priority.headline)
+                    .font(.title3.weight(.semibold))
+                Text(priority.detail)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let bridge = outcome.trainingBridge, !bridge.isEmpty {
+                    HStack(alignment: .top, spacing: 6) {
+                        Image(systemName: "link")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(color.opacity(0.85))
+                            .padding(.top, 2)
+                        Text(bridge)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+            .padding(16)
+            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(color.opacity(0.22), lineWidth: 0.5)
+            )
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+            .animation(.easeOut(duration: 0.5).delay(0.03), value: appeared)
+        }
+    }
+
+    private func priorityState(_ outcome: PhysiqueOutcome) -> STRQPalette.State {
+        switch outcome.paceVerdict {
+        case .onTrack, .aligned: return .success
+        case .tooSlow, .drifting: return .warning
+        case .tooFast: return .danger
+        case .noSignal: return .info
+        }
+    }
+
+    private func confidenceBadge(_ tier: PhysiqueConfidenceTier) -> String {
+        switch tier {
+        case .calibrating: return "CALIBRATING"
+        case .directional: return "DIRECTIONAL"
+        case .confident:   return "CONFIDENT"
         }
     }
 

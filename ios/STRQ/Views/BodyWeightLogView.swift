@@ -34,6 +34,8 @@ struct BodyWeightLogView: View {
     private var weightChartCard: some View {
         let entries = vm.bodyWeightEntries.sorted { $0.date < $1.date }
         if entries.count >= 2 {
+            let outcome = vm.physiqueOutcome
+            let verdictColor = chartVerdictColor(outcome)
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Text("Body Weight")
@@ -42,7 +44,7 @@ struct BodyWeightLogView: View {
                     if let latest = entries.last {
                         Text(String(format: "%.1f kg", latest.weightKg))
                             .font(.subheadline.weight(.bold).monospacedDigit())
-                            .foregroundStyle(STRQBrand.steel)
+                            .foregroundStyle(verdictColor)
                     }
                 }
 
@@ -53,7 +55,7 @@ struct BodyWeightLogView: View {
                             y: .value("Weight", entry.weightKg)
                         )
                         .foregroundStyle(
-                            LinearGradient(colors: [STRQBrand.steel.opacity(0.3), STRQBrand.steel.opacity(0.02)], startPoint: .top, endPoint: .bottom)
+                            LinearGradient(colors: [verdictColor.opacity(0.28), verdictColor.opacity(0.02)], startPoint: .top, endPoint: .bottom)
                         )
                         .interpolationMethod(.catmullRom)
 
@@ -61,19 +63,36 @@ struct BodyWeightLogView: View {
                             x: .value("Date", entry.date),
                             y: .value("Weight", entry.weightKg)
                         )
-                        .foregroundStyle(STRQBrand.steel)
+                        .foregroundStyle(verdictColor)
                         .interpolationMethod(.catmullRom)
                         .lineStyle(StrokeStyle(lineWidth: 2.5))
                     }
 
+                    if let proj = projectionSegment(entries: entries, outcome: outcome) {
+                        LineMark(
+                            x: .value("Date", proj.startDate),
+                            y: .value("Weight", proj.startKg),
+                            series: .value("Series", "projection")
+                        )
+                        .foregroundStyle(verdictColor.opacity(0.55))
+                        .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
+                        LineMark(
+                            x: .value("Date", proj.endDate),
+                            y: .value("Weight", proj.endKg),
+                            series: .value("Series", "projection")
+                        )
+                        .foregroundStyle(verdictColor.opacity(0.55))
+                        .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
+                    }
+
                     if let targetW = vm.profile.targetWeightKg {
                         RuleMark(y: .value("Target", targetW))
-                            .foregroundStyle(.green.opacity(0.5))
+                            .foregroundStyle(STRQPalette.success.opacity(0.5))
                             .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
                             .annotation(position: .top, alignment: .trailing) {
                                 Text("Target")
                                     .font(.system(size: 8, weight: .semibold))
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(STRQPalette.success)
                             }
                     }
                 }
@@ -91,10 +110,11 @@ struct BodyWeightLogView: View {
                     }
                 }
 
-                HStack(spacing: 16) {
-                    trendChip(label: vm.weightTrendDescription, icon: trendIcon, color: trendColor)
-                    if let dir = vm.nutritionTarget.weightGoalDirection.displayName as String? {
-                        trendChip(label: "Goal: \(dir)", icon: "target", color: .blue)
+                HStack(spacing: 8) {
+                    trendChip(label: verdictTrendLabel(outcome), icon: verdictIcon(outcome), color: verdictColor)
+                    trendChip(label: "Target \(String(format: "%+.2f kg/wk", vm.nutritionTarget.targetWeeklyChangeKg))", icon: "target", color: STRQBrand.steel)
+                    if let projLabel = projectionChipLabel(outcome) {
+                        trendChip(label: projLabel, icon: "chart.line.uptrend.xyaxis", color: verdictColor)
                     }
                 }
             }
@@ -137,6 +157,56 @@ struct BodyWeightLogView: View {
         case .maintaining:
             return vm.weightTrendDescription == "Stable" ? .green : .yellow
         }
+    }
+
+    // MARK: - Physique-verdict driven chart helpers
+
+    private func chartVerdictColor(_ outcome: PhysiqueOutcome?) -> Color {
+        guard let outcome else { return STRQBrand.steel }
+        switch outcome.paceVerdict {
+        case .onTrack, .aligned: return STRQPalette.success
+        case .tooSlow, .drifting: return STRQPalette.warning
+        case .tooFast: return STRQPalette.danger
+        case .noSignal: return STRQBrand.steel
+        }
+    }
+
+    private func verdictTrendLabel(_ outcome: PhysiqueOutcome?) -> String {
+        guard let outcome, outcome.trend.strength != .insufficient else {
+            return "Calibrating"
+        }
+        return String(format: "%+.2f kg/wk", outcome.trend.weeklyChangeKg)
+    }
+
+    private func verdictIcon(_ outcome: PhysiqueOutcome?) -> String {
+        guard let outcome else { return "waveform.path" }
+        switch outcome.paceVerdict {
+        case .onTrack, .aligned: return "checkmark.seal.fill"
+        case .tooSlow: return "arrow.right.circle.fill"
+        case .tooFast: return "exclamationmark.triangle.fill"
+        case .drifting: return "arrow.left.arrow.right.circle.fill"
+        case .noSignal: return "waveform.path"
+        }
+    }
+
+    private func projectionChipLabel(_ outcome: PhysiqueOutcome?) -> String? {
+        guard let outcome, outcome.trend.strength != .insufficient else { return nil }
+        let proj = outcome.trend.projected4wKg
+        guard abs(proj) >= 0.2 else { return nil }
+        return String(format: "4w proj %+.1f kg", proj)
+    }
+
+    private func projectionSegment(
+        entries: [BodyWeightEntry],
+        outcome: PhysiqueOutcome?
+    ) -> (startDate: Date, endDate: Date, startKg: Double, endKg: Double)? {
+        guard let outcome,
+              outcome.trend.strength == .strong || outcome.trend.strength == .moderate,
+              let last = entries.last else { return nil }
+        let anchor = outcome.trend.smoothedLatestKg ?? last.weightKg
+        let endDate = Calendar.current.date(byAdding: .day, value: 28, to: last.date) ?? last.date
+        let endKg = anchor + outcome.trend.projected4wKg
+        return (last.date, endDate, anchor, endKg)
     }
 
     private var quickLogCard: some View {
