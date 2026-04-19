@@ -60,7 +60,9 @@ final class ReminderWidgetCoordinator {
         let lastWorkout = vm.workoutHistory.first(where: \.isCompleted)?.startTime
         let lastReadiness = vm.readinessHistory.first?.date
         let lastActive: Date? = [lastWorkout, lastReadiness].compactMap { $0 }.max()
+        // Only nudge body-weight logging if the user opted into tracking.
         let missingWeightDays: Int = {
+            guard vm.profile.nutritionTrackingEnabled else { return 0 }
             guard let last = vm.bodyWeightEntries.first?.date else { return 99 }
             return calendar.dateComponents([.day], from: last, to: Date()).day ?? 0
         }()

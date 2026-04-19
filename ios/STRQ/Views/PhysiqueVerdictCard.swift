@@ -9,11 +9,70 @@ struct PhysiqueVerdictCard: View {
     var compact: Bool = false
 
     var body: some View {
+        if !vm.profile.nutritionTrackingEnabled {
+            optInCard
+        } else {
+            trackingCard
+        }
+    }
+
+    private var optInCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(STRQPalette.info)
+                Text("PHYSIQUE COACHING")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(STRQPalette.info)
+                    .tracking(0.8)
+                Spacer()
+                Text("OPTIONAL")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.secondary)
+                    .tracking(0.5)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(Color.white.opacity(0.06), in: Capsule())
+            }
+            Text("Physique tracking is off.")
+                .font(.title3.weight(.semibold))
+            Text("STRQ is coaching your training and recovery. Turn on physique tracking anytime to add bodyweight and nutrition intelligence — only when you want it.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Button {
+                vm.profile.nutritionTrackingEnabled = true
+                vm.refreshNutritionInsights()
+                vm.refreshCoachingInsights()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.caption)
+                    Text("Enable Physique Tracking")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .foregroundStyle(.black)
+                .frame(maxWidth: .infinity)
+                .frame(height: 40)
+                .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 11))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(STRQPalette.info.opacity(0.18), lineWidth: 0.5)
+        )
+    }
+
+    private var trackingCard: some View {
         let outcome = vm.physiqueOutcome
         let state = verdictState(for: outcome)
         let color = STRQPalette.color(for: state)
 
-        VStack(alignment: .leading, spacing: 14) {
+        return VStack(alignment: .leading, spacing: 14) {
             header(state: state, color: color, outcome: outcome)
             headline(outcome: outcome, state: state)
             metricStrip(outcome: outcome, color: color)

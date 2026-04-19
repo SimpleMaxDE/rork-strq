@@ -609,14 +609,16 @@ struct DashboardView: View {
     private var dailySignalsRow: some View {
         VStack(spacing: 10) {
             HStack(spacing: 10) {
-                signalButton(
-                    icon: "fork.knife",
-                    label: "Protein",
-                    value: "\(Int(vm.todayProteinProgress * 100))%",
-                    progress: vm.todayProteinProgress,
-                    color: STRQBrand.steel
-                ) {
-                    showNutritionLog = true
+                if vm.profile.nutritionTrackingEnabled {
+                    signalButton(
+                        icon: "fork.knife",
+                        label: "Protein",
+                        value: "\(Int(vm.todayProteinProgress * 100))%",
+                        progress: vm.todayProteinProgress,
+                        color: STRQBrand.steel
+                    ) {
+                        showNutritionLog = true
+                    }
                 }
 
                 signalButton(
@@ -629,14 +631,16 @@ struct DashboardView: View {
                     showSleepLog = true
                 }
 
-                signalButton(
-                    icon: "scalemass.fill",
-                    label: "Weight",
-                    value: vm.latestWeight.map { String(format: "%.1f", $0) } ?? "—",
-                    progress: vm.latestWeight != nil ? 1.0 : 0.0,
-                    color: STRQBrand.steel
-                ) {
-                    showWeightLog = true
+                if vm.profile.nutritionTrackingEnabled {
+                    signalButton(
+                        icon: "scalemass.fill",
+                        label: "Weight",
+                        value: vm.latestWeight.map { String(format: "%.1f", $0) } ?? "—",
+                        progress: vm.latestWeight != nil ? 1.0 : 0.0,
+                        color: STRQBrand.steel
+                    ) {
+                        showWeightLog = true
+                    }
                 }
             }
 

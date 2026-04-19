@@ -120,22 +120,29 @@ final class CoachingCoordinator {
             }
         }
 
-        let outcome = physiqueEngine.analyze(
-            profile: vm.profile,
-            target: vm.nutritionTarget,
-            weightEntries: vm.bodyWeightEntries,
-            nutritionLogs: vm.nutritionLogs,
-            recoveryScore: vm.effectiveRecoveryScore,
-            baseConfidence: confidence
-        )
-        vm.physiqueOutcome = outcome
-        for insight in outcome.insights where !existingTitles.contains(insight.title) {
-            newInsights.append(insight)
-            existingTitles.insert(insight.title)
-        }
-        for rec in outcome.recommendations where !existingRecTitles.contains(rec.title) {
-            newRecs.append(rec)
-            existingRecTitles.insert(rec.title)
+        // Physique intelligence only feeds coaching when the user has opted
+        // into nutrition / physique tracking. Missing logs are never treated
+        // as negative signal for non-tracking users.
+        if vm.profile.nutritionTrackingEnabled {
+            let outcome = physiqueEngine.analyze(
+                profile: vm.profile,
+                target: vm.nutritionTarget,
+                weightEntries: vm.bodyWeightEntries,
+                nutritionLogs: vm.nutritionLogs,
+                recoveryScore: vm.effectiveRecoveryScore,
+                baseConfidence: confidence
+            )
+            vm.physiqueOutcome = outcome
+            for insight in outcome.insights where !existingTitles.contains(insight.title) {
+                newInsights.append(insight)
+                existingTitles.insert(insight.title)
+            }
+            for rec in outcome.recommendations where !existingRecTitles.contains(rec.title) {
+                newRecs.append(rec)
+                existingRecTitles.insert(rec.title)
+            }
+        } else {
+            vm.physiqueOutcome = nil
         }
 
         vm._dynamicInsights = newInsights.sorted { $0.severityRank > $1.severityRank }

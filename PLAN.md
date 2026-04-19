@@ -27,3 +27,28 @@ Surface the existing physique-intelligence engine as a decisive top-level verdic
 **Identity**
 - [x] Keep dark premium identity and coach authority
 - [x] No redesign of unrelated screens
+
+---
+
+# Phase 9.1 — Nutrition / Physique Is Opt-In
+
+Training intelligence must stay fully strong for users who don't want to track food, water, or bodyweight. Missing logs must never be interpreted as poor adherence.
+
+**Model**
+- [x] `UserProfile.nutritionTrackingEnabled: Bool` (default off) — single source of truth
+
+**Engines gated**
+- [x] `NutritionPhysiqueCoordinator.refresh()` clears insights / goalPace / physiqueOutcome when off
+- [x] `CoachingCoordinator` skips `PhysiqueIntelligenceEngine` when off
+- [x] Daily briefing no longer prompts `logBodyWeight` when tracking is off
+- [x] Reminder scheduler skips weight-log nudges when tracking is off
+
+**UI**
+- [x] `PhysiqueVerdictCard` renders an opt-in call-to-action when tracking is off
+- [x] Dashboard protein signal pill replaced by a neutral tile / hidden when off
+- [x] Profile's Body & Nutrition section shows an "Enable tracking" toggle
+- [x] Nutrition Settings gates coaching-verdict UI behind the toggle
+
+**Language**
+- [x] Insufficient data uses "calibrating" / "not enough data" — never negative
+- [x] Non-tracking users see no "off track" verdicts from missing data

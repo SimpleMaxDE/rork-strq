@@ -19,6 +19,16 @@ final class NutritionPhysiqueCoordinator {
     }
 
     func refresh() {
+        // Nutrition / physique intelligence is strictly opt-in.
+        // When tracking is off, missing data must never be interpreted
+        // as poor adherence or an "off-track" verdict.
+        guard vm.profile.nutritionTrackingEnabled else {
+            vm.nutritionInsights = []
+            vm.goalPace = nil
+            vm.physiqueOutcome = nil
+            return
+        }
+
         vm.nutritionInsights = nutritionEngine.generateInsights(
             target: vm.nutritionTarget,
             recentLogs: vm.nutritionLogs,
@@ -38,6 +48,8 @@ final class NutritionPhysiqueCoordinator {
             let last3Avg = last14Weights.suffix(3).map(\.weightKg).reduce(0, +) / 3.0
             let weeklyChange = (last3Avg - first3Avg) / 2.0
             vm.goalPace = nutritionEngine.goalPaceStatus(target: vm.nutritionTarget, weeklyChange: weeklyChange)
+        } else {
+            vm.goalPace = nil
         }
 
         vm.physiqueOutcome = physiqueEngine.analyze(

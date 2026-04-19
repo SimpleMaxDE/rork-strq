@@ -1747,26 +1747,32 @@ class AppViewModel {
 
     var recoveryTrainingBridge: String {
         let avgSleep = averageSleepHours
-        let proteinPct = todayProteinProgress
         let recovery = effectiveRecoveryScore
+        let nutritionOn = profile.nutritionTrackingEnabled
+        let proteinPct = todayProteinProgress
         let goal = nutritionTarget.nutritionGoal
 
         if avgSleep < 6.5 && recovery < 55 {
             return "Poor sleep is dragging recovery down. Consider lighter training until sleep improves."
         }
-        if proteinPct < 0.5 && (goal == .leanBulk || goal == .muscleGain) {
+        if nutritionOn, proteinPct < 0.5, (goal == .leanBulk || goal == .muscleGain) {
             return "Protein far below target today. Your muscle-building stimulus needs fuel to convert to gains."
         }
-        if avgSleep >= 7.5 && recovery >= 80 && proteinPct >= 0.7 {
+        if nutritionOn, avgSleep >= 7.5, recovery >= 80, proteinPct >= 0.7 {
             return "Sleep, recovery, and nutrition are all aligned. Great day to push your training."
         }
-        if recovery < 50 {
-            return "Recovery is low. Prioritize sleep and protein to get back on track for your next session."
+        if !nutritionOn, avgSleep >= 7.5, recovery >= 80 {
+            return "Sleep and recovery are aligned. Great day to push your training."
         }
-        if let summary = physiqueOutcome?.summary, !summary.isEmpty {
+        if recovery < 50 {
+            return nutritionOn
+                ? "Recovery is low. Prioritize sleep and protein to get back on track for your next session."
+                : "Recovery is low. Prioritize sleep and rest to get back on track for your next session."
+        }
+        if nutritionOn, let summary = physiqueOutcome?.summary, !summary.isEmpty {
             return summary
         }
-        if let pace = goalPace, !pace.isOnTrack {
+        if nutritionOn, let pace = goalPace, !pace.isOnTrack {
             return "\(pace.headline) — adjust nutrition to better match your \(goal.displayName) goal."
         }
         return ""

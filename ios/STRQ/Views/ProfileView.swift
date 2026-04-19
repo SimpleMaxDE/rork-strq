@@ -445,12 +445,21 @@ struct ProfileView: View {
                     label: "Sleep",
                     color: ForgeTheme.sleepColor(for: vm.averageSleepHours)
                 )
-                statusChip(
-                    icon: "fork.knife",
-                    value: "\(Int(vm.weeklyNutritionAdherence * 100))%",
-                    label: "Nutrition",
-                    color: vm.weeklyNutritionAdherence >= 0.8 ? STRQPalette.success : STRQBrand.steel
-                )
+                if vm.profile.nutritionTrackingEnabled {
+                    statusChip(
+                        icon: "fork.knife",
+                        value: "\(Int(vm.weeklyNutritionAdherence * 100))%",
+                        label: "Nutrition",
+                        color: vm.weeklyNutritionAdherence >= 0.8 ? STRQPalette.success : STRQBrand.steel
+                    )
+                } else {
+                    statusChip(
+                        icon: "flame.fill",
+                        value: "\(vm.streak)",
+                        label: "Streak",
+                        color: STRQBrand.steel
+                    )
+                }
             }
         }
         .padding(14)
@@ -520,30 +529,36 @@ struct ProfileView: View {
         VStack(alignment: .leading, spacing: 10) {
             ForgeSectionHeader(title: "Body & Nutrition")
 
+            trackingToggleCard
+
             VStack(spacing: 1) {
                 profileRow("Height", value: "\(Int(vm.profile.heightCm)) cm")
                 profileRow("Weight", value: String(format: "%.1f kg", vm.profile.weightKg))
                 profileRow("Age", value: "\(vm.profile.age)")
-                profileRow("Calories", value: "\(vm.nutritionTarget.calories) kcal")
-                profileRow("Protein", value: "\(vm.nutritionTarget.proteinGrams)g")
-                profileRow("Goal", value: vm.nutritionTarget.nutritionGoal.displayName)
+                if vm.profile.nutritionTrackingEnabled {
+                    profileRow("Calories", value: "\(vm.nutritionTarget.calories) kcal")
+                    profileRow("Protein", value: "\(vm.nutritionTarget.proteinGrams)g")
+                    profileRow("Goal", value: vm.nutritionTarget.nutritionGoal.displayName)
+                }
             }
             .clipShape(.rect(cornerRadius: 12))
 
             HStack(spacing: 10) {
-                Button { showNutritionSettings = true } label: {
-                    Label("Edit Targets", systemImage: "slider.horizontal.3")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(STRQBrand.steel)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                        .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 11))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 11)
-                                .strokeBorder(STRQBrand.steel.opacity(0.1), lineWidth: 1)
-                        )
+                if vm.profile.nutritionTrackingEnabled {
+                    Button { showNutritionSettings = true } label: {
+                        Label("Edit Targets", systemImage: "slider.horizontal.3")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(STRQBrand.steel)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 44)
+                            .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 11))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 11)
+                                    .strokeBorder(STRQBrand.steel.opacity(0.1), lineWidth: 1)
+                            )
+                    }
+                    .buttonStyle(.strqPressable)
                 }
-                .buttonStyle(.strqPressable)
 
                 Button { showSleepLog = true } label: {
                     Label("Sleep Log", systemImage: "moon.zzz.fill")
@@ -559,6 +574,46 @@ struct ProfileView: View {
                 }
                 .buttonStyle(.strqPressable)
             }
+        }
+    }
+
+    private var trackingToggleCard: some View {
+        let on = vm.profile.nutritionTrackingEnabled
+        return VStack(alignment: .leading, spacing: 8) {
+            Toggle(isOn: Binding(
+                get: { vm.profile.nutritionTrackingEnabled },
+                set: { newValue in
+                    vm.profile.nutritionTrackingEnabled = newValue
+                    vm.refreshNutritionInsights()
+                    vm.refreshCoachingInsights()
+                    vm.refreshDailyState()
+                }
+            )) {
+                HStack(spacing: 10) {
+                    Image(systemName: on ? "checkmark.seal.fill" : "leaf.fill")
+                        .font(.subheadline)
+                        .foregroundStyle(on ? STRQPalette.success : STRQPalette.info)
+                        .frame(width: 30, height: 30)
+                        .background((on ? STRQPalette.success : STRQPalette.info).opacity(0.12), in: .rect(cornerRadius: 8))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Physique & Nutrition Coaching")
+                            .font(.subheadline.weight(.semibold))
+                        Text(on
+                            ? "STRQ uses bodyweight and nutrition logs to coach body-composition progress."
+                            : "Optional. STRQ will coach training and recovery without food or weight data.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+            .tint(STRQPalette.success)
+            .padding(14)
+            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+            )
         }
     }
 

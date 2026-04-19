@@ -114,7 +114,10 @@ final class DailyStateCoordinator {
             return max(0, calendar.dateComponents([.day], from: start, to: target).day ?? 0)
         }
 
+        // When nutrition/physique tracking is off, never surface a weight-log
+        // prompt — missing logs must not create negative signal.
         let missingWeight: Int = {
+            guard vm.profile.nutritionTrackingEnabled else { return 0 }
             guard let last = vm.bodyWeightEntries.first?.date else { return 99 }
             return calendar.dateComponents([.day], from: last, to: now).day ?? 0
         }()

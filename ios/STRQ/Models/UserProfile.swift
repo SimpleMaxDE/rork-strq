@@ -227,4 +227,5 @@ nonisolated struct UserProfile: Codable, Sendable {
     var startWeightKg: Double?
     var hasCompletedOnboarding: Bool = false
     var preferredTrainingDays: [Int] = []
+    var nutritionTrackingEnabled: Bool = false
 }
