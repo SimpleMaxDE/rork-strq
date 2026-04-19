@@ -10,7 +10,9 @@ struct BodyWeightLogView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                goalPaceCard
+                PhysiqueVerdictCard(vm: vm)
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 10)
                 weightChartCard
                 quickLogCard
                 trendStatsCard
@@ -25,46 +27,6 @@ struct BodyWeightLogView: View {
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
-        }
-    }
-
-    @ViewBuilder
-    private var goalPaceCard: some View {
-        if let pace = vm.goalPace {
-            let color = colorFor(pace.colorName)
-            HStack(spacing: 14) {
-                Image(systemName: pace.icon)
-                    .font(.title3.weight(.medium))
-                    .foregroundStyle(.white)
-                    .frame(width: 48, height: 48)
-                    .background(color.gradient, in: .rect(cornerRadius: 12))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 6) {
-                        Text("GOAL PACE")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(color)
-                            .tracking(0.5)
-                        Text(vm.nutritionTarget.nutritionGoal.displayName)
-                            .font(.system(size: 9, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(color, in: Capsule())
-                    }
-                    Text(pace.headline)
-                        .font(.subheadline.weight(.semibold))
-                    Text(pace.detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(3)
-                }
-                Spacer()
-            }
-            .padding(16)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 10)
         }
     }
 

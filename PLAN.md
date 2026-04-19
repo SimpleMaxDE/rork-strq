@@ -1,29 +1,29 @@
-# Phase 8 — Recovery / Check-in as a Premium Operating Flow
+# Phase 9 — Nutrition / Physique as a Real Product Surface
 
-Make the daily check-in + recovery logging feel like one coherent, fast, high-confidence operating flow.
+Surface the existing physique-intelligence engine as a decisive top-level verdict, and make nutrition ↔ training feel like one system.
 
-**Check-in flow (ReadinessCheckInView)**
-- [x] Compress 5-step questionnaire into 3 decision blocks (sleep+energy, load, mindset+pain)
-- [x] Strong selected states — colored fills, white text, shadow lift, clear contrast
-- [x] Semantic color per option (danger → warning → success) instead of flat gradient
-- [x] Context-aware header: "Before training" vs "Rest day check"
-- [x] Compact 1–5 segmented pickers with short labels (replaces long emoji rows)
-- [x] Invert stress mapping so green = low stress
-- [x] Pain step inline on step 3 with proper FocusState + submit-to-dismiss
+**Physique verdict (new shared surface)**
+- [x] `PhysiqueVerdictCard` hero component — answers "am I on track?" in ≤1s
+- [x] Semantic verdict state (success / warning / danger / info) driven by `PhysiqueIntelligenceEngine`
+- [x] Compact metric strip: trend kg/wk · target kg/wk · protein hit rate · recovery
+- [x] Signal-confidence line (strong / moderate / weak + weigh-in + nutrition day count)
+- [x] Calibration state when data is insufficient (not a blank card)
 
-**Coach output (DailyCoachEngine)**
-- [x] Split every readiness tier by hasWorkoutToday for train-day vs rest-day copy
-- [x] Sharper, more specific adjustments (actual load % / rep targets / time caps)
-- [x] Pain response adapts: "train around it" vs "protect it"
-- [x] Rest-day peak readiness = "bank recovery" instead of "train anyway"
+**Body Progress surface (BodyWeightLogView)**
+- [x] Replace the goal-pace card with `PhysiqueVerdictCard` as the hero
+- [x] Regression-based weekly trend (from engine) drives the verdict instead of crude 3-vs-3
+- [x] Keep chart, but trend chip now reflects verdict state color
 
-**Output screen**
-- [x] Larger readiness dial (128pt) with real status badge
-- [x] Advice card with colored icon tile + label chip + specific adjustments
-- [x] Signal breakdown table showing sleep/energy/stress/soreness at a glance
-- [x] Contextual CTA: "Go to today's session" vs "Done"
+**Nutrition surface (NutritionLogView)**
+- [x] `PhysiqueVerdictCard` hero above target overview
+- [x] Nutrition × training bridge line using `recoveryTrainingBridge`
+- [x] Target overview demoted to a compact secondary card
+
+**Consistency**
+- [x] Both surfaces read from the same verdict — no parallel truths
+- [x] Reuse `STRQPalette` state colors (no ad-hoc color maps)
+- [x] Dark, premium, structured — no calorie-tracker clutter
 
 **Identity**
-- [x] Keep STRQ dark premium palette, typography, motion
-- [x] Semantic color discipline (green/amber/red) without over-coloring
+- [x] Keep dark premium identity and coach authority
 - [x] No redesign of unrelated screens

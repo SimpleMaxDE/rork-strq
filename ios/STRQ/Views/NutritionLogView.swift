@@ -13,6 +13,9 @@ struct NutritionLogView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
+                PhysiqueVerdictCard(vm: vm)
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 10)
                 targetOverview
                 todayProgress
                 quickLogSection
