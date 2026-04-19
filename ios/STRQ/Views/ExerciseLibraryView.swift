@@ -5,6 +5,7 @@ struct ExerciseLibraryView: View {
     @State private var searchText: String = ""
     @State private var selectedWorld: TrainingWorld?
     @State private var selectedMuscle: MuscleGroup?
+    @State private var selectedPattern: MovementPatternGroup?
     @State private var selectedDifficulty: ExerciseDifficulty?
     @State private var showFilters: Bool = false
     @State private var bodyweightOnly: Bool = false
@@ -28,6 +29,9 @@ struct ExerciseLibraryView: View {
                 bodyweightOnly: bodyweightOnly,
                 jointFriendly: jointFriendlyOnly
             )
+        }
+        if let pattern = selectedPattern {
+            results = results.filter { pattern.contains($0.movementPattern) }
         }
         if favoritesOnly {
             results = results.filter { vm.favoriteExerciseIds.contains($0.id) }
@@ -103,9 +107,9 @@ struct ExerciseLibraryView: View {
         HStack(alignment: .center, spacing: 0) {
             libraryStatColumn(value: "\(library.exercises.count)", label: "Exercises")
             libraryDivider
-            libraryStatColumn(value: "\(MuscleGroup.allCases.count)", label: "Muscles")
+            libraryStatColumn(value: "\(ExerciseFamilyService.shared.families.count)", label: "Families")
             libraryDivider
-            libraryStatColumn(value: "\(TrainingWorld.allCases.count)", label: "Worlds")
+            libraryStatColumn(value: "\(MuscleGroup.allCases.count)", label: "Muscles")
             libraryDivider
             libraryStatColumn(value: "\(vm.favoriteExerciseIds.count)", label: "Favorites")
         }
@@ -588,6 +592,31 @@ struct ExerciseLibraryView: View {
                     .background(Color(.secondarySystemGroupedBackground), in: Capsule())
                 }
 
+                Menu {
+                    Button("All Patterns") { selectedPattern = nil }
+                    Divider()
+                    ForEach(MovementPatternGroup.allCases) { pattern in
+                        Button {
+                            selectedPattern = selectedPattern == pattern ? nil : pattern
+                        } label: {
+                            Label(pattern.displayName, systemImage: pattern.icon)
+                        }
+                    }
+                } label: {
+                    let isActive = selectedPattern != nil
+                    HStack(spacing: 5) {
+                        Image(systemName: selectedPattern?.icon ?? "arrow.triangle.swap")
+                            .font(.system(size: 12))
+                        Text(selectedPattern?.displayName ?? "Pattern")
+                            .font(.subheadline.weight(.medium))
+                    }
+                    .foregroundStyle(isActive ? .white : .primary)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(isActive ? STRQBrand.steel : Color(.secondarySystemGroupedBackground), in: Capsule())
+                    .overlay(Capsule().strokeBorder(isActive ? Color.clear : STRQBrand.cardBorder, lineWidth: 1))
+                }
+
                 ForEach(MuscleRegion.allCases) { region in
                     Menu {
                         ForEach(region.muscles) { muscle in
@@ -635,11 +664,12 @@ struct ExerciseLibraryView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Spacer()
-            if selectedMuscle != nil || selectedWorld != nil || bodyweightOnly || jointFriendlyOnly || favoritesOnly {
+            if selectedMuscle != nil || selectedWorld != nil || selectedPattern != nil || bodyweightOnly || jointFriendlyOnly || favoritesOnly {
                 Button("Clear All") {
                     withAnimation {
                         selectedMuscle = nil
                         selectedWorld = nil
+                        selectedPattern = nil
                         selectedDifficulty = nil
                         bodyweightOnly = false
                         jointFriendlyOnly = false
@@ -815,6 +845,58 @@ nonisolated enum BrowseMode: String, CaseIterable {
     case byWorld
 }
 
+nonisolated enum MovementPatternGroup: String, CaseIterable, Identifiable, Sendable {
+    case push
+    case pull
+    case squat
+    case hinge
+    case lunge
+    case carry
+    case core
+    case isolation
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .push: "Push"
+        case .pull: "Pull"
+        case .squat: "Squat"
+        case .hinge: "Hinge"
+        case .lunge: "Lunge"
+        case .carry: "Carry"
+        case .core: "Core"
+        case .isolation: "Isolation"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .push: "arrow.up.right"
+        case .pull: "arrow.down.left"
+        case .squat: "figure.strengthtraining.traditional"
+        case .hinge: "figure.cooldown"
+        case .lunge: "figure.walk"
+        case .carry: "figure.walk.motion"
+        case .core: "figure.core.training"
+        case .isolation: "scope"
+        }
+    }
+
+    func contains(_ pattern: MovementPattern) -> Bool {
+        switch self {
+        case .push: return pattern == .horizontalPush || pattern == .verticalPush
+        case .pull: return pattern == .horizontalPull || pattern == .verticalPull
+        case .squat: return pattern == .squat
+        case .hinge: return pattern == .hipHinge
+        case .lunge: return pattern == .lunge
+        case .carry: return pattern == .carry
+        case .core: return pattern == .isometric || pattern == .rotation || pattern == .antiRotation
+        case .isolation: return pattern == .flexion || pattern == .extension_ || pattern == .abduction || pattern == .adduction
+        }
+    }
+}
+
 struct ExerciseCard: View {
     let exercise: Exercise
     let isFavorite: Bool
@@ -822,19 +904,23 @@ struct ExerciseCard: View {
     let onTap: () -> Void
     let onFavorite: () -> Void
 
+    private var familyName: String? {
+        ExerciseFamilyService.shared.family(forExercise: exercise.id)?.name
+    }
+
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 9)
                         .fill(exerciseAccentColor.opacity(0.09))
-                        .frame(width: 44, height: 44)
+                        .frame(width: 38, height: 38)
                     Image(systemName: exercise.primaryMuscle.symbolName)
-                        .font(.system(size: 18, weight: .regular))
+                        .font(.system(size: 15, weight: .regular))
                         .foregroundStyle(exerciseAccentColor)
                 }
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 5) {
                         Text(exercise.name)
                             .font(.subheadline.weight(.semibold))
@@ -847,21 +933,28 @@ struct ExerciseCard: View {
                         }
                     }
 
-                    HStack(spacing: 6) {
+                    HStack(spacing: 5) {
                         Text(exercise.primaryMuscle.displayName)
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.system(size: 10.5, weight: .medium))
                             .foregroundStyle(.secondary)
 
-                        Circle().fill(Color(.separator)).frame(width: 2, height: 2)
-
-                        Text(exercise.category == .compound ? "Compound" : exercise.category.displayName)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(.secondary)
+                        if let family = familyName {
+                            Circle().fill(Color(.separator)).frame(width: 2, height: 2)
+                            Text(family)
+                                .font(.system(size: 10.5, weight: .medium))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        } else {
+                            Circle().fill(Color(.separator)).frame(width: 2, height: 2)
+                            Text(exercise.category.displayName)
+                                .font(.system(size: 10.5, weight: .medium))
+                                .foregroundStyle(.secondary)
+                        }
 
                         if let equip = exercise.equipment.first(where: { $0 != .none }) {
                             Circle().fill(Color(.separator)).frame(width: 2, height: 2)
                             Text(equip.displayName)
-                                .font(.system(size: 11))
+                                .font(.system(size: 10.5))
                                 .foregroundStyle(.tertiary)
                                 .lineLimit(1)
                         }
@@ -874,20 +967,20 @@ struct ExerciseCard: View {
                     ForEach(0..<3, id: \.self) { i in
                         Capsule()
                             .fill(i < diffLevel ? diffColor : Color(.separator).opacity(0.5))
-                            .frame(width: 3, height: 9)
+                            .frame(width: 3, height: 8)
                     }
                 }
 
                 Button(action: onFavorite) {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
-                        .font(.system(size: 14))
+                        .font(.system(size: 13))
                         .foregroundStyle(isFavorite ? STRQBrand.steel : Color.secondary.opacity(0.35))
-                        .frame(width: 28, height: 28)
+                        .frame(width: 26, height: 26)
                 }
                 .buttonStyle(.plain)
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.vertical, 8)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

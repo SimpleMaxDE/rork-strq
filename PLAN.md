@@ -1,28 +1,27 @@
-# Phase 4 — Active Logger Exactness
+# Phase 5 — Exercise Library / Detail Depth
 
-Turn ActiveWorkoutView into a precise, fast, confident real-time training tool.
+Turn the exercise library + detail system into a deeper, more curated training database.
 
-**Hero / current-task clarity**
-- [x] Fuse exercise hero + active-set header into one compact "current task" block (exercise · set X/Y · planned reps × RPE)
-- [x] Add always-visible context strip: previous best · last session · target — inline, numeric, monospaced
-- [x] Move progression guidance (coach "do this now") into the current-task block, not a separate row below
+**Library: database-grade scanning**
+- [x] Add Movement Pattern menu chip (push, pull, squat, hinge, lunge, carry, core) alongside existing filters
+- [x] Show exercise family name on each row (replaces/augments generic "Compound/Isolation" label)
+- [x] Add "Families" quick stat to the library hero (count of movement families)
+- [x] Tighten row density so rows scan faster as a database list
 
-**Set table precision**
-- [x] Active row gets strong accent (bright border + subtle glow), completed rows drop opacity, pending rows get dotted/ghost state
-- [x] Show target column (planned reps / suggested kg) next to actual logged value so drift is visible
-- [x] Compact delta indicator on completed rows (+2.5, +1 rep vs last session) — small semantic chip
+**Detail top: answer faster**
+- [x] Replace the scattered quick-info strip with a dense classification row: Role · Family · Pattern · Difficulty
+- [x] Move plan-context card directly under the header so "why STRQ picked this" is instantly visible
+- [x] Add "why here" rationale line to plan-context card (role reasoning, when STRQ would swap)
 
-**Inputs: faster, more deliberate**
-- [x] Tap the active weight/reps number → quick numeric edit sheet for direct typing (keeps steppers for nudges)
-- [x] Long-press +/- for ±5 step; plate-math helper label under weight (2×20+1×2.5)
-- [x] "Match last" and "Match target" one-tap chips above inputs when their values differ from current
+**Execution: sharper coaching**
+- [x] Split instructions into Setup → Execute hierarchy (first 2 steps = setup, rest = execute)
+- [x] Tighten the coaching cues and mistakes cards with more compact, scannable rows
 
-**Rest / between-set context**
-- [x] Rest overlay leads with "Just logged: X kg × Y reps · e1RM Z" — not abstract
-- [x] Next-set recommendation block: explicit suggested kg × reps for the next set based on last set quality/RPE
-- [x] Keep SET FEEL chips but move them above the timer (highest-value action first)
+**Variations: family-first**
+- [x] Make the progression chain the hero of Variations (clear regression ← current → progression)
+- [x] Add "why this swap" reason tags across alternatives (same pattern, joint-friendly, home-option, etc.)
+- [x] Consolidate home-alternatives and joint-friendly rails into the main alternatives rail with reason chips
 
-**Compression / utility-first**
-- [x] Collapse "Up Next" preview while a set is active; only show between exercises or after all sets done
-- [x] Previous session table becomes a single compact strip (not full table) under set table
-- [x] Reduce vertical space before the active-set block (trim hero height, tighten spacing)
+**System consistency**
+- [x] Align section header treatment across library and detail
+- [x] Keep STRQ dark premium identity; no hero-first sprawl

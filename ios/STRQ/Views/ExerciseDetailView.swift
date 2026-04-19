@@ -27,32 +27,43 @@ struct ExerciseDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 heroSection
-                summaryStatsRow
+                classificationRow
                     .padding(.horizontal, 16)
                     .padding(.top, 10)
-                quickInfoStrip
-                    .padding(.top, 6)
+
+                // Plan context leads — "why STRQ picked this"
+                if let ctx = planContext {
+                    planContextCard(ctx)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 10)
+                }
 
                 // SECTION 1 — TODAY
-                sectionGroup("Today") {
-                    if let ctx = planContext {
-                        planContextCard(ctx)
-                    }
-                    if let suggestion = loadSuggestion {
-                        loadSuggestionCard(suggestion)
-                    }
-                    if let g = guidance {
-                        nextSessionCard(g)
-                    }
-                    if let prog = progression {
-                        progressionStatusCard(prog)
-                    }
-                    if planContext == nil && loadSuggestion == nil && guidance == nil && progression == nil {
-                        emptyTodayPlaceholder
+                if loadSuggestion != nil || guidance != nil || progression != nil || (planContext == nil) {
+                    sectionGroup("Today") {
+                        if let suggestion = loadSuggestion {
+                            loadSuggestionCard(suggestion)
+                        }
+                        if let g = guidance {
+                            nextSessionCard(g)
+                        }
+                        if let prog = progression {
+                            progressionStatusCard(prog)
+                        }
+                        if planContext == nil && loadSuggestion == nil && guidance == nil && progression == nil {
+                            emptyTodayPlaceholder
+                        }
                     }
                 }
 
-                // SECTION 2 — EXECUTION
+                // SECTION 2 — VARIATIONS (family-first)
+                sectionGroup("Variations") {
+                    progressionChainSection
+                    unifiedAlternativesSection
+                    familySection
+                }
+
+                // SECTION 3 — EXECUTION
                 if !exercise.instructions.isEmpty || !exercise.cues.isEmpty || !exercise.commonMistakes.isEmpty {
                     sectionGroup("Execution") {
                         if !exercise.instructions.isEmpty { instructionsSection }
@@ -61,18 +72,9 @@ struct ExerciseDetailView: View {
                     }
                 }
 
-                // SECTION 3 — TARGET
+                // SECTION 4 — TARGET
                 sectionGroup("Target") {
                     muscleMapSection
-                }
-
-                // SECTION 4 — ALTERNATIVES & PROGRESSION
-                sectionGroup("Variations") {
-                    progressionChainSection
-                    familySection
-                    alternativesSection
-                    homeAlternativesSection
-                    jointFriendlySection
                 }
 
                 // SECTION 5 — EQUIPMENT
@@ -140,61 +142,66 @@ struct ExerciseDetailView: View {
         .padding(.top, 14)
     }
 
-    private var summaryStatsRow: some View {
-        HStack(spacing: 0) {
-            summaryStatCell(
-                value: exercise.difficulty.displayName,
-                label: "Difficulty"
-            )
-            summaryDivider
-            summaryStatCell(
-                value: exercise.category.displayName,
-                label: "Type"
-            )
-            summaryDivider
-            if let last = vm.lastPerformance(for: exercise.id) {
-                summaryStatCell(
-                    value: "\(formatKg(last.topWeight))×\(last.topReps)",
-                    label: "Last"
-                )
-            } else {
-                summaryStatCell(value: "—", label: "Last")
-            }
-            summaryDivider
-            if let prog = progression {
-                summaryStatCell(
-                    value: "\(prog.sessionCount)",
-                    label: "Sessions"
-                )
-            } else {
-                summaryStatCell(value: "0", label: "Sessions")
-            }
+    private var classificationRow: some View {
+        let family = library.family(for: exercise)?.name
+        let role = planContext?.role.displayName ?? (exercise.category == .compound ? "Key Lift" : exercise.category == .isolation ? "Accessory" : exercise.category.displayName)
+        return HStack(spacing: 0) {
+            classificationCell(label: "Role", value: role, accent: .primary)
+            classificationDivider
+            classificationCell(label: "Family", value: family ?? exercise.movementPattern.displayName, accent: .primary)
+            classificationDivider
+            classificationCell(label: "Pattern", value: shortPatternName(exercise.movementPattern), accent: .secondary)
+            classificationDivider
+            classificationCell(label: "Level", value: exercise.difficulty.displayName, accent: diffColor)
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
     }
 
-    private func summaryStatCell(value: String, label: String) -> some View {
-        VStack(spacing: 2) {
+    private func classificationCell(label: String, value: String, accent: Color) -> some View {
+        VStack(spacing: 3) {
+            Text(label.uppercased())
+                .font(.system(size: 8.5, weight: .bold))
+                .tracking(0.7)
+                .foregroundStyle(.tertiary)
             Text(value)
-                .font(.system(size: 13, weight: .bold, design: .rounded).monospacedDigit())
-                .foregroundStyle(.primary)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(accent)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-            Text(label.uppercased())
-                .font(.system(size: 8, weight: .bold))
-                .tracking(0.6)
-                .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 4)
     }
 
-    private var summaryDivider: some View {
+    private var classificationDivider: some View {
         Rectangle()
-            .fill(Color(.separator).opacity(0.6))
-            .frame(width: 1, height: 24)
+            .fill(Color(.separator).opacity(0.5))
+            .frame(width: 1, height: 26)
     }
+
+    private func shortPatternName(_ p: MovementPattern) -> String {
+        switch p {
+        case .horizontalPush: "H. Push"
+        case .horizontalPull: "H. Pull"
+        case .verticalPush: "V. Push"
+        case .verticalPull: "V. Pull"
+        case .hipHinge: "Hinge"
+        case .squat: "Squat"
+        case .lunge: "Lunge"
+        case .carry: "Carry"
+        case .rotation: "Rotation"
+        case .antiRotation: "Anti-Rot"
+        case .flexion: "Flexion"
+        case .extension_: "Extension"
+        case .abduction: "Abduction"
+        case .adduction: "Adduction"
+        case .isometric: "Isometric"
+        case .plyometric: "Plyo"
+        case .locomotion: "Locomotion"
+        }
+    }
+
 
     private var emptyTodayPlaceholder: some View {
         HStack(spacing: 10) {
@@ -214,26 +221,6 @@ struct ExerciseDetailView: View {
         v.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", v) : String(format: "%.1f", v)
     }
 
-    private var quickInfoStrip: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 8) {
-                infoChip(exercise.difficulty.displayName, icon: difficultyIcon, color: diffColor)
-                infoChip(exercise.category.displayName, icon: categoryIcon, color: categoryColor)
-                infoChip(exercise.movementPattern.displayName, icon: "arrow.triangle.2.circlepath", color: STRQBrand.slate)
-                if exercise.isBodyweight {
-                    infoChip("Bodyweight", icon: "figure.stand", color: STRQPalette.success)
-                }
-                if exercise.isJointFriendly {
-                    infoChip("Joint-Friendly", icon: "hand.thumbsup.fill", color: STRQPalette.info)
-                }
-                if exercise.isBeginnerFriendly {
-                    infoChip("Beginner OK", icon: "star.fill", color: STRQPalette.warning)
-                }
-            }
-        }
-        .contentMargins(.horizontal, 16)
-        .scrollIndicators(.hidden)
-    }
 
     private func infoChip(_ text: String, icon: String, color: Color) -> some View {
         HStack(spacing: 5) {
@@ -255,7 +242,7 @@ struct ExerciseDetailView: View {
                 Image(systemName: "calendar.badge.clock")
                     .font(.caption)
                     .foregroundStyle(STRQPalette.info)
-                Text("IN YOUR PLAN")
+                Text("WHY STRQ PICKED THIS")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQPalette.info)
                     .tracking(0.5)
@@ -272,6 +259,10 @@ struct ExerciseDetailView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
+            Text(roleRationale(ctx.role))
+                .font(.system(size: 11))
+                .foregroundStyle(.tertiary)
+
             HStack(spacing: 12) {
                 Label("\(ctx.sets) × \(ctx.reps)", systemImage: "rectangle.stack.fill")
                     .font(.caption.weight(.medium))
@@ -280,12 +271,26 @@ struct ExerciseDetailView: View {
                         .font(.caption.weight(.medium))
                         .foregroundStyle(STRQBrand.steel)
                 }
+                Spacer()
+                Text(ctx.dayName)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.tertiary)
             }
             .labelStyle(.titleAndIcon)
             .foregroundStyle(.secondary)
         }
         .padding(14)
         .background(STRQPalette.info.opacity(0.05), in: .rect(cornerRadius: 14))
+    }
+
+    private func roleRationale(_ role: ExerciseRole) -> String {
+        switch role {
+        case .keyLift: return "Anchor lift — strongest stimulus, highest priority. STRQ will only swap this if load is too heavy or a joint signal appears."
+        case .supportLift: return "Supports the anchor with a complementary angle. Swappable for similar pattern variations."
+        case .accessory: return "Targeted volume for lagging or focus muscles. Swap freely within the same muscle group."
+        case .warmup: return "Primes the movement. Swap for any pattern-matched mobility or activation drill."
+        case .saferSubstitute: return "Selected because of a joint or recovery signal. STRQ will restore the standard lift when signals clear."
+        }
     }
 
     private func loadSuggestionCard(_ suggestion: StartingLoadEngine.LoadSuggestion) -> some View {
@@ -486,31 +491,19 @@ struct ExerciseDetailView: View {
     }
 
     private var instructionsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        let splitIndex = min(2, exercise.instructions.count)
+        let setup = Array(exercise.instructions.prefix(splitIndex))
+        let execute = Array(exercise.instructions.dropFirst(splitIndex))
+
+        return VStack(alignment: .leading, spacing: 10) {
             subsectionHeader("How to Perform", icon: "list.number")
 
-            VStack(alignment: .leading, spacing: 0) {
-                ForEach(Array(exercise.instructions.enumerated()), id: \.offset) { index, instruction in
-                    HStack(alignment: .top, spacing: 14) {
-                        Text("\(index + 1)")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(.white)
-                            .frame(width: 24, height: 24)
-                            .background(categoryColor, in: Circle())
-
-                        Text(instruction)
-                            .font(.subheadline)
-                            .foregroundStyle(.primary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .padding(.vertical, 10)
-
-                    if index < exercise.instructions.count - 1 {
-                        Rectangle()
-                            .fill(Color(.separator).opacity(0.3))
-                            .frame(width: 1, height: 8)
-                            .padding(.leading, 12)
-                    }
+            VStack(alignment: .leading, spacing: 12) {
+                if !setup.isEmpty {
+                    instructionPhase(label: "SETUP", color: STRQPalette.info, steps: setup, startIndex: 0)
+                }
+                if !execute.isEmpty {
+                    instructionPhase(label: "EXECUTE", color: categoryColor, steps: execute, startIndex: splitIndex)
                 }
             }
             .padding(14)
@@ -520,48 +513,98 @@ struct ExerciseDetailView: View {
         .animation(.easeOut(duration: 0.5).delay(0.15), value: appeared)
     }
 
-    private var cuesSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            subsectionHeader("Coaching Cues", icon: "checkmark.seal.fill")
-
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(exercise.cues, id: \.self) { cue in
+    private func instructionPhase(label: String, color: Color, steps: [String], startIndex: Int) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Rectangle()
+                    .fill(color)
+                    .frame(width: 3, height: 10)
+                    .clipShape(.capsule)
+                Text(label)
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.8)
+                    .foregroundStyle(color)
+            }
+            VStack(alignment: .leading, spacing: 7) {
+                ForEach(Array(steps.enumerated()), id: \.offset) { idx, step in
                     HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.subheadline)
-                            .foregroundStyle(STRQPalette.success)
-                        Text(cue)
+                        Text("\(startIndex + idx + 1)")
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundStyle(color)
+                            .frame(width: 18, height: 18)
+                            .background(color.opacity(0.12), in: Circle())
+                        Text(step)
                             .font(.subheadline)
                             .foregroundStyle(.primary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
             }
-            .padding(14)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
         }
+    }
+
+    private var cuesSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 10))
+                    .foregroundStyle(STRQPalette.success)
+                Text("DO THIS")
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.8)
+                    .foregroundStyle(STRQPalette.success)
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(exercise.cues, id: \.self) { cue in
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(STRQPalette.success)
+                            .frame(width: 14, alignment: .center)
+                            .padding(.top, 3)
+                        Text(cue)
+                            .font(.subheadline)
+                            .foregroundStyle(.primary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
         .opacity(appeared ? 1 : 0)
         .animation(.easeOut(duration: 0.5).delay(0.2), value: appeared)
     }
 
     private var mistakesSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            subsectionHeader("Common Mistakes", icon: "exclamationmark.triangle.fill")
-
-            VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 10))
+                    .foregroundStyle(STRQPalette.danger)
+                Text("AVOID THIS")
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.8)
+                    .foregroundStyle(STRQPalette.danger)
+            }
+            VStack(alignment: .leading, spacing: 6) {
                 ForEach(exercise.commonMistakes, id: \.self) { mistake in
-                    HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.subheadline)
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(STRQPalette.danger)
+                            .frame(width: 14, alignment: .center)
+                            .padding(.top, 3)
                         Text(mistake)
                             .font(.subheadline)
                             .foregroundStyle(.primary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
             }
-            .padding(14)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
         }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
         .opacity(appeared ? 1 : 0)
         .animation(.easeOut(duration: 0.5).delay(0.25), value: appeared)
     }
@@ -578,19 +621,19 @@ struct ExerciseDetailView: View {
     }
 
     @ViewBuilder
-    private var alternativesSection: some View {
-        let alts = library.alternatives(for: exercise)
-        if !alts.isEmpty {
+    private var unifiedAlternativesSection: some View {
+        let items = unifiedAlternativeItems()
+        if !items.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 subsectionHeader("Alternatives", icon: "arrow.triangle.2.circlepath")
 
                 ScrollView(.horizontal) {
                     HStack(spacing: 10) {
-                        ForEach(alts) { alt in
+                        ForEach(items, id: \.exercise.id) { item in
                             Button {
-                                selectedAlternative = alt
+                                selectedAlternative = item.exercise
                             } label: {
-                                alternativeCard(alt)
+                                alternativeCard(item.exercise, reasonOverride: item.reason)
                             }
                         }
                     }
@@ -600,6 +643,38 @@ struct ExerciseDetailView: View {
             .opacity(appeared ? 1 : 0)
             .animation(.easeOut(duration: 0.5).delay(0.3), value: appeared)
         }
+    }
+
+    private struct UnifiedAltItem {
+        let exercise: Exercise
+        let reason: String
+        let priority: Int
+    }
+
+    private func unifiedAlternativeItems() -> [UnifiedAltItem] {
+        var seen: Set<String> = [exercise.id]
+        var items: [UnifiedAltItem] = []
+
+        func add(_ ex: Exercise, reason: String, priority: Int) {
+            guard !seen.contains(ex.id) else { return }
+            seen.insert(ex.id)
+            items.append(UnifiedAltItem(exercise: ex, reason: reason, priority: priority))
+        }
+
+        for alt in library.alternatives(for: exercise) {
+            add(alt, reason: alternativeReason(alt), priority: 0)
+        }
+        if !exercise.isJointFriendly {
+            for alt in library.jointFriendlyOptions(for: exercise) {
+                add(alt, reason: "Joint-friendly", priority: 1)
+            }
+        }
+        if exercise.locationType == .gym {
+            for alt in library.homeAlternatives(for: exercise) {
+                add(alt, reason: "Home option", priority: 2)
+            }
+        }
+        return items.sorted { $0.priority < $1.priority }
     }
 
 
@@ -637,6 +712,7 @@ struct ExerciseDetailView: View {
         case "Same target": return STRQPalette.info
         case "Joint-friendly": return STRQPalette.success
         case "No equipment": return STRQBrand.steel
+        case "Home option": return STRQPalette.info
         default: return .secondary
         }
     }
@@ -822,55 +898,6 @@ struct ExerciseDetailView: View {
         }
     }
 
-    @ViewBuilder
-    private var homeAlternativesSection: some View {
-        let homeAlts = library.homeAlternatives(for: exercise)
-        if !homeAlts.isEmpty && exercise.locationType == .gym {
-            VStack(alignment: .leading, spacing: 10) {
-                subsectionHeader("Home Alternatives", icon: "house.fill")
-
-                ScrollView(.horizontal) {
-                    HStack(spacing: 10) {
-                        ForEach(homeAlts) { alt in
-                            Button {
-                                selectedAlternative = alt
-                            } label: {
-                                alternativeCard(alt, reasonOverride: "Home option")
-                            }
-                        }
-                    }
-                }
-                .scrollIndicators(.hidden)
-            }
-            .opacity(appeared ? 1 : 0)
-            .animation(.easeOut(duration: 0.5).delay(0.33), value: appeared)
-        }
-    }
-
-    @ViewBuilder
-    private var jointFriendlySection: some View {
-        let jfOptions = library.jointFriendlyOptions(for: exercise)
-        if !jfOptions.isEmpty && !exercise.isJointFriendly {
-            VStack(alignment: .leading, spacing: 10) {
-                subsectionHeader("Joint-Friendly Options", icon: "hand.thumbsup.fill")
-
-                ScrollView(.horizontal) {
-                    HStack(spacing: 10) {
-                        ForEach(jfOptions) { alt in
-                            Button {
-                                selectedAlternative = alt
-                            } label: {
-                                alternativeCard(alt, reasonOverride: "Joint-friendly")
-                            }
-                        }
-                    }
-                }
-                .scrollIndicators(.hidden)
-            }
-            .opacity(appeared ? 1 : 0)
-            .animation(.easeOut(duration: 0.5).delay(0.36), value: appeared)
-        }
-    }
 
     private func alternativeCard(_ alt: Exercise, reasonOverride: String? = nil) -> some View {
         VStack(alignment: .leading, spacing: 8) {
