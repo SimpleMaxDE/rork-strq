@@ -191,6 +191,7 @@ struct DashboardView: View {
                             .strokeBorder(STRQBrand.steel.opacity(0.15), lineWidth: 1)
                     )
                 }
+                .buttonStyle(.strqPressable)
                 .sensoryFeedback(.selection, trigger: showReadinessCheckIn)
             }
         }
@@ -566,6 +567,7 @@ struct DashboardView: View {
         Button { showWeightLog = true } label: {
             HStack(spacing: 14) {
                 Image(systemName: "scalemass.fill")
+                    .accessibilityHidden(true)
                     .font(.title3.weight(.medium))
                     .foregroundStyle(.white)
                     .frame(width: 44, height: 44)
@@ -606,6 +608,7 @@ struct DashboardView: View {
                     .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
             )
         }
+        .buttonStyle(.strqPressable)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(.easeOut(duration: 0.5).delay(0.06), value: appeared)
@@ -630,6 +633,7 @@ struct DashboardView: View {
                     progressColor: STRQBrand.steel
                 )
             }
+            .buttonStyle(.strqPressable)
 
             Button { showSleepLog = true } label: {
                 let sleepColor = ForgeTheme.sleepColor(for: vm.averageSleepHours)
@@ -641,6 +645,7 @@ struct DashboardView: View {
                     progressColor: sleepColor
                 )
             }
+            .buttonStyle(.strqPressable)
 
             if vm.isWeeklyReviewReady {
                 Button {

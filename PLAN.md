@@ -1,100 +1,57 @@
-# Product-wide Guided Clarity, Semantic Color & Premium Completion pass
+# Native Feel + Real Device Polish pass
 
-A full STRQ-wide polish pass that makes every key screen easier to understand at a glance, introduces meaningful red / yellow / green state language, and turns finishing a workout into a memorable moment — while keeping STRQ's dark, steel, premium identity.
+A focused polish pass to make STRQ feel more tactile, finished, and iPhone-native in actual use. No new features, no redesign, identity preserved.
 
-## Foundation
+**Tap & Press Feedback**
+- Unified pressed-state for all primary cards, rows, and choice tiles — subtle scale + dim on touch down, instant release.
+- Consistent haptic language: light tick for selections, medium for confirmations, success haptic on set logged and workout completed, warning on destructive actions.
+- All tappable rows get proper touch-down highlight instead of dead taps.
 
-- **New STRQ semantic palette** — a single shared set of state colors (success / warning / danger / info / neutral / gold-accent) used consistently across the whole app. Existing Forge theme keeps working and quietly forwards to the new palette, so nothing visual regresses.
-- **Rule of one signal** — each section gets one primary message, one clear action, supporting detail only when useful. Applied carefully, not destructively.
+**Selection States**
+- Onboarding choice tiles: stronger selected border, filled check affordance, clearer unselected vs selected contrast.
+- Session editor rows: clearer active edit state, pressed state, and coach-vs-custom badge alignment.
+- Library filters & segmented controls: tighter selected indicator, smoother cross-fade between options.
 
-## Premium workout completion moment
+**Sheets & Modals**
+- All sheets use consistent detents, grabber visibility, and corner treatment.
+- Content-aware sheet heights (exercise swap, set notes, rest timer) so sheets don't feel oversized.
+- Scrollable sheets get proper presentationContentInteraction so swipe scrolls content, not the sheet.
+- Dismiss gestures feel native everywhere.
 
-A new, full-screen post-workout experience that replaces today's small stats card.
+**Transitions & Navigation**
+- Push/pop transitions feel consistent across Train, Library, Progress, and Profile stacks.
+- Plan reveal and completion flow get calmer, more confident enter/exit motion.
+- Tab switches stay instant; no jank when returning from deep stacks.
 
-- Full-screen dark reveal with a soft particle/spark burst and gentle spring-in
-- Large "Session Complete" headline with duration and a satisfying success check
-- Highlights list surfaced immediately after finish, in priority order:
-  - PRs (gold accent)
-  - Best set vs. last session (green)
-  - Volume change vs. last session (green / steel / yellow)
-  - Longest session / streak milestones (gold)
-- Calm celebratory haptic sequence and a restrained confetti/spark layer that fades out
-- Clear primary action ("Done") and secondary action ("Share / View details")
-- Respects Reduce Motion — falls back to a static premium summary
+**Active Workout Polish**
+- Set-logged confirmation: tighter micro-motion, success tick haptic, row highlight that settles quickly.
+- Rest timer sheet presents and dismisses more smoothly, with subtle countdown motion.
+- Weight/reps steppers get firmer press feedback and repeat-tap rhythm.
+- Sticky bottom CTA respects home indicator and keyboard safely.
 
-## Today
+**Row Interactions**
+- History rows, exercise rows, and plan rows get unified press feedback and disclosure behavior.
+- Swipe actions (where present) feel native with proper resistance.
 
-- Stronger primary mission at the top (what to do today, one tap to start)
-- Secondary signals (recovery, sleep, streak) become quieter supporting context
-- Red / yellow / green used meaningfully on recovery and readiness, not decoratively
+**Completion Flow**
+- Entry animation into completion screen feels earned but calm — slight stagger, no noisy particles.
+- Highlight cards reveal with a gentle sequence, then settle.
+- Dismiss returns cleanly to Today without stack flicker.
 
-## Coach
+**Real-Device Ergonomics**
+- All primary actions sit within comfortable thumb reach.
+- Minimum 44pt touch targets verified across dense rows and editor controls.
+- Safe-area and home-indicator spacing consistent across sheets and sticky CTAs.
+- Scroll rhythm tuned — no layouts that jump when content loads.
 
-- One strongest recommendation prominently, one watchpoint, one momentum signal
-- Lower-value details collapsed beneath
-- State colors only where they actually mean something (on-track / monitor / off-track)
+**Micro-Motion Guardrails**
+- Springs unified across the app (one response/damping baseline).
+- No animation longer than it needs to be; no decorative motion.
+- Respect Reduce Motion setting everywhere new motion was added.
 
-## Train / Session Plan
+**Consistency Sweep**
+- Button hierarchy (primary / secondary / tertiary) behaves identically in onboarding, editor, logger, and completion.
+- Status accents, chevrons, and disclosure indicators aligned system-wide.
+- Identical pressed/selected/disabled language across all modules.
 
-- Cleaner session hero with clearer "start" action
-- Tighter, more scannable exercise rows (anchor / support / accessory distinction)
-- Better separation between summary, adjustment context, and the exercise list
-- Semantic color on session status (ready / caution / overdue)
-
-## Active Workout Logger
-
-- Clearer LAST → TARGET → NOW relationship in the active set card
-- Calmer micro-signals; green confirm only at meaningful moments (set logged, PR hit)
-- Yellow caution if logged numbers drift meaningfully below target
-- Up Next stays calm but reads faster
-
-## Onboarding & setup choices
-
-- Large, obvious decision tiles (frequency, session length, muscle focus, experience)
-- One strong primary button per step, quieter secondary help
-- Semantic accents where they add meaning (e.g. short / medium / long session = green / yellow / red dot, used sparingly)
-- Step progress feels more confident and premium
-
-## Plan Reveal & plan control
-
-- Stronger "this is your plan" moment with calmer hero
-- Clearer structure: overview → weekly split → today's focus → what you can change
-- Plan edits feel safer: clearer labels on what's editable vs. coach-recommended
-
-## Exercise Library
-
-- Denser, more database-like list with clearer primary/secondary metadata
-- Filter and count feel more serious and trustworthy
-- Subtle state accents (e.g. trained recently / due / overdue) using semantic colors
-
-## Exercise Detail
-
-- Reordered for scanning: Summary → Execution → Target muscles → Progression/history → Alternatives → Equipment
-- Less stacked-card fatigue, stronger hierarchy between sections
-- Subtle semantic bars (range of motion / stability style indicators) without copying the reference
-
-## Progress & History
-
-- Clear separation between highlights, trends, PRs, consistency
-- Recent improvement reads faster (green = up, steel = flat, yellow = attention)
-- History rows feel more like a structured logbook: date · split · duration · sets · volume · highlight
-
-## Profile
-
-- Cleaner grouping between account, subscription, nutrition/recovery overview, settings
-- More premium control-surface feel, less utility clutter
-
-## Identity preserved
-
-- Dark, monochrome / steel base stays intact
-- Strong typography, rounded premium surfaces, calm motion
-- Color is used only to clarify meaning — never to decorate
-- No cloning of the reference app's layouts, wording, or visuals
-
-## Success criteria
-
-- Every key surface answers "what is this, what do I tap, what happens next" within seconds
-- Red / yellow / green feel earned and meaningful across the app
-- Finishing a workout feels rewarding and memorable
-- STRQ still unmistakably feels like STRQ — just sharper, clearer, and more premium
-
+STRQ keeps its dark premium identity, semantic palette, strong typography, and coach authority — this pass only sharpens how it feels in the hand.

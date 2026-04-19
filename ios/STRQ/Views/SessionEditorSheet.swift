@@ -202,6 +202,7 @@ struct SessionEditorSheet: View {
         .onTapGesture {
             editingPlanned = planned
         }
+        .sensoryFeedback(.selection, trigger: editingPlanned?.id)
     }
 
     private func formatRestShort(_ seconds: Int) -> String {
@@ -282,7 +283,7 @@ struct PrescriptionEditSheet: View {
                     HStack(spacing: 8) {
                         ForEach(["3-5", "6-8", "8-10", "10-12", "12-15", "15-20"], id: \.self) { preset in
                             Button {
-                                repsText = preset
+                                withAnimation(STRQMotion.tap) { repsText = preset }
                             } label: {
                                 Text(preset)
                                     .font(.caption.monospacedDigit().weight(.semibold))
@@ -290,8 +291,10 @@ struct PrescriptionEditSheet: View {
                                     .padding(.horizontal, 10)
                                     .padding(.vertical, 6)
                                     .background(repsText == preset ? STRQBrand.steel : Color(.tertiarySystemGroupedBackground), in: Capsule())
+                                    .contentShape(Capsule())
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.strqPressable)
+                            .sensoryFeedback(.selection, trigger: repsText)
                         }
                     }
                 }
@@ -309,7 +312,7 @@ struct PrescriptionEditSheet: View {
                     HStack(spacing: 8) {
                         ForEach([60, 90, 120, 180], id: \.self) { preset in
                             Button {
-                                restSeconds = preset
+                                withAnimation(STRQMotion.tap) { restSeconds = preset }
                             } label: {
                                 Text(formatRest(preset))
                                     .font(.caption.monospacedDigit().weight(.semibold))
@@ -317,8 +320,10 @@ struct PrescriptionEditSheet: View {
                                     .padding(.horizontal, 10)
                                     .padding(.vertical, 6)
                                     .background(restSeconds == preset ? STRQBrand.steel : Color(.tertiarySystemGroupedBackground), in: Capsule())
+                                    .contentShape(Capsule())
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.strqPressable)
+                            .sensoryFeedback(.selection, trigger: restSeconds)
                         }
                     }
                 }

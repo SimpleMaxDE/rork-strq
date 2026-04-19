@@ -118,6 +118,7 @@ struct ActiveWorkoutView: View {
                 .padding(.vertical, 8)
                 .background(Color.white.opacity(0.06), in: Capsule())
             }
+            .buttonStyle(.strqPressable)
             .padding(.trailing, 10)
 
             Button {
@@ -322,9 +323,11 @@ struct ActiveWorkoutView: View {
                                     Image(systemName: "minus")
                                         .font(.system(size: 12, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 32, height: 40)
+                                        .frame(width: 44, height: 44)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
+                                        .contentShape(.rect)
                                 }
+                                .buttonStyle(.strqStepper)
                                 .disabled(isBodyweight && setLog.weight <= 0)
 
                                 Text(isBodyweight && setLog.weight <= 0 ? "BW" : formatWeight(setLog.weight, increment: increment))
@@ -342,9 +345,11 @@ struct ActiveWorkoutView: View {
                                     Image(systemName: "plus")
                                         .font(.system(size: 12, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 32, height: 40)
+                                        .frame(width: 44, height: 44)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
+                                        .contentShape(.rect)
                                 }
+                                .buttonStyle(.strqStepper)
                             }
 
                             Text(isBodyweight ? "added load" : "kg")
@@ -368,9 +373,11 @@ struct ActiveWorkoutView: View {
                                     Image(systemName: "minus")
                                         .font(.system(size: 12, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 32, height: 40)
+                                        .frame(width: 44, height: 44)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
+                                        .contentShape(.rect)
                                 }
+                                .buttonStyle(.strqStepper)
 
                                 Text("\(setLog.reps)")
                                     .font(.system(size: 30, weight: .heavy, design: .rounded).monospacedDigit())
@@ -384,9 +391,11 @@ struct ActiveWorkoutView: View {
                                     Image(systemName: "plus")
                                         .font(.system(size: 12, weight: .medium))
                                         .foregroundStyle(.white.opacity(0.5))
-                                        .frame(width: 32, height: 40)
+                                        .frame(width: 44, height: 44)
                                         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
+                                        .contentShape(.rect)
                                 }
+                                .buttonStyle(.strqStepper)
                             }
 
                             Text("reps")
@@ -411,6 +420,7 @@ struct ActiveWorkoutView: View {
                         .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 12))
                         .shadow(color: .white.opacity(0.12), radius: 10, y: 2)
                     }
+                    .buttonStyle(.strqPressable)
                 }
                 .padding(.horizontal, 13)
                 .padding(.vertical, 11)
@@ -933,6 +943,7 @@ struct ActiveWorkoutView: View {
                             .background(Color.white.opacity(0.05), in: Capsule())
                             .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
                     }
+                    .buttonStyle(.strqPressable)
 
                     Button {
                         restTimeRemaining = 0
@@ -945,6 +956,7 @@ struct ActiveWorkoutView: View {
                             .frame(height: 52)
                             .background(STRQBrand.accentGradient, in: Capsule())
                     }
+                    .buttonStyle(.strqPressable)
 
                     Button { restTimeRemaining += 15 } label: {
                         Text("+15s")
@@ -954,6 +966,7 @@ struct ActiveWorkoutView: View {
                             .background(Color.white.opacity(0.05), in: Capsule())
                             .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
                     }
+                    .buttonStyle(.strqPressable)
                 }
                 .padding(.horizontal, 20)
 

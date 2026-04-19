@@ -56,7 +56,7 @@ struct SessionHistoryView: View {
                                         Button { selectedSession = session } label: {
                                             sessionRow(session)
                                         }
-                                        .buttonStyle(.plain)
+                                        .buttonStyle(.strqRow)
                                         if index < monthSessions.count - 1 {
                                             Rectangle().fill(Color.white.opacity(0.04)).frame(height: 0.5)
                                                 .padding(.leading, 54)

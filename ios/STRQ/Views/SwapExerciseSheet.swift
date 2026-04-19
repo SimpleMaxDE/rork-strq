@@ -253,10 +253,12 @@ struct SwapExerciseSheet: View {
                             .font(.subheadline.weight(.semibold))
                     }
                     .frame(maxWidth: .infinity)
-                    .frame(height: 42)
+                    .frame(height: 44)
                     .foregroundStyle(.white)
                     .background(Color.green.gradient, in: .rect(cornerRadius: 12))
                 }
+                .buttonStyle(.strqPressable)
+                .sensoryFeedback(.success, trigger: confirmed)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
@@ -271,11 +273,11 @@ struct SwapExerciseSheet: View {
         .contentShape(.rect(cornerRadius: 14))
         .onTapGesture {
             guard !confirmed else { return }
-            withAnimation(.snappy(duration: 0.25)) {
+            withAnimation(STRQMotion.tap) {
                 selectedOption = option
             }
         }
-        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.4), trigger: isSelected)
+        .sensoryFeedback(.selection, trigger: isSelected)
     }
 
     private func groupIcon(_ group: String) -> String {

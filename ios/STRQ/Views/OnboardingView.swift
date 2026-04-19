@@ -136,7 +136,9 @@ struct OnboardingView: View {
                 )
                 .opacity(canAdvance ? 1 : 0.6)
             }
+            .buttonStyle(.strqPressable)
             .disabled(!canAdvance)
+            .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.5), trigger: step)
 
             if step > 0 {
                 Button {
@@ -735,7 +737,10 @@ struct OnboardingView: View {
 
     @ViewBuilder
     private func selectionChip(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+        Button {
+            withAnimation(STRQMotion.tap) { action() }
+            selectionPulse.toggle()
+        } label: {
             Text(title)
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(selected ? .black : .white)
@@ -749,6 +754,8 @@ struct OnboardingView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .strokeBorder(selected ? .clear : Color.white.opacity(0.06), lineWidth: 1)
                 )
+                .contentShape(.rect(cornerRadius: 12))
         }
+        .buttonStyle(.strqPressable)
     }
 }

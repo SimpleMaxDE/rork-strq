@@ -536,26 +536,28 @@ struct ProfileView: View {
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(STRQBrand.steel)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 42)
+                        .frame(height: 44)
                         .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 11))
                         .overlay(
                             RoundedRectangle(cornerRadius: 11)
                                 .strokeBorder(STRQBrand.steel.opacity(0.1), lineWidth: 1)
                         )
                 }
+                .buttonStyle(.strqPressable)
 
                 Button { showSleepLog = true } label: {
                     Label("Sleep Log", systemImage: "moon.zzz.fill")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(STRQBrand.steel)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 42)
+                        .frame(height: 44)
                         .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 11))
                         .overlay(
                             RoundedRectangle(cornerRadius: 11)
                                 .strokeBorder(STRQBrand.steel.opacity(0.1), lineWidth: 1)
                         )
                 }
+                .buttonStyle(.strqPressable)
             }
         }
     }

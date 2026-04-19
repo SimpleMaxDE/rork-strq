@@ -503,7 +503,7 @@ struct ExerciseLibraryView: View {
                             .padding(12)
                             .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.strqPressable)
                     }
                 }
             }

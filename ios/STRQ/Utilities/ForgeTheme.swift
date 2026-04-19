@@ -208,6 +208,7 @@ struct ForgePrimaryButton: View {
             )
             .shadow(color: .white.opacity(0.08), radius: 12, y: 2)
         }
+        .buttonStyle(.strqPressable)
     }
 }
 
@@ -229,5 +230,6 @@ struct ForgeSecondaryButton: View {
             .frame(height: 46)
             .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 12))
         }
+        .buttonStyle(.strqPressable)
     }
 }

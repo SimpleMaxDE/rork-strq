@@ -241,6 +241,7 @@ struct WorkoutCompletionView: View {
                         .frame(height: 56)
                         .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 18))
                 }
+                .buttonStyle(.strqPressable)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 28)
