@@ -1,28 +1,29 @@
-# Phase 7 — Today + Coach as One Daily Operating System
+# Phase 8 — Recovery / Check-in as a Premium Operating Flow
 
-Make Today and Coach feel like one coherent command layer — decisive, ranked, contextual.
+Make the daily check-in + recovery logging feel like one coherent, fast, high-confidence operating flow.
 
-**Daily priority engine**
-- [x] Build `DailyBriefing` model + `DailyBriefingEngine` that ranks today's signals (training, recovery, progression, nutrition, readiness, deload)
-- [x] Pick one strongest primary action, one watchpoint, one momentum line — in that order
-- [x] Use recent workout outcomes (last completed session + highlights) to shape today's guidance
-- [x] Rest day path: recovery focus, next session prep, logging gap
-- [x] Wire engine into DailyStateCoordinator so vm exposes `dailyBriefing`
+**Check-in flow (ReadinessCheckInView)**
+- [x] Compress 5-step questionnaire into 3 decision blocks (sleep+energy, load, mindset+pain)
+- [x] Strong selected states — colored fills, white text, shadow lift, clear contrast
+- [x] Semantic color per option (danger → warning → success) instead of flat gradient
+- [x] Context-aware header: "Before training" vs "Rest day check"
+- [x] Compact 1–5 segmented pickers with short labels (replaces long emoji rows)
+- [x] Invert stress mapping so green = low stress
+- [x] Pain step inline on step 3 with proper FocusState + submit-to-dismiss
 
-**Today surface**
-- [x] Replace multiple competing signal modules with a ranked "what matters today" stack
-- [x] Lead with the single primary action (train / recover / check in / log / prep)
-- [x] Add "Since last session" bridge when there's a fresh completed session
-- [x] Collapse weight/nutrition/sleep into a single compact row rather than competing cards
-- [x] Keep today hero + schedule timeline but tighten spacing/rhythm
+**Coach output (DailyCoachEngine)**
+- [x] Split every readiness tier by hasWorkoutToday for train-day vs rest-day copy
+- [x] Sharper, more specific adjustments (actual load % / rep targets / time caps)
+- [x] Pain response adapts: "train around it" vs "protect it"
+- [x] Rest-day peak readiness = "bank recovery" instead of "train anyway"
 
-**Coach surface**
-- [x] Reframe Coach around one decision: primary move, one watch, one momentum — nothing else at top
-- [x] Cut parallel-notes feel by deferring other insights/recommendations behind "More signals"
-- [x] Sharpen Coach copy: confident, specific, not generic
-- [x] Rest-day Coach: shows what to prep, not empty state
+**Output screen**
+- [x] Larger readiness dial (128pt) with real status badge
+- [x] Advice card with colored icon tile + label chip + specific adjustments
+- [x] Signal breakdown table showing sleep/energy/stress/soreness at a glance
+- [x] Contextual CTA: "Go to today's session" vs "Done"
 
-**System consistency**
-- [x] Keep STRQ dark premium identity, semantic palette, calm motion
-- [x] Shared section headers, card treatment
+**Identity**
+- [x] Keep STRQ dark premium palette, typography, motion
+- [x] Semantic color discipline (green/amber/red) without over-coloring
 - [x] No redesign of unrelated screens

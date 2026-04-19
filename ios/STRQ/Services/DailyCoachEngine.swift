@@ -10,79 +10,148 @@ struct DailyCoachEngine {
         phase: TrainingPhase
     ) -> ReadinessCoachResponse {
         let score = readiness.readinessScore
+        let hasWorkout = todaysWorkout != nil
 
         if readiness.painOrRestriction {
+            return painResponse(readiness: readiness, hasWorkout: hasWorkout)
+        }
+
+        if score >= 85 {
+            return highReadinessResponse(readiness: readiness, phase: phase, hasWorkout: hasWorkout)
+        } else if score >= 70 {
+            return goodReadinessResponse(readiness: readiness, hasWorkout: hasWorkout)
+        } else if score >= 55 {
+            return moderateReadinessResponse(readiness: readiness, hasWorkout: hasWorkout)
+        } else if score >= 40 {
+            return lowReadinessResponse(readiness: readiness, hasWorkout: hasWorkout)
+        } else {
+            return veryLowReadinessResponse(readiness: readiness, hasWorkout: hasWorkout)
+        }
+    }
+
+    // MARK: Pain
+
+    private func painResponse(readiness: DailyReadiness, hasWorkout: Bool) -> ReadinessCoachResponse {
+        let noteFragment = readiness.painNote.isEmpty ? "" : " around \(readiness.painNote.lowercased())"
+        let message = hasWorkout
+            ? "You flagged something off\(noteFragment). Keep the session — but stay out of the pain path. Swap risky variations, drop load where needed, and end a set early if form breaks."
+            : "You flagged something off\(noteFragment). Treat today as a recovery day: mobility, circulation, and sleep. Don't test it."
+
+        return ReadinessCoachResponse(
+            headline: hasWorkout ? "Train around it" : "Protect it today",
+            message: message,
+            icon: "shield.checkered",
+            colorName: "orange",
+            trainingAdvice: hasWorkout ? .useSaferVariations : .restDay,
+            adjustments: hasWorkout
+                ? [
+                    "Swap to joint-friendly variations",
+                    "Drop load ~15% on affected patterns",
+                    "Stop a set the moment form slips"
+                ]
+                : [
+                    "Mobility + light cardio only",
+                    "Prioritize sleep and protein",
+                    "Re-check tomorrow before training"
+                ]
+        )
+    }
+
+    // MARK: Peak
+
+    private func highReadinessResponse(readiness: DailyReadiness, phase: TrainingPhase, hasWorkout: Bool) -> ReadinessCoachResponse {
+        if !hasWorkout {
             return ReadinessCoachResponse(
-                headline: "Protect Yourself Today",
-                message: "You reported pain or restriction. Use safer exercise variations and avoid aggravating movements. Listen to your body — consistency matters more than one hard session.",
-                icon: "shield.checkered",
-                colorName: "orange",
-                trainingAdvice: .useSaferVariations,
+                headline: "Bank the recovery",
+                message: "You're fresh and firing — but no session is planned. Don't burn it on junk volume. Keep today active and easy so tomorrow's session gets the benefit.",
+                icon: "bolt.fill",
+                colorName: "mint",
+                trainingAdvice: .trainAsPlanned,
                 adjustments: [
-                    "Swap to joint-friendly alternatives",
-                    "Reduce load on affected area",
-                    "Skip exercises that cause discomfort"
+                    "Walk, mobility, or light skill work",
+                    "Hit protein + sleep targets",
+                    "Prep tomorrow's lifts mentally"
                 ]
             )
         }
 
-        if score >= 85 {
-            return highReadinessResponse(readiness: readiness, phase: phase, todaysWorkout: todaysWorkout)
-        } else if score >= 70 {
-            return goodReadinessResponse(readiness: readiness, todaysWorkout: todaysWorkout)
-        } else if score >= 55 {
-            return moderateReadinessResponse(readiness: readiness, todaysWorkout: todaysWorkout)
-        } else if score >= 40 {
-            return lowReadinessResponse(readiness: readiness, todaysWorkout: todaysWorkout)
-        } else {
-            return veryLowReadinessResponse(readiness: readiness)
-        }
-    }
-
-    private func highReadinessResponse(readiness: DailyReadiness, phase: TrainingPhase, todaysWorkout: WorkoutDay?) -> ReadinessCoachResponse {
-        let pushPhrase = phase == .push ? " You're in a push phase — take advantage." : ""
+        let phaseNote = phase == .push ? " You're in a push phase — this is a progression day." : ""
         return ReadinessCoachResponse(
-            headline: "You're Ready to Go",
-            message: "Sleep, energy, and recovery are all strong. Train as planned and push for progress.\(pushPhrase)",
+            headline: "Green light — push",
+            message: "Sleep, energy, and recovery are all stacked.\(phaseNote) Attack the top set and look for a real rep or load PR on the anchor lift.",
             icon: "bolt.fill",
             colorName: "mint",
             trainingAdvice: readiness.motivation.rawValue >= 4 ? .pushHard : .trainAsPlanned,
             adjustments: [
-                "Train at full intensity",
-                "Good day to test progression",
-                "Push for an extra rep or small weight increase"
+                "Warm up thoroughly — earn the intensity",
+                "Push anchor lift: +1 rep or +2.5 kg",
+                "Keep accessory quality, not just tonnage"
             ]
         )
     }
 
-    private func goodReadinessResponse(readiness: DailyReadiness, todaysWorkout: WorkoutDay?) -> ReadinessCoachResponse {
+    // MARK: Good
+
+    private func goodReadinessResponse(readiness: DailyReadiness, hasWorkout: Bool) -> ReadinessCoachResponse {
+        if !hasWorkout {
+            return ReadinessCoachResponse(
+                headline: "Solid baseline",
+                message: "Recovery is on track and no session is scheduled. Log your inputs and keep the signal clean for STRQ.",
+                icon: "checkmark.circle.fill",
+                colorName: "green",
+                trainingAdvice: .trainAsPlanned,
+                adjustments: [
+                    "Log weight and sleep",
+                    "Keep steps moving",
+                    "Stay on nutrition"
+                ]
+            )
+        }
+
         return ReadinessCoachResponse(
-            headline: "Solid Day Ahead",
-            message: "You're well-recovered and ready to train. Follow your planned session and focus on quality reps.",
+            headline: "Run the plan",
+            message: "You're well-recovered. Follow today's prescription exactly — this is the kind of day progress is built on. Nothing fancy.",
             icon: "checkmark.circle.fill",
             colorName: "green",
             trainingAdvice: .trainAsPlanned,
             adjustments: [
-                "Follow planned session",
-                "Maintain current intensity",
-                "Focus on technique and control"
+                "Hit target reps at target RPE",
+                "Clean tempo, full ROM",
+                "Log every set honestly"
             ]
         )
     }
 
-    private func moderateReadinessResponse(readiness: DailyReadiness, todaysWorkout: WorkoutDay?) -> ReadinessCoachResponse {
-        var adjustments = ["Lower RPE targets by ~1 point"]
+    // MARK: Moderate
+
+    private func moderateReadinessResponse(readiness: DailyReadiness, hasWorkout: Bool) -> ReadinessCoachResponse {
+        if !hasWorkout {
+            return ReadinessCoachResponse(
+                headline: "Stack recovery",
+                message: "You're not quite fresh and no session is planned — that's a fit. Use the day to rebuild: sleep, food, and light movement.",
+                icon: "arrow.down.circle.fill",
+                colorName: "yellow",
+                trainingAdvice: .restDay,
+                adjustments: [
+                    "20–30 min walk or mobility",
+                    "Hit protein target",
+                    "Target 7h+ sleep tonight"
+                ]
+            )
+        }
+
+        var adjustments = ["Warm-up sets matter — don't rush them"]
         if readiness.soreness.rawValue >= 2 {
-            adjustments.append("Reduce accessories by 1 set each")
+            adjustments.append("Cut last accessory set on sore muscles")
         }
         if readiness.energyLevel.rawValue <= 2 {
-            adjustments.append("Shorten session by 10–15 min")
+            adjustments.append("Cap session at ~45 min")
         }
-        adjustments.append("Prioritize compound movements")
+        adjustments.append("Hold load, stay ~1 RIR lighter than usual")
 
         return ReadinessCoachResponse(
-            headline: "Take It Steady Today",
-            message: "Recovery is moderate. You can still train productively, but dial back the intensity slightly. Focus on the main lifts and cut accessories if needed.",
+            headline: "Train, but tune it down",
+            message: "Recovery is mixed. Don't chase a PR today — anchor lifts at planned load, accessories trimmed. Quality > tonnage.",
             icon: "arrow.down.circle.fill",
             colorName: "yellow",
             trainingAdvice: readiness.soreness.rawValue >= 3 ? .reduceAccessories : .trainButLighter,
@@ -90,19 +159,37 @@ struct DailyCoachEngine {
         )
     }
 
-    private func lowReadinessResponse(readiness: DailyReadiness, todaysWorkout: WorkoutDay?) -> ReadinessCoachResponse {
+    // MARK: Low
+
+    private func lowReadinessResponse(readiness: DailyReadiness, hasWorkout: Bool) -> ReadinessCoachResponse {
+        if !hasWorkout {
+            return ReadinessCoachResponse(
+                headline: "Full recovery day",
+                message: "Your body is telling you it needs time. Let it. Sleep, food, and walking will pay off more than anything else today.",
+                icon: "bed.double.fill",
+                colorName: "orange",
+                trainingAdvice: .restDay,
+                adjustments: [
+                    "No training today",
+                    "Extra hour of sleep if possible",
+                    "Protein + water first",
+                    "Re-check tomorrow"
+                ]
+            )
+        }
+
         var adjustments = [
-            "Reduce load by 15–20%",
+            "Drop working load ~15–20%",
             "Cut 1–2 accessory exercises",
             "Keep session under 40 min"
         ]
         if readiness.stressLevel.rawValue >= 4 {
-            adjustments.append("Consider light cardio or mobility instead")
+            adjustments.append("If it still feels wrong — swap to mobility")
         }
 
         return ReadinessCoachResponse(
-            headline: "Easy Does It",
-            message: "Your body is signaling it needs a break. If you train, keep it light and short. A movement session is better than a hard grind today.",
+            headline: "Movement, not a grind",
+            message: "Readiness is low. A short, lighter session beats skipping outright — but do not push through pain or form breakdown. Bank the rep quality, not the intensity.",
             icon: "heart.circle.fill",
             colorName: "orange",
             trainingAdvice: .shortenSession,
@@ -110,21 +197,27 @@ struct DailyCoachEngine {
         )
     }
 
-    private func veryLowReadinessResponse(readiness: DailyReadiness) -> ReadinessCoachResponse {
+    // MARK: Very low
+
+    private func veryLowReadinessResponse(readiness: DailyReadiness, hasWorkout: Bool) -> ReadinessCoachResponse {
         return ReadinessCoachResponse(
-            headline: "Rest & Recover",
-            message: "Multiple signals suggest your body needs recovery. Take today off or do light stretching. You'll come back stronger tomorrow.",
+            headline: hasWorkout ? "Skip today" : "Rest & rebuild",
+            message: hasWorkout
+                ? "Multiple systems are flagged. Training today costs more than it pays. Move the session — STRQ will rebalance the week."
+                : "Multiple systems are flagged. Let today be about recovery. You'll come back measurably stronger.",
             icon: "bed.double.fill",
             colorName: "red",
             trainingAdvice: .restDay,
             adjustments: [
-                "Skip today's workout",
-                "Light walk or stretching only",
-                "Prioritize sleep and nutrition",
-                "Check in again tomorrow"
+                "No lifting today",
+                "Light walk, stretch, sunlight",
+                "Eat well, sleep early",
+                "Re-check tomorrow morning"
             ]
         )
     }
+
+    // MARK: Today / Coach messaging (unchanged signatures)
 
     func dailyCoachMessage(
         readiness: DailyReadiness?,

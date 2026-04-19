@@ -15,24 +15,32 @@ struct ReadinessCheckInView: View {
     @State private var showResult: Bool = false
     @State private var coachResponse: ReadinessCoachResponse?
     @State private var appeared: Bool = false
+    @FocusState private var painFieldFocused: Bool
     @Environment(\.dismiss) private var dismiss
 
-    private let totalSteps = 5
+    private let totalSteps = 3
+
+    private var hasWorkoutToday: Bool { vm.todaysWorkout != nil }
 
     var body: some View {
         VStack(spacing: 0) {
             header
             progressBar
             ScrollView {
-                VStack(spacing: 32) {
+                VStack(spacing: 28) {
                     if showResult, let response = coachResponse {
                         resultView(response)
                     } else {
                         stepContent
+                            .transition(.asymmetric(
+                                insertion: .offset(x: 14).combined(with: .opacity),
+                                removal: .offset(x: -14).combined(with: .opacity)
+                            ))
+                            .id(currentStep)
                     }
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 24)
+                .padding(.top, 20)
                 .padding(.bottom, 40)
             }
             if !showResult {
@@ -45,6 +53,8 @@ struct ReadinessCheckInView: View {
         }
     }
 
+    // MARK: Header + Progress
+
     private var header: some View {
         HStack {
             Button {
@@ -55,16 +65,21 @@ struct ReadinessCheckInView: View {
                 }
             } label: {
                 Image(systemName: showResult || currentStep == 0 ? "xmark" : "chevron.left")
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(.secondary)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.primary)
                     .frame(width: 36, height: 36)
                     .background(Color(.tertiarySystemGroupedBackground), in: Circle())
             }
             Spacer()
-            if !showResult {
-                Text("Step \(currentStep + 1) of \(totalSteps)")
-                    .font(.caption.weight(.medium))
+            VStack(spacing: 2) {
+                Text(showResult ? "Ready" : "Daily check-in")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Text(showResult ? "Today's plan" : contextLabel)
+                    .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(.secondary)
+                    .tracking(0.3)
+                    .textCase(.uppercase)
             }
             Spacer()
             Color.clear.frame(width: 36, height: 36)
@@ -73,15 +88,24 @@ struct ReadinessCheckInView: View {
         .padding(.top, 12)
     }
 
+    private var contextLabel: String {
+        hasWorkoutToday ? "Before training" : "Rest day check"
+    }
+
     private var progressBar: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(Color(.tertiarySystemGroupedBackground))
+                    .fill(Color.white.opacity(0.06))
                     .frame(height: 3)
                 Capsule()
                     .fill(STRQBrand.accentGradient)
-                    .frame(width: showResult ? geo.size.width : geo.size.width * CGFloat(currentStep + 1) / CGFloat(totalSteps), height: 3)
+                    .frame(
+                        width: showResult
+                            ? geo.size.width
+                            : geo.size.width * CGFloat(currentStep + 1) / CGFloat(totalSteps),
+                        height: 3
+                    )
                     .animation(.snappy(duration: 0.3), value: currentStep)
                     .animation(.snappy(duration: 0.3), value: showResult)
             }
@@ -91,319 +115,347 @@ struct ReadinessCheckInView: View {
         .padding(.top, 12)
     }
 
+    // MARK: Step content (3 compact blocks)
+
     @ViewBuilder
     private var stepContent: some View {
         switch currentStep {
-        case 0:
-            readinessStep(
-                title: "How did you sleep?",
-                subtitle: "Sleep quality strongly affects recovery and performance",
-                selection: $sleepQuality,
-                options: ReadinessLevel.allCases
-            )
-        case 1:
-            readinessStep(
-                title: "Energy level right now?",
-                subtitle: "How your body feels at this moment",
-                selection: $energyLevel,
-                options: ReadinessLevel.allCases
-            )
-        case 2:
-            readinessStep(
-                title: "Current stress level?",
-                subtitle: "Mental and life stress affects recovery capacity",
-                selection: $stressLevel,
-                options: ReadinessLevel.allCases
-            )
-        case 3:
-            sorenessStep
-        case 4:
-            painStep
-        default:
-            EmptyView()
+        case 0: sleepEnergyStep
+        case 1: loadStep
+        case 2: mindsetStep
+        default: EmptyView()
         }
     }
 
-    private func readinessStep<T: Identifiable & Hashable>(
-        title: String,
-        subtitle: String,
-        selection: Binding<T>,
-        options: [T]
-    ) -> some View where T: RawRepresentable<Int> {
+    // Step 1 — Sleep + Energy
+    private var sleepEnergyStep: some View {
         VStack(spacing: 24) {
-            VStack(spacing: 8) {
-                Text(title)
-                    .font(.title2.bold())
-                    .multilineTextAlignment(.center)
-                Text(subtitle)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 10)
+            stepHeader(
+                title: "How's your body?",
+                subtitle: "Sleep recovery and current energy are the biggest signals for today."
+            )
 
-            VStack(spacing: 8) {
-                ForEach(options) { option in
-                    let isSelected = selection.wrappedValue.rawValue == option.rawValue
-                    Button {
-                        withAnimation(.snappy(duration: 0.2)) {
-                            selection.wrappedValue = option
-                        }
-                    } label: {
-                        HStack(spacing: 14) {
-                            if let level = option as? ReadinessLevel {
-                                Text(level.emoji)
-                                    .font(.title3)
-                            }
-                            Text(optionLabel(option))
-                                .font(.body.weight(isSelected ? .semibold : .regular))
-                                .foregroundStyle(isSelected ? .black : .primary)
-                            Spacer()
-                            if isSelected {
-                                Image(systemName: "checkmark")
-                                    .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(.black)
-                            }
-                        }
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 16)
-                        .background(
-                            isSelected ?
-                            AnyShapeStyle(STRQBrand.accentGradient) :
-                            AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
-                            in: .rect(cornerRadius: 14)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .strokeBorder(isSelected ? .clear : Color.white.opacity(0.06), lineWidth: 1)
-                        )
-                    }
-                    .sensoryFeedback(.selection, trigger: isSelected)
-                }
+            VStack(alignment: .leading, spacing: 10) {
+                fieldLabel("Sleep quality")
+                readinessSegment(selection: $sleepQuality)
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                fieldLabel("Energy right now")
+                readinessSegment(selection: $energyLevel)
             }
         }
     }
 
-    private func optionLabel<T>(_ option: T) -> String {
-        if let level = option as? ReadinessLevel { return level.label }
-        if let level = option as? SorenessLevel { return level.label }
-        if let level = option as? DailyMotivation { return level.label }
-        return ""
-    }
-
-    private var sorenessStep: some View {
+    // Step 2 — Load (soreness + stress)
+    private var loadStep: some View {
         VStack(spacing: 24) {
-            VStack(spacing: 8) {
-                Text("Muscle soreness?")
-                    .font(.title2.bold())
-                Text("General body soreness from recent training")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+            stepHeader(
+                title: "What's taxing you?",
+                subtitle: "Soreness and stress affect what's worth pushing today."
+            )
+
+            VStack(alignment: .leading, spacing: 10) {
+                fieldLabel("Muscle soreness")
+                sorenessSegment
             }
 
-            VStack(spacing: 8) {
-                ForEach(SorenessLevel.allCases) { level in
-                    let isSelected = soreness == level
-                    Button {
-                        withAnimation(.snappy(duration: 0.2)) { soreness = level }
-                    } label: {
-                        HStack(spacing: 14) {
-                            Text(level.label)
-                                .font(.body.weight(isSelected ? .semibold : .regular))
-                                .foregroundStyle(isSelected ? .black : .primary)
-                            Spacer()
-                            if isSelected {
-                                Image(systemName: "checkmark")
-                                    .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(.black)
-                            }
-                        }
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 16)
-                        .background(
-                            isSelected ?
-                            AnyShapeStyle(STRQBrand.accentGradient) :
-                            AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
-                            in: .rect(cornerRadius: 14)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .strokeBorder(isSelected ? .clear : Color.white.opacity(0.06), lineWidth: 1)
-                        )
-                    }
-                    .sensoryFeedback(.selection, trigger: isSelected)
-                }
+            VStack(alignment: .leading, spacing: 10) {
+                fieldLabel("Life stress")
+                readinessSegment(selection: $stressLevel, invertSemantic: true)
             }
-
-            VStack(spacing: 12) {
-                Text("How motivated are you today?")
-                    .font(.subheadline.weight(.semibold))
-
-                HStack(spacing: 8) {
-                    ForEach(DailyMotivation.allCases) { level in
-                        let isSelected = motivation == level
-                        Button {
-                            withAnimation(.snappy(duration: 0.2)) { motivation = level }
-                        } label: {
-                            VStack(spacing: 4) {
-                                Text("\(level.rawValue)")
-                                    .font(.headline.monospacedDigit())
-                                Text(level.label)
-                                    .font(.system(size: 9, weight: .medium))
-                                    .lineLimit(1)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 12)
-                            .foregroundStyle(isSelected ? .black : .primary)
-                            .background(
-                                isSelected ?
-                                AnyShapeStyle(STRQBrand.accentGradient) :
-                                AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
-                                in: .rect(cornerRadius: 12)
-                            )
-                        }
-                        .sensoryFeedback(.selection, trigger: isSelected)
-                    }
-                }
-            }
-            .padding(.top, 8)
         }
     }
 
-    private var painStep: some View {
+    // Step 3 — Mindset + pain gate
+    private var mindsetStep: some View {
         VStack(spacing: 24) {
-            VStack(spacing: 8) {
-                Text("Any pain or restrictions?")
-                    .font(.title2.bold())
-                Text("Injuries, joint pain, or movement limitations today")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+            stepHeader(
+                title: hasWorkoutToday ? "One more check" : "Mindset check",
+                subtitle: hasWorkoutToday
+                    ? "Motivation shapes intent. Pain reshapes the whole session."
+                    : "A quick note so STRQ can tune recovery and next session."
+            )
+
+            VStack(alignment: .leading, spacing: 10) {
+                fieldLabel("Motivation")
+                motivationSegment
             }
 
-            VStack(spacing: 8) {
-                Button {
-                    withAnimation(.snappy(duration: 0.2)) { painOrRestriction = false }
-                } label: {
-                    HStack(spacing: 14) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(!painOrRestriction ? .white : .green)
-                        Text("No issues today")
-                            .font(.body.weight(!painOrRestriction ? .semibold : .regular))
-                            .foregroundStyle(!painOrRestriction ? .white : .primary)
-                        Spacer()
-                        if !painOrRestriction {
-                            Image(systemName: "checkmark")
-                                .font(.subheadline.weight(.bold))
-                                .foregroundStyle(.white)
-                        }
-                    }
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 16)
-                    .background(
-                        !painOrRestriction ?
-                        AnyShapeStyle(Color.green.gradient) :
-                        AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
-                        in: .rect(cornerRadius: 14)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(!painOrRestriction ? .clear : Color.white.opacity(0.06), lineWidth: 1)
-                    )
-                }
-
-                Button {
-                    withAnimation(.snappy(duration: 0.2)) { painOrRestriction = true }
-                } label: {
-                    HStack(spacing: 14) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.title3)
-                            .foregroundStyle(painOrRestriction ? .black : STRQBrand.steel)
-                        Text("Yes, something feels off")
-                            .font(.body.weight(painOrRestriction ? .semibold : .regular))
-                            .foregroundStyle(painOrRestriction ? .black : .primary)
-                        Spacer()
-                        if painOrRestriction {
-                            Image(systemName: "checkmark")
-                                .font(.subheadline.weight(.bold))
-                                .foregroundStyle(.black)
-                        }
-                    }
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 16)
-                    .background(
-                        painOrRestriction ?
-                        AnyShapeStyle(STRQBrand.accentGradient) :
-                        AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
-                        in: .rect(cornerRadius: 14)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(painOrRestriction ? .clear : Color.white.opacity(0.06), lineWidth: 1)
-                    )
-                }
-            }
-
-            if painOrRestriction {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("What's bothering you?")
-                        .font(.subheadline.weight(.medium))
-                    TextField("e.g. Left shoulder discomfort", text: $painNote)
+            VStack(alignment: .leading, spacing: 10) {
+                fieldLabel("Pain or restriction")
+                painToggle
+                if painOrRestriction {
+                    TextField("e.g. Left shoulder, lower back", text: $painNote)
                         .textFieldStyle(.plain)
+                        .focused($painFieldFocused)
+                        .submitLabel(.done)
+                        .onSubmit { painFieldFocused = false }
                         .padding(14)
                         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(STRQPalette.danger.opacity(0.3), lineWidth: 1)
+                        )
+                        .transition(.opacity.combined(with: .move(edge: .top)))
                 }
-                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
     }
+
+    private func stepHeader(title: String, subtitle: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.system(.title2, design: .rounded, weight: .bold))
+            Text(subtitle)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+    }
+
+    private func fieldLabel(_ text: String) -> some View {
+        Text(text.uppercased())
+            .font(.system(size: 10, weight: .bold))
+            .foregroundStyle(.secondary)
+            .tracking(0.6)
+    }
+
+    // MARK: Semantic segment pickers
+
+    private func readinessSegment(selection: Binding<ReadinessLevel>, invertSemantic: Bool = false) -> some View {
+        HStack(spacing: 6) {
+            ForEach(ReadinessLevel.allCases) { level in
+                let isSelected = selection.wrappedValue == level
+                let color = readinessColor(level, inverted: invertSemantic)
+                Button {
+                    withAnimation(.snappy(duration: 0.2)) { selection.wrappedValue = level }
+                } label: {
+                    VStack(spacing: 5) {
+                        Text("\(level.rawValue)")
+                            .font(.system(.headline, design: .rounded, weight: .heavy).monospacedDigit())
+                            .foregroundStyle(isSelected ? .white : .primary)
+                        Text(shortLabel(level))
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(isSelected ? .white.opacity(0.9) : .secondary)
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        isSelected
+                            ? AnyShapeStyle(LinearGradient(colors: [color, color.opacity(0.85)], startPoint: .top, endPoint: .bottom))
+                            : AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
+                        in: .rect(cornerRadius: 12)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(
+                                isSelected ? Color.white.opacity(0.25) : Color.white.opacity(0.05),
+                                lineWidth: 1
+                            )
+                    )
+                    .shadow(color: isSelected ? color.opacity(0.35) : .clear, radius: 12, y: 4)
+                }
+                .sensoryFeedback(.selection, trigger: isSelected)
+            }
+        }
+    }
+
+    private var sorenessSegment: some View {
+        HStack(spacing: 6) {
+            ForEach(SorenessLevel.allCases) { level in
+                let isSelected = soreness == level
+                let color = sorenessColor(level)
+                Button {
+                    withAnimation(.snappy(duration: 0.2)) { soreness = level }
+                } label: {
+                    VStack(spacing: 4) {
+                        Text(level.label)
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(isSelected ? .white : .primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(
+                        isSelected
+                            ? AnyShapeStyle(LinearGradient(colors: [color, color.opacity(0.85)], startPoint: .top, endPoint: .bottom))
+                            : AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
+                        in: .rect(cornerRadius: 12)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(
+                                isSelected ? Color.white.opacity(0.25) : Color.white.opacity(0.05),
+                                lineWidth: 1
+                            )
+                    )
+                    .shadow(color: isSelected ? color.opacity(0.3) : .clear, radius: 10, y: 3)
+                }
+                .sensoryFeedback(.selection, trigger: isSelected)
+            }
+        }
+    }
+
+    private var motivationSegment: some View {
+        HStack(spacing: 6) {
+            ForEach(DailyMotivation.allCases) { level in
+                let isSelected = motivation == level
+                Button {
+                    withAnimation(.snappy(duration: 0.2)) { motivation = level }
+                } label: {
+                    VStack(spacing: 4) {
+                        Text("\(level.rawValue)")
+                            .font(.system(.headline, design: .rounded, weight: .heavy).monospacedDigit())
+                        Text(level.label)
+                            .font(.system(size: 10, weight: .semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .foregroundStyle(isSelected ? .black : .primary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        isSelected
+                            ? AnyShapeStyle(STRQBrand.accentGradient)
+                            : AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
+                        in: .rect(cornerRadius: 12)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(
+                                isSelected ? Color.clear : Color.white.opacity(0.05),
+                                lineWidth: 1
+                            )
+                    )
+                }
+                .sensoryFeedback(.selection, trigger: isSelected)
+            }
+        }
+    }
+
+    private var painToggle: some View {
+        HStack(spacing: 8) {
+            painChoiceButton(
+                title: "All clear",
+                icon: "checkmark.circle.fill",
+                selected: !painOrRestriction,
+                color: STRQPalette.success
+            ) {
+                withAnimation(.snappy(duration: 0.2)) {
+                    painOrRestriction = false
+                    painFieldFocused = false
+                }
+            }
+            painChoiceButton(
+                title: "Something's off",
+                icon: "exclamationmark.triangle.fill",
+                selected: painOrRestriction,
+                color: STRQPalette.danger
+            ) {
+                withAnimation(.snappy(duration: 0.2)) {
+                    painOrRestriction = true
+                }
+            }
+        }
+    }
+
+    private func painChoiceButton(title: String, icon: String, selected: Bool, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.subheadline.weight(.semibold))
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .foregroundStyle(selected ? .white : .primary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(
+                selected
+                    ? AnyShapeStyle(LinearGradient(colors: [color, color.opacity(0.85)], startPoint: .top, endPoint: .bottom))
+                    : AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
+                in: .rect(cornerRadius: 12)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(selected ? Color.white.opacity(0.2) : Color.white.opacity(0.05), lineWidth: 1)
+            )
+            .shadow(color: selected ? color.opacity(0.3) : .clear, radius: 10, y: 3)
+        }
+        .sensoryFeedback(.selection, trigger: selected)
+    }
+
+    // MARK: Result
 
     private func resultView(_ response: ReadinessCoachResponse) -> some View {
         let readiness = buildReadiness()
-        return VStack(spacing: 24) {
-            VStack(spacing: 12) {
+        let statusColor = ForgeTheme.color(for: readiness.readinessColorName)
+        let adviceColor = ForgeTheme.color(for: response.colorName)
+
+        return VStack(spacing: 20) {
+            // Readiness dial
+            VStack(spacing: 14) {
                 ZStack {
                     Circle()
-                        .stroke(Color(.separator), lineWidth: 6)
-                        .frame(width: 100, height: 100)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 8)
+                        .frame(width: 128, height: 128)
                     Circle()
                         .trim(from: 0, to: CGFloat(readiness.readinessScore) / 100)
-                        .stroke(colorFor(readiness.readinessColorName).gradient, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-                        .frame(width: 100, height: 100)
+                        .stroke(
+                            LinearGradient(colors: [statusColor, statusColor.opacity(0.7)], startPoint: .top, endPoint: .bottom),
+                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                        )
+                        .frame(width: 128, height: 128)
                         .rotationEffect(.degrees(-90))
                     VStack(spacing: 2) {
                         Text("\(readiness.readinessScore)")
-                            .font(.title.bold().monospacedDigit())
-                        Text("Readiness")
-                            .font(.caption2.weight(.medium))
+                            .font(.system(size: 44, weight: .heavy, design: .rounded).monospacedDigit())
+                        Text("READINESS")
+                            .font(.system(size: 9, weight: .bold))
+                            .tracking(0.8)
                             .foregroundStyle(.secondary)
                     }
                 }
 
                 Text(readiness.readinessLabel)
-                    .font(.headline)
-                    .foregroundStyle(colorFor(readiness.readinessColorName))
+                    .font(.system(.subheadline, design: .rounded, weight: .bold))
+                    .foregroundStyle(statusColor)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(statusColor.opacity(0.12), in: Capsule())
+                    .overlay(Capsule().strokeBorder(statusColor.opacity(0.3), lineWidth: 0.5))
             }
-            .padding(.top, 8)
+            .padding(.top, 4)
 
+            // Primary advice card
             VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     Image(systemName: response.icon)
-                        .font(.body.weight(.medium))
+                        .font(.title3.weight(.semibold))
                         .foregroundStyle(.white)
-                        .frame(width: 40, height: 40)
-                        .background(colorFor(response.colorName).gradient, in: .rect(cornerRadius: 10))
+                        .frame(width: 46, height: 46)
+                        .background(
+                            LinearGradient(colors: [adviceColor, adviceColor.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                            in: .rect(cornerRadius: 12)
+                        )
 
-                    VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(response.trainingAdvice.label.uppercased())
+                            .font(.system(size: 9, weight: .bold))
+                            .tracking(0.6)
+                            .foregroundStyle(adviceColor)
                         Text(response.headline)
-                            .font(.subheadline.weight(.semibold))
-                        Text(response.trainingAdvice.label)
-                            .font(.caption)
-                            .foregroundStyle(colorFor(response.colorName))
+                            .font(.system(.headline, design: .rounded, weight: .bold))
                     }
+                    Spacer(minLength: 0)
                 }
 
                 Text(response.message)
@@ -412,67 +464,127 @@ struct ReadinessCheckInView: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 if !response.adjustments.isEmpty {
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 8) {
                         ForEach(response.adjustments, id: \.self) { adj in
-                            HStack(spacing: 8) {
-                                Image(systemName: "circle.fill")
-                                    .font(.system(size: 4))
-                                    .foregroundStyle(colorFor(response.colorName))
+                            HStack(alignment: .top, spacing: 10) {
+                                Image(systemName: "arrow.turn.down.right")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundStyle(adviceColor)
+                                    .frame(width: 16, alignment: .leading)
                                 Text(adj)
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(.primary.opacity(0.85))
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
                         }
                     }
+                    .padding(.top, 2)
                 }
             }
             .padding(16)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+            )
 
+            // Signal breakdown
+            signalBreakdown(readiness: readiness)
+
+            // Done
             Button {
                 onComplete(readiness)
                 dismiss()
             } label: {
-                Text("Done")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(.black)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 52)
-                    .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 14))
+                HStack(spacing: 8) {
+                    Image(systemName: hasWorkoutToday ? "figure.strengthtraining.traditional" : "checkmark")
+                        .font(.subheadline.weight(.semibold))
+                    Text(hasWorkoutToday ? "Go to today's session" : "Done")
+                        .font(.body.weight(.bold))
+                }
+                .foregroundStyle(.black)
+                .frame(maxWidth: .infinity)
+                .frame(height: 54)
+                .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 14))
             }
-            .sensoryFeedback(.impact(flexibility: .soft), trigger: true)
+            .sensoryFeedback(.success, trigger: showResult)
         }
     }
 
+    private func signalBreakdown(readiness: DailyReadiness) -> some View {
+        VStack(spacing: 0) {
+            signalRow(label: "Sleep", value: readiness.sleepQuality.label, color: readinessColor(readiness.sleepQuality))
+            Divider().overlay(Color.white.opacity(0.05))
+            signalRow(label: "Energy", value: readiness.energyLevel.label, color: readinessColor(readiness.energyLevel))
+            Divider().overlay(Color.white.opacity(0.05))
+            signalRow(label: "Stress", value: readiness.stressLevel.label, color: readinessColor(readiness.stressLevel, inverted: true))
+            Divider().overlay(Color.white.opacity(0.05))
+            signalRow(label: "Soreness", value: readiness.soreness.label, color: sorenessColor(readiness.soreness))
+            if readiness.painOrRestriction {
+                Divider().overlay(Color.white.opacity(0.05))
+                signalRow(label: "Flag", value: readiness.painNote.isEmpty ? "Pain reported" : readiness.painNote, color: STRQPalette.danger)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 4)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(STRQBrand.cardBorder, lineWidth: 1))
+    }
+
+    private func signalRow(label: String, value: String, color: Color) -> some View {
+        HStack(spacing: 10) {
+            Circle().fill(color).frame(width: 7, height: 7)
+            Text(label)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Spacer()
+            Text(value)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+        }
+        .padding(.vertical, 11)
+    }
+
+    // MARK: Bottom bar
+
     private var bottomBar: some View {
         VStack(spacing: 0) {
-            Divider()
-            HStack {
+            Divider().overlay(Color.white.opacity(0.05))
+            HStack(spacing: 12) {
                 if currentStep > 0 {
                     Button {
                         withAnimation(.snappy(duration: 0.25)) { currentStep -= 1 }
                     } label: {
                         Text("Back")
-                            .font(.body.weight(.medium))
+                            .font(.body.weight(.semibold))
                             .foregroundStyle(.secondary)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 12)
+                            .padding(.horizontal, 18)
+                            .frame(height: 48)
+                            .frame(minWidth: 88)
+                            .background(Color(.tertiarySystemGroupedBackground), in: Capsule())
                     }
                 }
-                Spacer()
                 Button {
                     if currentStep < totalSteps - 1 {
+                        painFieldFocused = false
                         withAnimation(.snappy(duration: 0.25)) { currentStep += 1 }
                     } else {
+                        painFieldFocused = false
                         submitCheckIn()
                     }
                 } label: {
-                    Text(currentStep == totalSteps - 1 ? "Get Results" : "Next")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 28)
-                        .padding(.vertical, 12)
-                        .background(STRQBrand.accentGradient, in: Capsule())
+                    HStack(spacing: 8) {
+                        Text(currentStep == totalSteps - 1 ? "See today's plan" : "Continue")
+                            .font(.body.weight(.bold))
+                        Image(systemName: currentStep == totalSteps - 1 ? "sparkles" : "arrow.right")
+                            .font(.subheadline.weight(.bold))
+                    }
+                    .foregroundStyle(.black)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+                    .background(STRQBrand.accentGradient, in: Capsule())
                 }
                 .sensoryFeedback(.impact(flexibility: .soft), trigger: currentStep)
             }
@@ -480,6 +592,45 @@ struct ReadinessCheckInView: View {
             .padding(.vertical, 12)
         }
         .background(.ultraThinMaterial)
+    }
+
+    // MARK: Helpers
+
+    private func shortLabel(_ level: ReadinessLevel) -> String {
+        switch level {
+        case .terrible: "Bad"
+        case .poor: "Low"
+        case .okay: "Ok"
+        case .good: "Good"
+        case .great: "Peak"
+        }
+    }
+
+    private func readinessColor(_ level: ReadinessLevel, inverted: Bool = false) -> Color {
+        let effective: ReadinessLevel
+        if inverted {
+            // For stress: higher = worse. Flip mapping.
+            effective = ReadinessLevel(rawValue: 6 - level.rawValue) ?? level
+        } else {
+            effective = level
+        }
+        switch effective {
+        case .terrible: return STRQPalette.danger
+        case .poor: return Color(red: 0.95, green: 0.55, blue: 0.32)
+        case .okay: return STRQPalette.warning
+        case .good: return STRQPalette.success
+        case .great: return Color(red: 0.30, green: 0.85, blue: 0.62)
+        }
+    }
+
+    private func sorenessColor(_ level: SorenessLevel) -> Color {
+        switch level {
+        case .none: return STRQPalette.success
+        case .mild: return Color(red: 0.55, green: 0.82, blue: 0.48)
+        case .moderate: return STRQPalette.warning
+        case .significant: return Color(red: 0.95, green: 0.55, blue: 0.32)
+        case .severe: return STRQPalette.danger
+        }
     }
 
     private func buildReadiness() -> DailyReadiness {
@@ -507,20 +658,6 @@ struct ReadinessCheckInView: View {
         withAnimation(.easeOut(duration: 0.4)) {
             coachResponse = response
             showResult = true
-        }
-    }
-
-    private func colorFor(_ name: String) -> Color {
-        switch name {
-        case "orange": return STRQBrand.steel
-        case "yellow": return .yellow
-        case "green": return .green
-        case "red": return .red
-        case "blue": return STRQBrand.steel
-        case "purple": return STRQBrand.slate
-        case "cyan": return STRQBrand.steel
-        case "mint": return STRQBrand.steel
-        default: return STRQBrand.steel
         }
     }
 }
