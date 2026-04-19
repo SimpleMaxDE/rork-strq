@@ -385,10 +385,12 @@ struct ProfileView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(vm.profile.goal.displayName)
                         .font(.subheadline.weight(.semibold))
-                    Text(goalDescription)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                    if !vm.isEarlyStage {
+                        Text(goalDescription)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                    }
                 }
                 Spacer()
             }

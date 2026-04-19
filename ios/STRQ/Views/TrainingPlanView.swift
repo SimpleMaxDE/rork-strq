@@ -248,13 +248,11 @@ struct TrainingPlanView: View {
                 scheduleControlRow(day: day)
                     .padding(.horizontal, 16)
 
-                if let adj = vm.adjustment(for: day.id) {
-                    coachBanner(adj)
-                        .padding(.horizontal, 16)
-                }
-
                 if let weekAdj = vm.weekAdjustment {
                     weekAdjBanner(weekAdj)
+                        .padding(.horizontal, 16)
+                } else if let adj = vm.adjustment(for: day.id) {
+                    coachBanner(adj)
                         .padding(.horizontal, 16)
                 }
 
@@ -314,15 +312,17 @@ struct TrainingPlanView: View {
                         .lineLimit(2)
                         .minimumScaleFactor(0.7)
 
-                    Text(briefing.dayExplanation)
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.65))
-                        .lineLimit(2)
+                    if !vm.isEarlyStage {
+                        Text(briefing.dayExplanation)
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.65))
+                            .lineLimit(2)
+                    }
                 }
 
                 ScrollView(.horizontal) {
                     HStack(spacing: 6) {
-                        ForEach(briefing.focusMuscles.prefix(4)) { muscle in
+                        ForEach(briefing.focusMuscles.prefix(3)) { muscle in
                             ForgeChip(text: muscle.displayName)
                         }
                     }
