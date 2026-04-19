@@ -31,26 +31,23 @@ struct ActiveWorkoutView: View {
                     progressStrip(workout)
 
                     ScrollView {
-                        VStack(spacing: 0) {
+                        VStack(spacing: 20) {
                             exerciseFocusHero(workout)
                                 .padding(.horizontal, 16)
-                                .padding(.top, 14)
+                                .padding(.top, 18)
 
-                            activeSetCard(workout)
-                                .padding(.horizontal, 16)
-                                .padding(.top, 14)
-
-                            remainingSetsStrip(workout)
-                                .padding(.horizontal, 16)
-                                .padding(.top, 10)
+                            VStack(spacing: 10) {
+                                activeSetCard(workout)
+                                remainingSetsStrip(workout)
+                            }
+                            .padding(.horizontal, 16)
 
                             exerciseActions(workout)
                                 .padding(.horizontal, 16)
-                                .padding(.top, 14)
 
                             upNextPreview(workout)
                                 .padding(.horizontal, 16)
-                                .padding(.top, 18)
+                                .padding(.top, 4)
                         }
                         .padding(.bottom, 120)
                     }
@@ -93,31 +90,33 @@ struct ActiveWorkoutView: View {
     private func workoutHeader(_ workout: ActiveWorkoutState) -> some View {
         let total = workout.session.exerciseLogs.count
         let done = workout.session.exerciseLogs.filter(\.isCompleted).count
-        return HStack(alignment: .center, spacing: 12) {
-            VStack(alignment: .leading, spacing: 2) {
+        return HStack(alignment: .center, spacing: 10) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(workout.session.dayName.uppercased())
                     .font(.system(size: 10, weight: .black))
-                    .tracking(1.2)
+                    .tracking(1.4)
                     .foregroundStyle(STRQBrand.steel)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
                 Text(formatTime(elapsedSeconds))
                     .font(.system(size: 22, weight: .bold, design: .rounded).monospacedDigit())
                     .foregroundStyle(.white)
                     .contentTransition(.numericText())
             }
 
-            Spacer()
+            Spacer(minLength: 8)
 
             Button { showExerciseList = true } label: {
                 HStack(spacing: 6) {
                     Text("\(done)/\(total)")
                         .font(.caption.weight(.bold).monospacedDigit())
                     Image(systemName: "list.bullet")
-                        .font(.caption)
+                        .font(.caption2)
                 }
-                .foregroundStyle(.white.opacity(0.75))
-                .padding(.horizontal, 12)
+                .foregroundStyle(.white.opacity(0.7))
+                .padding(.horizontal, 11)
                 .padding(.vertical, 8)
-                .background(Color.white.opacity(0.08), in: Capsule())
+                .background(Color.white.opacity(0.06), in: Capsule())
             }
 
             Button {
@@ -127,14 +126,14 @@ struct ActiveWorkoutView: View {
                 Text("Finish")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.black)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 9)
                     .background(STRQBrand.accentGradient, in: Capsule())
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 8)
-        .padding(.bottom, 12)
+        .padding(.top, 14)
+        .padding(.bottom, 14)
     }
 
     private func progressStrip(_ workout: ActiveWorkoutState) -> some View {
@@ -500,40 +499,46 @@ struct ActiveWorkoutView: View {
     // MARK: - Exercise Actions
 
     private func exerciseActions(_ workout: ActiveWorkoutState) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 0) {
             Button { moveToPreviousExercise() } label: {
                 Image(systemName: "chevron.left")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(workout.currentExerciseIndex == 0 ? .quaternary : .secondary)
-                    .frame(width: 48, height: 44)
-                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 12))
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(workout.currentExerciseIndex == 0 ? AnyShapeStyle(.quaternary) : AnyShapeStyle(Color.white.opacity(0.55)))
+                    .frame(width: 44, height: 40)
             }
             .disabled(workout.currentExerciseIndex == 0)
+
+            Rectangle()
+                .fill(Color.white.opacity(0.05))
+                .frame(width: 1, height: 20)
 
             if let exercise = vm.library.exercise(byId: workout.session.exerciseLogs[workout.currentExerciseIndex].exerciseId) {
                 Button { showExerciseInfo = exercise } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "info.circle")
-                            .font(.caption.weight(.semibold))
+                            .font(.caption2.weight(.semibold))
                         Text("Exercise Guide")
-                            .font(.subheadline.weight(.medium))
+                            .font(.footnote.weight(.medium))
                     }
-                    .foregroundStyle(STRQBrand.steel)
+                    .foregroundStyle(.white.opacity(0.55))
                     .frame(maxWidth: .infinity)
-                    .frame(height: 44)
-                    .background(STRQBrand.steel.opacity(0.08), in: .rect(cornerRadius: 12))
+                    .frame(height: 40)
                 }
             }
 
+            Rectangle()
+                .fill(Color.white.opacity(0.05))
+                .frame(width: 1, height: 20)
+
             Button { moveToNextExercise() } label: {
                 Image(systemName: "chevron.right")
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(workout.currentExerciseIndex >= workout.session.exerciseLogs.count - 1 ? .quaternary : .secondary)
-                    .frame(width: 48, height: 44)
-                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 12))
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(workout.currentExerciseIndex >= workout.session.exerciseLogs.count - 1 ? AnyShapeStyle(.quaternary) : AnyShapeStyle(Color.white.opacity(0.55)))
+                    .frame(width: 44, height: 40)
             }
             .disabled(workout.currentExerciseIndex >= workout.session.exerciseLogs.count - 1)
         }
+        .background(Color.white.opacity(0.025), in: Capsule())
     }
 
     // MARK: - Up Next Preview
@@ -542,52 +547,81 @@ struct ActiveWorkoutView: View {
     private func upNextPreview(_ workout: ActiveWorkoutState) -> some View {
         let nextIndex = workout.currentExerciseIndex + 1
         if nextIndex < workout.session.exerciseLogs.count {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("UP NEXT")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(STRQBrand.steel)
-                    .tracking(0.5)
-                    .padding(.leading, 4)
+            let remaining = Array(workout.session.exerciseLogs[nextIndex...].prefix(2))
+            let total = workout.session.exerciseLogs.count - nextIndex
 
-                let remaining = workout.session.exerciseLogs[nextIndex...]
-                ForEach(Array(remaining.prefix(2).enumerated()), id: \.element.id) { offset, log in
-                    let exercise = vm.library.exercise(byId: log.exerciseId)
-                    let mediaProvider = ExerciseMediaProvider.shared
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 8) {
+                    Text("UP NEXT")
+                        .font(.system(size: 10, weight: .black))
+                        .foregroundStyle(STRQBrand.steel)
+                        .tracking(1.4)
+                    Rectangle()
+                        .fill(Color.white.opacity(0.06))
+                        .frame(height: 1)
+                    Text("\(total) left")
+                        .font(.system(size: 10, weight: .bold).monospacedDigit())
+                        .foregroundStyle(.white.opacity(0.35))
+                }
 
-                    HStack(spacing: 12) {
-                        if let ex = exercise {
-                            let colors = mediaProvider.heroGradient(for: ex)
-                            let symbol = mediaProvider.heroSymbol(for: ex)
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(LinearGradient(colors: [colors[0], colors[1]], startPoint: .topLeading, endPoint: .bottomTrailing))
-                                    .frame(width: 40, height: 40)
-                                Image(systemName: symbol)
-                                    .font(.system(size: 18, weight: .thin))
-                                    .foregroundStyle(.white.opacity(0.85))
-                            }
-                        }
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(exercise?.name ?? log.exerciseId)
-                                .font(.subheadline.weight(.medium))
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
-                            if let ex = exercise {
-                                Text(ex.primaryMuscle.displayName)
-                                    .font(.caption2.weight(.medium))
-                                    .foregroundStyle(.tertiary)
-                            }
-                        }
-                        Spacer()
+                VStack(spacing: 8) {
+                    ForEach(Array(remaining.enumerated()), id: \.element.id) { offset, log in
+                        upNextRow(log: log, isImmediate: offset == 0, positionLabel: offset == 0 ? "NEXT" : "THEN")
                     }
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 12)
                 }
             }
-            .padding(14)
-            .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 16))
         }
+    }
+
+    @ViewBuilder
+    private func upNextRow(log: ExerciseLog, isImmediate: Bool, positionLabel: String) -> some View {
+        let exercise = vm.library.exercise(byId: log.exerciseId)
+        let mediaProvider = ExerciseMediaProvider.shared
+        let tileSize: CGFloat = isImmediate ? 46 : 36
+
+        HStack(spacing: 14) {
+            if let ex = exercise {
+                let colors = mediaProvider.heroGradient(for: ex)
+                let symbol = mediaProvider.heroSymbol(for: ex)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 11)
+                        .fill(LinearGradient(colors: [colors[0], colors[1]], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: tileSize, height: tileSize)
+                        .opacity(isImmediate ? 1 : 0.65)
+                    Image(systemName: symbol)
+                        .font(.system(size: isImmediate ? 20 : 16, weight: .thin))
+                        .foregroundStyle(.white.opacity(isImmediate ? 0.9 : 0.75))
+                }
+                .frame(width: 46, alignment: .leading)
+            }
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(positionLabel)
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(1.2)
+                    .foregroundStyle(isImmediate ? STRQBrand.steel : .white.opacity(0.3))
+                Text(exercise?.name ?? log.exerciseId)
+                    .font(isImmediate ? .subheadline.weight(.semibold) : .subheadline.weight(.medium))
+                    .foregroundStyle(isImmediate ? .white.opacity(0.9) : .white.opacity(0.55))
+                    .lineLimit(1)
+                if let ex = exercise {
+                    Text("\(ex.primaryMuscle.displayName) · \(log.sets.count) sets")
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.35))
+                }
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(.white.opacity(isImmediate ? 0.3 : 0.18))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, isImmediate ? 12 : 10)
+        .background(Color.white.opacity(isImmediate ? 0.045 : 0.02), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(isImmediate ? 0.06 : 0), lineWidth: 1)
+        )
     }
 
     // MARK: - Bottom CTA
