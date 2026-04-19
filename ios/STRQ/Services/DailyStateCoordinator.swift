@@ -7,6 +7,7 @@ import Foundation
 final class DailyStateCoordinator {
     private unowned let vm: AppViewModel
     private let dailyCoachEngine = DailyCoachEngine()
+    private let briefingEngine = DailyBriefingEngine()
 
     init(vm: AppViewModel) {
         self.vm = vm
@@ -24,6 +25,7 @@ final class DailyStateCoordinator {
             hasWorkoutToday: vm.todaysWorkout != nil
         )
         refreshMomentum()
+        refreshBriefing()
     }
 
     func makeCoachResponse(for readiness: DailyReadiness) -> ReadinessCoachResponse {
@@ -81,5 +83,81 @@ final class DailyStateCoordinator {
             consistencyPercent: consistency,
             recentWins: recentWins
         )
+    }
+
+    private func refreshBriefing() {
+        let calendar = Calendar.current
+        let now = Date()
+
+        let lastCompleted = vm.workoutHistory.first(where: \.isCompleted)
+        let lastHoursAgo: Int? = lastCompleted.map {
+            max(0, Int(now.timeIntervalSince($0.startTime) / 3600))
+        }
+
+        var verdictEyebrow: String? = nil
+        var verdictSummary: String? = nil
+        if let session = lastCompleted, let hours = lastHoursAgo, hours <= 36 {
+            let result = WorkoutHighlightBuilder.buildResult(
+                session: session,
+                history: vm.workoutHistory,
+                streak: vm.streak,
+                exerciseName: { id in vm.library.exercise(byId: id)?.name ?? "Exercise" }
+            )
+            verdictEyebrow = result.verdict.eyebrow
+            verdictSummary = result.verdict.summary
+        }
+
+        let nextDate = vm.nextScheduledWorkoutDate
+        let nextInDays: Int? = nextDate.map {
+            let start = calendar.startOfDay(for: now)
+            let target = calendar.startOfDay(for: $0)
+            return max(0, calendar.dateComponents([.day], from: start, to: target).day ?? 0)
+        }
+
+        let missingWeight: Int = {
+            guard let last = vm.bodyWeightEntries.first?.date else { return 99 }
+            return calendar.dateComponents([.day], from: last, to: now).day ?? 0
+        }()
+        let missingSleep: Int = {
+            guard let last = vm.sleepEntries.first?.date else { return 99 }
+            return calendar.dateComponents([.day], from: last, to: now).day ?? 0
+        }()
+
+        let topInsight = vm.highPriorityInsights.first
+        let topMomentum = vm.positiveInsights.first
+
+        let input = DailyBriefingInput(
+            hasPlan: vm.currentPlan != nil,
+            hasCompletedOnboarding: vm.hasCompletedOnboarding,
+            hasActiveWorkout: vm.activeWorkout != nil,
+            todaysWorkoutName: vm.todaysWorkout?.name,
+            todaysFocus: vm.todaysWorkout?.focusMuscles.prefix(2).map(\.displayName).joined(separator: " & "),
+            nextWorkoutName: vm.nextWorkout?.name,
+            nextWorkoutInDays: nextInDays,
+            hasCheckedInToday: vm.hasCheckedInToday,
+            painOrRestriction: vm.todaysReadiness?.painOrRestriction ?? false,
+            readinessScore: vm.todaysReadiness?.readinessScore ?? 0,
+            effectiveRecoveryScore: vm.effectiveRecoveryScore,
+            streak: vm.streak,
+            weeklyCompleted: vm.weeklyStats.sessions,
+            weeklyPlanned: max(1, vm.profile.daysPerWeek),
+            lastCompletedSessionName: lastCompleted?.dayName,
+            lastCompletedHoursAgo: lastHoursAgo,
+            lastSessionVerdictEyebrow: verdictEyebrow,
+            lastSessionVerdictSummary: verdictSummary,
+            topInsightTitle: topInsight?.title,
+            topInsightMessage: topInsight?.message,
+            topInsightIcon: topInsight?.icon,
+            topInsightColor: topInsight?.color,
+            topMomentumTitle: topMomentum?.title,
+            topMomentumIcon: topMomentum?.icon,
+            missingWeightDays: missingWeight,
+            missingSleepDays: missingSleep,
+            totalInsightsCount: vm.insights.count,
+            totalRecommendationsCount: vm.recommendations.count,
+            hour: calendar.component(.hour, from: now),
+            isEarlyStage: vm.isEarlyStage
+        )
+        vm.dailyBriefing = briefingEngine.build(input)
     }
 }

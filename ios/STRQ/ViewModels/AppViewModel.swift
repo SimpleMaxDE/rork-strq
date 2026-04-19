@@ -48,6 +48,7 @@ class AppViewModel {
     var coachResponse: ReadinessCoachResponse?
     var dailyCoachMessage: DailyCoachMessage?
     var momentumData: MomentumData?
+    var dailyBriefing: DailyBriefing?
     var notificationSettings: NotificationSettings = NotificationSettings()
 
 
@@ -264,6 +265,7 @@ class AppViewModel {
         coachResponse = nil
         dailyCoachMessage = nil
         momentumData = nil
+        dailyBriefing = nil
         notificationSettings = NotificationSettings()
         nutritionTarget = NutritionTarget()
         nutritionLogs = []

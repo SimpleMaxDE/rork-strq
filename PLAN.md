@@ -1,23 +1,28 @@
-# Phase 6 — Completion Highlight Ordering + Progress Bridge
+# Phase 7 — Today + Coach as One Daily Operating System
 
-Make the post-workout moment more useful, ranked, and better connected to progress + next session.
+Make Today and Coach feel like one coherent command layer — decisive, ranked, contextual.
 
-**Ranked highlights**
-- [x] Add explicit score to each highlight in `WorkoutHighlightBuilder` and sort by score
-- [x] Promote the top highlight into a "session verdict" consumed by the completion hero
-- [x] Demote lower-value context (streak/sets milestones) below meaningful performance wins
-- [x] Mark one highlight as the primary so the UI can style it distinctly
+**Daily priority engine**
+- [x] Build `DailyBriefing` model + `DailyBriefingEngine` that ranks today's signals (training, recovery, progression, nutrition, readiness, deload)
+- [x] Pick one strongest primary action, one watchpoint, one momentum line — in that order
+- [x] Use recent workout outcomes (last completed session + highlights) to shape today's guidance
+- [x] Rest day path: recovery focus, next session prep, logging gap
+- [x] Wire engine into DailyStateCoordinator so vm exposes `dailyBriefing`
 
-**What improved — instant**
-- [x] Replace generic "Session Logged" eyebrow with the actual win (PR / Best Set / Volume Up / First Session / Consolidated)
-- [x] Add a single-line summary beneath hero: "beat last [exercise]" / "most volume yet" / "baseline set"
-- [x] Style the primary highlight row so the strongest achievement clearly wins
+**Today surface**
+- [x] Replace multiple competing signal modules with a ranked "what matters today" stack
+- [x] Lead with the single primary action (train / recover / check in / log / prep)
+- [x] Add "Since last session" bridge when there's a fresh completed session
+- [x] Collapse weight/nutrition/sleep into a single compact row rather than competing cards
+- [x] Keep today hero + schedule timeline but tighten spacing/rhythm
 
-**Progress bridge**
-- [x] Add a "Next session" card: day name, what STRQ will push/hold/drop, based on this session's data
-- [x] Surface 1–2 exercises that confirmed progression (or suggest hold) from progressionStates delta
-- [x] Keep celebration premium but disciplined — no clutter, no gamification
+**Coach surface**
+- [x] Reframe Coach around one decision: primary move, one watch, one momentum — nothing else at top
+- [x] Cut parallel-notes feel by deferring other insights/recommendations behind "More signals"
+- [x] Sharpen Coach copy: confident, specific, not generic
+- [x] Rest-day Coach: shows what to prep, not empty state
 
 **System consistency**
 - [x] Keep STRQ dark premium identity, semantic palette, calm motion
-- [x] Align section header treatment with the rest of STRQ
+- [x] Shared section headers, card treatment
+- [x] No redesign of unrelated screens

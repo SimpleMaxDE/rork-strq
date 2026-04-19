@@ -7,33 +7,22 @@ struct CoachTabView: View {
     @State private var expandedRecIds: Set<String> = []
     @State private var showWeeklyReview: Bool = false
     @State private var showReadinessCheckIn: Bool = false
+    @State private var showMoreSignals: Bool = false
     @State private var toast: STRQToast?
     @State private var lastAppliedCount: Int = 0
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 22) {
+            VStack(spacing: 20) {
                 authorityHero
+
                 if vm.isEarlyStage {
                     earlyStateCard
                     calibrationChecklist
                 } else {
-                    directionCard
-
-                    // Single strongest secondary message: only surface Watch when there's a real concern.
-                    // Momentum is a celebratory signal — suppress it if there's already a watchpoint.
-                    let hasWatch = vm.highPriorityInsights.first != nil || vm.recommendations.first != nil
-                    if hasWatch {
-                        watchSection
-                    } else {
-                        momentumSection
-                    }
-
-                    // Lift tracker is deeper detail — only show when coach has strong enough signal.
-                    if vm.coachingConfidence >= .moderate {
-                        liftTrackerSection
-                    }
+                    decisionStack
                 }
+
                 weeklyCheckInRow
             }
             .padding(.horizontal, 16)
@@ -63,6 +52,14 @@ struct CoachTabView: View {
             ReadinessCheckInView(vm: vm) { readiness in
                 vm.submitReadiness(readiness)
             }
+        }
+        .sheet(isPresented: $showMoreSignals) {
+            NavigationStack {
+                MoreSignalsSheet(vm: vm)
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationContentInteraction(.scrolls)
         }
         .strqToast($toast)
     }
@@ -166,19 +163,200 @@ struct CoachTabView: View {
     }
 
     private var headline: String {
+        if let briefing = vm.dailyBriefing {
+            return briefing.primary.title
+        }
         if let guidance = vm.earlyStateGuidance {
             return guidance.headline
         }
         if let action = vm.nextBestAction {
             return action.title
         }
-        if vm.stalledExercises.count > 0 {
-            return "Hold load. Rebuild reps."
-        }
-        if vm.progressingExercises.count >= 3 {
-            return "Momentum is yours. Keep pushing."
-        }
         return "You're on plan. Stay the course."
+    }
+
+    // MARK: - Decision Stack (primary move / watch / momentum)
+
+    @ViewBuilder
+    private var decisionStack: some View {
+        if let briefing = vm.dailyBriefing {
+            VStack(spacing: 14) {
+                primaryMoveCard(briefing.primary)
+
+                if let watch = briefing.watch {
+                    watchCard(watch)
+                }
+
+                if let momentum = briefing.momentum {
+                    momentumCard(momentum)
+                }
+
+                if briefing.moreSignalsCount > 0 {
+                    Button {
+                        showMoreSignals = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "list.bullet.rectangle")
+                                .font(.caption)
+                                .foregroundStyle(STRQBrand.steel)
+                            Text("\(briefing.moreSignalsCount) more signal\(briefing.moreSignalsCount == 1 ? "" : "s")")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(.quaternary)
+                        }
+                        .padding(12)
+                        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(.strqPressable)
+                }
+
+                // Lift tracker only when coach has real signal.
+                if vm.coachingConfidence >= .moderate {
+                    liftTrackerSection
+                }
+            }
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+            .animation(.easeOut(duration: 0.5).delay(0.05), value: appeared)
+        }
+    }
+
+    private func primaryMoveCard(_ primary: DailyBriefing.Primary) -> some View {
+        let tint = ForgeTheme.color(for: primary.colorName)
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(tint)
+                    .frame(width: 3, height: 14)
+                Text("PRIMARY MOVE")
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.2)
+                    .foregroundStyle(.primary)
+                Spacer()
+                Text(primary.eyebrow)
+                    .font(.system(size: 9, weight: .bold))
+                    .tracking(0.6)
+                    .foregroundStyle(tint)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(tint.opacity(0.12), in: Capsule())
+            }
+
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: primary.icon)
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(.white)
+                    .frame(width: 46, height: 46)
+                    .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 12))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(primary.title)
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(.primary)
+                    Text(primary.detail)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+
+            if let sinceLast = vm.dailyBriefing?.sinceLast {
+                HStack(spacing: 10) {
+                    Image(systemName: "arrow.up.right.circle.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(STRQPalette.success)
+                        .frame(width: 22, height: 22)
+                        .background(STRQPalette.successSoft, in: .rect(cornerRadius: 7))
+                    Text("\(sinceLast.eyebrow.capitalized) — \(sinceLast.summary)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                    Spacer(minLength: 0)
+                }
+                .padding(.top, 2)
+            }
+        }
+        .padding(16)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+        )
+    }
+
+    private func watchCard(_ watch: DailyBriefing.Watch) -> some View {
+        let tint = ForgeTheme.color(for: watch.colorName)
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(tint)
+                    .frame(width: 3, height: 12)
+                Text("WATCH")
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.2)
+                    .foregroundStyle(.primary)
+                Spacer()
+            }
+
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: watch.icon)
+                    .font(.subheadline)
+                    .foregroundStyle(tint)
+                    .frame(width: 34, height: 34)
+                    .background(tint.opacity(0.15), in: .rect(cornerRadius: 10))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(watch.title)
+                        .font(.subheadline.weight(.semibold))
+                    Text(watch.detail)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(3)
+                }
+                Spacer(minLength: 0)
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+    }
+
+    private func momentumCard(_ momentum: DailyBriefing.Momentum) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: momentum.icon)
+                .font(.subheadline)
+                .foregroundStyle(STRQPalette.success)
+                .frame(width: 34, height: 34)
+                .background(STRQPalette.successSoft, in: .rect(cornerRadius: 10))
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text("MOMENTUM")
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(1.1)
+                    .foregroundStyle(STRQPalette.success)
+                Text(momentum.title)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(2)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
     }
 
     // MARK: - Early State
@@ -289,145 +467,6 @@ struct CoachTabView: View {
         .animation(.easeOut(duration: 0.5).delay(0.1), value: appeared)
     }
 
-    // MARK: - Direction (Your Move)
-
-    @ViewBuilder
-    private var directionCard: some View {
-        if let action = vm.nextBestAction {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 6) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(STRQBrand.accentGradient)
-                        .frame(width: 3, height: 14)
-                    Text("YOUR MOVE")
-                        .font(.system(size: 10, weight: .black))
-                        .tracking(1.2)
-                        .foregroundStyle(.primary)
-                    Spacer()
-                    confidencePill(action.confidence)
-                }
-
-                HStack(alignment: .top, spacing: 14) {
-                    Image(systemName: action.icon)
-                        .font(.title3.weight(.medium))
-                        .foregroundStyle(.white)
-                        .frame(width: 46, height: 46)
-                        .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 12))
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(action.title)
-                            .font(.body.weight(.bold))
-                            .foregroundStyle(.primary)
-                        Text(action.explanation)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    Spacer(minLength: 0)
-                }
-            }
-            .padding(16)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
-            )
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.5).delay(0.05), value: appeared)
-        }
-    }
-
-    private func confidencePill(_ confidence: Double) -> some View {
-        let label = confidence >= 0.75 ? "High confidence" : confidence >= 0.5 ? "Confident" : "Consider"
-        return Text(label)
-            .font(.system(size: 9, weight: .bold))
-            .textCase(.uppercase)
-            .tracking(0.4)
-            .foregroundStyle(STRQBrand.steel)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3)
-            .background(STRQBrand.steel.opacity(0.12), in: Capsule())
-    }
-
-    // MARK: - Watch (single focused item)
-
-    @ViewBuilder
-    private var watchSection: some View {
-        let topInsight = vm.highPriorityInsights.first
-        let topRec = vm.recommendations.first
-        let hasContent = topInsight != nil || topRec != nil
-
-        if hasContent {
-            VStack(alignment: .leading, spacing: 10) {
-                ForgeSectionHeader(title: "Watch")
-
-                if let insight = topInsight {
-                    ExpandableInsightCard(
-                        insight: insight,
-                        actions: CoachActionMapper.actions(for: insight),
-                        vm: vm,
-                        isExpanded: insightBinding(insight.id),
-                        onAction: { _ in }
-                    )
-                } else if let rec = topRec {
-                    ExpandableRecommendationCard(
-                        recommendation: rec,
-                        actions: CoachActionMapper.actions(for: rec),
-                        vm: vm,
-                        isExpanded: recBinding(rec.id),
-                        onAction: { _ in }
-                    )
-                }
-            }
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.5).delay(0.08), value: appeared)
-        }
-    }
-
-    // MARK: - Momentum
-
-    @ViewBuilder
-    private var momentumSection: some View {
-        let wins = vm.positiveInsights.prefix(1)
-        if let win = wins.first {
-            VStack(alignment: .leading, spacing: 10) {
-                ForgeSectionHeader(title: "Momentum")
-
-                HStack(spacing: 12) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(STRQPalette.successSoft)
-                            .frame(width: 38, height: 38)
-                        Image(systemName: win.icon)
-                            .font(.subheadline)
-                            .foregroundStyle(STRQPalette.success)
-                    }
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(win.title)
-                            .font(.subheadline.weight(.semibold))
-                        Text(win.message)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                    }
-                    Spacer(minLength: 0)
-                }
-                .padding(14)
-                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-                )
-            }
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.5).delay(0.12), value: appeared)
-        }
-    }
-
     // MARK: - Lift Tracker
 
     @ViewBuilder
@@ -446,9 +485,7 @@ struct CoachTabView: View {
                     liftRow(state: state, isStalled: false)
                 }
             }
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.5).delay(0.15), value: appeared)
+            .padding(.top, 4)
         }
     }
 
@@ -591,20 +628,84 @@ struct CoachTabView: View {
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
         )
     }
+}
 
-    // MARK: - Bindings
+// MARK: - More Signals Sheet
 
-    private func insightBinding(_ id: String) -> Binding<Bool> {
-        Binding(
-            get: { expandedInsightIds.contains(id) },
-            set: { v in if v { expandedInsightIds.insert(id) } else { expandedInsightIds.remove(id) } }
-        )
-    }
+struct MoreSignalsSheet: View {
+    let vm: AppViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var expandedInsightIds: Set<String> = []
+    @State private var expandedRecIds: Set<String> = []
 
-    private func recBinding(_ id: String) -> Binding<Bool> {
-        Binding(
-            get: { expandedRecIds.contains(id) },
-            set: { v in if v { expandedRecIds.insert(id) } else { expandedRecIds.remove(id) } }
-        )
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 14) {
+                let insights = Array(vm.highPriorityInsights.dropFirst())
+                let recs = Array(vm.recommendations.dropFirst(vm.highPriorityInsights.isEmpty ? 1 : 0))
+
+                if !insights.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        ForgeSectionHeader(title: "Watch")
+                        ForEach(insights) { insight in
+                            ExpandableInsightCard(
+                                insight: insight,
+                                actions: CoachActionMapper.actions(for: insight),
+                                vm: vm,
+                                isExpanded: Binding(
+                                    get: { expandedInsightIds.contains(insight.id) },
+                                    set: { v in if v { expandedInsightIds.insert(insight.id) } else { expandedInsightIds.remove(insight.id) } }
+                                ),
+                                onAction: { _ in }
+                            )
+                        }
+                    }
+                }
+
+                if !recs.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        ForgeSectionHeader(title: "Recommendations")
+                        ForEach(recs) { rec in
+                            ExpandableRecommendationCard(
+                                recommendation: rec,
+                                actions: CoachActionMapper.actions(for: rec),
+                                vm: vm,
+                                isExpanded: Binding(
+                                    get: { expandedRecIds.contains(rec.id) },
+                                    set: { v in if v { expandedRecIds.insert(rec.id) } else { expandedRecIds.remove(rec.id) } }
+                                ),
+                                onAction: { _ in }
+                            )
+                        }
+                    }
+                }
+
+                if insights.isEmpty && recs.isEmpty {
+                    VStack(spacing: 10) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.title)
+                            .foregroundStyle(STRQPalette.success)
+                        Text("Nothing else to flag")
+                            .font(.subheadline.weight(.semibold))
+                        Text("Coach is satisfied with the rest of your picture.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.top, 40)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 32)
+        }
+        .background(Color(.systemBackground))
+        .navigationTitle("More signals")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Done") { dismiss() }
+                    .font(.subheadline.weight(.semibold))
+            }
+        }
     }
 }
