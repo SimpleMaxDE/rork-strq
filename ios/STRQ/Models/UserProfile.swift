@@ -228,4 +228,180 @@ nonisolated struct UserProfile: Codable, Sendable {
     var hasCompletedOnboarding: Bool = false
     var preferredTrainingDays: [Int] = []
     var nutritionTrackingEnabled: Bool = false
+    var coachingPreferences: CoachingPreferences = CoachingPreferences()
+}
+
+// MARK: - Coaching Preferences
+
+nonisolated enum CoachingTone: String, Codable, CaseIterable, Identifiable, Sendable {
+    case supportive
+    case balanced
+    case direct
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .supportive: "Supportive"
+        case .balanced: "Balanced"
+        case .direct: "Direct"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .supportive: "Encouraging, patient, softer language."
+        case .balanced: "Clear and honest — STRQ's default voice."
+        case .direct: "Sharp, no-nonsense. Straight to the call."
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .supportive: "hand.raised.fill"
+        case .balanced: "bubble.left.and.bubble.right.fill"
+        case .direct: "bolt.fill"
+        }
+    }
+}
+
+nonisolated enum CoachingDensity: String, Codable, CaseIterable, Identifiable, Sendable {
+    case focused
+    case standard
+    case detailed
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .focused: "Focused"
+        case .standard: "Standard"
+        case .detailed: "Detailed"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .focused: "One call at a time. Maximum signal, minimum noise."
+        case .standard: "Primary + watch + momentum. The coach default."
+        case .detailed: "Show more of what STRQ is seeing."
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .focused: "circle.grid.cross.fill"
+        case .standard: "square.grid.2x2.fill"
+        case .detailed: "square.grid.3x3.fill"
+        }
+    }
+
+    /// How many side-cards (watch, momentum) to show below the primary move.
+    var sideSignalsLimit: Int {
+        switch self {
+        case .focused: 0
+        case .standard: 2
+        case .detailed: 4
+        }
+    }
+}
+
+nonisolated enum CoachingEmphasis: String, Codable, CaseIterable, Identifiable, Sendable {
+    case performance
+    case physique
+    case recovery
+    case consistency
+    case simplicity
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .performance: "Performance"
+        case .physique: "Physique"
+        case .recovery: "Recovery"
+        case .consistency: "Consistency"
+        case .simplicity: "Simplicity"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .performance: "Strength, PRs, progression."
+        case .physique: "Body composition and nutrition pace."
+        case .recovery: "Sleep, readiness, fatigue protection."
+        case .consistency: "Showing up. Streaks and adherence."
+        case .simplicity: "Just tell me what to do today."
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .performance: "bolt.fill"
+        case .physique: "figure.stand"
+        case .recovery: "heart.fill"
+        case .consistency: "calendar.badge.checkmark"
+        case .simplicity: "target"
+        }
+    }
+}
+
+nonisolated enum CoachingAutomation: String, Codable, CaseIterable, Identifiable, Sendable {
+    case manual
+    case guided
+    case adaptive
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .manual: "Manual"
+        case .guided: "Guided"
+        case .adaptive: "Adaptive"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .manual: "STRQ suggests. You decide every change."
+        case .guided: "STRQ proposes adjustments. You approve them."
+        case .adaptive: "STRQ adjusts load and volume as signal comes in."
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .manual: "hand.point.up.left.fill"
+        case .guided: "signpost.right.fill"
+        case .adaptive: "sparkles"
+        }
+    }
+}
+
+nonisolated struct CoachingPreferences: Codable, Sendable {
+    var tone: CoachingTone = .balanced
+    var density: CoachingDensity = .standard
+    var emphasis: CoachingEmphasis = .performance
+    var automation: CoachingAutomation = .guided
+
+    init(
+        tone: CoachingTone = .balanced,
+        density: CoachingDensity = .standard,
+        emphasis: CoachingEmphasis = .performance,
+        automation: CoachingAutomation = .guided
+    ) {
+        self.tone = tone
+        self.density = density
+        self.emphasis = emphasis
+        self.automation = automation
+    }
+
+    // Tolerate missing keys so older persisted profiles decode cleanly.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.tone = (try? c.decode(CoachingTone.self, forKey: .tone)) ?? .balanced
+        self.density = (try? c.decode(CoachingDensity.self, forKey: .density)) ?? .standard
+        self.emphasis = (try? c.decode(CoachingEmphasis.self, forKey: .emphasis)) ?? .performance
+        self.automation = (try? c.decode(CoachingAutomation.self, forKey: .automation)) ?? .guided
+    }
 }

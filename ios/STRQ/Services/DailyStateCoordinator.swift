@@ -159,7 +159,23 @@ final class DailyStateCoordinator {
             totalInsightsCount: vm.insights.count,
             totalRecommendationsCount: vm.recommendations.count,
             hour: calendar.component(.hour, from: now),
-            isEarlyStage: vm.isEarlyStage
+            isEarlyStage: vm.isEarlyStage,
+            tone: {
+                switch vm.profile.coachingPreferences.tone {
+                case .supportive: return .supportive
+                case .balanced: return .balanced
+                case .direct: return .direct
+                }
+            }(),
+            emphasis: {
+                switch vm.profile.coachingPreferences.emphasis {
+                case .performance: return .performance
+                case .physique: return .physique
+                case .recovery: return .recovery
+                case .consistency: return .consistency
+                case .simplicity: return .simplicity
+                }
+            }()
         )
         vm.dailyBriefing = briefingEngine.build(input)
     }

@@ -57,6 +57,20 @@ nonisolated struct DailyBriefing: Sendable {
     let moreSignalsCount: Int
 }
 
+nonisolated enum BriefingTone: String, Sendable {
+    case supportive
+    case balanced
+    case direct
+}
+
+nonisolated enum BriefingEmphasis: String, Sendable {
+    case performance
+    case physique
+    case recovery
+    case consistency
+    case simplicity
+}
+
 nonisolated struct DailyBriefingInput: Sendable {
     let hasPlan: Bool
     let hasCompletedOnboarding: Bool
@@ -88,12 +102,15 @@ nonisolated struct DailyBriefingInput: Sendable {
     let totalRecommendationsCount: Int
     let hour: Int
     let isEarlyStage: Bool
+    let tone: BriefingTone
+    let emphasis: BriefingEmphasis
 }
 
 nonisolated struct DailyBriefingEngine: Sendable {
 
     func build(_ input: DailyBriefingInput) -> DailyBriefing {
-        let primary = resolvePrimary(input)
+        let rawPrimary = resolvePrimary(input)
+        let primary = applyToneAndEmphasis(rawPrimary, input: input)
         let watch = resolveWatch(input, primaryKind: primary.kind)
         let momentum = resolveMomentum(input)
         let sinceLast = resolveSinceLast(input)
@@ -106,6 +123,55 @@ nonisolated struct DailyBriefingEngine: Sendable {
             sinceLast: sinceLast,
             restPrep: restPrep,
             moreSignalsCount: extra
+        )
+    }
+
+    // MARK: - Tone / Emphasis
+
+    private func applyToneAndEmphasis(_ p: DailyBriefing.Primary, input: DailyBriefingInput) -> DailyBriefing.Primary {
+        var title = p.title
+        var detail = p.detail
+
+        switch input.tone {
+        case .direct:
+            // Strip softeners for a sharper read.
+            detail = detail
+                .replacingOccurrences(of: "Let's ", with: "")
+                .replacingOccurrences(of: "let's ", with: "")
+        case .supportive:
+            // Only prepend a soft lead when it reads naturally.
+            if p.kind == .trainToday || p.kind == .startFirstSession {
+                detail = "You’ve got this. " + detail
+            }
+        case .balanced:
+            break
+        }
+
+        // Emphasis-tuned framing on the primary title for rest-day guidance.
+        switch input.emphasis {
+        case .recovery where p.kind == .recoveryDay:
+            title = "Recover with intent"
+        case .physique where p.kind == .logBodyWeight:
+            title = "Weigh-in keeps physique honest"
+        case .consistency where p.kind == .recoveryDay && input.streak >= 3:
+            title = "Protect the streak"
+        case .simplicity:
+            // Trim supporting detail to a single clear sentence.
+            if let first = detail.split(separator: ".").first {
+                detail = String(first).trimmingCharacters(in: .whitespaces) + "."
+            }
+        default:
+            break
+        }
+
+        return DailyBriefing.Primary(
+            kind: p.kind,
+            eyebrow: p.eyebrow,
+            title: title,
+            detail: detail,
+            icon: p.icon,
+            colorName: p.colorName,
+            ctaTitle: p.ctaTitle
         )
     }
 

@@ -180,18 +180,23 @@ struct CoachTabView: View {
     @ViewBuilder
     private var decisionStack: some View {
         if let briefing = vm.dailyBriefing {
+            let density = vm.profile.coachingPreferences.density
+            let sideLimit = density.sideSignalsLimit
+            let emphasis = vm.profile.coachingPreferences.emphasis
+            let showWatch = briefing.watch != nil && sideLimit >= 1
+            let showMomentum = briefing.momentum != nil && sideLimit >= (showWatch ? 2 : 1) && emphasis != .simplicity
             VStack(spacing: 14) {
                 primaryMoveCard(briefing.primary)
 
-                if let watch = briefing.watch {
+                if showWatch, let watch = briefing.watch {
                     watchCard(watch)
                 }
 
-                if let momentum = briefing.momentum {
+                if showMomentum, let momentum = briefing.momentum {
                     momentumCard(momentum)
                 }
 
-                if briefing.moreSignalsCount > 0 {
+                if briefing.moreSignalsCount > 0, density != .focused {
                     Button {
                         showMoreSignals = true
                     } label: {

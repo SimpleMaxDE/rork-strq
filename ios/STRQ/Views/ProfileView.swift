@@ -23,6 +23,7 @@ struct ProfileView: View {
                 accountSection
                 subscriptionSection
                 fitnessIdentity
+                coachingStyleRow
                 trainingSetup
                 bodyNutrition
                 controlsSection
@@ -618,6 +619,65 @@ struct ProfileView: View {
     }
 
     // MARK: - Controls
+
+    private var coachingStyleRow: some View {
+        let prefs = vm.profile.coachingPreferences
+        return NavigationLink {
+            CoachingPreferencesView(vm: vm)
+        } label: {
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: "person.bust.fill")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        Text("Coaching Style")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        Text("PERSONAL")
+                            .font(.system(size: 9, weight: .black))
+                            .tracking(0.8)
+                            .foregroundStyle(STRQBrand.steel)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+                    }
+                    HStack(spacing: 5) {
+                        styleChip(icon: prefs.tone.symbolName, label: prefs.tone.displayName)
+                        styleChip(icon: prefs.emphasis.symbolName, label: prefs.emphasis.displayName)
+                        styleChip(icon: prefs.density.symbolName, label: prefs.density.displayName)
+                    }
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(14)
+            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func styleChip(icon: String, label: String) -> some View {
+        HStack(spacing: 3) {
+            Image(systemName: icon)
+                .font(.system(size: 8, weight: .bold))
+            Text(label)
+                .font(.system(size: 9, weight: .bold))
+        }
+        .foregroundStyle(STRQBrand.steel)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 3)
+        .background(STRQBrand.steel.opacity(0.10), in: Capsule())
+    }
 
     private var controlsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
