@@ -686,125 +686,162 @@ struct ActiveWorkoutView: View {
     @ViewBuilder
     private func restTimerOverlay(_ workout: ActiveWorkoutState) -> some View {
         ZStack {
-            Color.black.opacity(0.92).ignoresSafeArea()
+            Color.black.opacity(0.94).ignoresSafeArea()
                 .onTapGesture { }
 
-            VStack(spacing: 28) {
-                Text("REST")
-                    .font(.system(size: 11, weight: .black))
-                    .foregroundStyle(STRQBrand.steel)
-                    .tracking(2)
+            let planned = workout.currentExerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[workout.currentExerciseIndex] : nil
+            let totalRest = planned?.restSeconds ?? 90
+            let progress = totalRest > 0 ? CGFloat(restTimeRemaining) / CGFloat(totalRest) : 0
 
-                let planned = workout.currentExerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[workout.currentExerciseIndex] : nil
-                let totalRest = planned?.restSeconds ?? 90
-                let progress = totalRest > 0 ? CGFloat(restTimeRemaining) / CGFloat(totalRest) : 0
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
 
-                ZStack {
-                    Circle()
-                        .stroke(Color.white.opacity(0.06), lineWidth: 6)
-                        .frame(width: 180, height: 180)
-                    Circle()
-                        .trim(from: 0, to: progress)
-                        .stroke(
-                            restTimeRemaining <= 10 ? Color.red : Color.white,
-                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                        )
-                        .frame(width: 180, height: 180)
-                        .rotationEffect(.degrees(-90))
-                        .animation(.linear(duration: 1), value: restTimeRemaining)
+                VStack(spacing: 14) {
+                    Text("REST")
+                        .font(.system(size: 11, weight: .black))
+                        .foregroundStyle(STRQBrand.steel)
+                        .tracking(2.5)
 
-                    VStack(spacing: 4) {
-                        Text(formatTime(restTimeRemaining))
-                            .font(.system(size: 48, weight: .bold, design: .monospaced))
-                            .foregroundStyle(restTimeRemaining <= 10 ? .red : .white)
-                        Text("remaining")
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(.secondary)
+                    ZStack {
+                        Circle()
+                            .stroke(Color.white.opacity(0.06), lineWidth: 6)
+                            .frame(width: 196, height: 196)
+                        Circle()
+                            .trim(from: 0, to: progress)
+                            .stroke(
+                                restTimeRemaining <= 10 ? Color.red : Color.white,
+                                style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                            )
+                            .frame(width: 196, height: 196)
+                            .rotationEffect(.degrees(-90))
+                            .animation(.linear(duration: 1), value: restTimeRemaining)
+
+                        VStack(spacing: 6) {
+                            Text(formatTime(restTimeRemaining))
+                                .font(.system(size: 52, weight: .bold, design: .monospaced))
+                                .foregroundStyle(restTimeRemaining <= 10 ? .red : .white)
+                                .contentTransition(.numericText(countsDown: true))
+                            Text("remaining")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.35))
+                                .tracking(0.5)
+                        }
                     }
                 }
+
+                Spacer(minLength: 24)
 
                 if let last = lastLoggedSet,
                    last.exerciseIndex < workout.session.exerciseLogs.count,
                    last.setIndex < workout.session.exerciseLogs[last.exerciseIndex].sets.count {
                     let currentQuality = workout.session.exerciseLogs[last.exerciseIndex].sets[last.setIndex].quality
-                    VStack(spacing: 10) {
-                        Text("HOW DID THAT SET FEEL?")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(.white.opacity(0.4))
-                            .tracking(1.0)
+                    VStack(spacing: 12) {
+                        Text("SET FEEL")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.35))
+                            .tracking(1.5)
                         HStack(spacing: 6) {
                             ForEach(SetQuality.allCases, id: \.self) { quality in
                                 let isSelected = currentQuality == quality
                                 Button {
                                     setQuality(exerciseIndex: last.exerciseIndex, setIndex: last.setIndex, quality: isSelected ? nil : quality)
                                 } label: {
-                                    VStack(spacing: 4) {
+                                    VStack(spacing: 5) {
                                         Image(systemName: quality.icon)
-                                            .font(.system(size: 13, weight: .semibold))
+                                            .font(.system(size: 14, weight: .semibold))
                                         Text(quality.shortLabel)
                                             .font(.system(size: 9, weight: .bold))
                                     }
-                                    .foregroundStyle(isSelected ? .black : .white.opacity(0.7))
+                                    .foregroundStyle(isSelected ? .black : .white.opacity(0.65))
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: 52)
+                                    .frame(height: 54)
                                     .background(
                                         isSelected
                                             ? AnyShapeStyle(qualityColor(quality.colorName))
-                                            : AnyShapeStyle(Color.white.opacity(0.06)),
+                                            : AnyShapeStyle(Color.white.opacity(0.05)),
                                         in: .rect(cornerRadius: 12)
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .strokeBorder(Color.white.opacity(isSelected ? 0 : 0.06), lineWidth: 1)
                                     )
                                 }
                             }
                         }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 4)
+                    .padding(.horizontal, 20)
                 }
 
-                HStack(spacing: 16) {
+                Spacer(minLength: 28)
+
+                HStack(spacing: 14) {
                     Button { restTimeRemaining = max(0, restTimeRemaining - 15) } label: {
-                        Text("-15s")
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 60, height: 40)
-                            .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 12))
+                        Text("−15s")
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.75))
+                            .frame(width: 68, height: 44)
+                            .background(Color.white.opacity(0.05), in: Capsule())
+                            .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
                     }
 
                     Button {
                         restTimeRemaining = 0
                         restTimerActive = false
                     } label: {
-                        Text("Skip")
-                            .font(.body.weight(.bold))
+                        Text("Skip Rest")
+                            .font(.system(size: 15, weight: .bold))
                             .foregroundStyle(.black)
-                            .frame(width: 80, height: 44)
-                            .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 14))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 52)
+                            .background(STRQBrand.accentGradient, in: Capsule())
                     }
 
                     Button { restTimeRemaining += 15 } label: {
                         Text("+15s")
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 60, height: 40)
-                            .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 12))
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.75))
+                            .frame(width: 68, height: 44)
+                            .background(Color.white.opacity(0.05), in: Capsule())
+                            .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
                     }
+                }
+                .padding(.horizontal, 20)
+
+                if let nextUp = nextUpPreview(workout) {
+                    VStack(spacing: 6) {
+                        Text("UP NEXT")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.28))
+                            .tracking(1.5)
+                        Text(nextUp)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.7))
+                            .lineLimit(1)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, 20)
+                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
+                    )
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
                 }
 
-                if let nextIdx = Optional(workout.currentExerciseIndex + 1), nextIdx < workout.session.exerciseLogs.count {
-                    let nextLog = workout.session.exerciseLogs[nextIdx]
-                    let nextEx = vm.library.exercise(byId: nextLog.exerciseId)
-                    HStack(spacing: 8) {
-                        Text("Next:")
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(.tertiary)
-                        Text(nextEx?.name ?? nextLog.exerciseId)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.top, 8)
-                }
+                Spacer(minLength: 24)
             }
+            .padding(.top, 40)
+            .padding(.bottom, 20)
         }
+    }
+
+    private func nextUpPreview(_ workout: ActiveWorkoutState) -> String? {
+        let nextIdx = workout.currentExerciseIndex + 1
+        guard nextIdx < workout.session.exerciseLogs.count else { return nil }
+        let nextLog = workout.session.exerciseLogs[nextIdx]
+        return vm.library.exercise(byId: nextLog.exerciseId)?.name ?? nextLog.exerciseId
     }
 
     // MARK: - Exercise List Sheet
@@ -1040,33 +1077,67 @@ struct WorkoutCompletionView: View {
         ZStack {
             Color.black.ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                Spacer()
+            RadialGradient(
+                colors: [Color.white.opacity(0.06), Color.clear],
+                center: .top,
+                startRadius: 10,
+                endRadius: 420
+            )
+            .ignoresSafeArea()
 
-                VStack(spacing: 28) {
+            VStack(spacing: 0) {
+                Spacer(minLength: 24)
+
+                VStack(spacing: 32) {
                     ZStack {
                         Circle()
-                            .fill(Color.white.opacity(0.06))
-                            .frame(width: 110, height: 110)
-                            .scaleEffect(appeared ? 1 : 0.5)
-                            .animation(.spring(response: 0.6, dampingFraction: 0.5), value: appeared)
-
+                            .fill(Color.white.opacity(0.04))
+                            .frame(width: 132, height: 132)
+                        Circle()
+                            .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                            .frame(width: 132, height: 132)
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [Color.yellow.opacity(0.22), Color.clear],
+                                    center: .center,
+                                    startRadius: 4,
+                                    endRadius: 70
+                                )
+                            )
+                            .frame(width: 132, height: 132)
                         Image(systemName: "trophy.fill")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.yellow)
-                            .scaleEffect(appeared ? 1 : 0.3)
-                            .animation(.spring(response: 0.5, dampingFraction: 0.5).delay(0.1), value: appeared)
+                            .font(.system(size: 52, weight: .semibold))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color(red: 1.0, green: 0.86, blue: 0.42), Color(red: 0.95, green: 0.72, blue: 0.24)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
                     }
-
-                    VStack(spacing: 8) {
-                        Text("Workout Complete")
-                            .font(.title.bold())
-                        Text(session?.dayName ?? "Great session!")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
+                    .scaleEffect(appeared ? 1 : 0.7)
                     .opacity(appeared ? 1 : 0)
-                    .animation(.easeOut(duration: 0.5).delay(0.2), value: appeared)
+                    .animation(.spring(response: 0.55, dampingFraction: 0.7), value: appeared)
+
+                    VStack(spacing: 10) {
+                        Text("COMPLETE")
+                            .font(.system(size: 11, weight: .black))
+                            .foregroundStyle(STRQBrand.steel)
+                            .tracking(3)
+                        Text("Session Logged")
+                            .font(.system(size: 30, weight: .bold))
+                            .foregroundStyle(.white)
+                        if let day = session?.dayName {
+                            Text(day)
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+                    }
+                    .multilineTextAlignment(.center)
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 8)
+                    .animation(.easeOut(duration: 0.5).delay(0.15), value: appeared)
                 }
 
                 if let session {
@@ -1075,62 +1146,89 @@ struct WorkoutCompletionView: View {
                     let totalReps = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).reduce(0) { $0 + $1.reps }
                     let completedExercises = session.exerciseLogs.filter(\.isCompleted).count
 
-                    VStack(spacing: 20) {
-                        HStack(spacing: 0) {
-                            completionStat("Duration", value: "\(duration)m", icon: "clock.fill", color: STRQBrand.steel)
-                            completionStat("Exercises", value: "\(completedExercises)", icon: "figure.strengthtraining.traditional", color: STRQBrand.steel)
-                            completionStat("Sets", value: "\(totalSets)", icon: "checkmark.circle.fill", color: .green)
-                            completionStat("Reps", value: "\(totalReps)", icon: "repeat", color: STRQBrand.slate)
+                    VStack(spacing: 14) {
+                        HStack(spacing: 10) {
+                            completionStat("Duration", value: "\(duration)", unit: "min")
+                            completionStat("Exercises", value: "\(completedExercises)", unit: nil)
+                            completionStat("Sets", value: "\(totalSets)", unit: nil)
+                            completionStat("Reps", value: "\(totalReps)", unit: nil)
                         }
 
                         if session.totalVolume > 0 {
-                            VStack(spacing: 4) {
-                                Text("Total Volume")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                Text(String(format: "%.0f kg", session.totalVolume))
-                                    .font(.system(.title2, design: .rounded, weight: .bold))
-                                    .foregroundStyle(.white)
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("TOTAL VOLUME")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundStyle(.white.opacity(0.4))
+                                        .tracking(1.2)
+                                    Text(String(format: "%.0f kg", session.totalVolume))
+                                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                                        .foregroundStyle(.white)
+                                }
+                                Spacer()
+                                Image(systemName: "chart.bar.fill")
+                                    .font(.system(size: 22, weight: .semibold))
+                                    .foregroundStyle(STRQBrand.steel.opacity(0.6))
                             }
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 18)
+                            .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 16))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
+                            )
                         }
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 36)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 40)
                     .opacity(appeared ? 1 : 0)
-                    .animation(.easeOut(duration: 0.5).delay(0.4), value: appeared)
+                    .offset(y: appeared ? 0 : 12)
+                    .animation(.easeOut(duration: 0.5).delay(0.3), value: appeared)
                 }
 
-                Spacer()
+                Spacer(minLength: 24)
 
                 Button { onDismiss() } label: {
                     Text("Done")
                         .font(.body.weight(.bold))
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
+                        .frame(height: 56)
+                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 18))
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 32)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 28)
                 .opacity(appeared ? 1 : 0)
-                .animation(.easeOut(duration: 0.5).delay(0.5), value: appeared)
+                .animation(.easeOut(duration: 0.5).delay(0.45), value: appeared)
             }
         }
         .preferredColorScheme(.dark)
         .onAppear { withAnimation { appeared = true } }
     }
 
-    private func completionStat(_ title: String, value: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.body)
-                .foregroundStyle(color)
-            Text(value)
-                .font(.system(.title3, design: .rounded, weight: .bold))
-            Text(title)
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.secondary)
+    private func completionStat(_ title: String, value: String, unit: String?) -> some View {
+        VStack(spacing: 6) {
+            HStack(alignment: .lastTextBaseline, spacing: 2) {
+                Text(value)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                if let unit {
+                    Text(unit)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.4))
+                }
+            }
+            Text(title.uppercased())
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(.white.opacity(0.4))
+                .tracking(1.0)
         }
         .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
+        )
     }
 }
