@@ -38,11 +38,17 @@ struct PlanRevealView: View {
                         qualitySection(quality)
                     }
                     explanationSection
-                    startButton
+                    Color.clear.frame(height: 90)
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, 60)
+                .padding(.bottom, 20)
             }
+
+            VStack(spacing: 0) {
+                Spacer()
+                stickyStartBar
+            }
+            .ignoresSafeArea(edges: .bottom)
         }
         .preferredColorScheme(.dark)
         .onAppear {
@@ -352,24 +358,38 @@ struct PlanRevealView: View {
         .animation(.easeOut(duration: 0.5).delay(1.0), value: showQuality)
     }
 
-    private var startButton: some View {
-        Button {
-            onStart()
-        } label: {
-            HStack(spacing: 10) {
-                Text("Start Training")
-                    .font(.body.weight(.semibold))
-                Image(systemName: "arrow.right")
-                    .font(.subheadline.weight(.semibold))
+    private var stickyStartBar: some View {
+        VStack(spacing: 0) {
+            LinearGradient(colors: [.black.opacity(0), .black], startPoint: .top, endPoint: .bottom)
+                .frame(height: 36)
+            VStack(spacing: 8) {
+                Button {
+                    onStart()
+                } label: {
+                    HStack(spacing: 10) {
+                        Text("Start First Session")
+                            .font(.body.weight(.bold))
+                        Image(systemName: "arrow.right")
+                            .font(.subheadline.weight(.bold))
+                    }
+                    .foregroundStyle(.black)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
+                    .shadow(color: .white.opacity(0.1), radius: 14, y: 3)
+                }
+                .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: showQuality)
+
+                Text("You can adjust anything later in Train.")
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.35))
             }
-            .foregroundStyle(.black)
-            .frame(maxWidth: .infinity)
-            .frame(height: 56)
-            .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
+            .padding(.horizontal, 20)
+            .padding(.bottom, 28)
+            .background(Color.black)
         }
-        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: showQuality)
         .opacity(showQuality ? 1 : 0)
-        .animation(.easeOut(duration: 0.5).delay(1.2), value: showQuality)
+        .animation(.easeOut(duration: 0.5).delay(1.0), value: showQuality)
     }
 
     private func qualityColor(_ name: String) -> Color {

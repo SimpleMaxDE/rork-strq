@@ -107,19 +107,7 @@ struct OnboardingView: View {
     }
 
     private var navigationButtons: some View {
-        HStack(spacing: 12) {
-            if step > 0 {
-                Button {
-                    withAnimation(.smooth(duration: 0.35)) { step -= 1 }
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.white.opacity(0.6))
-                        .frame(width: 52, height: 52)
-                        .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 14))
-                }
-            }
-
+        VStack(spacing: 10) {
             Button {
                 if step < totalSteps - 1 {
                     withAnimation(.smooth(duration: 0.35)) { step += 1 }
@@ -129,21 +117,45 @@ struct OnboardingView: View {
             } label: {
                 HStack(spacing: 8) {
                     Text(primaryButtonLabel)
-                        .font(.body.weight(.semibold))
+                        .font(.body.weight(.bold))
                     if step == 0 {
                         Image(systemName: "arrow.right")
-                            .font(.subheadline.weight(.semibold))
+                            .font(.subheadline.weight(.bold))
                     }
                     if step == totalSteps - 1 {
                         Image(systemName: "sparkles")
-                            .font(.subheadline)
+                            .font(.subheadline.weight(.semibold))
                     }
                 }
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 14))
+                .frame(height: 54)
+                .background(
+                    (canAdvance ? AnyShapeStyle(STRQBrand.accentGradient) : AnyShapeStyle(Color.white.opacity(0.18))),
+                    in: .rect(cornerRadius: 14)
+                )
+                .opacity(canAdvance ? 1 : 0.6)
             }
+            .disabled(!canAdvance)
+
+            if step > 0 {
+                Button {
+                    withAnimation(.smooth(duration: 0.35)) { step -= 1 }
+                } label: {
+                    Text("Back")
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.4))
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 32)
+                }
+            }
+        }
+    }
+
+    private var canAdvance: Bool {
+        switch step {
+        case 1: return !vm.profile.name.trimmingCharacters(in: .whitespaces).isEmpty
+        default: return true
         }
     }
 
