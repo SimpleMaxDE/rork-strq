@@ -154,6 +154,8 @@ struct SessionHistoryView: View {
         let sets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
         let reps = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).reduce(0) { $0 + $1.reps }
         let hasPR = session.exerciseLogs.flatMap(\.sets).contains(where: \.isPR)
+        let volumeDelta = volumeDelta(for: session)
+        let verdict = sessionVerdictTag(session: session, hasPR: hasPR, volumeDelta: volumeDelta)
 
         return HStack(spacing: 10) {
             VStack(spacing: 0) {
@@ -180,6 +182,15 @@ struct SessionHistoryView: View {
                             .font(.system(size: 9))
                             .foregroundStyle(STRQPalette.gold)
                     }
+                    if let verdict {
+                        Text(verdict.label.uppercased())
+                            .font(.system(size: 8, weight: .black))
+                            .tracking(0.6)
+                            .foregroundStyle(STRQPalette.color(for: verdict.state))
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(STRQPalette.soft(for: verdict.state), in: Capsule())
+                    }
                 }
                 HStack(spacing: 6) {
                     logMetric("\(duration)", unit: "min")
@@ -198,11 +209,17 @@ struct SessionHistoryView: View {
                 Text(ForgeTheme.formatVolume(session.totalVolume))
                     .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
                     .foregroundStyle(.white)
-                Text("kg")
-                    .font(.system(size: 8, weight: .bold))
-                    .foregroundStyle(.tertiary)
-                    .textCase(.uppercase)
-                    .tracking(0.3)
+                if let volumeDelta, abs(volumeDelta) >= 0.03 {
+                    Text(String(format: "%@%.0f%%", volumeDelta > 0 ? "+" : "", volumeDelta * 100))
+                        .font(.system(size: 9, weight: .bold, design: .rounded).monospacedDigit())
+                        .foregroundStyle(volumeDelta > 0 ? STRQPalette.success : STRQPalette.warning)
+                } else {
+                    Text("kg")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundStyle(.tertiary)
+                        .textCase(.uppercase)
+                        .tracking(0.3)
+                }
             }
 
             Image(systemName: "chevron.right")
@@ -218,6 +235,22 @@ struct SessionHistoryView: View {
         Text("·")
             .font(.caption2)
             .foregroundStyle(.quaternary)
+    }
+
+    private func volumeDelta(for session: WorkoutSession) -> Double? {
+        guard let prev = sessions.first(where: { $0.startTime < session.startTime && $0.dayName == session.dayName && $0.isCompleted }) else { return nil }
+        guard prev.totalVolume > 0 else { return nil }
+        return (session.totalVolume - prev.totalVolume) / prev.totalVolume
+    }
+
+    private func sessionVerdictTag(session: WorkoutSession, hasPR: Bool, volumeDelta: Double?) -> (label: String, state: STRQPalette.State)? {
+        if hasPR { return ("PR", .gold) }
+        if let d = volumeDelta {
+            if d >= 0.05 { return ("Up", .success) }
+            if d <= -0.08 { return ("Down", .warning) }
+            return ("Held", .neutral)
+        }
+        return nil
     }
 
     private func logMetric(_ value: String, unit: String) -> some View {
@@ -241,6 +274,7 @@ struct SessionDetailView: View {
         ScrollView {
             VStack(spacing: 18) {
                 header
+                verdictBanner
                 statsRow
                 exercisesList
             }
@@ -268,6 +302,65 @@ struct SessionDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 4)
+    }
+
+    private var highlightResult: WorkoutHighlightBuilder.Result {
+        WorkoutHighlightBuilder.buildResult(
+            session: session,
+            history: vm.workoutHistory,
+            streak: vm.streak,
+            exerciseName: { id in vm.library.exercise(byId: id)?.name ?? id }
+        )
+    }
+
+    @ViewBuilder
+    private var verdictBanner: some View {
+        let result = highlightResult
+        let verdict = result.verdict
+        let state: STRQPalette.State = {
+            switch verdict.kind {
+            case .personalRecord: return .gold
+            case .bestSet, .volumeUp: return .success
+            case .volumeDown: return .warning
+            case .firstSession: return .info
+            case .consolidated: return .neutral
+            }
+        }()
+        let icon: String = {
+            switch verdict.kind {
+            case .personalRecord: return "trophy.fill"
+            case .bestSet: return "arrow.up.right"
+            case .volumeUp: return "chart.line.uptrend.xyaxis"
+            case .volumeDown: return "chart.line.downtrend.xyaxis"
+            case .firstSession: return "sparkles"
+            case .consolidated: return "checkmark.seal.fill"
+            }
+        }()
+
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(STRQPalette.color(for: state))
+                .frame(width: 36, height: 36)
+                .background(STRQPalette.soft(for: state), in: .rect(cornerRadius: 10))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(verdict.eyebrow)
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(1.1)
+                    .foregroundStyle(STRQPalette.color(for: state))
+                Text(verdict.summary)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(STRQPalette.color(for: state).opacity(0.2), lineWidth: 1)
+        )
     }
 
     private var statsRow: some View {

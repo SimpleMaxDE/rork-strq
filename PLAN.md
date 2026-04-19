@@ -88,3 +88,25 @@ Build forward from the gated foundation so opted-in users feel a clearly deeper,
 **Identity**
 - [x] Opt-out users unaffected — priority / drivers / projection only render when tracking is on
 - [x] No new color maps — all new surfaces use `STRQPalette` state colors
+
+---
+
+# Phase 10 — Progress / History Final Sharpness
+
+Make Progress and History feel like the single trustworthy record of what is actually changing.
+
+**Progress (`ProgressAnalyticsView`)**
+- [x] "What changed" strip above signal pills — ranked verdict (PR / progressing / flat / volume up/down / holding)
+- [x] Momentum breakdown card — Strength · Physique (opt-in) · Consistency as one integrated block
+- [x] Uses `STRQPalette` state colors; no new color maps
+- [x] Physique momentum row only renders when nutrition tracking is on
+
+**History (`SessionHistoryView`)**
+- [x] Per-row verdict tag (PR / Up / Held / Down) based on volume delta vs last same-day session
+- [x] Volume delta % replaces generic "kg" label when meaningful
+- [x] Same-day-name comparison for like-for-like progression reading
+
+**Session Detail (`SessionDetailView`)**
+- [x] Verdict banner at top built from `WorkoutHighlightBuilder` (same engine as completion screen)
+- [x] Eyebrow + summary + semantic color — session record is readable in under 1s
+- [x] Connects completion highlights to the historical record

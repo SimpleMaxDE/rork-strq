@@ -17,11 +17,19 @@ struct ProgressAnalyticsView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 4)
 
+                whatChangedStrip
+                    .padding(.horizontal, 16)
+
                 signalStrip
                     .padding(.horizontal, 16)
 
                 if !vm.isEarlyStage {
                     recentImprovementCard
+                        .padding(.horizontal, 16)
+                }
+
+                if !vm.isEarlyStage {
+                    momentumBreakdown
                         .padding(.horizontal, 16)
                 }
 
@@ -153,6 +161,195 @@ struct ProgressAnalyticsView: View {
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(.easeOut(duration: 0.5), value: appeared)
+    }
+
+    // MARK: - What Changed Strip
+
+    private var whatChangedStrip: some View {
+        let calendar = Calendar.current
+        let now = Date()
+        let weekAgo = calendar.date(byAdding: .day, value: -7, to: now) ?? now
+        let twoWeeksAgo = calendar.date(byAdding: .day, value: -14, to: now) ?? now
+        let thisWeek = vm.workoutHistory.filter { $0.startTime > weekAgo && $0.isCompleted }
+        let lastWeek = vm.workoutHistory.filter { $0.startTime > twoWeeksAgo && $0.startTime <= weekAgo && $0.isCompleted }
+        let volumeThis = thisWeek.reduce(0.0) { $0 + $1.totalVolume }
+        let volumeLast = lastWeek.reduce(0.0) { $0 + $1.totalVolume }
+        let progressing = vm.progressingExercises.count
+        let stalled = vm.stalledExercises.count
+        let prsThisWeek = vm.personalRecords.filter { $0.date > weekAgo }.count
+
+        let state: STRQPalette.State
+        let headline: String
+        let detail: String
+        let icon: String
+
+        if vm.isEarlyStage {
+            state = .info
+            icon = "waveform.path.ecg"
+            headline = "Calibrating your signal"
+            detail = "Log a few more sessions to unlock momentum."
+        } else if prsThisWeek > 0 {
+            state = .success
+            icon = "trophy.fill"
+            headline = "\(prsThisWeek) new PR\(prsThisWeek == 1 ? "" : "s") this week"
+            detail = progressing > 0 ? "\(progressing) lift\(progressing == 1 ? "" : "s") still progressing" : "Strength is moving"
+        } else if progressing > stalled && progressing > 0 {
+            state = .success
+            icon = "arrow.up.right"
+            headline = "\(progressing) lift\(progressing == 1 ? "" : "s") progressing"
+            detail = stalled > 0 ? "\(stalled) needs attention" : "Momentum on your side"
+        } else if stalled > progressing && stalled > 0 {
+            state = .warning
+            icon = "arrow.right"
+            headline = "\(stalled) lift\(stalled == 1 ? "" : "s") flat"
+            detail = progressing > 0 ? "\(progressing) still progressing" : "Consider a variation or reset"
+        } else if volumeThis > volumeLast && volumeLast > 0 {
+            let pct = Int((volumeThis - volumeLast) / volumeLast * 100)
+            state = .success
+            icon = "chart.line.uptrend.xyaxis"
+            headline = "Volume up \(pct)%"
+            detail = "More work than last week"
+        } else if volumeLast > 0 && volumeThis < volumeLast * 0.85 {
+            state = .warning
+            icon = "chart.line.downtrend.xyaxis"
+            headline = "Lighter week"
+            detail = "Volume down vs last week"
+        } else {
+            state = .neutral
+            icon = "equal.circle"
+            headline = "Holding steady"
+            detail = "Consistent output across the week"
+        }
+
+        return HStack(alignment: .center, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(STRQPalette.color(for: state))
+                .frame(width: 36, height: 36)
+                .background(STRQPalette.soft(for: state), in: .rect(cornerRadius: 10))
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
+                    Text("WHAT CHANGED")
+                        .font(.system(size: 9, weight: .black))
+                        .tracking(1.1)
+                        .foregroundStyle(.tertiary)
+                    Text("· 7 days")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(.quaternary)
+                }
+                Text(headline)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(STRQPalette.color(for: state).opacity(0.18), lineWidth: 1)
+        )
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 6)
+    }
+
+    // MARK: - Momentum Breakdown
+
+    @ViewBuilder
+    private var momentumBreakdown: some View {
+        let progressing = vm.progressingExercises
+        let stalled = vm.stalledExercises
+        let nutritionOn = vm.profile.nutritionTrackingEnabled
+        let physique = vm.physiqueOutcome
+
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                ForgeSectionHeader(title: "Momentum")
+                Spacer()
+                Text("by lift · body · streak")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.tertiary)
+            }
+
+            VStack(spacing: 8) {
+                momentumPill(
+                    icon: "arrow.up.right",
+                    title: "Strength",
+                    state: progressing.count > stalled.count ? .success : (stalled.count > 0 ? .warning : .neutral),
+                    detail: {
+                        if progressing.isEmpty && stalled.isEmpty { return "Calibrating" }
+                        var parts: [String] = []
+                        if !progressing.isEmpty { parts.append("\(progressing.count) progressing") }
+                        if !stalled.isEmpty { parts.append("\(stalled.count) flat") }
+                        return parts.joined(separator: " · ")
+                    }()
+                )
+
+                if nutritionOn, let physique {
+                    momentumPill(
+                        icon: "figure.arms.open",
+                        title: "Physique",
+                        state: mapVerdictState(physique.paceVerdict),
+                        detail: physique.summary ?? "Calibrating"
+                    )
+                }
+
+                momentumPill(
+                    icon: "flame.fill",
+                    title: "Consistency",
+                    state: vm.streak >= 7 ? .success : (vm.streak >= 3 ? .info : .neutral),
+                    detail: vm.streak > 0 ? "\(vm.streak)-day streak · \(vm.totalCompletedWorkouts) sessions logged" : "Start fresh today"
+                )
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 10)
+    }
+
+    private func momentumPill(icon: String, title: String, state: STRQPalette.State, detail: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(STRQPalette.color(for: state))
+                .frame(width: 26, height: 26)
+                .background(STRQPalette.soft(for: state), in: .rect(cornerRadius: 7))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(0.6)
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+                Text(detail)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+            Circle()
+                .fill(STRQPalette.color(for: state))
+                .frame(width: 6, height: 6)
+        }
+    }
+
+    private func mapVerdictState(_ v: PhysiquePaceVerdict) -> STRQPalette.State {
+        switch v {
+        case .onTrack, .aligned: return .success
+        case .tooSlow, .tooFast: return .warning
+        case .drifting: return .danger
+        case .noSignal: return .neutral
+        }
     }
 
     // MARK: - Signal Strip
