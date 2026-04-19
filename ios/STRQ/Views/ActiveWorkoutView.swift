@@ -132,8 +132,8 @@ struct ActiveWorkoutView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 14)
-        .padding(.bottom, 14)
+        .padding(.top, 26)
+        .padding(.bottom, 16)
     }
 
     private func progressStrip(_ workout: ActiveWorkoutState) -> some View {
