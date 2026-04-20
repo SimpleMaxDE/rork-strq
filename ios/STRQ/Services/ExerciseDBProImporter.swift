@@ -23,26 +23,36 @@ nonisolated final class ExerciseDBProImporter: Sendable {
 
     private let _exercises: [Exercise]
     private let _remoteGif: [String: String]
+    private let _familyByExerciseId: [String: String]
 
     var exercises: [Exercise] { _exercises }
+    var familyAssignments: [String: String] { _familyByExerciseId }
     func remoteGifURL(for id: String) -> String? { _remoteGif[id] }
+    func familyId(for exerciseId: String) -> String? { _familyByExerciseId[exerciseId] }
 
     private init() {
         guard let raws = Self.loadRaws() else {
             self._exercises = []
             self._remoteGif = [:]
+            self._familyByExerciseId = [:]
             return
         }
         var out: [Exercise] = []
         var gifs: [String: String] = [:]
+        var families: [String: String] = [:]
+        var seenFingerprints: Set<String> = []
         out.reserveCapacity(raws.count)
         for r in raws {
-            guard let ex = Self.normalize(r) else { continue }
-            out.append(ex)
-            if let g = r.gifUrl, !g.isEmpty { gifs[ex.id] = g }
+            guard let result = Self.normalize(r) else { continue }
+            if seenFingerprints.contains(result.fingerprint) { continue }
+            seenFingerprints.insert(result.fingerprint)
+            out.append(result.exercise)
+            if let g = r.gifUrl, !g.isEmpty { gifs[result.exercise.id] = g }
+            if let famId = result.familyId { families[result.exercise.id] = famId }
         }
         self._exercises = out
         self._remoteGif = gifs
+        self._familyByExerciseId = families
     }
 
     // MARK: - Load
@@ -61,15 +71,23 @@ nonisolated final class ExerciseDBProImporter: Sendable {
 
     private static let importedPrefix = "edb-"
 
-    private static func normalize(_ r: ExerciseDBProRaw) -> Exercise? {
+    struct NormalizedExercise {
+        let exercise: Exercise
+        let fingerprint: String
+        let familyId: String?
+    }
+
+    private static func normalize(_ r: ExerciseDBProRaw) -> NormalizedExercise? {
+        let cleanedName = cleanDisplayName(r.name)
+        guard !cleanedName.isEmpty else { return nil }
         let primary = mapPrimaryMuscle(r) ?? .coreStability
         let secondaries = r.secondaryMuscles.compactMap(mapMuscle).filter { $0 != primary }
         let equipment = normalizeEquipment(r.equipments)
         let isBodyweight = r.equipments.contains("body weight") || equipment == [.none] || equipment.isEmpty
-        let pattern = inferPattern(name: r.name, primary: primary, bodyParts: r.bodyParts)
-        let category = inferCategory(name: r.name, bodyParts: r.bodyParts, equipment: equipment, isBodyweight: isBodyweight)
-        let difficulty = inferDifficulty(name: r.name, equipment: equipment, category: category)
-        let jointFriendly = inferJointFriendly(name: r.name, equipment: equipment, pattern: pattern, category: category)
+        let pattern = inferPattern(name: cleanedName, primary: primary, bodyParts: r.bodyParts)
+        let category = inferCategory(name: cleanedName, bodyParts: r.bodyParts, equipment: equipment, isBodyweight: isBodyweight)
+        let difficulty = inferDifficulty(name: cleanedName, equipment: equipment, category: category)
+        let jointFriendly = inferJointFriendly(name: cleanedName, equipment: equipment, pattern: pattern, category: category)
         let worlds = inferWorlds(equipment: equipment, isBodyweight: isBodyweight, category: category, bodyParts: r.bodyParts)
         let location: LocationType = {
             if isBodyweight { return .anywhere }
@@ -81,10 +99,12 @@ nonisolated final class ExerciseDBProImporter: Sendable {
         let instructions = r.instructions.map { stripStepPrefix($0) }.filter { !$0.isEmpty }
         let shortDesc = buildShortDescription(primary: primary, secondaries: secondaries, equipment: equipment, pattern: pattern)
         let tags = buildTags(r: r, pattern: pattern, category: category)
+        let familyId = inferFamily(cleanName: cleanedName, primary: primary, pattern: pattern, isBodyweight: isBodyweight)
+        let fingerprint = makeFingerprint(cleanName: cleanedName, equipment: equipment, isBodyweight: isBodyweight)
 
-        return Exercise(
+        let exercise = Exercise(
             id: importedPrefix + r.exerciseId,
-            name: prettifyName(r.name),
+            name: prettifyName(cleanedName),
             primaryMuscle: primary,
             secondaryMuscles: Array(Set(secondaries)).sorted { $0.rawValue < $1.rawValue },
             category: category,
@@ -106,6 +126,145 @@ nonisolated final class ExerciseDBProImporter: Sendable {
             alternatives: [],
             tags: tags
         )
+        return NormalizedExercise(exercise: exercise, fingerprint: fingerprint, familyId: familyId)
+    }
+
+    // MARK: - Name cleanup / dedup
+
+    /// Strips raw third-party naming artifacts so display names feel STRQ-grade:
+    /// - removes `(male)` / `(female)` gender tags
+    /// - removes trailing `male` / `female`
+    /// - removes versioning noise like `v. 2` / trailing standalone digits
+    /// - collapses whitespace
+    private static func cleanDisplayName(_ raw: String) -> String {
+        var n = raw
+        let patterns: [(String, String)] = [
+            (#"\s*\((?i:male|female)\)\s*"#, " "),
+            (#"\s+(?i:male|female)\s*$"#, ""),
+            (#"\s+v\.\s*\d+\s*$"#, ""),
+            (#"\s+\d+\s*$"#, ""),
+            (#"\s+"#, " ")
+        ]
+        for (pattern, replacement) in patterns {
+            n = n.replacingOccurrences(of: pattern, with: replacement, options: .regularExpression)
+        }
+        return n.trimmingCharacters(in: .whitespaces)
+    }
+
+    /// Deterministic fingerprint that groups true duplicates together:
+    /// clean lowercased name + sorted normalized equipment set.
+    private static func makeFingerprint(cleanName: String, equipment: [Equipment], isBodyweight: Bool) -> String {
+        let eq: [String]
+        if equipment.isEmpty || equipment == [.none] || isBodyweight {
+            eq = ["bodyweight"]
+        } else {
+            eq = equipment.filter { $0 != .none }.map(\.rawValue).sorted()
+        }
+        return cleanName.lowercased() + "|" + eq.joined(separator: ",")
+    }
+
+    // MARK: - Family classification
+
+    /// Maps an imported exercise onto a curated STRQ family id based on name /
+    /// movement cues. Conservative — returns `nil` when no strong match exists
+    /// so imports don't dilute curated family coherence.
+    private static func inferFamily(cleanName: String, primary: MuscleGroup, pattern: MovementPattern, isBodyweight: Bool) -> String? {
+        let n = cleanName.lowercased()
+        // Rear delt / upper back isolations first (face pull can contain "pull")
+        if n.contains("face pull") || n.contains("reverse fly") || n.contains("rear delt") || n.contains("pull apart") || n.contains("rear deltoid") {
+            return "rear-delt-family"
+        }
+        // Presses
+        if n.contains("incline") && (n.contains("press") || n.contains("bench")) && !n.contains("row") && !n.contains("fly") && !n.contains("curl") && !n.contains("raise") {
+            return "incline-press-family"
+        }
+        if n.contains("bench press") || n.contains("chest press") || n.contains("floor press") {
+            return "bench-press-family"
+        }
+        if n.contains("fly") || n.contains("crossover") || n.contains("pec deck") {
+            return "chest-fly-family"
+        }
+        if n.contains("dip") && !n.contains("dip kickback") {
+            return "dip-family"
+        }
+        if n.contains("push-up") || n.contains("push up") || n.contains("pushup") {
+            if n.contains("pike") || n.contains("handstand") { return "overhead-push-bw-family" }
+            return "push-up-family"
+        }
+        // Pulls
+        if n.contains("pull-up") || n.contains("pull up") || n.contains("pullup") || n.contains("chin-up") || n.contains("chin up") || n.contains("muscle up") || n.contains("muscle-up") {
+            return "pull-up-family"
+        }
+        if n.contains("pulldown") || n.contains("lat pull") {
+            return "lat-pulldown-family"
+        }
+        if n.contains("pullover") {
+            return "pullover-family"
+        }
+        if n.contains("row") && !n.contains("upright") {
+            return "row-family"
+        }
+        if n.contains("shrug") {
+            return "shrug-family"
+        }
+        // Shoulders
+        if n.contains("lateral raise") || n.contains("side raise") || n.contains("side lateral") || n.contains("upright row") {
+            return "lateral-raise-family"
+        }
+        if n.contains("shoulder press") || n.contains("military press") || n.contains("overhead press") || n.contains("arnold press") || n.contains("push press") {
+            return "shoulder-press-family"
+        }
+        // Hinge
+        if n.contains("deadlift") || n.contains("rdl") || n.contains("romanian") || n.contains("good morning") || n.contains("stiff leg") || n.contains("stiff-leg") {
+            return "deadlift-family"
+        }
+        if n.contains("hip thrust") || n.contains("glute bridge") || n.contains("glute kickback") || n.contains("pull-through") || n.contains("pull through") {
+            return "hip-thrust-family"
+        }
+        if n.contains("swing") && (n.contains("kettlebell") || n.contains("dumbbell")) {
+            return "kettlebell-swing-family"
+        }
+        // Legs
+        if n.contains("lunge") || n.contains("split squat") || n.contains("step-up") || n.contains("step up") {
+            return "lunge-family"
+        }
+        if n.contains("squat") {
+            if isBodyweight || n.contains("pistol") || n.contains("cossack") || n.contains("shrimp") || n.contains("hindu squat") || n.contains("dragon") {
+                return "bw-squat-family"
+            }
+            return "squat-family"
+        }
+        if n.contains("leg curl") || n.contains("hamstring curl") || n.contains("nordic") {
+            return "hamstring-curl-family"
+        }
+        if n.contains("leg extension") || n.contains("sissy") {
+            return "quad-extension-family"
+        }
+        if n.contains("calf raise") || (primary == .calves && (n.contains("calf") || n.contains("heel raise"))) {
+            return "calf-raise-family"
+        }
+        // Arms
+        if n.contains("curl") && (primary == .biceps || n.contains("bicep") || n.contains("hammer") || n.contains("preacher") || n.contains("spider") || n.contains("concentration")) {
+            return "bicep-curl-family"
+        }
+        if n.contains("tricep") || n.contains("skull") || n.contains("pushdown") || n.contains("overhead extension") || n.contains("jm press") || n.contains("kickback") {
+            return "tricep-extension-family"
+        }
+        // Core
+        if n.contains("plank") || n.contains("dead bug") || n.contains("bird dog") || n.contains("hollow") || n.contains("body saw") {
+            return "plank-family"
+        }
+        if n.contains("crunch") || n.contains("sit-up") || n.contains("sit up") || n.contains("sitted") || n.contains("leg raise") || n.contains("v-up") || n.contains("v up") || n.contains("toe touch") || n.contains("flutter") || n.contains("bicycle crunch") {
+            return "crunch-family"
+        }
+        if n.contains("twist") || n.contains("wood chop") || n.contains("woodchop") || n.contains("pallof") || n.contains("rotation") {
+            return "rotation-family"
+        }
+        // Carries
+        if n.contains("farmer") || n.contains("carry") {
+            return "carry-family"
+        }
+        return nil
     }
 
     // MARK: - Muscle mapping
@@ -324,7 +483,8 @@ nonisolated final class ExerciseDBProImporter: Sendable {
         s.split(separator: " ").map { part -> String in
             let lower = part.lowercased()
             // Keep short grip/brand tokens uppercase
-            if ["ez", "trx", "rdl"].contains(lower) { return lower.uppercased() }
+            if ["ez", "trx", "rdl", "tk", "jm"].contains(lower) { return lower.uppercased() }
+            // Keep roman-like single letters uppercase when they follow a hyphen pattern
             return lower.prefix(1).uppercased() + lower.dropFirst()
         }.joined(separator: " ")
     }

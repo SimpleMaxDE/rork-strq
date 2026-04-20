@@ -223,3 +223,36 @@ Integrate the ExerciseDBPro dataset cleanly as an additive asset source, without
 
 **Generator gating (preparation only)**
 - [x] `PlanGenerator` / `ExerciseSelectionEngine` / `ProgressionEngine` continue to use `ExerciseLibrary.shared` — no blanket injection of imported ids into plan generation, substitution, or progression chains yet
+
+---
+
+# Phase 15 — Duplicate / Variant / Gender-Tag Cleanup + Family Curation
+
+Turn the imported ExerciseDBPro dataset into a cleaner, STRQ-grade catalog without weakening curated data.
+
+**Display-name cleanup (`ExerciseDBProImporter.cleanDisplayName`)**
+- [x] Strips `(male)` / `(female)` gender tags
+- [x] Strips trailing `male` / `female`
+- [x] Strips versioning noise (`v. 2`, trailing standalone digits)
+- [x] Collapses whitespace before prettifying
+- [x] Prettifier keeps short brand/grip tokens uppercased (EZ / TRX / RDL / JM)
+
+**Deterministic dedup**
+- [x] Fingerprint = cleaned name + sorted normalized equipment set (bodyweight collapsed)
+- [x] First-seen wins — `(male)` / `(female)` / `v. 2` duplicates dropped before they reach the catalog
+- [x] Reduces 1500 raw rows to ~1466 deduped exercises
+
+**Family curation (`ExerciseDBProImporter.inferFamily`)**
+- [x] Keyword-based assignment onto curated `ExerciseFamilyGroup` ids
+- [x] Conservative — unmatched imports stay family-less rather than diluting curated families
+- [x] Handles presses, pulls, rows, shoulders, hinge, squat, lunge, arms, core, rotation, carries
+- [x] Routes bodyweight squat progressions (pistol / cossack / shrimp / hindu) to the BW squat family
+
+**Family service (`ExerciseFamilyService`)**
+- [x] Folds importer assignments into `exerciseToFamily` so `edb-` ids resolve to curated families
+- [x] Curated `memberIds` stay canonical; imported variants surfaced via `importedMembers(for:)`
+- [x] `familyMembers(forExercise:)` returns curated first, then imported variants sorted by name
+
+**Integration surfaces**
+- [x] Library / Detail / Add / Swap consume cleaned names and curated-first family ordering
+- [x] Generator remains gated — no blanket injection into plan generation

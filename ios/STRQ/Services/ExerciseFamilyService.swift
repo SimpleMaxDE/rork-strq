@@ -6,6 +6,10 @@ struct ExerciseFamilyService {
     let families: [ExerciseFamilyGroup]
     private let familyMap: [String: ExerciseFamilyGroup]
     private let exerciseToFamily: [String: String]
+    /// Imported exercise ids grouped under their assigned curated family id.
+    /// Used to surface imported variants inside curated families without
+    /// polluting `ExerciseFamilyGroup.memberIds` (which stays curated-only).
+    private let importedByFamily: [String: [String]]
 
     private init() {
         let all = Self.buildFamilies()
@@ -18,8 +22,16 @@ struct ExerciseFamilyService {
                 eMap[memberId] = family.id
             }
         }
+        // Fold imported family assignments in so `family(forExercise:)` works
+        // for `edb-` ids and imported variants appear under curated families.
+        var imported: [String: [String]] = [:]
+        for (exerciseId, familyId) in ExerciseDBProImporter.shared.familyAssignments {
+            eMap[exerciseId] = familyId
+            imported[familyId, default: []].append(exerciseId)
+        }
         self.familyMap = fMap
         self.exerciseToFamily = eMap
+        self.importedByFamily = imported
     }
 
     func family(byId id: String) -> ExerciseFamilyGroup? {
@@ -31,10 +43,11 @@ struct ExerciseFamilyService {
         return familyMap[familyId]
     }
 
+    /// Curated + imported members for a family. Curated first to preserve
+    /// canonical ordering, then imported variants under the same family.
     func familyMembers(forExercise exerciseId: String) -> [Exercise] {
         guard let family = family(forExercise: exerciseId) else { return [] }
-        let library = ExerciseLibrary.shared
-        return family.memberIds.compactMap { library.exercise(byId: $0) }
+        return resolveMembers(family: family)
     }
 
     func progressionChain(forExercise exerciseId: String) -> [Exercise] {
@@ -53,6 +66,21 @@ struct ExerciseFamilyService {
         guard let family = family(forExercise: exerciseId) else { return [] }
         let library = ExerciseLibrary.shared
         return family.jointFriendlyIds.compactMap { library.exercise(byId: $0) }
+    }
+
+    /// Imported (ExerciseDBPro) variants grouped under a curated family.
+    func importedMembers(for familyId: String) -> [Exercise] {
+        guard let ids = importedByFamily[familyId] else { return [] }
+        let library = ExerciseLibrary.shared
+        return ids.compactMap { library.exercise(byId: $0) }
+            .sorted { $0.name < $1.name }
+    }
+
+    private func resolveMembers(family: ExerciseFamilyGroup) -> [Exercise] {
+        let library = ExerciseLibrary.shared
+        let curated = family.memberIds.compactMap { library.exercise(byId: $0) }
+        let imported = importedMembers(for: family.id)
+        return curated + imported
     }
 
     func families(forMuscle muscle: MuscleGroup) -> [ExerciseFamilyGroup] {
