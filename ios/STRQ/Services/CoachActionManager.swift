@@ -195,12 +195,46 @@ struct ExerciseSwapOption: Identifiable, Sendable {
     let exercise: Exercise
     let reason: String
     let tags: [String]
+    let intent: SwapIntent
+    let score: Double
+    let role: ReplacementRole
 
-    init(id: String = UUID().uuidString, exercise: Exercise, reason: String, tags: [String]) {
+    init(
+        id: String = UUID().uuidString,
+        exercise: Exercise,
+        reason: String,
+        tags: [String],
+        intent: SwapIntent,
+        score: Double,
+        role: ReplacementRole
+    ) {
         self.id = id
         self.exercise = exercise
         self.reason = reason
         self.tags = tags
+        self.intent = intent
+        self.score = score
+        self.role = role
+    }
+}
+
+nonisolated struct ExerciseSwapResults: Sendable {
+    let currentRole: ReplacementRole
+    let sections: [ExerciseSwapSection]
+
+    var isEmpty: Bool { sections.allSatisfy { $0.options.isEmpty } }
+    var flattened: [ExerciseSwapOption] { sections.flatMap(\.options) }
+}
+
+nonisolated struct ExerciseSwapSection: Identifiable, Sendable {
+    let id: String
+    let intent: SwapIntent
+    let options: [ExerciseSwapOption]
+
+    init(intent: SwapIntent, options: [ExerciseSwapOption]) {
+        self.id = intent.rawValue
+        self.intent = intent
+        self.options = options
     }
 }
 
@@ -366,7 +400,50 @@ struct CoachActionManager {
         recoveryScore: Int = 75,
         phase: TrainingPhase = .build
     ) -> [ExerciseSwapOption] {
-        guard library.exercise(byId: exerciseId) != nil else { return [] }
+        results(
+            for: exerciseId,
+            profile: profile,
+            progressionStates: progressionStates,
+            workoutHistory: workoutHistory,
+            recoveryScore: recoveryScore,
+            phase: phase
+        ).flattened
+    }
+
+    /// Intent-grouped swap results. Each intent runs its own ranking pass so
+    /// the sheet can present genuinely distinct replacement lists instead of
+    /// one generic ordering with labels.
+    func swapExerciseResults(
+        for exerciseId: String,
+        in plan: WorkoutPlan,
+        dayId: String,
+        profile: UserProfile,
+        progressionStates: [ExerciseProgressionState] = [],
+        workoutHistory: [WorkoutSession] = [],
+        recoveryScore: Int = 75,
+        phase: TrainingPhase = .build
+    ) -> ExerciseSwapResults {
+        results(
+            for: exerciseId,
+            profile: profile,
+            progressionStates: progressionStates,
+            workoutHistory: workoutHistory,
+            recoveryScore: recoveryScore,
+            phase: phase
+        )
+    }
+
+    private func results(
+        for exerciseId: String,
+        profile: UserProfile,
+        progressionStates: [ExerciseProgressionState],
+        workoutHistory: [WorkoutSession],
+        recoveryScore: Int,
+        phase: TrainingPhase
+    ) -> ExerciseSwapResults {
+        guard let original = library.exercise(byId: exerciseId) else {
+            return ExerciseSwapResults(currentRole: .accessory, sections: [])
+        }
 
         let selection = ExerciseSelectionEngine()
         let context = ExerciseSelectionContext(
@@ -376,15 +453,49 @@ struct CoachActionManager {
             recoveryScore: recoveryScore,
             phase: phase
         )
-        let ranked = selection.rankedSubstitutes(for: exerciseId, context: context, reason: .general, limit: 6)
+        let currentRole = selection.replacementRole(for: original)
 
-        return ranked.map { scored in
-            ExerciseSwapOption(
-                exercise: scored.exercise,
-                reason: scored.reasons.first ?? "Alternative",
-                tags: scored.tags
-            )
+        // Intent order is intentional — closest first, then variation, then
+        // the "what if" alternatives. Home / joint-friendly are contextual and
+        // come last so they don't crowd the default view.
+        var intents: [SwapIntent] = [.closest, .variation, .easier, .harder]
+        if !original.isJointFriendly { intents.append(.jointFriendly) }
+        if profile.trainingLocation != .gym || original.locationType == .gym {
+            intents.append(.home)
         }
+
+        var seen: Set<String> = []
+        var sections: [ExerciseSwapSection] = []
+
+        for intent in intents {
+            let ranked = selection.rankedSubstitutes(
+                for: exerciseId,
+                intent: intent,
+                context: context,
+                limit: 5
+            )
+            let options: [ExerciseSwapOption] = ranked.compactMap { scored in
+                // De-dupe across intents so the closest-match stays in .closest
+                // instead of repeating under .variation. Higher-priority intents
+                // win earlier iterations.
+                if seen.contains(scored.exercise.id) { return nil }
+                seen.insert(scored.exercise.id)
+                let candidateRole = selection.replacementRole(for: scored.exercise)
+                return ExerciseSwapOption(
+                    exercise: scored.exercise,
+                    reason: scored.reasons.first ?? intent.shortLabel,
+                    tags: scored.tags,
+                    intent: intent,
+                    score: scored.score,
+                    role: candidateRole
+                )
+            }
+            if !options.isEmpty {
+                sections.append(ExerciseSwapSection(intent: intent, options: options))
+            }
+        }
+
+        return ExerciseSwapResults(currentRole: currentRole, sections: sections)
     }
 
     func applyExerciseSwap(plan: inout WorkoutPlan, dayId: String, oldExerciseId: String, newExercise: Exercise) -> CoachAdjustment? {

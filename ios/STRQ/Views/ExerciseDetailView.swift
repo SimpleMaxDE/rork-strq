@@ -652,28 +652,53 @@ struct ExerciseDetailView: View {
     }
 
     private func unifiedAlternativeItems() -> [UnifiedAltItem] {
+        // Use the intent-ranked engine so the detail rail shows the same
+        // role-preserving, coach-grade alternatives as the swap sheet —
+        // curated first, followed by joint-friendly and home contexts.
         var seen: Set<String> = [exercise.id]
         var items: [UnifiedAltItem] = []
 
-        func add(_ ex: Exercise, reason: String, priority: Int) {
-            guard !seen.contains(ex.id) else { return }
-            seen.insert(ex.id)
-            items.append(UnifiedAltItem(exercise: ex, reason: reason, priority: priority))
+        let selection = ExerciseSelectionEngine()
+        let context = ExerciseSelectionContext(
+            profile: vm.profile,
+            progressionStates: vm.progressionStates,
+            workoutHistory: vm.workoutHistory,
+            recoveryScore: vm.effectiveRecoveryScore,
+            phase: vm.trainingPhaseState.currentPhase
+        )
+
+        func add(intent: SwapIntent, limit: Int, priority: Int) {
+            let ranked = selection.rankedSubstitutes(
+                for: exercise.id,
+                intent: intent,
+                context: context,
+                limit: limit
+            )
+            for scored in ranked {
+                if seen.contains(scored.exercise.id) { continue }
+                seen.insert(scored.exercise.id)
+                let reason = scored.reasons.first ?? intent.shortLabel
+                items.append(UnifiedAltItem(exercise: scored.exercise, reason: reason, priority: priority))
+            }
         }
 
-        for alt in library.alternatives(for: exercise) {
-            add(alt, reason: alternativeReason(alt), priority: 0)
-        }
+        add(intent: .closest, limit: 4, priority: 0)
+        add(intent: .variation, limit: 3, priority: 1)
         if !exercise.isJointFriendly {
-            for alt in library.jointFriendlyOptions(for: exercise) {
-                add(alt, reason: "Joint-friendly", priority: 1)
-            }
+            add(intent: .jointFriendly, limit: 2, priority: 2)
         }
         if exercise.locationType == .gym {
-            for alt in library.homeAlternatives(for: exercise) {
-                add(alt, reason: "Home option", priority: 2)
+            add(intent: .home, limit: 2, priority: 3)
+        }
+
+        if items.isEmpty {
+            for alt in library.alternatives(for: exercise) {
+                if seen.contains(alt.id) { continue }
+                seen.insert(alt.id)
+                items.append(UnifiedAltItem(exercise: alt, reason: alternativeReason(alt), priority: 0))
             }
         }
+
         return items.sorted { $0.priority < $1.priority }
     }
 

@@ -7,7 +7,8 @@ struct SwapExerciseSheet: View {
     let onSwap: (Exercise) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @State private var options: [ExerciseSwapOption] = []
+    @State private var results: ExerciseSwapResults = ExerciseSwapResults(currentRole: .accessory, sections: [])
+    @State private var selectedIntent: SwapIntent?
     @State private var selectedOption: ExerciseSwapOption?
     @State private var confirmed: Bool = false
     @State private var appeared: Bool = false
@@ -16,43 +17,24 @@ struct SwapExerciseSheet: View {
         vm.library.exercise(byId: exerciseId)
     }
 
-    private var groupedOptions: [(String, [ExerciseSwapOption])] {
-        var groups: [(String, [ExerciseSwapOption])] = []
-        var samePattern: [ExerciseSwapOption] = []
-        var sameTarget: [ExerciseSwapOption] = []
-        var jointFriendly: [ExerciseSwapOption] = []
-        var other: [ExerciseSwapOption] = []
+    private var availableIntents: [SwapIntent] {
+        results.sections.map(\.intent)
+    }
 
-        for opt in options {
-            if opt.tags.contains("Same pattern") {
-                samePattern.append(opt)
-            } else if opt.tags.contains("Same target") {
-                sameTarget.append(opt)
-            } else if opt.tags.contains("Joint-friendly") {
-                jointFriendly.append(opt)
-            } else {
-                other.append(opt)
-            }
+    private var visibleSections: [ExerciseSwapSection] {
+        if let intent = selectedIntent {
+            return results.sections.filter { $0.intent == intent }
         }
-
-        if !samePattern.isEmpty { groups.append(("Same Movement Pattern", samePattern)) }
-        if !sameTarget.isEmpty { groups.append(("Same Target Muscle", sameTarget)) }
-        if !jointFriendly.isEmpty { groups.append(("Joint-Friendly Options", jointFriendly)) }
-        if !other.isEmpty { groups.append(("Other Alternatives", other)) }
-
-        if groups.isEmpty && !options.isEmpty {
-            groups.append(("Alternatives", options))
-        }
-
-        return groups
+        return results.sections
     }
 
     var body: some View {
         VStack(spacing: 0) {
             headerBar
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: 18) {
                     currentExerciseCard
+                    if !availableIntents.isEmpty { intentFilterStrip }
                     alternativesList
                 }
                 .padding(.horizontal, 16)
@@ -61,44 +43,46 @@ struct SwapExerciseSheet: View {
         }
         .background(Color(.systemGroupedBackground))
         .onAppear {
-            options = vm.swapExerciseOptions(for: exerciseId, dayId: dayId)
+            results = vm.swapExerciseResults(for: exerciseId, dayId: dayId)
             withAnimation(.easeOut(duration: 0.4)) { appeared = true }
         }
     }
 
     private var headerBar: some View {
-        VStack(spacing: 12) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Swap Exercise")
-                        .font(.headline)
-                    Text("Choose a smart alternative")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                }
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Swap Exercise")
+                    .font(.headline)
+                Text("Role-preserving alternatives")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 8)
+            Spacer()
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+            }
         }
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .padding(.bottom, 8)
     }
 
     @ViewBuilder
     private var currentExerciseCard: some View {
         if let exercise = currentExercise {
             VStack(alignment: .leading, spacing: 10) {
-                Text("CURRENT")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.secondary)
-                    .tracking(0.5)
+                HStack(spacing: 8) {
+                    Text("CURRENT")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.secondary)
+                        .tracking(0.5)
+                    Spacer()
+                    roleBadge(results.currentRole)
+                }
 
                 HStack(spacing: 12) {
                     ZStack {
@@ -120,14 +104,6 @@ struct SwapExerciseSheet: View {
                             Text(exercise.movementPattern.displayName)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            if exercise.category == .compound {
-                                Text("Compound")
-                                    .font(.system(size: 9, weight: .semibold))
-                                    .foregroundStyle(.blue)
-                                    .padding(.horizontal, 5)
-                                    .padding(.vertical, 1)
-                                    .background(Color.blue.opacity(0.1), in: Capsule())
-                            }
                         }
                     }
                     Spacer()
@@ -140,9 +116,48 @@ struct SwapExerciseSheet: View {
         }
     }
 
+    private var intentFilterStrip: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 8) {
+                intentChip(nil, label: "All", systemImage: "square.grid.2x2.fill")
+                ForEach(availableIntents) { intent in
+                    intentChip(intent, label: intent.label, systemImage: intent.symbolName)
+                }
+            }
+            .padding(.vertical, 2)
+        }
+        .scrollIndicators(.hidden)
+        .opacity(appeared ? 1 : 0)
+        .animation(.easeOut(duration: 0.4).delay(0.05), value: appeared)
+    }
+
+    private func intentChip(_ intent: SwapIntent?, label: String, systemImage: String) -> some View {
+        let isSelected = selectedIntent == intent
+        let accent = intent.map(intentColor) ?? STRQBrand.steel
+        return Button {
+            withAnimation(STRQMotion.tap) {
+                selectedIntent = intent
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 11, weight: .semibold))
+                Text(label)
+                    .font(.caption.weight(.semibold))
+            }
+            .foregroundStyle(isSelected ? .white : accent)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                Capsule().fill(isSelected ? accent : accent.opacity(0.12))
+            )
+        }
+        .buttonStyle(.strqPressable)
+    }
+
     private var alternativesList: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            if options.isEmpty {
+        VStack(alignment: .leading, spacing: 18) {
+            if results.isEmpty {
                 VStack(spacing: 12) {
                     Image(systemName: "magnifyingglass")
                         .font(.title2)
@@ -154,22 +169,8 @@ struct SwapExerciseSheet: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 32)
             } else {
-                ForEach(Array(groupedOptions.enumerated()), id: \.offset) { _, group in
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(spacing: 6) {
-                            Image(systemName: groupIcon(group.0))
-                                .font(.caption)
-                                .foregroundStyle(groupColor(group.0))
-                            Text(group.0.uppercased())
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundStyle(.secondary)
-                                .tracking(0.5)
-                        }
-
-                        ForEach(group.1) { option in
-                            swapOptionCard(option)
-                        }
-                    }
+                ForEach(visibleSections) { section in
+                    intentSection(section)
                 }
             }
         }
@@ -177,18 +178,47 @@ struct SwapExerciseSheet: View {
         .animation(.easeOut(duration: 0.4).delay(0.1), value: appeared)
     }
 
+    private func intentSection(_ section: ExerciseSwapSection) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: section.intent.symbolName)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(intentColor(section.intent))
+                    .frame(width: 22, height: 22)
+                    .background(intentColor(section.intent).opacity(0.14), in: .rect(cornerRadius: 6))
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(section.intent.label.uppercased())
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(.primary)
+                        .tracking(0.6)
+                    Text(section.intent.shortLabel)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
+
+            VStack(spacing: 8) {
+                ForEach(section.options) { option in
+                    swapOptionCard(option)
+                }
+            }
+        }
+    }
+
     private func swapOptionCard(_ option: ExerciseSwapOption) -> some View {
         let isSelected = selectedOption?.id == option.id
-        let accentColor: Color = isSelected ? .green : .blue
+        let accent = intentColor(option.intent)
+        let showConfirm = isSelected && !confirmed
         return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 12) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(accentColor.opacity(0.1))
-                        .frame(width: 48, height: 48)
+                        .fill(accent.opacity(0.12))
+                        .frame(width: 44, height: 44)
                     Image(systemName: option.exercise.primaryMuscle.symbolName)
                         .font(.title3)
-                        .foregroundStyle(accentColor)
+                        .foregroundStyle(accent)
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
@@ -205,18 +235,20 @@ struct SwapExerciseSheet: View {
                 if isSelected && confirmed {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.title3)
-                        .foregroundStyle(.green)
+                        .foregroundStyle(STRQPalette.success)
                 }
             }
 
             HStack(spacing: 6) {
-                ForEach(option.tags, id: \.self) { tag in
+                roleChip(option.role, preserved: option.role == results.currentRole)
+
+                ForEach(option.tags.prefix(2), id: \.self) { tag in
                     Text(tag)
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(tagColor(tag))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(tagColor(tag).opacity(0.1), in: Capsule())
+                        .background(tagColor(tag).opacity(0.12), in: Capsule())
                 }
 
                 Spacer()
@@ -236,7 +268,7 @@ struct SwapExerciseSheet: View {
                 }
             }
 
-            if isSelected && !confirmed {
+            if showConfirm {
                 Button {
                     withAnimation(.snappy(duration: 0.3)) {
                         confirmed = true
@@ -255,7 +287,7 @@ struct SwapExerciseSheet: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 44)
                     .foregroundStyle(.white)
-                    .background(Color.green.gradient, in: .rect(cornerRadius: 12))
+                    .background(STRQPalette.success.gradient, in: .rect(cornerRadius: 12))
                 }
                 .buttonStyle(.strqPressable)
                 .sensoryFeedback(.success, trigger: confirmed)
@@ -263,11 +295,11 @@ struct SwapExerciseSheet: View {
             }
         }
         .padding(14)
-        .background(isSelected ? Color.green.opacity(0.04) : Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .background(isSelected ? STRQPalette.success.opacity(0.05) : Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
         .overlay {
             if isSelected {
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(Color.green.opacity(0.3), lineWidth: 1)
+                    .stroke(STRQPalette.success.opacity(0.35), lineWidth: 1)
             }
         }
         .contentShape(.rect(cornerRadius: 14))
@@ -280,31 +312,74 @@ struct SwapExerciseSheet: View {
         .sensoryFeedback(.selection, trigger: isSelected)
     }
 
-    private func groupIcon(_ group: String) -> String {
-        switch group {
-        case "Same Movement Pattern": return "arrow.triangle.2.circlepath"
-        case "Same Target Muscle": return "scope"
-        case "Joint-Friendly Options": return "hand.thumbsup.fill"
-        default: return "star.fill"
+    private func roleBadge(_ role: ReplacementRole) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: roleIcon(role))
+                .font(.system(size: 9, weight: .bold))
+            Text(role.displayName.uppercased())
+                .font(.system(size: 10, weight: .bold))
+                .tracking(0.5)
+        }
+        .foregroundStyle(roleColor(role))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(roleColor(role).opacity(0.14), in: Capsule())
+    }
+
+    private func roleChip(_ role: ReplacementRole, preserved: Bool) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: preserved ? "checkmark.shield.fill" : roleIcon(role))
+                .font(.system(size: 9, weight: .bold))
+            Text(preserved ? "Same role" : role.displayName)
+                .font(.system(size: 10, weight: .semibold))
+        }
+        .foregroundStyle(preserved ? STRQPalette.success : roleColor(role))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background((preserved ? STRQPalette.success : roleColor(role)).opacity(0.12), in: Capsule())
+    }
+
+    private func roleIcon(_ role: ReplacementRole) -> String {
+        switch role {
+        case .anchor: "bolt.fill"
+        case .secondary: "circle.grid.cross.fill"
+        case .accessory: "scope"
+        case .isolation: "target"
+        case .warmup: "flame.fill"
+        case .mobility: "figure.flexibility"
         }
     }
 
-    private func groupColor(_ group: String) -> Color {
-        switch group {
-        case "Same Movement Pattern": return .purple
-        case "Same Target Muscle": return .blue
-        case "Joint-Friendly Options": return .green
-        default: return STRQBrand.steel
+    private func roleColor(_ role: ReplacementRole) -> Color {
+        switch role {
+        case .anchor: .primary
+        case .secondary: STRQPalette.info
+        case .accessory, .isolation: STRQBrand.steel
+        case .warmup: STRQPalette.warning
+        case .mobility: STRQPalette.success
+        }
+    }
+
+    private func intentColor(_ intent: SwapIntent) -> Color {
+        switch intent {
+        case .closest: STRQPalette.info
+        case .variation: .purple
+        case .easier: STRQPalette.success
+        case .harder: STRQPalette.warning
+        case .jointFriendly: STRQPalette.success
+        case .home: STRQBrand.steel
         }
     }
 
     private func tagColor(_ tag: String) -> Color {
         switch tag {
-        case "Same target": return .blue
+        case "Same target": return STRQPalette.info
         case "Same pattern": return .purple
-        case "Joint-friendly": return .green
+        case "Joint-friendly": return STRQPalette.success
         case "Minimal equipment": return STRQBrand.steel
         case "Easier": return .teal
+        case "Harder": return STRQPalette.warning
+        case "Same family": return .purple
         default: return .secondary
         }
     }
@@ -319,9 +394,9 @@ struct SwapExerciseSheet: View {
 
     private func difficultyColor(_ difficulty: ExerciseDifficulty) -> Color {
         switch difficulty {
-        case .beginner: return .green
+        case .beginner: return STRQPalette.success
         case .intermediate: return STRQBrand.steel
-        case .advanced: return .red
+        case .advanced: return STRQPalette.warning
         }
     }
 }

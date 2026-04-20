@@ -902,6 +902,22 @@ class AppViewModel {
         )
     }
 
+    func swapExerciseResults(for exerciseId: String, dayId: String) -> ExerciseSwapResults {
+        guard let plan = currentPlan else {
+            return ExerciseSwapResults(currentRole: .accessory, sections: [])
+        }
+        return actionManager.swapExerciseResults(
+            for: exerciseId,
+            in: plan,
+            dayId: dayId,
+            profile: profile,
+            progressionStates: progressionStates,
+            workoutHistory: workoutHistory,
+            recoveryScore: recoveryScore,
+            phase: trainingPhaseState.currentPhase
+        )
+    }
+
     func applyExerciseSwap(dayId: String, oldExerciseId: String, newExercise: Exercise) {
         guard var plan = currentPlan else { return }
         if let adjustment = actionManager.applyExerciseSwap(plan: &plan, dayId: dayId, oldExerciseId: oldExerciseId, newExercise: newExercise) {

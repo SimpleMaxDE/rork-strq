@@ -41,6 +41,46 @@ struct ExerciseSelectionEngine {
     private let familyService = ExerciseFamilyService.shared
     private let readiness = ImportedExerciseReadinessService.shared
 
+    // MARK: - Role inference (engine-side)
+
+    /// Derive the coaching role of an exercise from its catalog shape. Used to
+    /// preserve role during substitution — an anchor should not casually swap
+    /// into an isolation, and vice versa.
+    func replacementRole(for exercise: Exercise) -> ReplacementRole {
+        switch exercise.category {
+        case .warmup: return .warmup
+        case .mobility, .recovery: return .mobility
+        case .isolation: return .isolation
+        case .bodyweight:
+            return exercise.progressionLevel == .progression ? .secondary : .accessory
+        case .compound:
+            switch exercise.movementPattern {
+            case .squat, .hipHinge, .horizontalPush, .verticalPush, .horizontalPull, .verticalPull:
+                return .anchor
+            default:
+                return .secondary
+            }
+        case .cardio, .pilates:
+            return .accessory
+        }
+    }
+
+    private func difficultyRank(_ d: ExerciseDifficulty) -> Int {
+        switch d {
+        case .beginner: 0
+        case .intermediate: 1
+        case .advanced: 2
+        }
+    }
+
+    private func rolesMatch(_ a: ReplacementRole, _ b: ReplacementRole) -> Bool {
+        if a == b { return true }
+        // Accessory and isolation are mutually compatible — both are
+        // low-priority volume work with overlapping prescriptions.
+        if (a == .accessory && b == .isolation) || (a == .isolation && b == .accessory) { return true }
+        return false
+    }
+
     // MARK: - Score a candidate as a substitute for another exercise
 
     func score(
@@ -54,6 +94,25 @@ struct ExerciseSelectionEngine {
         var tags: [String] = []
 
         let profile = context.profile
+
+        // Role preservation — strongest structural constraint.
+        let originalRole = replacementRole(for: original)
+        let candidateRole = replacementRole(for: candidate)
+        if rolesMatch(originalRole, candidateRole) {
+            s += 22
+        } else {
+            // Penalize role mismatch heavily so an anchor never casually
+            // becomes an isolation (and vice versa).
+            switch (originalRole, candidateRole) {
+            case (.anchor, .isolation), (.anchor, .accessory),
+                 (.isolation, .anchor), (.accessory, .anchor):
+                s -= 50
+            case (.anchor, .secondary), (.secondary, .anchor):
+                s -= 8
+            default:
+                s -= 18
+            }
+        }
 
         if candidate.movementPattern == original.movementPattern {
             s += 18
@@ -146,19 +205,15 @@ struct ExerciseSelectionEngine {
             break
         }
 
-        let primaryReason: String = {
-            if let r = reasons.first { return r }
-            if candidate.movementPattern == original.movementPattern && candidate.primaryMuscle == original.primaryMuscle {
-                return "Same pattern and target muscle"
-            }
-            if candidate.primaryMuscle == original.primaryMuscle {
-                return "Hits \(original.primaryMuscle.displayName.lowercased()) from a different angle"
-            }
-            if candidate.isJointFriendly && !original.isJointFriendly {
-                return "Lower joint stress alternative"
-            }
-            return "Alternative for \(original.primaryMuscle.displayName.lowercased())"
-        }()
+        let primaryReason: String = Self.buildPrimaryReason(
+            candidate: candidate,
+            original: original,
+            originalRole: originalRole,
+            candidateRole: candidateRole,
+            reasons: reasons,
+            reason: reason,
+            profile: profile
+        )
 
         var combinedReasons = [primaryReason]
         for r in reasons where r != primaryReason { combinedReasons.append(r) }
@@ -172,7 +227,124 @@ struct ExerciseSelectionEngine {
         )
     }
 
-    // MARK: - Ranked substitutes
+    // MARK: - Intent-ranked substitutes
+
+    /// Ranked substitutes for a specific swap intent. The engine filters and
+    /// re-weights the pool so each intent produces a genuinely different
+    /// list — not the same ranking with a tag stamped on.
+    func rankedSubstitutes(
+        for exerciseId: String,
+        intent: SwapIntent,
+        context: ExerciseSelectionContext,
+        limit: Int = 5
+    ) -> [ScoredExercise] {
+        guard let original = library.exercise(byId: exerciseId) else { return [] }
+
+        let baseReason: ReplacementReason = {
+            switch intent {
+            case .closest: .samePattern
+            case .variation: .general
+            case .easier: .easier
+            case .harder: .harder
+            case .jointFriendly: .injuryAvoidance
+            case .home: .equipmentUnavailable
+            }
+        }()
+
+        let pool = candidatePool(for: original)
+        let originalRole = replacementRole(for: original)
+
+        let scored: [ScoredExercise] = pool.compactMap { candidate -> ScoredExercise? in
+            // Intent-level filters — if the candidate can't satisfy the intent,
+            // don't let it surface at all. This keeps each mode distinct.
+            switch intent {
+            case .closest:
+                guard candidate.movementPattern == original.movementPattern else { return nil }
+                guard candidate.primaryMuscle == original.primaryMuscle ||
+                      candidate.secondaryMuscles.contains(original.primaryMuscle) else { return nil }
+            case .variation:
+                let sameFamily = familyService.family(forExercise: original.id)?.memberIds.contains(candidate.id) == true
+                let importedSibling = familyService.family(forExercise: original.id).flatMap { fam in
+                    familyService.importedMembers(for: fam.id).contains(where: { $0.id == candidate.id })
+                } ?? false
+                guard sameFamily || importedSibling else { return nil }
+            case .easier:
+                guard candidate.difficulty.rawValue <= original.difficulty.rawValue || candidate.isBeginnerFriendly else { return nil }
+                guard rolesMatch(replacementRole(for: candidate), originalRole) else { return nil }
+            case .harder:
+                guard candidate.difficulty.rawValue >= original.difficulty.rawValue else { return nil }
+                guard rolesMatch(replacementRole(for: candidate), originalRole) else { return nil }
+            case .jointFriendly:
+                guard candidate.isJointFriendly else { return nil }
+                guard rolesMatch(replacementRole(for: candidate), originalRole) else { return nil }
+            case .home:
+                guard candidate.locationType == .anywhere ||
+                      candidate.locationType == .homeNoEquipment ||
+                      candidate.locationType == .homeGym else { return nil }
+            }
+
+            if candidate.id.hasPrefix("edb-") && !readiness.isEligibleForSubstitution(candidate.id) {
+                return nil
+            }
+
+            var result = score(candidate: candidate, replacing: original, context: context, reason: baseReason)
+
+            // Intent-specific bonuses — sharpen ranking per mode so the top
+            // result feels intentional rather than generic.
+            var bonus: Double = 0
+            switch intent {
+            case .closest:
+                if candidate.primaryMuscle == original.primaryMuscle { bonus += 8 }
+                if candidate.category == original.category { bonus += 4 }
+            case .variation:
+                if candidate.equipment != original.equipment { bonus += 6 }
+            case .easier:
+                let diff = difficultyRank(original.difficulty) - difficultyRank(candidate.difficulty)
+                bonus += Double(max(0, diff)) * 6
+                if candidate.isBeginnerFriendly { bonus += 4 }
+            case .harder:
+                let diff = difficultyRank(candidate.difficulty) - difficultyRank(original.difficulty)
+                bonus += Double(max(0, diff)) * 6
+            case .jointFriendly:
+                bonus += 10
+                if candidate.equipment.contains(.machine) || candidate.equipment.contains(.cable) { bonus += 4 }
+            case .home:
+                if candidate.locationType == .anywhere || candidate.locationType == .homeNoEquipment { bonus += 10 }
+                if candidate.isBodyweight { bonus += 6 }
+            }
+            result = ScoredExercise(
+                id: result.id,
+                exercise: result.exercise,
+                score: result.score + bonus,
+                reasons: result.reasons,
+                tags: result.tags
+            )
+
+            guard result.score > 0 else { return nil }
+            return result
+        }
+
+        return Array(scored.sorted { $0.score > $1.score }.prefix(limit))
+    }
+
+    /// Build the candidate pool for an exercise — curated members across
+    /// family + alternatives + muscle matches, plus imported family siblings
+    /// that clear the substitution-readiness gate.
+    private func candidatePool(for original: Exercise) -> [Exercise] {
+        var pool: Set<String> = []
+        if let family = familyService.family(forExercise: original.id) {
+            pool.formUnion(family.memberIds)
+            for imported in familyService.importedMembers(for: family.id) {
+                if readiness.isEligibleForSubstitution(imported.id) {
+                    pool.insert(imported.id)
+                }
+            }
+        }
+        for alt in library.alternatives(for: original) { pool.insert(alt.id) }
+        for ex in library.exercises(forMuscle: original.primaryMuscle) { pool.insert(ex.id) }
+        pool.remove(original.id)
+        return pool.compactMap { library.exercise(byId: $0) }
+    }
 
     func rankedSubstitutes(
         for exerciseId: String,
@@ -345,6 +517,50 @@ struct ExerciseSelectionEngine {
             return progressing
         }
         return familyStates.first
+    }
+
+    // MARK: - Reason building
+
+    private static func buildPrimaryReason(
+        candidate: Exercise,
+        original: Exercise,
+        originalRole: ReplacementRole,
+        candidateRole: ReplacementRole,
+        reasons: [String],
+        reason: ReplacementReason,
+        profile: UserProfile
+    ) -> String {
+        if let r = reasons.first { return r }
+
+        switch reason {
+        case .injuryAvoidance:
+            return "Lower joint stress \(candidateRole.displayName.lowercased())"
+        case .equipmentUnavailable:
+            if candidate.isBodyweight { return "No equipment needed" }
+            if candidate.locationType == .anywhere || candidate.locationType == .homeNoEquipment {
+                return "Works with your home setup"
+            }
+        case .easier:
+            return "Easier \(candidateRole.displayName.lowercased()) on the same pattern"
+        case .harder:
+            return "Harder progression on the same pattern"
+        case .samePattern, .general:
+            break
+        }
+
+        if candidate.movementPattern == original.movementPattern && candidate.primaryMuscle == original.primaryMuscle {
+            return "Same pattern, same target"
+        }
+        if candidate.movementPattern == original.movementPattern {
+            return "Same \(original.movementPattern.displayName.lowercased()) pattern"
+        }
+        if candidate.primaryMuscle == original.primaryMuscle {
+            return "Hits \(original.primaryMuscle.displayName.lowercased()) from a different angle"
+        }
+        if candidate.isJointFriendly && !original.isJointFriendly {
+            return "Lower joint stress alternative"
+        }
+        return "Alternative for \(original.primaryMuscle.displayName.lowercased())"
     }
 
     // Adherence heuristic: how often the user actually logged this exercise

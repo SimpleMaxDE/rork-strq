@@ -290,3 +290,55 @@ Build a quality-gated activation layer so imported ExerciseDBPro exercises can b
 **Trust / debugging**
 - [x] `byTier()` grouping available for internal curation review
 - [x] Per-exercise `factors` + `gaps` on each score for future promotion tooling
+
+---
+
+# Phase 17 — Smart Swap / Alternative Intelligence 2.0
+
+Turn STRQ's swap/alternative system into a stronger coaching capability with role preservation, intent-aware ranking, and genuinely distinct replacement modes.
+
+**Model (`SwapIntent.swift`)**
+- [x] `SwapIntent` — closest / variation / easier / harder / jointFriendly / home
+- [x] `ReplacementRole` — anchor / secondary / accessory / isolation / warmup / mobility (engine-side)
+- [x] Each intent carries its own label, short label, and SF Symbol
+
+**Engine (`ExerciseSelectionEngine`)**
+- [x] `replacementRole(for:)` infers coaching role from category + pattern + progression
+- [x] Role preservation as primary structural constraint (+22 match, −50 anchor↔isolation, −18 default mismatch)
+- [x] Accessory ↔ isolation treated as compatible — others penalized
+- [x] `rankedSubstitutes(for:intent:context:limit:)` — per-intent filtering and bonus weighting
+- [x] Intent-specific hard filters (closest must match pattern; variation must be same family; home must not be gym-locked; joint-friendly requires joint-friendly flag)
+- [x] Intent-specific bonuses (difficulty delta for easier/harder; bodyweight boost for home; machine/cable boost for joint-friendly)
+- [x] Shared `candidatePool(for:)` — curated family + alternatives + muscle matches + readiness-gated imported siblings
+- [x] Reason builder rewrites primary reason from role + intent context (no generic fallback labels)
+
+**Manager (`CoachActionManager`)**
+- [x] `ExerciseSwapOption` extended with `intent`, `score`, `role`
+- [x] `ExerciseSwapResults` + `ExerciseSwapSection` — intent-grouped results with current role
+- [x] `swapExerciseResults(...)` runs one pass per intent and de-dupes across sections (higher-priority intent wins)
+- [x] Joint-friendly only appears when the original isn't already joint-friendly
+- [x] Home only appears for home users or when the original is gym-locked
+- [x] Legacy `swapExerciseOptions(...)` preserved via `.flattened` for ToleranceEngine / CoachActionManager callers
+
+**Swap Sheet (`SwapExerciseSheet`)**
+- [x] Current exercise card shows the inferred role badge
+- [x] Intent filter strip — All / Closest / Variation / Easier / Harder / Joint-Friendly / Home
+- [x] Intent sections with icon, label, short descriptor
+- [x] Per-option role chip — "Same role" check when role is preserved, falls back to candidate role otherwise
+- [x] Intent-colored accent per option (info / purple / success / warning / steel)
+- [x] Reasons feel like coach explanations, not generic similarity matches
+
+**Exercise Detail alternatives rail (`ExerciseDetailView`)**
+- [x] `unifiedAlternativeItems()` rebuilt on top of the intent engine
+- [x] Closest (4) → Variation (3) → Joint-friendly (2, only if not already joint-friendly) → Home (2, only if gym-locked)
+- [x] De-duped across intents; falls back to curated alternatives if engine returns nothing
+
+**AppViewModel**
+- [x] `swapExerciseResults(for:dayId:)` exposes intent-grouped results to views
+- [x] Existing `swapExerciseOptions(...)` preserved for unchanged callers
+
+**Identity**
+- [x] Curated STRQ exercises remain canonical — imported siblings only surface when readiness ≥ substitution
+- [x] Role preservation is enforced at the engine level, not patched in UI
+- [x] `STRQPalette` state colors only — no new color maps
+- [x] Reasons stay concise and coach-grade
