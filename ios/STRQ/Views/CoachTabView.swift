@@ -33,6 +33,37 @@ struct CoachTabView: View {
                     }
                     calibrationChecklist
                 } else {
+                    if let comeback = vm.comebackGuidance {
+                        ComebackCard(
+                            guidance: comeback,
+                            onEaseNext: comeback.offersLighterSession ? {
+                                Analytics.shared.track(.comeback_cta_tapped, [
+                                    "action": "ease",
+                                    "tier": comeback.tier.rawValue,
+                                    "surface": "coach"
+                                ])
+                                vm.applyComebackLighterSession()
+                            } : nil,
+                            onCheckIn: vm.hasCheckedInToday ? nil : {
+                                Analytics.shared.track(.comeback_cta_tapped, [
+                                    "action": "checkin",
+                                    "tier": comeback.tier.rawValue,
+                                    "surface": "coach"
+                                ])
+                                showReadinessCheckIn = true
+                            }
+                        )
+                        .opacity(appeared ? 1 : 0)
+                        .offset(y: appeared ? 0 : 10)
+                        .animation(.easeOut(duration: 0.5).delay(0.04), value: appeared)
+                        .onAppear {
+                            Analytics.shared.track(.comeback_card_viewed, [
+                                "tier": comeback.tier.rawValue,
+                                "days_since": String(comeback.daysSinceLastWorkout),
+                                "surface": "coach"
+                            ])
+                        }
+                    }
                     decisionStack
                 }
 

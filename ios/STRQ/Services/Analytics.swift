@@ -114,6 +114,12 @@ nonisolated enum AnalyticsEvent: String {
     case activation_step_unlocked
     case rest_day_guidance_viewed
 
+    // Retention / Comeback (Phase 22)
+    case comeback_card_viewed
+    case comeback_cta_tapped
+    case comeback_ease_applied
+    case lapse_tier_entered
+
     // Coach
     case coach_viewed
     case coach_action_applied

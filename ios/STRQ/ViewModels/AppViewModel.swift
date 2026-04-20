@@ -1858,6 +1858,76 @@ class AppViewModel {
 
     var isEarlyStage: Bool { dataMaturityTier < .established }
 
+    // MARK: - Comeback / Habit-Loop Intelligence (Phase 22)
+
+    private static let comebackEngine = ComebackEngine()
+
+    /// Date of the most recent completed workout, used for lapse detection.
+    var lastCompletedWorkoutDate: Date? {
+        workoutHistory.first(where: \.isCompleted)?.startTime
+    }
+
+    /// Date of the most recent any-activity signal (workout or readiness check-in).
+    var lastActiveDate: Date? {
+        let dates: [Date] = [
+            lastCompletedWorkoutDate,
+            readinessHistory.first?.date
+        ].compactMap { $0 }
+        return dates.max()
+    }
+
+    /// Derived retention signals describing how far the user has drifted from
+    /// their expected training cadence. Always safe to read — returns `.inRhythm`
+    /// for fresh or still-activating users.
+    var retentionSignals: RetentionSignals {
+        Self.comebackEngine.evaluate(
+            lastWorkoutDate: lastCompletedWorkoutDate,
+            lastReadinessDate: readinessHistory.first?.date,
+            hasActiveWorkout: activeWorkout != nil,
+            daysPerWeek: profile.daysPerWeek,
+            hasCompletedOnboarding: hasCompletedOnboarding,
+            totalCompletedWorkouts: totalCompletedWorkouts
+        )
+    }
+
+    /// Current lapse tier — surfaces for UI and notifications.
+    var lapseTier: LapseTier { retentionSignals.tier }
+
+    /// True when the user is in a drift/pause/absence state that deserves a
+    /// comeback surface. Always false during active workouts or activation.
+    var needsComeback: Bool {
+        // Activation flow owns the early-stage user — don't double-surface.
+        guard !isEarlyStage else { return false }
+        return lapseTier.needsComeback
+    }
+
+    /// Full comeback guidance for the current lapse state, or nil when the
+    /// user is in rhythm (no card should render).
+    var comebackGuidance: ComebackGuidance? {
+        guard needsComeback else { return nil }
+        return Self.comebackEngine.guidance(
+            signals: retentionSignals,
+            hasWorkoutToday: todaysWorkout != nil,
+            hasNextScheduledWorkout: nextScheduledWorkoutDate != nil
+        )
+    }
+
+    /// Apply the comeback engine's suggested lighter-session to the next
+    /// scheduled training day. Uses the same lighter-session preview plumbing
+    /// as the weekly check-in, so the plan edit shows up in the change log.
+    @discardableResult
+    func applyComebackLighterSession() -> Bool {
+        guard let dayId = nextSessionDayId else { return false }
+        guard previewLighterSession(for: dayId) != nil else { return false }
+        applyLighterSession(dayId: dayId)
+        Analytics.shared.track(.comeback_ease_applied, [
+            "tier": lapseTier.rawValue,
+            "days_since": String(retentionSignals.daysSinceLastWorkout)
+        ])
+        return true
+    }
+
+
     var earlyStateGuidance: EarlyStateGuidance? {
         let tier = dataMaturityTier
         switch tier {

@@ -87,6 +87,7 @@ final class ReminderWidgetCoordinator {
             isEarlyStage: isEarlyStage,
             isRestDay: isRestDay,
             lastActiveDate: lastActive,
+            lapseTier: vm.lapseTier,
             missingBodyWeightDays: missingWeightDays,
             missingSleepDays: missingSleepDays,
             readinessBucket: vm.readinessBucket,

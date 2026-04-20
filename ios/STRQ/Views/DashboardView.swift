@@ -33,6 +33,34 @@ struct DashboardView: View {
                                 "surface": "today"
                             ])
                         }
+                } else if let comeback = vm.comebackGuidance {
+                    ComebackCard(
+                        guidance: comeback,
+                        onEaseNext: comeback.offersLighterSession ? {
+                            Analytics.shared.track(.comeback_cta_tapped, [
+                                "action": "ease",
+                                "tier": comeback.tier.rawValue,
+                                "surface": "today"
+                            ])
+                            vm.applyComebackLighterSession()
+                        } : nil,
+                        onCheckIn: vm.hasCheckedInToday ? nil : {
+                            Analytics.shared.track(.comeback_cta_tapped, [
+                                "action": "checkin",
+                                "tier": comeback.tier.rawValue,
+                                "surface": "today"
+                            ])
+                            showReadinessCheckIn = true
+                        }
+                    )
+                    .padding(.horizontal, 16)
+                    .onAppear {
+                        Analytics.shared.track(.comeback_card_viewed, [
+                            "tier": comeback.tier.rawValue,
+                            "days_since": String(comeback.daysSinceLastWorkout),
+                            "surface": "today"
+                        ])
+                    }
                 } else if let guidance = vm.earlyStateGuidance {
                     earlyStageHint(guidance)
                         .padding(.horizontal, 16)

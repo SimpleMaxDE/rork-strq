@@ -459,3 +459,58 @@ Improve activation so more users complete session 1, come back for session 2, an
 - [x] Premium dark identity preserved — no gamification, no fake urgency
 - [x] Coach authority intact — roadmap frames learning, not rewards
 - [x] Disappears cleanly once the user is established (tier ≥ `.established`)
+
+---
+
+# Phase 22 — Habit Loop / Missed-Session Recovery / Comeback Intelligence
+
+Make STRQ meaningfully better at keeping users engaged past week one and at bringing them back intelligently after missed sessions. Calm, adult, coach-grade — no guilt, no streak shaming, no fake urgency.
+
+**Lapse model (`ComebackEngine.swift`)**
+- [x] `LapseTier` — inRhythm / shortDrift / pause / extendedBreak / longAbsence (ordered, `Comparable`)
+- [x] `LapseTier.needsComeback` gates UI/notifications so comeback surfaces never fight activation
+- [x] `RetentionSignals` — derived projection of days-since-workout, days-since-activity, planned cadence, active-workout state
+- [x] `ComebackGuidance` with stance (resume / ease / ramp / rebuild), headline, detail, steps, and lighter-session offer flag
+
+**Engine (`ComebackEngine`)**
+- [x] `evaluate(...)` — maps cadence signals to a lapse tier, using a `plannedCadence(daysPerWeek:)` budget so drift doesn't fire on normal rest days
+- [x] Fresh / activating users always return `.inRhythm` — comeback never double-surfaces on session 0
+- [x] Active workouts short-circuit to `.inRhythm` — resume-flow owns the moment
+- [x] `guidance(...)` returns nil when `.inRhythm` / `.shortDrift` — no card, no guilt
+- [x] Pause / extendedBreak / longAbsence each carry distinct stance, steps, icon, and color tint
+- [x] Lighter-session re-entry is only offered on extendedBreak / longAbsence
+
+**AppViewModel wiring**
+- [x] `lastCompletedWorkoutDate` and `lastActiveDate` derived from history + readiness — single source for retention reads
+- [x] `retentionSignals`, `lapseTier`, `needsComeback`, `comebackGuidance` exposed to views
+- [x] `isEarlyStage` suppresses comeback so activation roadmap stays the primary surface in week one
+- [x] `applyComebackLighterSession()` reuses `previewLighterSession` / `applyLighterSession` so the change flows into the coaching-memory change log
+
+**ComebackCard UI (`ComebackCard.swift`)**
+- [x] Tier eyebrow + compact "Xd since last session" chip in the header
+- [x] Headline + coach-grade detail tailored to pause / extendedBreak / longAbsence
+- [x] Bulleted re-entry steps block (adult framing, never guilt-based)
+- [x] Contextual CTA row: Check-in (when today's check-in is missing) + Ease next session (when engine offers it)
+- [x] `STRQBrand` / `STRQPalette` only — no new color maps
+
+**Surfaces**
+- [x] Today (`DashboardView`) — comeback slot sits between activation-roadmap and legacy early-stage hint, so only one primary re-entry signal ever shows
+- [x] Coach (`CoachTabView`) — comeback appears above the decision stack for non-early-stage users
+- [x] Both surfaces fire `comeback_card_viewed` analytics on appearance with tier + days-since + surface
+
+**Notifications (`NotificationScheduler`)**
+- [x] `ScheduleInput.lapseTier` propagated from `ReminderWidgetCoordinator`
+- [x] `scheduleInactivityNudge` branches on tier — 3d pause / 7d extended / 14d long, each with distinct calm copy
+- [x] Early-stage / in-rhythm users keep the softer 4-day nudge — no regression for the activation window
+
+**Retention analytics (`Analytics.AnalyticsEvent`)**
+- [x] `comeback_card_viewed` — tier + days-since + surface
+- [x] `comeback_cta_tapped` — action (ease / checkin) + tier + surface
+- [x] `comeback_ease_applied` — tier + days-since (fires when lighter-session is staged via the engine path)
+- [x] `lapse_tier_entered` reserved for future lapse-transition instrumentation
+
+**Identity**
+- [x] Calm, adult tone — "rebuild, don't retest" over "don't break your streak"
+- [x] Comeback is coach guidance, not gamification — no streak mechanics added
+- [x] Curated premium surface — single card, high signal, no noisy re-entry feed
+- [x] Never surfaces on activation, during a live workout, or within planned cadence

@@ -62,6 +62,7 @@ final class NotificationScheduler {
         let isEarlyStage: Bool
         let isRestDay: Bool
         let lastActiveDate: Date?
+        let lapseTier: LapseTier
         let missingBodyWeightDays: Int
         let missingSleepDays: Int
         let readinessBucket: String
@@ -302,21 +303,51 @@ final class NotificationScheduler {
         guard let last = input.lastActiveDate else { return }
 
         let calendar = Calendar.current
-        let daysSince = calendar.dateComponents([.day], from: last, to: Date()).day ?? 0
-        // Schedule a come-back nudge 4 days after last activity, only if we're approaching that.
-        guard daysSince < 4 else { return }
 
-        guard let targetDay = calendar.date(byAdding: .day, value: 4, to: calendar.startOfDay(for: last)) else { return }
+        // Comeback-tier aware re-entry nudge. Tier thresholds come from the
+        // ComebackEngine so notifications, UI, and analytics share one source
+        // of truth for lapse state.
+        let (daysAhead, title, body): (Int, String, String) = {
+            switch input.lapseTier {
+            case .inRhythm, .shortDrift:
+                // Soft 4-day check-in — matches the Phase-21 behavior for users still roughly in rhythm.
+                return (
+                    4,
+                    "Back when you're ready",
+                    input.isEarlyStage
+                        ? "A single clean session rebuilds momentum."
+                        : "One session back keeps your plan honest. No pressure."
+                )
+            case .pause:
+                return (
+                    3,
+                    "Pick up where you left off",
+                    "A couple of days off is fine. Your next session is still the right move — no reset needed."
+                )
+            case .extendedBreak:
+                return (
+                    7,
+                    "Ease back in",
+                    "STRQ will lighten your first session back. Comebacks hold when the re-entry is soft."
+                )
+            case .longAbsence:
+                return (
+                    14,
+                    "Rebuild, don't retest",
+                    "Treat this week like a rebuild block. Lighter sessions now mean real gains in two weeks."
+                )
+            }
+        }()
+
+        guard let targetDay = calendar.date(byAdding: .day, value: daysAhead, to: calendar.startOfDay(for: last)) else { return }
         var comps = calendar.dateComponents([.year, .month, .day], from: targetDay)
         comps.hour = 18
         comps.minute = 0
         guard let fireDate = calendar.date(from: comps), fireDate > Date() else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Back when you're ready"
-        content.body = input.isEarlyStage
-            ? "A single clean session rebuilds momentum."
-            : "One session back keeps your plan honest. No pressure."
+        content.title = title
+        content.body = body
         content.sound = .default
 
         let trigger = UNCalendarNotificationTrigger(
