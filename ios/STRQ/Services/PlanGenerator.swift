@@ -551,6 +551,17 @@ struct PlanGenerator {
 
         var candidates = curated + imported
 
+        // Location equipment guardrail — home-no-equipment plans must never
+        // carry barbell / machine / cable movements even if the curated
+        // candidate leaked in through a mobility/anywhere tag. Harness-driven
+        // safety net for Phase 19.
+        if profile.trainingLocation == .homeNoEquipment {
+            let disallowed: Set<Equipment> = [.barbell, .machine, .smithMachine, .cable, .dipStation]
+            candidates = candidates.filter { ex in
+                !ex.equipment.contains(where: { disallowed.contains($0) })
+            }
+        }
+
         if !profile.availableEquipment.isEmpty && profile.trainingLocation != .gym {
             candidates = candidates.filter { ex in
                 ex.equipment.contains(.none) || ex.equipment.contains(where: { profile.availableEquipment.contains($0) })

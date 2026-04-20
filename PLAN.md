@@ -371,3 +371,36 @@ Selectively promote high-confidence imported exercises into real plan generation
 - [x] Role fit preserved through the generation gate — no accidental anchor pollution
 - [x] Safe-first activation — caps prevent sudden dramatic plan-personality shifts
 - [x] Plans feel richer where coverage was thin (home / joint-friendly / machine variants) without feeling random
+
+---
+
+# Phase 19 — Generator QA / Scenario Stress Test
+
+Stress test `PlanGenerator` across realistic user scenarios so weak spots, strange outputs, and quality regressions are caught before further expansion.
+
+**Diagnostics model (`PlanDiagnostics.swift`)**
+- [x] `PlanWarningSeverity` — info / warning / critical (ordered, Codable)
+- [x] `PlanWarning` — severity + message per issue
+- [x] `PlanDayDiagnostic` — per-day exercise count, total sets, role breakdown, imported count, dominant patterns, overloaded muscles, warnings
+- [x] `PlanScenarioDiagnostic` — split name, profile summary, totals, imported ratio, weekly volume, days, scenario-level warnings, max severity, total warnings
+- [x] `PlanQAReport` — scenario list + aggregate counts (critical / warning scenarios, total warnings)
+
+**Scenario harness (`PlanQAHarness`)**
+- [x] Core matrix: 3 levels × 5 day-counts × 8 goals × 3 locations (pruned for impossible goal/day combos)
+- [x] Edge cases: low recovery, push phase advanced, deload, rebalance with lagging muscles, shoulder/knee injuries, low/high recovery capacity, focus/neglect muscles, 30-min and 90-min sessions
+- [x] Each scenario runs the real `PlanGenerator.generate(...)` end-to-end
+
+**Output sanity checks**
+- [x] Day-level warnings: sparse session, session density high, pattern overload (>2 same pattern), muscle emphasis, missing anchor on strength/hypertrophy/athletic plans
+- [x] Scenario-level warnings: empty plan, zero exercises, imported ratio >40%, strength-plan imported ratio >25%, limited muscle coverage
+- [x] Safety criticals: barbell movement in no-equipment plan, unresolved exercise ids
+- [x] Goal-fit checks: non-joint-friendly compounds in rehab/flexibility plans
+- [x] Repetition checks: same exercise appearing 3+ times across a short week
+
+**Generator guardrails (Phase 19 safety net)**
+- [x] Home-no-equipment plans hard-filter barbell / machine / smith / cable / dip-station out of every candidate pool, regardless of readiness score
+
+**Identity**
+- [x] QA harness is internal-only — no user-facing debug UI
+- [x] Diagnostics are repeatable: future generator changes are checked against the same scenario matrix
+- [x] Curated quality bar preserved — harness surfaces regressions, guardrails prevent known failure modes
