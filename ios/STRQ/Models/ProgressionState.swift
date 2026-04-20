@@ -168,6 +168,54 @@ nonisolated enum TrainingPhase: String, Codable, Sendable, CaseIterable {
         case .rebalance: return -0.5
         }
     }
+
+    /// Short coach-voice label for what this phase is optimizing.
+    var optimizingFor: String {
+        switch self {
+        case .build: return "Work capacity & rhythm"
+        case .push: return "Progressive overload"
+        case .fatigueManagement: return "Protect recovery, hold fitness"
+        case .deload: return "Supercompensate & reset"
+        case .rebalance: return "Close weak-point gaps"
+        }
+    }
+
+    /// How hard training should feel inside this phase.
+    var expectedIntensityLabel: String {
+        switch self {
+        case .build: return "Moderate"
+        case .push: return "Hard"
+        case .fatigueManagement: return "Easier"
+        case .deload: return "Light"
+        case .rebalance: return "Moderate"
+        }
+    }
+
+    /// Typical block length in weeks — used for week-in-block progress read.
+    var typicalWeeks: Int {
+        switch self {
+        case .build: return 3
+        case .push: return 4
+        case .fatigueManagement: return 2
+        case .deload: return 1
+        case .rebalance: return 3
+        }
+    }
+
+    /// The phase STRQ most commonly shifts into after a successful run here.
+    var typicalNextPhase: TrainingPhase {
+        switch self {
+        case .build: return .push
+        case .push: return .fatigueManagement
+        case .fatigueManagement: return .push
+        case .deload: return .build
+        case .rebalance: return .build
+        }
+    }
+
+    var shortLabel: String {
+        displayName.replacingOccurrences(of: " Phase", with: "")
+    }
 }
 
 nonisolated struct ExerciseProgressionState: Identifiable, Codable, Sendable {

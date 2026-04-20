@@ -16,6 +16,7 @@ final class CoachingCoordinator {
     private let volumeEngine = SmartVolumeEngine()
     private let adaptiveEngine = AdaptivePrescriptionEngine()
     private let planEvolutionEngine = PlanEvolutionEngine()
+    private let phaseOutlookEngine = PhaseOutlookEngine()
     private let toleranceEngine = ToleranceEngine()
     private let physiqueEngine = PhysiqueIntelligenceEngine()
 
@@ -32,6 +33,21 @@ final class CoachingCoordinator {
         refreshNextBestAction()
         refreshCoachingInsights()
         refreshPlanQuality()
+        refreshPhaseOutlook()
+    }
+
+    func refreshPhaseOutlook() {
+        let trend = vm.recoveryTrendData.map(\.score)
+        vm.phaseOutlook = phaseOutlookEngine.analyze(
+            phaseState: vm.trainingPhaseState,
+            progressionStates: vm.progressionStates,
+            recoveryTrend: trend,
+            recoveryScore: vm.recoveryScore,
+            workoutHistory: vm.workoutHistory,
+            muscleBalance: vm.muscleBalance,
+            planEvolutionSignals: vm.planEvolutionSignals,
+            profile: vm.profile
+        )
     }
 
     func refreshCoachingInsights() {

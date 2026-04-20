@@ -110,3 +110,44 @@ Make Progress and History feel like the single trustworthy record of what is act
 - [x] Verdict banner at top built from `WorkoutHighlightBuilder` (same engine as completion screen)
 - [x] Eyebrow + summary + semantic color — session record is readable in under 1s
 - [x] Connects completion highlights to the historical record
+
+---
+
+# Phase 12 — Long-Term Adaptation / Mesocycle Clarity
+
+Make STRQ feel like a true adaptive system over weeks and blocks — users understand the phase they're in, why, and what's coming next.
+
+**Phase metadata (`TrainingPhase`)**
+- [x] `optimizingFor` string — what this phase is chasing (overload / recovery / weak-points / rhythm)
+- [x] `expectedIntensityLabel` — how training should feel inside the phase
+- [x] `typicalWeeks` — typical block length used for week-in-block reads
+- [x] `typicalNextPhase` — most common successor
+- [x] `shortLabel` convenience
+
+**`PhaseOutlookEngine` (new)**
+- [x] Interprets current phase + recovery trend + progression + muscle balance + plan-evolution signals
+- [x] Produces `PhaseOutlook` with week-in-block, progress fraction, block intent, week intent
+- [x] Predicts next phase with direction (hold / advance / consolidate / rebalance) and earned reason
+- [x] Likelihood tier (settled / building / likely soon / ready) — never random
+- [x] Optional driver line ("3 lifts progressing · recovery steady") surfaces the why
+
+**ViewModel wiring**
+- [x] `AppViewModel.phaseOutlook: PhaseOutlook?`
+- [x] `CoachingCoordinator.refreshPhaseOutlook()` runs in `refreshIntelligence()` after plan-evolution signals
+
+**`PhaseOutlookCard` UI**
+- [x] Phase + week-in-block header with likelihood badge
+- [x] Progress track tinted with accent gradient over typical length
+- [x] Block intent (what this block is optimizing for)
+- [x] "This week" intent line (what to do right now)
+- [x] Next shift block with direction icon, target phase, earned reason, driver line
+- [x] Compact style for Train tab
+
+**Surfaces**
+- [x] Coach tab — full card between decision stack and weekly check-in (non-early-stage only)
+- [x] Train tab — compact card under exercise stack, above Review & Start
+
+**Identity**
+- [x] `STRQPalette` semantic state colors only (no new color maps)
+- [x] Coach authority preserved — outlook is decisive, never hedged when data supports it
+- [x] No analytics-lab clutter — single card, high signal

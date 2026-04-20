@@ -35,6 +35,7 @@ class AppViewModel {
     var trainingPhaseState: TrainingPhaseState = TrainingPhaseState()
     var planQuality: PlanQualityScore?
     var nextBestAction: NextBestAction?
+    var phaseOutlook: PhaseOutlook?
     var volumeLandmarks: [VolumeLandmark] = []
     var balanceInsights: [BalanceInsight] = []
     var volumeGuidance: [VolumeGuidance] = []

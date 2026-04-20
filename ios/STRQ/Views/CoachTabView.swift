@@ -23,6 +23,13 @@ struct CoachTabView: View {
                     decisionStack
                 }
 
+                if !vm.isEarlyStage, let outlook = vm.phaseOutlook {
+                    PhaseOutlookCard(outlook: outlook)
+                        .opacity(appeared ? 1 : 0)
+                        .offset(y: appeared ? 0 : 10)
+                        .animation(.easeOut(duration: 0.5).delay(0.12), value: appeared)
+                }
+
                 weeklyCheckInRow
             }
             .padding(.horizontal, 16)

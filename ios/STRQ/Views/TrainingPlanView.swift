@@ -294,6 +294,12 @@ struct TrainingPlanView: View {
                 exerciseStack(day: day)
                     .padding(.horizontal, 16)
 
+                if let outlook = vm.phaseOutlook {
+                    PhaseOutlookCard(outlook: outlook, style: .compact)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 4)
+                }
+
                 if !day.isSkipped {
                     ForgePrimaryButton(icon: "bolt.fill", title: "Review & Start") {
                         vm.prepareWorkoutHandoff(day: day)
