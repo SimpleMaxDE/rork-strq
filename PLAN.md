@@ -151,3 +151,33 @@ Make STRQ feel like a true adaptive system over weeks and blocks — users under
 - [x] `STRQPalette` semantic state colors only (no new color maps)
 - [x] Coach authority preserved — outlook is decisive, never hedged when data supports it
 - [x] No analytics-lab clutter — single card, high signal
+
+---
+
+# Phase 13 — Trust / Explainability / Change Log
+
+Make STRQ's adaptive behavior easier to understand and trust by clearly showing what changed, why, when, and what it means now.
+
+**Model**
+- [x] `CoachAdjustment` extended with `driver`, `expectation`, and `scope` (session / week / block)
+- [x] Tolerant `Codable` decode so pre-Phase-13 snapshots load cleanly
+- [x] `CoachActionManager` populates driver + expectation for every adjustment type
+
+**Engine (`CoachingMemoryService`)**
+- [x] Unified, read-only timeline across adjustments, phase shifts, high-confidence plan-evolution signals, and physique verdicts
+- [x] Per-entry state (success / warning / danger / info / neutral) mapped to `STRQPalette`
+- [x] Status line per entry ("Active this week" / "Staged for next session" / "Block entered")
+- [x] Legacy-safe defaults for adjustments persisted before Phase 13
+
+**UI (`CoachingHistoryView`)**
+- [x] Premium, compact change-log sheet with scope badges, driver (WHY), and expectation (WHAT IT MEANS NOW)
+- [x] Bridge strip at the top connecting today / this week / this block
+- [x] Empty state that frames the log as future coaching memory
+
+**Coach tab surfaces**
+- [x] Inline "Recent change" bridge card on Coach tab that deep-links to the full log
+- [x] Neutral "Coaching memory" affordance shown when nothing has changed yet
+
+**Phase shifts**
+- [x] Applying a deload now records a phase transition in `phaseHistory`, feeding the timeline
+- [x] `recordPhaseShift(to:reason:)` on `AppViewModel` for future coach-driven shifts

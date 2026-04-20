@@ -8,8 +8,23 @@ nonisolated struct CoachAdjustment: Identifiable, Codable, Sendable {
     let description: String
     let details: [AdjustmentDetail]
     let originalState: AdjustmentSnapshot?
+    // Phase 13 — explainability metadata. All optional for backward-compatible decode.
+    let driver: String?          // the strongest reason this change happened
+    let expectation: String?     // what the user should expect now / how training should feel
+    let scope: AdjustmentScope?  // session / week / block — decides ordering in the log
 
-    init(id: String = UUID().uuidString, type: CoachAdjustmentType, dayId: String, appliedAt: Date = Date(), description: String, details: [AdjustmentDetail], originalState: AdjustmentSnapshot? = nil) {
+    init(
+        id: String = UUID().uuidString,
+        type: CoachAdjustmentType,
+        dayId: String,
+        appliedAt: Date = Date(),
+        description: String,
+        details: [AdjustmentDetail],
+        originalState: AdjustmentSnapshot? = nil,
+        driver: String? = nil,
+        expectation: String? = nil,
+        scope: AdjustmentScope? = nil
+    ) {
         self.id = id
         self.type = type
         self.dayId = dayId
@@ -17,7 +32,37 @@ nonisolated struct CoachAdjustment: Identifiable, Codable, Sendable {
         self.description = description
         self.details = details
         self.originalState = originalState
+        self.driver = driver
+        self.expectation = expectation
+        self.scope = scope
     }
+
+    // Tolerant decode so snapshots persisted before Phase 13 (which lacked
+    // driver / expectation / scope) still load cleanly.
+    private enum CodingKeys: String, CodingKey {
+        case id, type, dayId, appliedAt, description, details, originalState
+        case driver, expectation, scope
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decode(String.self, forKey: .id)
+        self.type = try c.decode(CoachAdjustmentType.self, forKey: .type)
+        self.dayId = try c.decode(String.self, forKey: .dayId)
+        self.appliedAt = try c.decode(Date.self, forKey: .appliedAt)
+        self.description = try c.decode(String.self, forKey: .description)
+        self.details = try c.decode([AdjustmentDetail].self, forKey: .details)
+        self.originalState = try c.decodeIfPresent(AdjustmentSnapshot.self, forKey: .originalState)
+        self.driver = try c.decodeIfPresent(String.self, forKey: .driver)
+        self.expectation = try c.decodeIfPresent(String.self, forKey: .expectation)
+        self.scope = try c.decodeIfPresent(AdjustmentScope.self, forKey: .scope)
+    }
+}
+
+nonisolated enum AdjustmentScope: String, Codable, Sendable {
+    case session   // one day edited
+    case week      // whole-week action (regenerate / deload)
+    case block     // phase-level
 }
 
 nonisolated enum CoachAdjustmentType: String, Codable, Sendable {
@@ -220,12 +265,16 @@ struct CoachActionManager {
             }
         }
 
+        let dayName = plan.days[dayIndex].name
         return CoachAdjustment(
             type: .volumeReduced,
             dayId: dayId,
-            description: "Volume reduced: \(preview.originalTotalSets) → \(preview.newTotalSets) sets",
+            description: "Volume reduced on \(dayName): \(preview.originalTotalSets) → \(preview.newTotalSets) sets",
             details: details,
-            originalState: snapshot
+            originalState: snapshot,
+            driver: "Recovery was trending low — less accessory work protects the compound work that matters.",
+            expectation: "\(dayName) should feel noticeably easier. Quality over quantity on the remaining sets.",
+            scope: .session
         )
     }
 
@@ -294,12 +343,16 @@ struct CoachActionManager {
             }
         }
 
+        let dayName = plan.days[dayIndex].name
         return CoachAdjustment(
             type: .lighterSession,
             dayId: dayId,
-            description: "Lighter session applied",
+            description: "Lighter session staged for \(dayName)",
             details: details,
-            originalState: snapshot
+            originalState: snapshot,
+            driver: "Fatigue signals were stacking — one deliberately lighter session protects the week.",
+            expectation: "\(dayName) should feel 1–2 RPE easier. Expect to leave the gym with reps in reserve.",
+            scope: .session
         )
     }
 
@@ -348,7 +401,10 @@ struct CoachActionManager {
             dayId: dayId,
             description: "Swapped \(oldName) → \(newExercise.name)",
             details: [AdjustmentDetail(exerciseName: newExercise.name, change: "Replaced \(oldName)")],
-            originalState: snapshot
+            originalState: snapshot,
+            driver: "\(oldName) wasn't moving — \(newExercise.name) opens a fresher stimulus on the same pattern.",
+            expectation: "Start lighter on \(newExercise.name) to calibrate, then rebuild load from there.",
+            scope: .session
         )
     }
 
@@ -446,7 +502,10 @@ struct CoachActionManager {
             dayId: "week-all",
             description: "Week regenerated by Coach",
             details: details,
-            originalState: nil
+            originalState: nil,
+            driver: "Coach rebalanced volume and selection around your recent signal — not a reset, a recalibration.",
+            expectation: "Expect sharper focus on lagging muscles and a cleaner distribution across your days.",
+            scope: .week
         )
 
         return (adjustment, oldPlan)
@@ -548,7 +607,10 @@ struct CoachActionManager {
             dayId: "week-all",
             description: "Deload week applied",
             details: details,
-            originalState: nil
+            originalState: nil,
+            driver: "Accumulated fatigue earned a deload — lower stress now sets up the next push block.",
+            expectation: "Training should feel clearly lighter this week. Leave reps in reserve everywhere.",
+            scope: .block
         )
 
         return (adjustment, oldPlan)

@@ -8,6 +8,7 @@ struct CoachTabView: View {
     @State private var showWeeklyReview: Bool = false
     @State private var showReadinessCheckIn: Bool = false
     @State private var showMoreSignals: Bool = false
+    @State private var showCoachingHistory: Bool = false
     @State private var toast: STRQToast?
     @State private var lastAppliedCount: Int = 0
 
@@ -29,6 +30,8 @@ struct CoachTabView: View {
                         .offset(y: appeared ? 0 : 10)
                         .animation(.easeOut(duration: 0.5).delay(0.12), value: appeared)
                 }
+
+                recentChangeBridge
 
                 weeklyCheckInRow
             }
@@ -63,6 +66,14 @@ struct CoachTabView: View {
         .sheet(isPresented: $showMoreSignals) {
             NavigationStack {
                 MoreSignalsSheet(vm: vm)
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationContentInteraction(.scrolls)
+        }
+        .sheet(isPresented: $showCoachingHistory) {
+            NavigationStack {
+                CoachingHistoryView(vm: vm)
             }
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
@@ -540,6 +551,82 @@ struct CoachTabView: View {
             RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
         )
+    }
+
+    // MARK: - Recent Change Bridge
+
+    @ViewBuilder
+    private var recentChangeBridge: some View {
+        let timeline = CoachingMemoryService().buildTimeline(
+            adjustments: vm.coachAdjustments,
+            phaseState: vm.trainingPhaseState,
+            planEvolutionSignals: vm.planEvolutionSignals,
+            outlook: vm.phaseOutlook,
+            physique: vm.physiqueOutcome,
+            activeWeekAdjustment: vm.weekAdjustmentActive,
+            nutritionTrackingEnabled: vm.profile.nutritionTrackingEnabled,
+            limit: 1
+        )
+        if let latest = timeline.first {
+            Button {
+                showCoachingHistory = true
+                Analytics.shared.track(.coach_viewed, ["surface": "memory_bridge"])
+            } label: {
+                CoachMemoryBridgeRow(entry: latest, totalCount: totalMemoryCount)
+            }
+            .buttonStyle(.plain)
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+            .animation(.easeOut(duration: 0.5).delay(0.16), value: appeared)
+        } else if !vm.isEarlyStage {
+            Button {
+                showCoachingHistory = true
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(STRQBrand.steel)
+                        .frame(width: 24, height: 24)
+                        .background(STRQBrand.steelGradient.opacity(0.5), in: .rect(cornerRadius: 7))
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Coaching memory")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        Text("No changes yet — every decision will be logged here.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.quaternary)
+                }
+                .padding(12)
+                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                )
+            }
+            .buttonStyle(.plain)
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+            .animation(.easeOut(duration: 0.5).delay(0.16), value: appeared)
+        }
+    }
+
+    private var totalMemoryCount: Int {
+        CoachingMemoryService().buildTimeline(
+            adjustments: vm.coachAdjustments,
+            phaseState: vm.trainingPhaseState,
+            planEvolutionSignals: vm.planEvolutionSignals,
+            outlook: vm.phaseOutlook,
+            physique: vm.physiqueOutcome,
+            activeWeekAdjustment: vm.weekAdjustmentActive,
+            nutritionTrackingEnabled: vm.profile.nutritionTrackingEnabled,
+            limit: 30
+        ).count
     }
 
     // MARK: - Weekly Check-In

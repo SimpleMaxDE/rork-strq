@@ -1107,6 +1107,24 @@ class AppViewModel {
         }
     }
 
+    /// Record an intentional phase transition so the coaching-memory timeline
+    /// has a "block entered" entry the user can see in the change log.
+    func recordPhaseShift(to nextPhase: TrainingPhase, reason: String) {
+        let previous = trainingPhaseState.currentPhase
+        guard previous != nextPhase else { return }
+        // Close the current entry and open the new one.
+        var history = trainingPhaseState.phaseHistory
+        history.append(PhaseEntry(phase: nextPhase, startDate: Date(), endDate: nil, reason: reason))
+        trainingPhaseState = TrainingPhaseState(
+            currentPhase: nextPhase,
+            weeksInPhase: 1,
+            totalWeeksTrained: trainingPhaseState.totalWeeksTrained,
+            lastPhaseChange: Date(),
+            phaseHistory: history
+        )
+        persist()
+    }
+
     func previewDeloadWeek() -> DeloadWeekPreview? {
         guard let plan = currentPlan else { return nil }
         return actionManager.previewDeloadWeek(plan: plan)
@@ -1120,6 +1138,9 @@ class AppViewModel {
             currentPlan = plan
             weekAdjustmentActive = .deloadWeek
             coachAdjustments.append(adjustment)
+            if trainingPhaseState.currentPhase != .deload {
+                recordPhaseShift(to: .deload, reason: "Fatigue trend earned a deload — lighter block protects the next push.")
+            }
             persist()
         }
     }
