@@ -30,6 +30,8 @@ nonisolated enum PlanExerciseRole: Sendable {
 
 struct PlanGenerator {
     let library = ExerciseLibrary.shared
+    private let importer = ExerciseDBProImporter.shared
+    private let readiness = ImportedExerciseReadinessService.shared
 
     func generate(
         for profile: UserProfile,
@@ -544,7 +546,10 @@ struct PlanGenerator {
             }
         }()
 
-        var candidates = library.filtered(muscle: muscle, location: location)
+        let curated = library.filtered(muscle: muscle, location: location)
+        let imported = importedCandidates(muscle: muscle, role: role, profile: profile, curatedCount: curated.count, location: location)
+
+        var candidates = curated + imported
 
         if !profile.availableEquipment.isEmpty && profile.trainingLocation != .gym {
             candidates = candidates.filter { ex in
@@ -567,6 +572,77 @@ struct PlanGenerator {
         }
     }
 
+    // MARK: - Imported exercise promotion (curated generator expansion)
+
+    /// Pull imported (ExerciseDBPro) exercises that clear the strict generation
+    /// gate for this muscle + role + location context. Curated exercises remain
+    /// canonical and preferred; imports are additive and only surfaced when
+    /// they genuinely improve coverage.
+    private func importedCandidates(
+        muscle: MuscleGroup,
+        role: PlanExerciseRole,
+        profile: UserProfile,
+        curatedCount: Int,
+        location: LocationType
+    ) -> [Exercise] {
+        let roleFit = roleFit(for: role)
+        let allImported = importer.exercises
+        let eligible = allImported.filter { ex in
+            // Must target this muscle (primary or secondary).
+            guard ex.primaryMuscle == muscle || ex.secondaryMuscles.contains(muscle) else { return false }
+            // Must clear the generation tier AND have the requested role fit.
+            guard readiness.isEligibleForGeneration(ex.id, role: roleFit) else { return false }
+            // Location hard-gate — mirror curated location filter.
+            switch location {
+            case .gym, .anywhere: break
+            case .homeGym: if ex.locationType == .gym { return false }
+            case .homeNoEquipment: if ex.locationType != .homeNoEquipment && ex.locationType != .anywhere { return false }
+            }
+            // Goal-safety: strength plans should not pull anchor imports —
+            // curated barbell compounds remain canonical for strength anchors.
+            if profile.goal == .strength && role == .anchor { return false }
+            // Rehab / flexibility only accept imports with matching category.
+            switch profile.goal {
+            case .rehabilitation:
+                if ex.category != .mobility && ex.category != .recovery && !ex.isJointFriendly { return false }
+            case .flexibility:
+                if ex.category != .mobility { return false }
+            default: break
+            }
+            // Don't let anchor role be filled by bodyweight/isolation imports.
+            if role == .anchor && ex.category != .compound { return false }
+            if role == .isolation && ex.category == .compound { return false }
+            return true
+        }
+
+        // Safe-first activation: cap how many imports surface per pick so a
+        // sudden dramatic personality shift doesn't happen. Expand the cap
+        // where curated coverage is thin (genuine coverage gap).
+        let cap: Int
+        if curatedCount < 3 {
+            cap = 6 // coverage gap — let more imports compete
+        } else if curatedCount < 6 {
+            cap = 3
+        } else {
+            cap = 2
+        }
+
+        // Rank imports by readiness score so the strongest surface first.
+        let ranked = eligible.sorted {
+            (readiness.score(for: $0.id)?.score ?? 0) > (readiness.score(for: $1.id)?.score ?? 0)
+        }
+        return Array(ranked.prefix(cap))
+    }
+
+    private func roleFit(for role: PlanExerciseRole) -> ImportedRoleFit {
+        switch role {
+        case .anchor: .anchor
+        case .secondary: .secondary
+        case .accessory: .accessory
+        case .isolation: .isolation
+        }
+    }
+
     private func isRiskyForInjuries(_ ex: Exercise, profile: UserProfile) -> Bool {
         for injury in profile.injuries {
             let i = injury.lowercased()
@@ -579,6 +655,15 @@ struct PlanGenerator {
 
     private func score(_ ex: Exercise, muscle: MuscleGroup, role: PlanExerciseRole, profile: UserProfile) -> Double {
         var s: Double = 50
+
+        // Curated canonical preference — imports must genuinely win on merit
+        // to displace curated exercises at the top of a pick list.
+        if ex.id.hasPrefix("edb-") {
+            s -= 6
+            // Extra caution on strength anchors — curated barbell compounds
+            // should stay dominant here.
+            if role == .anchor && profile.goal == .strength { s -= 10 }
+        }
 
         // Role fit — the most important single factor.
         switch role {

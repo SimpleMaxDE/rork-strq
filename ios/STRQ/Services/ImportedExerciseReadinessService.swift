@@ -53,6 +53,15 @@ nonisolated final class ImportedExerciseReadinessService: Sendable {
         tier(for: exerciseId) >= .generation
     }
 
+    /// Whether an imported exercise is safe to generate into a given role.
+    /// Curated ids always return `true`. Imported ids must clear the generation
+    /// tier AND have the requested role in their role-fit set.
+    func isEligibleForGeneration(_ exerciseId: String, role: ImportedRoleFit) -> Bool {
+        if !exerciseId.hasPrefix("edb-") { return true }
+        guard let score = scores[exerciseId] else { return false }
+        return score.tier >= .generation && score.roleFit.contains(role)
+    }
+
     func roleFit(for exerciseId: String) -> Set<ImportedRoleFit> {
         scores[exerciseId]?.roleFit ?? []
     }

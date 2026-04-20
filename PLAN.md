@@ -342,3 +342,32 @@ Turn STRQ's swap/alternative system into a stronger coaching capability with rol
 - [x] Role preservation is enforced at the engine level, not patched in UI
 - [x] `STRQPalette` state colors only — no new color maps
 - [x] Reasons stay concise and coach-grade
+
+---
+
+# Phase 18 — Curated Generator Expansion
+
+Selectively promote high-confidence imported exercises into real plan generation while keeping curated STRQ exercises canonical and plans coherent.
+
+**Readiness model (`ImportedExerciseReadiness`)**
+- [x] `GeneratorPromotionReason` — coverageGap / homeRelevance / jointFriendlyUpgrade / equipmentFit / familyCompleteness (internal curation signal)
+
+**Readiness service (`ImportedExerciseReadinessService`)**
+- [x] `isEligibleForGeneration(_:role:)` — role-aware generation gate (imports must clear `.generation` tier AND carry matching role fit)
+- [x] Curated ids (non-`edb-`) always eligible — bypass the role check
+
+**Plan generator (`PlanGenerator`)**
+- [x] `importedCandidates(muscle:role:profile:curatedCount:location:)` — pulls strict-gated imports that target the muscle and match the slot role
+- [x] Location hard-gate mirrors curated location filter (gym / homeGym / homeNoEquipment)
+- [x] Goal-safety: strength anchors stay curated-only — no imported anchor pollution
+- [x] Rehab accepts only joint-friendly / mobility / recovery imports; flexibility accepts only mobility
+- [x] Anchor role blocks non-compound imports; isolation role blocks compound imports
+- [x] Coverage-aware cap: 6 imports when curated coverage is thin (<3), 3 when moderate (<6), 2 otherwise
+- [x] Imports ranked by readiness score so the strongest compete first
+- [x] Curated canonical preference baked into scoring — imports start at −6, additional −10 for strength anchors
+
+**Identity**
+- [x] Curated STRQ exercises remain canonical — imports are additive, never displace strong canonical picks
+- [x] Role fit preserved through the generation gate — no accidental anchor pollution
+- [x] Safe-first activation — caps prevent sudden dramatic plan-personality shifts
+- [x] Plans feel richer where coverage was thin (home / joint-friendly / machine variants) without feeling random

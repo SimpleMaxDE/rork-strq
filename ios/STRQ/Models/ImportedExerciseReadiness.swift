@@ -54,3 +54,19 @@ nonisolated enum ImportedRoleFit: String, Sendable, Codable, CaseIterable {
     case isolation
     case mobility
 }
+
+/// Why an imported exercise was promoted into plan generation for a given
+/// muscle + role + location context. Used for internal curation reasoning
+/// and to keep activation decisions auditable. Never exposed to users.
+nonisolated enum GeneratorPromotionReason: String, Sendable, Codable, CaseIterable {
+    /// Curated coverage for this muscle + role + location is thin (<3 options).
+    case coverageGap
+    /// Fills a home / limited-equipment need curated library doesn't cover well.
+    case homeRelevance
+    /// Adds a joint-friendly option where curated coverage lacks one.
+    case jointFriendlyUpgrade
+    /// Adds a missing equipment variant (machine / cable / band) inside a family.
+    case equipmentFit
+    /// Fills a family variant gap the curated library is missing.
+    case familyCompleteness
+}
