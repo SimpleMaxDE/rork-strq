@@ -181,3 +181,45 @@ Make STRQ's adaptive behavior easier to understand and trust by clearly showing 
 **Phase shifts**
 - [x] Applying a deload now records a phase transition in `phaseHistory`, feeding the timeline
 - [x] `recordPhaseShift(to:reason:)` on `AppViewModel` for future coach-driven shifts
+
+---
+
+# Phase 14 — ExerciseDBPro Integration
+
+Integrate the ExerciseDBPro dataset cleanly as an additive asset source, without scattering raw external schema across the app or replacing the curated library.
+
+**Import / Normalization (`ExerciseDBProImporter`)**
+- [x] Raw `ExerciseDBProRaw` DTO mirrors external schema
+- [x] Loads `exercises2.json` from the bundle (lazy, fail-safe)
+- [x] Preserves external IDs behind an `edb-` prefix
+- [x] Maps `targetMuscles` / `secondaryMuscles` / `bodyParts` → `MuscleGroup`
+- [x] Normalizes `equipments` → STRQ `Equipment` enum (collapses ez/olympic/trap → barbell, machine variants → machine, etc.)
+- [x] Raw instruction array → clean step-prefix-stripped STRQ instructions
+- [x] Remote `gifUrl` stored separately, not baked into `Exercise`
+
+**Enrichment**
+- [x] Movement pattern inferred from name + primary muscle
+- [x] Category inferred (compound / isolation / bodyweight / mobility / warmup / cardio)
+- [x] Difficulty heuristic (beginner / intermediate / advanced) from name + equipment
+- [x] Joint-friendly heuristic (machines, cables, bands, mobility lean positive; deadlifts/plyo lean negative)
+- [x] Training worlds (gym / home / calisthenics / cardio / mobility) from equipment & category
+- [x] Generated `shortDescription` + tag set including external labels for search
+
+**Media support (`RemoteExerciseImage`)**
+- [x] Async loader with inflight de-duplication
+- [x] In-memory `NSCache` with byte-cost budget
+- [x] Uses `URLSession` default HTTP cache for disk persistence
+- [x] Graceful ProgressView → symbol fallback on failure
+- [x] `ExerciseMediaProvider` returns a `.gif` media entry for imported exercises
+- [x] `ExerciseHeroView` renders remote GIF in the same `Color + overlay` layout pattern
+
+**Safe app integration (`ExerciseCatalog`)**
+- [x] Unified catalog combining curated + imported with shared id lookup
+- [x] Curated library remains the single source of truth; imports are additive
+- [x] `ExerciseLibrary.exercise(byId:)` resolves `edb-` ids through the importer for swap/detail continuity
+- [x] Exercise Library view lists the full catalog, hero stats reflect combined count
+- [x] Add Exercise sheet (`AddExerciseSheet`) searches/filters the combined catalog
+- [x] Swap Exercise sheet resolves imported ids cleanly through the catalog
+
+**Generator gating (preparation only)**
+- [x] `PlanGenerator` / `ExerciseSelectionEngine` / `ProgressionEngine` continue to use `ExerciseLibrary.shared` — no blanket injection of imported ids into plan generation, substitution, or progression chains yet

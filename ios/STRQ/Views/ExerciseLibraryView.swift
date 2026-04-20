@@ -16,11 +16,14 @@ struct ExerciseLibraryView: View {
     @State private var browseMode: BrowseMode = .all
 
     private let library = ExerciseLibrary.shared
+    private let catalog = ExerciseCatalog.shared
 
     private var filteredExercises: [Exercise] {
         var results: [Exercise]
         if !searchText.isEmpty {
-            results = library.search(searchText)
+            results = catalog.search(searchText)
+        } else if selectedMuscle == nil && selectedWorld == nil && selectedDifficulty == nil && !bodyweightOnly && !jointFriendlyOnly {
+            results = catalog.all
         } else {
             results = library.filtered(
                 muscle: selectedMuscle,
@@ -105,7 +108,7 @@ struct ExerciseLibraryView: View {
 
     private var libraryHero: some View {
         HStack(alignment: .center, spacing: 0) {
-            libraryStatColumn(value: "\(library.exercises.count)", label: "Exercises")
+            libraryStatColumn(value: "\(catalog.all.count)", label: "Exercises")
             libraryDivider
             libraryStatColumn(value: "\(ExerciseFamilyService.shared.families.count)", label: "Families")
             libraryDivider

@@ -15,7 +15,13 @@ struct ExerciseLibrary {
     }
 
     func exercise(byId id: String) -> Exercise? {
-        exerciseMap[id]
+        if let curated = exerciseMap[id] { return curated }
+        // Fallback to imported (ExerciseDBPro) for id-based lookups so swaps/
+        // details keep resolving after an imported exercise is chosen.
+        if id.hasPrefix("edb-") {
+            return ExerciseDBProImporter.shared.exercises.first(where: { $0.id == id })
+        }
+        return nil
     }
 
     func exercises(forMuscle muscle: MuscleGroup) -> [Exercise] {

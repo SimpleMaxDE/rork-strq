@@ -7,10 +7,21 @@ struct ExerciseMediaProvider {
         if let override = topExerciseMedia[exercise.id] {
             return override
         }
+        if let url = ExerciseCatalog.shared.gifURL(for: exercise) {
+            return ExerciseMedia(
+                mediaType: .gif,
+                assetURL: url.absoluteString,
+                movementFamily: movementFamily(for: exercise)
+            )
+        }
         return ExerciseMedia(
             mediaType: .sfSymbol,
             movementFamily: movementFamily(for: exercise)
         )
+    }
+
+    func remoteGifURL(for exercise: Exercise) -> URL? {
+        ExerciseCatalog.shared.gifURL(for: exercise)
     }
 
     func heroSymbol(for exercise: Exercise) -> String {

@@ -718,6 +718,7 @@ struct AddExerciseSheet: View {
     @State private var selectedMuscle: MuscleGroup?
 
     private let library = ExerciseLibrary.shared
+    private let catalog = ExerciseCatalog.shared
 
     init(vm: AppViewModel, day: WorkoutDay? = nil, onSelect: @escaping (Exercise) -> Void) {
         self.vm = vm
@@ -728,11 +729,11 @@ struct AddExerciseSheet: View {
     private var results: [Exercise] {
         var list: [Exercise]
         if !searchText.isEmpty {
-            list = library.search(searchText)
+            list = catalog.search(searchText)
         } else if let m = selectedMuscle {
-            list = library.filtered(muscle: m, world: nil, difficulty: nil, bodyweightOnly: false, jointFriendly: false)
+            list = catalog.exercises(forMuscle: m)
         } else {
-            list = library.exercises
+            list = catalog.all
         }
         return list
     }

@@ -19,9 +19,11 @@ struct ExerciseHeroView: View {
             switch media.mediaType {
             case .staticImage:
                 staticImageHero
+            case .gif:
+                remoteGifHero
             case .sfSymbol:
                 symbolHero
-            case .lottie, .rive, .video, .gif:
+            case .lottie, .rive, .video:
                 symbolHero
             }
         }
@@ -64,6 +66,42 @@ struct ExerciseHeroView: View {
             if showTitle && !compact {
                 titleBlock
             }
+        }
+    }
+
+    private var remoteGifHero: some View {
+        VStack(spacing: 0) {
+            Color(.secondarySystemBackground)
+                .frame(height: height)
+                .overlay {
+                    ZStack {
+                        LinearGradient(
+                            colors: [gradientColors[0].opacity(0.35), gradientColors[1].opacity(0.15)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        if let urlString = media.assetURL, let url = URL(string: urlString) {
+                            RemoteExerciseImage(
+                                url: url,
+                                contentMode: .fit,
+                                fallback: AnyView(symbolFallbackContent)
+                            )
+                            .padding(8)
+                        } else {
+                            symbolFallbackContent
+                        }
+                    }
+                    .allowsHitTesting(false)
+                }
+                .clipShape(.rect(cornerRadius: compact ? 14 : 22))
+                .padding(.horizontal, compact ? 0 : 16)
+
+            if showTitle && !compact {
+                titleBlock
+            }
+        }
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.5)) { appeared = true }
         }
     }
 
