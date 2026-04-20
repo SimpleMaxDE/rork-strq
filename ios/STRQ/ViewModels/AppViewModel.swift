@@ -1913,6 +1913,115 @@ class AppViewModel {
         let have = weeklyStats.sessions
         return max(0, needed - have)
     }
+
+    // MARK: - Activation Roadmap (first-week retention)
+
+    /// A structured, week-1 activation path: plan → session 1 → session 2 →
+    /// session 3 → weekly target. Each step states what STRQ is learning at
+    /// that point, so the user feels an earned ramp instead of "you're on
+    /// your own." Only surfaces while the user is in early-stage data.
+    var activationRoadmap: ActivationRoadmap? {
+        guard isEarlyStage else { return nil }
+        let completed = totalCompletedWorkouts
+        let planned = max(1, profile.daysPerWeek)
+        let weekCount = weeklyStats.sessions
+        let weekTarget = min(3, planned)
+
+        var steps: [ActivationRoadmap.Step] = []
+
+        steps.append(.init(
+            kind: .planLocked,
+            title: "Plan built",
+            detail: "STRQ generated a plan shaped to your goal, recovery, and time.",
+            learning: "Inputs captured",
+            icon: "doc.text.fill",
+            isComplete: currentPlan != nil,
+            isActive: false
+        ))
+
+        steps.append(.init(
+            kind: .firstSession,
+            title: "First session",
+            detail: "Lock in your baseline. STRQ calibrates every load from what you actually lift.",
+            learning: completed >= 1 ? "Baseline loads locked in" : "Unlocks real load prescriptions",
+            icon: "figure.strengthtraining.traditional",
+            isComplete: completed >= 1,
+            isActive: completed == 0 && currentPlan != nil
+        ))
+
+        steps.append(.init(
+            kind: .secondSession,
+            title: "Session two",
+            detail: "Progression signals switch on. Coach starts adjusting load and volume.",
+            learning: completed >= 2 ? "Progression intelligence active" : "Unlocks progression calls",
+            icon: "chart.line.uptrend.xyaxis",
+            isComplete: completed >= 2,
+            isActive: completed == 1
+        ))
+
+        steps.append(.init(
+            kind: .thirdSession,
+            title: "Session three",
+            detail: "Pattern reads sharpen — balance, fatigue, and load pacing get real.",
+            learning: completed >= 3 ? "Coach is reading your patterns" : "Unlocks pattern-level coaching",
+            icon: "waveform.path.ecg",
+            isComplete: completed >= 3,
+            isActive: completed == 2
+        ))
+
+        let weekDetail: String
+        if weekCount >= weekTarget {
+            weekDetail = "Week one target hit — weekly signal is live."
+        } else {
+            let remaining = max(0, weekTarget - weekCount)
+            weekDetail = remaining == 1
+                ? "One more session this week unlocks your weekly review."
+                : "\(remaining) more sessions this week unlock your weekly review."
+        }
+        steps.append(.init(
+            kind: .firstWeek,
+            title: "Week one locked in",
+            detail: weekDetail,
+            learning: weekCount >= weekTarget ? "Weekly review unlocked" : "Unlocks weekly review & balance reads",
+            icon: "checkmark.seal.fill",
+            isComplete: weekCount >= weekTarget && completed >= 3,
+            isActive: completed >= 3 && weekCount < weekTarget
+        ))
+
+        let completedCount = steps.filter(\.isComplete).count
+        let nextIndex = steps.firstIndex { !$0.isComplete } ?? (steps.count - 1)
+        let activeIndex = steps.firstIndex { $0.isActive } ?? nextIndex
+
+        let headline: String
+        let subhead: String
+        switch completedCount {
+        case 0:
+            headline = "Your first week with STRQ"
+            subhead = "Session one locks your baseline. Every step sharpens the coach."
+        case 1:
+            headline = "Baseline locked. Build from here."
+            subhead = "Session two flips on progression. You're closer than you think."
+        case 2:
+            headline = "Coach is calibrating fast"
+            subhead = "Session three unlocks real pattern-level coaching."
+        case 3:
+            headline = "Pattern reads are live"
+            subhead = "Finish the week to unlock your first review."
+        default:
+            headline = "Week one secured"
+            subhead = "Weekly signal is live — coach is fully calibrated to you."
+        }
+
+        return ActivationRoadmap(
+            headline: headline,
+            subhead: subhead,
+            steps: steps,
+            activeIndex: activeIndex,
+            completedCount: completedCount,
+            weekTarget: weekTarget,
+            weekCompleted: weekCount
+        )
+    }
 }
 
 nonisolated enum DataMaturityTier: Int, Sendable, Comparable {
@@ -1940,6 +2049,49 @@ nonisolated struct EarlyStateGuidance: Sendable {
     let primaryAction: String
     let unlocksNext: String?
     let icon: String
+}
+
+nonisolated struct ActivationRoadmap: Sendable {
+    nonisolated enum StepKind: Sendable {
+        case planLocked
+        case firstSession
+        case secondSession
+        case thirdSession
+        case firstWeek
+    }
+
+    nonisolated struct Step: Identifiable, Sendable {
+        let kind: StepKind
+        let title: String
+        let detail: String
+        let learning: String
+        let icon: String
+        let isComplete: Bool
+        let isActive: Bool
+
+        var id: String {
+            switch kind {
+            case .planLocked: return "plan"
+            case .firstSession: return "s1"
+            case .secondSession: return "s2"
+            case .thirdSession: return "s3"
+            case .firstWeek: return "week"
+            }
+        }
+    }
+
+    let headline: String
+    let subhead: String
+    let steps: [Step]
+    let activeIndex: Int
+    let completedCount: Int
+    let weekTarget: Int
+    let weekCompleted: Int
+
+    var progress: Double {
+        guard !steps.isEmpty else { return 0 }
+        return Double(completedCount) / Double(steps.count)
+    }
 }
 
 nonisolated struct ActiveWorkoutState: Codable, Sendable {

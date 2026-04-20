@@ -69,6 +69,7 @@ struct WorkoutCompletionView: View {
                     Spacer(minLength: 28)
                     heroSection
                     statsSection
+                    activationRibbon
                     highlightsSection
                     nextSessionBridge
                     Color.clear.frame(height: 110)
@@ -216,6 +217,104 @@ struct WorkoutCompletionView: View {
     }
 
     // MARK: - Highlights
+
+    // MARK: - Activation Ribbon (first-week framing)
+
+    private struct ActivationRibbonCopy {
+        let headline: String
+        let detail: String
+        let icon: String
+    }
+
+    private func activationRibbonCopy(for roadmap: ActivationRoadmap) -> ActivationRibbonCopy {
+        switch vm.totalCompletedWorkouts {
+        case 1:
+            return .init(
+                headline: "Baseline locked in",
+                detail: "STRQ now knows your starting loads. Session 2 switches on real progression calls.",
+                icon: "scalemass.fill"
+            )
+        case 2:
+            return .init(
+                headline: "Progression is live",
+                detail: "Coach can now adjust load and volume. One more session sharpens pattern reads.",
+                icon: "chart.line.uptrend.xyaxis"
+            )
+        case 3:
+            return .init(
+                headline: "Pattern reads unlocked",
+                detail: "STRQ is reading balance, fatigue, and load pacing. Finish the week to unlock your first review.",
+                icon: "waveform.path.ecg"
+            )
+        default:
+            return .init(
+                headline: "Step \(roadmap.completedCount) of \(roadmap.steps.count)",
+                detail: roadmap.subhead,
+                icon: "sparkles"
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var activationRibbon: some View {
+        if let roadmap = vm.activationRoadmap {
+            let copy = activationRibbonCopy(for: roadmap)
+            let headline = copy.headline
+            let detail = copy.detail
+            let icon = copy.icon
+
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    Image(systemName: icon)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 32, height: 32)
+                        .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 6) {
+                            Text("COACH CALIBRATION")
+                                .font(.system(size: 9, weight: .black))
+                                .tracking(1.2)
+                                .foregroundStyle(STRQBrand.steel)
+                            Text("\(roadmap.completedCount)/\(roadmap.steps.count)")
+                                .font(.system(size: 9, weight: .black).monospacedDigit())
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+                        Text(headline)
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(.white)
+                    }
+                    Spacer(minLength: 0)
+                }
+
+                Text(detail)
+                    .font(.system(size: 11.5, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.65))
+                    .fixedSize(horizontal: false, vertical: true)
+
+                HStack(spacing: 4) {
+                    ForEach(0..<roadmap.steps.count, id: \.self) { i in
+                        Capsule()
+                            .fill(i < roadmap.completedCount
+                                  ? AnyShapeStyle(STRQBrand.accentGradient)
+                                  : AnyShapeStyle(Color.white.opacity(0.08)))
+                            .frame(height: 3)
+                    }
+                }
+            }
+            .padding(14)
+            .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+            )
+            .padding(.horizontal, 20)
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+            .animation(.easeOut(duration: 0.5).delay(0.35), value: appeared)
+        }
+    }
 
     @ViewBuilder
     private var highlightsSection: some View {

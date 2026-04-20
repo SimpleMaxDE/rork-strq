@@ -40,6 +40,12 @@ final class WorkoutController {
             "phase": String(describing: vm.trainingPhaseState.currentPhase),
             "readiness": vm.readinessBucket
         ])
+        let priorCompleted = vm.totalCompletedWorkouts
+        if priorCompleted == 0 {
+            Analytics.shared.track(.first_session_started, ["day": day.name])
+        } else if priorCompleted == 1 {
+            Analytics.shared.track(.second_session_started, ["day": day.name])
+        }
         ErrorReporter.shared.breadcrumb("Workout started: \(day.name)", category: "training")
         let exerciseLogs = day.exercises.map { planned -> ExerciseLog in
             let today = vm.todayPrescription(for: planned)
@@ -98,6 +104,28 @@ final class WorkoutController {
             "volume": String(Int(entry.totalVolume)),
             "duration_min": String(entry.workoutDuration)
         ])
+        let newCompleted = vm.totalCompletedWorkouts
+        switch newCompleted {
+        case 1:
+            Analytics.shared.track(.first_session_completed, ["day": workout.session.dayName])
+            Analytics.shared.track(.activation_step_unlocked, ["step": "s1"])
+        case 2:
+            Analytics.shared.track(.second_session_completed, ["day": workout.session.dayName])
+            Analytics.shared.track(.activation_step_unlocked, ["step": "s2"])
+        case 3:
+            Analytics.shared.track(.third_session_completed, ["day": workout.session.dayName])
+            Analytics.shared.track(.activation_step_unlocked, ["step": "s3"])
+        default:
+            break
+        }
+        let weekTarget = min(3, max(1, vm.profile.daysPerWeek))
+        if vm.weeklyStats.sessions == weekTarget && newCompleted >= 3 && newCompleted <= weekTarget + 2 {
+            Analytics.shared.track(.week_one_target_hit, [
+                "target": String(weekTarget),
+                "total_completed": String(newCompleted)
+            ])
+            Analytics.shared.track(.activation_step_unlocked, ["step": "week"])
+        }
         ErrorReporter.shared.breadcrumb("Workout completed: \(workout.session.dayName)", category: "training")
     }
 

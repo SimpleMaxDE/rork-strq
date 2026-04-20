@@ -19,6 +19,18 @@ struct CoachTabView: View {
 
                 if vm.isEarlyStage {
                     earlyStateCard
+                    if let roadmap = vm.activationRoadmap {
+                        ActivationRoadmapCard(roadmap: roadmap)
+                            .opacity(appeared ? 1 : 0)
+                            .offset(y: appeared ? 0 : 10)
+                            .animation(.easeOut(duration: 0.5).delay(0.08), value: appeared)
+                            .onAppear {
+                                Analytics.shared.track(.activation_roadmap_viewed, [
+                                    "completed": String(roadmap.completedCount),
+                                    "surface": "coach"
+                                ])
+                            }
+                    }
                     calibrationChecklist
                 } else {
                     decisionStack

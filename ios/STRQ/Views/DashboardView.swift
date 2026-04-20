@@ -24,7 +24,16 @@ struct DashboardView: View {
                         .padding(.horizontal, 16)
                 }
 
-                if let guidance = vm.earlyStateGuidance {
+                if let roadmap = vm.activationRoadmap {
+                    ActivationRoadmapCard(roadmap: roadmap)
+                        .padding(.horizontal, 16)
+                        .onAppear {
+                            Analytics.shared.track(.activation_roadmap_viewed, [
+                                "completed": String(roadmap.completedCount),
+                                "surface": "today"
+                            ])
+                        }
+                } else if let guidance = vm.earlyStateGuidance {
                     earlyStageHint(guidance)
                         .padding(.horizontal, 16)
                 }

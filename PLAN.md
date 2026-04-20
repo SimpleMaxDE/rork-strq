@@ -404,3 +404,58 @@ Stress test `PlanGenerator` across realistic user scenarios so weak spots, stran
 - [x] QA harness is internal-only — no user-facing debug UI
 - [x] Diagnostics are repeatable: future generator changes are checked against the same scenario matrix
 - [x] Curated quality bar preserved — harness surfaces regressions, guardrails prevent known failure modes
+
+---
+
+# Phase 21 — First-Session / Week-1 Retention Optimization
+
+Improve activation so more users complete session 1, come back for session 2, and carry through week one. Framed as an earned ramp, not a generic welcome.
+
+**Activation roadmap model (`AppViewModel.activationRoadmap`)**
+- [x] `ActivationRoadmap` struct with 5 ordered steps (plan locked → session 1 → session 2 → session 3 → week-one target)
+- [x] Each step exposes title, detail, what STRQ is *learning* at that point, icon, and complete/active state
+- [x] Headline/subhead adapts to current completion count (0/1/2/3/done)
+- [x] Only surfaces while the user is in early-stage data (`isEarlyStage`)
+- [x] Derives week target as `min(3, daysPerWeek)` so part-time plans aren't gated behind unrealistic week-ones
+
+**Activation roadmap card (`ActivationRoadmapCard`)**
+- [x] Premium step-rail with connector line, active/complete/pending states
+- [x] Progress track tinted with accent gradient
+- [x] "NEXT" badge on the active step
+- [x] Per-step unlock chip showing what the step unlocks (open-lock on complete)
+- [x] Uses `STRQBrand` / `STRQPalette` only — no new color maps
+
+**Today surface (`DashboardView`)**
+- [x] Roadmap card replaces the minimal `earlyStageHint` tier pill for early-stage users
+- [x] `earlyStageHint` retained as fallback for any legacy path
+- [x] `activation_roadmap_viewed` analytics fired on appearance with `surface=today`
+
+**Coach surface (`CoachTabView`)**
+- [x] Roadmap card injected into the early-state stack between `earlyStateCard` and `calibrationChecklist`
+- [x] `activation_roadmap_viewed` fired with `surface=coach`
+- [x] Calibration checklist preserved — roadmap is about *what happens next*, checklist is about *what's been captured*
+
+**Completion activation ribbon (`WorkoutCompletionView`)**
+- [x] New `activationRibbon` block between stats and highlights on the completion screen
+- [x] Copy ramps by completion count (1: baseline locked → 2: progression live → 3: pattern reads unlocked)
+- [x] Compact step progress bar reflects `ActivationRoadmap` state
+- [x] Only renders while user is still early-stage — disappears once week-one target is hit
+
+**Retention-critical analytics (`Analytics.AnalyticsEvent`)**
+- [x] `first_session_started` / `first_session_completed`
+- [x] `second_session_started` / `second_session_completed`
+- [x] `third_session_completed`
+- [x] `week_one_target_hit`
+- [x] `activation_roadmap_viewed` (surface + completed count)
+- [x] `activation_step_unlocked` (step id)
+- [x] `rest_day_guidance_viewed` (reserved for future rest-day surface instrumentation)
+
+**Instrumentation (`WorkoutController`)**
+- [x] Pre-start count compared so session 1 / 2 starts fire exactly once
+- [x] Post-complete count drives session 1 / 2 / 3 completed events + `activation_step_unlocked`
+- [x] Week-one target detection fires `week_one_target_hit` once, and only while user is still in the activation window
+
+**Identity**
+- [x] Premium dark identity preserved — no gamification, no fake urgency
+- [x] Coach authority intact — roadmap frames learning, not rewards
+- [x] Disappears cleanly once the user is established (tier ≥ `.established`)
