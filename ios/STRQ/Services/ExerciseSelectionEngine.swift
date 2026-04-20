@@ -39,6 +39,7 @@ nonisolated struct ReorderSuggestion: Sendable {
 struct ExerciseSelectionEngine {
     private let library = ExerciseLibrary.shared
     private let familyService = ExerciseFamilyService.shared
+    private let readiness = ImportedExerciseReadinessService.shared
 
     // MARK: - Score a candidate as a substitute for another exercise
 
@@ -184,6 +185,13 @@ struct ExerciseSelectionEngine {
         var pool: Set<String> = []
         if let family = familyService.family(forExercise: exerciseId) {
             pool.formUnion(family.memberIds)
+            // Imported family siblings are only eligible for coach-suggested
+            // swaps when their readiness tier clears the substitution gate.
+            for imported in familyService.importedMembers(for: family.id) {
+                if readiness.isEligibleForSubstitution(imported.id) {
+                    pool.insert(imported.id)
+                }
+            }
         }
         for alt in library.alternatives(for: original) {
             pool.insert(alt.id)
@@ -194,6 +202,11 @@ struct ExerciseSelectionEngine {
         pool.remove(original.id)
 
         let scored: [ScoredExercise] = pool.compactMap { id in
+            // Gate imported ids by readiness so weak external rows never
+            // surface as coach-suggested swaps. Curated ids are always allowed.
+            if id.hasPrefix("edb-") && !readiness.isEligibleForSubstitution(id) {
+                return nil
+            }
             guard let ex = library.exercise(byId: id) else { return nil }
             let result = score(candidate: ex, replacing: original, context: context, reason: reason)
             guard result.score > 0 else { return nil }

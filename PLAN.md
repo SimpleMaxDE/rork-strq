@@ -256,3 +256,37 @@ Turn the imported ExerciseDBPro dataset into a cleaner, STRQ-grade catalog witho
 **Integration surfaces**
 - [x] Library / Detail / Add / Swap consume cleaned names and curated-first family ordering
 - [x] Generator remains gated — no blanket injection into plan generation
+
+---
+
+# Phase 16 — Curated Activation / Generator Readiness
+
+Build a quality-gated activation layer so imported ExerciseDBPro exercises can be selectively promoted from catalog-only into real STRQ coaching usage.
+
+**Readiness model (`ImportedExerciseReadiness`)**
+- [x] `ImportedReadinessTier` — catalog / manual / substitution / progression / generation (ordered)
+- [x] `ImportedReadinessScore` — score + tier + factors + gaps + role fit
+- [x] `ImportedRoleFit` — anchor / secondary / accessory / isolation / mobility
+
+**Scoring service (`ImportedExerciseReadinessService`)**
+- [x] Deterministic per-exercise evaluation on first access
+- [x] Factors: family match, equipment clarity, movement-pattern confidence, instruction quality, name quality, category, role fit, joint-friendliness
+- [x] Gap tracking so each exercise exposes what blocks higher-tier promotion
+- [x] Family match required for anything above manual-only — prevents unfamilied imports from polluting coaching
+- [x] Mobility / warmup / recovery / cardio capped at manual-only
+- [x] Advanced-without-family capped at progression tier
+- [x] Curated STRQ ids always return `.generation` (canonical, bypass the gate)
+
+**Substitution gate (`ExerciseSelectionEngine.rankedSubstitutes`)**
+- [x] Imported family siblings only join the swap pool when readiness ≥ substitution
+- [x] `edb-` ids filtered out of muscle-pool candidates unless eligible
+- [x] Curated candidates always eligible — imports never displace canonical suggestions
+
+**Progression / generator gates (prepared, not yet opened)**
+- [x] `isEligibleForProgression` tier gate available for future progression-chain participation
+- [x] `isEligibleForGeneration` tier gate available for future plan-generator inclusion
+- [x] `PlanGenerator` / `ProgressionEngine` continue to use curated library only until explicitly opened
+
+**Trust / debugging**
+- [x] `byTier()` grouping available for internal curation review
+- [x] Per-exercise `factors` + `gaps` on each score for future promotion tooling
