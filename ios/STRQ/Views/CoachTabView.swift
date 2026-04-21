@@ -19,18 +19,6 @@ struct CoachTabView: View {
 
                 if vm.isEarlyStage {
                     earlyStateCard
-                    if let roadmap = vm.activationRoadmap {
-                        ActivationRoadmapCard(roadmap: roadmap)
-                            .opacity(appeared ? 1 : 0)
-                            .offset(y: appeared ? 0 : 10)
-                            .animation(.easeOut(duration: 0.5).delay(0.08), value: appeared)
-                            .onAppear {
-                                Analytics.shared.track(.activation_roadmap_viewed, [
-                                    "completed": String(roadmap.completedCount),
-                                    "surface": "coach"
-                                ])
-                            }
-                    }
                     calibrationChecklist
                 } else {
                     if let comeback = vm.comebackGuidance {
@@ -435,7 +423,7 @@ struct CoachTabView: View {
                     RoundedRectangle(cornerRadius: 2)
                         .fill(STRQBrand.accentGradient)
                         .frame(width: 3, height: 14)
-                    Text("COACH CALIBRATION")
+                    Text("COACH CONTEXT")
                         .font(.system(size: 10, weight: .black))
                         .tracking(1.2)
                         .foregroundStyle(.primary)
@@ -456,20 +444,14 @@ struct CoachTabView: View {
                         .frame(width: 46, height: 46)
                         .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 12))
 
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(guidance.message)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(guidance.headline)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        Text("Today owns the next step. Coach sharpens load, recovery, and weekly reads quietly as your real training data builds.")
                             .font(.subheadline)
-                            .foregroundStyle(.primary.opacity(0.9))
+                            .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
-                        if let unlocks = guidance.unlocksNext {
-                            HStack(spacing: 5) {
-                                Image(systemName: "lock.open.fill")
-                                    .font(.system(size: 9))
-                                Text(unlocks)
-                                    .font(.caption2.weight(.semibold))
-                            }
-                            .foregroundStyle(STRQBrand.steel)
-                        }
                     }
                     Spacer(minLength: 0)
                 }
@@ -487,21 +469,19 @@ struct CoachTabView: View {
     }
 
     private var calibrationChecklist: some View {
-        let tier = vm.dataMaturityTier
         let completed = vm.totalCompletedWorkouts
         let weekSessions = vm.weeklyStats.sessions
-        let planned = vm.profile.daysPerWeek
+        let hasRecoveryContext = vm.hasCheckedInToday || vm.todaysReadiness != nil
 
         let items: [(String, String, Bool)] = [
-            ("Plan generated", "doc.text.fill", vm.currentPlan != nil),
-            ("First session logged", "figure.strengthtraining.traditional", completed >= 1),
-            ("Baseline loads locked", "scalemass.fill", completed >= 2),
-            ("Weekly signal ready", "chart.line.uptrend.xyaxis", weekSessions >= max(1, planned - 1)),
-            ("Progression intelligence", "brain.head.profile.fill", tier == .established)
+            ("Plan shape captured", "doc.text.fill", vm.currentPlan != nil),
+            ("Real training inputs logged", "figure.strengthtraining.traditional", completed >= 1),
+            ("Recovery context logged", "heart.text.clipboard.fill", hasRecoveryContext),
+            ("Week rhythm started", "calendar.badge.clock", weekSessions >= 1)
         ]
 
         return VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Unlock Path")
+            ForgeSectionHeader(title: "Signals Captured")
 
             VStack(spacing: 8) {
                 ForEach(Array(items.enumerated()), id: \.offset) { _, item in
@@ -689,7 +669,7 @@ struct CoachTabView: View {
                     weeklyReviewLabel(subtitle: "Review your week and adjust", ready: true)
                 }
             } else if vm.isEarlyStage {
-                weeklyReviewLabel(subtitle: vm.sessionsUntilReviewReady == 0 ? "Log another session to unlock" : "Unlocks in \(vm.sessionsUntilReviewReady) more session\(vm.sessionsUntilReviewReady == 1 ? "" : "s") this week", ready: false)
+                weeklyReviewLabel(subtitle: vm.sessionsUntilReviewReady == 0 ? "Almost there — one more session rounds out the week" : "\(vm.sessionsUntilReviewReady) more session\(vm.sessionsUntilReviewReady == 1 ? "" : "s") and Coach can review the week clearly", ready: false)
                     .opacity(0.7)
             } else {
                 Button {
@@ -707,7 +687,7 @@ struct CoachTabView: View {
 
     private func weeklyReviewLabel(subtitle: String, ready: Bool) -> some View {
         HStack(spacing: 12) {
-            Image(systemName: ready ? "doc.text.magnifyingglass" : "lock.fill")
+            Image(systemName: ready ? "doc.text.magnifyingglass" : "calendar.badge.clock")
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(.white)
                 .frame(width: 36, height: 36)

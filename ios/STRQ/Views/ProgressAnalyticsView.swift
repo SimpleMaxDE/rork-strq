@@ -69,7 +69,7 @@ struct ProgressAnalyticsView: View {
         let headline: (String, String) = {
             switch tier {
             case .fresh:
-                return ("0", "baseline session")
+                return ("0", "sessions logged")
             case .firstSession:
                 return ("1", "session logged")
             case .earlyWeek:
@@ -87,11 +87,11 @@ struct ProgressAnalyticsView: View {
         let sub: String = {
             switch tier {
             case .fresh:
-                return "Your first session sets the signal"
+                return "Start with Today. Your first workout creates the baseline."
             case .firstSession:
-                return "Log a few more — trends unlock next"
+                return "Good start. Early trendlines are building from real work."
             case .earlyWeek:
-                return "\(vm.streak)-day streak · coach is calibrating"
+                return "\(vm.totalCompletedWorkouts) sessions in · week one is taking shape"
             case .established:
                 if progressing > 0 && prsThisMonth > 0 {
                     return "\(prsThisMonth) PR\(prsThisMonth == 1 ? "" : "s") this month · \(vm.streak)-day streak"
@@ -185,9 +185,11 @@ struct ProgressAnalyticsView: View {
 
         if vm.isEarlyStage {
             state = .info
-            icon = "waveform.path.ecg"
-            headline = "Calibrating your signal"
-            detail = "Log a few more sessions to unlock momentum."
+            icon = vm.totalCompletedWorkouts == 0 ? "arrow.forward.circle.fill" : "waveform.path.ecg"
+            headline = vm.totalCompletedWorkouts == 0 ? "Start with Today" : "Baseline taking shape"
+            detail = vm.totalCompletedWorkouts == 0
+                ? "Your first workout gives Progress something real to track."
+                : "\(vm.totalCompletedWorkouts) session\(vm.totalCompletedWorkouts == 1 ? "" : "s") logged — this view will fill in as the week builds."
         } else if prsThisWeek > 0 {
             state = .success
             icon = "trophy.fill"
@@ -356,10 +358,17 @@ struct ProgressAnalyticsView: View {
 
     private var signalStrip: some View {
         HStack(spacing: 8) {
-            signalPill(icon: "arrow.up.right", value: "\(vm.progressingExercises.count)", label: "Progressing", color: .green)
-            signalPill(icon: "flame.fill", value: "\(vm.streak)", label: "Streak", color: STRQBrand.steel)
-            signalPill(icon: "figure.strengthtraining.traditional", value: "\(vm.totalCompletedWorkouts)", label: "Workouts", color: STRQBrand.steel)
-            signalPill(icon: "heart.fill", value: "\(vm.effectiveRecoveryScore)%", label: "Recovery", color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+            if vm.isEarlyStage {
+                signalPill(icon: "figure.strengthtraining.traditional", value: "\(vm.totalCompletedWorkouts)", label: "Logged", color: STRQBrand.steel)
+                signalPill(icon: "calendar.badge.clock", value: "\(vm.weeklyStats.sessions)/\(max(1, min(3, vm.profile.daysPerWeek)))", label: "Week", color: STRQBrand.steel)
+                signalPill(icon: "flame.fill", value: "\(vm.streak)", label: "Streak", color: STRQBrand.steel)
+                signalPill(icon: "heart.fill", value: "\(vm.effectiveRecoveryScore)%", label: "Recovery", color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+            } else {
+                signalPill(icon: "arrow.up.right", value: "\(vm.progressingExercises.count)", label: "Progressing", color: .green)
+                signalPill(icon: "flame.fill", value: "\(vm.streak)", label: "Streak", color: STRQBrand.steel)
+                signalPill(icon: "figure.strengthtraining.traditional", value: "\(vm.totalCompletedWorkouts)", label: "Workouts", color: STRQBrand.steel)
+                signalPill(icon: "heart.fill", value: "\(vm.effectiveRecoveryScore)%", label: "Recovery", color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+            }
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 8)
@@ -439,7 +448,7 @@ struct ProgressAnalyticsView: View {
 
     private var strengthBaselineCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: "Estimated 1RM", trailing: "Locked")
+            ForgeSectionHeader(title: "Estimated 1RM", trailing: "Building")
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 10) {
@@ -449,11 +458,11 @@ struct ProgressAnalyticsView: View {
                         .frame(width: 40, height: 40)
                         .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 10))
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Baseline in progress")
+                        Text("Baseline taking shape")
                             .font(.subheadline.weight(.semibold))
                         Text(vm.totalCompletedWorkouts == 0
-                             ? "Your strength chart unlocks after your first two sessions on the main lifts."
-                             : "One more session with a main lift and your 1RM trend lights up.")
+                             ? "Your strength view starts filling in after a couple of main-lift sessions."
+                             : "Keep logging your main lifts and the first trendline will appear here.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)

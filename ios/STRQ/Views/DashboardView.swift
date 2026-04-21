@@ -212,7 +212,9 @@ struct DashboardView: View {
                     .tracking(1.2)
                     .foregroundStyle(tint)
                 Spacer()
-                if let momentum = briefing.momentum {
+                if vm.isEarlyStage {
+                    todayPriorityPill
+                } else if let momentum = briefing.momentum {
                     HStack(spacing: 4) {
                         Image(systemName: momentum.icon)
                             .font(.system(size: 9, weight: .bold))
@@ -305,6 +307,20 @@ struct DashboardView: View {
         default:
             EmptyView()
         }
+    }
+
+    private var todayPriorityPill: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "arrow.forward.circle.fill")
+                .font(.system(size: 9, weight: .bold))
+            Text("START HERE")
+                .font(.system(size: 9, weight: .black))
+                .tracking(0.8)
+        }
+        .foregroundStyle(.black)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 3)
+        .background(ForgeTheme.accentGradient, in: Capsule())
     }
 
     // MARK: - Since Last Session
@@ -415,7 +431,9 @@ struct DashboardView: View {
                         .font(.system(size: 9, weight: .black))
                         .tracking(1.2)
                     Spacer()
-                    if let momentum = briefing.momentum {
+                    if vm.isEarlyStage {
+                        todayPriorityPill
+                    } else if let momentum = briefing.momentum {
                         Text(momentum.title)
                             .font(.system(size: 9, weight: .bold))
                             .foregroundStyle(.white.opacity(0.55))
