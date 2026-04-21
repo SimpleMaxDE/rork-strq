@@ -56,7 +56,7 @@ struct MuscleFocusView: View {
     private var modeToggle: some View {
         HStack(spacing: 0) {
             modeTab(.focus, icon: "flame.fill", label: "Focus", count: focusMuscles.count, color: focusColor)
-            modeTab(.neglect, icon: "arrow.down.right.circle.fill", label: "De-emphasize", count: neglectMuscles.count, color: neglectColor)
+            modeTab(.neglect, icon: "arrow.down.right.circle.fill", label: "Reduce", count: neglectMuscles.count, color: neglectColor)
         }
         .padding(3)
         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
@@ -271,7 +271,7 @@ struct MuscleFocusView: View {
 
     private var muscleSelector: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Select muscle groups")
+            Text("Tap muscles to set priority")
                 .font(.footnote.weight(.medium))
                 .foregroundStyle(.white.opacity(0.45))
 
@@ -343,7 +343,7 @@ struct MuscleFocusView: View {
                     }
                 }
                 if !neglectMuscles.isEmpty {
-                    summaryRow(title: "De-emphasize", muscles: neglectMuscles, color: neglectColor) { m in
+                    summaryRow(title: "Reduce", muscles: neglectMuscles, color: neglectColor) { m in
                         withAnimation(.spring(response: 0.3)) { neglectMuscles.removeAll { $0 == m } }
                     }
                 }

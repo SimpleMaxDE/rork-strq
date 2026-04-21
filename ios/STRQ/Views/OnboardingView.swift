@@ -191,7 +191,7 @@ struct OnboardingView: View {
     private var primaryButtonLabel: String {
         switch step {
         case 0: return "Get Started"
-        case totalSteps - 1: return "Build My Plan"
+        case totalSteps - 1: return "See My Plan"
         default: return "Continue"
         }
     }
@@ -724,11 +724,11 @@ struct OnboardingView: View {
 
     private var muscleFocusStep: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 18) {
                 stepHero(
                     eyebrow: "Priorities",
                     title: "Muscle focus",
-                    subtitle: "Prioritize or de-emphasize muscles. The coach adjusts volume and selection. Optional."
+                    subtitle: "Tap muscles to give them more — or less — attention. Optional."
                 )
 
                 MuscleFocusView(
@@ -746,14 +746,14 @@ struct OnboardingView: View {
 
     private var lifestyleStep: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 18) {
                 stepHero(
                     eyebrow: "Recovery",
                     title: "Lifestyle & recovery",
-                    subtitle: "Sleep, stress, and activity shape your training intensity."
+                    subtitle: "Quick recovery signals that shape training load."
                 )
 
-                fieldGroup("Sleep quality") {
+                fieldGroup("Sleep") {
                     VStack(spacing: 8) {
                         ForEach(SleepQuality.allCases) { sleep in
                             selectionChip(sleep.displayName, selected: vm.profile.sleepQuality == sleep) {
@@ -763,7 +763,7 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup("Stress level") {
+                fieldGroup("Stress") {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                         ForEach(StressLevel.allCases) { stress in
                             selectionChip(stress.displayName, selected: vm.profile.stressLevel == stress) {
@@ -773,7 +773,7 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup("Daily activity") {
+                fieldGroup("Activity") {
                     VStack(spacing: 8) {
                         ForEach(ActivityLevel.allCases) { level in
                             selectionChip(level.displayName, selected: vm.profile.activityLevel == level) {
@@ -783,7 +783,7 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup("Recovery capacity") {
+                fieldGroup("Recovery") {
                     HStack(spacing: 8) {
                         ForEach(RecoveryCapacity.allCases) { rec in
                             selectionChip(rec.displayName, selected: vm.profile.recoveryCapacity == rec) {
@@ -802,21 +802,21 @@ struct OnboardingView: View {
 
     @ViewBuilder
     private func stepHero(eyebrow: String, title: String, subtitle: String) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Text(eyebrow.uppercased())
                 .font(.caption2.weight(.bold))
                 .tracking(1.2)
                 .foregroundStyle(STRQBrand.steel)
             Text(title)
-                .font(.system(size: 30, weight: .bold))
+                .font(.title.bold())
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
             Text(subtitle)
-                .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.55))
+                .font(.callout)
+                .foregroundStyle(.white.opacity(0.58))
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.bottom, 4)
+        .padding(.bottom, 2)
     }
 
     @ViewBuilder
