@@ -628,6 +628,42 @@ struct WorkoutControllerTests {
         #expect(vm.activeWorkout?.currentSetIndex == 0)
     }
 
+    @Test func undoLastCompletedSetRestoresSetStateAndCursor() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 1, sets: 3)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+        vm.updateSetLoad(exerciseIndex: 0, setIndex: 0, weight: 72.5, reps: 8)
+
+        _ = vm.completeCurrentSet(exerciseIndex: 0, setIndex: 0)
+        let restored = vm.undoLastCompletedSet()
+
+        #expect(restored == true)
+        #expect(vm.canUndoLastCompletedSet == false)
+        #expect(vm.activeWorkout?.currentExerciseIndex == 0)
+        #expect(vm.activeWorkout?.currentSetIndex == 0)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].isCompleted == false)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].weight == 72.5)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].reps == 8)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].isCompleted == false)
+    }
+
+    @Test func undoLastCompletedSetReturnsToPreviousExerciseWhenNeeded() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+        vm.currentPlan = planWithOneDay(exerciseCount: 2, sets: 1)
+        vm.startWorkout(day: vm.currentPlan!.days[0])
+
+        _ = vm.completeCurrentSet(exerciseIndex: 0, setIndex: 0)
+        let restored = vm.undoLastCompletedSet()
+
+        #expect(restored == true)
+        #expect(vm.activeWorkout?.currentExerciseIndex == 0)
+        #expect(vm.activeWorkout?.currentSetIndex == 0)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].isCompleted == false)
+        #expect(vm.activeWorkout?.session.exerciseLogs[0].sets[0].isCompleted == false)
+    }
+
     @Test func updateSetLoadClampsToNonNegative() {
         let vm = makeVM()
         defer { PersistenceStore.shared.clear() }

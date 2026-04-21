@@ -23,6 +23,17 @@ final class WorkoutController {
     private unowned let vm: AppViewModel
     private let liveActivity = WorkoutLiveActivityManager.shared
 
+    private struct PendingSetUndo {
+        let exerciseIndex: Int
+        let setIndex: Int
+        let previousSet: SetLog
+        let previousExerciseCompleted: Bool
+        let previousExerciseIndex: Int
+        let previousSetIndex: Int
+    }
+
+    private var pendingSetUndo: PendingSetUndo?
+
     init(vm: AppViewModel) {
         self.vm = vm
     }
@@ -64,6 +75,7 @@ final class WorkoutController {
         )
         vm.workoutMinimized = false
         vm.completedWorkoutHandoff = nil
+        pendingSetUndo = nil
         startLiveActivity()
         vm.persist()
     }
@@ -92,6 +104,7 @@ final class WorkoutController {
         let sessionStart = workout.session.startTime
         let sessionEnd = workout.session.endTime ?? Date()
         let sessionVolume = workout.session.totalVolume
+        pendingSetUndo = nil
         endLiveActivity(completed: true)
         vm.workoutMinimized = false
         vm.completedWorkoutHandoff = workout.session
@@ -134,6 +147,7 @@ final class WorkoutController {
     }
 
     func saveDraft() {
+        pendingSetUndo = nil
         vm.persist()
     }
 
@@ -141,6 +155,7 @@ final class WorkoutController {
     /// can be resumed later from the Today surface.
     func pauseWorkout() {
         guard vm.activeWorkout != nil else { return }
+        pendingSetUndo = nil
         Analytics.shared.track(.workout_paused, [:])
         ErrorReporter.shared.breadcrumb("Workout paused", category: "training")
         vm.workoutMinimized = true
@@ -152,6 +167,7 @@ final class WorkoutController {
     /// Activity ends immediately. No session is written to history.
     func discardWorkout() {
         guard let workout = vm.activeWorkout else { return }
+        pendingSetUndo = nil
         Analytics.shared.track(.workout_discarded, [
             "day": workout.session.dayName,
             "exercises_touched": String(workout.session.exerciseLogs.filter { $0.sets.contains(where: \.isCompleted) }.count)
@@ -199,6 +215,7 @@ final class WorkoutController {
         if workout.currentExerciseIndex == exerciseIndex {
             workout.currentSetIndex = 0
         }
+        pendingSetUndo = nil
         vm.activeWorkout = workout
         Analytics.shared.track(.exercise_swapped_in_workout, [
             "old": oldLog.exerciseId,
@@ -227,6 +244,15 @@ final class WorkoutController {
               exerciseIndex < workout.session.exerciseLogs.count,
               setIndex < workout.session.exerciseLogs[exerciseIndex].sets.count else { return 0 }
 
+        let undo = PendingSetUndo(
+            exerciseIndex: exerciseIndex,
+            setIndex: setIndex,
+            previousSet: workout.session.exerciseLogs[exerciseIndex].sets[setIndex],
+            previousExerciseCompleted: workout.session.exerciseLogs[exerciseIndex].isCompleted,
+            previousExerciseIndex: workout.currentExerciseIndex,
+            previousSetIndex: workout.currentSetIndex
+        )
+
         workout.session.exerciseLogs[exerciseIndex].sets[setIndex].isCompleted = true
 
         let allDone = workout.session.exerciseLogs[exerciseIndex].sets.allSatisfy(\.isCompleted)
@@ -245,9 +271,39 @@ final class WorkoutController {
             : nil
         let rest = planned?.restSeconds ?? 90
 
+        pendingSetUndo = undo
         vm.activeWorkout = workout
         updateLiveActivity(restEndsAt: Date().addingTimeInterval(TimeInterval(rest)))
         return rest
+    }
+
+    var canUndoLastCompletedSet: Bool {
+        pendingSetUndo != nil
+    }
+
+    @discardableResult
+    func undoLastCompletedSet() -> Bool {
+        guard let undo = pendingSetUndo,
+              var workout = vm.activeWorkout,
+              undo.exerciseIndex < workout.session.exerciseLogs.count,
+              undo.setIndex < workout.session.exerciseLogs[undo.exerciseIndex].sets.count else {
+            pendingSetUndo = nil
+            return false
+        }
+
+        workout.session.exerciseLogs[undo.exerciseIndex].sets[undo.setIndex] = undo.previousSet
+        workout.session.exerciseLogs[undo.exerciseIndex].isCompleted = undo.previousExerciseCompleted
+        workout.currentExerciseIndex = undo.previousExerciseIndex
+        workout.currentSetIndex = undo.previousSetIndex
+
+        pendingSetUndo = nil
+        vm.activeWorkout = workout
+        updateLiveActivity()
+        return true
+    }
+
+    func clearLastCompletedSetUndo() {
+        pendingSetUndo = nil
     }
 
     func setSetQuality(exerciseIndex: Int, setIndex: Int, quality: SetQuality?) {

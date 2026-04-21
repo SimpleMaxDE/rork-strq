@@ -18,6 +18,8 @@ struct ActiveWorkoutView: View {
     @State private var swapConfirmationText: String?
     @State private var swapFeedbackTrigger: Bool = false
     @State private var swapFeedbackTask: Task<Void, Never>?
+    @State private var undoPrompt: LoggedSetUndoPrompt?
+    @State private var undoDismissTask: Task<Void, Never>?
 
     private var workout: ActiveWorkoutState? { vm.activeWorkout }
     private var completedSession: WorkoutSession? { vm.completedWorkoutHandoff }
@@ -76,6 +78,16 @@ struct ActiveWorkoutView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
+                if let undoPrompt, vm.canUndoLastCompletedSet {
+                    VStack {
+                        Spacer()
+                        undoBanner(prompt: undoPrompt)
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, restTimerActive ? 28 : 92)
+                    }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+
                 VStack {
                     Spacer()
                     bottomAction(workout)
@@ -89,6 +101,7 @@ struct ActiveWorkoutView: View {
             .onDisappear {
                 timerTask?.cancel()
                 swapFeedbackTask?.cancel()
+                undoDismissTask?.cancel()
             }
             .sheet(item: $showExerciseInfo) { exercise in
                 NavigationStack {
@@ -151,6 +164,11 @@ struct ActiveWorkoutView: View {
             .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.6), trigger: setCompletedTrigger)
             .sensoryFeedback(.success, trigger: swapFeedbackTrigger)
         }
+    }
+
+    private struct LoggedSetUndoPrompt {
+        let title: String
+        let subtitle: String
     }
 
     // MARK: - Header
@@ -1129,6 +1147,44 @@ struct ActiveWorkoutView: View {
         )
     }
 
+    private func undoBanner(prompt: LoggedSetUndoPrompt) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(prompt.title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                Text(prompt.subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.55))
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 12)
+
+            Button {
+                undoLastCompletedSet()
+            } label: {
+                Text("Undo")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(STRQBrand.accentGradient, in: Capsule())
+            }
+            .buttonStyle(.strqPressable)
+            .accessibilityLabel("Undo last logged set")
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color.white.opacity(0.08), in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.18), radius: 16, y: 8)
+    }
+
     // MARK: - Bottom CTA
 
     private func bottomAction(_ workout: ActiveWorkoutState) -> some View {
@@ -1588,12 +1644,14 @@ struct ActiveWorkoutView: View {
     }
 
     private func saveAndLeave() {
+        dismissUndoPrompt()
         restTimerActive = false
         showExitDialog = false
         vm.workoutController.pauseWorkout()
     }
 
     private func finishWorkout() {
+        dismissUndoPrompt()
         restTimerActive = false
         showExitDialog = false
         confirmDiscard = false
@@ -1673,9 +1731,13 @@ struct ActiveWorkoutView: View {
     }
 
     private func completeSet(exerciseIndex: Int, setIndex: Int) {
+        let prompt = undoPromptDetails(exerciseIndex: exerciseIndex, setIndex: setIndex)
         let rest = vm.completeCurrentSet(exerciseIndex: exerciseIndex, setIndex: setIndex)
         setCompletedTrigger.toggle()
         lastLoggedSet = (exerciseIndex, setIndex)
+        if let prompt {
+            presentUndoPrompt(prompt)
+        }
         guard rest > 0 else { return }
         restTimeRemaining = rest
         restTimerActive = true
@@ -1720,6 +1782,55 @@ struct ActiveWorkoutView: View {
         case .reps:
             updateSet(exerciseIndex: ctx.exerciseIndex, setIndex: ctx.setIndex, weight: ctx.currentWeight, reps: max(0, Int(newValue.rounded())))
         }
+    }
+
+    private func undoPromptDetails(exerciseIndex: Int, setIndex: Int) -> LoggedSetUndoPrompt? {
+        guard let workout,
+              exerciseIndex < workout.session.exerciseLogs.count,
+              setIndex < workout.session.exerciseLogs[exerciseIndex].sets.count else { return nil }
+        let set = workout.session.exerciseLogs[exerciseIndex].sets[setIndex]
+        let exerciseId = workout.session.exerciseLogs[exerciseIndex].exerciseId
+        let exerciseName = vm.library.exercise(byId: exerciseId)?.name ?? "Exercise"
+        return LoggedSetUndoPrompt(
+            title: "Set \(set.setNumber) logged",
+            subtitle: "\(exerciseName) · \(formatWeight(set.weight, increment: 0.5)) × \(set.reps)"
+        )
+    }
+
+    private func presentUndoPrompt(_ prompt: LoggedSetUndoPrompt) {
+        undoDismissTask?.cancel()
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.9)) {
+            undoPrompt = prompt
+        }
+        undoDismissTask = Task {
+            try? await Task.sleep(for: .seconds(4))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                dismissUndoPrompt()
+            }
+        }
+    }
+
+    private func dismissUndoPrompt() {
+        undoDismissTask?.cancel()
+        undoDismissTask = nil
+        vm.clearLastCompletedSetUndo()
+        withAnimation(.easeOut(duration: 0.2)) {
+            undoPrompt = nil
+        }
+    }
+
+    private func undoLastCompletedSet() {
+        let restored = vm.undoLastCompletedSet()
+        undoDismissTask?.cancel()
+        undoDismissTask = nil
+        withAnimation(.easeOut(duration: 0.2)) {
+            undoPrompt = nil
+        }
+        guard restored else { return }
+        restTimerActive = false
+        restTimeRemaining = 0
+        lastLoggedSet = nil
     }
 
     private func startTimer(startTime: Date) {

@@ -463,6 +463,19 @@ class AppViewModel {
         workoutController.completeCurrentSet(exerciseIndex: exerciseIndex, setIndex: setIndex)
     }
 
+    var canUndoLastCompletedSet: Bool {
+        workoutController.canUndoLastCompletedSet
+    }
+
+    @discardableResult
+    func undoLastCompletedSet() -> Bool {
+        workoutController.undoLastCompletedSet()
+    }
+
+    func clearLastCompletedSetUndo() {
+        workoutController.clearLastCompletedSetUndo()
+    }
+
     func setSetQuality(exerciseIndex: Int, setIndex: Int, quality: SetQuality?) {
         workoutController.setSetQuality(exerciseIndex: exerciseIndex, setIndex: setIndex, quality: quality)
     }
