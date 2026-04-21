@@ -19,7 +19,10 @@ struct CoachTabView: View {
 
                 if vm.isEarlyStage {
                     earlyStateCard
-                    calibrationChecklist
+
+                    if shouldShowCalibrationChecklist {
+                        calibrationChecklist
+                    }
                 } else {
                     if let comeback = vm.comebackGuidance {
                         ComebackCard(
@@ -423,7 +426,7 @@ struct CoachTabView: View {
                     RoundedRectangle(cornerRadius: 2)
                         .fill(STRQBrand.accentGradient)
                         .frame(width: 3, height: 14)
-                    Text("COACH CONTEXT")
+                    Text("COACH")
                         .font(.system(size: 10, weight: .black))
                         .tracking(1.2)
                         .foregroundStyle(.primary)
@@ -448,7 +451,7 @@ struct CoachTabView: View {
                         Text(guidance.headline)
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.primary)
-                        Text("Today owns the next step. Coach sharpens load, recovery, and weekly reads quietly as your real training data builds.")
+                        Text(coachEarlyStateMessage)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -468,6 +471,23 @@ struct CoachTabView: View {
         }
     }
 
+    private var coachEarlyStateMessage: String {
+        switch vm.dataMaturityTier {
+        case .fresh:
+            return "Today owns the next step. Coach will start shaping load and recovery once your first real session is in."
+        case .firstSession:
+            return "Baseline is set. Keep the week moving and Coach will sharpen the details quietly in the background."
+        case .earlyWeek:
+            return "A little more real training data will make Coach's next calls feel much more personal."
+        case .established:
+            return "You're on plan. Stay the course."
+        }
+    }
+
+    private var shouldShowCalibrationChecklist: Bool {
+        vm.dataMaturityTier != .firstSession
+    }
+
     private var calibrationChecklist: some View {
         let completed = vm.totalCompletedWorkouts
         let weekSessions = vm.weeklyStats.sessions
@@ -481,7 +501,7 @@ struct CoachTabView: View {
         ]
 
         return VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Signals Captured")
+            ForgeSectionHeader(title: "What STRQ has picked up")
 
             VStack(spacing: 8) {
                 ForEach(Array(items.enumerated()), id: \.offset) { _, item in
@@ -669,7 +689,7 @@ struct CoachTabView: View {
                     weeklyReviewLabel(subtitle: "Review your week and adjust", ready: true)
                 }
             } else if vm.isEarlyStage {
-                weeklyReviewLabel(subtitle: vm.sessionsUntilReviewReady == 0 ? "Almost there — one more session rounds out the week" : "\(vm.sessionsUntilReviewReady) more session\(vm.sessionsUntilReviewReady == 1 ? "" : "s") and Coach can review the week clearly", ready: false)
+                weeklyReviewLabel(subtitle: vm.sessionsUntilReviewReady == 0 ? "Almost there — one more session rounds out the week" : "\(vm.sessionsUntilReviewReady) more session\(vm.sessionsUntilReviewReady == 1 ? "" : "s") and your first weekly read will come into focus", ready: false)
                     .opacity(0.7)
             } else {
                 Button {

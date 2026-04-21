@@ -19,58 +19,82 @@ struct DashboardView: View {
                 primaryActionCard
                     .padding(.horizontal, 16)
 
-                if let since = vm.dailyBriefing?.sinceLast {
-                    sinceLastCard(since)
+                if isPostFirstSessionState {
+                    scheduleTimeline
                         .padding(.horizontal, 16)
-                }
 
-                if let roadmap = vm.activationRoadmap {
-                    ActivationRoadmapCard(roadmap: roadmap)
+                    dailySignalsRow
+                        .padding(.horizontal, 16)
+
+                    if let roadmap = vm.activationRoadmap {
+                        ActivationRoadmapCard(roadmap: roadmap, compact: true)
+                            .padding(.horizontal, 16)
+                            .onAppear {
+                                Analytics.shared.track(.activation_roadmap_viewed, [
+                                    "completed": String(roadmap.completedCount),
+                                    "surface": "today"
+                                ])
+                            }
+                    }
+
+                    if let since = vm.dailyBriefing?.sinceLast {
+                        sinceLastCard(since)
+                            .padding(.horizontal, 16)
+                    }
+                } else {
+                    if let since = vm.dailyBriefing?.sinceLast {
+                        sinceLastCard(since)
+                            .padding(.horizontal, 16)
+                    }
+
+                    if let roadmap = vm.activationRoadmap {
+                        ActivationRoadmapCard(roadmap: roadmap)
+                            .padding(.horizontal, 16)
+                            .onAppear {
+                                Analytics.shared.track(.activation_roadmap_viewed, [
+                                    "completed": String(roadmap.completedCount),
+                                    "surface": "today"
+                                ])
+                            }
+                    } else if let comeback = vm.comebackGuidance {
+                        ComebackCard(
+                            guidance: comeback,
+                            onEaseNext: comeback.offersLighterSession ? {
+                                Analytics.shared.track(.comeback_cta_tapped, [
+                                    "action": "ease",
+                                    "tier": comeback.tier.rawValue,
+                                    "surface": "today"
+                                ])
+                                vm.applyComebackLighterSession()
+                            } : nil,
+                            onCheckIn: vm.hasCheckedInToday ? nil : {
+                                Analytics.shared.track(.comeback_cta_tapped, [
+                                    "action": "checkin",
+                                    "tier": comeback.tier.rawValue,
+                                    "surface": "today"
+                                ])
+                                showReadinessCheckIn = true
+                            }
+                        )
                         .padding(.horizontal, 16)
                         .onAppear {
-                            Analytics.shared.track(.activation_roadmap_viewed, [
-                                "completed": String(roadmap.completedCount),
+                            Analytics.shared.track(.comeback_card_viewed, [
+                                "tier": comeback.tier.rawValue,
+                                "days_since": String(comeback.daysSinceLastWorkout),
                                 "surface": "today"
                             ])
                         }
-                } else if let comeback = vm.comebackGuidance {
-                    ComebackCard(
-                        guidance: comeback,
-                        onEaseNext: comeback.offersLighterSession ? {
-                            Analytics.shared.track(.comeback_cta_tapped, [
-                                "action": "ease",
-                                "tier": comeback.tier.rawValue,
-                                "surface": "today"
-                            ])
-                            vm.applyComebackLighterSession()
-                        } : nil,
-                        onCheckIn: vm.hasCheckedInToday ? nil : {
-                            Analytics.shared.track(.comeback_cta_tapped, [
-                                "action": "checkin",
-                                "tier": comeback.tier.rawValue,
-                                "surface": "today"
-                            ])
-                            showReadinessCheckIn = true
-                        }
-                    )
-                    .padding(.horizontal, 16)
-                    .onAppear {
-                        Analytics.shared.track(.comeback_card_viewed, [
-                            "tier": comeback.tier.rawValue,
-                            "days_since": String(comeback.daysSinceLastWorkout),
-                            "surface": "today"
-                        ])
+                    } else if let guidance = vm.earlyStateGuidance {
+                        earlyStageHint(guidance)
+                            .padding(.horizontal, 16)
                     }
-                } else if let guidance = vm.earlyStateGuidance {
-                    earlyStageHint(guidance)
+
+                    scheduleTimeline
+                        .padding(.horizontal, 16)
+
+                    dailySignalsRow
                         .padding(.horizontal, 16)
                 }
-
-                scheduleTimeline
-                    .padding(.horizontal, 16)
-
-                dailySignalsRow
-                    .padding(.horizontal, 16)
 
                 if !vm.isEarlyStage {
                     weekPulse
@@ -326,12 +350,14 @@ struct DashboardView: View {
     // MARK: - Since Last Session
 
     private func sinceLastCard(_ since: DailyBriefing.SinceLast) -> some View {
-        HStack(spacing: 12) {
+        let isSupporting = isPostFirstSessionState
+
+        return HStack(spacing: 12) {
             Image(systemName: "arrow.up.right.circle.fill")
-                .font(.title3)
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(STRQPalette.success)
-                .frame(width: 36, height: 36)
-                .background(STRQPalette.successSoft, in: .rect(cornerRadius: 10))
+                .frame(width: 32, height: 32)
+                .background(STRQPalette.successSoft, in: .rect(cornerRadius: 9))
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
@@ -344,7 +370,7 @@ struct DashboardView: View {
                         .foregroundStyle(.tertiary)
                 }
                 Text(since.summary)
-                    .font(.subheadline.weight(.semibold))
+                    .font((isSupporting ? Font.caption.weight(.semibold) : Font.subheadline.weight(.semibold)))
                     .lineLimit(2)
                 Text(since.sessionName)
                     .font(.caption2)
@@ -353,10 +379,10 @@ struct DashboardView: View {
             Spacer(minLength: 0)
         }
         .padding(12)
-        .background(STRQPalette.successSoft.opacity(0.5), in: .rect(cornerRadius: 14))
+        .background(isSupporting ? Color(.secondarySystemGroupedBackground) : STRQPalette.successSoft.opacity(0.5), in: .rect(cornerRadius: 14))
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(STRQPalette.success.opacity(0.2), lineWidth: 1)
+                .strokeBorder(isSupporting ? STRQBrand.cardBorder : STRQPalette.success.opacity(0.2), lineWidth: 1)
         )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
@@ -367,6 +393,10 @@ struct DashboardView: View {
         if hours < 1 { return "JUST NOW" }
         if hours < 24 { return "\(hours)H AGO" }
         return "YESTERDAY"
+    }
+
+    private var isPostFirstSessionState: Bool {
+        vm.dataMaturityTier == .firstSession
     }
 
     // MARK: - Early Stage
