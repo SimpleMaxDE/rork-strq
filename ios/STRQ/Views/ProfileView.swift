@@ -78,27 +78,27 @@ struct ProfileView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Your data stays on this device. Sign back in anytime to restore from iCloud.")
+            Text("Your training stays on this device. You can sign in again later to sync or restore from iCloud.")
         }
-        .alert("Restore from iCloud?", isPresented: $showCloudRestoreConfirm) {
+        .alert("Restore This Device?", isPresented: $showCloudRestoreConfirm) {
             Button("Restore", role: .destructive) {
                 let outcome = vm.restoreFromCloud(force: true)
                 cloudRestoreMessage = {
                     switch outcome {
-                    case .restored: return "Your training data has been restored."
-                    case .noSnapshot: return "No cloud snapshot found yet. Train on this device and it will sync automatically."
-                    case .unavailable: return "iCloud is unavailable right now. Check your connection and try again."
-                    case .staleIgnored: return "Your device already has the most recent data."
-                    case .decodeFailed: return "We couldn't read the cloud snapshot. Try again shortly."
+                    case .restored: return "This device has been updated from your latest iCloud snapshot."
+                    case .noSnapshot: return "No iCloud snapshot is available yet. Once you train while signed in, changes will sync automatically."
+                    case .unavailable: return "iCloud isn't available right now. Check that iCloud is enabled, then try again."
+                    case .staleIgnored: return "This device is already using your latest iCloud data."
+                    case .decodeFailed: return "We couldn't read your iCloud data right now. Try again in a moment."
                     }
                 }()
                 showCloudRestoreMessage = true
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("This will replace data on this device with your most recent iCloud snapshot.")
+            Text("Use your most recent iCloud snapshot on this device. Current local data will be replaced.")
         }
-        .alert("iCloud", isPresented: $showCloudRestoreMessage) {
+        .alert("iCloud Sync", isPresented: $showCloudRestoreMessage) {
             Button("OK") { cloudRestoreMessage = nil }
         } message: {
             Text(cloudRestoreMessage ?? "")
@@ -128,12 +128,12 @@ struct ProfileView: View {
                             .frame(width: 34, height: 34)
                             .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(account.displayName ?? "Signed in with Apple")
+                            Text("iCloud Sync")
                                 .font(.subheadline.weight(.bold))
-                                .lineLimit(1)
-                            Text(cloudStatusText)
+                            Text(signedInCloudSummary(name: account.displayName))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         Spacer()
                         cloudStatusBadge
@@ -145,7 +145,11 @@ struct ProfileView: View {
                     Button {
                         showCloudRestoreConfirm = true
                     } label: {
-                        accountActionRow(icon: "arrow.clockwise.icloud.fill", label: "Restore from iCloud")
+                        accountActionRow(
+                            icon: "arrow.clockwise.icloud.fill",
+                            label: "Restore This Device",
+                            detail: "Replace local data with your latest iCloud snapshot"
+                        )
                     }
 
                     Divider().opacity(0.3).padding(.horizontal, 14)
@@ -170,9 +174,9 @@ struct ProfileView: View {
                             .frame(width: 34, height: 34)
                             .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Sync across devices")
+                            Text("iCloud Sync")
                                 .font(.subheadline.weight(.bold))
-                            Text("Sign in with Apple to back up your training to iCloud.")
+                            Text("Sign in with Apple to keep your training backed up in iCloud and ready to restore on another device.")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -195,6 +199,10 @@ struct ProfileView: View {
                     .signInWithAppleButtonStyle(.white)
                     .frame(height: 44)
                     .clipShape(.rect(cornerRadius: 11))
+
+                    Text("Your training stays local on this device until you turn sync on.")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
                 }
                 .padding(14)
                 .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
@@ -223,15 +231,26 @@ struct ProfileView: View {
         )
     }
 
-    private func accountActionRow(icon: String, label: String, tint: Color = STRQBrand.steel) -> some View {
+    private func accountActionRow(icon: String, label: String, detail: String? = nil, tint: Color = STRQBrand.steel) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
                 .font(.caption)
                 .foregroundStyle(tint)
                 .frame(width: 24)
-            Text(label)
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(label == "Sign Out" ? .red : .primary)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(label == "Sign Out" ? .red : .primary)
+
+                if let detail {
+                    Text(detail)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.caption2.weight(.semibold))
@@ -241,19 +260,36 @@ struct ProfileView: View {
         .padding(.vertical, 11)
     }
 
+    private func signedInCloudSummary(name: String?) -> String {
+        let trimmedName: String? = name?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let accountLine: String
+        if let trimmedName, !trimmedName.isEmpty {
+            accountLine = "Signed in as \(trimmedName)"
+        } else {
+            accountLine = "Signed in with Apple"
+        }
+        return "\(accountLine) · \(cloudStatusText)"
+    }
+
     private var cloudStatusText: String {
         guard vm.cloudSync.isAvailable else {
-            return "iCloud unavailable on this device"
+            return "iCloud isn't available right now"
         }
         switch vm.cloudSync.status {
-        case .syncing: return "Syncing…"
-        case .failed(let reason): return "Sync issue · \(reason)"
-        case .unavailable: return "iCloud unavailable"
+        case .syncing:
+            return "Saving recent changes"
+        case .failed(let reason):
+            if reason.localizedCaseInsensitiveContains("too large") {
+                return "Some changes couldn't be saved to iCloud yet"
+            }
+            return "Sync paused. Try again shortly"
+        case .unavailable:
+            return "iCloud isn't available right now"
         case .success, .idle:
             if let text = vm.cloudSync.lastSyncText {
-                return "Synced \(text)"
+                return "Last synced \(text)"
             }
-            return "Ready to sync"
+            return "Changes sync automatically"
         }
     }
 
@@ -262,7 +298,7 @@ struct ProfileView: View {
             guard vm.cloudSync.isAvailable else { return ("OFF", .gray) }
             switch vm.cloudSync.status {
             case .syncing: return ("SYNC", STRQBrand.steel)
-            case .failed: return ("RETRY", STRQPalette.warning)
+            case .failed: return ("CHECK", STRQPalette.warning)
             case .unavailable: return ("OFF", .gray)
             case .success, .idle: return ("ON", STRQPalette.success)
             }
