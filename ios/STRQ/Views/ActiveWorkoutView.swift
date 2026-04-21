@@ -1323,194 +1323,250 @@ struct ActiveWorkoutView: View {
 
     @ViewBuilder
     private func restTimerOverlay(_ workout: ActiveWorkoutState) -> some View {
+        let planned = workout.currentExerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[workout.currentExerciseIndex] : nil
+        let totalRest = planned?.restSeconds ?? 90
+        let progress = totalRest > 0 ? CGFloat(restTimeRemaining) / CGFloat(totalRest) : 0
+
         ZStack {
-            Color.black.opacity(0.95).ignoresSafeArea()
+            Color.black.opacity(0.84).ignoresSafeArea()
                 .onTapGesture { }
 
-            let planned = workout.currentExerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[workout.currentExerciseIndex] : nil
-            let totalRest = planned?.restSeconds ?? 90
-            let progress = totalRest > 0 ? CGFloat(restTimeRemaining) / CGFloat(totalRest) : 0
-
             VStack(spacing: 0) {
-                Spacer(minLength: 0)
-
-                // Just logged summary
-                if let last = lastLoggedSet,
-                   last.exerciseIndex < workout.session.exerciseLogs.count,
-                   last.setIndex < workout.session.exerciseLogs[last.exerciseIndex].sets.count {
-                    let loggedSet = workout.session.exerciseLogs[last.exerciseIndex].sets[last.setIndex]
-                    let e1rm = estimatedOneRM(weight: loggedSet.weight, reps: loggedSet.reps)
-                    VStack(spacing: 4) {
-                        Text("JUST LOGGED")
-                            .font(.system(size: 9, weight: .black))
-                            .tracking(1.5)
-                            .foregroundStyle(STRQBrand.steel)
-                        HStack(spacing: 10) {
-                            Text("Set \(loggedSet.setNumber)")
-                                .font(.system(size: 11, weight: .heavy).monospacedDigit())
-                                .foregroundStyle(.white.opacity(0.55))
-                            Text("\(formatWeight(loggedSet.weight, increment: 0.5)) × \(loggedSet.reps)")
-                                .font(.system(size: 20, weight: .heavy, design: .rounded).monospacedDigit())
-                                .foregroundStyle(.white)
-                            if e1rm > 0 {
-                                Rectangle().fill(Color.white.opacity(0.15)).frame(width: 1, height: 14)
-                                Text(String(format: "e1RM %.0f", e1rm))
-                                    .font(.system(size: 11, weight: .bold).monospacedDigit())
-                                    .foregroundStyle(.white.opacity(0.6))
-                            }
-                        }
-                    }
-                    .padding(.bottom, 14)
-                }
-
-                // SET FEEL (moved above timer)
-                if let last = lastLoggedSet,
-                   last.exerciseIndex < workout.session.exerciseLogs.count,
-                   last.setIndex < workout.session.exerciseLogs[last.exerciseIndex].sets.count {
-                    let currentQuality = workout.session.exerciseLogs[last.exerciseIndex].sets[last.setIndex].quality
-                    VStack(spacing: 8) {
-                        Text("HOW DID THAT FEEL?")
-                            .font(.system(size: 9, weight: .black))
-                            .foregroundStyle(.white.opacity(0.4))
-                            .tracking(1.5)
-                        HStack(spacing: 6) {
-                            ForEach(SetQuality.allCases, id: \.self) { quality in
-                                let isSelected = currentQuality == quality
-                                Button {
-                                    setQuality(exerciseIndex: last.exerciseIndex, setIndex: last.setIndex, quality: isSelected ? nil : quality)
-                                } label: {
-                                    VStack(spacing: 4) {
-                                        Image(systemName: quality.icon)
-                                            .font(.system(size: 13, weight: .semibold))
-                                        Text(quality.shortLabel)
-                                            .font(.system(size: 9, weight: .bold))
-                                    }
-                                    .foregroundStyle(isSelected ? .black : .white.opacity(0.7))
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 48)
-                                    .background(
-                                        isSelected
-                                            ? AnyShapeStyle(qualityColor(quality.colorName))
-                                            : AnyShapeStyle(Color.white.opacity(0.05)),
-                                        in: .rect(cornerRadius: 11)
-                                    )
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 11)
-                                            .strokeBorder(Color.white.opacity(isSelected ? 0 : 0.06), lineWidth: 1)
-                                    )
-                                }
-                                .buttonStyle(.strqPressable)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 18)
-                }
-
-                // Timer ring (smaller, more utility-focused)
-                ZStack {
-                    Circle()
-                        .stroke(Color.white.opacity(0.06), lineWidth: 5)
-                        .frame(width: 168, height: 168)
-                    Circle()
-                        .trim(from: 0, to: progress)
-                        .stroke(
-                            restTimeRemaining <= 10 ? STRQPalette.warning : Color.white,
-                            style: StrokeStyle(lineWidth: 5, lineCap: .round)
-                        )
-                        .frame(width: 168, height: 168)
-                        .rotationEffect(.degrees(-90))
-                        .animation(.linear(duration: 1), value: restTimeRemaining)
-
-                    VStack(spacing: 4) {
-                        Text("REST")
-                            .font(.system(size: 10, weight: .black))
-                            .tracking(2.0)
-                            .foregroundStyle(.white.opacity(0.5))
-                        Text(formatTime(restTimeRemaining))
-                            .font(.system(size: 42, weight: .bold, design: .monospaced))
-                            .foregroundStyle(restTimeRemaining <= 10 ? STRQPalette.warning : .white)
-                            .contentTransition(.numericText(countsDown: true))
-                    }
-                }
-
                 Spacer(minLength: 20)
 
-                // Next set recommendation
-                if let nextRec = nextSetRecommendation(workout) {
-                    VStack(spacing: 5) {
-                        Text("NEXT SET")
-                            .font(.system(size: 9, weight: .black))
-                            .foregroundStyle(.white.opacity(0.4))
-                            .tracking(1.5)
-                        Text(nextRec.primary)
-                            .font(.system(size: 18, weight: .heavy, design: .rounded).monospacedDigit())
-                            .foregroundStyle(.white)
-                        Text(nextRec.detail)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.55))
+                VStack(spacing: 18) {
+                    if let last = lastLoggedSet,
+                       last.exerciseIndex < workout.session.exerciseLogs.count,
+                       last.setIndex < workout.session.exerciseLogs[last.exerciseIndex].sets.count {
+                        let log = workout.session.exerciseLogs[last.exerciseIndex]
+                        let loggedSet = log.sets[last.setIndex]
+                        let exerciseName = vm.library.exercise(byId: log.exerciseId)?.name ?? "Exercise"
+                        let e1rm = estimatedOneRM(weight: loggedSet.weight, reps: loggedSet.reps)
+                        let currentQuality = loggedSet.quality
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("JUST LOGGED")
+                                    .font(.system(size: 9, weight: .black))
+                                    .tracking(1.5)
+                                    .foregroundStyle(STRQBrand.steel)
+                                Text(exerciseName)
+                                    .font(.headline.weight(.semibold))
+                                    .foregroundStyle(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.85)
+                                Text("Set \(loggedSet.setNumber) · \(formatWeight(loggedSet.weight, increment: 0.5)) × \(loggedSet.reps)")
+                                    .font(.system(size: 24, weight: .heavy, design: .rounded).monospacedDigit())
+                                    .foregroundStyle(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                                if e1rm > 0 {
+                                    Text(String(format: "Estimated 1RM %.0f", e1rm))
+                                        .font(.caption.weight(.semibold).monospacedDigit())
+                                        .foregroundStyle(.white.opacity(0.52))
+                                }
+                            }
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("How did that feel?")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(.white.opacity(0.48))
+                                HStack(spacing: 8) {
+                                    ForEach(SetQuality.allCases, id: \.self) { quality in
+                                        let isSelected = currentQuality == quality
+                                        Button {
+                                            setQuality(exerciseIndex: last.exerciseIndex, setIndex: last.setIndex, quality: isSelected ? nil : quality)
+                                        } label: {
+                                            VStack(spacing: 4) {
+                                                Image(systemName: quality.icon)
+                                                    .font(.system(size: 13, weight: .semibold))
+                                                Text(quality.shortLabel)
+                                                    .font(.caption2.weight(.bold))
+                                                    .lineLimit(1)
+                                            }
+                                            .foregroundStyle(isSelected ? .black : .white.opacity(0.74))
+                                            .frame(maxWidth: .infinity)
+                                            .frame(minHeight: 50)
+                                            .background(
+                                                isSelected
+                                                    ? AnyShapeStyle(qualityColor(quality.colorName))
+                                                    : AnyShapeStyle(Color.white.opacity(0.05)),
+                                                in: .rect(cornerRadius: 12)
+                                            )
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .strokeBorder(Color.white.opacity(isSelected ? 0 : 0.06), lineWidth: 1)
+                                            )
+                                        }
+                                        .buttonStyle(.strqPressable)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(16)
+                        .background(Color.white.opacity(0.05), in: .rect(cornerRadius: 20))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                        )
+                    }
+
+                    VStack(spacing: 10) {
+                        ZStack {
+                            Circle()
+                                .stroke(Color.white.opacity(0.06), lineWidth: 6)
+                                .frame(width: 176, height: 176)
+                            Circle()
+                                .trim(from: 0, to: progress)
+                                .stroke(
+                                    restTimeRemaining <= 10 ? STRQPalette.warning : Color.white,
+                                    style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                                )
+                                .frame(width: 176, height: 176)
+                                .rotationEffect(.degrees(-90))
+                                .animation(.linear(duration: 1), value: restTimeRemaining)
+
+                            VStack(spacing: 6) {
+                                Text("REST")
+                                    .font(.system(size: 10, weight: .black))
+                                    .tracking(2.0)
+                                    .foregroundStyle(.white.opacity(0.46))
+                                Text(formatTime(restTimeRemaining))
+                                    .font(.system(size: 42, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(restTimeRemaining <= 10 ? STRQPalette.warning : .white)
+                                    .contentTransition(.numericText(countsDown: true))
+                            }
+                        }
+
+                        Text(restCountdownHint())
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.58))
                             .multilineTextAlignment(.center)
-                            .lineLimit(2)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 18)
-                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
-                    )
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 14)
+
+                    if let nextRec = nextSetRecommendation(workout) {
+                        restNextActionCard(nextRec)
+                    }
+
+                    HStack(spacing: 12) {
+                        restTimerAdjustmentButton(title: "−15s") {
+                            let updatedTime = max(0, restTimeRemaining - 15)
+                            restTimeRemaining = updatedTime
+                            if updatedTime == 0 {
+                                restTimerActive = false
+                            }
+                        }
+
+                        Button {
+                            restTimeRemaining = 0
+                            restTimerActive = false
+                        } label: {
+                            Text("Continue Now")
+                                .font(.body.weight(.bold))
+                                .foregroundStyle(.black)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(STRQBrand.accentGradient, in: Capsule())
+                        }
+                        .buttonStyle(.strqPressable)
+                        .accessibilityLabel("Continue workout now")
+
+                        restTimerAdjustmentButton(title: "+15s") {
+                            restTimeRemaining += 15
+                        }
+                    }
                 }
-
-                // Timer controls
-                HStack(spacing: 12) {
-                    Button { restTimeRemaining = max(0, restTimeRemaining - 15) } label: {
-                        Text("−15s")
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.75))
-                            .frame(width: 68, height: 44)
-                            .background(Color.white.opacity(0.05), in: Capsule())
-                            .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
-                    }
-                    .buttonStyle(.strqPressable)
-
-                    Button {
-                        restTimeRemaining = 0
-                        restTimerActive = false
-                    } label: {
-                        Text("Skip Rest")
-                            .font(.system(size: 15, weight: .bold))
-                            .foregroundStyle(.black)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 52)
-                            .background(STRQBrand.accentGradient, in: Capsule())
-                    }
-                    .buttonStyle(.strqPressable)
-
-                    Button { restTimeRemaining += 15 } label: {
-                        Text("+15s")
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.75))
-                            .frame(width: 68, height: 44)
-                            .background(Color.white.opacity(0.05), in: Capsule())
-                            .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
-                    }
-                    .buttonStyle(.strqPressable)
-                }
+                .padding(20)
+                .frame(maxWidth: 380)
+                .background(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.08), Color.white.opacity(0.04)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    in: .rect(cornerRadius: 28)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28)
+                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.3), radius: 22, y: 12)
                 .padding(.horizontal, 20)
 
-                Spacer(minLength: 20)
+                Spacer(minLength: 92)
             }
-            .padding(.top, 36)
-            .padding(.bottom, 20)
         }
     }
 
+    private func restTimerAdjustmentButton(title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.78))
+                .frame(width: 72, height: 46)
+                .background(Color.white.opacity(0.05), in: Capsule())
+                .overlay(
+                    Capsule()
+                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                )
+        }
+        .buttonStyle(.strqPressable)
+    }
+
+    private func restCountdownHint() -> String {
+        if restTimeRemaining <= 10 {
+            return "Get set for the next effort."
+        }
+        if restTimeRemaining <= 30 {
+            return "Reset, then go again."
+        }
+        return "Take the rest you need. The next move is already queued."
+    }
+
+    private func restNextActionCard(_ nextRec: NextSetRec) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            Image(systemName: nextRec.icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(nextRec.tint)
+                .frame(width: 40, height: 40)
+                .background(nextRec.tint.opacity(0.16), in: .rect(cornerRadius: 12))
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(nextRec.eyebrow)
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(1.4)
+                    .foregroundStyle(nextRec.tint)
+                Text(nextRec.primary)
+                    .font(nextRec.usesMonospacedPrimary ? .system(size: 20, weight: .heavy, design: .rounded).monospacedDigit() : .title3.weight(.heavy))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+                Text(nextRec.detail)
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.58))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(Color.white.opacity(0.05), in: .rect(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(nextRec.tint.opacity(0.22), lineWidth: 1)
+        )
+    }
+
     private struct NextSetRec {
+        let eyebrow: String
         let primary: String
         let detail: String
+        let icon: String
+        let tint: Color
+        let usesMonospacedPrimary: Bool
     }
 
     private func nextSetRecommendation(_ workout: ActiveWorkoutState) -> NextSetRec? {
@@ -1519,26 +1575,38 @@ struct ActiveWorkoutView: View {
         let log = workout.session.exerciseLogs[last.exerciseIndex]
         guard last.setIndex < log.sets.count else { return nil }
         let justLogged = log.sets[last.setIndex]
-        // find next pending set
         let nextPending = log.sets.dropFirst(last.setIndex + 1).first(where: { !$0.isCompleted })
+
         guard let next = nextPending else {
-            // Last set — recommend moving on
             let nextIdx = last.exerciseIndex + 1
             if nextIdx < workout.session.exerciseLogs.count {
                 let nextEx = vm.library.exercise(byId: workout.session.exerciseLogs[nextIdx].exerciseId)
                 return NextSetRec(
+                    eyebrow: "NEXT EXERCISE",
                     primary: nextEx?.name ?? "Next exercise",
-                    detail: "All sets done — move on when ready"
+                    detail: "This lift is done. Move on when the rest feels right.",
+                    icon: "arrow.right.circle.fill",
+                    tint: STRQBrand.steel,
+                    usesMonospacedPrimary: false
                 )
             }
-            return nil
+            return NextSetRec(
+                eyebrow: "WORKOUT READY",
+                primary: "Finish Workout",
+                detail: "All working sets are logged. Finish when you're ready.",
+                icon: "flag.checkered",
+                tint: STRQPalette.success,
+                usesMonospacedPrimary: false
+            )
         }
 
         let planned = last.exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[last.exerciseIndex] : nil
         let quality = justLogged.quality
         var targetWeight = next.weight > 0 ? next.weight : justLogged.weight
         var targetReps = next.reps > 0 ? next.reps : justLogged.reps
-        var guidance = "Match the last set"
+        var guidance = "Repeat the last set cleanly."
+        var icon = "figure.strengthtraining.traditional"
+        var tint: Color = STRQBrand.steel
 
         let exercise = vm.library.exercise(byId: log.exerciseId)
         let increment = weightIncrement(for: exercise)
@@ -1547,20 +1615,32 @@ struct ActiveWorkoutView: View {
             switch q {
             case .tooEasy:
                 targetWeight = roundTo(targetWeight + max(increment, 2.5), step: increment)
-                guidance = "Last set felt easy — add load"
+                guidance = "Felt easy. Add a small bump and keep the reps clean."
+                icon = "arrow.up.right.circle.fill"
+                tint = STRQPalette.success
             case .onTarget:
-                guidance = "Hold steady — same load & reps"
+                guidance = "Stay here. Same load, same standard."
+                icon = "checkmark.circle.fill"
+                tint = STRQBrand.steel
             case .grinder:
-                guidance = "Tough finish — hold load, aim for same reps"
+                guidance = "Hold the load. Match the reps if they're still clean."
+                icon = "minus.circle.fill"
+                tint = STRQPalette.warning
             case .formBreakdown:
                 targetWeight = roundTo(max(0, targetWeight - max(increment, 2.5)), step: increment)
-                guidance = "Form broke — drop load to clean it up"
+                guidance = "Drop the load slightly and keep the pattern smooth."
+                icon = "arrow.down.right.circle.fill"
+                tint = STRQPalette.warning
             case .pain:
-                guidance = "Pain signal — swap or skip the next set"
+                guidance = "Pain noted. Swap or stop this movement if it doesn't settle."
+                icon = "exclamationmark.triangle.fill"
+                tint = STRQPalette.danger
             }
         } else if let p = planned, let plannedTopReps = parsePlannedReps(p.reps), justLogged.reps >= plannedTopReps {
             targetWeight = roundTo(targetWeight + increment, step: increment)
-            guidance = "Hit target reps — nudge weight up"
+            guidance = "Top of the range hit. Nudge the load up."
+            icon = "arrow.up.right.circle.fill"
+            tint = STRQPalette.success
         }
 
         let primary: String
@@ -1569,7 +1649,7 @@ struct ActiveWorkoutView: View {
         } else {
             primary = "Set \(next.setNumber) · \(formatWeight(targetWeight, increment: increment)) × \(targetReps)"
         }
-        // Apply suggestion to the set so inputs pre-fill
+
         if next.weight != targetWeight || next.reps != targetReps {
             let setIndex = last.setIndex + 1 + (log.sets.dropFirst(last.setIndex + 1).firstIndex(where: { !$0.isCompleted }) ?? 0)
             if setIndex < log.sets.count {
@@ -1578,7 +1658,14 @@ struct ActiveWorkoutView: View {
             _ = targetReps
         }
 
-        return NextSetRec(primary: primary, detail: guidance)
+        return NextSetRec(
+            eyebrow: "NEXT SET",
+            primary: primary,
+            detail: guidance,
+            icon: icon,
+            tint: tint,
+            usesMonospacedPrimary: true
+        )
     }
 
     // MARK: - Exercise List Sheet
