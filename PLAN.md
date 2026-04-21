@@ -730,3 +730,26 @@ Fix three user-facing gaps now that the GIF pipeline works end-to-end: ExerciseD
 - [x] `STRQBrand` / `STRQPalette` only — no new color maps
 - [x] Dark premium identity preserved — media now reads as part of the card, not pasted on top
 - [x] No release work, no unrelated UX pass — surgical to the three reported gaps
+
+---
+
+# Phase 30 — Workout Clarity / Swap Confidence / Action Naming Polish
+
+Tighten the workout UX now that media, exit flow, and swap affordances are in place. Consistent action wording, unambiguous swap target framing, calm post-swap feedback.
+
+**Action naming consistency (`ActiveWorkoutView`)**
+- [x] Header primary action renamed `Finish` → `Finish Workout` (flag.checkered icon) — matches end-of-workout bottom CTA
+- [x] Bottom all-done CTA renamed `Complete Workout` → `Finish Workout` (flag.checkered) so complete-state wording matches the header
+- [x] Current-exercise action bar: `Guide` → `Exercise Guide`, `Swap` → `Swap Exercise`
+- [x] Exercise-list swipe action relabelled `Swap` → `Swap Exercise`
+- [x] Exit dialog wording preserved (`Save & Leave` / `Discard Workout` / `Continue Workout`) — already consistent
+
+**Swap confidence (`SwapExerciseSheet`)**
+- [x] Current-exercise card eyebrow changed from neutral `CURRENT` to `REPLACING` with swap glyph in `STRQBrand.steel` — replacement target is unambiguous
+- [x] Current-exercise card gets a steel hairline border — visually anchors which exercise is being replaced
+- [x] Header subhead tightened to `Pick a role-preserving alternative`
+- [x] Close button carries an accessibility label (`Cancel swap`)
+
+**Identity**
+- [x] `STRQBrand` / `STRQPalette` only — no new color maps
+- [x] No logger complexity added — naming + framing only

@@ -53,7 +53,7 @@ struct SwapExerciseSheet: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Swap Exercise")
                     .font(.headline)
-                Text("Role-preserving alternatives")
+                Text("Pick a role-preserving alternative")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -65,6 +65,7 @@ struct SwapExerciseSheet: View {
                     .font(.title3)
                     .foregroundStyle(.secondary)
             }
+            .accessibilityLabel("Cancel swap")
         }
         .padding(.horizontal, 16)
         .padding(.top, 16)
@@ -76,10 +77,13 @@ struct SwapExerciseSheet: View {
         if let exercise = currentExercise {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 8) {
-                    Text("CURRENT")
+                    Image(systemName: "arrow.triangle.2.circlepath")
                         .font(.caption2.weight(.bold))
-                        .foregroundStyle(.secondary)
-                        .tracking(0.5)
+                        .foregroundStyle(STRQBrand.steel)
+                    Text("REPLACING")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(STRQBrand.steel)
+                        .tracking(0.8)
                     Spacer()
                     roleBadge(results.currentRole)
                 }
@@ -104,6 +108,10 @@ struct SwapExerciseSheet: View {
             }
             .padding(14)
             .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(STRQBrand.steel.opacity(0.22), lineWidth: 1)
+            )
             .opacity(appeared ? 1 : 0)
             .animation(.easeOut(duration: 0.4), value: appeared)
         }

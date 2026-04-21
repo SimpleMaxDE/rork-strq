@@ -181,13 +181,18 @@ struct ActiveWorkoutView: View {
                 vm.completeWorkout()
                 showCompletion = true
             } label: {
-                Text("Finish")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(.black)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(STRQBrand.accentGradient, in: Capsule())
+                HStack(spacing: 5) {
+                    Image(systemName: "flag.checkered")
+                        .font(.system(size: 11, weight: .bold))
+                    Text("Finish Workout")
+                        .font(.system(size: 13, weight: .bold))
+                }
+                .foregroundStyle(.black)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(STRQBrand.accentGradient, in: Capsule())
             }
+            .accessibilityLabel("Finish workout")
         }
         .padding(.horizontal, 14)
         .padding(.top, 28)
@@ -971,7 +976,7 @@ struct ActiveWorkoutView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "info.circle")
                             .font(.caption2.weight(.semibold))
-                        Text("Guide")
+                        Text("Exercise Guide")
                             .font(.footnote.weight(.medium))
                     }
                     .foregroundStyle(.white.opacity(0.55))
@@ -988,13 +993,14 @@ struct ActiveWorkoutView: View {
                 HStack(spacing: 5) {
                     Image(systemName: "arrow.triangle.2.circlepath")
                         .font(.caption2.weight(.semibold))
-                    Text("Swap")
+                    Text("Swap Exercise")
                         .font(.footnote.weight(.semibold))
                 }
                 .foregroundStyle(.white.opacity(0.75))
                 .frame(maxWidth: .infinity)
                 .frame(height: 38)
             }
+            .accessibilityLabel("Swap exercise")
 
             Rectangle()
                 .fill(Color.white.opacity(0.05))
@@ -1114,9 +1120,9 @@ struct ActiveWorkoutView: View {
                         showCompletion = true
                     } label: {
                         HStack(spacing: 8) {
-                            Image(systemName: "trophy.fill")
+                            Image(systemName: "flag.checkered")
                                 .font(.subheadline)
-                            Text("Complete Workout")
+                            Text("Finish Workout")
                                 .font(.body.weight(.bold))
                         }
                         .foregroundStyle(.black)
@@ -1480,7 +1486,7 @@ struct ActiveWorkoutView: View {
                                 swapContextIndex = index
                             }
                         } label: {
-                            Label("Swap", systemImage: "arrow.triangle.2.circlepath")
+                            Label("Swap Exercise", systemImage: "arrow.triangle.2.circlepath")
                         }
                         .tint(STRQBrand.steel)
                     }
