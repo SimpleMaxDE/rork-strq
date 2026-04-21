@@ -54,12 +54,22 @@ class StoreViewModel {
         defer { isLoading = false }
         ErrorReporter.shared.breadcrumb("Fetching offerings", category: "subscription")
         do {
-            offerings = try await Purchases.shared.offerings()
+            let loaded = try await Purchases.shared.offerings()
+            offerings = loaded
+            if loaded.current == nil || loaded.current?.availablePackages.isEmpty == true {
+                #if DEBUG
+                print("[STRQ][Paywall] Offerings loaded but no current offering or packages available — showing fallback")
+                #endif
+                ErrorReporter.shared.breadcrumb("Offerings empty — fallback shown", category: "subscription")
+            }
             let info = try await Purchases.shared.customerInfo()
             customerInfo = info
             isPro = info.entitlements["pro"]?.isActive == true
         } catch {
-            self.error = error.localizedDescription
+            #if DEBUG
+            print("[STRQ][Paywall] Offerings fetch failed: \(error.localizedDescription) — showing fallback")
+            #endif
+            ErrorReporter.shared.breadcrumb("Offerings fetch failed — fallback shown", category: "subscription")
             ErrorReporter.shared.report(error, context: ["flow": "fetchOfferings"])
         }
     }
@@ -94,6 +104,12 @@ class StoreViewModel {
             Analytics.shared.track(.purchase_failed, ["reason": "error"])
             ErrorReporter.shared.report(error, context: ["flow": "purchase", "package": package.identifier])
         }
+    }
+
+    var productsUnavailable: Bool {
+        guard isConfigured else { return true }
+        if isLoading { return false }
+        return currentOffering == nil || (currentOffering?.availablePackages.isEmpty ?? true)
     }
 
     func restore() async {

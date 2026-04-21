@@ -15,12 +15,10 @@ struct STRQPaywallView: View {
                 alreadySubscribedState
             } else if store.isLoading {
                 loadingState
-            } else if store.currentOffering != nil {
+            } else if store.currentOffering != nil, !(store.currentOffering?.availablePackages.isEmpty ?? true) {
                 paywallContent
-            } else if !store.isConfigured {
-                notConfiguredState
             } else {
-                emptyState
+                comingSoonState
             }
         }
         .overlay(alignment: .topTrailing) {
@@ -35,14 +33,7 @@ struct STRQPaywallView: View {
             }
             .padding(16)
         }
-        .alert("Error", isPresented: .init(
-            get: { store.error != nil },
-            set: { if !$0 { store.error = nil } }
-        )) {
-            Button("OK") { store.error = nil }
-        } message: {
-            Text(store.error ?? "")
-        }
+        .onAppear { store.error = nil }
         .onChange(of: store.isPro) { _, isPro in
             if isPro { dismiss() }
         }
@@ -652,40 +643,92 @@ struct STRQPaywallView: View {
         }
     }
 
-    private var notConfiguredState: some View {
-        VStack(spacing: 0) {
-            Spacer()
+    private var comingSoonState: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                heroSection
+                    .padding(.top, 28)
 
-            heroSection
+                Spacer().frame(height: 22)
 
-            Spacer().frame(height: 24)
+                comingSoonBanner
 
-            pillarList
-                .padding(.horizontal, 24)
+                Spacer().frame(height: 22)
 
-            Spacer().frame(height: 28)
+                pillarList
 
-            VStack(spacing: 10) {
-                Image(systemName: "info.circle")
-                    .font(.title3)
-                    .foregroundStyle(STRQBrand.steel)
+                Spacer().frame(height: 22)
 
-                Text("Subscriptions are not available in this preview environment.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+                compareBlock
 
-                Text("Install on your device via TestFlight to subscribe.")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .multilineTextAlignment(.center)
+                Spacer().frame(height: 22)
+
+                disabledCTA
+
+                Spacer().frame(height: 10)
+
+                trustRow
+
+                Spacer().frame(height: 12)
+
+                restoreButton
+
+                Spacer().frame(height: 10)
+
+                legalText
+
+                Spacer().frame(height: 28)
             }
-            .padding(.horizontal, 32)
+            .padding(.horizontal, 24)
+        }
+        .scrollIndicators(.hidden)
+    }
 
-            Spacer()
+    private var comingSoonBanner: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(STRQBrand.steel)
+                Text("SUBSCRIPTIONS COMING SOON")
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.4)
+                    .foregroundStyle(STRQBrand.steel)
+            }
+            Text("Premium plans will become available once App Store setup is complete.")
+                .font(.subheadline.weight(.semibold))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("You can continue exploring STRQ in the meantime.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(16)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+    }
 
-            restoreButton
-                .padding(.bottom, 24)
+    private var disabledCTA: some View {
+        VStack(spacing: 6) {
+            Text("Unavailable")
+                .font(.body.weight(.bold))
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .frame(height: 54)
+                .background(Color.white.opacity(0.05), in: .rect(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                )
+            Text("Check back once premium plans are live.")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
         }
     }
 
