@@ -47,7 +47,10 @@ nonisolated final class ExerciseDBProImporter: Sendable {
             if seenFingerprints.contains(result.fingerprint) { continue }
             seenFingerprints.insert(result.fingerprint)
             out.append(result.exercise)
-            if let g = r.gifUrl, !g.isEmpty { gifs[result.exercise.id] = g }
+            if let g = r.gifUrl, !g.isEmpty {
+                gifs[r.exerciseId] = g
+                gifs[result.exercise.id] = g
+            }
             if let famId = result.familyId { families[result.exercise.id] = famId }
         }
         self._exercises = out

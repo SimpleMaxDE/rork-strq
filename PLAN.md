@@ -647,6 +647,27 @@ Make canonical STRQ lifts reliably inherit correct imported GIFs. The Phase 25 b
 
 ---
 
+# Phase 28 — Imported GIF Lookup Key Fix
+
+Diagnostics confirmed the pipeline was healthy (bundle loaded, 1500 exercises parsed, 1500 gifUrls present, raw fetch succeeded, GIF decoded) — but every canonical lift still resolved to nil with reason `matched sibling has no remote GIF`. Root cause was a single key mismatch in the importer.
+
+**Root cause**
+- [x] `ExerciseDBProImporter` stored `_remoteGif` keyed by the prefixed exercise id (`"edb-" + r.exerciseId`)
+- [x] All callers (`ExerciseCatalog.gifURL`, `CuratedImportedMediaBridge`, `MediaDiagnosticsView.runSmokeTest`) stripped the `edb-` prefix before calling `remoteGifURL(for:)`
+- [x] Every lookup missed — `_remoteGif[rawId]` was always nil, so both direct and bridge URL resolution silently returned nil
+
+**Fix (`ExerciseDBProImporter`)**
+- [x] Store each imported GIF under both the raw source id (`r.exerciseId`) and the prefixed id (`result.exercise.id`) so every caller resolves correctly regardless of which key it uses
+- [x] No other changes — matching logic, bridge, renderer, and diagnostics untouched
+
+**Expected result**
+- [x] Direct URLs resolve for imported `edb-` ids
+- [x] Bridge URLs resolve for curated canonical lifts with imported siblings
+- [x] Final URL is non-nil across Barbell Bench Press / Overhead Press / Dumbbell Shoulder Press / Cable Pullover
+- [x] Live render shows real animated previews instead of universal fallback
+
+---
+
 # Phase 27 — End-to-End Media Pipeline Audit / Animated GIF Renderer
 
 Every surface was still showing fallback symbols — proving the issue was not just matching. Root cause: the previous renderer used `UIImage(data:)` + SwiftUI `Image(uiImage:)`, which does NOT animate animated-UIImage frames. Even if URLs resolved and bytes arrived, nothing played — and if the first frame happened not to render (cache miss race), users saw fallback. Phase 27 fixes the pipeline end-to-end and ships an internal audit surface to prove each stage works.
