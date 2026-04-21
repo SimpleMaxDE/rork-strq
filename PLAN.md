@@ -616,3 +616,31 @@ Close the gap where workout exercises still render static SF Symbols. Curated ST
 - [x] Bridge is deterministic and built lazily on first access — zero runtime cost per view
 - [x] Low-confidence matches stay on symbol fallback — no wrong GIFs to chase coverage
 - [x] `STRQBrand` / `STRQPalette` only — no new color maps, no layout regressions
+
+---
+
+# Phase 26 — Canonical Lift Media Bridge / Diagnostics
+
+Make canonical STRQ lifts reliably inherit correct imported GIFs. The Phase 25 bridge was too brittle for short canonical names that couldn't clear the 2-token overlap bar against longer imported variants. This phase adds synonym expansion, a canonical-short match path, and internal diagnostics — without weakening family / equipment-class hard filters.
+
+**Bridge hardening (`CuratedImportedMediaBridge.swift`)**
+- [x] Token-level synonym expansion — `overhead ↔ shoulder`, `pullup ↔ chinup`, `rdl ↔ romanian`, `bb ↔ barbell`, `db ↔ dumbbell`, `glutebridge ↔ hipthrust` — applied to both sides before overlap scoring
+- [x] Canonical-short match path — curated names with ≤3 meaningful tokens can match on a single shared movement noun when equipment class agrees, fixing "Overhead Press" / "Cable Pullover" / "Dumbbell Shoulder Press" coverage without lowering quality globally
+- [x] Movement-noun set extended (`thruster`, `clean`, `snatch`, `jerk`, `goodmorning`) so Olympic-lift canonicals don't silently fall back
+- [x] Family + equipment-class still required — wrong cross-family or cross-equipment GIFs remain impossible
+- [x] Scoring still favours higher overlap; canonical-short only wins when no ≥2 overlap sibling exists
+
+**Diagnostics (`CuratedImportedMediaBridge.Diagnostic`)**
+- [x] Per-curated-id record: family id, equipment class, candidate count, rejections (equipment / noun / overlap), matched imported name, matched overlap, strategy (`overlap` / `canonical-short`), textual reason
+- [x] `diagnostic(forCuratedId:)` exposes the record for internal curation review
+- [x] Distinct reason strings — "equipment-class mismatch across all siblings" / "no shared movement noun" / "name token overlap below threshold" / "matched sibling has no remote GIF" — so future bridge failures are immediately diagnosable
+
+**Canonical validation list**
+- [x] `CuratedImportedMediaBridge.canonicalLiftIds` — 28 top lifts spanning chest / back / shoulders / arms / legs / hinge / core pulls
+- [x] `canonicalCoverageReport()` returns `(id, hasMedia)` pairs so regression checks after matching tweaks become a one-liner
+- [x] Targets Phase 26 verified in-place: Barbell Bench Press, Overhead Press, Dumbbell Shoulder Press, Cable Pullover
+
+**Identity / safety**
+- [x] Curated → imported mapping stays strict — synonym groups only unify well-known naming pairs, never loosen family or equipment-class gates
+- [x] No UI surface added — diagnostics are internal-only, coverage report is for curation review
+- [x] Bridge remains deterministic, built once, cached in memory — no runtime cost per view
