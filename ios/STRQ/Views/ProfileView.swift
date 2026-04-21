@@ -15,6 +15,7 @@ struct ProfileView: View {
     @State private var showCloudRestoreConfirm: Bool = false
     @State private var cloudRestoreMessage: String?
     @State private var showCloudRestoreMessage: Bool = false
+    @State private var showMediaDiagnostics: Bool = false
 
     var body: some View {
         ScrollView {
@@ -61,6 +62,9 @@ struct ProfileView: View {
             }
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showMediaDiagnostics) {
+            NavigationStack { MediaDiagnosticsView() }
         }
         .sheet(isPresented: $showPaywall) {
             STRQPaywallView(store: store)
@@ -720,6 +724,10 @@ struct ProfileView: View {
                 .foregroundStyle(.quaternary)
                 .frame(maxWidth: .infinity)
                 .padding(.top, 6)
+                .contentShape(Rectangle())
+                .onLongPressGesture(minimumDuration: 1.2) {
+                    showMediaDiagnostics = true
+                }
         }
     }
 

@@ -644,3 +644,37 @@ Make canonical STRQ lifts reliably inherit correct imported GIFs. The Phase 25 b
 - [x] Curated → imported mapping stays strict — synonym groups only unify well-known naming pairs, never loosen family or equipment-class gates
 - [x] No UI surface added — diagnostics are internal-only, coverage report is for curation review
 - [x] Bridge remains deterministic, built once, cached in memory — no runtime cost per view
+
+---
+
+# Phase 27 — End-to-End Media Pipeline Audit / Animated GIF Renderer
+
+Every surface was still showing fallback symbols — proving the issue was not just matching. Root cause: the previous renderer used `UIImage(data:)` + SwiftUI `Image(uiImage:)`, which does NOT animate animated-UIImage frames. Even if URLs resolved and bytes arrived, nothing played — and if the first frame happened not to render (cache miss race), users saw fallback. Phase 27 fixes the pipeline end-to-end and ships an internal audit surface to prove each stage works.
+
+**Animated GIF decoder (`GIFImageView.swift`)**
+- [x] `RemoteGIFDecoder.decode(_:)` — ImageIO-based frame extraction with per-frame GIF delays, unclamped / clamped / fallback timing
+- [x] Returns `DecodedRemoteImage` with `isAnimated` flag + byte count for cache cost
+- [x] Gracefully degrades to static `UIImage(data:)` for single-frame or non-GIF data
+- [x] `AnimatedGIFView: UIViewRepresentable` — UIKit `UIImageView` wrapper so animated `UIImage.animatedImage(with:duration:)` actually plays (SwiftUI's `Image(uiImage:)` does not animate)
+
+**Renderer rewrite (`RemoteExerciseImage.swift`)**
+- [x] Cache now stores decoded `CachedEntry` (UIImage + isAnimated + byteCount) instead of raw bytes — GIFs are expensive to re-decode
+- [x] Inflight de-duplication preserved — concurrent views of the same URL share one fetch
+- [x] Animated entries render through `AnimatedGIFView`; static entries keep the SwiftUI `Image` path
+- [x] Fallback only triggers on nil URL, network failure, non-2xx response, or decode failure — no longer the default
+
+**Internal diagnostics (`MediaDiagnosticsView.swift`)**
+- [x] Section 1 — Bundle / JSON: confirms `exercises2.json` loads from `Bundle.main`, parses, and carries gifUrl values
+- [x] Section 2 — URL resolution: for Barbell Bench Press / Overhead Press / Dumbbell Shoulder Press / Cable Pullover, shows direct / bridge / final URL plus bridge reason
+- [x] Section 3 — Raw fetch smoke test: real HTTP status, byte count, GIF magic-number check, decoded frame count against the first bundled URL
+- [x] Section 4 — Live render: runs the 4 canonical lifts through the real `RemoteExerciseImage` path
+- [x] Section 5 — Direct URL smoke render: bypasses matching, proves the renderer works in isolation
+- [x] Section 6 — Canonical coverage report: green/red per canonical lift id
+
+**Access**
+- [x] Hidden long-press gesture (1.2s) on the Profile version string opens the diagnostics sheet — internal-only, no visible clutter
+
+**Identity / safety**
+- [x] No user-facing copy or UX polish added — this phase is purely pipeline correctness
+- [x] Cache size raised to 48 MB to accommodate decoded frame arrays
+- [x] Fallbacks remain safe — symbol tile still renders when URL is nil or fetch fails
