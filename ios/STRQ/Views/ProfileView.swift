@@ -29,6 +29,7 @@ struct ProfileView: View {
                 controlsSection
                 accountSection
                 dangerSection
+                footerSection
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 32)
@@ -306,9 +307,9 @@ struct ProfileView: View {
                     Divider().opacity(0.3).padding(.horizontal, 14)
 
                     Button {
-                    Analytics.shared.track(.manage_subscription_opened)
-                    showManageSubscription = true
-                } label: {
+                        Analytics.shared.track(.manage_subscription_opened)
+                        showManageSubscription = true
+                    } label: {
                         HStack(spacing: 10) {
                             Image(systemName: "creditcard.fill")
                                 .font(.caption)
@@ -691,52 +692,53 @@ struct ProfileView: View {
     }
 
     private var controlsSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 10) {
-                ForgeSectionHeader(title: "Notifications & Tools")
+        VStack(alignment: .leading, spacing: 10) {
+            ForgeSectionHeader(title: "Notifications & Tools")
 
-                VStack(spacing: 1) {
-                    NavigationLink {
-                        NotificationSettingsView(vm: vm)
-                    } label: {
-                        controlRowContent("Notifications", icon: "bell.fill", color: STRQBrand.steel)
-                            .background(Color(.secondarySystemGroupedBackground))
+            VStack(spacing: 1) {
+                NavigationLink {
+                    NotificationSettingsView(vm: vm)
+                } label: {
+                    controlRowContent("Notifications", icon: "bell.fill", color: STRQBrand.steel)
+                        .background(Color(.secondarySystemGroupedBackground))
+                }
+                controlRow("Restore Purchases", icon: "arrow.clockwise", color: STRQBrand.steel) {
+                    guard store.isConfigured else {
+                        store.restoreMessage = "Subscriptions are not available in this environment."
+                        showRestoreMessage = true
+                        return
                     }
-                    controlRow("Restore Purchases", icon: "arrow.clockwise", color: STRQBrand.steel) {
-                        guard store.isConfigured else {
-                            store.restoreMessage = "Subscriptions are not available in this environment."
-                            showRestoreMessage = true
-                            return
-                        }
-                        Task {
-                            await store.restore()
-                            showRestoreMessage = true
-                        }
-                    }
-                    controlRow("Regenerate Plan", icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
-                        vm.generatePlan()
+                    Task {
+                        await store.restore()
+                        showRestoreMessage = true
                     }
                 }
-                .clipShape(.rect(cornerRadius: 12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-                )
+                controlRow("Regenerate Plan", icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
+                    vm.generatePlan()
+                }
             }
+            .clipShape(.rect(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+            )
+        }
+    }
 
+    private var footerSection: some View {
+        VStack(spacing: 10) {
             legalLinks
-                .padding(.top, 4)
 
             Text(appVersionString)
                 .font(.caption2)
                 .foregroundStyle(.quaternary)
                 .frame(maxWidth: .infinity)
-                .padding(.top, 6)
                 .contentShape(Rectangle())
                 .onLongPressGesture(minimumDuration: 1.2) {
                     showMediaDiagnostics = true
                 }
         }
+        .padding(.top, 2)
     }
 
     private var legalLinks: some View {
