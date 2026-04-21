@@ -13,6 +13,10 @@ struct ActiveWorkoutView: View {
     @State private var showExerciseList: Bool = false
     @State private var lastLoggedSet: (exerciseIndex: Int, setIndex: Int)?
     @State private var numericEdit: NumericEditContext?
+    @State private var showExitDialog: Bool = false
+    @State private var confirmDiscard: Bool = false
+    @State private var swapContextIndex: Int?
+    @Environment(\.dismiss) private var dismiss
 
     private var workout: ActiveWorkoutState? { vm.activeWorkout }
 
@@ -91,6 +95,39 @@ struct ActiveWorkoutView: View {
                 .presentationDetents([.height(280)])
                 .presentationDragIndicator(.visible)
             }
+            .sheet(item: Binding(
+                get: { swapContextIndex.map { SwapIdx(index: $0) } },
+                set: { swapContextIndex = $0?.index }
+            )) { ctx in
+                if ctx.index < workout.session.exerciseLogs.count {
+                    let exId = workout.session.exerciseLogs[ctx.index].exerciseId
+                    SwapExerciseSheet(vm: vm, dayId: workout.session.dayId, exerciseId: exId) { newExercise in
+                        vm.workoutController.replaceExerciseInActiveWorkout(exerciseIndex: ctx.index, with: newExercise)
+                    }
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+                }
+            }
+            .confirmationDialog("End this workout?", isPresented: $showExitDialog, titleVisibility: .visible) {
+                Button("Save & Leave") {
+                    vm.workoutController.pauseWorkout()
+                    dismiss()
+                }
+                Button("Discard Workout", role: .destructive) {
+                    confirmDiscard = true
+                }
+                Button("Continue Workout", role: .cancel) { }
+            } message: {
+                Text("Your progress is saved as a draft. You can resume it anytime from Today.")
+            }
+            .confirmationDialog("Discard this workout?", isPresented: $confirmDiscard, titleVisibility: .visible) {
+                Button("Discard", role: .destructive) {
+                    vm.workoutController.discardWorkout()
+                }
+                Button("Keep Workout", role: .cancel) { }
+            } message: {
+                Text("All logged sets for this session will be lost. This can't be undone.")
+            }
             .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.6), trigger: setCompletedTrigger)
         }
     }
@@ -100,7 +137,17 @@ struct ActiveWorkoutView: View {
     private func workoutHeader(_ workout: ActiveWorkoutState) -> some View {
         let total = workout.session.exerciseLogs.count
         let done = workout.session.exerciseLogs.filter(\.isCompleted).count
-        return HStack(alignment: .center, spacing: 12) {
+        return HStack(alignment: .center, spacing: 10) {
+            Button { showExitDialog = true } label: {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.75))
+                    .frame(width: 32, height: 32)
+                    .background(Color.white.opacity(0.06), in: Circle())
+            }
+            .buttonStyle(.strqPressable)
+            .accessibilityLabel("End workout")
+
             VStack(alignment: .leading, spacing: 3) {
                 Text(workout.session.dayName.uppercased())
                     .font(.system(size: 10, weight: .black))
@@ -911,7 +958,7 @@ struct ActiveWorkoutView: View {
                 Image(systemName: "chevron.left")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(workout.currentExerciseIndex == 0 ? AnyShapeStyle(.quaternary) : AnyShapeStyle(Color.white.opacity(0.55)))
-                    .frame(width: 44, height: 38)
+                    .frame(width: 40, height: 38)
             }
             .disabled(workout.currentExerciseIndex == 0)
 
@@ -921,10 +968,10 @@ struct ActiveWorkoutView: View {
 
             if let exercise = vm.library.exercise(byId: workout.session.exerciseLogs[workout.currentExerciseIndex].exerciseId) {
                 Button { showExerciseInfo = exercise } label: {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 5) {
                         Image(systemName: "info.circle")
                             .font(.caption2.weight(.semibold))
-                        Text("Exercise Guide")
+                        Text("Guide")
                             .font(.footnote.weight(.medium))
                     }
                     .foregroundStyle(.white.opacity(0.55))
@@ -937,11 +984,27 @@ struct ActiveWorkoutView: View {
                 .fill(Color.white.opacity(0.05))
                 .frame(width: 1, height: 18)
 
+            Button { swapContextIndex = workout.currentExerciseIndex } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                        .font(.caption2.weight(.semibold))
+                    Text("Swap")
+                        .font(.footnote.weight(.semibold))
+                }
+                .foregroundStyle(.white.opacity(0.75))
+                .frame(maxWidth: .infinity)
+                .frame(height: 38)
+            }
+
+            Rectangle()
+                .fill(Color.white.opacity(0.05))
+                .frame(width: 1, height: 18)
+
             Button { moveToNextExercise() } label: {
                 Image(systemName: "chevron.right")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(workout.currentExerciseIndex >= workout.session.exerciseLogs.count - 1 ? AnyShapeStyle(.quaternary) : AnyShapeStyle(Color.white.opacity(0.55)))
-                    .frame(width: 44, height: 38)
+                    .frame(width: 40, height: 38)
             }
             .disabled(workout.currentExerciseIndex >= workout.session.exerciseLogs.count - 1)
         }
@@ -1410,6 +1473,17 @@ struct ActiveWorkoutView: View {
                             }
                         }
                     }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
+                            showExerciseList = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                swapContextIndex = index
+                            }
+                        } label: {
+                            Label("Swap", systemImage: "arrow.triangle.2.circlepath")
+                        }
+                        .tint(STRQBrand.steel)
+                    }
                 }
             }
             .navigationTitle("Exercises")
@@ -1588,6 +1662,11 @@ struct ActiveWorkoutView: View {
 }
 
 // MARK: - Numeric Input Sheet
+
+private struct SwapIdx: Identifiable {
+    let index: Int
+    var id: Int { index }
+}
 
 struct NumericEditContext: Identifiable {
     enum Field { case weight, reps }

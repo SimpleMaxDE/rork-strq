@@ -11,6 +11,7 @@ class AppViewModel {
     var recommendations: [Recommendation]
     var favoriteExerciseIds: Set<String>
     var activeWorkout: ActiveWorkoutState?
+    var workoutMinimized: Bool = false
     var hasCompletedOnboarding: Bool
 
     let library = ExerciseLibrary.shared

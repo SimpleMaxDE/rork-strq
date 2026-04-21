@@ -41,33 +41,38 @@ struct ExerciseThumbnail: View {
     private var remoteURL: URL? { mediaProvider.remoteGifURL(for: exercise) }
 
     var body: some View {
-        Color(.secondarySystemGroupedBackground)
-            .frame(width: size.side, height: size.side)
-            .overlay {
-                ZStack {
-                    LinearGradient(
-                        colors: [gradient[0].opacity(0.55), gradient[1].opacity(0.28)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    if let url = remoteURL {
-                        RemoteExerciseImage(
-                            url: url,
-                            contentMode: .fit,
-                            fallback: AnyView(fallbackSymbol)
-                        )
-                        .padding(size == .mini ? 2 : 4)
-                    } else {
-                        fallbackSymbol
-                    }
-                }
-                .allowsHitTesting(false)
-            }
-            .clipShape(.rect(cornerRadius: cornerRadius))
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .strokeBorder(Color.white.opacity(0.04), lineWidth: 0.5)
+        ZStack {
+            LinearGradient(
+                colors: [gradient[0], gradient[1]],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
+            if let url = remoteURL {
+                RemoteExerciseImage(
+                    url: url,
+                    contentMode: .fill,
+                    fallback: AnyView(fallbackSymbol),
+                    trimWhitespace: true
+                )
+                .blendMode(.luminosity)
+                .opacity(0.92)
+            } else {
+                fallbackSymbol
+            }
+            LinearGradient(
+                colors: [Color.black.opacity(0.25), Color.clear, Color.black.opacity(0.18)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .blendMode(.multiply)
+        }
+        .frame(width: size.side, height: size.side)
+        .clipShape(.rect(cornerRadius: cornerRadius))
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .strokeBorder(Color.white.opacity(0.06), lineWidth: 0.5)
+        )
+        .allowsHitTesting(false)
     }
 
     private var fallbackSymbol: some View {
@@ -91,25 +96,33 @@ struct ExerciseMediaPreview: View {
     private var remoteURL: URL? { mediaProvider.remoteGifURL(for: exercise) }
 
     var body: some View {
-        Color.black.opacity(0.25)
+        Color.black
             .frame(height: height)
             .overlay {
                 ZStack {
                     LinearGradient(
-                        colors: [gradient[0].opacity(0.5), gradient[1].opacity(0.25)],
+                        colors: [gradient[0], gradient[1]],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                     if let url = remoteURL {
                         RemoteExerciseImage(
                             url: url,
-                            contentMode: .fit,
-                            fallback: AnyView(symbolFallback)
+                            contentMode: .fill,
+                            fallback: AnyView(symbolFallback),
+                            trimWhitespace: true
                         )
-                        .padding(6)
+                        .blendMode(.luminosity)
+                        .opacity(0.9)
                     } else {
                         symbolFallback
                     }
+                    LinearGradient(
+                        colors: [Color.black.opacity(0.35), Color.clear, Color.black.opacity(0.25)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .blendMode(.multiply)
                     if overlayTint > 0 {
                         Color.black.opacity(overlayTint)
                     }
@@ -119,7 +132,7 @@ struct ExerciseMediaPreview: View {
             .clipShape(.rect(cornerRadius: cornerRadius))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .strokeBorder(Color.white.opacity(0.06), lineWidth: 0.5)
+                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
             )
     }
 

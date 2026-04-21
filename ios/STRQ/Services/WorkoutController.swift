@@ -133,6 +133,74 @@ final class WorkoutController {
         vm.persist()
     }
 
+    /// Pauses and leaves the current workout — session stays as a draft so it
+    /// can be resumed later from the Today surface.
+    func pauseWorkout() {
+        guard vm.activeWorkout != nil else { return }
+        Analytics.shared.track(.workout_paused, [:])
+        ErrorReporter.shared.breadcrumb("Workout paused", category: "training")
+        updateLiveActivity()
+        vm.persist()
+    }
+
+    /// Permanently discards the active workout. All logged sets are lost. Live
+    /// Activity ends immediately. No session is written to history.
+    func discardWorkout() {
+        guard let workout = vm.activeWorkout else { return }
+        Analytics.shared.track(.workout_discarded, [
+            "day": workout.session.dayName,
+            "exercises_touched": String(workout.session.exerciseLogs.filter { $0.sets.contains(where: \.isCompleted) }.count)
+        ])
+        ErrorReporter.shared.breadcrumb("Workout discarded: \(workout.session.dayName)", category: "training")
+        endLiveActivity(completed: false)
+        vm.activeWorkout = nil
+        vm.persist()
+    }
+
+    /// Replaces a planned exercise inside the *active* workout without mutating
+    /// the plan itself. Preserves completed-set history for earlier exercises;
+    /// replaces the log & planned row for the targeted slot with a fresh prescription.
+    func replaceExerciseInActiveWorkout(exerciseIndex: Int, with newExercise: Exercise) {
+        guard var workout = vm.activeWorkout,
+              exerciseIndex < workout.session.exerciseLogs.count,
+              exerciseIndex < workout.plannedExercises.count else { return }
+        let oldPlanned = workout.plannedExercises[exerciseIndex]
+        let newPlanned = PlannedExercise(
+            id: oldPlanned.id,
+            exerciseId: newExercise.id,
+            sets: oldPlanned.sets,
+            reps: oldPlanned.reps,
+            restSeconds: oldPlanned.restSeconds,
+            rpe: oldPlanned.rpe,
+            notes: oldPlanned.notes,
+            order: oldPlanned.order,
+            coachDefault: oldPlanned.coachDefault
+        )
+        workout.plannedExercises[exerciseIndex] = newPlanned
+
+        let today = vm.todayPrescription(for: newPlanned)
+        let setCount = max(1, today.suggestedSets)
+        let prefill = today.suggestedWeight
+        let sets = (1...setCount).map { SetLog(setNumber: $0, weight: prefill) }
+        let oldLog = workout.session.exerciseLogs[exerciseIndex]
+        var newLog = ExerciseLog(exerciseId: newExercise.id, sets: sets)
+        if oldLog.sets.allSatisfy({ !$0.isCompleted }) == false {
+            // If user had already logged into this slot, reset completion state safely
+            newLog.isCompleted = false
+        }
+        workout.session.exerciseLogs[exerciseIndex] = newLog
+        if workout.currentExerciseIndex == exerciseIndex {
+            workout.currentSetIndex = 0
+        }
+        vm.activeWorkout = workout
+        Analytics.shared.track(.exercise_swapped_in_workout, [
+            "old": oldLog.exerciseId,
+            "new": newExercise.id
+        ])
+        updateLiveActivity()
+        vm.persist()
+    }
+
     // MARK: - Set edits
 
     func updateSetLoad(exerciseIndex: Int, setIndex: Int, weight: Double, reps: Int) {

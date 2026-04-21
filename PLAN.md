@@ -699,3 +699,34 @@ Every surface was still showing fallback symbols — proving the issue was not j
 - [x] No user-facing copy or UX polish added — this phase is purely pipeline correctness
 - [x] Cache size raised to 48 MB to accommodate decoded frame arrays
 - [x] Fallbacks remain safe — symbol tile still renders when URL is nil or fetch fails
+
+---
+
+# Phase 29 — Workout UX: Media Presentation / Exit Flow / Swap Affordances
+
+Fix three user-facing gaps now that the GIF pipeline works end-to-end: ExerciseDB white-canvas media bleeds into the dark cards as a white square, there was no explicit cancel/discard/resume path, and swap was buried too deep inside the plan editor.
+
+**Dark-native media presentation (`RemoteExerciseImage` / `ExerciseThumbnail`)**
+- [x] `RemoteExerciseImage.trimWhitespace` — opt-in flag that forces `.fill` + gentle zoom (1.18×) so the white outer canvas is clipped inside the card instead of rendered as a pasted rectangle
+- [x] `ExerciseThumbnail` tiles now stack media with `.blendMode(.luminosity)` + dark vertical gradient so movements read as silhouettes against the steel gradient instead of as white squares
+- [x] `ExerciseMediaPreview` wider hero tile gets the same luminosity + dark gradient treatment; edge fade replaces the pale padding strip around the GIF
+- [x] Falls back cleanly — missing media still shows gradient + SF Symbol, no layout regression
+
+**Workout exit flow (`ActiveWorkoutView` / `WorkoutController`)**
+- [x] `WorkoutController.pauseWorkout()` — leaves the session as a draft so it can be resumed later from Today; emits `workout_paused`
+- [x] `WorkoutController.discardWorkout()` — clears draft & ends Live Activity immediately; emits `workout_discarded`
+- [x] Header now leads with a chevron-down button (32pt, high-contrast) that opens a confirmation dialog: Save & Leave / Discard Workout / Continue Workout
+- [x] Discard goes through a second destructive confirmation — hard to trigger by accident
+- [x] Finish stays as the positive primary action in the header so complete-vs-exit remain distinct
+
+**Swap affordances (`ActiveWorkoutView` / `WorkoutController`)**
+- [x] Explicit `Swap` button added to the current-exercise action bar alongside Guide / prev / next — no more relying on deep navigation to reach it
+- [x] Exercise-list sheet rows get a trailing swipe action (`Swap` with steel tint) so any upcoming exercise can be replaced inline
+- [x] Swap sheet reuses the existing `SwapExerciseSheet` so role-preserving, intent-ranked alternatives drive the picker
+- [x] `WorkoutController.replaceExerciseInActiveWorkout(exerciseIndex:with:)` replaces the planned row + log in-place, preserves plan id/order, resets cursor if the active slot is swapped; does not mutate the underlying plan
+- [x] `exercise_swapped_in_workout` analytics for future retention reads
+
+**Identity**
+- [x] `STRQBrand` / `STRQPalette` only — no new color maps
+- [x] Dark premium identity preserved — media now reads as part of the card, not pasted on top
+- [x] No release work, no unrelated UX pass — surgical to the three reported gaps

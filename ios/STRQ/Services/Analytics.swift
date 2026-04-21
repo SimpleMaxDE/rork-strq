@@ -101,6 +101,9 @@ nonisolated enum AnalyticsEvent: String {
     case set_logged
     case workout_completed
     case workout_abandoned
+    case workout_paused
+    case workout_discarded
+    case exercise_swapped_in_workout
     case active_workout_restored
 
     // Retention / Activation (first-week)

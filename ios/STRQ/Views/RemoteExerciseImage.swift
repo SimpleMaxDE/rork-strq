@@ -61,6 +61,10 @@ struct RemoteExerciseImage: View {
     let url: URL?
     var contentMode: ContentMode = .fill
     var fallback: AnyView? = nil
+    /// When true, the remote media is rendered edge-to-edge with a mild zoom
+    /// so ExerciseDB-style white canvas margins get clipped instead of
+    /// showing as a white rectangle inside a dark card.
+    var trimWhitespace: Bool = false
 
     @State private var entry: RemoteExerciseImageCache.CachedEntry?
     @State private var failed: Bool = false
@@ -68,15 +72,20 @@ struct RemoteExerciseImage: View {
     var body: some View {
         Group {
             if let entry {
-                if entry.isAnimated {
-                    AnimatedGIFView(image: entry.image, contentMode: uiContentMode)
-                        .transition(.opacity)
-                } else {
-                    Image(uiImage: entry.image)
-                        .resizable()
-                        .aspectRatio(contentMode: contentMode)
-                        .transition(.opacity)
+                let effectiveMode: ContentMode = trimWhitespace ? .fill : contentMode
+                let scale: CGFloat = trimWhitespace ? 1.18 : 1.0
+                let uiMode: UIView.ContentMode = effectiveMode == .fill ? .scaleAspectFill : .scaleAspectFit
+                Group {
+                    if entry.isAnimated {
+                        AnimatedGIFView(image: entry.image, contentMode: uiMode)
+                    } else {
+                        Image(uiImage: entry.image)
+                            .resizable()
+                            .aspectRatio(contentMode: effectiveMode)
+                    }
                 }
+                .scaleEffect(scale)
+                .transition(.opacity)
             } else if failed {
                 fallbackContent
             } else if url != nil {
@@ -100,10 +109,6 @@ struct RemoteExerciseImage: View {
                 self.failed = true
             }
         }
-    }
-
-    private var uiContentMode: UIView.ContentMode {
-        contentMode == .fill ? .scaleAspectFill : .scaleAspectFit
     }
 
     private var fallbackContent: some View {
