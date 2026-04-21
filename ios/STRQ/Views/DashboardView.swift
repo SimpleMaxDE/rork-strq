@@ -19,6 +19,11 @@ struct DashboardView: View {
                 primaryActionCard
                     .padding(.horizontal, 16)
 
+                if let bridge = postWorkoutBridge {
+                    postWorkoutBridgeCard(bridge)
+                        .padding(.horizontal, 16)
+                }
+
                 if isPostFirstSessionState {
                     scheduleTimeline
                         .padding(.horizontal, 16)
@@ -37,12 +42,12 @@ struct DashboardView: View {
                             }
                     }
 
-                    if let since = vm.dailyBriefing?.sinceLast {
+                    if let since = vm.dailyBriefing?.sinceLast, postWorkoutBridge == nil {
                         sinceLastCard(since)
                             .padding(.horizontal, 16)
                     }
                 } else {
-                    if let since = vm.dailyBriefing?.sinceLast {
+                    if let since = vm.dailyBriefing?.sinceLast, postWorkoutBridge == nil {
                         sinceLastCard(since)
                             .padding(.horizontal, 16)
                     }
@@ -345,6 +350,169 @@ struct DashboardView: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 3)
         .background(ForgeTheme.accentGradient, in: Capsule())
+    }
+
+    private struct PostWorkoutBridge {
+        let sessionName: String
+        let timeLabel: String
+        let stats: String
+        let takeaway: String
+        let nextStep: String
+        let accent: Color
+        let icon: String
+    }
+
+    private var postWorkoutBridge: PostWorkoutBridge? {
+        guard let session = vm.workoutHistory.first(where: \.isCompleted) else { return nil }
+        let referenceDate = session.endTime ?? session.startTime
+        let minutesAgo = max(0, Int(Date().timeIntervalSince(referenceDate) / 60))
+        guard minutesAgo <= 180 else { return nil }
+
+        let result = WorkoutHighlightBuilder.buildResult(
+            session: session,
+            history: vm.workoutHistory,
+            streak: vm.streak,
+            exerciseName: { id in vm.library.exercise(byId: id)?.name ?? "Exercise" }
+        )
+        let completedExercises = session.exerciseLogs.filter(\.isCompleted).count
+        let completedSets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
+
+        return PostWorkoutBridge(
+            sessionName: session.dayName,
+            timeLabel: postWorkoutTimeLabel(minutesAgo),
+            stats: "\(completedExercises) exercise\(completedExercises == 1 ? "" : "s") · \(completedSets) set\(completedSets == 1 ? "" : "s")",
+            takeaway: postWorkoutTakeaway(for: result.verdict.kind),
+            nextStep: postWorkoutNextStep(),
+            accent: postWorkoutAccent(for: result.verdict.kind),
+            icon: postWorkoutIcon(for: result.verdict.kind)
+        )
+    }
+
+    private func postWorkoutBridgeCard(_ bridge: PostWorkoutBridge) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: bridge.icon)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(bridge.accent)
+                    .frame(width: 34, height: 34)
+                    .background(bridge.accent.opacity(0.16), in: .rect(cornerRadius: 10))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        Text("JUST COMPLETED")
+                            .font(.system(size: 9, weight: .black))
+                            .tracking(1.1)
+                            .foregroundStyle(bridge.accent)
+                        Text(bridge.timeLabel)
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    Text(bridge.sessionName)
+                        .font(.subheadline.weight(.semibold))
+                    Text(bridge.stats)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                postWorkoutBridgeLine(label: "STRQ took", text: bridge.takeaway)
+                postWorkoutBridgeLine(label: "Next", text: bridge.nextStep)
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+        .animation(.easeOut(duration: 0.5).delay(0.06), value: appeared)
+    }
+
+    private func postWorkoutBridgeLine(label: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text(label.uppercased())
+                .font(.system(size: 9, weight: .black))
+                .tracking(0.8)
+                .foregroundStyle(.tertiary)
+                .frame(width: 60, alignment: .leading)
+            Text(text)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func postWorkoutTimeLabel(_ minutesAgo: Int) -> String {
+        if minutesAgo < 2 { return "JUST NOW" }
+        if minutesAgo < 60 { return "\(minutesAgo)M AGO" }
+        return "\(max(1, minutesAgo / 60))H AGO"
+    }
+
+    private func postWorkoutTakeaway(for kind: SessionVerdict.Kind) -> String {
+        switch kind {
+        case .firstSession:
+            return "Baseline loads are now tied to what you actually lifted."
+        case .personalRecord:
+            return "That PR gives STRQ room to push the next exposure."
+        case .bestSet:
+            return "Your top set moved up, so progression can keep climbing."
+        case .volumeUp:
+            return "You handled more work than last time. Capacity is moving up."
+        case .volumeDown:
+            return "Today read lighter, which still sharpens STRQ's load pacing."
+        case .consolidated:
+            return "Execution held steady, so the next call can stay confident."
+        }
+    }
+
+    private func postWorkoutNextStep() -> String {
+        if vm.dataMaturityTier == .firstSession {
+            return "Session 2 is the next signal that matters."
+        }
+        if let title = vm.dailyBriefing?.primary.title {
+            return title
+        }
+        if let day = nextScheduledDay {
+            return "Prep for \(day.name)."
+        }
+        return "Let recovery carry this forward."
+    }
+
+    private func postWorkoutAccent(for kind: SessionVerdict.Kind) -> Color {
+        switch kind {
+        case .personalRecord:
+            return STRQPalette.gold
+        case .bestSet, .volumeUp:
+            return STRQPalette.success
+        case .volumeDown:
+            return STRQPalette.warning
+        case .firstSession:
+            return STRQPalette.info
+        case .consolidated:
+            return STRQBrand.steel
+        }
+    }
+
+    private func postWorkoutIcon(for kind: SessionVerdict.Kind) -> String {
+        switch kind {
+        case .personalRecord:
+            return "trophy.fill"
+        case .bestSet:
+            return "bolt.fill"
+        case .volumeUp:
+            return "arrow.up.right.circle.fill"
+        case .volumeDown:
+            return "equal.circle.fill"
+        case .firstSession:
+            return "sparkles"
+        case .consolidated:
+            return "checkmark.seal.fill"
+        }
     }
 
     // MARK: - Since Last Session

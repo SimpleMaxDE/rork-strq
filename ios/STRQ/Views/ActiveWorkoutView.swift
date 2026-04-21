@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ActiveWorkoutView: View {
     @Bindable var vm: AppViewModel
+    let onCompletionDismiss: () -> Void
     @State private var elapsedSeconds: Int = 0
     @State private var restTimerActive: Bool = false
     @State private var restTimeRemaining: Int = 0
@@ -27,9 +28,7 @@ struct ActiveWorkoutView: View {
 
     var body: some View {
         if let completedSession {
-            WorkoutCompletionView(vm: vm, session: completedSession) {
-                vm.completedWorkoutHandoff = nil
-            }
+            WorkoutCompletionView(vm: vm, session: completedSession, onDismiss: onCompletionDismiss)
         } else if let workout = workout {
             ZStack {
                 Color.black.ignoresSafeArea()

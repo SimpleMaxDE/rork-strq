@@ -31,7 +31,13 @@ struct ContentView: View {
                 }
             }
         } else if (vm.activeWorkout != nil && !vm.workoutMinimized) || vm.completedWorkoutHandoff != nil {
-            ActiveWorkoutView(vm: vm)
+            ActiveWorkoutView(vm: vm) {
+                withAnimation(.snappy(duration: 0.25)) {
+                    selectedTab = 0
+                }
+                vm.refreshDailyState()
+                vm.completedWorkoutHandoff = nil
+            }
         } else if vm.showPreWorkoutHandoff, let day = vm.handoffDay {
             PreWorkoutHandoffView(
                 vm: vm,
