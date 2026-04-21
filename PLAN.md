@@ -587,3 +587,32 @@ Make STRQ's upgrade surfaces feel as premium and trustworthy as the rest of the 
 - [x] `STRQBrand` / `STRQPalette` only — no new color maps, no fake urgency, no gimmicky discount language
 - [x] Already-subscribed state uses semantic success instead of raw `.green`
 - [x] Copy throughout reflects STRQ (adaptive programming, progression memory, nutrition × training bridge) — not generic fitness SaaS
+
+---
+
+# Phase 25 — Curated→Imported Media Bridge / Workout Animated Coverage
+
+Close the gap where workout exercises still render static SF Symbols. Curated STRQ exercises now inherit animated previews from high-confidence imported family siblings, and more workout surfaces use the real visual anchor.
+
+**Bridge service (`CuratedImportedMediaBridge.swift`)**
+- [x] Builds once from `ExerciseFamilyService.importedMembers(for:)` — strictly family-scoped, never cross-family
+- [x] Hard filter: curated and imported candidate must share the same equipment class (barbell / dumbbell / cable / machine / smith / kettlebell / band / bodyweight)
+- [x] Hard filter: candidate name must share at least one movement noun (press, squat, row, curl, raise, fly, pulldown, etc.) with curated name
+- [x] Soft ranking: minimum 2-token name overlap, best overlap wins, length-distance tiebreak
+- [x] Returns `nil` for imported ids — they already resolve through `ExerciseCatalog.gifURL`
+- [x] Returns `nil` when no confident sibling exists — curated exercise keeps gradient + SF Symbol fallback
+
+**Media provider (`ExerciseMediaProvider`)**
+- [x] `remoteGifURL(for:)` resolves in priority order: direct imported GIF → curated-bridge GIF → nil
+- [x] `media(for:)` prefers remote GIF over static `topExerciseMedia` overrides so bridged curated exercises animate everywhere
+
+**Workout surfaces (`ActiveWorkoutView`)**
+- [x] Up-Next rows replaced their gradient+symbol tile with `ExerciseThumbnail` — immediate and later previews now animate when media is available
+- [x] Exercise list sheet rows replaced their numbered circle with `ExerciseThumbnail` + compact status badge — in-workout exercise picker reads visually first
+- [x] Current-task tile and active list already used `ExerciseThumbnail` — now inherit broader animated coverage through the bridge
+
+**Safety / performance**
+- [x] Same `RemoteExerciseImageCache` — no new network or caching layer
+- [x] Bridge is deterministic and built lazily on first access — zero runtime cost per view
+- [x] Low-confidence matches stay on symbol fallback — no wrong GIFs to chase coverage
+- [x] `STRQBrand` / `STRQPalette` only — no new color maps, no layout regressions

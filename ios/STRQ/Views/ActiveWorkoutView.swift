@@ -990,23 +990,14 @@ struct ActiveWorkoutView: View {
     @ViewBuilder
     private func upNextRow(log: ExerciseLog, isImmediate: Bool, positionLabel: String) -> some View {
         let exercise = vm.library.exercise(byId: log.exerciseId)
-        let mediaProvider = ExerciseMediaProvider.shared
         let tileSize: CGFloat = isImmediate ? 36 : 30
 
         HStack(spacing: 12) {
             if let ex = exercise {
-                let colors = mediaProvider.heroGradient(for: ex)
-                let symbol = mediaProvider.heroSymbol(for: ex)
-                ZStack {
-                    RoundedRectangle(cornerRadius: 9)
-                        .fill(LinearGradient(colors: [colors[0], colors[1]], startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(width: tileSize, height: tileSize)
-                        .opacity(isImmediate ? 1 : 0.7)
-                    Image(systemName: symbol)
-                        .font(.system(size: isImmediate ? 16 : 13, weight: .thin))
-                        .foregroundStyle(.white.opacity(isImmediate ? 0.9 : 0.75))
-                }
-                .frame(width: 36, alignment: .leading)
+                ExerciseThumbnail(exercise: ex, size: isImmediate ? .small : .mini, cornerRadius: 9)
+                    .frame(width: tileSize, height: tileSize)
+                    .opacity(isImmediate ? 1 : 0.78)
+                    .frame(width: 36, alignment: .leading)
             }
 
             VStack(alignment: .leading, spacing: 1) {
@@ -1371,20 +1362,32 @@ struct ActiveWorkoutView: View {
                         showExerciseList = false
                     } label: {
                         HStack(spacing: 12) {
-                            ZStack {
-                                Circle()
-                                    .fill(log.isCompleted ? STRQPalette.success : isCurrent ? Color.white : Color.white.opacity(0.08))
-                                    .frame(width: 30, height: 30)
-                                if log.isCompleted {
-                                    Image(systemName: "checkmark")
-                                        .font(.system(size: 11, weight: .bold))
-                                        .foregroundStyle(.white)
+                            ZStack(alignment: .topTrailing) {
+                                if let ex = exercise {
+                                    ExerciseThumbnail(exercise: ex, size: .small, cornerRadius: 9)
+                                        .opacity(log.isCompleted ? 0.55 : 1)
                                 } else {
-                                    Text("\(index + 1)")
-                                        .font(.caption.weight(.bold).monospacedDigit())
-                                        .foregroundStyle(isCurrent ? .black : .secondary)
+                                    RoundedRectangle(cornerRadius: 9)
+                                        .fill(Color.white.opacity(0.08))
+                                        .frame(width: 44, height: 44)
                                 }
+                                ZStack {
+                                    Circle()
+                                        .fill(log.isCompleted ? STRQPalette.success : isCurrent ? Color.white : Color.black.opacity(0.7))
+                                        .frame(width: 18, height: 18)
+                                    if log.isCompleted {
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 9, weight: .bold))
+                                            .foregroundStyle(.white)
+                                    } else {
+                                        Text("\(index + 1)")
+                                            .font(.system(size: 9, weight: .bold).monospacedDigit())
+                                            .foregroundStyle(isCurrent ? .black : .white.opacity(0.7))
+                                    }
+                                }
+                                .offset(x: 5, y: -5)
                             }
+                            .frame(width: 44, height: 44)
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(exercise?.name ?? log.exerciseId)

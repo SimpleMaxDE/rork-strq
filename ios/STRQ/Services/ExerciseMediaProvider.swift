@@ -4,15 +4,15 @@ struct ExerciseMediaProvider {
     static let shared = ExerciseMediaProvider()
 
     func media(for exercise: Exercise) -> ExerciseMedia {
-        if let override = topExerciseMedia[exercise.id] {
-            return override
-        }
-        if let url = ExerciseCatalog.shared.gifURL(for: exercise) {
+        if let url = remoteGifURL(for: exercise) {
             return ExerciseMedia(
                 mediaType: .gif,
                 assetURL: url.absoluteString,
                 movementFamily: movementFamily(for: exercise)
             )
+        }
+        if let override = topExerciseMedia[exercise.id] {
+            return override
         }
         return ExerciseMedia(
             mediaType: .sfSymbol,
@@ -20,8 +20,15 @@ struct ExerciseMediaProvider {
         )
     }
 
+    /// Remote animated preview for an exercise. Resolves in priority order:
+    /// 1. Imported (`edb-`) exercises → their own ExerciseDBPro GIF
+    /// 2. Curated STRQ exercises → strong imported family sibling via `CuratedImportedMediaBridge`
+    /// 3. Nil — caller falls back to gradient + SF Symbol tile
     func remoteGifURL(for exercise: Exercise) -> URL? {
-        ExerciseCatalog.shared.gifURL(for: exercise)
+        if let direct = ExerciseCatalog.shared.gifURL(for: exercise) {
+            return direct
+        }
+        return CuratedImportedMediaBridge.shared.gifURL(forCuratedId: exercise.id)
     }
 
     func heroSymbol(for exercise: Exercise) -> String {
