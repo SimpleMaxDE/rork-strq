@@ -30,7 +30,7 @@ struct ContentView: View {
                     )
                 }
             }
-        } else if vm.activeWorkout != nil {
+        } else if (vm.activeWorkout != nil && !vm.workoutMinimized) || vm.completedWorkoutHandoff != nil {
             ActiveWorkoutView(vm: vm)
         } else if vm.showPreWorkoutHandoff, let day = vm.handoffDay {
             PreWorkoutHandoffView(

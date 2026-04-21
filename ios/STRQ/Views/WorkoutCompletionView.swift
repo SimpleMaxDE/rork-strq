@@ -530,7 +530,7 @@ struct WorkoutCompletionView: View {
                 .frame(height: 40)
             VStack(spacing: 10) {
                 Button { onDismiss() } label: {
-                    Text("Done")
+                    Text("Back to Today")
                         .font(.body.weight(.bold))
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)

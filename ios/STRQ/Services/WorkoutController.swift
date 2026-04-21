@@ -62,6 +62,8 @@ final class WorkoutController {
             restTimeRemaining: 0,
             plannedExercises: day.exercises
         )
+        vm.workoutMinimized = false
+        vm.completedWorkoutHandoff = nil
         startLiveActivity()
         vm.persist()
     }
@@ -91,6 +93,8 @@ final class WorkoutController {
         let sessionEnd = workout.session.endTime ?? Date()
         let sessionVolume = workout.session.totalVolume
         endLiveActivity(completed: true)
+        vm.workoutMinimized = false
+        vm.completedWorkoutHandoff = workout.session
         vm.activeWorkout = nil
         vm.refreshIntelligence()
         vm.persist()
@@ -139,6 +143,7 @@ final class WorkoutController {
         guard vm.activeWorkout != nil else { return }
         Analytics.shared.track(.workout_paused, [:])
         ErrorReporter.shared.breadcrumb("Workout paused", category: "training")
+        vm.workoutMinimized = true
         updateLiveActivity()
         vm.persist()
     }
@@ -153,6 +158,8 @@ final class WorkoutController {
         ])
         ErrorReporter.shared.breadcrumb("Workout discarded: \(workout.session.dayName)", category: "training")
         endLiveActivity(completed: false)
+        vm.workoutMinimized = false
+        vm.completedWorkoutHandoff = nil
         vm.activeWorkout = nil
         vm.persist()
     }

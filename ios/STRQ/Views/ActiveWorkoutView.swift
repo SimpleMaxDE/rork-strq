@@ -5,7 +5,6 @@ struct ActiveWorkoutView: View {
     @State private var elapsedSeconds: Int = 0
     @State private var restTimerActive: Bool = false
     @State private var restTimeRemaining: Int = 0
-    @State private var showCompletion: Bool = false
     @State private var showExerciseInfo: Exercise?
     @State private var timerTask: Task<Void, Never>?
     @State private var appeared: Bool = false
@@ -19,14 +18,14 @@ struct ActiveWorkoutView: View {
     @State private var swapConfirmationText: String?
     @State private var swapFeedbackTrigger: Bool = false
     @State private var swapFeedbackTask: Task<Void, Never>?
-    @Environment(\.dismiss) private var dismiss
 
     private var workout: ActiveWorkoutState? { vm.activeWorkout }
+    private var completedSession: WorkoutSession? { vm.completedWorkoutHandoff }
 
     var body: some View {
-        if showCompletion {
-            WorkoutCompletionView(vm: vm, session: vm.workoutHistory.first) {
-                showCompletion = false
+        if let completedSession {
+            WorkoutCompletionView(vm: vm, session: completedSession) {
+                vm.completedWorkoutHandoff = nil
             }
         } else if let workout = workout {
             ZStack {
@@ -84,7 +83,7 @@ struct ActiveWorkoutView: View {
             }
             .preferredColorScheme(.dark)
             .onAppear {
-                startTimer()
+                startTimer(startTime: workout.session.startTime)
                 withAnimation(.easeOut(duration: 0.4)) { appeared = true }
             }
             .onDisappear {
@@ -132,15 +131,14 @@ struct ActiveWorkoutView: View {
             }
             .confirmationDialog("Workout options", isPresented: $showExitDialog, titleVisibility: .visible) {
                 Button("Save & Leave") {
-                    vm.workoutController.pauseWorkout()
-                    dismiss()
+                    saveAndLeave()
                 }
                 Button("Discard Workout", role: .destructive) {
                     confirmDiscard = true
                 }
                 Button("Continue Workout", role: .cancel) { }
             } message: {
-                Text("Save & Leave keeps this workout ready to resume from Today.")
+                Text("Save & Leave preserves everything you've logged and keeps this workout ready to resume from Today.")
             }
             .confirmationDialog("Discard Workout?", isPresented: $confirmDiscard, titleVisibility: .visible) {
                 Button("Discard Workout", role: .destructive) {
@@ -201,8 +199,7 @@ struct ActiveWorkoutView: View {
             .buttonStyle(.strqPressable)
 
             Button {
-                vm.completeWorkout()
-                showCompletion = true
+                finishWorkout()
             } label: {
                 HStack(spacing: 5) {
                     Image(systemName: "flag.checkered")
@@ -438,7 +435,12 @@ struct ActiveWorkoutView: View {
                 let isBodyweight = exerciseForIncrement?.category == .bodyweight || (exerciseForIncrement?.isBodyweight ?? false)
 
                 VStack(spacing: 10) {
-                    // Match chips
+                    activeTaskHeader(
+                        exercise: exerciseForIncrement,
+                        currentSet: setLog,
+                        totalSets: log.sets.count
+                    )
+
                     matchChipsRow(
                         setLog: setLog,
                         exerciseIndex: exerciseIndex,
@@ -544,16 +546,22 @@ struct ActiveWorkoutView: View {
                         .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
                 )
             } else {
+                let isLastExercise = exerciseIndex >= workout.session.exerciseLogs.count - 1
                 VStack(spacing: 10) {
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(systemName: isLastExercise ? "flag.checkered" : "checkmark.circle.fill")
                         .font(.title)
-                        .foregroundStyle(STRQPalette.success)
-                    Text("All sets complete")
+                        .foregroundStyle(isLastExercise ? STRQBrand.steel : STRQPalette.success)
+                    Text(isLastExercise ? "Last exercise complete" : "Exercise complete")
                         .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text(isLastExercise ? "Finish Workout when you're ready to save this session." : "Move to the next exercise when you're ready.")
+                        .font(.footnote)
                         .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 22)
+                .padding(.horizontal, 16)
                 .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 16))
             }
         }
@@ -1138,33 +1146,44 @@ struct ActiveWorkoutView: View {
 
             Group {
                 if allDone {
-                    Button {
-                        vm.completeWorkout()
-                        showCompletion = true
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "flag.checkered")
-                                .font(.subheadline)
-                            Text("Finish Workout")
-                                .font(.body.weight(.bold))
+                    VStack(spacing: 10) {
+                        Text("All sets are logged. Finish Workout to hand this session back to Today.")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                        Button {
+                            finishWorkout()
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "flag.checkered")
+                                    .font(.subheadline)
+                                Text("Finish Workout")
+                                    .font(.body.weight(.bold))
+                            }
+                            .foregroundStyle(.black)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 54)
+                            .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
                         }
-                        .foregroundStyle(.black)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
                     }
                 } else if allCurrentSetsDone && !isLastExercise {
-                    Button { moveToNextExercise() } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "arrow.right")
-                                .font(.subheadline)
-                            Text("Next Exercise")
-                                .font(.body.weight(.bold))
+                    VStack(spacing: 10) {
+                        Text("Current exercise is complete. Move on when you're ready.")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                        Button { moveToNextExercise() } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "arrow.right")
+                                    .font(.subheadline)
+                                Text("Next Exercise")
+                                    .font(.body.weight(.bold))
+                            }
+                            .foregroundStyle(.black)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 54)
+                            .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
                         }
-                        .foregroundStyle(.black)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
                     }
                 } else {
                     EmptyView()
@@ -1568,6 +1587,77 @@ struct ActiveWorkoutView: View {
         }
     }
 
+    private func saveAndLeave() {
+        restTimerActive = false
+        showExitDialog = false
+        vm.workoutController.pauseWorkout()
+    }
+
+    private func finishWorkout() {
+        restTimerActive = false
+        showExitDialog = false
+        confirmDiscard = false
+        vm.completeWorkout()
+    }
+
+    private func activeTaskHeader(exercise: Exercise?, currentSet: SetLog?, totalSets: Int) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(currentSet == nil ? "NEXT ACTION" : "CURRENT TASK")
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(1.0)
+                    .foregroundStyle(.white.opacity(0.45))
+                Text(taskHeaderTitle(exercise: exercise, currentSet: currentSet, totalSets: totalSets))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                Text(taskHeaderDetail(currentSet: currentSet, totalSets: totalSets))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+
+            Spacer(minLength: 0)
+
+            if let exercise {
+                Button {
+                    showExerciseInfo = exercise
+                } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "info.circle")
+                            .font(.caption.weight(.semibold))
+                        Text("Exercise Guide")
+                            .font(.caption.weight(.semibold))
+                    }
+                    .foregroundStyle(.white.opacity(0.82))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(Color.white.opacity(0.06), in: Capsule())
+                    .overlay(
+                        Capsule()
+                            .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                    )
+                }
+                .buttonStyle(.strqPressable)
+            }
+        }
+    }
+
+    private func taskHeaderTitle(exercise: Exercise?, currentSet: SetLog?, totalSets: Int) -> String {
+        let exerciseName = exercise?.name ?? "Exercise"
+        if let currentSet {
+            return "Log set \(currentSet.setNumber) of \(totalSets) for \(exerciseName)"
+        }
+        return "All sets logged for \(exerciseName)"
+    }
+
+    private func taskHeaderDetail(currentSet: SetLog?, totalSets: Int) -> String {
+        if let currentSet {
+            return "Adjust load or reps if needed, then log set \(currentSet.setNumber)."
+        }
+        return totalSets == 0 ? "This exercise is ready." : "Use the bottom action to move forward when you're ready."
+    }
+
     private func activeSetFor(log: ExerciseLog, workout: ActiveWorkoutState) -> SetLog? {
         let currentSetIdx = workout.currentSetIndex
         if currentSetIdx < log.sets.count && !log.sets[currentSetIdx].isCompleted {
@@ -1632,12 +1722,14 @@ struct ActiveWorkoutView: View {
         }
     }
 
-    private func startTimer() {
+    private func startTimer(startTime: Date) {
+        timerTask?.cancel()
+        elapsedSeconds = max(0, Int(Date().timeIntervalSince(startTime)))
         timerTask = Task {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1))
                 if Task.isCancelled { break }
-                elapsedSeconds += 1
+                elapsedSeconds = max(0, Int(Date().timeIntervalSince(startTime)))
                 if restTimerActive && restTimeRemaining > 0 {
                     restTimeRemaining -= 1
                     if restTimeRemaining <= 0 {

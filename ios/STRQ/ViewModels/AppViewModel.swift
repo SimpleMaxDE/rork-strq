@@ -12,6 +12,7 @@ class AppViewModel {
     var favoriteExerciseIds: Set<String>
     var activeWorkout: ActiveWorkoutState?
     var workoutMinimized: Bool = false
+    var completedWorkoutHandoff: WorkoutSession?
     var hasCompletedOnboarding: Bool
 
     let library = ExerciseLibrary.shared
@@ -96,6 +97,7 @@ class AppViewModel {
         self.recommendations = []
         self.favoriteExerciseIds = []
         self.activeWorkout = nil
+        self.completedWorkoutHandoff = nil
         self.hasCompletedOnboarding = false
 
         self._coachingCoordinator = CoachingCoordinator(vm: self)
@@ -1172,12 +1174,19 @@ class AppViewModel {
     var handoffDay: WorkoutDay?
 
     func prepareWorkoutHandoff(day: WorkoutDay) {
+        if activeWorkout != nil {
+            workoutMinimized = false
+            showPreWorkoutHandoff = false
+            handoffDay = nil
+            return
+        }
         handoffDay = day
         showPreWorkoutHandoff = true
     }
 
     func confirmStartWorkout() {
         guard let day = handoffDay else { return }
+        workoutMinimized = false
         showPreWorkoutHandoff = false
         startWorkout(day: day)
         handoffDay = nil
