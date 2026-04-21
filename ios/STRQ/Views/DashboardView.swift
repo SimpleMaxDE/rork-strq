@@ -294,13 +294,13 @@ struct DashboardView: View {
             }
         case .startFirstSession:
             if let day = vm.todaysWorkout ?? vm.nextWorkout {
-                ForgePrimaryButton(icon: "sparkles", title: "Begin first session") {
+                ForgePrimaryButton(icon: "sparkles", title: "Start Session 1") {
                     vm.prepareWorkoutHandoff(day: day)
                 }
             }
         case .resumeWorkout:
             if let day = vm.todaysWorkout {
-                ForgePrimaryButton(icon: "play.fill", title: "Resume session") {
+                ForgePrimaryButton(icon: "play.fill", title: "Resume Workout") {
                     vm.prepareWorkoutHandoff(day: day)
                 }
             }
@@ -504,7 +504,7 @@ struct DashboardView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "bolt.fill")
-                            Text("Start")
+                            Text("Start Workout")
                         }
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(.black)
@@ -519,7 +519,7 @@ struct DashboardView: View {
             } else {
                 ForgePrimaryButton(
                     icon: primary.kind == .resumeWorkout ? "play.fill" : "bolt.fill",
-                    title: primary.kind == .resumeWorkout ? "Resume session" : "Review & start"
+                    title: primary.kind == .resumeWorkout ? "Resume Workout" : (primary.kind == .startFirstSession ? "Start Session 1" : "Start Workout")
                 ) {
                     vm.prepareWorkoutHandoff(day: day)
                 }

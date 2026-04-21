@@ -71,25 +71,39 @@ struct ExerciseHeroView: View {
 
     private var remoteGifHero: some View {
         VStack(spacing: 0) {
-            Color(.secondarySystemBackground)
+            Color.black
                 .frame(height: height)
                 .overlay {
                     ZStack {
                         LinearGradient(
-                            colors: [gradientColors[0].opacity(0.35), gradientColors[1].opacity(0.15)],
+                            colors: [gradientColors[0].opacity(0.34), gradientColors[1].opacity(0.16)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                         if let urlString = media.assetURL, let url = URL(string: urlString) {
                             RemoteExerciseImage(
                                 url: url,
-                                contentMode: .fit,
-                                fallback: AnyView(symbolFallbackContent)
+                                contentMode: .fill,
+                                fallback: AnyView(symbolFallbackContent),
+                                trimWhitespace: true
                             )
-                            .padding(8)
+                            .blendMode(.luminosity)
+                            .opacity(0.96)
                         } else {
                             symbolFallbackContent
                         }
+                        LinearGradient(
+                            colors: [Color.black.opacity(0.42), Color.clear, Color.black.opacity(0.28)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .blendMode(.multiply)
+                        LinearGradient(
+                            colors: [Color.black.opacity(0.18), Color.clear, Color.black.opacity(0.14)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                        .blendMode(.multiply)
                     }
                     .allowsHitTesting(false)
                 }

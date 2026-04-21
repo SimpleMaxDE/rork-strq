@@ -77,7 +77,7 @@ struct PlanRevealView: View {
             VStack(spacing: 6) {
                 Text("Your Plan is Ready")
                     .font(.title.bold())
-                Text(profile.name.isEmpty ? "Start Session 1. STRQ will tune the rest from real training." : "\(profile.name), start Session 1. STRQ will tune the rest from real training.")
+                Text(profile.name.isEmpty ? "Start Session 1 now. STRQ will tune the rest from real training." : "\(profile.name), start Session 1 now. STRQ will tune the rest from real training.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -381,7 +381,7 @@ struct PlanRevealView: View {
                 }
                 .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: showQuality)
 
-                Text("You can fine-tune the plan later in Train.")
+                Text("You'll go straight into today's session. You can fine-tune the plan later in Train.")
                     .font(.caption2)
                     .foregroundStyle(.white.opacity(0.35))
             }

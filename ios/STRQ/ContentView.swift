@@ -20,7 +20,12 @@ struct ContentView: View {
                         plan: plan,
                         profile: vm.profile,
                         planQuality: vm.planQuality,
-                        onStart: { vm.completeOnboarding() },
+                        onStart: {
+                            vm.completeOnboarding()
+                            if let day = vm.todaysWorkout ?? vm.nextWorkout {
+                                vm.prepareWorkoutHandoff(day: day)
+                            }
+                        },
                         impacts: vm.onboardingImpactSummary()
                     )
                 }

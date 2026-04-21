@@ -16,6 +16,9 @@ struct ActiveWorkoutView: View {
     @State private var showExitDialog: Bool = false
     @State private var confirmDiscard: Bool = false
     @State private var swapContextIndex: Int?
+    @State private var swapConfirmationText: String?
+    @State private var swapFeedbackTrigger: Bool = false
+    @State private var swapFeedbackTask: Task<Void, Never>?
     @Environment(\.dismiss) private var dismiss
 
     private var workout: ActiveWorkoutState? { vm.activeWorkout }
@@ -64,6 +67,16 @@ struct ActiveWorkoutView: View {
                     restTimerOverlay(workout)
                 }
 
+                if let swapConfirmationText {
+                    VStack {
+                        swapConfirmationBanner(text: swapConfirmationText)
+                            .padding(.top, 76)
+                            .padding(.horizontal, 16)
+                        Spacer()
+                    }
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
+
                 VStack {
                     Spacer()
                     bottomAction(workout)
@@ -74,7 +87,10 @@ struct ActiveWorkoutView: View {
                 startTimer()
                 withAnimation(.easeOut(duration: 0.4)) { appeared = true }
             }
-            .onDisappear { timerTask?.cancel() }
+            .onDisappear {
+                timerTask?.cancel()
+                swapFeedbackTask?.cancel()
+            }
             .sheet(item: $showExerciseInfo) { exercise in
                 NavigationStack {
                     ExerciseDetailView(exercise: exercise, vm: vm)
@@ -102,13 +118,19 @@ struct ActiveWorkoutView: View {
                 if ctx.index < workout.session.exerciseLogs.count {
                     let exId = workout.session.exerciseLogs[ctx.index].exerciseId
                     SwapExerciseSheet(vm: vm, dayId: workout.session.dayId, exerciseId: exId) { newExercise in
+                        let previousName = vm.library.exercise(byId: exId)?.name ?? "Exercise"
                         vm.workoutController.replaceExerciseInActiveWorkout(exerciseIndex: ctx.index, with: newExercise)
+                        presentSwapConfirmation(
+                            oldExerciseName: previousName,
+                            newExerciseName: newExercise.name,
+                            isCurrentExercise: ctx.index == workout.currentExerciseIndex
+                        )
                     }
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
                 }
             }
-            .confirmationDialog("End this workout?", isPresented: $showExitDialog, titleVisibility: .visible) {
+            .confirmationDialog("Workout options", isPresented: $showExitDialog, titleVisibility: .visible) {
                 Button("Save & Leave") {
                     vm.workoutController.pauseWorkout()
                     dismiss()
@@ -118,10 +140,10 @@ struct ActiveWorkoutView: View {
                 }
                 Button("Continue Workout", role: .cancel) { }
             } message: {
-                Text("Your progress is saved as a draft. You can resume it anytime from Today.")
+                Text("Save & Leave keeps this workout ready to resume from Today.")
             }
-            .confirmationDialog("Discard this workout?", isPresented: $confirmDiscard, titleVisibility: .visible) {
-                Button("Discard", role: .destructive) {
+            .confirmationDialog("Discard Workout?", isPresented: $confirmDiscard, titleVisibility: .visible) {
+                Button("Discard Workout", role: .destructive) {
                     vm.workoutController.discardWorkout()
                 }
                 Button("Keep Workout", role: .cancel) { }
@@ -129,6 +151,7 @@ struct ActiveWorkoutView: View {
                 Text("All logged sets for this session will be lost. This can't be undone.")
             }
             .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.6), trigger: setCompletedTrigger)
+            .sensoryFeedback(.success, trigger: swapFeedbackTrigger)
         }
     }
 
@@ -146,7 +169,7 @@ struct ActiveWorkoutView: View {
                     .background(Color.white.opacity(0.06), in: Circle())
             }
             .buttonStyle(.strqPressable)
-            .accessibilityLabel("End workout")
+            .accessibilityLabel("Workout options")
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(workout.session.dayName.uppercased())
@@ -1503,6 +1526,47 @@ struct ActiveWorkoutView: View {
     }
 
     // MARK: - Actions & helpers
+
+    private func swapConfirmationBanner(text: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(STRQPalette.success)
+            Text(text)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color.white.opacity(0.08), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+        )
+    }
+
+    private func presentSwapConfirmation(oldExerciseName: String, newExerciseName: String, isCurrentExercise: Bool) {
+        let message = isCurrentExercise
+            ? "Current exercise updated to \(newExerciseName)"
+            : "Swapped \(oldExerciseName) for \(newExerciseName)"
+        swapFeedbackTask?.cancel()
+        withAnimation(.easeOut(duration: 0.2)) {
+            swapConfirmationText = message
+        }
+        swapFeedbackTrigger.toggle()
+        swapFeedbackTask = Task {
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                withAnimation(.easeOut(duration: 0.2)) {
+                    swapConfirmationText = nil
+                }
+            }
+        }
+    }
 
     private func activeSetFor(log: ExerciseLog, workout: ActiveWorkoutState) -> SetLog? {
         let currentSetIdx = workout.currentSetIndex

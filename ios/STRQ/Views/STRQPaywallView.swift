@@ -716,19 +716,24 @@ struct STRQPaywallView: View {
 
     private var disabledCTA: some View {
         VStack(spacing: 6) {
-            Text("Unavailable")
-                .font(.body.weight(.bold))
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity)
-                .frame(height: 54)
-                .background(Color.white.opacity(0.05), in: .rect(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-                )
-            Text("Check back once premium plans are live.")
+            HStack(spacing: 8) {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 12, weight: .bold))
+                Text("Subscriptions coming soon")
+                    .font(.body.weight(.bold))
+            }
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity)
+            .frame(height: 54)
+            .background(Color.white.opacity(0.05), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+            )
+            Text("Premium plans will appear here once App Store setup is complete.")
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
+                .multilineTextAlignment(.center)
         }
     }
 

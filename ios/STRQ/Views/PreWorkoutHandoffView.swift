@@ -239,23 +239,14 @@ struct PreWorkoutHandoffView: View {
             ForEach(Array(day.exercises.enumerated()), id: \.element.id) { index, planned in
                 let exercise = vm.library.exercise(byId: planned.exerciseId)
                 let suggestion = vm.loadSuggestion(for: planned.exerciseId, planned: planned)
-                let mediaProvider = ExerciseMediaProvider.shared
 
                 Button {
                     selectedExerciseIndex = index
                 } label: {
                     HStack(spacing: 12) {
                         if let ex = exercise {
-                            let colors = mediaProvider.heroGradient(for: ex)
-                            let symbol = mediaProvider.heroSymbol(for: ex)
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(LinearGradient(colors: [colors[0], colors[1]], startPoint: .topLeading, endPoint: .bottomTrailing))
-                                    .frame(width: 40, height: 40)
-                                Image(systemName: symbol)
-                                    .font(.system(size: 18, weight: .thin))
-                                    .foregroundStyle(.white.opacity(0.85))
-                            }
+                            ExerciseThumbnail(exercise: ex, size: .small, cornerRadius: 10)
+                                .frame(width: 40, height: 40)
                         }
 
                         VStack(alignment: .leading, spacing: 3) {
