@@ -3,6 +3,7 @@ import RevenueCat
 
 @main
 struct STRQApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @State private var isFirstLaunch: Bool = !UserDefaults.standard.bool(forKey: "strq_has_launched_before")
     @State private var vm = AppViewModel()

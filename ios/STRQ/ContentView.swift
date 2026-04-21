@@ -4,84 +4,135 @@ struct ContentView: View {
     @Bindable var vm: AppViewModel
     var store: StoreViewModel
     @State private var selectedTab: Int = 0
+    @State private var presentedDeepLinkSheet: DeepLinkSheet?
+    private let notificationDeepLinkCenter: NotificationDeepLinkCenter = .shared
 
     var body: some View {
-        if !vm.hasCompletedOnboarding {
-            switch vm.onboardingPhase {
-            case .form:
-                OnboardingView(vm: vm)
-            case .generating:
-                PlanGenerationView(profile: vm.profile) {
-                    vm.finishPlanGeneration()
+        Group {
+            if !vm.hasCompletedOnboarding {
+                switch vm.onboardingPhase {
+                case .form:
+                    OnboardingView(vm: vm)
+                case .generating:
+                    PlanGenerationView(profile: vm.profile) {
+                        vm.finishPlanGeneration()
+                    }
+                case .reveal:
+                    if let plan = vm.currentPlan {
+                        PlanRevealView(
+                            plan: plan,
+                            profile: vm.profile,
+                            planQuality: vm.planQuality,
+                            onStart: {
+                                vm.completeOnboarding()
+                                if let day = vm.todaysWorkout ?? vm.nextWorkout {
+                                    vm.prepareWorkoutHandoff(day: day)
+                                }
+                            },
+                            impacts: vm.onboardingImpactSummary()
+                        )
+                    }
                 }
-            case .reveal:
-                if let plan = vm.currentPlan {
-                    PlanRevealView(
-                        plan: plan,
-                        profile: vm.profile,
-                        planQuality: vm.planQuality,
-                        onStart: {
-                            vm.completeOnboarding()
-                            if let day = vm.todaysWorkout ?? vm.nextWorkout {
-                                vm.prepareWorkoutHandoff(day: day)
+            } else if (vm.activeWorkout != nil && !vm.workoutMinimized) || vm.completedWorkoutHandoff != nil {
+                ActiveWorkoutView(vm: vm) {
+                    withAnimation(.snappy(duration: 0.25)) {
+                        selectedTab = 0
+                    }
+                    vm.refreshDailyState()
+                    vm.completedWorkoutHandoff = nil
+                }
+            } else if vm.showPreWorkoutHandoff, let day = vm.handoffDay {
+                PreWorkoutHandoffView(
+                    vm: vm,
+                    day: day,
+                    onStart: { vm.confirmStartWorkout() },
+                    onCancel: { vm.cancelHandoff() }
+                )
+            } else {
+                ZStack(alignment: .bottom) {
+                    TabView(selection: $selectedTab) {
+                        Tab(value: 0) {
+                            NavigationStack {
+                                DashboardView(vm: vm)
                             }
-                        },
-                        impacts: vm.onboardingImpactSummary()
-                    )
-                }
-            }
-        } else if (vm.activeWorkout != nil && !vm.workoutMinimized) || vm.completedWorkoutHandoff != nil {
-            ActiveWorkoutView(vm: vm) {
-                withAnimation(.snappy(duration: 0.25)) {
-                    selectedTab = 0
-                }
-                vm.refreshDailyState()
-                vm.completedWorkoutHandoff = nil
-            }
-        } else if vm.showPreWorkoutHandoff, let day = vm.handoffDay {
-            PreWorkoutHandoffView(
-                vm: vm,
-                day: day,
-                onStart: { vm.confirmStartWorkout() },
-                onCancel: { vm.cancelHandoff() }
-            )
-        } else {
-            ZStack(alignment: .bottom) {
-                TabView(selection: $selectedTab) {
-                    Tab(value: 0) {
-                        NavigationStack {
-                            DashboardView(vm: vm)
+                        }
+                        Tab(value: 1) {
+                            NavigationStack {
+                                CoachTabView(vm: vm)
+                            }
+                        }
+                        Tab(value: 2) {
+                            NavigationStack {
+                                TrainingPlanView(vm: vm)
+                            }
+                        }
+                        Tab(value: 3) {
+                            NavigationStack {
+                                ProgressAnalyticsView(vm: vm)
+                            }
+                        }
+                        Tab(value: 4) {
+                            NavigationStack {
+                                ProfileView(vm: vm, store: store)
+                            }
                         }
                     }
-                    Tab(value: 1) {
-                        NavigationStack {
-                            CoachTabView(vm: vm)
-                        }
-                    }
-                    Tab(value: 2) {
-                        NavigationStack {
-                            TrainingPlanView(vm: vm)
-                        }
-                    }
-                    Tab(value: 3) {
-                        NavigationStack {
-                            ProgressAnalyticsView(vm: vm)
-                        }
-                    }
-                    Tab(value: 4) {
-                        NavigationStack {
-                            ProfileView(vm: vm, store: store)
-                        }
-                    }
-                }
-                .tabViewStyle(.sidebarAdaptable)
-                .tint(.white)
-                .preferredColorScheme(.dark)
-                .toolbar(.hidden, for: .tabBar)
+                    .tabViewStyle(.sidebarAdaptable)
+                    .tint(.white)
+                    .preferredColorScheme(.dark)
+                    .toolbar(.hidden, for: .tabBar)
 
-                STRQTabBar(selectedTab: $selectedTab, hasWorkoutToday: vm.todaysWorkout != nil)
+                    STRQTabBar(selectedTab: $selectedTab, hasWorkoutToday: vm.todaysWorkout != nil)
+                }
             }
         }
+        .task {
+            handlePendingNotificationRoute()
+        }
+        .onChange(of: notificationDeepLinkCenter.pendingRoute) { _, _ in
+            handlePendingNotificationRoute()
+        }
+        .sheet(item: $presentedDeepLinkSheet) { sheet in
+            switch sheet {
+            case .readinessCheckIn:
+                ReadinessCheckInView(vm: vm) { readiness in
+                    vm.submitReadiness(readiness)
+                }
+            case .sleepLog:
+                NavigationStack {
+                    SleepLogView(vm: vm)
+                }
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+            }
+        }
+    }
+
+    private func handlePendingNotificationRoute() {
+        guard let route = notificationDeepLinkCenter.consume() else { return }
+
+        switch route {
+        case .resumeWorkout:
+            withAnimation(.snappy(duration: 0.25)) {
+                selectedTab = 0
+            }
+            if vm.activeWorkout != nil {
+                vm.workoutMinimized = false
+            } else if let day = vm.todaysWorkout ?? vm.nextWorkout {
+                vm.prepareWorkoutHandoff(day: day)
+            }
+        case .readinessCheckIn:
+            presentedDeepLinkSheet = .readinessCheckIn
+        case .sleepLog:
+            presentedDeepLinkSheet = .sleepLog
+        }
+    }
+
+    private enum DeepLinkSheet: String, Identifiable {
+        case readinessCheckIn
+        case sleepLog
+
+        var id: String { rawValue }
     }
 }
 

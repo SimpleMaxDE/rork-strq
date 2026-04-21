@@ -122,6 +122,7 @@ final class NotificationScheduler {
                 content.title = input.isEarlyStage ? "Your session is ready" : "Today: \(workoutName)"
                 content.body = buildWorkoutBody(input: input, workoutName: workoutName)
                 content.sound = .default
+                content.userInfo = NotificationDeepLinkRoute.resumeWorkout.userInfo
 
                 let trigger = UNCalendarNotificationTrigger(
                     dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: todaysReminder),
@@ -147,6 +148,7 @@ final class NotificationScheduler {
                 ? "Your next session keeps your baseline honest. Small wins compound."
                 : "Get ready for \(nextName). Sleep and fuel set the tone."
             content.sound = .default
+            content.userInfo = NotificationDeepLinkRoute.resumeWorkout.userInfo
 
             let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
             add(id: "\(Category.workout).next", content: content, trigger: trigger)
@@ -192,6 +194,7 @@ final class NotificationScheduler {
             ? "Tell STRQ how today feels. It calibrates everything."
             : "How's your body today? 30 seconds sharpens today's session."
         content.sound = .default
+        content.userInfo = NotificationDeepLinkRoute.readinessCheckIn.userInfo
 
         let trigger = UNCalendarNotificationTrigger(
             dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate),
@@ -289,6 +292,7 @@ final class NotificationScheduler {
                 content.title = "Log last night's sleep"
                 content.body = "Sleep is half of recovery. Takes a second."
                 content.sound = .default
+                content.userInfo = NotificationDeepLinkRoute.sleepLog.userInfo
                 let trigger = UNCalendarNotificationTrigger(
                     dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate),
                     repeats: false
@@ -349,6 +353,7 @@ final class NotificationScheduler {
         content.title = title
         content.body = body
         content.sound = .default
+        content.userInfo = NotificationDeepLinkRoute.resumeWorkout.userInfo
 
         let trigger = UNCalendarNotificationTrigger(
             dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate),
