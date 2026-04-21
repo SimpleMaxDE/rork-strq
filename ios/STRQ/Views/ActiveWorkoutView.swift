@@ -215,11 +215,8 @@ struct ActiveWorkoutView: View {
                             }
 
                             HStack(spacing: 10) {
-                                Image(systemName: heroSymbol)
-                                    .font(.system(size: 18, weight: .thin))
-                                    .foregroundStyle(.white.opacity(0.92))
-                                    .frame(width: 34, height: 34)
-                                    .background(.white.opacity(0.12), in: .rect(cornerRadius: 8))
+                                ExerciseThumbnail(exercise: ex, size: .small, cornerRadius: 8)
+                                    .frame(width: 44, height: 44)
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(ex.name)

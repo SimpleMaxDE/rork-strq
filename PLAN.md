@@ -514,3 +514,37 @@ Make STRQ meaningfully better at keeping users engaged past week one and at brin
 - [x] Comeback is coach guidance, not gamification — no streak mechanics added
 - [x] Curated premium surface — single card, high signal, no noisy re-entry feed
 - [x] Never surfaces on activation, during a live workout, or within planned cadence
+
+# Phase 23 — Exercise Media / Visual Coaching Quality
+
+Use the normalized ExerciseDBPro media foundation to make exercise surfaces more visual, clearer, and more premium — without weakening STRQ's dark identity or performance.
+
+**Reusable components (`ExerciseThumbnail.swift`)**
+- [x] `ExerciseThumbnail` — size-aware square tile (mini / small / medium / large) built on the `Color + overlay` layout pattern so remote GIFs never overflow grids / lists
+- [x] Fallback stack — gradient + SF Symbol when no remote media is available, so the catalog always renders consistently
+- [x] `ExerciseMediaPreview` — wider rectangular variant for hero slots (Active Workout / preview cards)
+- [x] Border hairline on both variants for premium feel; `.allowsHitTesting(false)` preserves tap targets on parent rows
+- [x] Async GIF load delegated to `RemoteExerciseImage` — shared cache, inflight de-duplication, graceful fallback
+
+**Library (`ExerciseLibraryView`)**
+- [x] `ExerciseCard` row thumbnail replaced with `ExerciseThumbnail` — real movement visual for imported exercises, gradient tile for curated
+- [x] Your-exercises row thumbnail replaced with `ExerciseThumbnail` so progression & stall rails feel more visual
+- [x] No layout regression — list density and spacing preserved
+
+**Add Exercise (`AddExerciseSheet`)**
+- [x] Contextual picks row uses `ExerciseThumbnail` — fills-gap / matches-focus hint now sits next to a real movement preview
+- [x] Result row thumbnail replaced — browse decisions feel more confident, especially for imported variants
+
+**Swap (`SwapExerciseSheet`)**
+- [x] Current-exercise card thumbnail replaced with `ExerciseThumbnail` — the swap decision starts from a visual anchor
+- [x] Per-option card thumbnail replaced — alternatives read visually before users parse role / reason / tags
+
+**Active Workout (`ActiveWorkoutView`)**
+- [x] Current-task hero icon tile replaced with `ExerciseThumbnail` — compact visual reinforcement of the movement before the first set, without disturbing the dark gradient identity
+- [x] Fixed 44pt frame preserves the existing header layout and rest of the task block stays untouched
+
+**Identity / performance**
+- [x] `STRQBrand` / `STRQPalette` only — no new color maps
+- [x] Reuses the existing `RemoteExerciseImageCache` — no new network layer, no extra caching stack
+- [x] Fallback always renders (never a blank state), so the catalog stays visually coherent whether or not remote GIFs are present
+- [x] Curated STRQ exercises keep their gradient+symbol identity; remote GIF only surfaces where the importer provides one

@@ -169,11 +169,7 @@ struct ExerciseLibraryView: View {
     private func yourExerciseRow(_ exercise: Exercise, progression: ExerciseProgressionState?) -> some View {
         Button { selectedExercise = exercise } label: {
             HStack(spacing: 12) {
-                Image(systemName: exercise.primaryMuscle.symbolName)
-                    .font(.system(size: 15))
-                    .foregroundStyle(STRQBrand.steel)
-                    .frame(width: 32, height: 32)
-                    .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 8))
+                ExerciseThumbnail(exercise: exercise, size: .small, cornerRadius: 9)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(exercise.name)
@@ -914,14 +910,7 @@ struct ExerciseCard: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 9)
-                        .fill(exerciseAccentColor.opacity(0.09))
-                        .frame(width: 38, height: 38)
-                    Image(systemName: exercise.primaryMuscle.symbolName)
-                        .font(.system(size: 15, weight: .regular))
-                        .foregroundStyle(exerciseAccentColor)
-                }
+                ExerciseThumbnail(exercise: exercise, size: .small, cornerRadius: 9)
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 5) {

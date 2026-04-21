@@ -85,14 +85,7 @@ struct SwapExerciseSheet: View {
                 }
 
                 HStack(spacing: 12) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(STRQBrand.steel.opacity(0.12))
-                            .frame(width: 48, height: 48)
-                        Image(systemName: exercise.primaryMuscle.symbolName)
-                            .font(.title3)
-                            .foregroundStyle(STRQBrand.steel)
-                    }
+                    ExerciseThumbnail(exercise: exercise, size: .medium, cornerRadius: 12)
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(exercise.name)
@@ -212,14 +205,7 @@ struct SwapExerciseSheet: View {
         let showConfirm = isSelected && !confirmed
         return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 12) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(accent.opacity(0.12))
-                        .frame(width: 44, height: 44)
-                    Image(systemName: option.exercise.primaryMuscle.symbolName)
-                        .font(.title3)
-                        .foregroundStyle(accent)
-                }
+                ExerciseThumbnail(exercise: option.exercise, size: .small, cornerRadius: 12)
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(option.exercise.name)

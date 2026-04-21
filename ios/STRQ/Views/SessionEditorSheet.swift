@@ -845,11 +845,7 @@ struct AddExerciseSheet: View {
             dismiss()
         } label: {
             HStack(spacing: 11) {
-                Image(systemName: ex.primaryMuscle.symbolName)
-                    .font(.subheadline)
-                    .foregroundStyle(STRQBrand.steel)
-                    .frame(width: 32, height: 32)
-                    .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 8))
+                ExerciseThumbnail(exercise: ex, size: .small, cornerRadius: 8)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(ex.name)
                         .font(.subheadline.weight(.semibold))
@@ -882,11 +878,7 @@ struct AddExerciseSheet: View {
             dismiss()
         } label: {
             HStack(spacing: 11) {
-                Image(systemName: ex.primaryMuscle.symbolName)
-                    .font(.subheadline)
-                    .foregroundStyle(STRQBrand.steel)
-                    .frame(width: 32, height: 32)
-                    .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 8))
+                ExerciseThumbnail(exercise: ex, size: .small, cornerRadius: 8)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(ex.name)
                         .font(.subheadline.weight(.semibold))
