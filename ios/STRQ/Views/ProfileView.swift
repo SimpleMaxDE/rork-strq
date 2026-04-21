@@ -21,13 +21,14 @@ struct ProfileView: View {
         ScrollView {
             VStack(spacing: 24) {
                 profileHeader
-                accountSection
                 subscriptionSection
                 fitnessIdentity
                 coachingStyleRow
-                trainingSetup
                 bodyNutrition
+                trainingSetup
                 controlsSection
+                accountSection
+                dangerSection
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 32)
@@ -114,7 +115,9 @@ struct ProfileView: View {
     // MARK: - Account
 
     private var accountSection: some View {
-        VStack(spacing: 10) {
+        VStack(alignment: .leading, spacing: 10) {
+            ForgeSectionHeader(title: "Sync & Restore")
+
             if let account = vm.account.account {
                 VStack(spacing: 0) {
                     HStack(spacing: 12) {
@@ -391,7 +394,7 @@ struct ProfileView: View {
                     .foregroundStyle(.white)
             }
 
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(vm.profile.name.isEmpty ? "Athlete" : vm.profile.name)
                     .font(.system(.title3, design: .rounded, weight: .bold))
                 HStack(spacing: 6) {
@@ -405,6 +408,10 @@ struct ProfileView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                Text(profileHeaderSummary)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
             }
             Spacer()
         }
@@ -501,11 +508,11 @@ struct ProfileView: View {
 
     private var trainingSetup: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Training")
+            ForgeSectionHeader(title: "Training Setup")
 
             VStack(spacing: 1) {
-                profileRow("Days/Week", value: "\(vm.profile.daysPerWeek)")
-                profileRow("Session", value: "\(vm.profile.minutesPerSession) min")
+                profileRow("Days / Week", value: "\(vm.profile.daysPerWeek)")
+                profileRow("Session Length", value: "\(vm.profile.minutesPerSession) min")
                 profileRow("Split", value: vm.profile.splitPreference.displayName)
                 profileRow("Location", value: vm.profile.trainingLocation.displayName)
             }
@@ -604,8 +611,8 @@ struct ProfileView: View {
                         Text("Physique & Nutrition Coaching")
                             .font(.subheadline.weight(.semibold))
                         Text(on
-                            ? "STRQ uses bodyweight and nutrition logs to coach body-composition progress."
-                            : "Optional. STRQ will coach training and recovery without food or weight data.")
+                            ? "STRQ uses weigh-ins and nutrition logs to read body-composition progress."
+                            : "Optional. Training and recovery coaching stay fully active without food or bodyweight logs.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -684,37 +691,38 @@ struct ProfileView: View {
     }
 
     private var controlsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            VStack(spacing: 1) {
-                controlRow("Regenerate Plan", icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
-                    vm.generatePlan()
-                }
-                NavigationLink {
-                    NotificationSettingsView(vm: vm)
-                } label: {
-                    controlRowContent("Notifications", icon: "bell.fill", color: STRQBrand.steel)
-                        .background(Color(.secondarySystemGroupedBackground))
-                }
-                controlRow("Restore Purchases", icon: "arrow.clockwise", color: STRQBrand.steel) {
-                    guard store.isConfigured else {
-                        store.restoreMessage = "Subscriptions are not available in this environment."
-                        showRestoreMessage = true
-                        return
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 10) {
+                ForgeSectionHeader(title: "Notifications & Tools")
+
+                VStack(spacing: 1) {
+                    NavigationLink {
+                        NotificationSettingsView(vm: vm)
+                    } label: {
+                        controlRowContent("Notifications", icon: "bell.fill", color: STRQBrand.steel)
+                            .background(Color(.secondarySystemGroupedBackground))
                     }
-                    Task {
-                        await store.restore()
-                        showRestoreMessage = true
+                    controlRow("Restore Purchases", icon: "arrow.clockwise", color: STRQBrand.steel) {
+                        guard store.isConfigured else {
+                            store.restoreMessage = "Subscriptions are not available in this environment."
+                            showRestoreMessage = true
+                            return
+                        }
+                        Task {
+                            await store.restore()
+                            showRestoreMessage = true
+                        }
+                    }
+                    controlRow("Regenerate Plan", icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
+                        vm.generatePlan()
                     }
                 }
-                controlRow("Reset All Data", icon: "trash.fill", color: .red) {
-                    showResetAlert = true
-                }
+                .clipShape(.rect(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                )
             }
-            .clipShape(.rect(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-            )
 
             legalLinks
                 .padding(.top, 4)
@@ -742,6 +750,30 @@ struct ProfileView: View {
         .font(.caption.weight(.medium))
         .foregroundStyle(.secondary)
         .frame(maxWidth: .infinity)
+    }
+
+    private var dangerSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ForgeSectionHeader(title: "Danger Zone")
+
+            VStack(spacing: 1) {
+                controlRow("Reset All Data", icon: "trash.fill", color: .red) {
+                    showResetAlert = true
+                }
+            }
+            .clipShape(.rect(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+            )
+        }
+    }
+
+    private var profileHeaderSummary: String {
+        if vm.isEarlyStage {
+            return "Your setup is locked in. STRQ is building its first read on your training rhythm."
+        }
+        return "Your coaching profile, recovery context, and continuity settings in one place."
     }
 
     private var appVersionString: String {

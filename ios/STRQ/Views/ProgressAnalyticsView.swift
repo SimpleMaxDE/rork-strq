@@ -87,18 +87,18 @@ struct ProgressAnalyticsView: View {
         let sub: String = {
             switch tier {
             case .fresh:
-                return "Start with Today. Your first workout creates the baseline."
+                return "Today starts the record. One logged workout turns this screen into signal."
             case .firstSession:
-                return "Good start. Early trendlines are building from real work."
+                return "Strong start. STRQ is already reading load, recovery, and consistency."
             case .earlyWeek:
-                return "\(vm.totalCompletedWorkouts) sessions in · week one is taking shape"
+                return "\(vm.totalCompletedWorkouts) session\(vm.totalCompletedWorkouts == 1 ? "" : "s") in · first-week trends are starting to resolve"
             case .established:
                 if progressing > 0 && prsThisMonth > 0 {
                     return "\(prsThisMonth) PR\(prsThisMonth == 1 ? "" : "s") this month · \(vm.streak)-day streak"
                 } else if vm.streak > 0 {
                     return "\(vm.streak)-day streak · keep the signal strong"
                 } else {
-                    return "Train to build your signal"
+                    return "Train to keep the signal sharp"
                 }
             }
         }()
@@ -120,7 +120,7 @@ struct ProgressAnalyticsView: View {
             .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("SIGNAL")
+                Text("PROGRESS")
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.4)
                     .foregroundStyle(STRQBrand.steel)
@@ -186,10 +186,10 @@ struct ProgressAnalyticsView: View {
         if vm.isEarlyStage {
             state = .info
             icon = vm.totalCompletedWorkouts == 0 ? "arrow.forward.circle.fill" : "waveform.path.ecg"
-            headline = vm.totalCompletedWorkouts == 0 ? "Start with Today" : "Baseline taking shape"
+            headline = vm.totalCompletedWorkouts == 0 ? "Your baseline starts with Today" : "Signal is coming in"
             detail = vm.totalCompletedWorkouts == 0
-                ? "Your first workout gives Progress something real to track."
-                : "\(vm.totalCompletedWorkouts) session\(vm.totalCompletedWorkouts == 1 ? "" : "s") logged — this view will fill in as the week builds."
+                ? "One workout gives Progress real training signal to read."
+                : "\(vm.totalCompletedWorkouts) session\(vm.totalCompletedWorkouts == 1 ? "" : "s") logged · the first clear trends arrive through week one."
         } else if prsThisWeek > 0 {
             state = .success
             icon = "trophy.fill"
@@ -360,7 +360,7 @@ struct ProgressAnalyticsView: View {
         HStack(spacing: 8) {
             if vm.isEarlyStage {
                 signalPill(icon: "figure.strengthtraining.traditional", value: "\(vm.totalCompletedWorkouts)", label: "Logged", color: STRQBrand.steel)
-                signalPill(icon: "calendar.badge.clock", value: "\(vm.weeklyStats.sessions)/\(max(1, min(3, vm.profile.daysPerWeek)))", label: "Week", color: STRQBrand.steel)
+                signalPill(icon: "calendar.badge.clock", value: "\(vm.weeklyStats.sessions)/\(max(1, min(3, vm.profile.daysPerWeek)))", label: "Target", color: STRQBrand.steel)
                 signalPill(icon: "flame.fill", value: "\(vm.streak)", label: "Streak", color: STRQBrand.steel)
                 signalPill(icon: "heart.fill", value: "\(vm.effectiveRecoveryScore)%", label: "Recovery", color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
             } else {
@@ -438,7 +438,9 @@ struct ProgressAnalyticsView: View {
             } else {
                 strengthBaselineCard
             }
-            prHighlights
+            if !vm.isEarlyStage || !vm.personalRecords.isEmpty {
+                prHighlights
+            }
             recentSessionsCard
             consistencyHeatmap
         }
@@ -448,7 +450,7 @@ struct ProgressAnalyticsView: View {
 
     private var strengthBaselineCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: "Estimated 1RM", trailing: "Building")
+            ForgeSectionHeader(title: "Estimated 1RM", trailing: "First Signal")
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 10) {
@@ -458,11 +460,11 @@ struct ProgressAnalyticsView: View {
                         .frame(width: 40, height: 40)
                         .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 10))
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Baseline taking shape")
+                        Text("Strength trend starts here")
                             .font(.subheadline.weight(.semibold))
                         Text(vm.totalCompletedWorkouts == 0
-                             ? "Your strength view starts filling in after a couple of main-lift sessions."
-                             : "Keep logging your main lifts and the first trendline will appear here.")
+                             ? "Your main lifts create the first real strength read."
+                             : "Keep logging anchor lifts and STRQ will turn them into a readable strength trend.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -567,7 +569,7 @@ struct ProgressAnalyticsView: View {
                     Image(systemName: "trophy")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("No personal records yet. Log a heavy set to earn your first.")
+                    Text("Heavy sets and rep bests will start surfacing here as your log grows.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -777,7 +779,7 @@ struct ProgressAnalyticsView: View {
                     Image(systemName: "figure.strengthtraining.traditional")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("Sessions will appear here once you complete your first workout.")
+                    Text("Each finished workout becomes a clean training record here.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -870,12 +872,25 @@ struct ProgressAnalyticsView: View {
                     .background(STRQBrand.steel.opacity(0.12), in: Capsule())
             }
 
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 4) {
-                ForEach(last28Days, id: \.0) { _, trained in
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(trained ? Color.white.gradient : Color(.tertiarySystemGroupedBackground).gradient)
-                        .frame(height: 20)
+            if last28Days.contains(where: \.1) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 4) {
+                    ForEach(last28Days, id: \.0) { _, trained in
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(trained ? Color.white.gradient : Color(.tertiarySystemGroupedBackground).gradient)
+                            .frame(height: 20)
+                    }
                 }
+            } else {
+                HStack(spacing: 10) {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("Your consistency pattern will map here once sessions start landing.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.vertical, 4)
             }
         }
         .padding(16)
@@ -890,16 +905,76 @@ struct ProgressAnalyticsView: View {
 
     @ViewBuilder
     private var bodySignals: some View {
-        VStack(spacing: 14) {
-            if let pace = vm.goalPace {
-                goalPaceCard(pace)
+        if vm.goalPace == nil && vm.bodyWeightEntries.count < 2 && vm.recoveryTrendData.count < 3 && vm.nutritionLogs.isEmpty {
+            signalRunwayCard(
+                title: "Body Signals",
+                trailing: "Gathering",
+                icon: "heart.text.square.fill",
+                headline: "Recovery and body trends build from repeat logs",
+                detail: "Sleep, weigh-ins, and nutrition entries turn this tab into a cleaner read of how your body is responding.",
+                chips: [("moon.zzz.fill", "Recovery"), ("scalemass.fill", "Weight"), ("fork.knife", "Nutrition")]
+            )
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+        } else {
+            VStack(spacing: 14) {
+                if let pace = vm.goalPace {
+                    goalPaceCard(pace)
+                }
+                bodyWeightChart
+                recoveryTrend
+                nutritionAdherence
             }
-            bodyWeightChart
-            recoveryTrend
-            nutritionAdherence
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
         }
-        .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 10)
+    }
+
+    private func signalRunwayCard(title: String, trailing: String, icon: String, headline: String, detail: String, chips: [(String, String)]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForgeSectionHeader(title: title, trailing: trailing)
+
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(STRQBrand.steel)
+                    .frame(width: 40, height: 40)
+                    .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 10))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(headline)
+                        .font(.subheadline.weight(.semibold))
+                    Text(detail)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            HStack(spacing: 6) {
+                ForEach(chips, id: \.1) { chip in
+                    HStack(spacing: 4) {
+                        Image(systemName: chip.0)
+                            .font(.system(size: 9, weight: .semibold))
+                        Text(chip.1)
+                            .font(.caption2.weight(.semibold))
+                    }
+                    .foregroundStyle(.tertiary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.white.opacity(0.04), in: Capsule())
+                }
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
     }
 
     private func goalPaceCard(_ pace: GoalPaceStatus) -> some View {
@@ -1119,13 +1194,26 @@ struct ProgressAnalyticsView: View {
 
     @ViewBuilder
     private var volumeSignals: some View {
-        VStack(spacing: 14) {
-            muscleBalanceChart
-            weeklySessionsChart
-            movementBalanceCard
+        if vm.totalCompletedWorkouts < 2 {
+            signalRunwayCard(
+                title: "Volume Signals",
+                trailing: "First Week",
+                icon: "chart.bar.xaxis",
+                headline: "Session volume and balance sharpen after a few workouts",
+                detail: "Completed sessions give STRQ enough context to read workload distribution, weekly rhythm, and movement mix.",
+                chips: [("figure.strengthtraining.traditional", "Sessions"), ("square.stack.3d.up.fill", "Volume"), ("arrow.left.arrow.right", "Balance")]
+            )
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+        } else {
+            VStack(spacing: 14) {
+                muscleBalanceChart
+                weeklySessionsChart
+                movementBalanceCard
+            }
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
         }
-        .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 10)
     }
 
     private var muscleBalanceChart: some View {
