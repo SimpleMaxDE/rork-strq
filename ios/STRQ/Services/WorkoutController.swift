@@ -151,6 +151,15 @@ final class WorkoutController {
         vm.persist()
     }
 
+    func updateWorkoutNote(_ note: String) {
+        guard var workout = vm.activeWorkout else { return }
+        let normalized = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard workout.session.notes != normalized else { return }
+        workout.session.notes = normalized
+        vm.activeWorkout = workout
+        vm.persist()
+    }
+
     /// Pauses and leaves the current workout — session stays as a draft so it
     /// can be resumed later from the Today surface.
     func pauseWorkout() {

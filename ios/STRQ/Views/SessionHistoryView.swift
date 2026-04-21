@@ -276,6 +276,9 @@ struct SessionDetailView: View {
                 header
                 verdictBanner
                 statsRow
+                if let note = sessionNote {
+                    noteCard(note)
+                }
                 exercisesList
             }
             .padding(.horizontal, 16)
@@ -311,6 +314,11 @@ struct SessionDetailView: View {
             streak: vm.streak,
             exerciseName: { id in vm.library.exercise(byId: id)?.name ?? id }
         )
+    }
+
+    private var sessionNote: String? {
+        let note = session.notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        return note.isEmpty ? nil : note
     }
 
     @ViewBuilder
@@ -401,6 +409,34 @@ struct SessionDetailView: View {
         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 10))
         .overlay(
             RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+    }
+
+    private func noteCard(_ note: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "note.text")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(STRQBrand.steel)
+                    .frame(width: 30, height: 30)
+                    .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 9))
+                Text("Session Note")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Spacer(minLength: 0)
+            }
+
+            Text(note)
+                .font(.subheadline)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
         )
     }

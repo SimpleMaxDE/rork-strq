@@ -14,6 +14,7 @@ struct ActiveWorkoutView: View {
     @State private var numericEdit: NumericEditContext?
     @State private var showExitDialog: Bool = false
     @State private var confirmDiscard: Bool = false
+    @State private var showSessionNoteEditor: Bool = false
     @State private var swapContextIndex: Int?
     @State private var swapConfirmationText: String?
     @State private var swapFeedbackTrigger: Bool = false
@@ -50,6 +51,9 @@ struct ActiveWorkoutView: View {
                                 .padding(.horizontal, 14)
 
                             previousSessionStrip(workout)
+                                .padding(.horizontal, 14)
+
+                            sessionNoteCard(workout)
                                 .padding(.horizontal, 14)
 
                             exerciseActions(workout)
@@ -115,6 +119,13 @@ struct ActiveWorkoutView: View {
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
                     .presentationContentInteraction(.scrolls)
+            }
+            .sheet(isPresented: $showSessionNoteEditor) {
+                WorkoutNoteSheet(note: workout.session.notes) { note in
+                    vm.workoutController.updateWorkoutNote(note)
+                }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
             }
             .sheet(item: $numericEdit) { ctx in
                 NumericInputSheet(context: ctx) { newValue in
@@ -965,6 +976,61 @@ struct ActiveWorkoutView: View {
         var map: [Int: SetLog] = [:]
         for s in sets { map[s.setNumber] = s }
         return map
+    }
+
+    private func sessionNoteCard(_ workout: ActiveWorkoutState) -> some View {
+        let note = workout.session.notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hasNote = !note.isEmpty
+
+        return Button {
+            showSessionNoteEditor = true
+        } label: {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: hasNote ? "note.text" : "square.and.pencil")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(hasNote ? .white : STRQBrand.steel)
+                    .frame(width: 36, height: 36)
+                    .background(hasNote ? Color.white.opacity(0.06) : STRQBrand.steel.opacity(0.14), in: .rect(cornerRadius: 11))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Session Note")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text(hasNote ? note : "Add one quick thought to remember how this session felt.")
+                        .font(.footnote)
+                        .foregroundStyle(hasNote ? .white.opacity(0.72) : .white.opacity(0.48))
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(hasNote ? 3 : 2)
+                    Text(hasNote ? "Saved with this workout" : "Optional")
+                        .font(.system(size: 10, weight: .bold))
+                        .tracking(0.7)
+                        .foregroundStyle(.white.opacity(0.34))
+                        .textCase(.uppercase)
+                }
+
+                Spacer(minLength: 12)
+
+                Text(hasNote ? "Edit" : "Add")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.82))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(Color.white.opacity(0.06), in: Capsule())
+                    .overlay(
+                        Capsule()
+                            .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                    )
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 12)
+            .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.strqPressable)
+        .accessibilityLabel(hasNote ? "Edit session note" : "Add session note")
     }
 
     private struct PersonalBest {
@@ -1935,6 +2001,72 @@ struct ActiveWorkoutView: View {
 }
 
 // MARK: - Numeric Input Sheet
+
+private struct WorkoutNoteSheet: View {
+    let note: String
+    let onSave: (String) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var draftNote: String = ""
+    @FocusState private var focused: Bool
+
+    private var trimmedNote: String {
+        draftNote.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 18) {
+                Text("Keep one quick note for this workout.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                TextField("How did this session feel?", text: $draftNote, axis: .vertical)
+                    .lineLimit(4...8)
+                    .padding(14)
+                    .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .strokeBorder(Color(.separator).opacity(0.35), lineWidth: 1)
+                    )
+                    .focused($focused)
+
+                Text(trimmedNote.isEmpty ? "Optional. Save a cue, win, or anything you want to remember next time." : "This note stays attached to the saved session.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                Spacer(minLength: 0)
+            }
+            .padding(20)
+            .navigationTitle("Session Note")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(trimmedNote.isEmpty ? "Done" : "Save") {
+                        onSave(trimmedNote)
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        focused = false
+                    }
+                }
+            }
+            .onAppear {
+                draftNote = note
+                focused = note.isEmpty
+            }
+        }
+    }
+}
 
 private struct SwapIdx: Identifiable {
     let index: Int
