@@ -3,6 +3,7 @@ import RevenueCat
 
 struct STRQPaywallView: View {
     var store: StoreViewModel
+    var source: String = "profile"
     @Environment(\.dismiss) private var dismiss
     @State private var selectedPackage: Package?
 
@@ -45,6 +46,10 @@ struct STRQPaywallView: View {
         .onChange(of: store.isPro) { _, isPro in
             if isPro { dismiss() }
         }
+        .onChange(of: selectedPackage?.identifier) { _, newId in
+            guard let newId else { return }
+            Analytics.shared.track(.package_selected, ["package": newId, "source": source])
+        }
         .onAppear {
             if let annual = store.annualPackage {
                 selectedPackage = annual
@@ -54,15 +59,21 @@ struct STRQPaywallView: View {
         }
     }
 
+    // MARK: - Main content
+
     private var paywallContent: some View {
         ScrollView {
             VStack(spacing: 0) {
                 heroSection
-                    .padding(.top, 24)
+                    .padding(.top, 28)
 
-                Spacer().frame(height: 28)
+                Spacer().frame(height: 26)
 
                 pillarList
+
+                Spacer().frame(height: 22)
+
+                compareBlock
 
                 Spacer().frame(height: 22)
 
@@ -72,9 +83,13 @@ struct STRQPaywallView: View {
 
                 trialReassurance
 
-                Spacer().frame(height: 18)
+                Spacer().frame(height: 16)
 
                 purchaseButton
+
+                Spacer().frame(height: 10)
+
+                trustRow
 
                 Spacer().frame(height: 12)
 
@@ -84,12 +99,14 @@ struct STRQPaywallView: View {
 
                 legalText
 
-                Spacer().frame(height: 24)
+                Spacer().frame(height: 28)
             }
             .padding(.horizontal, 24)
         }
         .scrollIndicators(.hidden)
     }
+
+    // MARK: - Hero
 
     private var heroSection: some View {
         VStack(spacing: 14) {
@@ -112,49 +129,87 @@ struct STRQPaywallView: View {
                     .tracking(2.4)
                     .foregroundStyle(STRQBrand.steel)
 
-                Text("Training that keeps adapting to you")
+                Text("Coaching that keeps learning you")
                     .font(.system(.title2, design: .rounded, weight: .bold))
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("Deeper coaching, evolving plans, and your training safely synced across devices.")
+                Text("Adaptive plans, deeper progression reads, and every session safely carried across your devices.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 2)
+                    .padding(.horizontal, 4)
             }
         }
     }
 
+    // MARK: - Pillars
+
+    private struct Pillar {
+        let icon: String
+        let title: String
+        let detail: String
+        let bullets: [String]
+    }
+
+    private var pillars: [Pillar] {
+        [
+            Pillar(
+                icon: "brain.head.profile.fill",
+                title: "Adaptive coaching",
+                detail: "Readiness-aware adjustments and weekly reviews that tune your plan as you train.",
+                bullets: [
+                    "Smart swaps that preserve the training role",
+                    "Weekly check-in that reasons about your week",
+                    "Comeback guidance after missed sessions"
+                ]
+            ),
+            Pillar(
+                icon: "chart.line.uptrend.xyaxis",
+                title: "Deeper progression",
+                detail: "Long-term phase reads, progression memory, and a change log you can trust.",
+                bullets: [
+                    "Mesocycle outlook — block, phase, and next shift",
+                    "Per-lift progression signals and plateau reads",
+                    "Coaching memory: what changed, why, and when"
+                ]
+            ),
+            Pillar(
+                icon: "scalemass.fill",
+                title: "Physique intelligence",
+                detail: "Bodyweight trend and nutrition coaching tuned to your goal — fully opt-in.",
+                bullets: [
+                    "Regression-based bodyweight trend with 4-week projection",
+                    "Protein and calorie targets that follow your goal",
+                    "Nutrition × training bridge, not a calorie tracker"
+                ]
+            ),
+            Pillar(
+                icon: "icloud.fill",
+                title: "Ecosystem & continuity",
+                detail: "Your training carried safely across devices, with premium continuity features.",
+                bullets: [
+                    "iCloud sync across iPhone, iPad, and Mac",
+                    "Smart reminders tuned to your week",
+                    "Priority updates and early-access features"
+                ]
+            )
+        ]
+    }
+
     private var pillarList: some View {
         VStack(spacing: 10) {
-            pillarRow(
-                icon: "brain.head.profile.fill",
-                title: "Adaptive Coaching",
-                detail: "Readiness-aware adjustments, weekly reviews, and deeper plan reasoning."
-            )
-            pillarRow(
-                icon: "arrow.triangle.2.circlepath",
-                title: "Plans That Evolve",
-                detail: "Automatic progression, smart swaps, and training that responds to your signals."
-            )
-            pillarRow(
-                icon: "scalemass.fill",
-                title: "Physique Intelligence",
-                detail: "Bodyweight trend, protein and calorie guidance tuned to your goal."
-            )
-            pillarRow(
-                icon: "icloud.fill",
-                title: "Ecosystem Access",
-                detail: "iCloud sync, Apple Watch companion, widgets, and Live Activity."
-            )
+            ForEach(pillars.indices, id: \.self) { i in
+                pillarRow(pillars[i])
+            }
         }
     }
 
-    private func pillarRow(icon: String, title: String, detail: String) -> some View {
+    private func pillarRow(_ p: Pillar) -> some View {
         HStack(alignment: .top, spacing: 14) {
-            Image(systemName: icon)
+            Image(systemName: p.icon)
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 38, height: 38)
@@ -164,13 +219,30 @@ struct STRQPaywallView: View {
                         .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
                 )
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
+            VStack(alignment: .leading, spacing: 6) {
+                Text(p.title)
                     .font(.subheadline.weight(.bold))
-                Text(detail)
+                Text(p.detail)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(p.bullets, id: \.self) { line in
+                        HStack(alignment: .top, spacing: 6) {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(STRQPalette.success)
+                                .frame(width: 10, alignment: .leading)
+                                .padding(.top, 2)
+                            Text(line)
+                                .font(.system(size: 11.5, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.78))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+                .padding(.top, 2)
             }
             Spacer(minLength: 0)
         }
@@ -181,6 +253,103 @@ struct STRQPaywallView: View {
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
         )
     }
+
+    // MARK: - Compare (Free vs Pro)
+
+    private var compareBlock: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(STRQBrand.steelGradient)
+                    .frame(width: 3, height: 14)
+                Text("WHAT YOU KEEP · WHAT PRO ADDS")
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.2)
+                    .foregroundStyle(STRQBrand.steel)
+                Spacer()
+            }
+
+            VStack(spacing: 0) {
+                compareRow(
+                    label: "Plan generation",
+                    free: "Strong default plans",
+                    pro: "Adaptive weekly tuning"
+                )
+                Divider().opacity(0.25).padding(.horizontal, 14)
+                compareRow(
+                    label: "Exercise library",
+                    free: "Full curated catalog",
+                    pro: "Smart swaps & alternatives"
+                )
+                Divider().opacity(0.25).padding(.horizontal, 14)
+                compareRow(
+                    label: "Progression",
+                    free: "Per-session logging",
+                    pro: "Phase outlook & memory"
+                )
+                Divider().opacity(0.25).padding(.horizontal, 14)
+                compareRow(
+                    label: "Physique coaching",
+                    free: "Training-only",
+                    pro: "Trend · protein · bridge"
+                )
+                Divider().opacity(0.25).padding(.horizontal, 14)
+                compareRow(
+                    label: "Across devices",
+                    free: "This device",
+                    pro: "iCloud continuity"
+                )
+            }
+            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+            )
+        }
+    }
+
+    private func compareRow(label: String, free: String, pro: String) -> some View {
+        HStack(alignment: .center, spacing: 10) {
+            Text(label)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.primary)
+                .frame(width: 110, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("FREE")
+                    .font(.system(size: 8, weight: .black))
+                    .tracking(0.8)
+                    .foregroundStyle(.tertiary)
+                Text(free)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 3) {
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 7, weight: .black))
+                    Text("PRO")
+                        .font(.system(size: 8, weight: .black))
+                        .tracking(0.8)
+                }
+                .foregroundStyle(.white)
+                Text(pro)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+    }
+
+    // MARK: - Packages
 
     @ViewBuilder
     private var trialReassurance: some View {
@@ -204,6 +373,7 @@ struct STRQPaywallView: View {
                     package: annual,
                     title: "Yearly",
                     subtitle: annualSubtitle(annual),
+                    trailing: perMonthLine(for: annual),
                     badge: trialBadge(annual) ?? savingsBadge(),
                     isSelected: selectedPackage?.identifier == annual.identifier
                 )
@@ -213,6 +383,7 @@ struct STRQPaywallView: View {
                     package: monthly,
                     title: "Monthly",
                     subtitle: "\(monthly.storeProduct.localizedPriceString)/month",
+                    trailing: nil,
                     badge: nil,
                     isSelected: selectedPackage?.identifier == monthly.identifier
                 )
@@ -237,6 +408,21 @@ struct STRQPaywallView: View {
         return "\(price)/year"
     }
 
+    private func perMonthLine(for package: Package) -> String? {
+        let priceValue = (package.storeProduct.price as NSDecimalNumber).doubleValue
+        guard priceValue > 0 else { return nil }
+        let monthly = priceValue / 12.0
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = package.storeProduct.priceFormatter?.locale ?? .current
+        if let code = package.storeProduct.currencyCode {
+            formatter.currencyCode = code
+        }
+        formatter.maximumFractionDigits = monthly < 10 ? 2 : 0
+        guard let formatted = formatter.string(from: NSNumber(value: monthly)) else { return nil }
+        return "\(formatted)/mo"
+    }
+
     private func trialBadge(_ package: Package) -> String? {
         guard let intro = package.storeProduct.introductoryDiscount else { return nil }
         let period = intro.subscriptionPeriod
@@ -248,7 +434,7 @@ struct STRQPaywallView: View {
         return "Free trial"
     }
 
-    private func packageCard(package: Package, title: String, subtitle: String, badge: String?, isSelected: Bool) -> some View {
+    private func packageCard(package: Package, title: String, subtitle: String, trailing: String?, badge: String?, isSelected: Bool) -> some View {
         Button {
             withAnimation(.snappy(duration: 0.2)) {
                 selectedPackage = package
@@ -285,6 +471,12 @@ struct STRQPaywallView: View {
                 }
 
                 Spacer()
+
+                if let trailing {
+                    Text(trailing)
+                        .font(.system(size: 12, weight: .bold).monospacedDigit())
+                        .foregroundStyle(isSelected ? .white : .secondary)
+                }
             }
             .padding(16)
             .background(
@@ -302,6 +494,8 @@ struct STRQPaywallView: View {
             )
         }
     }
+
+    // MARK: - Purchase button
 
     private var purchaseButton: some View {
         Button {
@@ -343,6 +537,33 @@ struct STRQPaywallView: View {
         return "Subscribe"
     }
 
+    private var trustRow: some View {
+        HStack(spacing: 14) {
+            trustItem(icon: "lock.shield.fill", label: "Secure")
+            trustDivider
+            trustItem(icon: "xmark.circle.fill", label: "Cancel anytime")
+            trustDivider
+            trustItem(icon: "apple.logo", label: "Via Apple")
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func trustItem(icon: String, label: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .semibold))
+            Text(label)
+                .font(.system(size: 10, weight: .semibold))
+        }
+        .foregroundStyle(.tertiary)
+    }
+
+    private var trustDivider: some View {
+        Circle()
+            .fill(Color.white.opacity(0.18))
+            .frame(width: 3, height: 3)
+    }
+
     private var restoreButton: some View {
         Button {
             Task { await store.restore() }
@@ -360,6 +581,8 @@ struct STRQPaywallView: View {
             .multilineTextAlignment(.center)
     }
 
+    // MARK: - States
+
     private var alreadySubscribedState: some View {
         VStack(spacing: 0) {
             Spacer()
@@ -367,7 +590,7 @@ struct STRQPaywallView: View {
             VStack(spacing: 20) {
                 ZStack {
                     Circle()
-                        .fill(.green.opacity(0.15))
+                        .fill(STRQPalette.success.opacity(0.15))
                         .frame(width: 88, height: 88)
                     Circle()
                         .fill(STRQBrand.steelGradient)
@@ -396,7 +619,7 @@ struct STRQPaywallView: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 5)
-                    .background(.green.opacity(0.8), in: Capsule())
+                    .background(STRQPalette.success.opacity(0.8), in: Capsule())
             }
 
             Spacer()
@@ -423,7 +646,7 @@ struct STRQPaywallView: View {
     private var loadingState: some View {
         VStack(spacing: 16) {
             ProgressView()
-            Text("Loading plans...")
+            Text("Loading plans…")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }

@@ -548,3 +548,42 @@ Use the normalized ExerciseDBPro media foundation to make exercise surfaces more
 - [x] Reuses the existing `RemoteExerciseImageCache` — no new network layer, no extra caching stack
 - [x] Fallback always renders (never a blank state), so the catalog stays visually coherent whether or not remote GIFs are present
 - [x] Curated STRQ exercises keep their gradient+symbol identity; remote GIF only surfaces where the importer provides one
+
+---
+
+# Phase 24 — Premium Value Communication / Monetization Surface Quality
+
+Make STRQ's upgrade surfaces feel as premium and trustworthy as the rest of the product. Product-specific value, fair free-vs-pro framing, calm trust, no salesy tactics.
+
+**Paywall hero (`STRQPaywallView`)**
+- [x] Reframed headline to coach voice — "Coaching that keeps learning you" + adaptive/deeper/continuity subhead
+- [x] Keeps dark steel hero mark, STRQ PRO eyebrow, and premium spacing
+
+**Pillar structure (product-specific value)**
+- [x] Four pillars that reflect STRQ's real strengths: Adaptive coaching · Deeper progression · Physique intelligence · Ecosystem & continuity
+- [x] Each pillar exposes 3 concrete bullets (smart swaps, mesocycle outlook, bodyweight trend, iCloud continuity, etc.) — no generic "unlock more features" copy
+- [x] Semantic success check per bullet; no new color maps
+
+**Free vs Pro comparison block**
+- [x] New "WHAT YOU KEEP · WHAT PRO ADDS" card so free feels respected, not punished
+- [x] Rows: Plan generation · Exercise library · Progression · Physique coaching · Across devices
+- [x] Dividers, compact FREE/PRO labels, hairline border — reads at a glance without feeling salesy
+
+**Package selector upgrades**
+- [x] Yearly card now shows `/mo` equivalent on the trailing edge (localized, currency-aware) so the per-month value lands immediately
+- [x] Trial badge still wins over savings badge when an intro is present; savings badge falls back gracefully
+- [x] `package_selected` analytics fires on user selection with source context
+
+**Trust row + CTA**
+- [x] New post-button trust row: Secure · Cancel anytime · Via Apple (tertiary tone, quiet)
+- [x] Primary CTA title driven by intro discount — "Start Free Trial" vs "Subscribe"
+- [x] Legal copy retained, kept quiet and standards-compliant
+
+**Source plumbing**
+- [x] `STRQPaywallView(source:)` optional parameter; ProfileView already fires `paywall_viewed` with `source=profile`
+- [x] Prepared for future contextual entry points (no surface clutter added yet)
+
+**Identity**
+- [x] `STRQBrand` / `STRQPalette` only — no new color maps, no fake urgency, no gimmicky discount language
+- [x] Already-subscribed state uses semantic success instead of raw `.green`
+- [x] Copy throughout reflects STRQ (adaptive programming, progression memory, nutrition × training bridge) — not generic fitness SaaS
