@@ -37,33 +37,36 @@ struct ActiveWorkoutView: View {
                     workoutHeader(workout)
                     progressStrip(workout)
 
-                    ScrollView {
-                        VStack(spacing: 10) {
-                            currentTaskBlock(workout)
-                                .padding(.horizontal, 14)
-                                .padding(.top, 6)
-
-                            activeSetCard(workout)
-                                .padding(.horizontal, 14)
-
-                            setLogTable(workout)
-                                .padding(.horizontal, 14)
-
-                            previousSessionStrip(workout)
-                                .padding(.horizontal, 14)
-
-                            sessionNoteCard(workout)
-                                .padding(.horizontal, 14)
-
-                            exerciseActions(workout)
-                                .padding(.horizontal, 14)
-
-                            if shouldShowUpNext(workout) {
-                                upNextPreview(workout)
+                    GeometryReader { proxy in
+                        ScrollView(.vertical) {
+                            VStack(spacing: 10) {
+                                currentTaskBlock(workout)
                                     .padding(.horizontal, 14)
+                                    .padding(.top, 6)
+
+                                activeSetCard(workout)
+                                    .padding(.horizontal, 14)
+
+                                setLogTable(workout)
+                                    .padding(.horizontal, 14)
+
+                                previousSessionStrip(workout)
+                                    .padding(.horizontal, 14)
+
+                                sessionNoteCard(workout)
+                                    .padding(.horizontal, 14)
+
+                                exerciseActions(workout)
+                                    .padding(.horizontal, 14)
+
+                                if shouldShowUpNext(workout) {
+                                    upNextPreview(workout)
+                                        .padding(.horizontal, 14)
+                                }
                             }
+                            .frame(width: proxy.size.width, alignment: .top)
+                            .padding(.bottom, 100)
                         }
-                        .padding(.bottom, 100)
                     }
                 }
 
