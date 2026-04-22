@@ -109,6 +109,7 @@ final class WorkoutController {
         vm.workoutMinimized = false
         vm.completedWorkoutHandoff = workout.session
         vm.activeWorkout = nil
+        vm.refreshFamilyResponseProfile()
         vm.refreshIntelligence()
         vm.persist()
         if vm.notificationSettings.healthKitSyncEnabled {

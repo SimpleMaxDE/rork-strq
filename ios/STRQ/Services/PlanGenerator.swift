@@ -667,6 +667,11 @@ struct PlanGenerator {
         return false
     }
 
+    // Internal hook for the adaptive-response QA harness.
+    func _score(_ ex: Exercise, muscle: MuscleGroup, role: PlanExerciseRole, context: PlanContext) -> Double {
+        score(ex, muscle: muscle, role: role, context: context)
+    }
+
     private func score(_ ex: Exercise, muscle: MuscleGroup, role: PlanExerciseRole, context: PlanContext) -> Double {
         let profile = context.profile
         var s: Double = 50
@@ -681,13 +686,68 @@ struct PlanGenerator {
 
         // Personal response adjustment — only moves the needle once real
         // per-user data accumulates (confidence gating is inside the engine).
-        s += ExerciseResponseEngine.personalAdjustment(
+        let personalAdj = ExerciseResponseEngine.personalAdjustment(
             for: ex,
             role: role,
             profile: context.responseProfile,
             phase: context.phase,
             recoveryScore: context.recoveryScore
         )
+        s += personalAdj
+
+        // Preferred-exercise adherence bias — preferred picks get a calm
+        // positive bias because the user said they like them (adherence
+        // signal). Bias is softened (or removed) when personal response data
+        // says this family is actually poor for the user — preference never
+        // blindly overrides strong negative response.
+        if profile.preferredExercises.contains(ex.id) ||
+           profile.preferredExercises.contains(where: { $0.lowercased() == ex.name.lowercased() }) {
+            var boost: Double = 8
+            if personalAdj < -4 { boost = 2 }          // strong negative → barely nudge
+            else if personalAdj < 0 { boost = 4 }      // mild negative → softened
+            // Respect role / safety — no bias if candidate can't fill the role.
+            switch role {
+            case .accessory, .isolation: boost *= 0.85
+            default: break
+            }
+            s += boost
+        }
+
+        // Recent-session exposure penalty — conservative anti-repetition so
+        // already-hammered families get a small nudge down when novelty is
+        // useful. Strongly-progressing families are spared (they're working,
+        // don't rotate away from them). Anchors are penalized less than
+        // accessories/isolations so progression lifts stay stable.
+        if !context.recentSessions.isEmpty,
+           let family = ExerciseFamilyService.shared.family(forExercise: ex.id) {
+            let cutoff = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+            var recentFamilyHits = 0
+            var recentExerciseHits = 0
+            for session in context.recentSessions where session.isCompleted && session.startTime >= cutoff {
+                for log in session.exerciseLogs {
+                    if log.exerciseId == ex.id { recentExerciseHits += 1 }
+                    if ExerciseFamilyService.shared.family(forExercise: log.exerciseId)?.id == family.id {
+                        recentFamilyHits += 1
+                    }
+                }
+            }
+            // Progression-aware sparing — if the user is clearly progressing on
+            // this family, keep it in the rotation rather than swapping away.
+            let progressingStrongly: Bool = {
+                guard let resp = context.responseProfile.response(forFamily: family.id),
+                      resp.hasUsableData else { return false }
+                return resp.progressionSignal > 0.3 && resp.confidence > 0.5
+            }()
+
+            if !progressingStrongly {
+                if recentExerciseHits >= 2 {
+                    s -= (role == .anchor ? 2 : 5)
+                }
+                if recentFamilyHits >= 3 {
+                    s -= (role == .anchor ? 1 : 3)
+                }
+            }
+        }
 
         // Curated canonical preference — imports must genuinely win on merit
         // to displace curated exercises at the top of a pick list.

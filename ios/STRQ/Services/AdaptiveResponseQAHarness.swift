@@ -36,8 +36,193 @@ nonisolated struct AdaptiveResponseQAHarness: Sendable {
         cases.append(evaluateDeloadAmpliesFatigue())
         cases.append(evaluateSwapPrefersProgressingFamily())
         cases.append(evaluatePriorIsNeutralWhenZeroData())
+        cases.append(evaluatePreferredExerciseBoost())
+        cases.append(evaluatePreferredSoftenedByNegativeResponse())
+        cases.append(evaluateRecentRepetitionPenalty())
+        cases.append(evaluateProgressingFamilySparedFromRepetitionPenalty())
 
         return AdaptiveResponseQAReport(cases: cases)
+    }
+
+    // MARK: - New Cases (preferred exercises + recent-session memory)
+
+    private func evaluatePreferredExerciseBoost() -> AdaptiveResponseQACase {
+        let profile = Self.sampleProfile(preferred: ["barbell-bench-press"])
+        guard let bench = ExerciseLibrary.shared.exercise(byId: "barbell-bench-press") else {
+            return AdaptiveResponseQACase(label: "preferred boost", detail: "missing exercise", passed: false)
+        }
+        let baseCtx = PlanContext(
+            profile: Self.sampleProfile(preferred: []),
+            muscleBalance: [],
+            recentSessions: [],
+            recoveryScore: 75,
+            phase: .build,
+            responseProfile: .empty
+        )
+        let boostedCtx = PlanContext(
+            profile: profile,
+            muscleBalance: [],
+            recentSessions: [],
+            recoveryScore: 75,
+            phase: .build,
+            responseProfile: .empty
+        )
+        let gen = PlanGenerator()
+        let base = gen._score(bench, muscle: .chest, role: .anchor, context: baseCtx)
+        let boosted = gen._score(bench, muscle: .chest, role: .anchor, context: boostedCtx)
+        let delta = boosted - base
+        return AdaptiveResponseQACase(
+            label: "preferred boost",
+            detail: "Δ=\(String(format: "%.2f", delta)) (expected 4...10)",
+            passed: delta >= 4 && delta <= 10
+        )
+    }
+
+    private func evaluatePreferredSoftenedByNegativeResponse() -> AdaptiveResponseQACase {
+        let profile = Self.sampleProfile(preferred: ["barbell-bench-press"])
+        guard let bench = ExerciseLibrary.shared.exercise(byId: "barbell-bench-press"),
+              let familyId = ExerciseFamilyService.shared.family(forExercise: bench.id)?.id
+        else {
+            return AdaptiveResponseQACase(label: "preferred softened by bad response", detail: "missing exercise/family", passed: false)
+        }
+        let badResp = PersonalExerciseResponse(
+            familyId: familyId,
+            progressionSignal: -0.8, fatigueCost: 0.9,
+            jointTolerance: -0.8, adherenceScore: 0.3,
+            confidence: 1.0, sessionCount: 10
+        )
+        let respProfile = ExerciseFamilyResponseProfile(familyResponses: [familyId: badResp])
+
+        let neutralPrefCtx = PlanContext(
+            profile: Self.sampleProfile(preferred: []),
+            muscleBalance: [], recentSessions: [],
+            recoveryScore: 60, phase: .build,
+            responseProfile: respProfile
+        )
+        let prefCtx = PlanContext(
+            profile: profile,
+            muscleBalance: [], recentSessions: [],
+            recoveryScore: 60, phase: .build,
+            responseProfile: respProfile
+        )
+        let gen = PlanGenerator()
+        let base = gen._score(bench, muscle: .chest, role: .anchor, context: neutralPrefCtx)
+        let boosted = gen._score(bench, muscle: .chest, role: .anchor, context: prefCtx)
+        let delta = boosted - base
+        // Preferred boost should be softened (≤ 4) when response is strongly negative.
+        return AdaptiveResponseQACase(
+            label: "preferred softened by bad response",
+            detail: "Δ=\(String(format: "%.2f", delta)) (expected <= 4)",
+            passed: delta <= 4
+        )
+    }
+
+    private func evaluateRecentRepetitionPenalty() -> AdaptiveResponseQACase {
+        guard let bench = ExerciseLibrary.shared.exercise(byId: "barbell-bench-press") else {
+            return AdaptiveResponseQACase(label: "recent repetition penalty", detail: "missing exercise", passed: false)
+        }
+        let profile = Self.sampleProfile(preferred: [])
+        let freshCtx = PlanContext(
+            profile: profile,
+            muscleBalance: [], recentSessions: [],
+            recoveryScore: 75, phase: .build,
+            responseProfile: .empty
+        )
+        let repeated = Self.syntheticRecentSessions(
+            exerciseId: bench.id, repeats: 3
+        )
+        let repeatedCtx = PlanContext(
+            profile: profile,
+            muscleBalance: [], recentSessions: repeated,
+            recoveryScore: 75, phase: .build,
+            responseProfile: .empty
+        )
+        let gen = PlanGenerator()
+        let base = gen._score(bench, muscle: .chest, role: .accessory, context: freshCtx)
+        let penalized = gen._score(bench, muscle: .chest, role: .accessory, context: repeatedCtx)
+        let drop = base - penalized
+        return AdaptiveResponseQACase(
+            label: "recent repetition penalty",
+            detail: "drop=\(String(format: "%.2f", drop)) (expected >= 2)",
+            passed: drop >= 2
+        )
+    }
+
+    private func evaluateProgressingFamilySparedFromRepetitionPenalty() -> AdaptiveResponseQACase {
+        guard let bench = ExerciseLibrary.shared.exercise(byId: "barbell-bench-press"),
+              let familyId = ExerciseFamilyService.shared.family(forExercise: bench.id)?.id
+        else {
+            return AdaptiveResponseQACase(label: "progressing family spared", detail: "missing exercise/family", passed: false)
+        }
+        let progressing = PersonalExerciseResponse(
+            familyId: familyId,
+            progressionSignal: 0.8, fatigueCost: 0.45,
+            jointTolerance: 0.5, adherenceScore: 0.95,
+            confidence: 1.0, sessionCount: 10
+        )
+        let respProfile = ExerciseFamilyResponseProfile(familyResponses: [familyId: progressing])
+        let profile = Self.sampleProfile(preferred: [])
+        let freshCtx = PlanContext(
+            profile: profile,
+            muscleBalance: [], recentSessions: [],
+            recoveryScore: 75, phase: .build,
+            responseProfile: respProfile
+        )
+        let repeated = Self.syntheticRecentSessions(exerciseId: bench.id, repeats: 3)
+        let repeatedCtx = PlanContext(
+            profile: profile,
+            muscleBalance: [], recentSessions: repeated,
+            recoveryScore: 75, phase: .build,
+            responseProfile: respProfile
+        )
+        let gen = PlanGenerator()
+        let base = gen._score(bench, muscle: .chest, role: .accessory, context: freshCtx)
+        let penalized = gen._score(bench, muscle: .chest, role: .accessory, context: repeatedCtx)
+        let drop = base - penalized
+        // Strong progression should spare the family — drop stays small.
+        return AdaptiveResponseQACase(
+            label: "progressing family spared",
+            detail: "drop=\(String(format: "%.2f", drop)) (expected < 2)",
+            passed: drop < 2
+        )
+    }
+
+    // MARK: - Helpers
+
+    private static func sampleProfile(preferred: [String]) -> UserProfile {
+        var p = UserProfile()
+        p.name = ""
+        p.daysPerWeek = 4
+        p.minutesPerSession = 60
+        p.trainingLevel = .intermediate
+        p.goal = .muscleGain
+        p.trainingLocation = .gym
+        p.preferredExercises = preferred
+        return p
+    }
+
+    private static func syntheticRecentSessions(exerciseId: String, repeats: Int) -> [WorkoutSession] {
+        let now = Date()
+        return (0..<repeats).map { i in
+            let date = Calendar.current.date(byAdding: .day, value: -i, to: now) ?? now
+            let log = ExerciseLog(
+                exerciseId: exerciseId,
+                sets: [
+                    SetLog(setNumber: 1, weight: 60, reps: 8, isCompleted: true, quality: .onTarget),
+                    SetLog(setNumber: 2, weight: 60, reps: 8, isCompleted: true, quality: .onTarget)
+                ],
+                isCompleted: true
+            )
+            return WorkoutSession(
+                planId: "plan",
+                dayId: "day",
+                dayName: "Day",
+                startTime: date,
+                endTime: date,
+                exerciseLogs: [log],
+                isCompleted: true
+            )
+        }
     }
 
     // MARK: - Cases

@@ -314,10 +314,23 @@ struct ExerciseSelectionEngine {
                 profile: context.responseProfile,
                 recoveryScore: context.recoveryScore
             )
+
+            // Preferred-exercise adherence bias on swaps — if the user marked
+            // this candidate as preferred, softly lift it. Soften / drop the
+            // bias if personal response is clearly negative.
+            var preferenceBoost: Double = 0
+            let prefIds = Set(context.profile.preferredExercises)
+            let prefNames = Set(context.profile.preferredExercises.map { $0.lowercased() })
+            if prefIds.contains(candidate.id) || prefNames.contains(candidate.name.lowercased()) {
+                preferenceBoost = 5
+                if personal < -3 { preferenceBoost = 1 }
+                else if personal < 0 { preferenceBoost = 3 }
+            }
+
             result = ScoredExercise(
                 id: result.id,
                 exercise: result.exercise,
-                score: result.score + personal,
+                score: result.score + personal + preferenceBoost,
                 reasons: result.reasons,
                 tags: result.tags
             )

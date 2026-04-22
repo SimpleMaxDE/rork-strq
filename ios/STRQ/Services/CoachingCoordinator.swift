@@ -28,6 +28,10 @@ final class CoachingCoordinator {
 
     func refreshIntelligence() {
         refreshProgressionStates()
+        // Fold updated progression data into the adaptive family-response
+        // profile before downstream insights / plan-quality reads run, so
+        // swap ranking and plan quality see the latest personal response.
+        vm.refreshFamilyResponseProfile()
         refreshVolumeLandmarks()
         refreshBalanceInsights()
         refreshNextBestAction()
