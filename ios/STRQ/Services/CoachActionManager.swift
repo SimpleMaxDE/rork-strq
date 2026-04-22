@@ -398,7 +398,8 @@ struct CoachActionManager {
         progressionStates: [ExerciseProgressionState] = [],
         workoutHistory: [WorkoutSession] = [],
         recoveryScore: Int = 75,
-        phase: TrainingPhase = .build
+        phase: TrainingPhase = .build,
+        responseProfile: ExerciseFamilyResponseProfile = .empty
     ) -> [ExerciseSwapOption] {
         results(
             for: exerciseId,
@@ -406,7 +407,8 @@ struct CoachActionManager {
             progressionStates: progressionStates,
             workoutHistory: workoutHistory,
             recoveryScore: recoveryScore,
-            phase: phase
+            phase: phase,
+            responseProfile: responseProfile
         ).flattened
     }
 
@@ -421,7 +423,8 @@ struct CoachActionManager {
         progressionStates: [ExerciseProgressionState] = [],
         workoutHistory: [WorkoutSession] = [],
         recoveryScore: Int = 75,
-        phase: TrainingPhase = .build
+        phase: TrainingPhase = .build,
+        responseProfile: ExerciseFamilyResponseProfile = .empty
     ) -> ExerciseSwapResults {
         results(
             for: exerciseId,
@@ -429,7 +432,8 @@ struct CoachActionManager {
             progressionStates: progressionStates,
             workoutHistory: workoutHistory,
             recoveryScore: recoveryScore,
-            phase: phase
+            phase: phase,
+            responseProfile: responseProfile
         )
     }
 
@@ -439,7 +443,8 @@ struct CoachActionManager {
         progressionStates: [ExerciseProgressionState],
         workoutHistory: [WorkoutSession],
         recoveryScore: Int,
-        phase: TrainingPhase
+        phase: TrainingPhase,
+        responseProfile: ExerciseFamilyResponseProfile = .empty
     ) -> ExerciseSwapResults {
         guard let original = library.exercise(byId: exerciseId) else {
             return ExerciseSwapResults(currentRole: .accessory, sections: [])
@@ -451,7 +456,8 @@ struct CoachActionManager {
             progressionStates: progressionStates,
             workoutHistory: workoutHistory,
             recoveryScore: recoveryScore,
-            phase: phase
+            phase: phase,
+            responseProfile: responseProfile
         )
         let currentRole = selection.replacementRole(for: original)
 
@@ -528,9 +534,9 @@ struct CoachActionManager {
 
     // MARK: - Week-Level Actions
 
-    func previewWeekRegeneration(plan: WorkoutPlan, profile: UserProfile, muscleBalance: [MuscleBalanceEntry], recentSessions: [WorkoutSession], recoveryScore: Int) -> WeekRegenerationPreview {
+    func previewWeekRegeneration(plan: WorkoutPlan, profile: UserProfile, muscleBalance: [MuscleBalanceEntry], recentSessions: [WorkoutSession], recoveryScore: Int, phase: TrainingPhase = .build, responseProfile: ExerciseFamilyResponseProfile = .empty) -> WeekRegenerationPreview {
         let generator = PlanGenerator()
-        let newPlan = generator.generate(for: profile, muscleBalance: muscleBalance, recentSessions: recentSessions, recoveryScore: recoveryScore)
+        let newPlan = generator.generate(for: profile, muscleBalance: muscleBalance, recentSessions: recentSessions, recoveryScore: recoveryScore, phase: phase, responseProfile: responseProfile)
 
         let originalSummaries = plan.days.map { daySummary($0) }
         let newSummaries = newPlan.days.map { daySummary($0) }
@@ -587,10 +593,10 @@ struct CoachActionManager {
         )
     }
 
-    func applyWeekRegeneration(plan: inout WorkoutPlan, profile: UserProfile, muscleBalance: [MuscleBalanceEntry], recentSessions: [WorkoutSession], recoveryScore: Int) -> (CoachAdjustment, WorkoutPlan)? {
+    func applyWeekRegeneration(plan: inout WorkoutPlan, profile: UserProfile, muscleBalance: [MuscleBalanceEntry], recentSessions: [WorkoutSession], recoveryScore: Int, phase: TrainingPhase = .build, responseProfile: ExerciseFamilyResponseProfile = .empty) -> (CoachAdjustment, WorkoutPlan)? {
         let generator = PlanGenerator()
         let oldPlan = plan
-        let newPlan = generator.generate(for: profile, muscleBalance: muscleBalance, recentSessions: recentSessions, recoveryScore: recoveryScore)
+        let newPlan = generator.generate(for: profile, muscleBalance: muscleBalance, recentSessions: recentSessions, recoveryScore: recoveryScore, phase: phase, responseProfile: responseProfile)
 
         var details: [AdjustmentDetail] = []
         for (index, newDay) in newPlan.days.enumerated() {

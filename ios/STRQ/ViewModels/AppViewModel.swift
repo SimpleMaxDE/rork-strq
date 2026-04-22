@@ -135,6 +135,7 @@ class AppViewModel {
             self.nutritionLogs = saved.nutritionLogs
             self.bodyWeightEntries = saved.bodyWeightEntries
             self.sleepEntries = saved.sleepEntries
+            self.familyResponseProfile = saved.familyResponseProfile ?? .empty
             if let draft = saved.activeWorkoutDraft {
                 self.activeWorkout = ActiveWorkoutState(
                     session: draft.session,
@@ -209,6 +210,7 @@ class AppViewModel {
         nutritionLogs = saved.nutritionLogs
         bodyWeightEntries = saved.bodyWeightEntries
         sleepEntries = saved.sleepEntries
+        familyResponseProfile = saved.familyResponseProfile ?? .empty
         if let preservedActive {
             activeWorkout = preservedActive
             ErrorReporter.shared.breadcrumb("Snapshot applied — active workout preserved", category: "sync")
@@ -925,7 +927,8 @@ class AppViewModel {
             progressionStates: progressionStates,
             workoutHistory: workoutHistory,
             recoveryScore: recoveryScore,
-            phase: trainingPhaseState.currentPhase
+            phase: trainingPhaseState.currentPhase,
+            responseProfile: familyResponseProfile
         )
     }
 
@@ -941,7 +944,8 @@ class AppViewModel {
             progressionStates: progressionStates,
             workoutHistory: workoutHistory,
             recoveryScore: recoveryScore,
-            phase: trainingPhaseState.currentPhase
+            phase: trainingPhaseState.currentPhase,
+            responseProfile: familyResponseProfile
         )
     }
 
@@ -1123,24 +1127,30 @@ class AppViewModel {
 
     func previewWeekRegeneration() -> WeekRegenerationPreview? {
         guard let plan = currentPlan else { return nil }
+        refreshFamilyResponseProfile()
         return actionManager.previewWeekRegeneration(
             plan: plan,
             profile: profile,
             muscleBalance: muscleBalance,
             recentSessions: workoutHistory,
-            recoveryScore: recoveryScore
+            recoveryScore: recoveryScore,
+            phase: trainingPhaseState.currentPhase,
+            responseProfile: familyResponseProfile
         )
     }
 
     func applyWeekRegeneration() {
         guard var plan = currentPlan else { return }
         Analytics.shared.track(.coach_action_applied, ["type": "week_regenerated"])
+        refreshFamilyResponseProfile()
         if let (adjustment, oldPlan) = actionManager.applyWeekRegeneration(
             plan: &plan,
             profile: profile,
             muscleBalance: muscleBalance,
             recentSessions: workoutHistory,
-            recoveryScore: recoveryScore
+            recoveryScore: recoveryScore,
+            phase: trainingPhaseState.currentPhase,
+            responseProfile: familyResponseProfile
         ) {
             previousPlanBeforeWeekAction = oldPlan
             currentPlan = plan
