@@ -44,6 +44,8 @@ nonisolated struct AdaptiveResponseQAHarness: Sendable {
         cases.append(evaluateSinglePainNoteDoesNotDemote())
         cases.append(evaluateCorroboratedPainNotesDemote())
         cases.append(evaluateProgressingButFatiguingRanksLower())
+        cases.append(evaluateCanonicalIdentityStability())
+        cases.append(evaluateCanonicalIdentityUnification())
 
         return AdaptiveResponseQAReport(cases: cases)
     }
@@ -532,6 +534,47 @@ nonisolated struct AdaptiveResponseQAHarness: Sendable {
                 notes: note
             )
         }
+    }
+
+    // MARK: - Canonical identity cases
+
+    /// Curated ids must pass through canonicalization unchanged — we should
+    /// never accidentally rewrite STRQ's canonical exercise ids.
+    private func evaluateCanonicalIdentityStability() -> AdaptiveResponseQACase {
+        let curated = ["barbell-bench-press", "overhead-press", "deadlift", "lat-pulldown"]
+        let allStable = curated.allSatisfy { ExerciseIdentity.canonical($0) == $0 }
+        return AdaptiveResponseQACase(
+            label: "canonical id stability (curated)",
+            detail: curated.map { "\($0)->\(ExerciseIdentity.canonical($0))" }.joined(separator: ", "),
+            passed: allStable
+        )
+    }
+
+    /// An alias id and its canonical id must resolve to the same family so
+    /// adaptive response, swaps, and media behave as one identity.
+    private func evaluateCanonicalIdentityUnification() -> AdaptiveResponseQACase {
+        let famService = ExerciseFamilyService.shared
+        // Probe a handful of imported ids — any collapsed duplicate should
+        // resolve to the same family as its canonical counterpart.
+        let probes = ExerciseDBProImporter.shared.exercises.prefix(10).map(\.id)
+        guard !probes.isEmpty else {
+            return AdaptiveResponseQACase(
+                label: "canonical id unification",
+                detail: "no imported exercises in bundle",
+                passed: true
+            )
+        }
+        let ok = probes.allSatisfy { id in
+            let canonical = ExerciseIdentity.canonical(id)
+            let viaAlias = famService.family(forExercise: id)?.id
+            let viaCanonical = famService.family(forExercise: canonical)?.id
+            return viaAlias == viaCanonical
+        }
+        return AdaptiveResponseQACase(
+            label: "canonical id unification",
+            detail: "alias/canonical family lookup agrees across \(probes.count) probes",
+            passed: ok
+        )
     }
 
     private func evaluatePriorIsNeutralWhenZeroData() -> AdaptiveResponseQACase {

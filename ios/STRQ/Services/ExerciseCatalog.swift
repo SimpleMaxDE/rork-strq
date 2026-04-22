@@ -31,7 +31,13 @@ struct ExerciseCatalog {
 
     var all: [Exercise] { curated + imported }
 
-    func exercise(byId id: String) -> Exercise? { map[id] }
+    func exercise(byId id: String) -> Exercise? {
+        if let direct = map[id] { return direct }
+        // Canonicalize alias ids so legacy references still resolve.
+        let canonical = ExerciseIdentity.canonical(id)
+        if canonical != id { return map[canonical] }
+        return nil
+    }
 
     func isImported(_ id: String) -> Bool {
         id.hasPrefix("edb-")
@@ -39,7 +45,11 @@ struct ExerciseCatalog {
 
     func gifURL(for exercise: Exercise) -> URL? {
         guard isImported(exercise.id) else { return nil }
-        let rawId = String(exercise.id.dropFirst("edb-".count))
+        // Resolve through canonical id so collapsed alias rows still inherit
+        // the canonical media. The importer already follows aliases, but
+        // calling canonical() here makes the intent explicit.
+        let canonical = ExerciseIdentity.canonical(exercise.id)
+        let rawId = String(canonical.dropFirst("edb-".count))
         guard let s = ExerciseDBProImporter.shared.remoteGifURL(for: rawId) else { return nil }
         return URL(string: s)
     }

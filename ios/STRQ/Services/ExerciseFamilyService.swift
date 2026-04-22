@@ -39,8 +39,15 @@ struct ExerciseFamilyService {
     }
 
     func family(forExercise exerciseId: String) -> ExerciseFamilyGroup? {
-        guard let familyId = exerciseToFamily[exerciseId] else { return nil }
-        return familyMap[familyId]
+        if let familyId = exerciseToFamily[exerciseId] { return familyMap[familyId] }
+        // Canonicalize before giving up — legacy alias ids collapsed by the
+        // importer should still resolve to the canonical row's family so
+        // adaptive response, swaps, and media all agree on identity.
+        let canonical = ExerciseIdentity.canonical(exerciseId)
+        if canonical != exerciseId, let familyId = exerciseToFamily[canonical] {
+            return familyMap[familyId]
+        }
+        return nil
     }
 
     /// Curated + imported members for a family. Curated first to preserve

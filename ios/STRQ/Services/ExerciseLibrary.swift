@@ -18,8 +18,11 @@ struct ExerciseLibrary {
         if let curated = exerciseMap[id] { return curated }
         // Fallback to imported (ExerciseDBPro) for id-based lookups so swaps/
         // details keep resolving after an imported exercise is chosen.
+        // Canonicalize first so legacy alias ids still resolve to the
+        // canonical imported row after dedup.
         if id.hasPrefix("edb-") {
-            return ExerciseDBProImporter.shared.exercises.first(where: { $0.id == id })
+            let canonical = ExerciseIdentity.canonical(id)
+            return ExerciseDBProImporter.shared.exercises.first(where: { $0.id == canonical })
         }
         return nil
     }

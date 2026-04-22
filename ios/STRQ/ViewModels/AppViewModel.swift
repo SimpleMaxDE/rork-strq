@@ -136,6 +136,10 @@ class AppViewModel {
             self.bodyWeightEntries = saved.bodyWeightEntries
             self.sleepEntries = saved.sleepEntries
             self.familyResponseProfile = saved.familyResponseProfile ?? .empty
+            // Canonicalize any legacy alias ids carried forward from older
+            // snapshots so history / progression / response / media all
+            // resolve through one identity per exercise.
+            ExerciseIdentityMigration.migrate(self)
             if let draft = saved.activeWorkoutDraft {
                 self.activeWorkout = ActiveWorkoutState(
                     session: draft.session,
@@ -211,6 +215,9 @@ class AppViewModel {
         bodyWeightEntries = saved.bodyWeightEntries
         sleepEntries = saved.sleepEntries
         familyResponseProfile = saved.familyResponseProfile ?? .empty
+        // Canonicalize any legacy alias ids inside the incoming cloud snapshot
+        // so restored data doesn't fragment history / progression / response.
+        ExerciseIdentityMigration.migrate(self)
         if let preservedActive {
             activeWorkout = preservedActive
             ErrorReporter.shared.breadcrumb("Snapshot applied — active workout preserved", category: "sync")
