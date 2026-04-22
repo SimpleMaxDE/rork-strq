@@ -24,30 +24,69 @@ nonisolated final class ExerciseDBProImporter: Sendable {
     private let _exercises: [Exercise]
     private let _remoteGif: [String: String]
     private let _familyByExerciseId: [String: String]
+    /// Alias map — raw or prefixed ids of duplicate rows that were collapsed
+    /// into a canonical exercise. Resolves both directions so any caller that
+    /// still holds a legacy id can reach canonical media / family.
+    private let _canonicalIdByAlias: [String: String]
 
     var exercises: [Exercise] { _exercises }
     var familyAssignments: [String: String] { _familyByExerciseId }
-    func remoteGifURL(for id: String) -> String? { _remoteGif[id] }
-    func familyId(for exerciseId: String) -> String? { _familyByExerciseId[exerciseId] }
+    /// Remote GIF URL for an imported exercise id. Follows alias mappings so
+    /// collapsed duplicates still resolve to the canonical row's media.
+    func remoteGifURL(for id: String) -> String? {
+        if let direct = _remoteGif[id] { return direct }
+        if let canonical = _canonicalIdByAlias[id], let url = _remoteGif[canonical] { return url }
+        return nil
+    }
+    func familyId(for exerciseId: String) -> String? {
+        if let fam = _familyByExerciseId[exerciseId] { return fam }
+        if let canonical = _canonicalIdByAlias[exerciseId] { return _familyByExerciseId[canonical] }
+        return nil
+    }
+    /// Canonical id for an imported row id when it was collapsed as a duplicate.
+    /// Returns the input id when it is already canonical or unknown.
+    func canonicalId(for id: String) -> String { _canonicalIdByAlias[id] ?? id }
 
     private init() {
         guard let raws = Self.loadRaws() else {
             self._exercises = []
             self._remoteGif = [:]
             self._familyByExerciseId = [:]
+            self._canonicalIdByAlias = [:]
             return
         }
         var out: [Exercise] = []
         var gifs: [String: String] = [:]
         var families: [String: String] = [:]
-        var seenFingerprints: Set<String> = []
+        var aliases: [String: String] = [:]
+        // Canonical row index, keyed by fingerprint, so we can upgrade a
+        // previously-seen duplicate when a later row brings better data
+        // (e.g. an imported GIF the first duplicate was missing).
+        var canonicalIndexByFingerprint: [String: Int] = [:]
         out.reserveCapacity(raws.count)
         for r in raws {
             guard let result = Self.normalize(r) else { continue }
-            if seenFingerprints.contains(result.fingerprint) { continue }
-            seenFingerprints.insert(result.fingerprint)
+            let rawGif = r.gifUrl.flatMap { $0.isEmpty ? nil : $0 }
+
+            if let existingIdx = canonicalIndexByFingerprint[result.fingerprint] {
+                // Duplicate collapsed by fingerprint. Register both raw and
+                // prefixed ids as aliases of the canonical row so lookups by
+                // either id resolve to canonical family / media.
+                let canonicalId = out[existingIdx].id
+                aliases[r.exerciseId] = canonicalId
+                aliases[Self.importedPrefix + r.exerciseId] = canonicalId
+                // If the canonical row had no GIF but this duplicate does,
+                // upgrade canonical media — avoids the "first-seen wins even
+                // when blank" failure mode.
+                if gifs[canonicalId] == nil, let g = rawGif {
+                    gifs[canonicalId] = g
+                }
+                continue
+            }
+
+            canonicalIndexByFingerprint[result.fingerprint] = out.count
             out.append(result.exercise)
-            if let g = r.gifUrl, !g.isEmpty {
+            if let g = rawGif {
                 gifs[r.exerciseId] = g
                 gifs[result.exercise.id] = g
             }
@@ -56,6 +95,7 @@ nonisolated final class ExerciseDBProImporter: Sendable {
         self._exercises = out
         self._remoteGif = gifs
         self._familyByExerciseId = families
+        self._canonicalIdByAlias = aliases
     }
 
     // MARK: - Load
@@ -154,8 +194,98 @@ nonisolated final class ExerciseDBProImporter: Sendable {
         return n.trimmingCharacters(in: .whitespaces)
     }
 
+    /// Canonicalizes a cleaned name for fingerprinting only — lowercases,
+    /// normalizes punctuation/hyphens/apostrophes, collapses whitespace, and
+    /// applies conservative singular/plural + known alias normalization so
+    /// trivial naming variants collapse without merging genuinely different
+    /// exercises.
+    ///
+    /// Kept intentionally conservative: we only strip trailing `s` for tokens
+    /// that have a safe plural form in this domain (raises → raise, curls →
+    /// curl, rows → row, etc.) and preserve equipment/target names that
+    /// would change meaning (e.g. `triceps`, `lats`, `abs`).
+    private static func canonicalFingerprintName(_ cleanedName: String) -> String {
+        let lowered = cleanedName.lowercased()
+        let punctStripped = lowered
+            .replacingOccurrences(of: "’", with: "")
+            .replacingOccurrences(of: "'", with: "")
+            .replacingOccurrences(of: "`", with: "")
+            .replacingOccurrences(of: "-", with: " ")
+            .replacingOccurrences(of: "/", with: " ")
+            .replacingOccurrences(of: ".", with: " ")
+            .replacingOccurrences(of: ",", with: " ")
+        let parts = punctStripped.split { !$0.isLetter && !$0.isNumber }
+        var tokens: [String] = []
+        tokens.reserveCapacity(parts.count)
+        for part in parts {
+            var t = String(part)
+            if let alias = tokenAliasMap[t] {
+                t = alias
+            } else if let singular = safeSingular(t) {
+                t = singular
+            }
+            tokens.append(t)
+        }
+        return tokens.joined(separator: " ")
+    }
+
+    /// Safe plural→singular reductions. Returns nil when a token should be
+    /// left alone (e.g. `triceps`, `lats`, `abs` — anatomy, not plural noise).
+    private static func safeSingular(_ token: String) -> String? {
+        if preserveAsIs.contains(token) { return nil }
+        // "raises", "pulses", "crunches" → "raise", "pulse", "crunch"
+        if token.hasSuffix("ies"), token.count > 3 {
+            return String(token.dropLast(3)) + "y"
+        }
+        if token.hasSuffix("sses"), token.count > 4 {
+            return String(token.dropLast(2))
+        }
+        if token.hasSuffix("ches") || token.hasSuffix("shes") {
+            return String(token.dropLast(2))
+        }
+        if token.hasSuffix("ses"), token.count > 3 {
+            return String(token.dropLast(2))
+        }
+        if token.hasSuffix("s"), !token.hasSuffix("ss"), token.count > 3 {
+            return String(token.dropLast())
+        }
+        return nil
+    }
+
+    /// Anatomy / equipment tokens that look plural but are not — preserve.
+    private static let preserveAsIs: Set<String> = [
+        "triceps", "biceps", "lats", "abs", "glutes", "traps", "quads",
+        "hamstrings", "calves", "delts", "pecs", "obliques", "adductors",
+        "abductors", "forearms", "shoulders", "shins", "hips", "knees",
+        "ankles", "wrists", "hands", "legs", "arms", "dumbbells",
+        "kettlebells", "barbells"
+    ]
+
+    /// Token-level canonical aliases — collapses common naming variants
+    /// (`pushup` / `push up` / `push-up`) at the fingerprint layer.
+    private static let tokenAliasMap: [String: String] = [
+        "pushups": "pushup",
+        "push": "push",
+        "pullup": "pullup",
+        "pullups": "pullup",
+        "chinup": "chinup",
+        "chinups": "chinup",
+        "situp": "situp",
+        "situps": "situp",
+        "signle": "single",
+        "db": "dumbbell",
+        "bb": "barbell",
+        "kb": "kettlebell",
+        "rdl": "rdl",
+        "romanian": "rdl",
+        "stifflegged": "rdl",
+        "stiffleg": "rdl"
+    ]
+
     /// Deterministic fingerprint that groups true duplicates together:
-    /// clean lowercased name + sorted normalized equipment set.
+    /// canonicalized name (singular, punctuation-normalized, alias-folded) +
+    /// sorted normalized equipment set. Conservative — only collapses
+    /// trivial naming noise, not genuinely different exercises.
     private static func makeFingerprint(cleanName: String, equipment: [Equipment], isBodyweight: Bool) -> String {
         let eq: [String]
         if equipment.isEmpty || equipment == [.none] || isBodyweight {
@@ -163,7 +293,7 @@ nonisolated final class ExerciseDBProImporter: Sendable {
         } else {
             eq = equipment.filter { $0 != .none }.map(\.rawValue).sorted()
         }
-        return cleanName.lowercased() + "|" + eq.joined(separator: ",")
+        return canonicalFingerprintName(cleanName) + "|" + eq.joined(separator: ",")
     }
 
     // MARK: - Family classification
