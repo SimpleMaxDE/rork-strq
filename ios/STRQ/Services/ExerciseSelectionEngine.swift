@@ -196,7 +196,29 @@ struct ExerciseSelectionEngine {
         if profile.focusMuscles.contains(candidate.primaryMuscle) { s += 8 }
 
         let avoided = Set(profile.avoidedExercises.map { $0.lowercased() })
-        if avoided.contains(candidate.name.lowercased()) { s -= 60 }
+        let avoidedIds = Set(profile.avoidedExercises)
+        if avoided.contains(candidate.name.lowercased()) || avoidedIds.contains(candidate.id) { s -= 60 }
+
+        // Preferred-exercise adherence bias at the base-score layer so every
+        // caller (intent-based swap, legacy swap, tolerance safer-alternative,
+        // exercise-detail alternatives) gets the same signal. Softened when
+        // personal response is clearly negative — preference never overrides
+        // strong negative response. Computed here against the live response
+        // profile so swap ranking matches plan-generation ranking.
+        let preferredIds = Set(profile.preferredExercises)
+        let preferredNames = Set(profile.preferredExercises.map { $0.lowercased() })
+        if preferredIds.contains(candidate.id) || preferredNames.contains(candidate.name.lowercased()) {
+            let personal = ExerciseResponseEngine.swapAdjustment(
+                for: candidate,
+                replacing: original,
+                profile: context.responseProfile,
+                recoveryScore: context.recoveryScore
+            )
+            var boost: Double = 5
+            if personal < -3 { boost = 1 }
+            else if personal < 0 { boost = 3 }
+            s += boost
+        }
 
         if adherenceScore(for: candidate, context: context) < 0.3 && candidate.difficulty == .advanced {
             s -= 6
@@ -315,22 +337,14 @@ struct ExerciseSelectionEngine {
                 recoveryScore: context.recoveryScore
             )
 
-            // Preferred-exercise adherence bias on swaps — if the user marked
-            // this candidate as preferred, softly lift it. Soften / drop the
-            // bias if personal response is clearly negative.
-            var preferenceBoost: Double = 0
-            let prefIds = Set(context.profile.preferredExercises)
-            let prefNames = Set(context.profile.preferredExercises.map { $0.lowercased() })
-            if prefIds.contains(candidate.id) || prefNames.contains(candidate.name.lowercased()) {
-                preferenceBoost = 5
-                if personal < -3 { preferenceBoost = 1 }
-                else if personal < 0 { preferenceBoost = 3 }
-            }
-
+            // Preferred-exercise bias is already folded into `score(...)` at
+            // the base layer so every swap path (intent, legacy, safer-alt,
+            // exercise-detail) gets it consistently. Here we only layer the
+            // personal response adjustment on top.
             result = ScoredExercise(
                 id: result.id,
                 exercise: result.exercise,
-                score: result.score + personal + preferenceBoost,
+                score: result.score + personal,
                 reasons: result.reasons,
                 tags: result.tags
             )
