@@ -40,6 +40,10 @@ nonisolated struct AdaptiveResponseQAHarness: Sendable {
         cases.append(evaluatePreferredSoftenedByNegativeResponse())
         cases.append(evaluateRecentRepetitionPenalty())
         cases.append(evaluateProgressingFamilySparedFromRepetitionPenalty())
+        cases.append(evaluateNoteInterpretationKeywords())
+        cases.append(evaluateSinglePainNoteDoesNotDemote())
+        cases.append(evaluateCorroboratedPainNotesDemote())
+        cases.append(evaluateProgressingButFatiguingRanksLower())
 
         return AdaptiveResponseQAReport(cases: cases)
     }
@@ -392,6 +396,142 @@ nonisolated struct AdaptiveResponseQAHarness: Sendable {
             detail: "pulldown swap adj=\(String(format: "%.2f", pulldownAdj)) (expected >= 4)",
             passed: pulldownAdj >= 4
         )
+    }
+
+    // MARK: - Phase 31 deeper learning cases
+
+    private func evaluateNoteInterpretationKeywords() -> AdaptiveResponseQACase {
+        let pain = ExerciseResponseEngine.interpretNote("shoulder pain on last set")
+        let hard = ExerciseResponseEngine.interpretNote("Absolutely smoked me")
+        let easy = ExerciseResponseEngine.interpretNote("felt too light today")
+        let good = ExerciseResponseEngine.interpretNote("Felt strong and crisp")
+        let neutral = ExerciseResponseEngine.interpretNote("regular session")
+
+        let ok = pain == .pain && hard == .tooHard && easy == .tooEasy && good == .positive && neutral == nil
+        return AdaptiveResponseQACase(
+            label: "note keyword interpretation",
+            detail: "pain=\(String(describing: pain)) hard=\(String(describing: hard)) easy=\(String(describing: easy)) good=\(String(describing: good)) neutral=\(String(describing: neutral))",
+            passed: ok
+        )
+    }
+
+    private func evaluateSinglePainNoteDoesNotDemote() -> AdaptiveResponseQACase {
+        guard let ohp = ExerciseLibrary.shared.exercise(byId: "overhead-press") else {
+            return AdaptiveResponseQACase(label: "single pain note stable", detail: "missing exercise", passed: false)
+        }
+        // One painful session among otherwise normal sessions — corroboration
+        // threshold is 2, so response should stay near neutral.
+        let sessions = Self.syntheticSessions(
+            exerciseId: ohp.id,
+            count: 5,
+            notes: ["shoulder pain sharp", "", "", "", ""]
+        )
+        let engine = ExerciseResponseEngine()
+        let profile = engine.compute(workoutHistory: sessions, progressionStates: [])
+        let adj = ExerciseResponseEngine.personalAdjustment(
+            for: ohp, role: .anchor, profile: profile,
+            phase: .build, recoveryScore: 75
+        )
+        return AdaptiveResponseQACase(
+            label: "single pain note stable",
+            detail: "adj=\(String(format: "%.2f", adj)) (expected > -3)",
+            passed: adj > -3
+        )
+    }
+
+    private func evaluateCorroboratedPainNotesDemote() -> AdaptiveResponseQACase {
+        guard let ohp = ExerciseLibrary.shared.exercise(byId: "overhead-press") else {
+            return AdaptiveResponseQACase(label: "corroborated pain demotes", detail: "missing exercise", passed: false)
+        }
+        // Three painful sessions in a 10-session history — corroboration clears,
+        // confidence is high, tolerance should shift negative enough to demote.
+        let sessions = Self.syntheticSessions(
+            exerciseId: ohp.id,
+            count: 10,
+            notes: ["shoulder pain", "sharp pinch", "hurt again", "", "", "", "", "", "", ""]
+        )
+        let engine = ExerciseResponseEngine()
+        let profile = engine.compute(workoutHistory: sessions, progressionStates: [])
+        let adj = ExerciseResponseEngine.personalAdjustment(
+            for: ohp, role: .anchor, profile: profile,
+            phase: .build, recoveryScore: 70
+        )
+        return AdaptiveResponseQACase(
+            label: "corroborated pain demotes",
+            detail: "adj=\(String(format: "%.2f", adj)) (expected <= -1.5)",
+            passed: adj <= -1.5
+        )
+    }
+
+    private func evaluateProgressingButFatiguingRanksLower() -> AdaptiveResponseQACase {
+        // Two responses: one progressing + well tolerated, one progressing
+        // but fatigue-heavy + poorly tolerated. Sweet-spot must rank higher.
+        guard let dl = ExerciseLibrary.shared.exercise(byId: "deadlift"),
+              let row = ExerciseLibrary.shared.exercise(byId: "barbell-row"),
+              let dlFam = ExerciseFamilyService.shared.family(forExercise: dl.id)?.id,
+              let rowFam = ExerciseFamilyService.shared.family(forExercise: row.id)?.id
+        else {
+            return AdaptiveResponseQACase(label: "stimulus-to-fatigue tempering", detail: "missing exercises", passed: false)
+        }
+        let sweetSpot = PersonalExerciseResponse(
+            familyId: rowFam,
+            progressionSignal: 0.7, fatigueCost: 0.4,
+            jointTolerance: 0.5, adherenceScore: 0.95,
+            confidence: 1.0, sessionCount: 10
+        )
+        let expensive = PersonalExerciseResponse(
+            familyId: dlFam,
+            progressionSignal: 0.7, fatigueCost: 0.85,
+            jointTolerance: 0.0, adherenceScore: 0.9,
+            confidence: 1.0, sessionCount: 10
+        )
+        let profile = ExerciseFamilyResponseProfile(familyResponses: [
+            rowFam: sweetSpot, dlFam: expensive
+        ])
+        let sweetAdj = ExerciseResponseEngine.personalAdjustment(
+            for: row, role: .secondary, profile: profile,
+            phase: .build, recoveryScore: 60
+        )
+        let expensiveAdj = ExerciseResponseEngine.personalAdjustment(
+            for: dl, role: .anchor, profile: profile,
+            phase: .build, recoveryScore: 60
+        )
+        return AdaptiveResponseQACase(
+            label: "stimulus-to-fatigue tempering",
+            detail: "sweet=\(String(format: "%.2f", sweetAdj)) expensive=\(String(format: "%.2f", expensiveAdj))",
+            passed: sweetAdj > expensiveAdj
+        )
+    }
+
+    private static func syntheticSessions(
+        exerciseId: String,
+        count: Int,
+        notes: [String]
+    ) -> [WorkoutSession] {
+        let now = Date()
+        return (0..<count).map { i in
+            let date = Calendar.current.date(byAdding: .day, value: -i * 2, to: now) ?? now
+            let note = i < notes.count ? notes[i] : ""
+            let log = ExerciseLog(
+                exerciseId: exerciseId,
+                sets: [
+                    SetLog(setNumber: 1, weight: 60, reps: 8, isCompleted: true, quality: .onTarget),
+                    SetLog(setNumber: 2, weight: 60, reps: 8, isCompleted: true, quality: .onTarget),
+                    SetLog(setNumber: 3, weight: 60, reps: 8, isCompleted: true, quality: .onTarget)
+                ],
+                isCompleted: true
+            )
+            return WorkoutSession(
+                planId: "plan",
+                dayId: "day",
+                dayName: "Day",
+                startTime: date,
+                endTime: date,
+                exerciseLogs: [log],
+                isCompleted: true,
+                notes: note
+            )
+        }
     }
 
     private func evaluatePriorIsNeutralWhenZeroData() -> AdaptiveResponseQACase {

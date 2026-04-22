@@ -13,6 +13,9 @@ nonisolated struct ExerciseResponseEngine: Sendable {
     // Tunable horizons.
     private let recentWindowDays: Int = 21
     private let minSetsForResponse: Int = 2
+    // Minimum corroborating sessions before a note signal is allowed to
+    // meaningfully shift family scores. Single-day notes stay quiet.
+    private let minNoteCorroboration: Int = 2
 
     func compute(
         workoutHistory: [WorkoutSession],
@@ -28,6 +31,10 @@ nonisolated struct ExerciseResponseEngine: Sendable {
         let recentCutoff = Calendar.current.date(byAdding: .day, value: -recentWindowDays, to: now) ?? now
 
         for session in workoutHistory where session.isCompleted {
+            // Families touched this session → used for note attribution.
+            var sessionSetsByFamily: [String: Int] = [:]
+            var sessionTotalSets: Int = 0
+
             for log in session.exerciseLogs {
                 guard let family = familyService.family(forExercise: log.exerciseId) else { continue }
                 var snap = snapshots[family.id] ?? FamilySnapshot(familyId: family.id)
@@ -58,6 +65,37 @@ nonisolated struct ExerciseResponseEngine: Sendable {
                 }
 
                 snap.lastSeen = max(snap.lastSeen ?? session.startTime, session.startTime)
+                snapshots[family.id] = snap
+                sessionSetsByFamily[family.id, default: 0] += max(completedSets, totalSets)
+                sessionTotalSets += max(completedSets, totalSets)
+            }
+
+            // Session-level note interpretation — apply only when a clean,
+            // high-signal keyword is present. Weighted by each family's share
+            // of the session so dominant families absorb more of the signal.
+            // Corroboration (>= minNoteCorroboration sessions) is required
+            // before the signal can actually move ranking.
+            if sessionTotalSets > 0,
+               let signal = Self.interpretNote(session.notes) {
+                for (fid, sets) in sessionSetsByFamily {
+                    var snap = snapshots[fid] ?? FamilySnapshot(familyId: fid)
+                    let share = Double(sets) / Double(sessionTotalSets)
+                    switch signal {
+                    case .pain:
+                        snap.painNoteSessions += 1
+                        snap.painNoteWeight += share
+                    case .tooHard:
+                        snap.hardNoteSessions += 1
+                        snap.hardNoteWeight += share
+                    case .tooEasy:
+                        snap.easyNoteSessions += 1
+                        snap.easyNoteWeight += share
+                    case .positive:
+                        snap.positiveNoteSessions += 1
+                        snap.positiveNoteWeight += share
+                    }
+                    snapshots[fid] = snap
+                }
             }
         }
 
@@ -114,6 +152,27 @@ nonisolated struct ExerciseResponseEngine: Sendable {
             if jointTolerance < -0.2 { fatigue += 0.1 }
             if jointTolerance > 0.3 { fatigue -= 0.05 }
             if adherence < 0.6 { fatigue += 0.1 }
+
+            // Corroborated note signals — softly shift tolerance / fatigue
+            // when the user has repeatedly left high-signal notes. Capped,
+            // and only active once the corroboration floor is cleared so one
+            // bad note can never tank a family.
+            var toleranceDelta: Double = 0
+            if snap.painNoteSessions >= minNoteCorroboration {
+                let d = min(0.35, snap.painNoteWeight * 0.18)
+                toleranceDelta -= d
+                fatigue += d * 0.4
+            }
+            if snap.hardNoteSessions >= minNoteCorroboration {
+                fatigue += min(0.18, snap.hardNoteWeight * 0.08)
+            }
+            if snap.easyNoteSessions >= minNoteCorroboration {
+                toleranceDelta += min(0.1, snap.easyNoteWeight * 0.04)
+            }
+            if snap.positiveNoteSessions >= minNoteCorroboration {
+                toleranceDelta += min(0.1, snap.positiveNoteWeight * 0.04)
+            }
+            let jointToleranceAdjusted = (jointTolerance + toleranceDelta).clamped(to: -1...1)
             fatigue = fatigue.clamped(to: 0...1)
 
             // Confidence: ramps from 0 to 1 across confidence window; weighted
@@ -129,7 +188,7 @@ nonisolated struct ExerciseResponseEngine: Sendable {
                 familyId: familyId,
                 progressionSignal: progression,
                 fatigueCost: fatigue,
-                jointTolerance: jointTolerance,
+                jointTolerance: jointToleranceAdjusted,
                 adherenceScore: adherence,
                 confidence: confidence,
                 sessionCount: snap.sessionCount,
@@ -192,6 +251,23 @@ nonisolated struct ExerciseResponseEngine: Sendable {
             }
         case .build, .rebalance:
             break
+        }
+
+        // Stimulus-to-fatigue tempering — progressing but fatigue-heavy and
+        // poorly tolerated should NOT rank the same as progressing + well
+        // tolerated. Small deterministic penalty when the user is paying too
+        // much for the gain. Conservative: only fires on clear combined data.
+        if response.progressionSignal > 0.3 &&
+           response.fatigueCost > 0.7 &&
+           response.jointTolerance < 0.2 {
+            adjustment -= 4 * c
+        }
+        // Conversely, clearly tolerated + progressing families get a small
+        // extra nudge up — the sweet spot for this user.
+        if response.progressionSignal > 0.4 &&
+           response.fatigueCost < 0.5 &&
+           response.jointTolerance > 0.3 {
+            adjustment += 2 * c
         }
 
         // Role guardrails — isolations shouldn't swing as hard as anchors.
@@ -263,6 +339,42 @@ nonisolated struct ExerciseResponseEngine: Sendable {
         var progressionAccumulator: Double = 0
         var progressionObservations: Double = 0
         var lastSeen: Date?
+        // Note-derived corroboration counters (per session that contained the
+        // signal) plus share-weighted magnitude (family's share of session sets).
+        var painNoteSessions: Int = 0
+        var painNoteWeight: Double = 0
+        var hardNoteSessions: Int = 0
+        var hardNoteWeight: Double = 0
+        var easyNoteSessions: Int = 0
+        var easyNoteWeight: Double = 0
+        var positiveNoteSessions: Int = 0
+        var positiveNoteWeight: Double = 0
+    }
+
+    // MARK: - Note interpretation
+
+    enum NoteSignal: Sendable { case pain, tooHard, tooEasy, positive }
+
+    static func interpretNote(_ raw: String) -> NoteSignal? {
+        let s = raw
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        guard !s.isEmpty else { return nil }
+
+        // Order matters — pain wins over fatigue wins over fatigue-positive.
+        let painTerms = ["pain", "hurt", "tweak", "injur", "sharp", "pinch", "aggravat", "flare", "sore joint", "bad knee", "bad shoulder", "bad back"]
+        if painTerms.contains(where: { s.contains($0) }) { return .pain }
+
+        let hardTerms = ["smoked", "crushed me", "gassed", "fried", "cooked", "brutal", "wrecked", "destroyed", "too hard", "way too hard", "couldn't finish", "couldnt finish", "exhaust"]
+        if hardTerms.contains(where: { s.contains($0) }) { return .tooHard }
+
+        let easyTerms = ["too easy", "too light", "no challenge", "sandbag", "felt weak", "weight was light"]
+        if easyTerms.contains(where: { s.contains($0) }) { return .tooEasy }
+
+        let goodTerms = ["felt strong", "felt great", "felt good", "felt solid", "crisp", "snappy", "dialed", "dialled", "moved well"]
+        if goodTerms.contains(where: { s.contains($0) }) { return .positive }
+
+        return nil
     }
 }
 
