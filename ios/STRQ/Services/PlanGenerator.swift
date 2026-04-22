@@ -38,7 +38,8 @@ struct PlanGenerator {
         muscleBalance: [MuscleBalanceEntry] = [],
         recentSessions: [WorkoutSession] = [],
         recoveryScore: Int = 75,
-        phase: TrainingPhase = .build
+        phase: TrainingPhase = .build,
+        responseProfile: ExerciseFamilyResponseProfile = .empty
     ) -> WorkoutPlan {
         let split = determineSplit(profile)
         let context = PlanContext(
@@ -46,7 +47,8 @@ struct PlanGenerator {
             muscleBalance: muscleBalance,
             recentSessions: recentSessions,
             recoveryScore: recoveryScore,
-            phase: phase
+            phase: phase,
+            responseProfile: responseProfile
         )
         let budgets = weeklyVolumeBudgets(context: context, split: split)
         let days = generateDays(split: split, context: context, budgets: budgets)
@@ -385,7 +387,7 @@ struct PlanGenerator {
             guard let ex = pickExercise(
                 muscle: muscle,
                 role: .anchor,
-                profile: profile,
+                context: context,
                 used: usedExerciseIds,
                 usedPatterns: usedPatterns
             ) else { continue }
@@ -403,7 +405,7 @@ struct PlanGenerator {
             guard let ex = pickExercise(
                 muscle: muscle,
                 role: .secondary,
-                profile: profile,
+                context: context,
                 used: usedExerciseIds,
                 usedPatterns: usedPatterns
             ) else { continue }
@@ -427,7 +429,7 @@ struct PlanGenerator {
                 guard let ex = pickExercise(
                     muscle: muscle,
                     role: role,
-                    profile: profile,
+                    context: context,
                     used: usedExerciseIds,
                     usedPatterns: usedPatterns
                 ) else { break }
@@ -449,7 +451,7 @@ struct PlanGenerator {
                 guard let ex = pickExercise(
                     muscle: muscle,
                     role: .isolation,
-                    profile: profile,
+                    context: context,
                     used: usedExerciseIds,
                     usedPatterns: usedPatterns
                 ) else { continue }
@@ -522,22 +524,23 @@ struct PlanGenerator {
     private func pickExercise(
         muscle: MuscleGroup,
         role: PlanExerciseRole,
-        profile: UserProfile,
+        context: PlanContext,
         used: Set<String>,
         usedPatterns: [MovementPattern: Int]
     ) -> Exercise? {
-        let candidates = scoredExercises(muscle: muscle, role: role, profile: profile)
+        let candidates = scoredExercises(muscle: muscle, role: role, context: context)
             .filter { !used.contains($0.id) }
             .filter { ex in
                 // Limit repetition of a single movement pattern per day.
                 (usedPatterns[ex.movementPattern] ?? 0) < 2
             }
 
-        return candidates.first ?? scoredExercises(muscle: muscle, role: role, profile: profile)
+        return candidates.first ?? scoredExercises(muscle: muscle, role: role, context: context)
             .first { !used.contains($0.id) }
     }
 
-    private func scoredExercises(muscle: MuscleGroup, role: PlanExerciseRole, profile: UserProfile) -> [Exercise] {
+    private func scoredExercises(muscle: MuscleGroup, role: PlanExerciseRole, context: PlanContext) -> [Exercise] {
+        let profile = context.profile
         let location: LocationType = {
             switch profile.trainingLocation {
             case .gym: return .gym
@@ -578,8 +581,8 @@ struct PlanGenerator {
         }
 
         return candidates.sorted {
-            score($0, muscle: muscle, role: role, profile: profile) >
-            score($1, muscle: muscle, role: role, profile: profile)
+            score($0, muscle: muscle, role: role, context: context) >
+            score($1, muscle: muscle, role: role, context: context)
         }
     }
 
@@ -664,8 +667,27 @@ struct PlanGenerator {
         return false
     }
 
-    private func score(_ ex: Exercise, muscle: MuscleGroup, role: PlanExerciseRole, profile: UserProfile) -> Double {
+    private func score(_ ex: Exercise, muscle: MuscleGroup, role: PlanExerciseRole, context: PlanContext) -> Double {
+        let profile = context.profile
         var s: Double = 50
+
+        // Family evidence prior — small structural bias before personal data
+        // exists. Centered on 0 so it can't dominate base heuristics.
+        if let family = ExerciseFamilyService.shared.family(forExercise: ex.id) {
+            let prior = ExerciseFamilyPriorsCatalog.prior(forFamily: family.id)
+            let isHome = profile.trainingLocation != .gym
+            s += ExerciseFamilyPriorScoring.score(prior: prior, goal: profile.goal, isHome: isHome) * 0.4
+        }
+
+        // Personal response adjustment — only moves the needle once real
+        // per-user data accumulates (confidence gating is inside the engine).
+        s += ExerciseResponseEngine.personalAdjustment(
+            for: ex,
+            role: role,
+            profile: context.responseProfile,
+            phase: context.phase,
+            recoveryScore: context.recoveryScore
+        )
 
         // Curated canonical preference — imports must genuinely win on merit
         // to displace curated exercises at the top of a pick list.
@@ -1009,13 +1031,22 @@ nonisolated struct PlanContext: Sendable {
     let recentSessions: [WorkoutSession]
     let recoveryScore: Int
     let phase: TrainingPhase
+    let responseProfile: ExerciseFamilyResponseProfile
 
-    init(profile: UserProfile, muscleBalance: [MuscleBalanceEntry], recentSessions: [WorkoutSession], recoveryScore: Int, phase: TrainingPhase = .build) {
+    init(
+        profile: UserProfile,
+        muscleBalance: [MuscleBalanceEntry],
+        recentSessions: [WorkoutSession],
+        recoveryScore: Int,
+        phase: TrainingPhase = .build,
+        responseProfile: ExerciseFamilyResponseProfile = .empty
+    ) {
         self.profile = profile
         self.muscleBalance = muscleBalance
         self.recentSessions = recentSessions
         self.recoveryScore = recoveryScore
         self.phase = phase
+        self.responseProfile = responseProfile
     }
 }
 

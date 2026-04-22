@@ -21,6 +21,8 @@ class AppViewModel {
     let startingLoadEngine = StartingLoadEngine()
     var planEvolutionSignals: [PlanEvolutionSignal] = []
     var toleranceSignals: [ToleranceSignal] = []
+    var familyResponseProfile: ExerciseFamilyResponseProfile = .empty
+    private let responseEngine = ExerciseResponseEngine()
 
     var coachAdjustments: [CoachAdjustment] = []
     var appliedActionIds: Set<String> = []
@@ -330,13 +332,22 @@ class AppViewModel {
         persist()
     }
 
+    func refreshFamilyResponseProfile() {
+        familyResponseProfile = responseEngine.compute(
+            workoutHistory: workoutHistory,
+            progressionStates: progressionStates
+        )
+    }
+
     func generatePlan() {
+        refreshFamilyResponseProfile()
         var plan = PlanGenerator().generate(
             for: profile,
             muscleBalance: muscleBalance,
             recentSessions: workoutHistory,
             recoveryScore: recoveryScore,
-            phase: trainingPhaseState.currentPhase
+            phase: trainingPhaseState.currentPhase,
+            responseProfile: familyResponseProfile
         )
         let preferred = profile.preferredTrainingDays.isEmpty
             ? defaultTrainingDays(count: plan.days.count)

@@ -11,6 +11,23 @@ nonisolated struct ExerciseSelectionContext: Sendable {
     let workoutHistory: [WorkoutSession]
     let recoveryScore: Int
     let phase: TrainingPhase
+    let responseProfile: ExerciseFamilyResponseProfile
+
+    init(
+        profile: UserProfile,
+        progressionStates: [ExerciseProgressionState],
+        workoutHistory: [WorkoutSession],
+        recoveryScore: Int,
+        phase: TrainingPhase,
+        responseProfile: ExerciseFamilyResponseProfile = .empty
+    ) {
+        self.profile = profile
+        self.progressionStates = progressionStates
+        self.workoutHistory = workoutHistory
+        self.recoveryScore = recoveryScore
+        self.phase = phase
+        self.responseProfile = responseProfile
+    }
 }
 
 nonisolated struct ScoredExercise: Identifiable, Sendable {
@@ -289,6 +306,22 @@ struct ExerciseSelectionEngine {
 
             var result = score(candidate: candidate, replacing: original, context: context, reason: baseReason)
 
+            // Personal family-response adjustment — prefer candidates that
+            // the user has actually done well on when data exists.
+            let personal = ExerciseResponseEngine.swapAdjustment(
+                for: candidate,
+                replacing: original,
+                profile: context.responseProfile,
+                recoveryScore: context.recoveryScore
+            )
+            result = ScoredExercise(
+                id: result.id,
+                exercise: result.exercise,
+                score: result.score + personal,
+                reasons: result.reasons,
+                tags: result.tags
+            )
+
             // Intent-specific bonuses — sharpen ranking per mode so the top
             // result feels intentional rather than generic.
             var bonus: Double = 0
@@ -380,7 +413,20 @@ struct ExerciseSelectionEngine {
                 return nil
             }
             guard let ex = library.exercise(byId: id) else { return nil }
-            let result = score(candidate: ex, replacing: original, context: context, reason: reason)
+            var result = score(candidate: ex, replacing: original, context: context, reason: reason)
+            let personal = ExerciseResponseEngine.swapAdjustment(
+                for: ex,
+                replacing: original,
+                profile: context.responseProfile,
+                recoveryScore: context.recoveryScore
+            )
+            result = ScoredExercise(
+                id: result.id,
+                exercise: result.exercise,
+                score: result.score + personal,
+                reasons: result.reasons,
+                tags: result.tags
+            )
             guard result.score > 0 else { return nil }
             return result
         }

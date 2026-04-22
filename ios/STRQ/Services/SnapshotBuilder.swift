@@ -37,7 +37,8 @@ enum SnapshotBuilder {
             nutritionLogs: vm.nutritionLogs,
             bodyWeightEntries: vm.bodyWeightEntries,
             sleepEntries: vm.sleepEntries,
-            activeWorkoutDraft: draft
+            activeWorkoutDraft: draft,
+            familyResponseProfile: vm.familyResponseProfile
         )
     }
 
