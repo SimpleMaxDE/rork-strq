@@ -119,7 +119,9 @@ final class NotificationScheduler {
                 matchingPolicy: .nextTime
             ), todaysReminder > now, calendar.isDateInToday(todaysReminder) {
                 let content = UNMutableNotificationContent()
-                content.title = input.isEarlyStage ? "Your session is ready" : "Today: \(workoutName)"
+                content.title = input.isEarlyStage
+                    ? L10n.tr("Your session is ready")
+                    : L10n.format("notification.workout.today.title", workoutName)
                 content.body = buildWorkoutBody(input: input, workoutName: workoutName)
                 content.sound = .default
                 content.userInfo = NotificationDeepLinkRoute.resumeWorkout.userInfo
@@ -143,10 +145,10 @@ final class NotificationScheduler {
             guard let fireDate = calendar.date(from: comps), fireDate > Date() else { return }
 
             let content = UNMutableNotificationContent()
-            content.title = "Tomorrow: \(nextName)"
+            content.title = L10n.format("notification.workout.tomorrow.title", nextName)
             content.body = input.isEarlyStage
-                ? "Your next session keeps your baseline honest. Small wins compound."
-                : "Get ready for \(nextName). Sleep and fuel set the tone."
+                ? L10n.tr("notification.workout.next.early.body")
+                : L10n.format("notification.workout.next.body", nextName)
             content.sound = .default
             content.userInfo = NotificationDeepLinkRoute.resumeWorkout.userInfo
 
@@ -157,21 +159,21 @@ final class NotificationScheduler {
 
     private func buildWorkoutBody(input: ScheduleInput, workoutName: String) -> String {
         if input.isEarlyStage {
-            return "Your first session sets your baseline. Keep it simple today."
+            return L10n.tr("notification.workout.first_session.body")
         }
         switch input.readinessBucket {
         case "peak", "high":
             if let focus = input.todaysFocus {
-                return "Recovery is aligned — \(focus.lowercased()) day. Push clean reps."
+                return L10n.format("notification.workout.focus_ready.body", focus.lowercased())
             }
-            return "Recovery and progression are aligned. Time to train."
+            return L10n.tr("notification.workout.ready.body")
         case "low", "very_low":
-            return "Readiness is lower today. Stay honest — quality over load."
+            return L10n.tr("notification.workout.low_readiness.body")
         default:
             if let focus = input.todaysFocus {
-                return "\(focus) today. \(workoutName) is queued up."
+                return L10n.format("notification.workout.focus_default.body", focus, workoutName)
             }
-            return "\(workoutName) is queued up."
+            return L10n.format("notification.workout.default.body", workoutName)
         }
     }
 
@@ -189,10 +191,10 @@ final class NotificationScheduler {
         ), calendar.isDateInToday(fireDate) else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Morning check-in"
+        content.title = L10n.tr("Morning check-in")
         content.body = input.isEarlyStage
-            ? "Tell STRQ how today feels. It calibrates everything."
-            : "How's your body today? 30 seconds sharpens today's session."
+            ? L10n.tr("notification.readiness.early.body")
+            : L10n.tr("notification.readiness.body")
         content.sound = .default
         content.userInfo = NotificationDeepLinkRoute.readinessCheckIn.userInfo
 
@@ -221,10 +223,10 @@ final class NotificationScheduler {
         ) else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Weekly review ready"
+        content.title = L10n.tr("Weekly review ready")
         content.body = input.isWeeklyReviewReady
-            ? "Your week is in. See what moved — and what's next."
-            : "Close the week with a clear-eyed review."
+            ? L10n.tr("notification.weekly_review.ready.body")
+            : L10n.tr("notification.weekly_review.default.body")
         content.sound = .default
 
         let trigger = UNCalendarNotificationTrigger(
@@ -249,8 +251,8 @@ final class NotificationScheduler {
         guard let fireDate = calendar.date(from: comps), fireDate > Date() else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Keep your \(input.streak)-day streak"
-        content.body = "A check-in or a short session is enough to hold the line."
+        content.title = L10n.format("notification.streak.title", input.streak)
+        content.body = L10n.tr("notification.streak.body")
         content.sound = .default
 
         let trigger = UNCalendarNotificationTrigger(
@@ -272,8 +274,8 @@ final class NotificationScheduler {
             comps.minute = 15
             if let fireDate = calendar.nextDate(after: Date(), matching: comps, matchingPolicy: .nextTime) {
                 let content = UNMutableNotificationContent()
-                content.title = "Weekly weigh-in"
-                content.body = "A quick log keeps your trend line honest."
+                content.title = L10n.tr("Weekly weigh-in")
+                content.body = L10n.tr("notification.weight_log.body")
                 content.sound = .default
                 let trigger = UNCalendarNotificationTrigger(
                     dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate),
@@ -289,8 +291,8 @@ final class NotificationScheduler {
             comps.minute = 30
             if let fireDate = calendar.nextDate(after: Date(), matching: comps, matchingPolicy: .nextTime) {
                 let content = UNMutableNotificationContent()
-                content.title = "Log last night's sleep"
-                content.body = "Sleep is half of recovery. Takes a second."
+                content.title = L10n.tr("Log last night's sleep")
+                content.body = L10n.tr("notification.sleep_log.body")
                 content.sound = .default
                 content.userInfo = NotificationDeepLinkRoute.sleepLog.userInfo
                 let trigger = UNCalendarNotificationTrigger(
@@ -317,28 +319,28 @@ final class NotificationScheduler {
                 // Soft 4-day check-in — matches the Phase-21 behavior for users still roughly in rhythm.
                 return (
                     4,
-                    "Back when you're ready",
+                    L10n.tr("Back when you're ready"),
                     input.isEarlyStage
-                        ? "A single clean session rebuilds momentum."
-                        : "One session back keeps your plan honest. No pressure."
+                        ? L10n.tr("notification.comeback.in_rhythm.early.body")
+                        : L10n.tr("notification.comeback.in_rhythm.body")
                 )
             case .pause:
                 return (
                     3,
-                    "Pick up where you left off",
-                    "A couple of days off is fine. Your next session is still the right move — no reset needed."
+                    L10n.tr("notification.comeback.pause.title"),
+                    L10n.tr("notification.comeback.pause.body")
                 )
             case .extendedBreak:
                 return (
                     7,
-                    "Ease back in",
-                    "STRQ will lighten your first session back. Comebacks hold when the re-entry is soft."
+                    L10n.tr("notification.comeback.extended.title"),
+                    L10n.tr("notification.comeback.extended.body")
                 )
             case .longAbsence:
                 return (
                     14,
-                    "Rebuild, don't retest",
-                    "Treat this week like a rebuild block. Lighter sessions now mean real gains in two weeks."
+                    L10n.tr("notification.comeback.long.title"),
+                    L10n.tr("notification.comeback.long.body")
                 )
             }
         }()
