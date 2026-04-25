@@ -244,3 +244,37 @@
 "Your setup is locked in. STRQ is building its first read on your training rhythm." = "Dein Setup steht. STRQ baut gerade das erste Verständnis für deinen Trainingsrhythmus auf.";
 "Your coaching profile, recovery context, and continuity settings in one place." = "Dein Coaching-Profil, Erholungskontext und Kontinuitätseinstellungen an einem Ort.";
 "Reset All Data" = "Alle Daten zurücksetzen";
+
+/* Training plan */
+"Edit Session" = "Einheit bearbeiten";
+"Schedule" = "Zeitplan";
+"Exercise Library" = "Übungsbibliothek";
+"Review & Start" = "Prüfen & starten";
+"DAY %d" = "TAG %d";
+"Skipped" = "Übersprungen";
+"Sets" = "Sätze";
+"Time" = "Zeit";
+"Effort" = "Anstrengung";
+"Warm-Up" = "Warm-up";
+"Key Lifts" = "Hauptübungen";
+"Support" = "Unterstützung";
+"Accessory" = "Zubehör";
+"%d · %d sets" = "%d · %d Sätze";
+"CUSTOM" = "ANGEPASST";
+"Edit Prescription" = "Vorgabe bearbeiten";
+"Swap Exercise" = "Übung ersetzen";
+"Restore Coach Default" = "Coach-Standard wiederherstellen";
+"Remove" = "Entfernen";
+"Undo" = "Rückgängig";
+"Revert" = "Zurücksetzen";
+"Deload Week" = "Deload-Woche";
+"Coach-Adjusted Week" = "Vom Coach angepasste Woche";
+"Volume Reduced" = "Volumen reduziert";
+"Exercise Swapped" = "Übung ersetzt";
+"Lighter Session" = "Leichtere Einheit";
+"Week Regenerated" = "Woche neu erstellt";
+"Unskip" = "Wieder einplanen";
+"Skip" = "Überspringen";
+"Move" = "Verschieben";
+"No Plan Yet" = "Noch kein Plan";
+"Complete onboarding to generate\nyour personalized training plan." = "Schließe das Onboarding ab, um\ndeinen persönlichen Trainingsplan zu erstellen.";
