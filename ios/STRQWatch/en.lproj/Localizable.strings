@@ -1,0 +1,14 @@
+/* English base localization for STRQ Watch. */
+
+"STRQ" = "STRQ";
+"Start Workout" = "Start Workout";
+"Resume Workout" = "Resume Workout";
+"Workout" = "Workout";
+"Ready" = "Ready";
+"Recovery" = "Recovery";
+"Sets" = "Sets";
+"Reps" = "Reps";
+"Weight" = "Weight";
+"Done" = "Done";
+"Pause" = "Pause";
+"Finish" = "Finish";

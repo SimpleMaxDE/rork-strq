@@ -85,7 +85,7 @@ struct NotificationSettingsView: View {
         .offset(y: appeared ? 0 : 10)
     }
 
-    private var bannerTitle: String {
+    private var bannerTitle: LocalizedStringKey {
         switch authStatus {
         case .authorized, .provisional, .ephemeral: return "Stay on Track"
         case .denied: return "Notifications Off"
@@ -93,7 +93,7 @@ struct NotificationSettingsView: View {
         }
     }
 
-    private var bannerSubtitle: String {
+    private var bannerSubtitle: LocalizedStringKey {
         switch authStatus {
         case .authorized, .provisional, .ephemeral: return "Smart reminders timed to your real schedule"
         case .denied: return "Turn on in Settings to receive STRQ reminders"
@@ -186,7 +186,7 @@ struct NotificationSettingsView: View {
                         Spacer()
                         Picker("", selection: $vm.notificationSettings.weeklyReviewDay) {
                             ForEach(0..<7) { idx in
-                                Text(weekdays[idx]).tag(idx)
+                                Text(LocalizedStringKey(weekdays[idx])).tag(idx)
                             }
                         }
                         .tint(STRQBrand.steel)
@@ -283,7 +283,7 @@ struct NotificationSettingsView: View {
         }
     }
 
-    private func sectionHeader(_ title: String, icon: String, color: Color) -> some View {
+    private func sectionHeader(_ title: LocalizedStringKey, icon: String, color: Color) -> some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.subheadline)
@@ -293,7 +293,7 @@ struct NotificationSettingsView: View {
         }
     }
 
-    private func toggleRow(_ title: String, subtitle: String, isOn: Binding<Bool>) -> some View {
+    private func toggleRow(_ title: LocalizedStringKey, subtitle: LocalizedStringKey, isOn: Binding<Bool>) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Toggle(isOn: isOn) {
                 VStack(alignment: .leading, spacing: 2) {

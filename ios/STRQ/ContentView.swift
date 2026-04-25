@@ -140,7 +140,7 @@ struct STRQTabBar: View {
     @Binding var selectedTab: Int
     let hasWorkoutToday: Bool
 
-    private let items: [(icon: String, label: String, index: Int)] = [
+    private let items: [(icon: String, labelKey: LocalizedStringKey, index: Int)] = [
         ("house.fill", "Today", 0),
         ("brain.head.profile.fill", "Coach", 1),
         ("bolt.fill", "Train", 2),
@@ -168,7 +168,7 @@ struct STRQTabBar: View {
         }
     }
 
-    private func regularTab(_ item: (icon: String, label: String, index: Int)) -> some View {
+    private func regularTab(_ item: (icon: String, labelKey: LocalizedStringKey, index: Int)) -> some View {
         let isSelected = selectedTab == item.index
 
         return Button {
@@ -178,7 +178,7 @@ struct STRQTabBar: View {
                 Image(systemName: item.icon)
                     .font(.system(size: 18, weight: isSelected ? .semibold : .regular))
                     .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
-                Text(item.label)
+                Text(item.labelKey)
                     .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
                     .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
             }
@@ -188,7 +188,7 @@ struct STRQTabBar: View {
         .sensoryFeedback(.selection, trigger: selectedTab)
     }
 
-    private func centerTrainTab(_ item: (icon: String, label: String, index: Int)) -> some View {
+    private func centerTrainTab(_ item: (icon: String, labelKey: LocalizedStringKey, index: Int)) -> some View {
         let isSelected = selectedTab == item.index
 
         return Button {
@@ -218,7 +218,7 @@ struct STRQTabBar: View {
                 }
                 .offset(y: -6)
 
-                Text(item.label)
+                Text(item.labelKey)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
                     .offset(y: -4)
