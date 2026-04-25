@@ -624,7 +624,7 @@ struct ProgressAnalyticsView: View {
                     Text("\(Int(pr.weight))")
                         .font(.system(size: 22, weight: .heavy, design: .rounded).monospacedDigit())
                         .foregroundStyle(.white)
-                    Text(L10n.tr("kg"))
+                    Text("kg")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.5))
                 }
@@ -835,9 +835,9 @@ struct ProgressAnalyticsView: View {
                     .lineLimit(1)
                 HStack(spacing: 4) {
                     Text("\(duration)min")
-                    Text(L10n.tr("·")).foregroundStyle(.quaternary)
+                    Text("·").foregroundStyle(.quaternary)
                     Text("\(sets) sets")
-                    Text(L10n.tr("·")).foregroundStyle(.quaternary)
+                    Text("·").foregroundStyle(.quaternary)
                     Text(ForgeTheme.formatVolume(session.totalVolume) + "kg")
                 }
                 .font(.caption2.monospacedDigit())

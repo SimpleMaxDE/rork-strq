@@ -780,9 +780,9 @@ struct ProfileView: View {
     private var legalLinks: some View {
         HStack(spacing: 18) {
             Link(L10n.tr("Privacy"), destination: STRQLinks.privacy)
-            Text(L10n.tr("·")).foregroundStyle(.quaternary)
+            Text("·").foregroundStyle(.quaternary)
             Link(L10n.tr("Terms"), destination: STRQLinks.terms)
-            Text(L10n.tr("·")).foregroundStyle(.quaternary)
+            Text("·").foregroundStyle(.quaternary)
             Link(L10n.tr("Support"), destination: STRQLinks.support)
         }
         .font(.caption.weight(.medium))

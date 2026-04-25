@@ -1506,7 +1506,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Review & Start"
+            "value": "Überprüfen & Starten"
           }
         }
       }
@@ -1566,7 +1566,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Key Lifts"
+            "value": "Hauptübungen"
           }
         }
       }
@@ -2396,7 +2396,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "CUSTOM"
+            "value": "BENUTZERDEFINIERT"
           }
         }
       }
@@ -3296,7 +3296,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Advanced"
+            "value": "Fortgeschritten"
           }
         }
       }
@@ -4531,16 +4531,6 @@
         }
       }
     },
-    "min": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "min"
-          }
-        }
-      }
-    },
     "Adaptive": {
       "localizations": {
         "de": {
@@ -5756,7 +5746,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "FORTSCHRITTION STATUS"
+            "value": "PROGRESSIONSSTATUS"
           }
         }
       }
@@ -5766,7 +5756,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Last"
+            "value": "Letzte"
           }
         }
       }
@@ -5776,7 +5766,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Strategy"
+            "value": "Strategie"
           }
         }
       }
@@ -5786,7 +5776,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "PRIMARY"
+            "value": "PRIMÄR"
           }
         }
       }
@@ -5796,7 +5786,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "SECONDARY"
+            "value": "SEKUNDÄR"
           }
         }
       }
@@ -5806,7 +5796,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "DO THIS"
+            "value": "TU DAS"
           }
         }
       }
@@ -5816,7 +5806,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "AVOID THIS"
+            "value": "VERMEIDE DAS"
           }
         }
       }
@@ -5826,7 +5816,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "FORTSCHRITTION PATH"
+            "value": "PROGRESSIONSVERLAUF"
           }
         }
       }
@@ -5836,7 +5826,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "FAMILY MEMBERS"
+            "value": "FAMILIENMITGLIEDER"
           }
         }
       }
@@ -5846,7 +5836,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Building Your Plan"
+            "value": "Dein Plan wird erstellt"
           }
         }
       }
@@ -5866,7 +5856,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Coaching that keeps learning you"
+            "value": "Coaching, das dich immer besser versteht"
           }
         }
       }
@@ -5886,7 +5876,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WHAT YOU KEEP · WHAT PRO ADDS"
+            "value": "WAS BLEIBT · WAS PRO HINZUFÜGT"
           }
         }
       }
@@ -5896,7 +5886,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "FREE"
+            "value": "KOSTENLOS"
           }
         }
       }
@@ -5916,7 +5906,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Try free, cancel anytime before it renews"
+            "value": "Kostenlos testen, jederzeit vor Verlängerung kündigen"
           }
         }
       }
@@ -5926,7 +5916,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Payment is charged to your Apple ID account. Subscription auto-renews unless cancelled at least 24 hours before the end of the current period."
+            "value": "Die Zahlung wird über deinen Apple-ID-Account abgerechnet. Das Abo verlängert sich automatisch, sofern es nicht mindestens 24 Stunden vor Ablauf des aktuellen Zeitraums gekündigt wird."
           }
         }
       }
@@ -5936,7 +5926,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "You have STRQ Pro"
+            "value": "Du hast STRQ Pro"
           }
         }
       }
@@ -5956,7 +5946,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "SUBSCRIPTIONS COMING SOON"
+            "value": "ABOS BALD VERFÜGBAR"
           }
         }
       }
@@ -5966,7 +5956,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Premium Pläne will become available once App Store setup is complete."
+            "value": "Premium-Pläne werden verfügbar, sobald die App-Store-Einrichtung abgeschlossen ist."
           }
         }
       }
@@ -5976,7 +5966,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "You can continue exploring STRQ in the meantime."
+            "value": "Du kannst STRQ in der Zwischenzeit weiter erkunden."
           }
         }
       }
@@ -5986,7 +5976,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Subscriptions coming soon"
+            "value": "Abos bald verfügbar"
           }
         }
       }
@@ -5996,7 +5986,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Premium Pläne will appear here once App Store setup is complete."
+            "value": "Premium-Pläne erscheinen hier, sobald die App-Store-Einrichtung abgeschlossen ist."
           }
         }
       }
@@ -6006,7 +5996,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Subscription Pläne are currently unavailable."
+            "value": "Abo-Pläne sind derzeit nicht verfügbar."
           }
         }
       }
@@ -6016,47 +6006,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Try Again"
-          }
-        }
-      }
-    },
-    "0.0": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "0.0"
-          }
-        }
-      }
-    },
-    "kg": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "kg"
-          }
-        }
-      }
-    },
-    "—": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "—"
-          }
-        }
-      }
-    },
-    "%": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%"
+            "value": "Erneut versuchen"
           }
         }
       }
@@ -6066,7 +6016,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "SLEEP & RECOVERY"
+            "value": "SCHLAF & REGENERATION"
           }
         }
       }
@@ -6076,7 +6026,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Avg Hours"
+            "value": "Ø Stunden"
           }
         }
       }
@@ -6086,7 +6036,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quality"
+            "value": "Qualität"
           }
         }
       }
@@ -6096,7 +6046,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "PHYSIQUE COACHING"
+            "value": "PHYSIQUE-COACHING"
           }
         }
       }
@@ -6116,7 +6066,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Physique tracking is off."
+            "value": "Physique-Tracking ist aus."
           }
         }
       }
@@ -6126,7 +6076,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STRQ is coaching your training and recovery. Turn on physique tracking anytime to add bodyweight and nutrition intelligence — only when you want it."
+            "value": "STRQ coacht bereits Training und Regeneration. Aktiviere Physique-Tracking jederzeit, um Körpergewicht und Ernährung einzubeziehen – nur wenn du möchtest."
           }
         }
       }
@@ -6136,7 +6086,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enable Physique Tracking"
+            "value": "Physique-Tracking aktivieren"
           }
         }
       }
@@ -6146,7 +6096,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WHY"
+            "value": "WARUM"
           }
         }
       }
@@ -6156,17 +6106,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "THIS WEEK"
-          }
-        }
-      }
-    },
-    "·": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "·"
+            "value": "DIESE WOCHE"
           }
         }
       }
@@ -6196,7 +6136,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "vs last week"
+            "value": "vs letzte Woche"
           }
         }
       }
@@ -6206,7 +6146,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Muscle Balance"
+            "value": "Muskelbalance"
           }
         }
       }
@@ -6226,7 +6166,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "What went well and what to improve"
+            "value": "Was gut lief und was du verbessern kannst"
           }
         }
       }
@@ -6256,7 +6196,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bodyweight Trend"
+            "value": "Körpergewichtstrend"
           }
         }
       }
@@ -6266,7 +6206,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your strength is progressing. Keep it up."
+            "value": "Deine Kraft entwickelt sich positiv. Weiter so."
           }
         }
       }
@@ -6276,7 +6216,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Coach's Take"
+            "value": "Einschätzung des Coaches"
           }
         }
       }
@@ -6306,7 +6246,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ease next session"
+            "value": "Nächste Einheit leichter angehen"
           }
         }
       }
@@ -6316,7 +6256,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quick Log"
+            "value": "Schnell-Log"
           }
         }
       }
@@ -6326,17 +6266,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Log Nutrition"
-          }
-        }
-      }
-    },
-    "0": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "0"
+            "value": "Ernährung loggen"
           }
         }
       }
@@ -6346,7 +6276,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Recent"
+            "value": "Zuletzt"
           }
         }
       }
@@ -6356,7 +6286,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "NEXT SHIFT"
+            "value": "NÄCHSTE ANPASSUNG"
           }
         }
       }
@@ -6366,7 +6296,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Coach-Adjusted"
+            "value": "Vom Coach angepasst"
           }
         }
       }
@@ -6376,7 +6306,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "TODAY'S EINHEIT"
+            "value": "HEUTIGE EINHEIT"
           }
         }
       }
@@ -6386,7 +6316,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "EINHEIT PLAN"
+            "value": "EINHEITSPLAN"
           }
         }
       }
@@ -6396,7 +6326,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tap for prescription"
+            "value": "Tippe für Vorgabe"
           }
         }
       }
@@ -6416,7 +6346,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WHY THIS EINHEIT"
+            "value": "WARUM DIESE EINHEIT"
           }
         }
       }
@@ -6456,7 +6386,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "COACH ASSESSMENT"
+            "value": "COACH-EINSCHÄTZUNG"
           }
         }
       }
@@ -6466,7 +6396,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "YOUR INPUTS SHAPED THIS PLAN"
+            "value": "DEINE ANGABEN HABEN DIESEN PLAN GEFORMT"
           }
         }
       }
@@ -6476,7 +6406,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "COACH NOTE"
+            "value": "COACH-NOTIZ"
           }
         }
       }
@@ -6486,7 +6416,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "You'll go straight into today's session. You can fine-tune the plan later in Train."
+            "value": "Du gehst direkt in die heutige Einheit. Den Plan kannst du später in Train feinjustieren."
           }
         }
       }
@@ -6496,7 +6426,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WHAT TO DO FIRST"
+            "value": "WAS DU ZUERST TUN SOLLTEST"
           }
         }
       }
@@ -6506,7 +6436,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "YOUR EXERCISES"
+            "value": "DEINE ÜBUNGEN"
           }
         }
       }
@@ -6526,7 +6456,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "NEEDS ATTENTION"
+            "value": "BRAUCHT AUFMERKSAMKEIT"
           }
         }
       }
@@ -6536,7 +6466,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "ESSENTIAL EXERCISES"
+            "value": "WICHTIGE ÜBUNGEN"
           }
         }
       }
@@ -6546,7 +6476,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "EXERCISE FAMILIES"
+            "value": "ÜBUNGSFAMILIEN"
           }
         }
       }
@@ -6556,7 +6486,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "TRAINING WORLDS"
+            "value": "TRAININGSBEREICHE"
           }
         }
       }
@@ -6576,7 +6506,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "All Patterns"
+            "value": "Alle Bewegungsmuster"
           }
         }
       }
@@ -6656,7 +6586,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "No changes yet — every decision will be logged here."
+            "value": "Noch keine Änderungen – jede Entscheidung wird hier protokolliert."
           }
         }
       }
@@ -6666,7 +6596,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wochely Check-In"
+            "value": "Wöchentlicher Check-in"
           }
         }
       }
@@ -6676,7 +6606,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Plan Quality"
+            "value": "Planqualität"
           }
         }
       }
@@ -6696,7 +6626,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Coach is satisfied with the rest of your picture."
+            "value": "Der Coach ist mit dem restlichen Gesamtbild zufrieden."
           }
         }
       }
@@ -6706,7 +6636,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "More signals"
+            "value": "Weitere Signale"
           }
         }
       }
@@ -6716,7 +6646,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "e.g. Left shoulder, lower back"
+            "value": "z. B. linke Schulter, unterer Rücken"
           }
         }
       }
@@ -6726,7 +6656,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "READINESS"
+            "value": "BEREITSCHAFT"
           }
         }
       }
@@ -6736,7 +6666,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Key Lift"
+            "value": "Hauptübung"
           }
         }
       }
@@ -6746,7 +6676,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bodyweight"
+            "value": "Körpergewicht"
           }
         }
       }
@@ -6756,7 +6686,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Applied"
+            "value": "Übernommen"
           }
         }
       }
@@ -6766,7 +6696,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Why This Matters"
+            "value": "Warum das wichtig ist"
           }
         }
       }
@@ -6776,7 +6706,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Woche-level"
+            "value": "Wochenebene"
           }
         }
       }
@@ -6786,7 +6716,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Effort: reduced"
+            "value": "Aufwand reduziert"
           }
         }
       }
@@ -6796,7 +6726,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Add Übung"
+            "value": "Übung hinzufügen"
           }
         }
       }
@@ -6806,7 +6736,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Prescription"
+            "value": "Vorgabe"
           }
         }
       }
@@ -6816,7 +6746,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "COACH DEFAULT"
+            "value": "COACH-STANDARD"
           }
         }
       }
@@ -6826,7 +6756,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Customized from coach default"
+            "value": "Vom Coach-Standard angepasst"
           }
         }
       }
@@ -6836,7 +6766,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Custom"
+            "value": "Benutzerdefiniert"
           }
         }
       }
@@ -6846,7 +6776,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "RPE 7 = 3 in reserve · RPE 9 = 1 in reserve"
+            "value": "RPE 7 = 3 Wiederholungen im Tank · RPE 9 = 1 Wiederholung im Tank"
           }
         }
       }
@@ -6856,7 +6786,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fits this session"
+            "value": "Passt zu dieser Einheit"
           }
         }
       }
@@ -6866,7 +6796,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Suggestions based on this session's focus muscles and gaps."
+            "value": "Vorschläge basierend auf den Fokusmuskeln und Lücken dieser Einheit."
           }
         }
       }
@@ -6886,7 +6816,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "RECOVERY STATUS"
+            "value": "REGENERATIONSSTATUS"
           }
         }
       }
@@ -6896,7 +6826,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "7-day sleep"
+            "value": "7-Tage-Schlaf"
           }
         }
       }
@@ -6906,7 +6836,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schlaf quality"
+            "value": "Schlafqualität"
           }
         }
       }
@@ -6926,7 +6856,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schlaf Trend"
+            "value": "Schlaftrend"
           }
         }
       }
@@ -6936,7 +6866,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "14 Days"
+            "value": "14 Tage"
           }
         }
       }
@@ -6946,7 +6876,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "7h target"
+            "value": "7h-Ziel"
           }
         }
       }
@@ -6976,7 +6906,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Log Tonight's Schlaf"
+            "value": "Schlaf der letzten Nacht loggen"
           }
         }
       }
@@ -6986,7 +6916,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hours Slept"
+            "value": "Geschlafene Stunden"
           }
         }
       }
@@ -6996,7 +6926,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schlaf Quality"
+            "value": "Schlafqualität"
           }
         }
       }
@@ -7016,7 +6946,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "HOW SLEEP AFFECTS YOUR TRAINING"
+            "value": "WIE SCHLAF DEIN TRAINING BEEINFLUSST"
           }
         }
       }
@@ -7026,7 +6956,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Recent Schlaf"
+            "value": "Letzter Schlaf"
           }
         }
       }
@@ -7036,7 +6966,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Training Schedule"
+            "value": "Trainingsplan"
           }
         }
       }
@@ -7046,7 +6976,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Assign Workouts to specific days. Tap a day to change it."
+            "value": "Weise Workouts bestimmten Tagen zu. Tippe auf einen Tag, um ihn zu ändern."
           }
         }
       }
@@ -7056,7 +6986,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "ASSIGN DAYS"
+            "value": "TAGE ZUWEISEN"
           }
         }
       }
@@ -7066,7 +6996,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Auto-Schedule"
+            "value": "Automatisch planen"
           }
         }
       }
@@ -7086,7 +7016,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pick a role-preserving alternative"
+            "value": "Wähle eine Alternative mit gleicher Rolle"
           }
         }
       }
@@ -7096,7 +7026,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cancel swap"
+            "value": "Tausch abbrechen"
           }
         }
       }
@@ -7106,7 +7036,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "REPLACING"
+            "value": "ERSETZT"
           }
         }
       }
@@ -7136,7 +7066,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tap muscles to set priority"
+            "value": "Tippe auf Muskeln, um Prioritäten zu setzen"
           }
         }
       }
@@ -7146,7 +7076,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "direct:"
+            "value": "direkt:"
           }
         }
       }
@@ -7156,7 +7086,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "bridge:"
+            "value": "Brücke:"
           }
         }
       }
@@ -7186,7 +7116,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Why STRQ changed your plan"
+            "value": "Warum STRQ deinen Plan geändert hat"
           }
         }
       }
@@ -7196,7 +7126,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "A record of the decisions Coach has made for you — what shifted, why it shifted, and what it means for training now."
+            "value": "Eine Übersicht der Entscheidungen deines Coaches – was geändert wurde, warum es geändert wurde und was das jetzt für dein Training bedeutet."
           }
         }
       }
@@ -7216,7 +7146,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Once Coach adjusts volume, swaps a lift, or shifts your phase, every change will show up here with the reason behind it."
+            "value": "Sobald der Coach Volumen anpasst, eine Übung tauscht oder deine Phase verschiebt, erscheint jede Änderung hier mit Begründung."
           }
         }
       }
@@ -7226,7 +7156,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "THE BRIDGE"
+            "value": "DIE VERBINDUNG"
           }
         }
       }
@@ -7236,7 +7166,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your recent changes are shaping how this week runs."
+            "value": "Deine letzten Änderungen beeinflussen, wie diese Woche läuft."
           }
         }
       }
@@ -7246,7 +7176,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WHAT IT MEANS NOW"
+            "value": "WAS DAS JETZT BEDEUTET"
           }
         }
       }
@@ -7256,7 +7186,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "RECENT CHANGE"
+            "value": "LETZTE ÄNDERUNG"
           }
         }
       }
@@ -7276,7 +7206,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "NUTRITION GOAL"
+            "value": "ERNÄHRUNGSZIEL"
           }
         }
       }
@@ -7286,7 +7216,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Recompute Targets"
+            "value": "Ziele neu berechnen"
           }
         }
       }
@@ -7296,7 +7226,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "COMPUTED TARGETS"
+            "value": "BERECHNETE ZIELE"
           }
         }
       }
@@ -7306,7 +7236,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Based on your profile"
+            "value": "Basierend auf deinem Profil"
           }
         }
       }
@@ -7316,7 +7246,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "CUSTOM OVERRIDES"
+            "value": "MANUELLE ANPASSUNGEN"
           }
         }
       }
@@ -7326,7 +7256,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Optional fine-tuning"
+            "value": "Optionale Feinabstimmung"
           }
         }
       }
@@ -7336,7 +7266,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save Custom Targets"
+            "value": "Eigene Ziele speichern"
           }
         }
       }
@@ -7356,7 +7286,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "BODY WEIGHT GOAL"
+            "value": "KÖRPERGEWICHTSZIEL"
           }
         }
       }
@@ -7366,7 +7296,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktuell Weight"
+            "value": "Aktuelles Gewicht"
           }
         }
       }
@@ -7376,7 +7306,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Target Weight"
+            "value": "Zielgewicht"
           }
         }
       }
@@ -7386,7 +7316,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save Target Weight"
+            "value": "Zielgewicht speichern"
           }
         }
       }
@@ -7396,7 +7326,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "TRAINING CONNECTION"
+            "value": "TRAININGSVERKNÜPFUNG"
           }
         }
       }
@@ -7406,7 +7336,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your nutrition targets are computed from these training parameters. Changes to your training profile will update nutrition recommendations."
+            "value": "Deine Ernährungsziele werden aus diesen Trainingsparametern berechnet. Änderungen im Trainingsprofil aktualisieren die Empfehlungen."
           }
         }
       }
@@ -7426,7 +7356,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WHAT CHANGED"
+            "value": "WAS SICH GEÄNDERT HAT"
           }
         }
       }
@@ -7436,7 +7366,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "· 7 days"
+            "value": "· 7 Tage"
           }
         }
       }
@@ -7446,7 +7376,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "by lift · body · streak"
+            "value": "nach Lift · Körper · Streak"
           }
         }
       }
@@ -7456,7 +7386,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Strength trend starts here"
+            "value": "Dein Krafttrend beginnt hier"
           }
         }
       }
@@ -7466,7 +7396,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heavy sets and rep bests will start surfacing here as your log grows."
+            "value": "Schwere Sets und neue Bestleistungen erscheinen hier, sobald dein Log wächst."
           }
         }
       }
@@ -7476,7 +7406,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "LATEST PR"
+            "value": "LETZTER PR"
           }
         }
       }
@@ -7486,7 +7416,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "RECENT IMPROVEMENT"
+            "value": "LETZTE VERBESSERUNG"
           }
         }
       }
@@ -7496,7 +7426,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "All"
+            "value": "Alle"
           }
         }
       }
@@ -7506,7 +7436,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Each finished Workout becomes a clean training record here."
+            "value": "Jedes abgeschlossene Workout wird hier als sauberer Trainingseintrag gespeichert."
           }
         }
       }
@@ -7516,7 +7446,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your consistency pattern will map here once sessions start landing."
+            "value": "Dein Konsistenzmuster erscheint hier, sobald du Sessions abschließt."
           }
         }
       }
@@ -7526,7 +7456,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Goal Pace"
+            "value": "Zieltempo"
           }
         }
       }
@@ -7546,7 +7476,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your training log is starting"
+            "value": "Dein Trainingslog beginnt"
           }
         }
       }
@@ -7556,7 +7486,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Finished sessions collect here as your week builds, so progress stays easy to review later."
+            "value": "Abgeschlossene Sessions sammeln sich hier, damit du deinen Fortschritt später leicht prüfen kannst."
           }
         }
       }
@@ -7566,7 +7496,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Regenerate Woche"
+            "value": "Woche neu generieren"
           }
         }
       }
@@ -7576,7 +7506,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Smart Woche Regeneration"
+            "value": "Intelligente Wochen-Neugenerierung"
           }
         }
       }
@@ -7586,7 +7516,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your upcoming week will be intelligently rebuilt based on your recent training data, recovery, and muscle balance."
+            "value": "Deine kommende Woche wird basierend auf deinen letzten Trainingsdaten, deiner Regeneration und Muskelbalance intelligent neu aufgebaut."
           }
         }
       }
@@ -7596,7 +7526,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Changes"
+            "value": "Änderungen"
           }
         }
       }
@@ -7606,7 +7536,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Woche Comparison"
+            "value": "Wochenvergleich"
           }
         }
       }
@@ -7616,7 +7546,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "sets"
+            "value": "Sets"
           }
         }
       }
@@ -7626,7 +7556,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "min total"
+            "value": "Min. gesamt"
           }
         }
       }
@@ -7636,7 +7566,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apply Regenerated Woche"
+            "value": "Neu generierte Woche übernehmen"
           }
         }
       }
@@ -7646,7 +7576,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Strategic Deload Woche"
+            "value": "Strategische Deload-Woche"
           }
         }
       }
@@ -7656,7 +7586,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "A lighter week to let accumulated fatigue dissipate. You keep the same structure and movements, but at reduced intensity."
+            "value": "Eine leichtere Woche, damit sich angesammelte Ermüdung abbauen kann. Struktur und Übungen bleiben gleich, aber mit reduzierter Intensität."
           }
         }
       }
@@ -7666,7 +7596,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Day-by-Day Preview"
+            "value": "Tagesvorschau"
           }
         }
       }
@@ -7686,7 +7616,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Start Deload Woche"
+            "value": "Deload-Woche starten"
           }
         }
       }
@@ -7706,7 +7636,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STRQ stays one coach — these tune how it speaks, what it emphasizes, and how much it adjusts on its own."
+            "value": "STRQ bleibt derselbe Coach – hier stellst du ein, wie er spricht, was er betont und wie viel er automatisch anpasst."
           }
         }
       }
@@ -7716,7 +7646,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Turn on physique tracking in Profile to unlock this focus."
+            "value": "Aktiviere Physique-Tracking im Profil, um diesen Fokus freizuschalten."
           }
         }
       }
@@ -7726,7 +7656,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Preferences shape the surface only. The underlying intelligence stays the same."
+            "value": "Die Einstellungen verändern nur die Darstellung. Die Intelligenz dahinter bleibt gleich."
           }
         }
       }
@@ -7777,6 +7707,86 @@
           "stringUnit": {
             "state": "translated",
             "value": "Schmerz oder Einschränkung"
+          }
+        }
+      }
+    },
+    "Search exercises, muscles, equipment...": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suche nach Übungen, Muskeln, Equipment..."
+          }
+        }
+      }
+    },
+    "Day %d": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tag %d"
+          }
+        }
+      }
+    },
+    "%d exercises": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Übungen"
+          }
+        }
+      }
+    },
+    "New PRs This Week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue PRs diese Woche"
+          }
+        }
+      }
+    },
+    "New PR This Week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neuer PR diese Woche"
+          }
+        }
+      }
+    },
+    "%d %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d %@"
+          }
+        }
+      }
+    },
+    "Personalizing for %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird personalisiert für %@"
+          }
+        }
+      }
+    },
+    "you": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dich"
           }
         }
       }

@@ -178,7 +178,7 @@ struct WorkoutCompletionView: View {
 
             VStack(spacing: 10) {
                 HStack(spacing: 8) {
-                    completionStat(L10n.tr("Time"), value: "\(duration)", unit: L10n.tr("min"))
+                    completionStat(L10n.tr("Time"), value: "\(duration)", unit: "min")
                     completionStat(L10n.tr("Exercises"), value: "\(completedExercises)", unit: nil)
                     completionStat(L10n.tr("Sets"), value: "\(totalSets)", unit: nil)
                     completionStat(L10n.tr("Reps"), value: "\(totalReps)", unit: nil)

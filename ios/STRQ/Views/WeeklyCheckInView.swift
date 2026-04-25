@@ -443,7 +443,8 @@ struct WeeklyCheckInView: View {
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text("\(review.summary.personalRecordsCount) New PR\(review.summary.personalRecordsCount > 1 ? "s" : "") This Week")
+                let prLabel = review.summary.personalRecordsCount > 1 ? L10n.tr("New PRs This Week") : L10n.tr("New PR This Week")
+                Text(L10n.format("%d %@", review.summary.personalRecordsCount, prLabel))
                     .font(.subheadline.weight(.bold))
                 Text(L10n.tr("Your strength is progressing. Keep it up."))
                     .font(.caption)

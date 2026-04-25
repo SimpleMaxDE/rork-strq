@@ -40,7 +40,7 @@ struct PlanGenerationView: View {
                 VStack(spacing: 10) {
                     Text(L10n.tr("Building Your Plan"))
                         .font(.title2.bold())
-                    Text("Personalizing for \(profile.name.isEmpty ? "you" : profile.name)")
+                    Text(L10n.format("Personalizing for %@", profile.name.isEmpty ? L10n.tr("you") : profile.name))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }

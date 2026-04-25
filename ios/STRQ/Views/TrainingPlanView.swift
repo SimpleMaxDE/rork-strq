@@ -513,14 +513,14 @@ struct TrainingPlanView: View {
                         Text("\(planned.sets)×\(planned.reps)")
                             .font(.system(size: 11, weight: .bold).monospacedDigit())
                             .foregroundStyle(.primary)
-                        Text(L10n.tr("·"))
+                        Text("·")
                             .font(.caption2)
                             .foregroundStyle(.tertiary)
                         Text(formatRestShort(planned.restSeconds))
                             .font(.system(size: 10, weight: .medium).monospacedDigit())
                             .foregroundStyle(.secondary)
                         if let rpe = planned.rpe {
-                            Text(L10n.tr("·"))
+                            Text("·")
                                 .font(.caption2)
                                 .foregroundStyle(.tertiary)
                             Text("RPE\(Int(rpe))")
@@ -528,7 +528,7 @@ struct TrainingPlanView: View {
                                 .foregroundStyle(STRQBrand.steel)
                         }
                         if let suggestion = vm.loadSuggestion(for: planned.exerciseId, planned: planned), suggestion.suggestedWeight > 0 {
-                            Text(L10n.tr("·"))
+                            Text("·")
                                 .font(.caption2)
                                 .foregroundStyle(.tertiary)
                             Text(suggestion.formattedWeight)

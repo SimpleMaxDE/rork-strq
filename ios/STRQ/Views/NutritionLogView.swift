@@ -271,7 +271,7 @@ struct NutritionLogView: View {
                 .font(.caption.weight(.medium))
                 .foregroundStyle(color)
             HStack(spacing: 4) {
-                TextField(L10n.tr("0"), text: text)
+                TextField("0", text: text)
                     .keyboardType(.numberPad)
                     .font(.subheadline.weight(.semibold).monospacedDigit())
                     .multilineTextAlignment(.leading)

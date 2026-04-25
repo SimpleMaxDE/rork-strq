@@ -174,7 +174,7 @@ struct CoachMemoryRow: View {
                         .font(.system(size: 9, weight: .black))
                         .tracking(0.9)
                         .foregroundStyle(STRQBrand.steel)
-                    Text(L10n.tr("·"))
+                    Text("·")
                         .font(.system(size: 9, weight: .black))
                         .foregroundStyle(.tertiary)
                     Text(relativeDate(entry.appliedAt))
@@ -309,7 +309,7 @@ struct CoachMemoryBridgeRow: View {
                             .tracking(0.8)
                             .foregroundStyle(STRQBrand.steel)
                         if let status = entry.status {
-                            Text(L10n.tr("·"))
+                            Text("·")
                                 .font(.system(size: 9, weight: .black))
                                 .foregroundStyle(.tertiary)
                             Text(status)

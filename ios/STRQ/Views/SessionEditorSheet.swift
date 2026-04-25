@@ -232,14 +232,14 @@ struct SessionEditorSheet: View {
                         Text("\(planned.sets)×\(planned.reps)")
                             .font(.system(size: 11, weight: .bold).monospacedDigit())
                             .foregroundStyle(.primary)
-                        Text(L10n.tr("·"))
+                        Text("·")
                             .font(.caption2)
                             .foregroundStyle(.tertiary)
                         Text(formatRestShort(planned.restSeconds))
                             .font(.system(size: 10, weight: .medium).monospacedDigit())
                             .foregroundStyle(.secondary)
                         if let rpe = planned.rpe {
-                            Text(L10n.tr("·"))
+                            Text("·")
                                 .font(.caption2)
                                 .foregroundStyle(.tertiary)
                             Text("RPE\(Int(rpe))")
@@ -822,7 +822,7 @@ struct AddExerciseSheet: View {
                 }
                 .listStyle(.insetGrouped)
             }
-            .searchable(text: $searchText, prompt: "Search exercises")
+            .searchable(text: $searchText, prompt: L10n.tr("Search exercises"))
             .navigationTitle(L10n.tr("Add Exercise"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -855,7 +855,7 @@ struct AddExerciseSheet: View {
                         Text(hint)
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(hintColor)
-                        Text(L10n.tr("·"))
+                        Text("·")
                             .font(.caption2)
                             .foregroundStyle(.tertiary)
                         Text(ex.category.displayName)
@@ -889,7 +889,7 @@ struct AddExerciseSheet: View {
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                         if let eq = ex.equipment.first(where: { $0 != .none }) {
-                            Text(L10n.tr("·"))
+                            Text("·")
                                 .font(.caption2)
                                 .foregroundStyle(.tertiary)
                             Text(eq.displayName)

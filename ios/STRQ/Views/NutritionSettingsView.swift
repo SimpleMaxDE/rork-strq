@@ -284,11 +284,11 @@ struct NutritionSettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     HStack(spacing: 4) {
-                        TextField(L10n.tr("—"), text: $editingTargetWeight)
+                        TextField("—", text: $editingTargetWeight)
                             .keyboardType(.decimalPad)
                             .font(.title3.bold().monospacedDigit())
                             .frame(width: 60)
-                        Text(L10n.tr("kg"))
+                        Text("kg")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

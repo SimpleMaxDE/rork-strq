@@ -127,10 +127,10 @@ struct WeightQuickLogSheet: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(STRQBrand.steel)
                     HStack(spacing: 4) {
-                        TextField(L10n.tr("0.0"), text: $weightText)
+                        TextField("0.0", text: $weightText)
                             .keyboardType(.decimalPad)
                             .font(.body.weight(.semibold).monospacedDigit())
-                        Text(L10n.tr("kg"))
+                        Text("kg")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -144,10 +144,10 @@ struct WeightQuickLogSheet: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                     HStack(spacing: 4) {
-                        TextField(L10n.tr("—"), text: $bodyFatText)
+                        TextField("—", text: $bodyFatText)
                             .keyboardType(.decimalPad)
                             .font(.body.weight(.semibold).monospacedDigit())
-                        Text(L10n.tr("%"))
+                        Text("%")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }

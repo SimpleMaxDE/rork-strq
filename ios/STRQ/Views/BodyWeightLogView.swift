@@ -220,10 +220,10 @@ struct BodyWeightLogView: View {
                         .font(.caption.weight(.medium))
                         .foregroundStyle(STRQBrand.steel)
                     HStack(spacing: 4) {
-                        TextField(L10n.tr("0.0"), text: $weightInput)
+                        TextField("0.0", text: $weightInput)
                             .keyboardType(.decimalPad)
                             .font(.subheadline.weight(.semibold).monospacedDigit())
-                        Text(L10n.tr("kg"))
+                        Text("kg")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -237,10 +237,10 @@ struct BodyWeightLogView: View {
                         .font(.caption.weight(.medium))
                         .foregroundStyle(.purple)
                     HStack(spacing: 4) {
-                        TextField(L10n.tr("—"), text: $bodyFatInput)
+                        TextField("—", text: $bodyFatInput)
                             .keyboardType(.decimalPad)
                             .font(.subheadline.weight(.semibold).monospacedDigit())
-                        Text(L10n.tr("%"))
+                        Text("%")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }

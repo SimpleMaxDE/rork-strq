@@ -489,7 +489,7 @@ struct OnboardingView: View {
                                     Text("\(m)")
                                         .font(.system(.title3, design: .rounded, weight: .bold))
                                         .monospacedDigit()
-                                    Text(L10n.tr("min"))
+                                    Text("min")
                                         .font(.caption2.weight(.semibold))
                                         .foregroundStyle(isSelected ? .black.opacity(0.55) : .white.opacity(0.4))
                                 }

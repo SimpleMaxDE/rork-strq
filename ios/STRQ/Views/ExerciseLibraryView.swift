@@ -88,7 +88,7 @@ struct ExerciseLibraryView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .searchable(text: $searchText, prompt: "Search exercises, muscles, equipment...")
+        .searchable(text: $searchText, prompt: L10n.tr("Search exercises, muscles, equipment..."))
         .navigationTitle(L10n.tr("Exercise Library"))
         .navigationBarTitleDisplayMode(.large)
         .sheet(item: $selectedExercise) { exercise in

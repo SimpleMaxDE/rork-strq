@@ -72,7 +72,7 @@ struct MetricEditSheet: View {
             Spacer(minLength: 16)
 
             HStack(alignment: .firstTextBaseline, spacing: 10) {
-                TextField(L10n.tr("0"), text: $text)
+                TextField("0", text: $text)
                     .focused($focused)
                     .keyboardType(metric.allowsDecimal ? .decimalPad : .numberPad)
                     .font(.system(size: 64, weight: .bold, design: .rounded))

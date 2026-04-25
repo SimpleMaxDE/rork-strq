@@ -214,7 +214,7 @@ struct SessionHistoryView: View {
                         .font(.system(size: 9, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundStyle(volumeDelta > 0 ? STRQPalette.success : STRQPalette.warning)
                 } else {
-                    Text(L10n.tr("kg"))
+                    Text("kg")
                         .font(.system(size: 8, weight: .bold))
                         .foregroundStyle(.tertiary)
                         .textCase(.uppercase)
@@ -232,7 +232,7 @@ struct SessionHistoryView: View {
     }
 
     private var dot: some View {
-        Text(L10n.tr("·"))
+        Text("·")
             .font(.caption2)
             .foregroundStyle(.quaternary)
     }

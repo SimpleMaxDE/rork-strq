@@ -176,7 +176,7 @@ struct PlanRevealView: View {
 
     private func dayRow(_ day: WorkoutDay, index: Int) -> some View {
         HStack(spacing: 14) {
-            Text("Day \(index + 1)")
+            Text(L10n.format("Day %d", index + 1))
                 .font(.system(size: 10, weight: .bold).monospacedDigit())
                 .foregroundStyle(STRQBrand.steel)
                 .frame(width: 38)
@@ -188,9 +188,9 @@ struct PlanRevealView: View {
                     Text(day.focusMuscles.prefix(3).map(\.displayName).joined(separator: ", "))
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(L10n.tr("·"))
+                    Text("·")
                         .foregroundStyle(.secondary)
-                    Text("\(day.exercises.count) exercises")
+                    Text(L10n.format("%d exercises", day.exercises.count))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
