@@ -127,3 +127,32 @@
 "notification.comeback.extended.body" = "STRQ macht deine erste Einheit zurück leichter. Comebacks halten besser, wenn der Einstieg sauber ist.";
 "notification.comeback.long.title" = "Aufbauen, nicht testen";
 "notification.comeback.long.body" = "Behandle diese Woche wie einen Aufbau-Block. Leichtere Einheiten jetzt zahlen sich später aus.";
+
+/* Active workout */
+"Finish Workout" = "Training beenden";
+"Finish workout" = "Training beenden";
+"Save & Leave preserves everything you've logged and keeps this workout ready to resume from Today." = "Speichern & verlassen behält alles, was du protokolliert hast, und hält dieses Training zum Fortsetzen auf der Heute-Seite bereit.";
+"EX %d/%d" = "ÜB %d/%d";
+"SET %d/%d" = "SATZ %d/%d";
+"Target %@" = "Ziel %@";
+"%ds rest" = "%ds Pause";
+"PREV" = "LETZTES";
+"BEST" = "BESTES";
+"TARGET" = "ZIEL";
+"no data" = "keine Daten";
+"BW" = "KG";
+"WEIGHT" = "GEWICHT";
+"ADDED LOAD" = "ZUSATZGEWICHT";
+"REPS" = "WDH.";
+"kg added" = "kg Zusatz";
+"kg" = "kg";
+"reps" = "Wdh.";
+"Edit Weight" = "Gewicht bearbeiten";
+"Edit Reps" = "Wdh. bearbeiten";
+"Log Set %d" = "Satz %d eintragen";
+"Last exercise complete" = "Letzte Übung abgeschlossen";
+"Exercise complete" = "Übung abgeschlossen";
+"Finish Workout when you're ready to save this session." = "Beende das Training, wenn du diese Einheit speichern möchtest.";
+"Move to the next exercise when you're ready." = "Gehe zur nächsten Übung, wenn du bereit bist.";
+"Match last" = "Letzten übernehmen";
+"Target" = "Ziel";
