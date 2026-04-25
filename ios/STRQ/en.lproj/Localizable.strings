@@ -183,3 +183,37 @@
 "Reminder when your streak might break tomorrow" = "Reminder when your streak might break tomorrow";
 "Sync with Apple Health" = "Sync with Apple Health";
 "Read body weight and sleep, write workouts and weigh-ins" = "Read body weight and sleep, write workouts and weigh-ins";
+
+/* Training plan */
+"Edit Session" = "Edit Session";
+"Schedule" = "Schedule";
+"Exercise Library" = "Exercise Library";
+"Review & Start" = "Review & Start";
+"DAY %d" = "DAY %d";
+"Skipped" = "Skipped";
+"Sets" = "Sets";
+"Time" = "Time";
+"Effort" = "Effort";
+"Warm-Up" = "Warm-Up";
+"Key Lifts" = "Key Lifts";
+"Support" = "Support";
+"Accessory" = "Accessory";
+"%d · %d sets" = "%d · %d sets";
+"CUSTOM" = "CUSTOM";
+"Edit Prescription" = "Edit Prescription";
+"Swap Exercise" = "Swap Exercise";
+"Restore Coach Default" = "Restore Coach Default";
+"Remove" = "Remove";
+"Undo" = "Undo";
+"Revert" = "Revert";
+"Deload Week" = "Deload Week";
+"Coach-Adjusted Week" = "Coach-Adjusted Week";
+"Volume Reduced" = "Volume Reduced";
+"Exercise Swapped" = "Exercise Swapped";
+"Lighter Session" = "Lighter Session";
+"Week Regenerated" = "Week Regenerated";
+"Unskip" = "Unskip";
+"Skip" = "Skip";
+"Move" = "Move";
+"No Plan Yet" = "No Plan Yet";
+"Complete onboarding to generate\nyour personalized training plan." = "Complete onboarding to generate\nyour personalized training plan.";
