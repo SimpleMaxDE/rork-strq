@@ -127,3 +127,32 @@
 "notification.comeback.extended.body" = "STRQ will lighten your first session back. Comebacks hold when the re-entry is soft.";
 "notification.comeback.long.title" = "Rebuild, don't retest";
 "notification.comeback.long.body" = "Treat this week like a rebuild block. Lighter sessions now mean real gains in two weeks.";
+
+/* Active workout */
+"Finish Workout" = "Finish Workout";
+"Finish workout" = "Finish workout";
+"Save & Leave preserves everything you've logged and keeps this workout ready to resume from Today." = "Save & Leave preserves everything you've logged and keeps this workout ready to resume from Today.";
+"EX %d/%d" = "EX %d/%d";
+"SET %d/%d" = "SET %d/%d";
+"Target %@" = "Target %@";
+"%ds rest" = "%ds rest";
+"PREV" = "PREV";
+"BEST" = "BEST";
+"TARGET" = "TARGET";
+"no data" = "no data";
+"BW" = "BW";
+"WEIGHT" = "WEIGHT";
+"ADDED LOAD" = "ADDED LOAD";
+"REPS" = "REPS";
+"kg added" = "kg added";
+"kg" = "kg";
+"reps" = "reps";
+"Edit Weight" = "Edit Weight";
+"Edit Reps" = "Edit Reps";
+"Log Set %d" = "Log Set %d";
+"Last exercise complete" = "Last exercise complete";
+"Exercise complete" = "Exercise complete";
+"Finish Workout when you're ready to save this session." = "Finish Workout when you're ready to save this session.";
+"Move to the next exercise when you're ready." = "Move to the next exercise when you're ready.";
+"Match last" = "Match last";
+"Target" = "Target";
