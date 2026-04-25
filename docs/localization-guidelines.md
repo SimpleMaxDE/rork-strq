@@ -6,38 +6,24 @@ STRQ uses English as the base language. German localization should sound natural
 
 Exercise names should only be translated when the German term is genuinely common in the German gym environment.
 
-Do not translate exercise names just because a literal German word exists. Many German gym users naturally use English exercise names, especially for common strength-training movements.
+Do not translate exercise names just because a literal German word exists. Many German gym users naturally use English exercise names, especially for common strength-training movements. At the same time, do not keep an English name if the German gym term is clearly standard and sounds natural.
 
 ## Preferred approach
 
+- Use the German gym term when it is the normal term German users would expect.
 - Keep internationally common gym terms in English when they are widely used in German gyms.
-- Use German names only where they are clearly established and sound natural.
 - Avoid awkward literal translations.
 - Keep names short enough for small UI surfaces, especially Apple Watch, widgets, Live Activities, and workout cards.
 - Keep technical consistency across the app, widgets, and watch app.
 
 ## Examples
 
-### Usually keep English
+### Prefer German when clearly standard
 
-- Bench Press
-- Incline Bench Press
-- Chest Press
-- Shoulder Press
-- Leg Press
-- Hip Thrust
-- Deadlift
-- Romanian Deadlift
-- Cable Row
-- Face Pull
-- Pushdown
-- Lat Pulldown may also stay English if the existing exercise library uses that convention.
-
-### German is usually acceptable
-
+- Bankdrücken for Bench Press
+- Schrägbankdrücken for Incline Bench Press
 - Kniebeuge for Squat
-- Kreuzheben for Deadlift, only if the library generally uses German naming
-- Bankdrücken for Bench Press, only if the surrounding German exercise names also follow that style
+- Kreuzheben for Deadlift
 - Latziehen for Lat Pulldown
 - Rudern for Row variants where it remains clear
 - Beinpresse for Leg Press
@@ -45,10 +31,20 @@ Do not translate exercise names just because a literal German word exists. Many 
 - Bizepscurls or Curls for Biceps Curl
 - Trizepsdrücken for Triceps Pushdown, if it sounds natural in context
 
+### Usually keep English when it is more natural in German gyms
+
+- Hip Thrust
+- Romanian Deadlift, unless the app consistently uses a natural German alternative
+- Cable Row, unless the app uses a clear variant like Kabelrudern
+- Face Pull
+- Pushdown, unless the German UI clearly uses Trizepsdrücken
+
 ## Decision rule
 
 If the German translation sounds like something a real gym member would say naturally, use it.
 If it sounds artificial, too long, or overly technical, keep the English name.
+
+For example: **Bankdrücken** is the correct and preferred German term for **Bench Press**.
 
 ## Important
 
