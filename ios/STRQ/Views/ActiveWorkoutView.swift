@@ -1068,6 +1068,7 @@ struct ActiveWorkoutView: View {
         if days < 7 { return L10n.format("%dd ago", days) }
         if days < 30 { return L10n.format("%dw ago", days / 7) }
         let f = DateFormatter()
+        f.locale = Locale.current
         f.dateFormat = "d MMM"
         return f.string(from: date)
     }
@@ -1583,7 +1584,7 @@ struct ActiveWorkoutView: View {
                 let nextEx = vm.library.exercise(byId: workout.session.exerciseLogs[nextIdx].exerciseId)
                 return NextSetRec(
                     eyebrow: L10n.tr("NEXT EXERCISE"),
-                    primary: nextEx?.name ?? "Next exercise",
+                    primary: nextEx?.name ?? L10n.tr("Next exercise"),
                     detail: L10n.tr("This lift is done. Move on when the rest feels right."),
                     icon: "arrow.right.circle.fill",
                     tint: STRQBrand.steel,

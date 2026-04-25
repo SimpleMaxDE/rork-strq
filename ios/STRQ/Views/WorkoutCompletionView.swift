@@ -439,8 +439,9 @@ struct WorkoutCompletionView: View {
             let days = cal.dateComponents([.day], from: cal.startOfDay(for: Date()), to: cal.startOfDay(for: date)).day ?? 0
             if days > 0 && days < 7 {
                 let f = DateFormatter()
+                f.locale = Locale.current
                 f.dateFormat = "EEEE"
-                return L10n.format("scheduled %@", f.string(from: date).lowercased())
+                return L10n.format("scheduled %@", f.string(from: date).localizedLowercase)
             }
         }
         return L10n.tr("STRQ will adapt from today's data")

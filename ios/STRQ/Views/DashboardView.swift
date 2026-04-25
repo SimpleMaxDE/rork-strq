@@ -380,12 +380,18 @@ struct DashboardView: View {
         return PostWorkoutBridge(
             sessionName: session.dayName,
             timeLabel: postWorkoutTimeLabel(minutesAgo),
-            stats: L10n.format("%d exercise%@ · %d set%@", completedExercises, completedExercises == 1 ? "" : "s", completedSets, completedSets == 1 ? "" : "s"),
+            stats: postWorkoutStatsText(exercises: completedExercises, sets: completedSets),
             takeaway: postWorkoutTakeaway(for: result.verdict.kind),
             nextStep: postWorkoutNextStep(),
             accent: postWorkoutAccent(for: result.verdict.kind),
             icon: postWorkoutIcon(for: result.verdict.kind)
         )
+    }
+
+    private func postWorkoutStatsText(exercises: Int, sets: Int) -> String {
+        let exerciseWord = L10n.tr(exercises == 1 ? "exercise.singular" : "exercise.plural")
+        let setWord = L10n.tr(sets == 1 ? "set.singular" : "set.plural")
+        return L10n.format("%d %@ · %d %@", exercises, exerciseWord, sets, setWord)
     }
 
     private func postWorkoutBridgeCard(_ bridge: PostWorkoutBridge) -> some View {

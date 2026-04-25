@@ -2646,7 +2646,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein Trainingssystem, das um dich herum gebaut ist."
+            "value": "Ein Trainingssystem, das auf dich abgestimmt ist."
           }
         }
       }
@@ -2696,7 +2696,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Start hier"
+            "value": "Hier starten"
           }
         }
       }
@@ -3346,7 +3346,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volles Gym"
+            "value": "Komplettes Gym"
           }
         }
       }
@@ -3846,7 +3846,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "VOLUMEN HOCH"
+            "value": "MEHR VOLUMEN"
           }
         }
       }
@@ -3856,7 +3856,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mehr Arbeit als letztes Mal"
+            "value": "Mehr Volumen als letztes Mal"
           }
         }
       }
@@ -4386,7 +4386,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "geplant %@"
+            "value": "geplant für %@"
           }
         }
       }
@@ -4476,7 +4476,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zurück zu Heute"
+            "value": "Zurück zu heute"
           }
         }
       }
@@ -4556,7 +4556,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Entwickelnd"
+            "value": "Dynamisch"
           }
         }
       }
@@ -4956,7 +4956,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Letztes matchen"
+            "value": "Letztes übernehmen"
           }
         }
       }
@@ -5647,6 +5647,66 @@
           "stringUnit": {
             "state": "translated",
             "value": "Schließe das Onboarding ab, um\\ndeinen personalisierten Trainingsplan zu erstellen."
+          }
+        }
+      }
+    },
+    "Next exercise": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Übung"
+          }
+        }
+      }
+    },
+    "exercise.singular": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übung"
+          }
+        }
+      }
+    },
+    "exercise.plural": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übungen"
+          }
+        }
+      }
+    },
+    "set.singular": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Satz"
+          }
+        }
+      }
+    },
+    "set.plural": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sätze"
+          }
+        }
+      }
+    },
+    "%d %@ · %d %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d %@ · %d %@"
           }
         }
       }
