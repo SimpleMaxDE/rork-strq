@@ -37,15 +37,15 @@ struct MediaDiagnosticsView: View {
                         Text(r.name).font(.subheadline.weight(.semibold))
                         Text(r.id).font(.caption2.monospaced()).foregroundStyle(.tertiary)
                         HStack {
-                            Text("direct:").font(.caption).foregroundStyle(.secondary)
+                            Text(L10n.tr("direct:")).font(.caption).foregroundStyle(.secondary)
                             Text(r.direct ?? "nil").font(.caption2.monospaced()).lineLimit(1).truncationMode(.middle)
                         }
                         HStack {
-                            Text("bridge:").font(.caption).foregroundStyle(.secondary)
+                            Text(L10n.tr("bridge:")).font(.caption).foregroundStyle(.secondary)
                             Text(r.bridge ?? "nil").font(.caption2.monospaced()).lineLimit(1).truncationMode(.middle)
                         }
                         HStack {
-                            Text("final:").font(.caption).foregroundStyle(.secondary)
+                            Text(L10n.tr("final:")).font(.caption).foregroundStyle(.secondary)
                             Text(r.final ?? "nil").font(.caption2.monospaced()).lineLimit(1).truncationMode(.middle)
                                 .foregroundStyle(r.final == nil ? .red : .primary)
                         }
@@ -113,7 +113,7 @@ struct MediaDiagnosticsView: View {
                 }
             }
         }
-        .navigationTitle("Media Diagnostics")
+        .navigationTitle(L10n.tr("Media Diagnostics"))
         .navigationBarTitleDisplayMode(.inline)
         .task { runAudit() }
     }

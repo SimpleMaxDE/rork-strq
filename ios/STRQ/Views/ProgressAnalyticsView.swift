@@ -49,7 +49,7 @@ struct ProgressAnalyticsView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Progress")
+        .navigationTitle(L10n.tr("Progress"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
@@ -120,7 +120,7 @@ struct ProgressAnalyticsView: View {
             .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("PROGRESS")
+                Text(L10n.tr("PROGRESS"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.4)
                     .foregroundStyle(STRQBrand.steel)
@@ -232,11 +232,11 @@ struct ProgressAnalyticsView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
-                    Text("WHAT CHANGED")
+                    Text(L10n.tr("WHAT CHANGED"))
                         .font(.system(size: 9, weight: .black))
                         .tracking(1.1)
                         .foregroundStyle(.tertiary)
-                    Text("· 7 days")
+                    Text(L10n.tr("· 7 days"))
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundStyle(.quaternary)
                 }
@@ -274,7 +274,7 @@ struct ProgressAnalyticsView: View {
             HStack {
                 ForgeSectionHeader(title: "Momentum")
                 Spacer()
-                Text("by lift · body · streak")
+                Text(L10n.tr("by lift · body · streak"))
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.tertiary)
             }
@@ -460,7 +460,7 @@ struct ProgressAnalyticsView: View {
                         .frame(width: 40, height: 40)
                         .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 10))
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Strength trend starts here")
+                        Text(L10n.tr("Strength trend starts here"))
                             .font(.subheadline.weight(.semibold))
                         Text(vm.totalCompletedWorkouts == 0
                              ? "Your main lifts create the first real strength read."
@@ -569,7 +569,7 @@ struct ProgressAnalyticsView: View {
                     Image(systemName: "trophy")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("Heavy sets and rep bests will start surfacing here as your log grows.")
+                    Text(L10n.tr("Heavy sets and rep bests will start surfacing here as your log grows."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -607,7 +607,7 @@ struct ProgressAnalyticsView: View {
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text("LATEST PR")
+                Text(L10n.tr("LATEST PR"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(STRQPalette.gold)
@@ -624,7 +624,7 @@ struct ProgressAnalyticsView: View {
                     Text("\(Int(pr.weight))")
                         .font(.system(size: 22, weight: .heavy, design: .rounded).monospacedDigit())
                         .foregroundStyle(.white)
-                    Text("kg")
+                    Text(L10n.tr("kg"))
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.5))
                 }
@@ -673,12 +673,12 @@ struct ProgressAnalyticsView: View {
 
         return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
-                Text("RECENT IMPROVEMENT")
+                Text(L10n.tr("RECENT IMPROVEMENT"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(.secondary)
                 Spacer()
-                Text("vs last week")
+                Text(L10n.tr("vs last week"))
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.tertiary)
             }
@@ -764,7 +764,7 @@ struct ProgressAnalyticsView: View {
                 if !recent.isEmpty {
                     NavigationLink(value: ProgressRoute.history) {
                         HStack(spacing: 3) {
-                            Text("All")
+                            Text(L10n.tr("All"))
                                 .font(.caption.weight(.semibold))
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 9, weight: .bold))
@@ -779,7 +779,7 @@ struct ProgressAnalyticsView: View {
                     Image(systemName: "figure.strengthtraining.traditional")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("Each finished workout becomes a clean training record here.")
+                    Text(L10n.tr("Each finished workout becomes a clean training record here."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -835,9 +835,9 @@ struct ProgressAnalyticsView: View {
                     .lineLimit(1)
                 HStack(spacing: 4) {
                     Text("\(duration)min")
-                    Text("·").foregroundStyle(.quaternary)
+                    Text(L10n.tr("·")).foregroundStyle(.quaternary)
                     Text("\(sets) sets")
-                    Text("·").foregroundStyle(.quaternary)
+                    Text(L10n.tr("·")).foregroundStyle(.quaternary)
                     Text(ForgeTheme.formatVolume(session.totalVolume) + "kg")
                 }
                 .font(.caption2.monospacedDigit())
@@ -885,7 +885,7 @@ struct ProgressAnalyticsView: View {
                     Image(systemName: "calendar.badge.clock")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("Your consistency pattern will map here once sessions start landing.")
+                    Text(L10n.tr("Your consistency pattern will map here once sessions start landing."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -991,7 +991,7 @@ struct ProgressAnalyticsView: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
-                    Text("Goal Pace")
+                    Text(L10n.tr("Goal Pace"))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(color)
                         .textCase(.uppercase)

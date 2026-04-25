@@ -144,7 +144,7 @@ struct ExpandableInsightCard: View {
         HStack(spacing: 3) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 9))
-            Text("Applied")
+            Text(L10n.tr("Applied"))
                 .font(.system(size: 9, weight: .semibold))
         }
         .foregroundStyle(STRQPalette.success)
@@ -162,7 +162,7 @@ struct ExpandableInsightCard: View {
 
             if let firstAction = actions.first {
                 VStack(alignment: .leading, spacing: 6) {
-                    Label("Why This Matters", systemImage: "info.circle.fill")
+                    Label(L10n.tr("Why This Matters"), systemImage: "info.circle.fill")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(accentColor)
                     Text(firstAction.whyItMatters)
@@ -238,7 +238,7 @@ struct ExpandableInsightCard: View {
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(color.opacity(0.8))
             Spacer()
-            Text("Week-level")
+            Text(L10n.tr("Week-level"))
                 .font(.system(size: 9, weight: .bold))
                 .foregroundStyle(color)
                 .padding(.horizontal, 6)
@@ -320,7 +320,7 @@ struct ExpandableInsightCard: View {
 
             if preview.estimatedTimeSaved > 0 {
                 HStack {
-                    Text("Effort: reduced")
+                    Text(L10n.tr("Effort: reduced"))
                         .font(.caption2.weight(.semibold))
                     Spacer()
                     Text("~\(preview.estimatedTimeSaved) min shorter")
@@ -340,7 +340,7 @@ struct ExpandableInsightCard: View {
             HStack(spacing: 5) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.caption2)
-                Text("Applied")
+                Text(L10n.tr("Applied"))
                     .font(.caption.weight(.semibold))
             }
             .foregroundStyle(STRQPalette.success)
@@ -376,7 +376,7 @@ struct ExpandableInsightCard: View {
         HStack(spacing: 4) {
             Image(systemName: "arrow.uturn.backward")
                 .font(.system(size: 10, weight: .semibold))
-            Text("Undo")
+            Text(L10n.tr("Undo"))
                 .font(.caption2.weight(.semibold))
         }
         .foregroundStyle(.white.opacity(0.6))
@@ -626,7 +626,7 @@ struct ExpandableRecommendationCard: View {
                         HStack(spacing: 3) {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.system(size: 9))
-                            Text("Applied")
+                            Text(L10n.tr("Applied"))
                                 .font(.system(size: 9, weight: .semibold))
                         }
                         .foregroundStyle(STRQPalette.success)
@@ -656,7 +656,7 @@ struct ExpandableRecommendationCard: View {
 
             if let firstAction = actions.first {
                 VStack(alignment: .leading, spacing: 6) {
-                    Label("Why This Matters", systemImage: "info.circle.fill")
+                    Label(L10n.tr("Why This Matters"), systemImage: "info.circle.fill")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(accentColor)
                     Text(firstAction.whyItMatters)
@@ -732,7 +732,7 @@ struct ExpandableRecommendationCard: View {
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(color.opacity(0.8))
             Spacer()
-            Text("Week-level")
+            Text(L10n.tr("Week-level"))
                 .font(.system(size: 9, weight: .bold))
                 .foregroundStyle(color)
                 .padding(.horizontal, 6)
@@ -754,7 +754,7 @@ struct ExpandableRecommendationCard: View {
             HStack(spacing: 5) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.caption2)
-                Text("Applied")
+                Text(L10n.tr("Applied"))
                     .font(.caption.weight(.semibold))
             }
             .foregroundStyle(STRQPalette.success)
@@ -790,7 +790,7 @@ struct ExpandableRecommendationCard: View {
         HStack(spacing: 4) {
             Image(systemName: "arrow.uturn.backward")
                 .font(.system(size: 10, weight: .semibold))
-            Text("Undo")
+            Text(L10n.tr("Undo"))
                 .font(.caption2.weight(.semibold))
         }
         .foregroundStyle(.white.opacity(0.6))
@@ -954,7 +954,7 @@ struct ExpandableRecommendationCard: View {
             }
             if preview.estimatedTimeSaved > 0 {
                 HStack {
-                    Text("Effort: reduced").font(.caption2.weight(.semibold))
+                    Text(L10n.tr("Effort: reduced")).font(.caption2.weight(.semibold))
                     Spacer()
                     Text("~\(preview.estimatedTimeSaved) min shorter")
                         .font(.caption2).foregroundStyle(.secondary)

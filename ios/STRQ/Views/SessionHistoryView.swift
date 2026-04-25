@@ -77,7 +77,7 @@ struct SessionHistoryView: View {
             .padding(.bottom, 40)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("History")
+        .navigationTitle(L10n.tr("History"))
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedSession) { session in
             NavigationStack {
@@ -138,9 +138,9 @@ struct SessionHistoryView: View {
             Image(systemName: "book.pages")
                 .font(.system(size: 42))
                 .foregroundStyle(STRQBrand.steel)
-            Text("Your training log is starting")
+            Text(L10n.tr("Your training log is starting"))
                 .font(.headline)
-            Text("Finished sessions collect here as your week builds, so progress stays easy to review later.")
+            Text(L10n.tr("Finished sessions collect here as your week builds, so progress stays easy to review later."))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -214,7 +214,7 @@ struct SessionHistoryView: View {
                         .font(.system(size: 9, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundStyle(volumeDelta > 0 ? STRQPalette.success : STRQPalette.warning)
                 } else {
-                    Text("kg")
+                    Text(L10n.tr("kg"))
                         .font(.system(size: 8, weight: .bold))
                         .foregroundStyle(.tertiary)
                         .textCase(.uppercase)
@@ -232,7 +232,7 @@ struct SessionHistoryView: View {
     }
 
     private var dot: some View {
-        Text("·")
+        Text(L10n.tr("·"))
             .font(.caption2)
             .foregroundStyle(.quaternary)
     }
@@ -289,7 +289,7 @@ struct SessionDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") { dismiss() }
+                Button(L10n.tr("Done")) { dismiss() }
                     .fontWeight(.semibold)
             }
         }
@@ -421,7 +421,7 @@ struct SessionDetailView: View {
                     .foregroundStyle(STRQBrand.steel)
                     .frame(width: 30, height: 30)
                     .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 9))
-                Text("Session Note")
+                Text(L10n.tr("Session Note"))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.primary)
                 Spacer(minLength: 0)

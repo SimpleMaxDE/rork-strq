@@ -64,9 +64,9 @@ struct WeightQuickLogSheet: View {
             Image(systemName: "scalemass.fill")
                 .font(.title2)
                 .foregroundStyle(STRQBrand.steel)
-            Text("Body Check-In")
+            Text(L10n.tr("Body Check-In"))
                 .font(.title3.bold())
-            Text("Quick weigh-in to keep your progress on track")
+            Text(L10n.tr("Quick weigh-in to keep your progress on track"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -123,14 +123,14 @@ struct WeightQuickLogSheet: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Weight")
+                    Text(L10n.tr("Weight"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(STRQBrand.steel)
                     HStack(spacing: 4) {
-                        TextField("0.0", text: $weightText)
+                        TextField(L10n.tr("0.0"), text: $weightText)
                             .keyboardType(.decimalPad)
                             .font(.body.weight(.semibold).monospacedDigit())
-                        Text("kg")
+                        Text(L10n.tr("kg"))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -140,14 +140,14 @@ struct WeightQuickLogSheet: View {
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Body Fat (optional)")
+                    Text(L10n.tr("Body Fat (optional)"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                     HStack(spacing: 4) {
-                        TextField("—", text: $bodyFatText)
+                        TextField(L10n.tr("—"), text: $bodyFatText)
                             .keyboardType(.decimalPad)
                             .font(.body.weight(.semibold).monospacedDigit())
-                        Text("%")
+                        Text(L10n.tr("%"))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -164,12 +164,12 @@ struct WeightQuickLogSheet: View {
                     if saved {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.subheadline)
-                        Text("Saved")
+                        Text(L10n.tr("Saved"))
                             .font(.body.weight(.semibold))
                     } else {
                         Image(systemName: "scalemass.fill")
                             .font(.subheadline)
-                        Text("Log Weight")
+                        Text(L10n.tr("Log Weight"))
                             .font(.body.weight(.semibold))
                     }
                 }

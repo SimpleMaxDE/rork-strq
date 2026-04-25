@@ -44,11 +44,11 @@ struct CoachingHistoryView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Coaching memory")
+        .navigationTitle(L10n.tr("Coaching memory"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") { dismiss() }
+                Button(L10n.tr("Done")) { dismiss() }
                     .font(.subheadline.weight(.semibold))
             }
         }
@@ -59,9 +59,9 @@ struct CoachingHistoryView: View {
 
     private var intro: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Why STRQ changed your plan")
+            Text(L10n.tr("Why STRQ changed your plan"))
                 .font(.system(.title3, design: .rounded, weight: .bold))
-            Text("A record of the decisions Coach has made for you — what shifted, why it shifted, and what it means for training now.")
+            Text(L10n.tr("A record of the decisions Coach has made for you — what shifted, why it shifted, and what it means for training now."))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -73,9 +73,9 @@ struct CoachingHistoryView: View {
             Image(systemName: "tray")
                 .font(.title)
                 .foregroundStyle(STRQBrand.steel)
-            Text("No coaching changes yet")
+            Text(L10n.tr("No coaching changes yet"))
                 .font(.subheadline.weight(.semibold))
-            Text("Once Coach adjusts volume, swaps a lift, or shifts your phase, every change will show up here with the reason behind it.")
+            Text(L10n.tr("Once Coach adjusts volume, swaps a lift, or shifts your phase, every change will show up here with the reason behind it."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -103,7 +103,7 @@ struct CoachingHistoryView: View {
                     .tracking(0.6)
                     .foregroundStyle(.primary)
                 Spacer()
-                Text("THE BRIDGE")
+                Text(L10n.tr("THE BRIDGE"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.0)
                     .foregroundStyle(.tertiary)
@@ -114,7 +114,7 @@ struct CoachingHistoryView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
-                Text("Your recent changes are shaping how this week runs.")
+                Text(L10n.tr("Your recent changes are shaping how this week runs."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -174,7 +174,7 @@ struct CoachMemoryRow: View {
                         .font(.system(size: 9, weight: .black))
                         .tracking(0.9)
                         .foregroundStyle(STRQBrand.steel)
-                    Text("·")
+                    Text(L10n.tr("·"))
                         .font(.system(size: 9, weight: .black))
                         .foregroundStyle(.tertiary)
                     Text(relativeDate(entry.appliedAt))
@@ -211,7 +211,7 @@ struct CoachMemoryRow: View {
                 .frame(width: 14)
                 .padding(.top, 2)
             VStack(alignment: .leading, spacing: 2) {
-                Text("WHY")
+                Text(L10n.tr("WHY"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(0.8)
                     .foregroundStyle(.tertiary)
@@ -231,7 +231,7 @@ struct CoachMemoryRow: View {
                 .frame(width: 14)
                 .padding(.top, 2)
             VStack(alignment: .leading, spacing: 2) {
-                Text("WHAT IT MEANS NOW")
+                Text(L10n.tr("WHAT IT MEANS NOW"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(0.8)
                     .foregroundStyle(STRQPalette.color(for: entry.state))
@@ -282,7 +282,7 @@ struct CoachMemoryBridgeRow: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(STRQPalette.color(for: entry.state))
                     .frame(width: 3, height: 12)
-                Text("RECENT CHANGE")
+                Text(L10n.tr("RECENT CHANGE"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(.primary)
@@ -309,7 +309,7 @@ struct CoachMemoryBridgeRow: View {
                             .tracking(0.8)
                             .foregroundStyle(STRQBrand.steel)
                         if let status = entry.status {
-                            Text("·")
+                            Text(L10n.tr("·"))
                                 .font(.system(size: 9, weight: .black))
                                 .foregroundStyle(.tertiary)
                             Text(status)

@@ -301,7 +301,7 @@ struct ActiveWorkoutView: View {
                                     .font(.system(size: 9, weight: .black).monospacedDigit())
                                     .foregroundStyle(.white.opacity(0.6))
                                     .tracking(0.8)
-                                Text("·")
+                                Text(L10n.tr("·"))
                                     .foregroundStyle(.white.opacity(0.3))
                                 Text(ex.primaryMuscle.displayName.uppercased())
                                     .font(.system(size: 9, weight: .black))
@@ -334,12 +334,12 @@ struct ActiveWorkoutView: View {
                                                 .font(.system(size: 10, weight: .bold).monospacedDigit())
                                                 .foregroundStyle(.white.opacity(0.78))
                                             if let rpe = p.rpe {
-                                                Text("·").foregroundStyle(.white.opacity(0.3))
+                                                Text(L10n.tr("·")).foregroundStyle(.white.opacity(0.3))
                                                 Text(L10n.format("RPE %@", formatRPE(rpe)))
                                                     .font(.system(size: 10, weight: .bold).monospacedDigit())
                                                     .foregroundStyle(.white.opacity(0.6))
                                             }
-                                            Text("·").foregroundStyle(.white.opacity(0.3))
+                                            Text(L10n.tr("·")).foregroundStyle(.white.opacity(0.3))
                                             Text(L10n.format("%ds rest", p.restSeconds))
                                                 .font(.system(size: 10, weight: .semibold).monospacedDigit())
                                                 .foregroundStyle(.white.opacity(0.55))
@@ -2192,7 +2192,7 @@ private struct NumericInputSheet: View {
                     .foregroundStyle(.secondary)
                     .padding(.top, 8)
 
-                TextField("", text: $text)
+                TextField(L10n.tr(""), text: $text)
                     .keyboardType(context.field == .weight ? .decimalPad : .numberPad)
                     .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
                     .multilineTextAlignment(.center)

@@ -324,7 +324,7 @@ struct ProfileView: View {
                             .frame(width: 34, height: 34)
                             .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("STRQ Pro")
+                            Text(L10n.tr("STRQ Pro"))
                                 .font(.subheadline.weight(.bold))
                             Text(store.subscriptionStatusText)
                                 .font(.caption)
@@ -380,7 +380,7 @@ struct ProfileView: View {
                                 .frame(width: 34, height: 34)
                                 .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 9))
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("STRQ Pro")
+                                Text(L10n.tr("STRQ Pro"))
                                     .font(.subheadline.weight(.bold))
                                 Text(L10n.tr("Deeper coaching, plans that evolve, full ecosystem."))
                                     .font(.caption)
@@ -780,9 +780,9 @@ struct ProfileView: View {
     private var legalLinks: some View {
         HStack(spacing: 18) {
             Link(L10n.tr("Privacy"), destination: STRQLinks.privacy)
-            Text("·").foregroundStyle(.quaternary)
+            Text(L10n.tr("·")).foregroundStyle(.quaternary)
             Link(L10n.tr("Terms"), destination: STRQLinks.terms)
-            Text("·").foregroundStyle(.quaternary)
+            Text(L10n.tr("·")).foregroundStyle(.quaternary)
             Link(L10n.tr("Support"), destination: STRQLinks.support)
         }
         .font(.caption.weight(.medium))

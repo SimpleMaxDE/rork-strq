@@ -32,7 +32,7 @@ struct ActivationRoadmapCard: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(STRQBrand.accentGradient)
                     .frame(width: 3, height: 14)
-                Text("YOUR FIRST WEEK")
+                Text(L10n.tr("YOUR FIRST WEEK"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(.primary)
@@ -111,7 +111,7 @@ struct ActivationRoadmapCard: View {
                         .font(.subheadline.weight(step.isActive ? .bold : .semibold))
                         .foregroundStyle(step.isComplete || step.isActive ? .primary : .secondary)
                     if step.isActive && !step.isComplete {
-                        Text("NEXT")
+                        Text(L10n.tr("NEXT"))
                             .font(.system(size: 8, weight: .black))
                             .tracking(0.8)
                             .foregroundStyle(STRQBrand.steel)

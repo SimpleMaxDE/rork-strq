@@ -20,11 +20,11 @@ struct WeekRegenerationSheet: View {
                 .padding(.bottom, 40)
             }
             .background(Color.black)
-            .navigationTitle("Regenerate Week")
+            .navigationTitle(L10n.tr("Regenerate Week"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(L10n.tr("Cancel")) { dismiss() }
                         .foregroundStyle(.secondary)
                 }
             }
@@ -50,10 +50,10 @@ struct WeekRegenerationSheet: View {
                     .foregroundStyle(.white)
             }
 
-            Text("Smart Week Regeneration")
+            Text(L10n.tr("Smart Week Regeneration"))
                 .font(.title3.bold())
 
-            Text("Your upcoming week will be intelligently rebuilt based on your recent training data, recovery, and muscle balance.")
+            Text(L10n.tr("Your upcoming week will be intelligently rebuilt based on your recent training data, recovery, and muscle balance."))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -82,7 +82,7 @@ struct WeekRegenerationSheet: View {
     private var changesSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("Changes")
+                Text(L10n.tr("Changes"))
                     .font(.headline)
                 Spacer()
                 Text("\(preview.changes.count) updates")
@@ -116,7 +116,7 @@ struct WeekRegenerationSheet: View {
 
     private var beforeAfterSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Week Comparison")
+            Text(L10n.tr("Week Comparison"))
                 .font(.headline)
 
             HStack(spacing: 12) {
@@ -140,7 +140,7 @@ struct WeekRegenerationSheet: View {
             HStack(spacing: 4) {
                 Text("\(totalSets)")
                     .font(.title3.bold())
-                Text("sets")
+                Text(L10n.tr("sets"))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -148,7 +148,7 @@ struct WeekRegenerationSheet: View {
             HStack(spacing: 4) {
                 Text("~\(totalMin)")
                     .font(.caption.weight(.semibold))
-                Text("min total")
+                Text(L10n.tr("min total"))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -177,7 +177,7 @@ struct WeekRegenerationSheet: View {
             HStack(spacing: 8) {
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .font(.subheadline.weight(.semibold))
-                Text("Apply Regenerated Week")
+                Text(L10n.tr("Apply Regenerated Week"))
                     .font(.body.weight(.semibold))
             }
             .foregroundStyle(.black)
@@ -236,11 +236,11 @@ struct DeloadWeekSheet: View {
                 .padding(.bottom, 40)
             }
             .background(Color.black)
-            .navigationTitle("Deload Week")
+            .navigationTitle(L10n.tr("Deload Week"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(L10n.tr("Cancel")) { dismiss() }
                         .foregroundStyle(.secondary)
                 }
             }
@@ -266,10 +266,10 @@ struct DeloadWeekSheet: View {
                     .foregroundStyle(.white)
             }
 
-            Text("Strategic Deload Week")
+            Text(L10n.tr("Strategic Deload Week"))
                 .font(.title3.bold())
 
-            Text("A lighter week to let accumulated fatigue dissipate. You keep the same structure and movements, but at reduced intensity.")
+            Text(L10n.tr("A lighter week to let accumulated fatigue dissipate. You keep the same structure and movements, but at reduced intensity."))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -341,7 +341,7 @@ struct DeloadWeekSheet: View {
 
     private var dayComparisonSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Day-by-Day Preview")
+            Text(L10n.tr("Day-by-Day Preview"))
                 .font(.headline)
 
             ForEach(Array(zip(preview.originalDays, preview.deloadDays)), id: \.0.id) { original, deload in
@@ -359,7 +359,7 @@ struct DeloadWeekSheet: View {
 
             HStack(spacing: 20) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Current")
+                    Text(L10n.tr("Current"))
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(.white.opacity(0.4))
                     Text("\(original.exerciseCount) ex · \(original.totalSets) sets · ~\(original.estimatedMinutes)m")
@@ -372,7 +372,7 @@ struct DeloadWeekSheet: View {
                     .foregroundStyle(.purple.opacity(0.6))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Deload")
+                    Text(L10n.tr("Deload"))
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(.purple)
                     Text("\(deload.exerciseCount) ex · \(deload.totalSets) sets · ~\(deload.estimatedMinutes)m")
@@ -393,7 +393,7 @@ struct DeloadWeekSheet: View {
             HStack(spacing: 8) {
                 Image(systemName: "arrow.down.to.line")
                     .font(.subheadline.weight(.semibold))
-                Text("Start Deload Week")
+                Text(L10n.tr("Start Deload Week"))
                     .font(.body.weight(.semibold))
             }
             .foregroundStyle(.white)

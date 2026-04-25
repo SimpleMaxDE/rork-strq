@@ -75,7 +75,7 @@ struct PlanRevealView: View {
             .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1), value: appeared)
 
             VStack(spacing: 6) {
-                Text("Your Plan is Ready")
+                Text(L10n.tr("Your Plan is Ready"))
                     .font(.title.bold())
                 Text(profile.name.isEmpty ? "Start Session 1 now. STRQ will tune the rest from real training." : "\(profile.name), start Session 1 now. STRQ will tune the rest from real training.")
                     .font(.subheadline)
@@ -148,7 +148,7 @@ struct PlanRevealView: View {
     private var weekPreview: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("YOUR WEEK")
+                Text(L10n.tr("YOUR WEEK"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
@@ -188,7 +188,7 @@ struct PlanRevealView: View {
                     Text(day.focusMuscles.prefix(3).map(\.displayName).joined(separator: ", "))
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("·")
+                    Text(L10n.tr("·"))
                         .foregroundStyle(.secondary)
                     Text("\(day.exercises.count) exercises")
                         .font(.caption)
@@ -209,7 +209,7 @@ struct PlanRevealView: View {
     private func qualitySection(_ quality: PlanQualityScore) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("COACH ASSESSMENT")
+                Text(L10n.tr("COACH ASSESSMENT"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
@@ -278,7 +278,7 @@ struct PlanRevealView: View {
                 Image(systemName: "person.fill.viewfinder")
                     .font(.caption)
                     .foregroundStyle(STRQBrand.steel)
-                Text("YOUR INPUTS SHAPED THIS PLAN")
+                Text(L10n.tr("YOUR INPUTS SHAPED THIS PLAN"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
@@ -337,7 +337,7 @@ struct PlanRevealView: View {
                 Image(systemName: "brain.head.profile.fill")
                     .font(.caption)
                     .foregroundStyle(STRQBrand.steel)
-                Text("COACH NOTE")
+                Text(L10n.tr("COACH NOTE"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
@@ -368,7 +368,7 @@ struct PlanRevealView: View {
                     onStart()
                 } label: {
                     HStack(spacing: 10) {
-                        Text("Start Session 1")
+                        Text(L10n.tr("Start Session 1"))
                             .font(.body.weight(.bold))
                         Image(systemName: "arrow.right")
                             .font(.subheadline.weight(.bold))
@@ -381,7 +381,7 @@ struct PlanRevealView: View {
                 }
                 .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: showQuality)
 
-                Text("You'll go straight into today's session. You can fine-tune the plan later in Train.")
+                Text(L10n.tr("You'll go straight into today's session. You can fine-tune the plan later in Train."))
                     .font(.caption2)
                     .foregroundStyle(.white.opacity(0.35))
             }
@@ -403,7 +403,7 @@ struct PlanRevealView: View {
                 Image(systemName: "map.fill")
                     .font(.caption)
                     .foregroundStyle(STRQBrand.steel)
-                Text("WHAT TO DO FIRST")
+                Text(L10n.tr("WHAT TO DO FIRST"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)

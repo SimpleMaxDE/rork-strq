@@ -208,7 +208,7 @@ struct OnboardingView: View {
                     .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.2), value: appeared)
 
                 VStack(spacing: 12) {
-                    Text("STRQ")
+                    Text(L10n.tr("STRQ"))
                         .font(.system(size: 38, weight: .black, design: .default))
                         .tracking(4)
                         .opacity(appeared ? 1 : 0)

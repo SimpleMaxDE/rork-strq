@@ -18,11 +18,11 @@ struct SessionEditorSheet: View {
         NavigationStack {
             if let day = day {
                 content(for: day)
-                    .navigationTitle("Edit Session")
+                    .navigationTitle(L10n.tr("Edit Session"))
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
-                            Button("Done") { dismiss() }
+                            Button(L10n.tr("Done")) { dismiss() }
                                 .fontWeight(.semibold)
                         }
                         ToolbarItem(placement: .topBarTrailing) {
@@ -87,7 +87,7 @@ struct SessionEditorSheet: View {
                     HStack(spacing: 8) {
                         Image(systemName: "plus.circle.fill")
                             .font(.subheadline.weight(.semibold))
-                        Text("Add Exercise")
+                        Text(L10n.tr("Add Exercise"))
                             .font(.subheadline.weight(.bold))
                     }
                     .foregroundStyle(STRQBrand.steel)
@@ -218,7 +218,7 @@ struct SessionEditorSheet: View {
                                 .foregroundStyle(STRQBrand.steel)
                         }
                         if isCustom {
-                            Text("CUSTOM")
+                            Text(L10n.tr("CUSTOM"))
                                 .font(.system(size: 7, weight: .black))
                                 .tracking(0.4)
                                 .foregroundStyle(STRQPalette.warning)
@@ -232,14 +232,14 @@ struct SessionEditorSheet: View {
                         Text("\(planned.sets)×\(planned.reps)")
                             .font(.system(size: 11, weight: .bold).monospacedDigit())
                             .foregroundStyle(.primary)
-                        Text("·")
+                        Text(L10n.tr("·"))
                             .font(.caption2)
                             .foregroundStyle(.tertiary)
                         Text(formatRestShort(planned.restSeconds))
                             .font(.system(size: 10, weight: .medium).monospacedDigit())
                             .foregroundStyle(.secondary)
                         if let rpe = planned.rpe {
-                            Text("·")
+                            Text(L10n.tr("·"))
                                 .font(.caption2)
                                 .foregroundStyle(.tertiary)
                             Text("RPE\(Int(rpe))")
@@ -300,17 +300,17 @@ struct SessionEditorSheet: View {
                 .strokeBorder(isCustom ? STRQPalette.warning.opacity(0.25) : STRQBrand.cardBorder, lineWidth: 1)
         )
         .contextMenu {
-            Button { editingPlanned = planned } label: { Label("Edit Prescription", systemImage: "slider.horizontal.3") }
-            Button { swapTarget = planned } label: { Label("Swap Exercise", systemImage: "arrow.triangle.2.circlepath") }
+            Button { editingPlanned = planned } label: { Label(L10n.tr("Edit Prescription"), systemImage: "slider.horizontal.3") }
+            Button { swapTarget = planned } label: { Label(L10n.tr("Swap Exercise"), systemImage: "arrow.triangle.2.circlepath") }
             if isCustom {
                 Button {
                     vm.restoreCoachDefault(dayId: dayId, plannedId: planned.id)
-                } label: { Label("Restore Coach Default", systemImage: "arrow.uturn.backward") }
+                } label: { Label(L10n.tr("Restore Coach Default"), systemImage: "arrow.uturn.backward") }
             }
             Divider()
             Button(role: .destructive) {
                 vm.removePlannedExercise(dayId: dayId, plannedId: planned.id)
-            } label: { Label("Remove", systemImage: "trash") }
+            } label: { Label(L10n.tr("Remove"), systemImage: "trash") }
         }
     }
 
@@ -443,14 +443,14 @@ struct PrescriptionEditSheet: View {
                 .padding(.bottom, 32)
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Prescription")
+            .navigationTitle(L10n.tr("Prescription"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
+                    Button(L10n.tr("Cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save") {
+                    Button(L10n.tr("Save")) {
                         vm.updatePrescription(
                             dayId: dayId,
                             plannedId: planned.id,
@@ -499,7 +499,7 @@ struct PrescriptionEditSheet: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     if isCustom {
-                        Text("CUSTOM")
+                        Text(L10n.tr("CUSTOM"))
                             .font(.system(size: 8, weight: .black))
                             .tracking(0.4)
                             .foregroundStyle(STRQPalette.warning)
@@ -507,7 +507,7 @@ struct PrescriptionEditSheet: View {
                             .padding(.vertical, 1.5)
                             .background(STRQPalette.warning.opacity(0.14), in: Capsule())
                     } else if coachDefault != nil {
-                        Text("COACH DEFAULT")
+                        Text(L10n.tr("COACH DEFAULT"))
                             .font(.system(size: 8, weight: .black))
                             .tracking(0.4)
                             .foregroundStyle(STRQBrand.steel)
@@ -529,7 +529,7 @@ struct PrescriptionEditSheet: View {
                 .font(.subheadline)
                 .foregroundStyle(STRQPalette.warning)
             VStack(alignment: .leading, spacing: 1) {
-                Text("Customized from coach default")
+                Text(L10n.tr("Customized from coach default"))
                     .font(.caption.weight(.semibold))
                 if let cd = coachDefault {
                     Text("Was \(cd.sets)×\(cd.reps) · \(formatRest(cd.restSeconds))\(cd.rpe.map { " · RPE\(Int($0))" } ?? "")")
@@ -553,7 +553,7 @@ struct PrescriptionEditSheet: View {
                     }
                 }
             } label: {
-                Text("Restore")
+                Text(L10n.tr("Restore"))
                     .font(.caption.weight(.bold))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 10)
@@ -603,7 +603,7 @@ struct PrescriptionEditSheet: View {
                     ForEach(["12-15", "15-20", "AMRAP"], id: \.self) { preset in
                         repsPresetButton(preset)
                     }
-                    TextField("Custom", text: $repsText)
+                    TextField(L10n.tr("Custom"), text: $repsText)
                         .multilineTextAlignment(.center)
                         .keyboardType(.asciiCapable)
                         .font(.system(size: 12, weight: .semibold).monospacedDigit())
@@ -660,7 +660,7 @@ struct PrescriptionEditSheet: View {
                 if rpeEnabled {
                     Slider(value: $rpeValue, in: 5...10, step: 0.5)
                         .tint(STRQBrand.steel)
-                    Text("RPE 7 = 3 in reserve · RPE 9 = 1 in reserve")
+                    Text(L10n.tr("RPE 7 = 3 in reserve · RPE 9 = 1 in reserve"))
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -778,7 +778,7 @@ struct AddExerciseSheet: View {
                         Button {
                             selectedMuscle = nil
                         } label: {
-                            chipLabel("All", active: selectedMuscle == nil)
+                            chipLabel(L10n.tr("All"), active: selectedMuscle == nil)
                         }
                         ForEach(MuscleGroup.allCases) { muscle in
                             Button {
@@ -804,10 +804,10 @@ struct AddExerciseSheet: View {
                                 Image(systemName: "sparkles")
                                     .font(.system(size: 10))
                                     .foregroundStyle(STRQBrand.steel)
-                                Text("Fits this session")
+                                Text(L10n.tr("Fits this session"))
                             }
                         } footer: {
-                            Text("Suggestions based on this session's focus muscles and gaps.")
+                            Text(L10n.tr("Suggestions based on this session's focus muscles and gaps."))
                                 .font(.caption2)
                         }
                     }
@@ -823,11 +823,11 @@ struct AddExerciseSheet: View {
                 .listStyle(.insetGrouped)
             }
             .searchable(text: $searchText, prompt: "Search exercises")
-            .navigationTitle("Add Exercise")
+            .navigationTitle(L10n.tr("Add Exercise"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Cancel") { dismiss() }
+                    Button(L10n.tr("Cancel")) { dismiss() }
                 }
             }
         }
@@ -855,7 +855,7 @@ struct AddExerciseSheet: View {
                         Text(hint)
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(hintColor)
-                        Text("·")
+                        Text(L10n.tr("·"))
                             .font(.caption2)
                             .foregroundStyle(.tertiary)
                         Text(ex.category.displayName)
@@ -889,7 +889,7 @@ struct AddExerciseSheet: View {
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                         if let eq = ex.equipment.first(where: { $0 != .none }) {
-                            Text("·")
+                            Text(L10n.tr("·"))
                                 .font(.caption2)
                                 .foregroundStyle(.tertiary)
                             Text(eq.displayName)

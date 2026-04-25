@@ -5710,6 +5710,2076 @@
           }
         }
       }
+    },
+    "STRQ": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ"
+          }
+        }
+      }
+    },
+    "Log a set to unlock today's guidance.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Logge einen Satz, um die heutige Empfehlung freizuschalten."
+          }
+        }
+      }
+    },
+    "WHY STRQ PICKED THIS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WARUM STRQ DAS AUSGEWÄHLT HAT"
+          }
+        }
+      }
+    },
+    "SUGGESTED LOAD": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMPFOHLENES GEWICHT"
+          }
+        }
+      }
+    },
+    "PROGRESSION STATUS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FORTSCHRITTION STATUS"
+          }
+        }
+      }
+    },
+    "Last": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last"
+          }
+        }
+      }
+    },
+    "Strategy": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strategy"
+          }
+        }
+      }
+    },
+    "PRIMARY": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRIMARY"
+          }
+        }
+      }
+    },
+    "SECONDARY": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SECONDARY"
+          }
+        }
+      }
+    },
+    "DO THIS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DO THIS"
+          }
+        }
+      }
+    },
+    "AVOID THIS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AVOID THIS"
+          }
+        }
+      }
+    },
+    "PROGRESSION PATH": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FORTSCHRITTION PATH"
+          }
+        }
+      }
+    },
+    "FAMILY MEMBERS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FAMILY MEMBERS"
+          }
+        }
+      }
+    },
+    "Building Your Plan": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Building Your Plan"
+          }
+        }
+      }
+    },
+    "STRQ PRO": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ PRO"
+          }
+        }
+      }
+    },
+    "Coaching that keeps learning you": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coaching that keeps learning you"
+          }
+        }
+      }
+    },
+    "Adaptive plans, deeper progression reads, and every session safely carried across your devices.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaptive Pläne, deeper progression reads, and every session safely carried across your devices."
+          }
+        }
+      }
+    },
+    "WHAT YOU KEEP · WHAT PRO ADDS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WHAT YOU KEEP · WHAT PRO ADDS"
+          }
+        }
+      }
+    },
+    "FREE": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FREE"
+          }
+        }
+      }
+    },
+    "PRO": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRO"
+          }
+        }
+      }
+    },
+    "Try free, cancel anytime before it renews": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try free, cancel anytime before it renews"
+          }
+        }
+      }
+    },
+    "Payment is charged to your Apple ID account. Subscription auto-renews unless cancelled at least 24 hours before the end of the current period.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Payment is charged to your Apple ID account. Subscription auto-renews unless cancelled at least 24 hours before the end of the current period."
+          }
+        }
+      }
+    },
+    "You have STRQ Pro": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have STRQ Pro"
+          }
+        }
+      }
+    },
+    "Loading plans…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lädt Pläne…"
+          }
+        }
+      }
+    },
+    "SUBSCRIPTIONS COMING SOON": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SUBSCRIPTIONS COMING SOON"
+          }
+        }
+      }
+    },
+    "Premium plans will become available once App Store setup is complete.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premium Pläne will become available once App Store setup is complete."
+          }
+        }
+      }
+    },
+    "You can continue exploring STRQ in the meantime.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can continue exploring STRQ in the meantime."
+          }
+        }
+      }
+    },
+    "Subscriptions coming soon": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subscriptions coming soon"
+          }
+        }
+      }
+    },
+    "Premium plans will appear here once App Store setup is complete.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premium Pläne will appear here once App Store setup is complete."
+          }
+        }
+      }
+    },
+    "Subscription plans are currently unavailable.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subscription Pläne are currently unavailable."
+          }
+        }
+      }
+    },
+    "Try Again": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try Again"
+          }
+        }
+      }
+    },
+    "0.0": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "0.0"
+          }
+        }
+      }
+    },
+    "kg": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kg"
+          }
+        }
+      }
+    },
+    "—": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "—"
+          }
+        }
+      }
+    },
+    "%": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%"
+          }
+        }
+      }
+    },
+    "SLEEP & RECOVERY": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SLEEP & RECOVERY"
+          }
+        }
+      }
+    },
+    "Avg Hours": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avg Hours"
+          }
+        }
+      }
+    },
+    "Quality": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quality"
+          }
+        }
+      }
+    },
+    "PHYSIQUE COACHING": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PHYSIQUE COACHING"
+          }
+        }
+      }
+    },
+    "OPTIONAL": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OPTIONAL"
+          }
+        }
+      }
+    },
+    "Physique tracking is off.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Physique tracking is off."
+          }
+        }
+      }
+    },
+    "STRQ is coaching your training and recovery. Turn on physique tracking anytime to add bodyweight and nutrition intelligence — only when you want it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ is coaching your training and recovery. Turn on physique tracking anytime to add bodyweight and nutrition intelligence — only when you want it."
+          }
+        }
+      }
+    },
+    "Enable Physique Tracking": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable Physique Tracking"
+          }
+        }
+      }
+    },
+    "WHY": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WHY"
+          }
+        }
+      }
+    },
+    "THIS WEEK": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "THIS WEEK"
+          }
+        }
+      }
+    },
+    "·": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "·"
+          }
+        }
+      }
+    },
+    "Week in Review": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woche in Review"
+          }
+        }
+      }
+    },
+    "Volume Comparison": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumen Comparison"
+          }
+        }
+      }
+    },
+    "vs last week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "vs last week"
+          }
+        }
+      }
+    },
+    "Muscle Balance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muscle Balance"
+          }
+        }
+      }
+    },
+    "Highlights": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Highlights"
+          }
+        }
+      }
+    },
+    "What went well and what to improve": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What went well and what to improve"
+          }
+        }
+      }
+    },
+    "Wins": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erfolge"
+          }
+        }
+      }
+    },
+    "Areas to Improve": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbesserungspotenziale"
+          }
+        }
+      }
+    },
+    "Bodyweight Trend": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bodyweight Trend"
+          }
+        }
+      }
+    },
+    "Your strength is progressing. Keep it up.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your strength is progressing. Keep it up."
+          }
+        }
+      }
+    },
+    "Coach's Take": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach's Take"
+          }
+        }
+      }
+    },
+    "What's Next?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie geht's weiter?"
+          }
+        }
+      }
+    },
+    "YOUR FIRST WEEK": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DEINE ERSTE WOCHE"
+          }
+        }
+      }
+    },
+    "Ease next session": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ease next session"
+          }
+        }
+      }
+    },
+    "Quick Log": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quick Log"
+          }
+        }
+      }
+    },
+    "Log Nutrition": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log Nutrition"
+          }
+        }
+      }
+    },
+    "0": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "0"
+          }
+        }
+      }
+    },
+    "Recent": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent"
+          }
+        }
+      }
+    },
+    "NEXT SHIFT": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NEXT SHIFT"
+          }
+        }
+      }
+    },
+    "Coach-Adjusted": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach-Adjusted"
+          }
+        }
+      }
+    },
+    "TODAY'S SESSION": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TODAY'S EINHEIT"
+          }
+        }
+      }
+    },
+    "SESSION PLAN": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EINHEIT PLAN"
+          }
+        }
+      }
+    },
+    "Tap for prescription": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap for prescription"
+          }
+        }
+      }
+    },
+    "KEY": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KERN"
+          }
+        }
+      }
+    },
+    "WHY THIS SESSION": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WHY THIS EINHEIT"
+          }
+        }
+      }
+    },
+    "Begin Workout": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout starten"
+          }
+        }
+      }
+    },
+    "Your Plan is Ready": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Plan ist bereit"
+          }
+        }
+      }
+    },
+    "YOUR WEEK": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DEINE WOCHE"
+          }
+        }
+      }
+    },
+    "COACH ASSESSMENT": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "COACH ASSESSMENT"
+          }
+        }
+      }
+    },
+    "YOUR INPUTS SHAPED THIS PLAN": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YOUR INPUTS SHAPED THIS PLAN"
+          }
+        }
+      }
+    },
+    "COACH NOTE": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "COACH NOTE"
+          }
+        }
+      }
+    },
+    "You'll go straight into today's session. You can fine-tune the plan later in Train.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You'll go straight into today's session. You can fine-tune the plan later in Train."
+          }
+        }
+      }
+    },
+    "WHAT TO DO FIRST": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WHAT TO DO FIRST"
+          }
+        }
+      }
+    },
+    "YOUR EXERCISES": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YOUR EXERCISES"
+          }
+        }
+      }
+    },
+    "PROGRESSING": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FORTSCHRITTING"
+          }
+        }
+      }
+    },
+    "NEEDS ATTENTION": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NEEDS ATTENTION"
+          }
+        }
+      }
+    },
+    "ESSENTIAL EXERCISES": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ESSENTIAL EXERCISES"
+          }
+        }
+      }
+    },
+    "EXERCISE FAMILIES": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EXERCISE FAMILIES"
+          }
+        }
+      }
+    },
+    "TRAINING WORLDS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TRAINING WORLDS"
+          }
+        }
+      }
+    },
+    "Filters": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter"
+          }
+        }
+      }
+    },
+    "All Patterns": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All Patterns"
+          }
+        }
+      }
+    },
+    "Favorites": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favoriten"
+          }
+        }
+      }
+    },
+    "Clear All": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle löschen"
+          }
+        }
+      }
+    },
+    "PRIMARY MOVE": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRIMÄRE ÜBUNG"
+          }
+        }
+      }
+    },
+    "WATCH": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WATCH"
+          }
+        }
+      }
+    },
+    "MOMENTUM": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MOMENTUM"
+          }
+        }
+      }
+    },
+    "COACH": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "COACH"
+          }
+        }
+      }
+    },
+    "Coaching memory": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coaching-Verlauf"
+          }
+        }
+      }
+    },
+    "No changes yet — every decision will be logged here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No changes yet — every decision will be logged here."
+          }
+        }
+      }
+    },
+    "Weekly Check-In": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wochely Check-In"
+          }
+        }
+      }
+    },
+    "Plan Quality": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plan Quality"
+          }
+        }
+      }
+    },
+    "Nothing else to flag": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts Weiteres auffällig"
+          }
+        }
+      }
+    },
+    "Coach is satisfied with the rest of your picture.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach is satisfied with the rest of your picture."
+          }
+        }
+      }
+    },
+    "More signals": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More signals"
+          }
+        }
+      }
+    },
+    "e.g. Left shoulder, lower back": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e.g. Left shoulder, lower back"
+          }
+        }
+      }
+    },
+    "READINESS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "READINESS"
+          }
+        }
+      }
+    },
+    "Key Lift": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Key Lift"
+          }
+        }
+      }
+    },
+    "Bodyweight": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bodyweight"
+          }
+        }
+      }
+    },
+    "Applied": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Applied"
+          }
+        }
+      }
+    },
+    "Why This Matters": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Why This Matters"
+          }
+        }
+      }
+    },
+    "Week-level": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woche-level"
+          }
+        }
+      }
+    },
+    "Effort: reduced": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effort: reduced"
+          }
+        }
+      }
+    },
+    "Add Exercise": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Übung"
+          }
+        }
+      }
+    },
+    "Prescription": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prescription"
+          }
+        }
+      }
+    },
+    "COACH DEFAULT": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "COACH DEFAULT"
+          }
+        }
+      }
+    },
+    "Customized from coach default": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Customized from coach default"
+          }
+        }
+      }
+    },
+    "Custom": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom"
+          }
+        }
+      }
+    },
+    "RPE 7 = 3 in reserve · RPE 9 = 1 in reserve": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE 7 = 3 in reserve · RPE 9 = 1 in reserve"
+          }
+        }
+      }
+    },
+    "Fits this session": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fits this session"
+          }
+        }
+      }
+    },
+    "Suggestions based on this session's focus muscles and gaps.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suggestions based on this session's focus muscles and gaps."
+          }
+        }
+      }
+    },
+    "Sleep & Recovery": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlaf & Regeneration"
+          }
+        }
+      }
+    },
+    "RECOVERY STATUS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RECOVERY STATUS"
+          }
+        }
+      }
+    },
+    "7-day sleep": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "7-day sleep"
+          }
+        }
+      }
+    },
+    "Sleep quality": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlaf quality"
+          }
+        }
+      }
+    },
+    "Training impact": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainingseinfluss"
+          }
+        }
+      }
+    },
+    "Sleep Trend": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlaf Trend"
+          }
+        }
+      }
+    },
+    "14 Days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "14 Days"
+          }
+        }
+      }
+    },
+    "7h target": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "7h target"
+          }
+        }
+      }
+    },
+    "≥ 7h": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "≥ 7h"
+          }
+        }
+      }
+    },
+    "< 7h": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "< 7h"
+          }
+        }
+      }
+    },
+    "Log Tonight's Sleep": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log Tonight's Schlaf"
+          }
+        }
+      }
+    },
+    "Hours Slept": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hours Slept"
+          }
+        }
+      }
+    },
+    "Sleep Quality": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlaf Quality"
+          }
+        }
+      }
+    },
+    "Log Sleep": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlaf loggen"
+          }
+        }
+      }
+    },
+    "HOW SLEEP AFFECTS YOUR TRAINING": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HOW SLEEP AFFECTS YOUR TRAINING"
+          }
+        }
+      }
+    },
+    "Recent Sleep": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent Schlaf"
+          }
+        }
+      }
+    },
+    "Training Schedule": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Training Schedule"
+          }
+        }
+      }
+    },
+    "Assign workouts to specific days. Tap a day to change it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assign Workouts to specific days. Tap a day to change it."
+          }
+        }
+      }
+    },
+    "ASSIGN DAYS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ASSIGN DAYS"
+          }
+        }
+      }
+    },
+    "Auto-Schedule": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-Schedule"
+          }
+        }
+      }
+    },
+    "Exercise Details": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übungsdetails"
+          }
+        }
+      }
+    },
+    "Pick a role-preserving alternative": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a role-preserving alternative"
+          }
+        }
+      }
+    },
+    "Cancel swap": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel swap"
+          }
+        }
+      }
+    },
+    "REPLACING": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REPLACING"
+          }
+        }
+      }
+    },
+    "No alternatives found": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Alternativen gefunden"
+          }
+        }
+      }
+    },
+    "Confirm Swap": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tausch bestätigen"
+          }
+        }
+      }
+    },
+    "Tap muscles to set priority": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap muscles to set priority"
+          }
+        }
+      }
+    },
+    "direct:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "direct:"
+          }
+        }
+      }
+    },
+    "bridge:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bridge:"
+          }
+        }
+      }
+    },
+    "final:": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "final:"
+          }
+        }
+      }
+    },
+    "Media Diagnostics": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mediendiagnose"
+          }
+        }
+      }
+    },
+    "Why STRQ changed your plan": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Why STRQ changed your plan"
+          }
+        }
+      }
+    },
+    "A record of the decisions Coach has made for you — what shifted, why it shifted, and what it means for training now.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A record of the decisions Coach has made for you — what shifted, why it shifted, and what it means for training now."
+          }
+        }
+      }
+    },
+    "No coaching changes yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Coaching-Änderungen"
+          }
+        }
+      }
+    },
+    "Once Coach adjusts volume, swaps a lift, or shifts your phase, every change will show up here with the reason behind it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Once Coach adjusts volume, swaps a lift, or shifts your phase, every change will show up here with the reason behind it."
+          }
+        }
+      }
+    },
+    "THE BRIDGE": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "THE BRIDGE"
+          }
+        }
+      }
+    },
+    "Your recent changes are shaping how this week runs.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your recent changes are shaping how this week runs."
+          }
+        }
+      }
+    },
+    "WHAT IT MEANS NOW": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WHAT IT MEANS NOW"
+          }
+        }
+      }
+    },
+    "RECENT CHANGE": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RECENT CHANGE"
+          }
+        }
+      }
+    },
+    "Nutrition Targets": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ernährungsziele"
+          }
+        }
+      }
+    },
+    "NUTRITION GOAL": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NUTRITION GOAL"
+          }
+        }
+      }
+    },
+    "Recompute Targets": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recompute Targets"
+          }
+        }
+      }
+    },
+    "COMPUTED TARGETS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "COMPUTED TARGETS"
+          }
+        }
+      }
+    },
+    "Based on your profile": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Based on your profile"
+          }
+        }
+      }
+    },
+    "CUSTOM OVERRIDES": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CUSTOM OVERRIDES"
+          }
+        }
+      }
+    },
+    "Optional fine-tuning": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optional fine-tuning"
+          }
+        }
+      }
+    },
+    "Save Custom Targets": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save Custom Targets"
+          }
+        }
+      }
+    },
+    "Auto": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto"
+          }
+        }
+      }
+    },
+    "BODY WEIGHT GOAL": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BODY WEIGHT GOAL"
+          }
+        }
+      }
+    },
+    "Current Weight": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktuell Weight"
+          }
+        }
+      }
+    },
+    "Target Weight": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Target Weight"
+          }
+        }
+      }
+    },
+    "Save Target Weight": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save Target Weight"
+          }
+        }
+      }
+    },
+    "TRAINING CONNECTION": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TRAINING CONNECTION"
+          }
+        }
+      }
+    },
+    "Your nutrition targets are computed from these training parameters. Changes to your training profile will update nutrition recommendations.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your nutrition targets are computed from these training parameters. Changes to your training profile will update nutrition recommendations."
+          }
+        }
+      }
+    },
+    "PROGRESS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FORTSCHRITT"
+          }
+        }
+      }
+    },
+    "WHAT CHANGED": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WHAT CHANGED"
+          }
+        }
+      }
+    },
+    "· 7 days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "· 7 days"
+          }
+        }
+      }
+    },
+    "by lift · body · streak": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "by lift · body · streak"
+          }
+        }
+      }
+    },
+    "Strength trend starts here": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strength trend starts here"
+          }
+        }
+      }
+    },
+    "Heavy sets and rep bests will start surfacing here as your log grows.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heavy sets and rep bests will start surfacing here as your log grows."
+          }
+        }
+      }
+    },
+    "LATEST PR": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LATEST PR"
+          }
+        }
+      }
+    },
+    "RECENT IMPROVEMENT": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RECENT IMPROVEMENT"
+          }
+        }
+      }
+    },
+    "All": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All"
+          }
+        }
+      }
+    },
+    "Each finished workout becomes a clean training record here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each finished Workout becomes a clean training record here."
+          }
+        }
+      }
+    },
+    "Your consistency pattern will map here once sessions start landing.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your consistency pattern will map here once sessions start landing."
+          }
+        }
+      }
+    },
+    "Goal Pace": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Goal Pace"
+          }
+        }
+      }
+    },
+    "History": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verlauf"
+          }
+        }
+      }
+    },
+    "Your training log is starting": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your training log is starting"
+          }
+        }
+      }
+    },
+    "Finished sessions collect here as your week builds, so progress stays easy to review later.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finished sessions collect here as your week builds, so progress stays easy to review later."
+          }
+        }
+      }
+    },
+    "Regenerate Week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regenerate Woche"
+          }
+        }
+      }
+    },
+    "Smart Week Regeneration": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smart Woche Regeneration"
+          }
+        }
+      }
+    },
+    "Your upcoming week will be intelligently rebuilt based on your recent training data, recovery, and muscle balance.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your upcoming week will be intelligently rebuilt based on your recent training data, recovery, and muscle balance."
+          }
+        }
+      }
+    },
+    "Changes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changes"
+          }
+        }
+      }
+    },
+    "Week Comparison": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woche Comparison"
+          }
+        }
+      }
+    },
+    "sets": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sets"
+          }
+        }
+      }
+    },
+    "min total": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "min total"
+          }
+        }
+      }
+    },
+    "Apply Regenerated Week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apply Regenerated Woche"
+          }
+        }
+      }
+    },
+    "Strategic Deload Week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strategic Deload Woche"
+          }
+        }
+      }
+    },
+    "A lighter week to let accumulated fatigue dissipate. You keep the same structure and movements, but at reduced intensity.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A lighter week to let accumulated fatigue dissipate. You keep the same structure and movements, but at reduced intensity."
+          }
+        }
+      }
+    },
+    "Day-by-Day Preview": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Day-by-Day Preview"
+          }
+        }
+      }
+    },
+    "Deload": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deload"
+          }
+        }
+      }
+    },
+    "Start Deload Week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Deload Woche"
+          }
+        }
+      }
+    },
+    "YOUR COACH, YOUR WAY": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DEIN COACH, DEIN STIL"
+          }
+        }
+      }
+    },
+    "STRQ stays one coach — these tune how it speaks, what it emphasizes, and how much it adjusts on its own.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ stays one coach — these tune how it speaks, what it emphasizes, and how much it adjusts on its own."
+          }
+        }
+      }
+    },
+    "Turn on physique tracking in Profile to unlock this focus.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on physique tracking in Profile to unlock this focus."
+          }
+        }
+      }
+    },
+    "Preferences shape the surface only. The underlying intelligence stays the same.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preferences shape the surface only. The underlying intelligence stays the same."
+          }
+        }
+      }
+    },
+    "Energy right now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Energie gerade"
+          }
+        }
+      }
+    },
+    "Muscle soreness": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muskelkater"
+          }
+        }
+      }
+    },
+    "Life stress": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alltagsstress"
+          }
+        }
+      }
+    },
+    "Motivation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Motivation"
+          }
+        }
+      }
+    },
+    "Pain or restriction": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schmerz oder Einschränkung"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

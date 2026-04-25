@@ -26,7 +26,7 @@ struct NutritionLogView: View {
             .padding(.bottom, 40)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Nutrition")
+        .navigationTitle(L10n.tr("Nutrition"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             prefillToday()
@@ -44,7 +44,7 @@ struct NutritionLogView: View {
                     Image(systemName: priority.icon)
                         .font(.caption.weight(.bold))
                         .foregroundStyle(color)
-                    Text("THIS WEEK")
+                    Text(L10n.tr("THIS WEEK"))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(color)
                         .tracking(0.8)
@@ -161,7 +161,7 @@ struct NutritionLogView: View {
 
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text("Today")
+                Text(L10n.tr("Today"))
                     .font(.headline)
                 Spacer()
                 if log != nil {
@@ -231,7 +231,7 @@ struct NutritionLogView: View {
 
     private var quickLogSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Quick Log")
+            Text(L10n.tr("Quick Log"))
                 .font(.headline)
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
@@ -247,7 +247,7 @@ struct NutritionLogView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "plus.circle.fill")
                         .font(.subheadline)
-                    Text("Log Nutrition")
+                    Text(L10n.tr("Log Nutrition"))
                         .font(.body.weight(.semibold))
                 }
                 .foregroundStyle(.white)
@@ -271,7 +271,7 @@ struct NutritionLogView: View {
                 .font(.caption.weight(.medium))
                 .foregroundStyle(color)
             HStack(spacing: 4) {
-                TextField("0", text: text)
+                TextField(L10n.tr("0"), text: text)
                     .keyboardType(.numberPad)
                     .font(.subheadline.weight(.semibold).monospacedDigit())
                     .multilineTextAlignment(.leading)
@@ -289,7 +289,7 @@ struct NutritionLogView: View {
     private var recentLogsSection: some View {
         if !vm.nutritionLogs.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Recent")
+                Text(L10n.tr("Recent"))
                     .font(.headline)
 
                 ForEach(vm.nutritionLogs.prefix(7)) { log in

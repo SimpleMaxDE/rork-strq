@@ -135,7 +135,7 @@ struct PhaseOutlookCard: View {
                 .foregroundStyle(STRQPalette.info)
                 .frame(width: 18)
             VStack(alignment: .leading, spacing: 2) {
-                Text("THIS WEEK")
+                Text(L10n.tr("THIS WEEK"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(0.8)
                     .foregroundStyle(STRQPalette.info)
@@ -165,7 +165,7 @@ struct PhaseOutlookCard: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
-                    Text("NEXT SHIFT")
+                    Text(L10n.tr("NEXT SHIFT"))
                         .font(.system(size: 9, weight: .black))
                         .tracking(0.8)
                         .foregroundStyle(.secondary)

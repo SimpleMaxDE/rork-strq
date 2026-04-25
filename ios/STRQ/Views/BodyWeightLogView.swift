@@ -23,7 +23,7 @@ struct BodyWeightLogView: View {
             .padding(.bottom, 40)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Body Progress")
+        .navigationTitle(L10n.tr("Body Progress"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
@@ -38,7 +38,7 @@ struct BodyWeightLogView: View {
             let verdictColor = chartVerdictColor(outcome)
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("Body Weight")
+                    Text(L10n.tr("Body Weight"))
                         .font(.subheadline.weight(.semibold))
                     Spacer()
                     if let latest = entries.last {
@@ -90,7 +90,7 @@ struct BodyWeightLogView: View {
                             .foregroundStyle(STRQPalette.success.opacity(0.5))
                             .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
                             .annotation(position: .top, alignment: .trailing) {
-                                Text("Target")
+                                Text(L10n.tr("Target"))
                                     .font(.system(size: 8, weight: .semibold))
                                     .foregroundStyle(STRQPalette.success)
                             }
@@ -211,19 +211,19 @@ struct BodyWeightLogView: View {
 
     private var quickLogCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Log Today")
+            Text(L10n.tr("Log Today"))
                 .font(.headline)
 
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Weight")
+                    Text(L10n.tr("Weight"))
                         .font(.caption.weight(.medium))
                         .foregroundStyle(STRQBrand.steel)
                     HStack(spacing: 4) {
-                        TextField("0.0", text: $weightInput)
+                        TextField(L10n.tr("0.0"), text: $weightInput)
                             .keyboardType(.decimalPad)
                             .font(.subheadline.weight(.semibold).monospacedDigit())
-                        Text("kg")
+                        Text(L10n.tr("kg"))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -233,14 +233,14 @@ struct BodyWeightLogView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Body Fat (optional)")
+                    Text(L10n.tr("Body Fat (optional)"))
                         .font(.caption.weight(.medium))
                         .foregroundStyle(.purple)
                     HStack(spacing: 4) {
-                        TextField("—", text: $bodyFatInput)
+                        TextField(L10n.tr("—"), text: $bodyFatInput)
                             .keyboardType(.decimalPad)
                             .font(.subheadline.weight(.semibold).monospacedDigit())
-                        Text("%")
+                        Text(L10n.tr("%"))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -256,7 +256,7 @@ struct BodyWeightLogView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "scalemass.fill")
                         .font(.subheadline)
-                    Text("Log Weight")
+                    Text(L10n.tr("Log Weight"))
                         .font(.body.weight(.semibold))
                 }
                 .foregroundStyle(.white)
@@ -309,7 +309,7 @@ struct BodyWeightLogView: View {
                     Image(systemName: "moon.zzz.fill")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.purple)
-                    Text("SLEEP & RECOVERY")
+                    Text(L10n.tr("SLEEP & RECOVERY"))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(.purple)
                         .tracking(0.5)
@@ -319,7 +319,7 @@ struct BodyWeightLogView: View {
                     VStack(spacing: 4) {
                         Text(String(format: "%.1f", vm.averageSleepHours))
                             .font(.title2.bold().monospacedDigit())
-                        Text("Avg Hours")
+                        Text(L10n.tr("Avg Hours"))
                             .font(.system(size: 9, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
@@ -329,7 +329,7 @@ struct BodyWeightLogView: View {
                         Text(vm.sleepQualityLabel)
                             .font(.title2.bold())
                             .foregroundStyle(sleepColor)
-                        Text("Quality")
+                        Text(L10n.tr("Quality"))
                             .font(.system(size: 9, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
@@ -339,7 +339,7 @@ struct BodyWeightLogView: View {
                         Text("\(vm.effectiveRecoveryScore)")
                             .font(.title2.bold().monospacedDigit())
                             .foregroundStyle(recoveryColor)
-                        Text("Recovery")
+                        Text(L10n.tr("Recovery"))
                             .font(.system(size: 9, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
@@ -375,7 +375,7 @@ struct BodyWeightLogView: View {
         let entries = vm.bodyWeightEntries.sorted { $0.date > $1.date }
         if !entries.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Recent Weigh-Ins")
+                Text(L10n.tr("Recent Weigh-Ins"))
                     .font(.headline)
 
                 ForEach(entries.prefix(8)) { entry in

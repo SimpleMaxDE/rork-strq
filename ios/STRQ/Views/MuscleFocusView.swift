@@ -271,7 +271,7 @@ struct MuscleFocusView: View {
 
     private var muscleSelector: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Tap muscles to set priority")
+            Text(L10n.tr("Tap muscles to set priority"))
                 .font(.footnote.weight(.medium))
                 .foregroundStyle(.white.opacity(0.45))
 
