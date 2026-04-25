@@ -101,13 +101,13 @@ struct OnboardingView: View {
 
     private var stepCategoryLabel: String {
         switch step {
-        case 1: return "ABOUT"
-        case 2: return "BODY"
-        case 3: return "GOAL"
-        case 4: return "TRAINING"
-        case 5: return "SETUP"
-        case 6: return "FOCUS"
-        case 7: return "LIFESTYLE"
+        case 1: return L10n.tr("ABOUT")
+        case 2: return L10n.tr("BODY")
+        case 3: return L10n.tr("GOAL")
+        case 4: return L10n.tr("TRAINING")
+        case 5: return L10n.tr("SETUP")
+        case 6: return L10n.tr("FOCUS")
+        case 7: return L10n.tr("LIFESTYLE")
         default: return ""
         }
     }
@@ -162,7 +162,7 @@ struct OnboardingView: View {
                     nameFocused = false
                     withAnimation(.smooth(duration: 0.35)) { step -= 1 }
                 } label: {
-                    Text("Back")
+                    Text(L10n.tr("Back"))
                         .font(.footnote.weight(.medium))
                         .foregroundStyle(.white.opacity(0.4))
                         .frame(maxWidth: .infinity)
@@ -190,9 +190,9 @@ struct OnboardingView: View {
 
     private var primaryButtonLabel: String {
         switch step {
-        case 0: return "Get Started"
-        case totalSteps - 1: return "See My Plan"
-        default: return "Continue"
+        case 0: return L10n.tr("Get Started")
+        case totalSteps - 1: return L10n.tr("See My Plan")
+        default: return L10n.tr("Continue")
         }
     }
 
@@ -215,7 +215,7 @@ struct OnboardingView: View {
                         .offset(y: appeared ? 0 : 16)
                         .animation(.easeOut(duration: 0.6).delay(0.35), value: appeared)
 
-                    Text("A training system built around you.")
+                    Text(L10n.tr("A training system built around you."))
                         .font(.title3.weight(.medium))
                         .foregroundStyle(.white.opacity(0.9))
                         .multilineTextAlignment(.center)
@@ -223,7 +223,7 @@ struct OnboardingView: View {
                         .offset(y: appeared ? 0 : 12)
                         .animation(.easeOut(duration: 0.6).delay(0.5), value: appeared)
 
-                    Text("Seven quick chapters. Then a plan that actually fits.")
+                    Text(L10n.tr("Seven quick chapters. Then a plan that actually fits."))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -234,9 +234,9 @@ struct OnboardingView: View {
             }
             Spacer()
             VStack(spacing: 14) {
-                welcomeFeatureRow(icon: "slider.horizontal.3", text: "Calibrated to your body, goal, and schedule")
-                welcomeFeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Progression that adapts after every session")
-                welcomeFeatureRow(icon: "waveform.path.ecg", text: "Recovery-aware. No guesswork on load or volume")
+                welcomeFeatureRow(icon: "slider.horizontal.3", text: L10n.tr("Calibrated to your body, goal, and schedule"))
+                welcomeFeatureRow(icon: "chart.line.uptrend.xyaxis", text: L10n.tr("Progression that adapts after every session"))
+                welcomeFeatureRow(icon: "waveform.path.ecg", text: L10n.tr("Recovery-aware. No guesswork on load or volume"))
             }
             .padding(.horizontal, 24)
             .opacity(appeared ? 1 : 0)
@@ -267,12 +267,12 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 stepHero(
-                    eyebrow: "Start here",
-                    title: "What should we call you?",
-                    subtitle: "STRQ personalizes everything from your goal to your schedule."
+                    eyebrow: L10n.tr("Start here"),
+                    title: L10n.tr("What should we call you?"),
+                    subtitle: L10n.tr("STRQ personalizes everything from your goal to your schedule.")
                 )
 
-                TextField("Your name", text: $vm.profile.name)
+                TextField(L10n.tr("Your name"), text: $vm.profile.name)
                     .textFieldStyle(.plain)
                     .font(.title3.weight(.semibold))
                     .focused($nameFocused)
@@ -289,14 +289,14 @@ struct OnboardingView: View {
                     )
                     .animation(.easeOut(duration: 0.18), value: nameFocused)
 
-                fieldGroup("Age") {
+                fieldGroup(L10n.tr("Age")) {
                     tapValueTile(
                         value: "\(vm.profile.age)",
-                        unit: "years"
+                        unit: L10n.tr("years")
                     ) { editingMetric = .age }
                 }
 
-                fieldGroup("Gender") {
+                fieldGroup(L10n.tr("Gender")) {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                         ForEach(Gender.allCases) { gender in
                             selectionChip(gender.displayName, selected: vm.profile.gender == gender) {
@@ -318,28 +318,28 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 stepHero(
-                    eyebrow: "Baseline",
-                    title: "Your body metrics",
-                    subtitle: "Tap any value to edit. Used to calibrate volume and exercise selection."
+                    eyebrow: L10n.tr("Baseline"),
+                    title: L10n.tr("Your body metrics"),
+                    subtitle: L10n.tr("Tap any value to edit. Used to calibrate volume and exercise selection.")
                 )
 
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
                     metricTile(
-                        label: "Height",
+                        label: L10n.tr("Height"),
                         value: "\(Int(vm.profile.heightCm))",
                         unit: "cm",
                         filled: true
                     ) { editingMetric = .height }
 
                     metricTile(
-                        label: "Weight",
+                        label: L10n.tr("Weight"),
                         value: String(format: "%.1f", vm.profile.weightKg),
                         unit: "kg",
                         filled: true
                     ) { editingMetric = .weight }
 
                     metricTile(
-                        label: "Target weight",
+                        label: L10n.tr("Target weight"),
                         value: vm.profile.targetWeightKg.map { String(format: "%.1f", $0) } ?? "—",
                         unit: "kg",
                         filled: vm.profile.targetWeightKg != nil,
@@ -347,7 +347,7 @@ struct OnboardingView: View {
                     ) { editingMetric = .targetWeight }
 
                     metricTile(
-                        label: "Body fat",
+                        label: L10n.tr("Body fat"),
                         value: vm.profile.bodyFatPercentage.map { "\(Int($0))" } ?? "—",
                         unit: "%",
                         filled: vm.profile.bodyFatPercentage != nil,
@@ -360,9 +360,9 @@ struct OnboardingView: View {
                     HStack(spacing: 8) {
                         Image(systemName: diff > 0.05 ? "arrow.up.right" : diff < -0.05 ? "arrow.down.right" : "equal")
                             .font(.system(size: 11, weight: .bold))
-                        Text(diff > 0.05 ? String(format: "+%.1f kg to gain", diff)
-                             : diff < -0.05 ? String(format: "%.1f kg to lose", diff)
-                             : "Maintaining current weight")
+                        Text(diff > 0.05 ? L10n.format("+%.1f kg to gain", diff)
+                             : diff < -0.05 ? L10n.format("%.1f kg to lose", diff)
+                             : L10n.tr("Maintaining current weight"))
                             .font(.caption.weight(.semibold))
                     }
                     .foregroundStyle(STRQBrand.steel)
@@ -372,7 +372,7 @@ struct OnboardingView: View {
                     .overlay(Capsule().strokeBorder(Color.white.opacity(0.06), lineWidth: 0.5))
                 }
 
-                Text("Target weight and body fat are optional.")
+                Text(L10n.tr("Target weight and body fat are optional."))
                     .font(.caption2)
                     .foregroundStyle(.white.opacity(0.35))
             }
@@ -387,9 +387,9 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 stepHero(
-                    eyebrow: "Direction",
-                    title: "What's your goal?",
-                    subtitle: "Shapes exercises, volume, intensity, and progression."
+                    eyebrow: L10n.tr("Direction"),
+                    title: L10n.tr("What's your goal?"),
+                    subtitle: L10n.tr("Shapes exercises, volume, intensity, and progression.")
                 )
 
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
@@ -453,12 +453,12 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 stepHero(
-                    eyebrow: "Structure",
-                    title: "How you train",
-                    subtitle: "Experience, schedule, and split preference."
+                    eyebrow: L10n.tr("Structure"),
+                    title: L10n.tr("How you train"),
+                    subtitle: L10n.tr("Experience, schedule, and split preference.")
                 )
 
-                fieldGroup("Experience level") {
+                fieldGroup(L10n.tr("Experience level")) {
                     VStack(spacing: 8) {
                         ForEach(TrainingLevel.allCases) { level in
                             levelRow(level)
@@ -466,7 +466,7 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup("Training days / week") {
+                fieldGroup(L10n.tr("Training days / week")) {
                     HStack(spacing: 6) {
                         ForEach(1...6, id: \.self) { n in
                             pillNumber(n, selected: vm.profile.daysPerWeek == n) {
@@ -476,7 +476,7 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup("Session length") {
+                fieldGroup(L10n.tr("Session length")) {
                     let presets = [30, 45, 60, 75, 90, 120]
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 6), GridItem(.flexible(), spacing: 6), GridItem(.flexible(), spacing: 6)], spacing: 6) {
                         ForEach(presets, id: \.self) { m in
@@ -489,7 +489,7 @@ struct OnboardingView: View {
                                     Text("\(m)")
                                         .font(.system(.title3, design: .rounded, weight: .bold))
                                         .monospacedDigit()
-                                    Text("min")
+                                    Text(L10n.tr("min"))
                                         .font(.caption2.weight(.semibold))
                                         .foregroundStyle(isSelected ? .black.opacity(0.55) : .white.opacity(0.4))
                                 }
@@ -510,7 +510,7 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup("Preferred split") {
+                fieldGroup(L10n.tr("Preferred split")) {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                         ForEach(SplitPreference.allCases) { split in
                             selectionChip(split.displayName, selected: vm.profile.splitPreference == split) {
@@ -608,9 +608,9 @@ struct OnboardingView: View {
 
     private func levelSubtitle(_ level: TrainingLevel) -> String {
         switch level {
-        case .beginner: return "Less than 1 year of consistent training"
-        case .intermediate: return "1–3 years of structured training"
-        case .advanced: return "3+ years with solid technique"
+        case .beginner: return L10n.tr("Less than 1 year of consistent training")
+        case .intermediate: return L10n.tr("1–3 years of structured training")
+        case .advanced: return L10n.tr("3+ years with solid technique")
         }
     }
 
@@ -620,12 +620,12 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 stepHero(
-                    eyebrow: "Environment",
-                    title: "Your training setup",
-                    subtitle: "Exercises are matched to your equipment and any restrictions."
+                    eyebrow: L10n.tr("Environment"),
+                    title: L10n.tr("Your training setup"),
+                    subtitle: L10n.tr("Exercises are matched to your equipment and any restrictions.")
                 )
 
-                fieldGroup("Where do you train?") {
+                fieldGroup(L10n.tr("Where do you train?")) {
                     HStack(spacing: 10) {
                         ForEach(TrainingLocation.allCases) { loc in
                             locationTile(loc)
@@ -634,7 +634,7 @@ struct OnboardingView: View {
                 }
 
                 if vm.profile.trainingLocation != .gym {
-                    fieldGroup("Available equipment") {
+                    fieldGroup(L10n.tr("Available equipment")) {
                         let homeEquipment: [Equipment] = [.dumbbell, .kettlebell, .resistanceBand, .pullUpBar, .bench, .stabilityBall, .foamRoller, .mat, .trx, .rings, .abWheel]
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                             ForEach(homeEquipment) { equip in
@@ -650,13 +650,13 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup("Injuries or restrictions") {
-                    Text("Select any areas of concern so exercises can be filtered for safety.")
+                fieldGroup(L10n.tr("Injuries or restrictions")) {
+                    Text(L10n.tr("Select any areas of concern so exercises can be filtered for safety."))
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.5))
                         .padding(.bottom, 2)
 
-                    let commonInjuries = ["Shoulder", "Knee", "Lower Back", "Wrist", "Neck", "Hip", "Ankle", "Elbow"]
+                    let commonInjuries = [L10n.tr("Shoulder"), L10n.tr("Knee"), L10n.tr("Lower Back"), L10n.tr("Wrist"), L10n.tr("Neck"), L10n.tr("Hip"), L10n.tr("Ankle"), L10n.tr("Elbow")]
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                         ForEach(commonInjuries, id: \.self) { injury in
                             selectionChip(injury, selected: vm.profile.injuries.contains(injury)) {
@@ -726,9 +726,9 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 stepHero(
-                    eyebrow: "Priorities",
-                    title: "Muscle focus",
-                    subtitle: "Tap muscles to give them more — or less — attention. Optional."
+                    eyebrow: L10n.tr("Priorities"),
+                    title: L10n.tr("Muscle focus"),
+                    subtitle: L10n.tr("Tap muscles to give them more — or less — attention. Optional.")
                 )
 
                 MuscleFocusView(
@@ -748,12 +748,12 @@ struct OnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 stepHero(
-                    eyebrow: "Recovery",
-                    title: "Lifestyle & recovery",
-                    subtitle: "Quick recovery signals that shape training load."
+                    eyebrow: L10n.tr("Recovery"),
+                    title: L10n.tr("Lifestyle & recovery"),
+                    subtitle: L10n.tr("Quick recovery signals that shape training load.")
                 )
 
-                fieldGroup("Sleep") {
+                fieldGroup(L10n.tr("Sleep")) {
                     VStack(spacing: 8) {
                         ForEach(SleepQuality.allCases) { sleep in
                             selectionChip(sleep.displayName, selected: vm.profile.sleepQuality == sleep) {
@@ -763,7 +763,7 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup("Stress") {
+                fieldGroup(L10n.tr("Stress")) {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                         ForEach(StressLevel.allCases) { stress in
                             selectionChip(stress.displayName, selected: vm.profile.stressLevel == stress) {
@@ -773,7 +773,7 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup("Activity") {
+                fieldGroup(L10n.tr("Activity")) {
                     VStack(spacing: 8) {
                         ForEach(ActivityLevel.allCases) { level in
                             selectionChip(level.displayName, selected: vm.profile.activityLevel == level) {
@@ -783,7 +783,7 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup("Recovery") {
+                fieldGroup(L10n.tr("Recovery")) {
                     HStack(spacing: 8) {
                         ForEach(RecoveryCapacity.allCases) { rec in
                             selectionChip(rec.displayName, selected: vm.profile.recoveryCapacity == rec) {

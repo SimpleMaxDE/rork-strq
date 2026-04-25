@@ -155,24 +155,24 @@ struct ActiveWorkoutView: View {
                     .presentationDragIndicator(.visible)
                 }
             }
-            .confirmationDialog("Workout options", isPresented: $showExitDialog, titleVisibility: .visible) {
-                Button("Save & Leave") {
+            .confirmationDialog(L10n.tr("Workout options"), isPresented: $showExitDialog, titleVisibility: .visible) {
+                Button(L10n.tr("Save & Leave")) {
                     saveAndLeave()
                 }
-                Button("Discard Workout", role: .destructive) {
+                Button(L10n.tr("Discard Workout"), role: .destructive) {
                     confirmDiscard = true
                 }
-                Button("Continue Workout", role: .cancel) { }
+                Button(L10n.tr("Continue Workout"), role: .cancel) { }
             } message: {
-                Text("Save & Leave preserves everything you've logged and keeps this workout ready to resume from Today.")
+                Text(L10n.tr("Save & Leave preserves everything you've logged and keeps this workout ready to resume from Today."))
             }
-            .confirmationDialog("Discard Workout?", isPresented: $confirmDiscard, titleVisibility: .visible) {
-                Button("Discard Workout", role: .destructive) {
+            .confirmationDialog(L10n.tr("Discard Workout?"), isPresented: $confirmDiscard, titleVisibility: .visible) {
+                Button(L10n.tr("Discard Workout"), role: .destructive) {
                     vm.workoutController.discardWorkout()
                 }
-                Button("Keep Workout", role: .cancel) { }
+                Button(L10n.tr("Keep Workout"), role: .cancel) { }
             } message: {
-                Text("All logged sets for this session will be lost. This can't be undone.")
+                Text(L10n.tr("All logged sets for this session will be lost. This can't be undone."))
             }
             .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.6), trigger: setCompletedTrigger)
             .sensoryFeedback(.success, trigger: swapFeedbackTrigger)
@@ -198,7 +198,7 @@ struct ActiveWorkoutView: View {
                     .background(Color.white.opacity(0.06), in: Circle())
             }
             .buttonStyle(.strqPressable)
-            .accessibilityLabel("Workout options")
+            .accessibilityLabel(L10n.tr("Workout options"))
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(workout.session.dayName.uppercased())
@@ -235,7 +235,7 @@ struct ActiveWorkoutView: View {
                 HStack(spacing: 5) {
                     Image(systemName: "flag.checkered")
                         .font(.system(size: 11, weight: .bold))
-                    Text("Finish Workout")
+                    Text(L10n.tr("Finish Workout"))
                         .font(.system(size: 13, weight: .bold))
                 }
                 .foregroundStyle(.black)
@@ -243,7 +243,7 @@ struct ActiveWorkoutView: View {
                 .padding(.vertical, 8)
                 .background(STRQBrand.accentGradient, in: Capsule())
             }
-            .accessibilityLabel("Finish workout")
+            .accessibilityLabel(L10n.tr("Finish workout"))
         }
         .padding(.horizontal, 14)
         .padding(.top, 28)
@@ -297,7 +297,7 @@ struct ActiveWorkoutView: View {
 
                         VStack(alignment: .leading, spacing: 6) {
                             HStack(spacing: 8) {
-                                Text("EX \(exerciseIndex + 1)/\(workout.session.exerciseLogs.count)")
+                                Text(L10n.format("EX %d/%d", exerciseIndex + 1, workout.session.exerciseLogs.count))
                                     .font(.system(size: 9, weight: .black).monospacedDigit())
                                     .foregroundStyle(.white.opacity(0.6))
                                     .tracking(0.8)
@@ -308,7 +308,7 @@ struct ActiveWorkoutView: View {
                                     .foregroundStyle(.white.opacity(0.6))
                                     .tracking(0.8)
                                 Spacer()
-                                Text("SET \(activeSetNumber)/\(log.sets.count)")
+                                Text(L10n.format("SET %d/%d", activeSetNumber, log.sets.count))
                                     .font(.system(size: 10, weight: .heavy).monospacedDigit())
                                     .tracking(0.8)
                                     .foregroundStyle(.white)
@@ -330,17 +330,17 @@ struct ActiveWorkoutView: View {
 
                                     HStack(spacing: 6) {
                                         if let p = planned {
-                                            Text("Target \(p.reps)")
+                                            Text(L10n.format("Target %@", p.reps))
                                                 .font(.system(size: 10, weight: .bold).monospacedDigit())
                                                 .foregroundStyle(.white.opacity(0.78))
                                             if let rpe = p.rpe {
                                                 Text("·").foregroundStyle(.white.opacity(0.3))
-                                                Text("RPE \(formatRPE(rpe))")
+                                                Text(L10n.format("RPE %@", formatRPE(rpe)))
                                                     .font(.system(size: 10, weight: .bold).monospacedDigit())
                                                     .foregroundStyle(.white.opacity(0.6))
                                             }
                                             Text("·").foregroundStyle(.white.opacity(0.3))
-                                            Text("\(p.restSeconds)s rest")
+                                            Text(L10n.format("%ds rest", p.restSeconds))
                                                 .font(.system(size: 10, weight: .semibold).monospacedDigit())
                                                 .foregroundStyle(.white.opacity(0.55))
                                         }
@@ -396,20 +396,20 @@ struct ActiveWorkoutView: View {
 
         HStack(spacing: 0) {
             contextCell(
-                label: "PREV",
+                label: L10n.tr("PREV"),
                 primary: last.map { "\(formatWeight($0.topWeight, increment: 0.5))×\($0.topReps)" } ?? "—",
-                secondary: last.map { formatRelativeDate($0.date) } ?? "no data"
+                secondary: last.map { formatRelativeDate($0.date) } ?? L10n.tr("no data")
             )
             contextDivider()
             contextCell(
-                label: "BEST",
+                label: L10n.tr("BEST"),
                 primary: best.map { "\(formatWeight($0.weight, increment: 0.5))×\($0.reps)" } ?? "—",
-                secondary: best.map { String(format: "e1RM %.0f", $0.e1rm) } ?? "—"
+                secondary: best.map { L10n.format("e1RM %.0f", $0.e1rm) } ?? "—"
             )
             contextDivider()
             contextCell(
-                label: "TARGET",
-                primary: suggestion.map { $0.suggestedWeight > 0 ? formatWeight($0.suggestedWeight, increment: 0.5) : "BW" } ?? "—",
+                label: L10n.tr("TARGET"),
+                primary: suggestion.map { $0.suggestedWeight > 0 ? formatWeight($0.suggestedWeight, increment: 0.5) : L10n.tr("BW") } ?? "—",
                 secondary: planned.map { "× \($0.reps)" } ?? "—"
             )
         }
@@ -484,9 +484,9 @@ struct ActiveWorkoutView: View {
 
                     HStack(spacing: 14) {
                         inputColumn(
-                            label: isBodyweight ? "ADDED LOAD" : "WEIGHT",
-                            value: isBodyweight && setLog.weight <= 0 ? "BW" : formatWeight(setLog.weight, increment: increment),
-                            unit: isBodyweight ? "kg added" : "kg",
+                            label: isBodyweight ? L10n.tr("ADDED LOAD") : L10n.tr("WEIGHT"),
+                            value: isBodyweight && setLog.weight <= 0 ? L10n.tr("BW") : formatWeight(setLog.weight, increment: increment),
+                            unit: isBodyweight ? L10n.tr("kg added") : "kg",
                             disableMinus: isBodyweight && setLog.weight <= 0,
                             onMinus: { step in
                                 let s = isBodyweight ? 1.0 : (step ?? increment)
@@ -505,8 +505,8 @@ struct ActiveWorkoutView: View {
                                     setIndex: activeSetIndex,
                                     currentWeight: setLog.weight,
                                     currentReps: setLog.reps,
-                                    title: "Edit Weight",
-                                    unit: isBodyweight ? "kg added" : "kg"
+                                    title: L10n.tr("Edit Weight"),
+                                    unit: isBodyweight ? L10n.tr("kg added") : "kg"
                                 )
                             },
                             plateMath: plateMathLabel(weight: setLog.weight, exercise: exerciseForIncrement)
@@ -518,9 +518,9 @@ struct ActiveWorkoutView: View {
                             .frame(width: 1, height: 64)
 
                         inputColumn(
-                            label: "REPS",
+                            label: L10n.tr("REPS"),
                             value: "\(setLog.reps)",
-                            unit: "reps",
+                            unit: L10n.tr("reps"),
                             disableMinus: setLog.reps <= 0,
                             onMinus: { step in
                                 let s = Int(step ?? 1)
@@ -537,8 +537,8 @@ struct ActiveWorkoutView: View {
                                     setIndex: activeSetIndex,
                                     currentWeight: setLog.weight,
                                     currentReps: setLog.reps,
-                                    title: "Edit Reps",
-                                    unit: "reps"
+                                    title: L10n.tr("Edit Reps"),
+                                    unit: L10n.tr("reps")
                                 )
                             },
                             plateMath: nil
@@ -552,7 +552,7 @@ struct ActiveWorkoutView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "checkmark")
                                 .font(.subheadline.weight(.bold))
-                            Text("Log Set \(setLog.setNumber)")
+                            Text(L10n.format("Log Set %d", setLog.setNumber))
                                 .font(.body.weight(.heavy))
                         }
                         .foregroundStyle(.black)
@@ -582,10 +582,10 @@ struct ActiveWorkoutView: View {
                     Image(systemName: isLastExercise ? "flag.checkered" : "checkmark.circle.fill")
                         .font(.title)
                         .foregroundStyle(isLastExercise ? STRQBrand.steel : STRQPalette.success)
-                    Text(isLastExercise ? "Last exercise complete" : "Exercise complete")
+                    Text(isLastExercise ? L10n.tr("Last exercise complete") : L10n.tr("Exercise complete"))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
-                    Text(isLastExercise ? "Finish Workout when you're ready to save this session." : "Move to the next exercise when you're ready.")
+                    Text(isLastExercise ? L10n.tr("Finish Workout when you're ready to save this session.") : L10n.tr("Move to the next exercise when you're ready."))
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -621,7 +621,7 @@ struct ActiveWorkoutView: View {
                 if showLast, let lw = lastWeight {
                     matchChip(
                         icon: "arrow.uturn.backward",
-                        label: "Match last",
+                        label: L10n.tr("Match last"),
                         value: "\(formatWeight(lw, increment: 0.5))\(lastReps.map { "×\($0)" } ?? "")"
                     ) {
                         updateSet(
@@ -635,7 +635,7 @@ struct ActiveWorkoutView: View {
                 if showTarget, let tw = targetWeight {
                     matchChip(
                         icon: "scope",
-                        label: "Target",
+                        label: L10n.tr("Target"),
                         value: "\(formatWeight(tw, increment: 0.5))\(targetReps.map { "×\($0)" } ?? "")"
                     ) {
                         updateSet(
@@ -936,7 +936,7 @@ struct ActiveWorkoutView: View {
                         .map { "\(formatWeight($0.weight, increment: 0.5))×\($0.reps)" }
                         .joined(separator: "  ")
                     HStack(spacing: 8) {
-                        Text("LAST")
+                        Text(L10n.tr("LAST"))
                             .font(.system(size: 9, weight: .black))
                             .tracking(1.2)
                             .foregroundStyle(.white.opacity(0.45))
@@ -995,15 +995,15 @@ struct ActiveWorkoutView: View {
                     .background(hasNote ? Color.white.opacity(0.06) : STRQBrand.steel.opacity(0.14), in: .rect(cornerRadius: 11))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Session Note")
+                    Text(L10n.tr("Session Note"))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
-                    Text(hasNote ? note : "Add one quick thought to remember how this session felt.")
+                    Text(hasNote ? note : L10n.tr("Add one quick thought to remember how this session felt."))
                         .font(.footnote)
                         .foregroundStyle(hasNote ? .white.opacity(0.72) : .white.opacity(0.48))
                         .multilineTextAlignment(.leading)
                         .lineLimit(hasNote ? 3 : 2)
-                    Text(hasNote ? "Saved with this workout" : "Optional")
+                    Text(hasNote ? L10n.tr("Saved with this workout") : L10n.tr("Optional"))
                         .font(.system(size: 10, weight: .bold))
                         .tracking(0.7)
                         .foregroundStyle(.white.opacity(0.34))
@@ -1012,7 +1012,7 @@ struct ActiveWorkoutView: View {
 
                 Spacer(minLength: 12)
 
-                Text(hasNote ? "Edit" : "Add")
+                Text(hasNote ? L10n.tr("Edit") : L10n.tr("Add"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.white.opacity(0.82))
                     .padding(.horizontal, 10)
@@ -1032,7 +1032,7 @@ struct ActiveWorkoutView: View {
             )
         }
         .buttonStyle(.strqPressable)
-        .accessibilityLabel(hasNote ? "Edit session note" : "Add session note")
+        .accessibilityLabel(hasNote ? L10n.tr("Edit session note") : L10n.tr("Add session note"))
     }
 
     private struct PersonalBest {
@@ -1063,10 +1063,10 @@ struct ActiveWorkoutView: View {
 
     private func formatRelativeDate(_ date: Date) -> String {
         let days = Calendar.current.dateComponents([.day], from: date, to: Date()).day ?? 0
-        if days <= 0 { return "today" }
-        if days == 1 { return "yesterday" }
-        if days < 7 { return "\(days)d ago" }
-        if days < 30 { return "\(days / 7)w ago" }
+        if days <= 0 { return L10n.tr("today") }
+        if days == 1 { return L10n.tr("yesterday") }
+        if days < 7 { return L10n.format("%dd ago", days) }
+        if days < 30 { return L10n.format("%dw ago", days / 7) }
         let f = DateFormatter()
         f.dateFormat = "d MMM"
         return f.string(from: date)
@@ -1093,7 +1093,7 @@ struct ActiveWorkoutView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "info.circle")
                             .font(.caption2.weight(.semibold))
-                        Text("Exercise Guide")
+                        Text(L10n.tr("Exercise Guide"))
                             .font(.footnote.weight(.medium))
                     }
                     .foregroundStyle(.white.opacity(0.55))
@@ -1110,14 +1110,14 @@ struct ActiveWorkoutView: View {
                 HStack(spacing: 5) {
                     Image(systemName: "arrow.triangle.2.circlepath")
                         .font(.caption2.weight(.semibold))
-                    Text("Swap Exercise")
+                    Text(L10n.tr("Swap Exercise"))
                         .font(.footnote.weight(.semibold))
                 }
                 .foregroundStyle(.white.opacity(0.75))
                 .frame(maxWidth: .infinity)
                 .frame(height: 38)
             }
-            .accessibilityLabel("Swap exercise")
+            .accessibilityLabel(L10n.tr("Swap exercise"))
 
             Rectangle()
                 .fill(Color.white.opacity(0.05))
@@ -1152,7 +1152,7 @@ struct ActiveWorkoutView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 10) {
-                    Text("UP NEXT")
+                    Text(L10n.tr("UP NEXT"))
                         .font(.system(size: 10, weight: .black))
                         .foregroundStyle(.white.opacity(0.9))
                         .tracking(1.4)
@@ -1166,7 +1166,7 @@ struct ActiveWorkoutView: View {
 
                 VStack(spacing: 6) {
                     ForEach(Array(remaining.enumerated()), id: \.element.id) { offset, log in
-                        upNextRow(log: log, isImmediate: offset == 0, positionLabel: offset == 0 ? "NEXT" : "THEN")
+                        upNextRow(log: log, isImmediate: offset == 0, positionLabel: offset == 0 ? L10n.tr("NEXT") : L10n.tr("THEN"))
                     }
                 }
             }
@@ -1233,7 +1233,7 @@ struct ActiveWorkoutView: View {
             Button {
                 undoLastCompletedSet()
             } label: {
-                Text("Undo")
+                Text(L10n.tr("Undo"))
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.black)
                     .padding(.horizontal, 14)
@@ -1241,7 +1241,7 @@ struct ActiveWorkoutView: View {
                     .background(STRQBrand.accentGradient, in: Capsule())
             }
             .buttonStyle(.strqPressable)
-            .accessibilityLabel("Undo last logged set")
+            .accessibilityLabel(L10n.tr("Undo last logged set"))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
@@ -1271,7 +1271,7 @@ struct ActiveWorkoutView: View {
             Group {
                 if allDone {
                     VStack(spacing: 10) {
-                        Text("All sets are logged. Finish Workout to hand this session back to Today.")
+                        Text(L10n.tr("All sets are logged. Finish Workout to hand this session back to Today."))
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(.white.opacity(0.7))
                             .multilineTextAlignment(.center)
@@ -1281,7 +1281,7 @@ struct ActiveWorkoutView: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "flag.checkered")
                                     .font(.subheadline)
-                                Text("Finish Workout")
+                                Text(L10n.tr("Finish Workout"))
                                     .font(.body.weight(.bold))
                             }
                             .foregroundStyle(.black)
@@ -1292,7 +1292,7 @@ struct ActiveWorkoutView: View {
                     }
                 } else if allCurrentSetsDone && !isLastExercise {
                     VStack(spacing: 10) {
-                        Text("Current exercise is complete. Move on when you're ready.")
+                        Text(L10n.tr("Current exercise is complete. Move on when you're ready."))
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(.white.opacity(0.7))
                             .multilineTextAlignment(.center)
@@ -1300,7 +1300,7 @@ struct ActiveWorkoutView: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "arrow.right")
                                     .font(.subheadline)
-                                Text("Next Exercise")
+                                Text(L10n.tr("Next Exercise"))
                                     .font(.body.weight(.bold))
                             }
                             .foregroundStyle(.black)
@@ -1346,7 +1346,7 @@ struct ActiveWorkoutView: View {
 
                         VStack(alignment: .leading, spacing: 14) {
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("JUST LOGGED")
+                                Text(L10n.tr("JUST LOGGED"))
                                     .font(.system(size: 9, weight: .black))
                                     .tracking(1.5)
                                     .foregroundStyle(STRQBrand.steel)
@@ -1355,20 +1355,20 @@ struct ActiveWorkoutView: View {
                                     .foregroundStyle(.white)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.85)
-                                Text("Set \(loggedSet.setNumber) · \(formatWeight(loggedSet.weight, increment: 0.5)) × \(loggedSet.reps)")
+                                Text(L10n.format("Set %d · %@ × %d", loggedSet.setNumber, formatWeight(loggedSet.weight, increment: 0.5), loggedSet.reps))
                                     .font(.system(size: 24, weight: .heavy, design: .rounded).monospacedDigit())
                                     .foregroundStyle(.white)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.8)
                                 if e1rm > 0 {
-                                    Text(String(format: "Estimated 1RM %.0f", e1rm))
+                                    Text(L10n.format("Estimated 1RM %.0f", e1rm))
                                         .font(.caption.weight(.semibold).monospacedDigit())
                                         .foregroundStyle(.white.opacity(0.52))
                                 }
                             }
 
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("How did that feel?")
+                                Text(L10n.tr("How did that feel?"))
                                     .font(.caption.weight(.bold))
                                     .foregroundStyle(.white.opacity(0.48))
                                 HStack(spacing: 8) {
@@ -1427,7 +1427,7 @@ struct ActiveWorkoutView: View {
                                 .animation(.linear(duration: 1), value: restTimeRemaining)
 
                             VStack(spacing: 6) {
-                                Text("REST")
+                                Text(L10n.tr("REST"))
                                     .font(.system(size: 10, weight: .black))
                                     .tracking(2.0)
                                     .foregroundStyle(.white.opacity(0.46))
@@ -1462,7 +1462,7 @@ struct ActiveWorkoutView: View {
                             restTimeRemaining = 0
                             restTimerActive = false
                         } label: {
-                            Text("Continue Now")
+                            Text(L10n.tr("Continue Now"))
                                 .font(.body.weight(.bold))
                                 .foregroundStyle(.black)
                                 .frame(maxWidth: .infinity)
@@ -1470,7 +1470,7 @@ struct ActiveWorkoutView: View {
                                 .background(STRQBrand.accentGradient, in: Capsule())
                         }
                         .buttonStyle(.strqPressable)
-                        .accessibilityLabel("Continue workout now")
+                        .accessibilityLabel(L10n.tr("Continue workout now"))
 
                         restTimerAdjustmentButton(title: "+15s") {
                             restTimeRemaining += 15
@@ -1516,12 +1516,12 @@ struct ActiveWorkoutView: View {
 
     private func restCountdownHint() -> String {
         if restTimeRemaining <= 10 {
-            return "Get set for the next effort."
+            return L10n.tr("Get set for the next effort.")
         }
         if restTimeRemaining <= 30 {
-            return "Reset, then go again."
+            return L10n.tr("Reset, then go again.")
         }
-        return "Take the rest you need. The next move is already queued."
+        return L10n.tr("Take the rest you need. The next move is already queued.")
     }
 
     private func restNextActionCard(_ nextRec: NextSetRec) -> some View {
@@ -1582,18 +1582,18 @@ struct ActiveWorkoutView: View {
             if nextIdx < workout.session.exerciseLogs.count {
                 let nextEx = vm.library.exercise(byId: workout.session.exerciseLogs[nextIdx].exerciseId)
                 return NextSetRec(
-                    eyebrow: "NEXT EXERCISE",
+                    eyebrow: L10n.tr("NEXT EXERCISE"),
                     primary: nextEx?.name ?? "Next exercise",
-                    detail: "This lift is done. Move on when the rest feels right.",
+                    detail: L10n.tr("This lift is done. Move on when the rest feels right."),
                     icon: "arrow.right.circle.fill",
                     tint: STRQBrand.steel,
                     usesMonospacedPrimary: false
                 )
             }
             return NextSetRec(
-                eyebrow: "WORKOUT READY",
-                primary: "Finish Workout",
-                detail: "All working sets are logged. Finish when you're ready.",
+                eyebrow: L10n.tr("WORKOUT READY"),
+                primary: L10n.tr("Finish Workout"),
+                detail: L10n.tr("All working sets are logged. Finish when you're ready."),
                 icon: "flag.checkered",
                 tint: STRQPalette.success,
                 usesMonospacedPrimary: false
@@ -1659,7 +1659,7 @@ struct ActiveWorkoutView: View {
         }
 
         return NextSetRec(
-            eyebrow: "NEXT SET",
+            eyebrow: L10n.tr("NEXT SET"),
             primary: primary,
             detail: guidance,
             icon: icon,
@@ -1723,7 +1723,7 @@ struct ActiveWorkoutView: View {
                             Spacer()
 
                             if isCurrent {
-                                Text("Active")
+                                Text(L10n.tr("Active"))
                                     .font(.system(size: 10, weight: .bold))
                                     .foregroundStyle(STRQBrand.steel)
                                     .padding(.horizontal, 8)
@@ -1739,17 +1739,17 @@ struct ActiveWorkoutView: View {
                                 swapContextIndex = index
                             }
                         } label: {
-                            Label("Swap Exercise", systemImage: "arrow.triangle.2.circlepath")
+                            Label(L10n.tr("Swap Exercise"), systemImage: "arrow.triangle.2.circlepath")
                         }
                         .tint(STRQBrand.steel)
                     }
                 }
             }
-            .navigationTitle("Exercises")
+            .navigationTitle(L10n.tr("Exercises"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { showExerciseList = false }
+                    Button(L10n.tr("Done")) { showExerciseList = false }
                 }
             }
         }
@@ -1780,8 +1780,8 @@ struct ActiveWorkoutView: View {
 
     private func presentSwapConfirmation(oldExerciseName: String, newExerciseName: String, isCurrentExercise: Bool) {
         let message = isCurrentExercise
-            ? "Current exercise updated to \(newExerciseName)"
-            : "Swapped \(oldExerciseName) for \(newExerciseName)"
+            ? L10n.format("Current exercise updated to %@", newExerciseName)
+            : L10n.format("Swapped %@ for %@", oldExerciseName, newExerciseName)
         swapFeedbackTask?.cancel()
         withAnimation(.easeOut(duration: 0.2)) {
             swapConfirmationText = message
@@ -1816,7 +1816,7 @@ struct ActiveWorkoutView: View {
     private func activeTaskHeader(exercise: Exercise?, currentSet: SetLog?, totalSets: Int) -> some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
-                Text(currentSet == nil ? "NEXT ACTION" : "CURRENT TASK")
+                Text(currentSet == nil ? L10n.tr("NEXT ACTION") : L10n.tr("CURRENT TASK"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.0)
                     .foregroundStyle(.white.opacity(0.45))
@@ -1839,7 +1839,7 @@ struct ActiveWorkoutView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "info.circle")
                             .font(.caption.weight(.semibold))
-                        Text("Exercise Guide")
+                        Text(L10n.tr("Exercise Guide"))
                             .font(.caption.weight(.semibold))
                     }
                     .foregroundStyle(.white.opacity(0.82))
@@ -1857,18 +1857,18 @@ struct ActiveWorkoutView: View {
     }
 
     private func taskHeaderTitle(exercise: Exercise?, currentSet: SetLog?, totalSets: Int) -> String {
-        let exerciseName = exercise?.name ?? "Exercise"
+        let exerciseName = exercise?.name ?? L10n.tr("Exercise")
         if let currentSet {
-            return "Log set \(currentSet.setNumber) of \(totalSets) for \(exerciseName)"
+            return L10n.format("Log set %d of %d for %@", currentSet.setNumber, totalSets, exerciseName)
         }
-        return "All sets logged for \(exerciseName)"
+        return L10n.format("All sets logged for %@", exerciseName)
     }
 
     private func taskHeaderDetail(currentSet: SetLog?, totalSets: Int) -> String {
         if let currentSet {
-            return "Adjust load or reps if needed, then log set \(currentSet.setNumber)."
+            return L10n.format("Adjust load or reps if needed, then log set %d.", currentSet.setNumber)
         }
-        return totalSets == 0 ? "This exercise is ready." : "Use the bottom action to move forward when you're ready."
+        return totalSets == 0 ? L10n.tr("This exercise is ready.") : L10n.tr("Use the bottom action to move forward when you're ready.")
     }
 
     private func activeSetFor(log: ExerciseLog, workout: ActiveWorkoutState) -> SetLog? {
@@ -1945,10 +1945,10 @@ struct ActiveWorkoutView: View {
               setIndex < workout.session.exerciseLogs[exerciseIndex].sets.count else { return nil }
         let set = workout.session.exerciseLogs[exerciseIndex].sets[setIndex]
         let exerciseId = workout.session.exerciseLogs[exerciseIndex].exerciseId
-        let exerciseName = vm.library.exercise(byId: exerciseId)?.name ?? "Exercise"
+        let exerciseName = vm.library.exercise(byId: exerciseId)?.name ?? L10n.tr("Exercise")
         return LoggedSetUndoPrompt(
-            title: "Set \(set.setNumber) logged",
-            subtitle: "\(exerciseName) · \(formatWeight(set.weight, increment: 0.5)) × \(set.reps)"
+            title: L10n.format("Set %d logged", set.setNumber),
+            subtitle: L10n.format("%@ · %@ × %d", exerciseName, formatWeight(set.weight, increment: 0.5), set.reps)
         )
     }
 
@@ -2106,11 +2106,11 @@ private struct WorkoutNoteSheet: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 18) {
-                Text("Keep one quick note for this workout.")
+                Text(L10n.tr("Keep one quick note for this workout."))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
-                TextField("How did this session feel?", text: $draftNote, axis: .vertical)
+                TextField(L10n.tr("How did this session feel?"), text: $draftNote, axis: .vertical)
                     .lineLimit(4...8)
                     .padding(14)
                     .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
@@ -2120,23 +2120,23 @@ private struct WorkoutNoteSheet: View {
                     )
                     .focused($focused)
 
-                Text(trimmedNote.isEmpty ? "Optional. Save a cue, win, or anything you want to remember next time." : "This note stays attached to the saved session.")
+                Text(trimmedNote.isEmpty ? L10n.tr("Optional. Save a cue, win, or anything you want to remember next time.") : L10n.tr("This note stays attached to the saved session."))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
 
                 Spacer(minLength: 0)
             }
             .padding(20)
-            .navigationTitle("Session Note")
+            .navigationTitle(L10n.tr("Session Note"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
+                    Button(L10n.tr("Cancel")) {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(trimmedNote.isEmpty ? "Done" : "Save") {
+                    Button(trimmedNote.isEmpty ? L10n.tr("Done") : L10n.tr("Save")) {
                         onSave(trimmedNote)
                         dismiss()
                     }
@@ -2144,7 +2144,7 @@ private struct WorkoutNoteSheet: View {
                 }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button("Done") {
+                    Button(L10n.tr("Done")) {
                         focused = false
                     }
                 }
@@ -2199,14 +2199,14 @@ private struct NumericInputSheet: View {
                     .focused($focused)
 
                 HStack(spacing: 12) {
-                    Button("Cancel") { dismiss() }
+                    Button(L10n.tr("Cancel")) { dismiss() }
                         .font(.body.weight(.semibold))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
                         .background(Color(.tertiarySystemFill), in: .rect(cornerRadius: 14))
 
-                    Button("Save") {
+                    Button(L10n.tr("Save")) {
                         let normalized = text.replacingOccurrences(of: ",", with: ".")
                         if let value = Double(normalized) {
                             onSave(value)
