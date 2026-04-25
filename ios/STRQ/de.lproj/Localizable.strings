@@ -99,3 +99,31 @@
 "Reset All Data?" = "Alle Daten zurücksetzen?";
 "Keep" = "Behalten";
 "OK" = "OK";
+
+/* Notifications */
+"notification.workout.today.title" = "Heute: %@";
+"notification.workout.tomorrow.title" = "Morgen: %@";
+"notification.workout.next.early.body" = "Deine nächste Einheit hält deine Basis ehrlich. Kleine Fortschritte summieren sich.";
+"notification.workout.next.body" = "Bereite dich auf %@ vor. Schlaf und Energie geben den Ton an.";
+"notification.workout.first_session.body" = "Deine erste Einheit setzt die Basis. Halte es heute sauber und einfach.";
+"notification.workout.focus_ready.body" = "Erholung passt — %@ steht an. Saubere Wiederholungen zählen.";
+"notification.workout.ready.body" = "Erholung und Progression passen zusammen. Zeit fürs Training.";
+"notification.workout.low_readiness.body" = "Deine Bereitschaft ist heute niedriger. Bleib ehrlich — Qualität vor Gewicht.";
+"notification.workout.focus_default.body" = "%@ heute. %@ ist vorbereitet.";
+"notification.workout.default.body" = "%@ ist vorbereitet.";
+"notification.readiness.early.body" = "Sag STRQ kurz, wie sich der Tag anfühlt. Das kalibriert alles.";
+"notification.readiness.body" = "Wie fühlt sich dein Körper heute an? 30 Sekunden schärfen die heutige Einheit.";
+"notification.weekly_review.ready.body" = "Deine Woche ist drin. Sieh, was sich bewegt hat — und was als Nächstes kommt.";
+"notification.weekly_review.default.body" = "Schließ die Woche mit einem klaren Review ab.";
+"notification.streak.title" = "Halte deine %d-Tage-Serie";
+"notification.streak.body" = "Ein Check-in oder eine kurze Einheit reicht, um dranzubleiben.";
+"notification.weight_log.body" = "Ein kurzer Eintrag hält deinen Verlauf ehrlich.";
+"notification.sleep_log.body" = "Schlaf ist ein großer Teil deiner Erholung. Dauert nur kurz.";
+"notification.comeback.in_rhythm.early.body" = "Eine saubere Einheit bringt den Rhythmus zurück.";
+"notification.comeback.in_rhythm.body" = "Eine Einheit reicht, um deinen Plan ehrlich zu halten. Kein Druck.";
+"notification.comeback.pause.title" = "Mach dort weiter, wo du aufgehört hast";
+"notification.comeback.pause.body" = "Ein paar Tage Pause sind okay. Deine nächste Einheit bleibt der richtige Schritt — kein Neustart nötig.";
+"notification.comeback.extended.title" = "Steig kontrolliert wieder ein";
+"notification.comeback.extended.body" = "STRQ macht deine erste Einheit zurück leichter. Comebacks halten besser, wenn der Einstieg sauber ist.";
+"notification.comeback.long.title" = "Aufbauen, nicht testen";
+"notification.comeback.long.body" = "Behandle diese Woche wie einen Aufbau-Block. Leichtere Einheiten jetzt zahlen sich später aus.";
