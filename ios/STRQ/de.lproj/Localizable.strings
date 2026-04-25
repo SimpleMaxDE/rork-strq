@@ -156,3 +156,30 @@
 "Move to the next exercise when you're ready." = "Gehe zur nächsten Übung, wenn du bereit bist.";
 "Match last" = "Letzten übernehmen";
 "Target" = "Ziel";
+
+/* Notification settings */
+"Sunday" = "Sonntag";
+"Monday" = "Montag";
+"Tuesday" = "Dienstag";
+"Wednesday" = "Mittwoch";
+"Thursday" = "Donnerstag";
+"Friday" = "Freitag";
+"Saturday" = "Samstag";
+"Workout Planned Today" = "Training heute geplant";
+"Get reminded when you have a session scheduled" = "Erhalte eine Erinnerung, wenn eine Einheit geplant ist";
+"Reminder Time" = "Erinnerungszeit";
+"Daily Check-In" = "Täglicher Check-in";
+"Daily Readiness Check-In" = "Täglicher Readiness-Check-in";
+"Morning reminder to log how you're feeling" = "Morgendliche Erinnerung, kurz einzutragen, wie du dich fühlst";
+"Check-In Time" = "Check-in-Zeit";
+"Weekly Review Ready" = "Wochenrückblick bereit";
+"Get notified when your weekly check-in is available" = "Erhalte eine Benachrichtigung, wenn dein Wochen-Check-in verfügbar ist";
+"Review Day" = "Review-Tag";
+"Coach Nudges" = "Coach-Hinweise";
+"Coach Recommendations" = "Coach-Empfehlungen";
+"When your coach has important adjustments or insights" = "Wenn dein Coach wichtige Anpassungen oder Hinweise hat";
+"Streak Protection" = "Serienschutz";
+"Streak at Risk" = "Serie gefährdet";
+"Reminder when your streak might break tomorrow" = "Erinnerung, wenn deine Serie morgen reißen könnte";
+"Sync with Apple Health" = "Mit Apple Health synchronisieren";
+"Read body weight and sleep, write workouts and weigh-ins" = "Körpergewicht und Schlaf lesen, Workouts und Wiegeeinträge speichern";
