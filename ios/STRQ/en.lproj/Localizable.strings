@@ -99,3 +99,31 @@
 "Reset All Data?" = "Reset All Data?";
 "Keep" = "Keep";
 "OK" = "OK";
+
+/* Notifications */
+"notification.workout.today.title" = "Today: %@";
+"notification.workout.tomorrow.title" = "Tomorrow: %@";
+"notification.workout.next.early.body" = "Your next session keeps your baseline honest. Small wins compound.";
+"notification.workout.next.body" = "Get ready for %@. Sleep and fuel set the tone.";
+"notification.workout.first_session.body" = "Your first session sets your baseline. Keep it simple today.";
+"notification.workout.focus_ready.body" = "Recovery is aligned — %@ day. Push clean reps.";
+"notification.workout.ready.body" = "Recovery and progression are aligned. Time to train.";
+"notification.workout.low_readiness.body" = "Readiness is lower today. Stay honest — quality over load.";
+"notification.workout.focus_default.body" = "%@ today. %@ is queued up.";
+"notification.workout.default.body" = "%@ is queued up.";
+"notification.readiness.early.body" = "Tell STRQ how today feels. It calibrates everything.";
+"notification.readiness.body" = "How's your body today? 30 seconds sharpens today's session.";
+"notification.weekly_review.ready.body" = "Your week is in. See what moved — and what's next.";
+"notification.weekly_review.default.body" = "Close the week with a clear-eyed review.";
+"notification.streak.title" = "Keep your %d-day streak";
+"notification.streak.body" = "A check-in or a short session is enough to hold the line.";
+"notification.weight_log.body" = "A quick log keeps your trend line honest.";
+"notification.sleep_log.body" = "Sleep is half of recovery. Takes a second.";
+"notification.comeback.in_rhythm.early.body" = "A single clean session rebuilds momentum.";
+"notification.comeback.in_rhythm.body" = "One session back keeps your plan honest. No pressure.";
+"notification.comeback.pause.title" = "Pick up where you left off";
+"notification.comeback.pause.body" = "A couple of days off is fine. Your next session is still the right move — no reset needed.";
+"notification.comeback.extended.title" = "Ease back in";
+"notification.comeback.extended.body" = "STRQ will lighten your first session back. Comebacks hold when the re-entry is soft.";
+"notification.comeback.long.title" = "Rebuild, don't retest";
+"notification.comeback.long.body" = "Treat this week like a rebuild block. Lighter sessions now mean real gains in two weeks.";
