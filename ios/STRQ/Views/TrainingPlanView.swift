@@ -225,7 +225,7 @@ struct TrainingPlanView: View {
                         .foregroundStyle(isSelected ? Color.white.opacity(0.6) : STRQBrand.steel)
                         .tracking(0.3)
                 } else {
-                    Text("DAY \(index + 1)")
+                    Text(L10n.format("DAY %d", index + 1))
                         .font(.system(size: 8, weight: .bold))
                         .foregroundStyle(isSelected ? Color.white.opacity(0.6) : Color.secondary)
                         .tracking(0.3)
@@ -301,7 +301,7 @@ struct TrainingPlanView: View {
                 }
 
                 if !day.isSkipped {
-                    ForgePrimaryButton(icon: "bolt.fill", title: "Review & Start") {
+                    ForgePrimaryButton(icon: "bolt.fill", title: L10n.tr("Review & Start")) {
                         vm.prepareWorkoutHandoff(day: day)
                     }
                     .padding(.horizontal, 16)
@@ -360,10 +360,10 @@ struct TrainingPlanView: View {
                 }
 
                 HStack(spacing: 0) {
-                    ForgeStatCell(value: "\(briefing.exerciseCount)", label: "Exercises")
-                    ForgeStatCell(value: "\(briefing.totalSets)", label: "Sets")
-                    ForgeStatCell(value: "~\(briefing.estimatedMinutes)m", label: "Time")
-                    ForgeStatCell(value: briefing.intensityLabel, label: "Effort", valueColor: STRQBrand.steel)
+                    ForgeStatCell(value: "\(briefing.exerciseCount)", label: L10n.tr("Exercises"))
+                    ForgeStatCell(value: "\(briefing.totalSets)", label: L10n.tr("Sets"))
+                    ForgeStatCell(value: "~\(briefing.estimatedMinutes)m", label: L10n.tr("Time"))
+                    ForgeStatCell(value: briefing.intensityLabel, label: L10n.tr("Effort"), valueColor: STRQBrand.steel)
                 }
                 .padding(.top, 2)
             }
@@ -435,10 +435,10 @@ struct TrainingPlanView: View {
             }
         }
         var out: [RoleGroup] = []
-        if !warm.isEmpty { out.append(RoleGroup(title: "Warm-Up", color: STRQPalette.warning, items: warm)) }
-        if !key.isEmpty { out.append(RoleGroup(title: "Key Lifts", color: .white, items: key)) }
-        if !support.isEmpty { out.append(RoleGroup(title: "Support", color: STRQPalette.info, items: support)) }
-        if !accessory.isEmpty { out.append(RoleGroup(title: "Accessory", color: STRQBrand.steel, items: accessory)) }
+        if !warm.isEmpty { out.append(RoleGroup(title: L10n.tr("Warm-Up"), color: STRQPalette.warning, items: warm)) }
+        if !key.isEmpty { out.append(RoleGroup(title: L10n.tr("Key Lifts"), color: .white, items: key)) }
+        if !support.isEmpty { out.append(RoleGroup(title: L10n.tr("Support"), color: STRQPalette.info, items: support)) }
+        if !accessory.isEmpty { out.append(RoleGroup(title: L10n.tr("Accessory"), color: STRQBrand.steel, items: accessory)) }
         return out
     }
 
@@ -452,7 +452,7 @@ struct TrainingPlanView: View {
                 .tracking(0.8)
                 .foregroundStyle(color == .white ? Color.primary : color)
             Spacer()
-            Text("\(count) · \(sets) sets")
+            Text(L10n.format("%d · %d sets", count, sets))
                 .font(.system(size: 10, weight: .semibold).monospacedDigit())
                 .foregroundStyle(.tertiary)
         }
@@ -626,7 +626,7 @@ struct TrainingPlanView: View {
             Image(systemName: isDeload ? "arrow.down.to.line" : "arrow.triangle.2.circlepath.circle.fill")
                 .font(.caption)
                 .foregroundStyle(color)
-            Text(isDeload ? "Deload Week" : "Coach-Adjusted Week")
+            Text(L10n.tr(isDeload ? "Deload Week" : "Coach-Adjusted Week"))
                 .font(.caption.weight(.bold))
                 .foregroundStyle(color)
             Spacer()
@@ -671,7 +671,7 @@ struct TrainingPlanView: View {
                 HStack(spacing: 4) {
                     Image(systemName: day.isSkipped ? "arrow.uturn.backward" : "forward.fill")
                         .font(.system(size: 9))
-                    Text(day.isSkipped ? "Unskip" : "Skip")
+                    Text(L10n.tr(day.isSkipped ? "Unskip" : "Skip"))
                         .font(.caption2.weight(.semibold))
                 }
                 .foregroundStyle(day.isSkipped ? STRQPalette.success : .secondary)
@@ -744,11 +744,11 @@ struct TrainingPlanView: View {
 
     private func adjustmentLabel(_ type: CoachAdjustmentType) -> String {
         switch type {
-        case .volumeReduced: return "Volume Reduced"
-        case .exerciseSwapped: return "Exercise Swapped"
-        case .lighterSession: return "Lighter Session"
-        case .weekRegenerated: return "Week Regenerated"
-        case .deloadWeek: return "Deload Week"
+        case .volumeReduced: return L10n.tr("Volume Reduced")
+        case .exerciseSwapped: return L10n.tr("Exercise Swapped")
+        case .lighterSession: return L10n.tr("Lighter Session")
+        case .weekRegenerated: return L10n.tr("Week Regenerated")
+        case .deloadWeek: return L10n.tr("Deload Week")
         }
     }
 
@@ -765,8 +765,8 @@ struct TrainingPlanView: View {
     private var emptyPlanState: some View {
         ForgeEmptyState(
             icon: "doc.text.magnifyingglass",
-            title: "No Plan Yet",
-            message: "Complete onboarding to generate\nyour personalized training plan."
+            title: L10n.tr("No Plan Yet"),
+            message: L10n.tr("Complete onboarding to generate\nyour personalized training plan.")
         )
         .padding(.top, 40)
     }
