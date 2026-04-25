@@ -109,7 +109,7 @@ struct ProfileView: View {
                 store.error = nil
             }
         } message: {
-            Text(store.restoreMessage ?? store.error ?? "No active subscriptions found.")
+            Text(store.restoreMessage ?? store.error ?? L10n.tr("No active subscriptions found."))
         }
     }
 
@@ -264,7 +264,7 @@ struct ProfileView: View {
         let trimmedName: String? = name?.trimmingCharacters(in: .whitespacesAndNewlines)
         let accountLine: String
         if let trimmedName, !trimmedName.isEmpty {
-            accountLine = "Signed in as \(trimmedName)"
+            accountLine = L10n.format("Signed in as %@", trimmedName)
         } else {
             accountLine = L10n.tr("Signed in with Apple")
         }
@@ -740,7 +740,7 @@ struct ProfileView: View {
                 }
                 controlRow(L10n.tr("Restore Purchases"), icon: "arrow.clockwise", color: STRQBrand.steel) {
                     guard store.isConfigured else {
-                        store.restoreMessage = "Subscriptions are not available in this environment."
+                        store.restoreMessage = L10n.tr("Subscriptions are not available in this environment.")
                         showRestoreMessage = true
                         return
                     }
