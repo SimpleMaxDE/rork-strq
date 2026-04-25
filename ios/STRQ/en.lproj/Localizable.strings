@@ -156,3 +156,30 @@
 "Move to the next exercise when you're ready." = "Move to the next exercise when you're ready.";
 "Match last" = "Match last";
 "Target" = "Target";
+
+/* Notification settings */
+"Sunday" = "Sunday";
+"Monday" = "Monday";
+"Tuesday" = "Tuesday";
+"Wednesday" = "Wednesday";
+"Thursday" = "Thursday";
+"Friday" = "Friday";
+"Saturday" = "Saturday";
+"Workout Planned Today" = "Workout Planned Today";
+"Get reminded when you have a session scheduled" = "Get reminded when you have a session scheduled";
+"Reminder Time" = "Reminder Time";
+"Daily Check-In" = "Daily Check-In";
+"Daily Readiness Check-In" = "Daily Readiness Check-In";
+"Morning reminder to log how you're feeling" = "Morning reminder to log how you're feeling";
+"Check-In Time" = "Check-In Time";
+"Weekly Review Ready" = "Weekly Review Ready";
+"Get notified when your weekly check-in is available" = "Get notified when your weekly check-in is available";
+"Review Day" = "Review Day";
+"Coach Nudges" = "Coach Nudges";
+"Coach Recommendations" = "Coach Recommendations";
+"When your coach has important adjustments or insights" = "When your coach has important adjustments or insights";
+"Streak Protection" = "Streak Protection";
+"Streak at Risk" = "Streak at Risk";
+"Reminder when your streak might break tomorrow" = "Reminder when your streak might break tomorrow";
+"Sync with Apple Health" = "Sync with Apple Health";
+"Read body weight and sleep, write workouts and weigh-ins" = "Read body weight and sleep, write workouts and weigh-ins";
