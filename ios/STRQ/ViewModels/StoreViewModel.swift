@@ -114,7 +114,7 @@ class StoreViewModel {
 
     func restore() async {
         guard isConfigured else {
-            restoreMessage = "Subscriptions are not available in this environment."
+            restoreMessage = L10n.tr("Subscriptions are not available in this environment.")
             Analytics.shared.track(.restore_failed, ["reason": "unconfigured"])
             return
         }
@@ -126,7 +126,7 @@ class StoreViewModel {
             let info = try await Purchases.shared.restorePurchases()
             isPro = info.entitlements["pro"]?.isActive == true
             customerInfo = info
-            restoreMessage = isPro ? "Purchases restored successfully." : "No active subscriptions found."
+            restoreMessage = isPro ? L10n.tr("Purchases restored successfully.") : L10n.tr("No active subscriptions found.")
             Analytics.shared.track(.restore_completed, ["is_pro": isPro ? "true" : "false"])
         } catch {
             self.error = error.localizedDescription
@@ -136,26 +136,26 @@ class StoreViewModel {
     }
 
     var subscriptionStatusText: String {
-        guard isConfigured else { return "Free" }
-        guard isPro else { return "Free" }
+        guard isConfigured else { return L10n.tr("Free") }
+        guard isPro else { return L10n.tr("Free") }
         if let entitlement = customerInfo?.entitlements["pro"], entitlement.isActive {
             if entitlement.willRenew {
-                return "Active · Renews automatically"
+                return L10n.tr("Active · Renews automatically")
             } else {
                 if let expDate = entitlement.expirationDate {
                     let formatter = DateFormatter()
                     formatter.dateStyle = .medium
-                    return "Expires \(formatter.string(from: expDate))"
+                    return L10n.format("Expires %@", formatter.string(from: expDate))
                 }
-                return "Active · Expires soon"
+                return L10n.tr("Active · Expires soon")
             }
         }
-        return "Active"
+        return L10n.tr("Active")
     }
 
     var subscriptionPlanName: String {
         guard isPro, let entitlement = customerInfo?.entitlements["pro"], entitlement.isActive else {
-            return "Free"
+            return L10n.tr("Free")
         }
         // Prefer the real StoreKit package type from the current offering when we
         // can resolve the user's product back to a RevenueCat Package. Falls back
@@ -165,25 +165,25 @@ class StoreViewModel {
         if let offering = offerings?.current {
             if let pkg = offering.availablePackages.first(where: { $0.storeProduct.productIdentifier == productId }) {
                 switch pkg.packageType {
-                case .annual, .sixMonth: return "Yearly"
-                case .threeMonth, .twoMonth, .monthly: return "Monthly"
-                case .weekly: return "Weekly"
-                case .lifetime: return "Lifetime"
+                case .annual, .sixMonth: return L10n.tr("Yearly")
+                case .threeMonth, .twoMonth, .monthly: return L10n.tr("Monthly")
+                case .weekly: return L10n.tr("Weekly")
+                case .lifetime: return L10n.tr("Lifetime")
                 default: break
                 }
             }
         }
         let id = productId.lowercased()
         if id.contains("year") || id.contains("annual") {
-            return "Yearly"
+            return L10n.tr("Yearly")
         } else if id.contains("month") {
-            return "Monthly"
+            return L10n.tr("Monthly")
         } else if id.contains("week") {
-            return "Weekly"
+            return L10n.tr("Weekly")
         } else if id.contains("life") {
-            return "Lifetime"
+            return L10n.tr("Lifetime")
         }
-        return "Pro"
+        return L10n.tr("Pro")
     }
 
     var currentOffering: Offering? {

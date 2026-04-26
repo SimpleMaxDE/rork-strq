@@ -88,8 +88,8 @@ struct ExerciseLibraryView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .searchable(text: $searchText, prompt: "Search exercises, muscles, equipment...")
-        .navigationTitle("Exercise Library")
+        .searchable(text: $searchText, prompt: L10n.tr("Search exercises, muscles, equipment..."))
+        .navigationTitle(L10n.tr("Exercise Library"))
         .navigationBarTitleDisplayMode(.large)
         .sheet(item: $selectedExercise) { exercise in
             NavigationStack {
@@ -135,7 +135,7 @@ struct ExerciseLibraryView: View {
         if !combined.isEmpty {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 8) {
-                    Text("YOUR EXERCISES")
+                    Text(L10n.tr("YOUR EXERCISES"))
                         .font(.system(size: 10, weight: .black))
                         .tracking(1.2)
                         .foregroundStyle(.secondary)
@@ -262,7 +262,7 @@ struct ExerciseLibraryView: View {
                 Image(systemName: "arrow.up.right")
                     .font(.caption)
                     .foregroundStyle(.green)
-                Text("PROGRESSING")
+                Text(L10n.tr("PROGRESSING"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
@@ -296,7 +296,7 @@ struct ExerciseLibraryView: View {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.caption)
                     .foregroundStyle(STRQBrand.steel)
-                Text("NEEDS ATTENTION")
+                Text(L10n.tr("NEEDS ATTENTION"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
@@ -363,7 +363,7 @@ struct ExerciseLibraryView: View {
                 Image(systemName: "star.fill")
                     .font(.caption)
                     .foregroundStyle(STRQBrand.steel)
-                Text("ESSENTIAL EXERCISES")
+                Text(L10n.tr("ESSENTIAL EXERCISES"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
@@ -448,7 +448,7 @@ struct ExerciseLibraryView: View {
                 Image(systemName: "rectangle.stack.fill")
                     .font(.caption)
                     .foregroundStyle(STRQBrand.steel)
-                Text("EXERCISE FAMILIES")
+                Text(L10n.tr("EXERCISE FAMILIES"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
@@ -524,7 +524,7 @@ struct ExerciseLibraryView: View {
                 Image(systemName: "globe")
                     .font(.caption)
                     .foregroundStyle(STRQBrand.steel)
-                Text("TRAINING WORLDS")
+                Text(L10n.tr("TRAINING WORLDS"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
@@ -577,7 +577,7 @@ struct ExerciseLibraryView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "line.3.horizontal.decrease")
                             .font(.system(size: 12))
-                        Text("Filters")
+                        Text(L10n.tr("Filters"))
                             .font(.subheadline.weight(.medium))
                         if hasActiveFilters {
                             Circle()
@@ -592,7 +592,7 @@ struct ExerciseLibraryView: View {
                 }
 
                 Menu {
-                    Button("All Patterns") { selectedPattern = nil }
+                    Button(L10n.tr("All Patterns")) { selectedPattern = nil }
                     Divider()
                     ForEach(MovementPatternGroup.allCases) { pattern in
                         Button {
@@ -641,7 +641,7 @@ struct ExerciseLibraryView: View {
                     HStack(spacing: 5) {
                         Image(systemName: favoritesOnly ? "heart.fill" : "heart")
                             .font(.system(size: 12))
-                        Text("Favorites")
+                        Text(L10n.tr("Favorites"))
                             .font(.subheadline.weight(.medium))
                     }
                     .foregroundStyle(favoritesOnly ? .white : .primary)
@@ -664,7 +664,7 @@ struct ExerciseLibraryView: View {
                 .foregroundStyle(.secondary)
             Spacer()
             if selectedMuscle != nil || selectedWorld != nil || selectedPattern != nil || bodyweightOnly || jointFriendlyOnly || favoritesOnly {
-                Button("Clear All") {
+                Button(L10n.tr("Clear All")) {
                     withAnimation {
                         selectedMuscle = nil
                         selectedWorld = nil
@@ -770,11 +770,11 @@ struct ExerciseLibraryView: View {
                 }
                 .padding(20)
             }
-            .navigationTitle("Filters")
+            .navigationTitle(L10n.tr("Filters"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { showFilters = false }
+                    Button(L10n.tr("Done")) { showFilters = false }
                         .fontWeight(.semibold)
                 }
             }

@@ -30,7 +30,7 @@ struct WeeklyCheckInView: View {
             }
             .scrollIndicators(.hidden)
             .background(Color.black)
-            .navigationTitle("Weekly Review")
+            .navigationTitle(L10n.tr("Weekly Review"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -86,7 +86,7 @@ struct WeeklyCheckInView: View {
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(.secondary)
 
-            Text("Week in Review")
+            Text(L10n.tr("Week in Review"))
                 .font(.title.bold())
         }
         .padding(.top, 12)
@@ -118,7 +118,7 @@ struct WeeklyCheckInView: View {
                 VStack(spacing: 2) {
                     Text("\(review.summary.completedWorkouts)/\(review.summary.plannedWorkouts)")
                         .font(.title2.bold())
-                    Text("Sessions")
+                    Text(L10n.tr("Sessions"))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
@@ -217,10 +217,10 @@ struct WeeklyCheckInView: View {
     private var volumeComparisonCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("Volume Comparison")
+                Text(L10n.tr("Volume Comparison"))
                     .font(.subheadline.weight(.semibold))
                 Spacer()
-                Text("vs last week")
+                Text(L10n.tr("vs last week"))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -263,7 +263,7 @@ struct WeeklyCheckInView: View {
     private var muscleBalanceCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("Muscle Balance")
+                Text(L10n.tr("Muscle Balance"))
                     .font(.subheadline.weight(.semibold))
                 Spacer()
                 let score = Int(review.summary.muscleBalanceScore * 100)
@@ -316,9 +316,9 @@ struct WeeklyCheckInView: View {
     private var highlightsPage: some View {
         VStack(spacing: 20) {
             VStack(spacing: 6) {
-                Text("Highlights")
+                Text(L10n.tr("Highlights"))
                     .font(.title2.bold())
-                Text("What went well and what to improve")
+                Text(L10n.tr("What went well and what to improve"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -345,7 +345,7 @@ struct WeeklyCheckInView: View {
 
     private var winsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Wins", systemImage: "star.fill")
+            Label(L10n.tr("Wins"), systemImage: "star.fill")
                 .font(.headline)
                 .foregroundStyle(STRQBrand.steel)
 
@@ -363,7 +363,7 @@ struct WeeklyCheckInView: View {
 
     private var areasSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Areas to Improve", systemImage: "arrow.up.right")
+            Label(L10n.tr("Areas to Improve"), systemImage: "arrow.up.right")
                 .font(.headline)
                 .foregroundStyle(STRQBrand.steel)
 
@@ -413,7 +413,7 @@ struct WeeklyCheckInView: View {
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text("Bodyweight Trend")
+                Text(L10n.tr("Bodyweight Trend"))
                     .font(.subheadline.weight(.semibold))
                 Text("\(change > 0 ? "+" : "")\(String(format: "%.1f", change))kg vs last week")
                     .font(.caption)
@@ -443,9 +443,10 @@ struct WeeklyCheckInView: View {
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text("\(review.summary.personalRecordsCount) New PR\(review.summary.personalRecordsCount > 1 ? "s" : "") This Week")
+                let prLabel = review.summary.personalRecordsCount > 1 ? L10n.tr("New PRs This Week") : L10n.tr("New PR This Week")
+                Text(L10n.format("%d %@", review.summary.personalRecordsCount, prLabel))
                     .font(.subheadline.weight(.bold))
-                Text("Your strength is progressing. Keep it up.")
+                Text(L10n.tr("Your strength is progressing. Keep it up."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -492,7 +493,7 @@ struct WeeklyCheckInView: View {
             }
             .padding(.top, 12)
 
-            Text("Coach's Take")
+            Text(L10n.tr("Coach's Take"))
                 .font(.caption.weight(.bold))
                 .foregroundStyle(color)
                 .tracking(0.5)
@@ -518,7 +519,7 @@ struct WeeklyCheckInView: View {
 
     private var actionsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("What's Next?")
+            Text(L10n.tr("What's Next?"))
                 .font(.headline)
 
             ForEach(review.suggestedActions) { action in
@@ -585,7 +586,7 @@ struct WeeklyCheckInView: View {
                         vm.applyReviewAction(selected)
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(L10n.tr("Cancel"), role: .cancel) {}
             }
         } message: {
             if let selected = selectedAction {

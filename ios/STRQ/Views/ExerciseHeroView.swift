@@ -342,7 +342,7 @@ struct ExerciseHeroView_Compact: View {
                         .foregroundStyle(gradientColors[0])
 
                     if exercise.category == .compound {
-                        Text("Key Lift")
+                        Text(L10n.tr("Key Lift"))
                             .font(.system(size: 9, weight: .bold))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 7)
@@ -356,7 +356,7 @@ struct ExerciseHeroView_Compact: View {
                                 in: Capsule()
                             )
                     } else if exercise.category == .bodyweight {
-                        Text("Bodyweight")
+                        Text(L10n.tr("Bodyweight"))
                             .font(.system(size: 9, weight: .semibold))
                             .foregroundStyle(gradientColors[0])
                             .padding(.horizontal, 7)

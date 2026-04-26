@@ -14,14 +14,14 @@ nonisolated enum FitnessGoal: String, Codable, CaseIterable, Identifiable, Senda
 
     var displayName: String {
         switch self {
-        case .muscleGain: "Build Muscle"
-        case .strength: "Get Stronger"
-        case .fatLoss: "Lose Fat"
-        case .generalFitness: "General Fitness"
-        case .endurance: "Endurance"
-        case .flexibility: "Flexibility"
-        case .athleticPerformance: "Athletic Performance"
-        case .rehabilitation: "Rehabilitation"
+        case .muscleGain: L10n.tr("Build Muscle")
+        case .strength: L10n.tr("Get Stronger")
+        case .fatLoss: L10n.tr("Lose Fat")
+        case .generalFitness: L10n.tr("General Fitness")
+        case .endurance: L10n.tr("Endurance")
+        case .flexibility: L10n.tr("Flexibility")
+        case .athleticPerformance: L10n.tr("Athletic Performance")
+        case .rehabilitation: L10n.tr("Rehabilitation")
         }
     }
 
@@ -48,17 +48,17 @@ nonisolated enum TrainingLevel: String, Codable, CaseIterable, Identifiable, Sen
 
     var displayName: String {
         switch self {
-        case .beginner: "Beginner (0-1 year)"
-        case .intermediate: "Intermediate (1-3 years)"
-        case .advanced: "Advanced (3+ years)"
+        case .beginner: L10n.tr("Beginner (0-1 year)")
+        case .intermediate: L10n.tr("Intermediate (1-3 years)")
+        case .advanced: L10n.tr("Advanced (3+ years)")
         }
     }
 
     var shortName: String {
         switch self {
-        case .beginner: "Beginner"
-        case .intermediate: "Intermediate"
-        case .advanced: "Advanced"
+        case .beginner: L10n.tr("Beginner")
+        case .intermediate: L10n.tr("Intermediate")
+        case .advanced: L10n.tr("Advanced")
         }
     }
 }
@@ -73,10 +73,10 @@ nonisolated enum Gender: String, Codable, CaseIterable, Identifiable, Sendable {
 
     var displayName: String {
         switch self {
-        case .male: "Male"
-        case .female: "Female"
-        case .other: "Other"
-        case .preferNotToSay: "Prefer not to say"
+        case .male: L10n.tr("Male")
+        case .female: L10n.tr("Female")
+        case .other: L10n.tr("Other")
+        case .preferNotToSay: L10n.tr("Prefer not to say")
         }
     }
 }
@@ -90,9 +90,9 @@ nonisolated enum TrainingLocation: String, Codable, CaseIterable, Identifiable, 
 
     var displayName: String {
         switch self {
-        case .gym: "Full Gym"
-        case .homeGym: "Home Gym"
-        case .homeNoEquipment: "Home (No Equipment)"
+        case .gym: L10n.tr("Full Gym")
+        case .homeGym: L10n.tr("Home Gym")
+        case .homeNoEquipment: L10n.tr("Home (No Equipment)")
         }
     }
 
@@ -117,12 +117,12 @@ nonisolated enum SplitPreference: String, Codable, CaseIterable, Identifiable, S
 
     var displayName: String {
         switch self {
-        case .automatic: "Let AI Decide"
-        case .fullBody: "Full Body"
-        case .upperLower: "Upper / Lower"
-        case .pushPullLegs: "Push / Pull / Legs"
-        case .bodyPart: "Body Part Split"
-        case .muscleGroup: "Muscle Group"
+        case .automatic: L10n.tr("Let AI Decide")
+        case .fullBody: L10n.tr("Full Body")
+        case .upperLower: L10n.tr("Upper / Lower")
+        case .pushPullLegs: L10n.tr("Push / Pull / Legs")
+        case .bodyPart: L10n.tr("Body Part Split")
+        case .muscleGroup: L10n.tr("Muscle Group")
         }
     }
 }
@@ -138,11 +138,11 @@ nonisolated enum ActivityLevel: String, Codable, CaseIterable, Identifiable, Sen
 
     var displayName: String {
         switch self {
-        case .sedentary: "Sedentary"
-        case .lightlyActive: "Lightly Active"
-        case .moderatelyActive: "Moderately Active"
-        case .veryActive: "Very Active"
-        case .extremelyActive: "Extremely Active"
+        case .sedentary: L10n.tr("Sedentary")
+        case .lightlyActive: L10n.tr("Lightly Active")
+        case .moderatelyActive: L10n.tr("Moderately Active")
+        case .veryActive: L10n.tr("Very Active")
+        case .extremelyActive: L10n.tr("Extremely Active")
         }
     }
 }
@@ -157,10 +157,10 @@ nonisolated enum StressLevel: String, Codable, CaseIterable, Identifiable, Senda
 
     var displayName: String {
         switch self {
-        case .low: "Low"
-        case .moderate: "Moderate"
-        case .high: "High"
-        case .veryHigh: "Very High"
+        case .low: L10n.tr("Low")
+        case .moderate: L10n.tr("Moderate")
+        case .high: L10n.tr("High")
+        case .veryHigh: L10n.tr("Very High")
         }
     }
 }
@@ -175,10 +175,10 @@ nonisolated enum SleepQuality: String, Codable, CaseIterable, Identifiable, Send
 
     var displayName: String {
         switch self {
-        case .poor: "Poor (< 5h)"
-        case .fair: "Fair (5-6h)"
-        case .good: "Good (7-8h)"
-        case .excellent: "Excellent (8+h)"
+        case .poor: L10n.tr("Poor (< 5h)")
+        case .fair: L10n.tr("Fair (5-6h)")
+        case .good: L10n.tr("Good (7-8h)")
+        case .excellent: L10n.tr("Excellent (8+h)")
         }
     }
 }
@@ -192,9 +192,9 @@ nonisolated enum RecoveryCapacity: String, Codable, CaseIterable, Identifiable, 
 
     var displayName: String {
         switch self {
-        case .low: "Low"
-        case .moderate: "Moderate"
-        case .high: "High"
+        case .low: L10n.tr("Low")
+        case .moderate: L10n.tr("Moderate")
+        case .high: L10n.tr("High")
         }
     }
 }
@@ -242,17 +242,17 @@ nonisolated enum CoachingTone: String, Codable, CaseIterable, Identifiable, Send
 
     var displayName: String {
         switch self {
-        case .supportive: "Supportive"
-        case .balanced: "Balanced"
-        case .direct: "Direct"
+        case .supportive: L10n.tr("Supportive")
+        case .balanced: L10n.tr("Balanced")
+        case .direct: L10n.tr("Direct")
         }
     }
 
     var detail: String {
         switch self {
-        case .supportive: "Encouraging, patient, softer language."
-        case .balanced: "Clear and honest — STRQ's default voice."
-        case .direct: "Sharp, no-nonsense. Straight to the call."
+        case .supportive: L10n.tr("Encouraging, patient, softer language.")
+        case .balanced: L10n.tr("Clear and honest — STRQ's default voice.")
+        case .direct: L10n.tr("Sharp, no-nonsense. Straight to the call.")
         }
     }
 
@@ -274,17 +274,17 @@ nonisolated enum CoachingDensity: String, Codable, CaseIterable, Identifiable, S
 
     var displayName: String {
         switch self {
-        case .focused: "Focused"
-        case .standard: "Standard"
-        case .detailed: "Detailed"
+        case .focused: L10n.tr("Focused")
+        case .standard: L10n.tr("Standard")
+        case .detailed: L10n.tr("Detailed")
         }
     }
 
     var detail: String {
         switch self {
-        case .focused: "One call at a time. Maximum signal, minimum noise."
-        case .standard: "Primary + watch + momentum. The coach default."
-        case .detailed: "Show more of what STRQ is seeing."
+        case .focused: L10n.tr("One call at a time. Maximum signal, minimum noise.")
+        case .standard: L10n.tr("Primary + watch + momentum. The coach default.")
+        case .detailed: L10n.tr("Show more of what STRQ is seeing.")
         }
     }
 
@@ -317,21 +317,21 @@ nonisolated enum CoachingEmphasis: String, Codable, CaseIterable, Identifiable, 
 
     var displayName: String {
         switch self {
-        case .performance: "Performance"
-        case .physique: "Physique"
-        case .recovery: "Recovery"
-        case .consistency: "Consistency"
-        case .simplicity: "Simplicity"
+        case .performance: L10n.tr("Performance")
+        case .physique: L10n.tr("Physique")
+        case .recovery: L10n.tr("Recovery")
+        case .consistency: L10n.tr("Consistency")
+        case .simplicity: L10n.tr("Simplicity")
         }
     }
 
     var detail: String {
         switch self {
-        case .performance: "Strength, PRs, progression."
-        case .physique: "Body composition and nutrition pace."
-        case .recovery: "Sleep, readiness, fatigue protection."
-        case .consistency: "Showing up. Streaks and adherence."
-        case .simplicity: "Just tell me what to do today."
+        case .performance: L10n.tr("Strength, PRs, progression.")
+        case .physique: L10n.tr("Body composition and nutrition pace.")
+        case .recovery: L10n.tr("Sleep, readiness, fatigue protection.")
+        case .consistency: L10n.tr("Showing up. Streaks and adherence.")
+        case .simplicity: L10n.tr("Just tell me what to do today.")
         }
     }
 
@@ -355,17 +355,17 @@ nonisolated enum CoachingAutomation: String, Codable, CaseIterable, Identifiable
 
     var displayName: String {
         switch self {
-        case .manual: "Manual"
-        case .guided: "Guided"
-        case .adaptive: "Adaptive"
+        case .manual: L10n.tr("Manual")
+        case .guided: L10n.tr("Guided")
+        case .adaptive: L10n.tr("Adaptive")
         }
     }
 
     var detail: String {
         switch self {
-        case .manual: "STRQ suggests. You decide every change."
-        case .guided: "STRQ proposes adjustments. You approve them."
-        case .adaptive: "STRQ adjusts load and volume as signal comes in."
+        case .manual: L10n.tr("STRQ suggests. You decide every change.")
+        case .guided: L10n.tr("STRQ proposes adjustments. You approve them.")
+        case .adaptive: L10n.tr("STRQ adjusts load and volume as signal comes in.")
         }
     }
 
