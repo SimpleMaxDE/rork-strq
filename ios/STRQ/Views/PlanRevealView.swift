@@ -77,7 +77,7 @@ struct PlanRevealView: View {
             VStack(spacing: 6) {
                 Text(L10n.tr("Your Plan is Ready"))
                     .font(.title.bold())
-                Text(profile.name.isEmpty ? "Start Session 1 now. STRQ will tune the rest from real training." : "\(profile.name), start Session 1 now. STRQ will tune the rest from real training.")
+                Text(profile.name.isEmpty ? L10n.tr("Start Session 1 now. STRQ will tune the rest from real training.") : L10n.format("%@, start Session 1 now. STRQ will tune the rest from real training.", profile.name))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -109,10 +109,10 @@ struct PlanRevealView: View {
             Divider().opacity(0.3)
 
             HStack(spacing: 0) {
-                overviewStat(value: "\(plan.days.count)", label: "Days/Week", icon: "calendar")
-                overviewStat(value: "\(profile.minutesPerSession)m", label: "Per Session", icon: "clock")
-                overviewStat(value: "\(plan.durationWeeks)wk", label: "Duration", icon: "repeat")
-                overviewStat(value: totalExercises, label: "Exercises", icon: "figure.strengthtraining.traditional")
+                overviewStat(value: "\(plan.days.count)", label: L10n.tr("Days/Week"), icon: "calendar")
+                overviewStat(value: L10n.format("%dm", profile.minutesPerSession), label: L10n.tr("Per Session"), icon: "clock")
+                overviewStat(value: L10n.format("%dwk", plan.durationWeeks), label: L10n.tr("Duration"), icon: "repeat")
+                overviewStat(value: totalExercises, label: L10n.tr("Exercises"), icon: "figure.strengthtraining.traditional")
             }
         }
         .padding(18)
@@ -198,7 +198,7 @@ struct PlanRevealView: View {
 
             Spacer()
 
-            Text("~\(day.estimatedMinutes)m")
+            Text(L10n.format("~%dm", day.estimatedMinutes))
                 .font(.caption.weight(.medium).monospacedDigit())
                 .foregroundStyle(.white.opacity(0.4))
         }
@@ -223,10 +223,10 @@ struct PlanRevealView: View {
             }
 
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                qualityItem("Recovery Fit", rating: quality.recoveryFit)
-                qualityItem("Time Fit", rating: quality.timeFit)
-                qualityItem("Muscle Balance", rating: quality.muscleBalance)
-                qualityItem("Equipment Fit", rating: quality.equipmentFit)
+                qualityItem(L10n.tr("Recovery Fit"), rating: quality.recoveryFit)
+                qualityItem(L10n.tr("Time Fit"), rating: quality.timeFit)
+                qualityItem(L10n.tr("Muscle Balance"), rating: quality.muscleBalance)
+                qualityItem(L10n.tr("Equipment Fit"), rating: quality.equipmentFit)
             }
 
             if !quality.strengths.isEmpty {
@@ -412,20 +412,20 @@ struct PlanRevealView: View {
             VStack(spacing: 0) {
                 roadmapRow(
                     index: 1,
-                    title: "Start Session 1",
-                    detail: "Train normally. STRQ sets your real baseline from this workout.",
+                    title: L10n.tr("Start Session 1"),
+                    detail: L10n.tr("Train normally. STRQ sets your real baseline from this workout."),
                     isLast: false
                 )
                 roadmapRow(
                     index: 2,
-                    title: "Come back for Session 2",
-                    detail: "Progression starts once STRQ sees your first-session data.",
+                    title: L10n.tr("Come back for Session 2"),
+                    detail: L10n.tr("Progression starts once STRQ sees your first-session data."),
                     isLast: false
                 )
                 roadmapRow(
                     index: 3,
-                    title: "Complete week one",
-                    detail: "Recovery, balance, and workload get sharper after your first week.",
+                    title: L10n.tr("Complete week one"),
+                    detail: L10n.tr("Recovery, balance, and workload get sharper after your first week."),
                     isLast: true
                 )
             }

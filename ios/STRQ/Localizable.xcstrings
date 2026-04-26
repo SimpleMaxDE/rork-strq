@@ -5866,7 +5866,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adaptive Pläne, tiefere Progressionsanalysen und jede Session sicher über deine Geräte hinweg synchronisiert."
+            "value": "Adaptive Pläne, tiefere Progressionsanalysen und jede Session sicher auf all deinen Geräten synchronisiert."
           }
         }
       }
@@ -6446,7 +6446,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "FORTSCHREITEND"
+            "value": "IN ENTWICKLUNG"
           }
         }
       }
@@ -7987,6 +7987,686 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ø %dg"
+          }
+        }
+      }
+    },
+    "%@, start Session 1 now. STRQ will tune the rest from real training.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, starte jetzt Session 1. STRQ passt den Rest anhand deines echten Trainings an."
+          }
+        }
+      }
+    },
+    "%@kg": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kg"
+          }
+        }
+      }
+    },
+    "%d needs attention": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d braucht Aufmerksamkeit"
+          }
+        }
+      }
+    },
+    "%d still progressing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d entwickeln sich weiter"
+          }
+        }
+      }
+    },
+    "%dkg × %d": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d kg × %d"
+          }
+        }
+      }
+    },
+    "%dm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Min"
+          }
+        }
+      }
+    },
+    "%dw": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%dW"
+          }
+        }
+      }
+    },
+    "%dwk": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%dW"
+          }
+        }
+      }
+    },
+    "28-Day Consistency": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "28-Tage-Konstanz"
+          }
+        }
+      }
+    },
+    "7 Days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "7 Tage"
+          }
+        }
+      }
+    },
+    "8 Weeks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "8 Wochen"
+          }
+        }
+      }
+    },
+    "Balance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balance"
+          }
+        }
+      }
+    },
+    "Bench": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bankdrücken"
+          }
+        }
+      }
+    },
+    "Body": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Körper"
+          }
+        }
+      }
+    },
+    "Body Signals": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Körpersignale"
+          }
+        }
+      }
+    },
+    "Come back for Session 2": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Komm für Session 2 zurück"
+          }
+        }
+      }
+    },
+    "Complete week one": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließe Woche eins ab"
+          }
+        }
+      }
+    },
+    "Completed sessions give STRQ enough context to read workload distribution, weekly rhythm, and movement mix.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abgeschlossene Sessions geben STRQ genug Kontext, um Lastverteilung, Wochenrhythmus und Bewegungsmix zu bewerten."
+          }
+        }
+      }
+    },
+    "Consider a variation or reset": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erwäge eine Variation oder einen Reset"
+          }
+        }
+      }
+    },
+    "Consistent output across the week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konstante Leistung über die Woche"
+          }
+        }
+      }
+    },
+    "Core": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Core"
+          }
+        }
+      }
+    },
+    "Days/Week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tage/Woche"
+          }
+        }
+      }
+    },
+    "Deadlift": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kreuzheben"
+          }
+        }
+      }
+    },
+    "Equipment Fit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geräte-Fit"
+          }
+        }
+      }
+    },
+    "Estimated 1RM": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geschätztes 1RM"
+          }
+        }
+      }
+    },
+    "First Signal": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstes Signal"
+          }
+        }
+      }
+    },
+    "First Week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erste Woche"
+          }
+        }
+      }
+    },
+    "Gathering": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sammelt Daten"
+          }
+        }
+      }
+    },
+    "Holding steady": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stabil"
+          }
+        }
+      }
+    },
+    "Keep logging anchor lifts and STRQ will turn them into a readable strength trend.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Protokolliere weiterhin Ankerübungen, dann macht STRQ daraus einen klaren Krafttrend."
+          }
+        }
+      }
+    },
+    "Lighter week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leichtere Woche"
+          }
+        }
+      }
+    },
+    "Logged": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geloggt"
+          }
+        }
+      }
+    },
+    "Momentum": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Momentum"
+          }
+        }
+      }
+    },
+    "Momentum on your side": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Momentum auf deiner Seite"
+          }
+        }
+      }
+    },
+    "More work than last week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr Arbeit als letzte Woche"
+          }
+        }
+      }
+    },
+    "Movement Balance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewegungsbalance"
+          }
+        }
+      }
+    },
+    "New PRs": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue PRs"
+          }
+        }
+      }
+    },
+    "Now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt"
+          }
+        }
+      }
+    },
+    "One workout gives Progress real training signal to read.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Workout liefert Progress ein echtes Trainingssignal."
+          }
+        }
+      }
+    },
+    "Per Session": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro Session"
+          }
+        }
+      }
+    },
+    "Personal Records": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Persönliche Rekorde"
+          }
+        }
+      }
+    },
+    "Progressing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Entwicklung"
+          }
+        }
+      }
+    },
+    "Progression starts once STRQ sees your first-session data.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Progression startet, sobald STRQ deine Daten aus der ersten Session sieht."
+          }
+        }
+      }
+    },
+    "Recent Sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzte Sessions"
+          }
+        }
+      }
+    },
+    "Recovery Fit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recovery-Fit"
+          }
+        }
+      }
+    },
+    "Recovery Trend": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recovery-Trend"
+          }
+        }
+      }
+    },
+    "Recovery and body trends build from repeat logs": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recovery- und Körpertrends entstehen durch wiederholte Einträge"
+          }
+        }
+      }
+    },
+    "Recovery, balance, and workload get sharper after your first week.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recovery, Balance und Arbeitslast werden nach deiner ersten Woche präziser."
+          }
+        }
+      }
+    },
+    "Session volume and balance sharpen after a few workouts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Session-Volumen und Balance werden nach ein paar Workouts präziser"
+          }
+        }
+      }
+    },
+    "Signal is coming in": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signal kommt an"
+          }
+        }
+      }
+    },
+    "Sleep, weigh-ins, and nutrition entries turn this tab into a cleaner read of how your body is responding.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlaf-, Wiege- und Ernährungseinträge machen diesen Tab zu einem klareren Bild deiner körperlichen Reaktion."
+          }
+        }
+      }
+    },
+    "Squat": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kniebeuge"
+          }
+        }
+      }
+    },
+    "Start Session 1 now. STRQ will tune the rest from real training.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starte jetzt Session 1. STRQ passt den Rest anhand deines echten Trainings an."
+          }
+        }
+      }
+    },
+    "Strength": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kraft"
+          }
+        }
+      }
+    },
+    "Strength is moving": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kraft entwickelt sich"
+          }
+        }
+      }
+    },
+    "Time Fit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeit-Fit"
+          }
+        }
+      }
+    },
+    "Train normally. STRQ sets your real baseline from this workout.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainiere normal. STRQ setzt mit diesem Workout deinen realen Ausgangswert."
+          }
+        }
+      }
+    },
+    "Volume Signals": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumensignale"
+          }
+        }
+      }
+    },
+    "Volume down vs last week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumen niedriger als letzte Woche"
+          }
+        }
+      }
+    },
+    "Volume up %d%%": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumen +%d%%"
+          }
+        }
+      }
+    },
+    "Weekly Sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wöchentliche Sessions"
+          }
+        }
+      }
+    },
+    "Workouts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workouts"
+          }
+        }
+      }
+    },
+    "Your baseline starts with Today": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Ausgangswert beginnt heute"
+          }
+        }
+      }
+    },
+    "Your main lifts create the first real strength read.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Hauptübungen liefern die erste echte Kraftauswertung."
+          }
+        }
+      }
+    },
+    "kg": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kg"
+          }
+        }
+      }
+    },
+    "vs 4-Week Avg": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "vs. 4-Wochen-Schnitt"
+          }
+        }
+      }
+    },
+    "~%dm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "~%d Min"
+          }
+        }
+      }
+    },
+    "× %d · e1RM %d": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "× %d · e1RM %d"
           }
         }
       }
