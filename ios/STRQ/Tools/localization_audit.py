@@ -34,6 +34,23 @@ EXCLUDED_FILE_HINTS = (
     "+Debug", "Debug", "Preview", "Mock", "Stub", "Fixture", "Snapshot", "Harness"
 )
 
+# Terms commonly unchanged in German product copy.
+IDENTICAL_DE_ALLOWLIST = {
+    "STRQ",
+    "STRQ Pro",
+    "PR",
+    "RPE",
+    "kg",
+    "kcal",
+    "min",
+    "Push",
+    "Pull",
+    "Push A",
+    "Push B",
+    "Pull A",
+    "Pull B",
+}
+
 STRING_RE = re.compile(r'"([^"\\]*(?:\\.[^"\\]*)*)"')
 L10N_KEY_RE = re.compile(r'L10n\.(?:tr|format)\("([^"]+)"')
 ENGLISH_CHAR_RE = re.compile(r"[A-Za-z]")
@@ -82,6 +99,33 @@ def looks_like_user_facing_english_literal(line: str, literal: str) -> bool:
     return True
 
 
+def read_de_value(entry: dict) -> str | None:
+    locs = entry.get("localizations", {})
+    de = locs.get("de")
+    if not isinstance(de, dict):
+        return None
+
+    string_unit = de.get("stringUnit")
+    if isinstance(string_unit, dict):
+        value = string_unit.get("value")
+        if isinstance(value, str):
+            return value
+
+    variations = de.get("variations")
+    if isinstance(variations, dict):
+        for variation in variations.values():
+            if not isinstance(variation, dict):
+                continue
+            for variant in variation.values():
+                if not isinstance(variant, dict):
+                    continue
+                unit = variant.get("stringUnit")
+                if isinstance(unit, dict) and isinstance(unit.get("value"), str):
+                    return unit["value"]
+
+    return None
+
+
 def main() -> int:
     issues: list[tuple[str, int, str]] = []
     l10n_keys: set[str] = set()
@@ -102,8 +146,20 @@ def main() -> int:
                     issues.append((str(rel), lineno, literal))
 
     catalog = json.loads(XCSTRINGS_PATH.read_text(encoding="utf-8"))
-    available = set(catalog.get("strings", {}).keys())
+    strings = catalog.get("strings", {})
+    available = set(strings.keys())
     missing_keys = sorted(k for k in l10n_keys if k not in available)
+
+    missing_de_keys: list[str] = []
+    identical_de_keys: list[str] = []
+    for key in sorted(l10n_keys & available):
+        entry = strings.get(key, {})
+        de_value = read_de_value(entry) if isinstance(entry, dict) else None
+        if not de_value:
+            missing_de_keys.append(key)
+            continue
+        if key not in IDENTICAL_DE_ALLOWLIST and de_value.strip() == key.strip():
+            identical_de_keys.append(key)
 
     print(f"Scanned {len(files)} Swift files")
     print(f"Likely user-facing hardcoded English literals: {len(issues)}")
@@ -112,9 +168,18 @@ def main() -> int:
 
     print(f"Missing L10n keys in Localizable.xcstrings: {len(missing_keys)}")
     for key in missing_keys[:250]:
-        print(f"MISSING: {key}")
+        print(f"MISSING_KEY: {key}")
 
-    return 1 if issues else 0
+    print(f"Missing visible German translations: {len(missing_de_keys)}")
+    for key in missing_de_keys[:250]:
+        print(f"MISSING_DE: {key}")
+
+    print(f"Visible German translations identical to English key: {len(identical_de_keys)}")
+    for key in identical_de_keys[:250]:
+        print(f"IDENTICAL_DE: {key}")
+
+    has_failures = bool(issues or missing_keys or missing_de_keys or identical_de_keys)
+    return 1 if has_failures else 0
 
 
 if __name__ == "__main__":
