@@ -6,6 +6,6 @@ nonisolated enum L10n {
     }
 
     static func format(_ key: String, _ arguments: CVarArg..., comment: String = "") -> String {
-        String(format: NSLocalizedString(key, comment: comment), locale: Locale.current, arguments: arguments)
+        String(format: tr(key, comment: comment), locale: Locale.current, arguments: arguments)
     }
 }
