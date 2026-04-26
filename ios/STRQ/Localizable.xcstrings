@@ -3616,7 +3616,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mittel"
+            "value": "Moderat"
           }
         }
       }
@@ -9206,7 +9206,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "BETRACHTEN"
+            "value": "IM BLICK"
           }
         }
       }
@@ -11777,6 +11777,256 @@
           "stringUnit": {
             "state": "translated",
             "value": "Produktiv"
+          }
+        }
+      }
+    },
+    "%d more signal": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch %d Signal"
+          }
+        }
+      }
+    },
+    "%d more signals": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch %d Signale"
+          }
+        }
+      }
+    },
+    "A little more real training data will make Coach's next calls feel much more personal.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein wenig mehr echte Trainingsdaten, dann werden Coach-Entscheidungen spürbar persönlicher."
+          }
+        }
+      }
+    },
+    "Baseline is set. Keep the week moving and Coach will sharpen the details quietly in the background.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Baseline steht. Halte die Woche in Bewegung, Coach schärft die Details im Hintergrund."
+          }
+        }
+      }
+    },
+    "Coach adjustment applied": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach-Anpassung übernommen"
+          }
+        }
+      }
+    },
+    "Fatigued": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ermüdet"
+          }
+        }
+      }
+    },
+    "Fully Recovered": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voll erholt"
+          }
+        }
+      }
+    },
+    "Low Energy": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wenig Energie"
+          }
+        }
+      }
+    },
+    "Next: %.1fkg": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächstes Ziel: %.1f kg"
+          }
+        }
+      }
+    },
+    "Overreached": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überlastet"
+          }
+        }
+      }
+    },
+    "Peak Readiness": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top-Readiness"
+          }
+        }
+      }
+    },
+    "Plan shape captured": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planstruktur erfasst"
+          }
+        }
+      }
+    },
+    "Real training inputs logged": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Echte Trainingsdaten geloggt"
+          }
+        }
+      }
+    },
+    "Recommendations": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empfehlungen"
+          }
+        }
+      }
+    },
+    "Recovery context logged": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recovery-Kontext geloggt"
+          }
+        }
+      }
+    },
+    "Rest Needed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erholung nötig"
+          }
+        }
+      }
+    },
+    "Today owns the next step. Coach will start shaping load and recovery once your first real session is in.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute zählt der nächste Schritt. Nach deiner ersten echten Session passt Coach Load und Recovery gezielter an."
+          }
+        }
+      }
+    },
+    "Week %d": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woche %d"
+          }
+        }
+      }
+    },
+    "Week rhythm started": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wochenrhythmus gestartet"
+          }
+        }
+      }
+    },
+    "Well Prepared": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gut vorbereitet"
+          }
+        }
+      }
+    },
+    "Well Rested": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gut erholt"
+          }
+        }
+      }
+    },
+    "Your plan has been updated": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Plan wurde aktualisiert"
+          }
+        }
+      }
+    },
+    "You're on plan. Stay the course.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du bist im Plan. Bleib dran."
+          }
+        }
+      }
+    },
+    "coach.liftTracker.progressing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steigert sich"
+          }
+        }
+      }
+    },
+    "coach.moreSignals.watch": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Blick"
           }
         }
       }

@@ -732,11 +732,11 @@ class AppViewModel {
 
     var recoveryStatus: String {
         switch recoveryScore {
-        case 85...: return "Fully Recovered"
-        case 70..<85: return "Well Rested"
-        case 50..<70: return "Moderate"
-        case 30..<50: return "Fatigued"
-        default: return "Overreached"
+        case 85...: return L10n.tr("Fully Recovered")
+        case 70..<85: return L10n.tr("Well Rested")
+        case 50..<70: return L10n.tr("Moderate")
+        case 30..<50: return L10n.tr("Fatigued")
+        default: return L10n.tr("Overreached")
         }
     }
 
@@ -1832,11 +1832,11 @@ class AppViewModel {
     var readinessBasedRecoveryStatus: String {
         let score = effectiveRecoveryScore
         switch score {
-        case 85...: return "Peak Readiness"
-        case 70..<85: return "Well Prepared"
-        case 55..<70: return "Moderate"
-        case 40..<55: return "Low Energy"
-        default: return "Rest Needed"
+        case 85...: return L10n.tr("Peak Readiness")
+        case 70..<85: return L10n.tr("Well Prepared")
+        case 55..<70: return L10n.tr("Moderate")
+        case 40..<55: return L10n.tr("Low Energy")
+        default: return L10n.tr("Rest Needed")
         }
     }
 

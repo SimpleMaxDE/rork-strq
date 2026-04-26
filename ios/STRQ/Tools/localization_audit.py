@@ -34,6 +34,12 @@ GENERATED_COPY_PROPERTY_RE = re.compile(
 GENERATED_COPY_FUNCTION_RE = re.compile(
     r"\bfunc\s+(determineTrainingPhase|computeNextBestAction|generateCoachNote|suggestNext)\b"
 )
+COACH_TAB_COPY_PROPERTY_RE = re.compile(
+    r"\bprivate\s+var\s+(headline|coachEarlyStateMessage)\s*:\s*String\b"
+)
+COACH_TAB_COPY_ARRAY_RE = re.compile(
+    r"\blet\s+items\s*:\s*\[\(String,\s*String,\s*Bool\)\]"
+)
 INTERPOLATION_RE = re.compile(r"\\\([^)]*\)")
 GENERATED_COPY_FILE_NAMES = {
     "ProgressionState.swift",
@@ -213,11 +219,15 @@ def main() -> int:
     for path in files:
         rel = path.relative_to(ROOT)
         scans_generated_copy = path.name in GENERATED_COPY_FILE_NAMES
+        scans_coach_tab_copy = rel.as_posix() == "Views/CoachTabView.swift"
         brace_depth = 0
         paren_depth = 0
         generated_brace_depth: int | None = None
         pending_generated_brace_scope = False
         generated_call_depth: int | None = None
+        coach_tab_copy_brace_depth: int | None = None
+        pending_coach_tab_copy_scope = False
+        coach_tab_copy_array_depth: int | None = None
 
         for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
             if scans_generated_copy and (GENERATED_COPY_PROPERTY_RE.search(line) or GENERATED_COPY_FUNCTION_RE.search(line)):
@@ -226,12 +236,27 @@ def main() -> int:
             if scans_generated_copy and any(token in line for token in GENERATED_COPY_INITIALIZERS) and generated_call_depth is None:
                 generated_call_depth = paren_depth + max(line.count("(") - line.count(")"), 1)
 
+            if scans_coach_tab_copy and COACH_TAB_COPY_PROPERTY_RE.search(line):
+                pending_coach_tab_copy_scope = True
+
+            if scans_coach_tab_copy and COACH_TAB_COPY_ARRAY_RE.search(line) and coach_tab_copy_array_depth is None:
+                coach_tab_copy_array_depth = 0
+
             generated_context = (
-                scans_generated_copy
-                and (
-                    generated_brace_depth is not None
-                    or generated_call_depth is not None
-                    or any(token in line for token in GENERATED_COPY_CONTEXT_TOKENS)
+                (
+                    scans_generated_copy
+                    and (
+                        generated_brace_depth is not None
+                        or generated_call_depth is not None
+                        or any(token in line for token in GENERATED_COPY_CONTEXT_TOKENS)
+                    )
+                )
+                or (
+                    scans_coach_tab_copy
+                    and (
+                        coach_tab_copy_brace_depth is not None
+                        or coach_tab_copy_array_depth is not None
+                    )
                 )
             )
 
@@ -248,6 +273,15 @@ def main() -> int:
                     generated_brace_depth = None
                 if generated_call_depth is not None and paren_depth < generated_call_depth:
                     generated_call_depth = None
+                if pending_coach_tab_copy_scope and "{" in line:
+                    coach_tab_copy_brace_depth = brace_depth
+                    pending_coach_tab_copy_scope = False
+                if coach_tab_copy_brace_depth is not None and brace_depth < coach_tab_copy_brace_depth:
+                    coach_tab_copy_brace_depth = None
+                if coach_tab_copy_array_depth is not None:
+                    coach_tab_copy_array_depth += line.count("[") - line.count("]")
+                    if coach_tab_copy_array_depth <= 0:
+                        coach_tab_copy_array_depth = None
                 continue
 
             for match in STRING_RE.finditer(line):
@@ -264,6 +298,15 @@ def main() -> int:
                 generated_brace_depth = None
             if generated_call_depth is not None and paren_depth < generated_call_depth:
                 generated_call_depth = None
+            if pending_coach_tab_copy_scope and "{" in line:
+                coach_tab_copy_brace_depth = brace_depth
+                pending_coach_tab_copy_scope = False
+            if coach_tab_copy_brace_depth is not None and brace_depth < coach_tab_copy_brace_depth:
+                coach_tab_copy_brace_depth = None
+            if coach_tab_copy_array_depth is not None:
+                coach_tab_copy_array_depth += line.count("[") - line.count("]")
+                if coach_tab_copy_array_depth <= 0:
+                    coach_tab_copy_array_depth = None
 
     catalog = json.loads(XCSTRINGS_PATH.read_text(encoding="utf-8"))
     strings = catalog.get("strings", {})

@@ -83,7 +83,11 @@ struct CoachTabView: View {
         }
         .onChange(of: vm.appliedActionIds.count) { old, new in
             if new > old {
-                toast = STRQToast(title: "Coach adjustment applied", detail: "Your plan has been updated", style: .applied)
+                toast = STRQToast(
+                    title: L10n.tr("Coach adjustment applied"),
+                    detail: L10n.tr("Your plan has been updated"),
+                    style: .applied
+                )
             }
             lastAppliedCount = new
         }
@@ -167,7 +171,7 @@ struct CoachTabView: View {
                 .padding(.vertical, 4)
                 .background(STRQBrand.steel.opacity(0.12), in: Capsule())
 
-                Text("Week \(vm.trainingPhaseState.weeksInPhase)")
+                Text(L10n.format("Week %d", vm.trainingPhaseState.weeksInPhase))
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.tertiary)
 
@@ -224,7 +228,7 @@ struct CoachTabView: View {
         if let action = vm.nextBestAction {
             return action.title
         }
-        return "You're on plan. Stay the course."
+        return L10n.tr("You're on plan. Stay the course.")
     }
 
     // MARK: - Decision Stack (primary move / watch / momentum)
@@ -256,7 +260,7 @@ struct CoachTabView: View {
                             Image(systemName: "list.bullet.rectangle")
                                 .font(.caption)
                                 .foregroundStyle(STRQBrand.steel)
-                            Text("\(briefing.moreSignalsCount) more signal\(briefing.moreSignalsCount == 1 ? "" : "s")")
+                            Text(moreSignalsLabel(briefing.moreSignalsCount))
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(.primary)
                             Spacer()
@@ -416,6 +420,12 @@ struct CoachTabView: View {
         )
     }
 
+    private func moreSignalsLabel(_ count: Int) -> String {
+        count == 1
+            ? L10n.format("%d more signal", count)
+            : L10n.format("%d more signals", count)
+    }
+
     // MARK: - Early State
 
     @ViewBuilder
@@ -474,13 +484,13 @@ struct CoachTabView: View {
     private var coachEarlyStateMessage: String {
         switch vm.dataMaturityTier {
         case .fresh:
-            return "Today owns the next step. Coach will start shaping load and recovery once your first real session is in."
+            return L10n.tr("Today owns the next step. Coach will start shaping load and recovery once your first real session is in.")
         case .firstSession:
-            return "Baseline is set. Keep the week moving and Coach will sharpen the details quietly in the background."
+            return L10n.tr("Baseline is set. Keep the week moving and Coach will sharpen the details quietly in the background.")
         case .earlyWeek:
-            return "A little more real training data will make Coach's next calls feel much more personal."
+            return L10n.tr("A little more real training data will make Coach's next calls feel much more personal.")
         case .established:
-            return "You're on plan. Stay the course."
+            return L10n.tr("You're on plan. Stay the course.")
         }
     }
 
@@ -494,10 +504,10 @@ struct CoachTabView: View {
         let hasRecoveryContext = vm.hasCheckedInToday || vm.todaysReadiness != nil
 
         let items: [(String, String, Bool)] = [
-            ("Plan shape captured", "doc.text.fill", vm.currentPlan != nil),
-            ("Real training inputs logged", "figure.strengthtraining.traditional", completed >= 1),
-            ("Recovery context logged", "heart.text.clipboard.fill", hasRecoveryContext),
-            ("Week rhythm started", "calendar.badge.clock", weekSessions >= 1)
+            (L10n.tr("Plan shape captured"), "doc.text.fill", vm.currentPlan != nil),
+            (L10n.tr("Real training inputs logged"), "figure.strengthtraining.traditional", completed >= 1),
+            (L10n.tr("Recovery context logged"), "heart.text.clipboard.fill", hasRecoveryContext),
+            (L10n.tr("Week rhythm started"), "calendar.badge.clock", weekSessions >= 1)
         ]
 
         return VStack(alignment: .leading, spacing: 10) {
@@ -571,11 +581,11 @@ struct CoachTabView: View {
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 HStack(spacing: 6) {
-                    Text(isStalled ? state.plateauStatus.displayName : "Progressing")
+                    Text(isStalled ? state.plateauStatus.displayName : L10n.tr("coach.liftTracker.progressing", fallback: "Progressing"))
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(color)
                     if let next = state.suggestedNextWeight, !isStalled {
-                        Text("Next: \(String(format: "%.1f", next))kg")
+                        Text(L10n.format("Next: %.1fkg", next))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -788,7 +798,7 @@ struct MoreSignalsSheet: View {
 
                 if !insights.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
-                        ForgeSectionHeader(title: "Watch")
+                        ForgeSectionHeader(title: L10n.tr("coach.moreSignals.watch", fallback: "Watch"))
                         ForEach(insights) { insight in
                             ExpandableInsightCard(
                                 insight: insight,
@@ -806,7 +816,7 @@ struct MoreSignalsSheet: View {
 
                 if !recs.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
-                        ForgeSectionHeader(title: "Recommendations")
+                        ForgeSectionHeader(title: L10n.tr("Recommendations"))
                         ForEach(recs) { rec in
                             ExpandableRecommendationCard(
                                 recommendation: rec,
