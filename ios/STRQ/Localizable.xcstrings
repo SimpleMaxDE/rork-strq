@@ -2766,7 +2766,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Athletische Leistung"
+            "value": "Athletik"
           }
         }
       }
@@ -3256,7 +3256,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Voll ausgestattetes Gym"
+            "value": "Volles Gym"
           }
         }
       }
@@ -3276,7 +3276,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Allgemeine Fitness"
+            "value": "Fitness allgemein"
           }
         }
       }
@@ -3466,7 +3466,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "KI entscheiden lassen"
+            "value": "STRQ entscheiden lassen"
           }
         }
       }
@@ -3666,7 +3666,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Muskelgruppe"
+            "value": "Bodypart"
           }
         }
       }
@@ -4006,7 +4006,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Drücken / Ziehen / Beine"
+            "value": "Push / Pull / Legs-Split"
           }
         }
       }
@@ -4176,7 +4176,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sitzend"
+            "value": "Überwiegend sitzend"
           }
         }
       }
@@ -5176,7 +5176,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@, starte jetzt Workout 1. STRQ passt den Rest mit echten Trainingsdaten an."
+            "value": "%@, starte mit Workout 1. STRQ passt den Rest mit echten Trainingsdaten an."
           }
         }
       }
@@ -5466,7 +5466,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "1–3 Jahre strukturierte Ausbildung"
+            "value": "1–3 Jahre strukturiertes Training"
           }
         }
       }
@@ -5556,7 +5556,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein Trainingssystem, das sich an dich anpasst."
+            "value": "Training, das sich an dich anpasst."
           }
         }
       }
@@ -5566,7 +5566,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "UM"
+            "value": "START"
           }
         }
       }
@@ -6226,7 +6226,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Komm für Workout 2 zurück"
+            "value": "Komm zu Workout 2 wieder"
           }
         }
       }
@@ -6436,7 +6436,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dauer"
+            "value": "Laufzeit"
           }
         }
       }
@@ -7046,7 +7046,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Weniger als 1 Jahr konsequente Ausbildung"
+            "value": "Weniger als 1 Jahr konsequentes Training"
           }
         }
       }
@@ -7756,7 +7756,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pro Workout"
+            "value": "pro Workout"
           }
         }
       }
@@ -7946,7 +7946,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schnelle Erholungssignale, die die Trainingsbelastung beeinflussen."
+            "value": "Diese Angaben beeinflussen deine Trainingsbelastung."
           }
         }
       }
@@ -8206,7 +8206,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "AUFSTELLEN"
+            "value": "Setup"
           }
         }
       }
@@ -8396,7 +8396,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Meinen Plan ansehen"
+            "value": "Plan erstellen"
           }
         }
       }
@@ -8476,7 +8476,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Formt Übungen, Volumen, Intensität und Fortschritt."
+            "value": "Bestimmt Übungsauswahl, Volumen, Intensität und Progression."
           }
         }
       }
@@ -8576,7 +8576,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starte jetzt Workout 1. STRQ stimmt den Rest mit echten Trainingsdaten ab."
+            "value": "Starte mit Workout 1. STRQ passt den Rest mit echten Trainingsdaten an."
           }
         }
       }
@@ -8826,7 +8826,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "AUSBILDUNG"
+            "value": "Training"
           }
         }
       }
@@ -8866,7 +8866,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tippe auf einen Wert zum Bearbeiten. Dient zur Kalibrierung von Volumen und Übungsauswahl."
+            "value": "Tippe auf einen Wert zum Bearbeiten. Damit STRQ Volumen und Übungsauswahl besser auf dich abstimmt."
           }
         }
       }
@@ -8896,7 +8896,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tippe Muskeln an, um Prioritäten zu setzen"
+            "value": "Wähle Muskelgruppen aus, die STRQ priorisieren soll."
           }
         }
       }
@@ -9256,7 +9256,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WAS ZUERST ZU TUN IST"
+            "value": "DEINE NÄCHSTEN SCHRITTE"
           }
         }
       }
@@ -9546,7 +9546,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Du gehst direkt ins heutige Workout. Feintuning machst du später in Train."
+            "value": "Du gehst direkt ins heutige Workout. Anpassen kannst du später im Tab „Train“."
           }
         }
       }
@@ -9666,7 +9666,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dein Trainingsaufbau"
+            "value": "Dein Trainingssetup"
           }
         }
       }
