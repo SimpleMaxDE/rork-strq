@@ -297,8 +297,8 @@ class AppViewModel {
         profile.startWeightKg = profile.weightKg
         onboardingPhase = .generating
         Analytics.shared.track(.plan_generation_started, [
-            "goal": profile.goal.displayName,
-            "level": profile.trainingLevel.shortName,
+            "goal": profile.goal.rawValue,
+            "level": profile.trainingLevel.rawValue,
             "days_per_week": String(profile.daysPerWeek)
         ])
         ErrorReporter.shared.breadcrumb("Plan generation started", category: "onboarding")
@@ -326,8 +326,8 @@ class AppViewModel {
         onboardingPhase = .form
         UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
         Analytics.shared.track(.onboarding_completed, [
-            "goal": profile.goal.displayName,
-            "level": profile.trainingLevel.shortName,
+            "goal": profile.goal.rawValue,
+            "level": profile.trainingLevel.rawValue,
             "days_per_week": String(profile.daysPerWeek)
         ])
         Analytics.shared.track(.plan_reveal_started_training)

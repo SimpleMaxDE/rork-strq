@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 XCSTRINGS_PATH = ROOT / "Localizable.xcstrings"
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 UI_CONTEXT_TOKENS = [
     "Text(", "Button(", "Label(", "navigationTitle(", "alert(",
@@ -14,11 +18,34 @@ UI_CONTEXT_TOKENS = [
     "proPillarChip(", "selectionChip(", "stepHero(", "fieldGroup(",
 ]
 
+GENERATED_COPY_CONTEXT_TOKENS = [
+    "title:", "explanation:", "coachNote:", "reason:",
+    "displayName:", "description:", "optimizingFor:", "expectedIntensityLabel:",
+]
+
+GENERATED_COPY_INITIALIZERS = [
+    "NextBestAction(",
+    "ExerciseProgressionState(",
+]
+
+GENERATED_COPY_PROPERTY_RE = re.compile(
+    r"\bvar\s+(displayName|description|optimizingFor|expectedIntensityLabel)\s*:\s*String\b"
+)
+GENERATED_COPY_FUNCTION_RE = re.compile(
+    r"\bfunc\s+(determineTrainingPhase|computeNextBestAction|generateCoachNote|suggestNext)\b"
+)
+INTERPOLATION_RE = re.compile(r"\\\([^)]*\)")
+GENERATED_COPY_FILE_NAMES = {
+    "ProgressionState.swift",
+    "ProgressionEngine.swift",
+}
+
 NON_USER_CONTEXT_TOKENS = [
     "print(", "debugPrint(", "logger.", "os_log", "Analytics.", "ErrorReporter.",
     "NSPredicate(", "URL(", "http://", "https://", "UserDefaults", "forKey:",
     "rawValue", "identifier", "id:", "systemName:", "symbolName:", "imageName:",
-    "accessibilityIdentifier(", "fatalError(", "preconditionFailure(",
+    "accessibilityIdentifier(", "fatalError(", "preconditionFailure(", "icon:",
+    "colorName:",
 ]
 
 EXCLUDED_PATH_PARTS = {
@@ -108,27 +135,31 @@ def iter_scoped_files() -> list[Path]:
     return files
 
 
-def looks_like_user_facing_english_literal(line: str, literal: str) -> bool:
+def looks_like_user_facing_english_literal(line: str, literal: str, generated_context: bool = False) -> bool:
     text = literal.strip()
     if not text:
         return False
 
     if "\\(" in text:
-        return False
+        if not generated_context:
+            return False
+        text = INTERPOLATION_RE.sub(" ", text).strip()
+        if not text:
+            return False
 
     if any(token in line for token in NON_USER_CONTEXT_TOKENS):
         return False
 
-    if not any(token in line for token in UI_CONTEXT_TOKENS):
+    if not generated_context and not any(token in line for token in UI_CONTEXT_TOKENS):
         return False
 
     if not ENGLISH_CHAR_RE.search(text):
         return False
 
-    if "%" in text or "%@" in text:
+    if not generated_context and ("%" in text or "%@" in text):
         return False
 
-    if "))" in text or "\\(" in text:
+    if not generated_context and ("))" in text or "\\(" in text):
         return False
 
     if re.fullmatch(r"[A-Z0-9_./:-]+", text):
@@ -141,7 +172,7 @@ def looks_like_user_facing_english_literal(line: str, literal: str) -> bool:
         return False
 
     # Focus on phrase-like literals that are most likely visible copy.
-    if " " not in text:
+    if not generated_context and " " not in text:
         return False
 
     return True
@@ -181,17 +212,58 @@ def main() -> int:
 
     for path in files:
         rel = path.relative_to(ROOT)
+        scans_generated_copy = path.name in GENERATED_COPY_FILE_NAMES
+        brace_depth = 0
+        paren_depth = 0
+        generated_brace_depth: int | None = None
+        pending_generated_brace_scope = False
+        generated_call_depth: int | None = None
+
         for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            if scans_generated_copy and (GENERATED_COPY_PROPERTY_RE.search(line) or GENERATED_COPY_FUNCTION_RE.search(line)):
+                pending_generated_brace_scope = True
+
+            if scans_generated_copy and any(token in line for token in GENERATED_COPY_INITIALIZERS) and generated_call_depth is None:
+                generated_call_depth = paren_depth + max(line.count("(") - line.count(")"), 1)
+
+            generated_context = (
+                scans_generated_copy
+                and (
+                    generated_brace_depth is not None
+                    or generated_call_depth is not None
+                    or any(token in line for token in GENERATED_COPY_CONTEXT_TOKENS)
+                )
+            )
+
             for match in L10N_KEY_RE.finditer(line):
                 l10n_keys.add(match.group(1))
 
             if "L10n.tr(" in line or "L10n.format(" in line or "NSLocalizedString(" in line:
+                brace_depth += line.count("{") - line.count("}")
+                paren_depth += line.count("(") - line.count(")")
+                if pending_generated_brace_scope and "{" in line:
+                    generated_brace_depth = brace_depth
+                    pending_generated_brace_scope = False
+                if generated_brace_depth is not None and brace_depth < generated_brace_depth:
+                    generated_brace_depth = None
+                if generated_call_depth is not None and paren_depth < generated_call_depth:
+                    generated_call_depth = None
                 continue
 
             for match in STRING_RE.finditer(line):
                 literal = match.group(1)
-                if looks_like_user_facing_english_literal(line, literal):
+                if looks_like_user_facing_english_literal(line, literal, generated_context):
                     issues.append((str(rel), lineno, literal))
+
+            brace_depth += line.count("{") - line.count("}")
+            paren_depth += line.count("(") - line.count(")")
+            if pending_generated_brace_scope and "{" in line:
+                generated_brace_depth = brace_depth
+                pending_generated_brace_scope = False
+            if generated_brace_depth is not None and brace_depth < generated_brace_depth:
+                generated_brace_depth = None
+            if generated_call_depth is not None and paren_depth < generated_call_depth:
+                generated_call_depth = None
 
     catalog = json.loads(XCSTRINGS_PATH.read_text(encoding="utf-8"))
     strings = catalog.get("strings", {})

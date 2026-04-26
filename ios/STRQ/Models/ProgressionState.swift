@@ -11,25 +11,25 @@ nonisolated enum ProgressionStrategy: String, Codable, Sendable {
 
     var displayName: String {
         switch self {
-        case .loadFirst: "Increase Load"
-        case .repFirst: "Increase Reps"
-        case .doubleProgression: "Double Progression"
-        case .variationProgression: "Progress Variation"
-        case .tempoProgression: "Tempo Progression"
-        case .holdAndConsolidate: "Hold & Consolidate"
-        case .deloadAndRebuild: "Deload & Rebuild"
+        case .loadFirst: L10n.tr("progression.strategy.loadFirst.displayName", fallback: "Increase Load")
+        case .repFirst: L10n.tr("progression.strategy.repFirst.displayName", fallback: "Increase Reps")
+        case .doubleProgression: L10n.tr("progression.strategy.doubleProgression.displayName", fallback: "Double Progression")
+        case .variationProgression: L10n.tr("progression.strategy.variationProgression.displayName", fallback: "Progress Variation")
+        case .tempoProgression: L10n.tr("progression.strategy.tempoProgression.displayName", fallback: "Tempo Progression")
+        case .holdAndConsolidate: L10n.tr("progression.strategy.holdAndConsolidate.displayName", fallback: "Hold & Consolidate")
+        case .deloadAndRebuild: L10n.tr("progression.strategy.deloadAndRebuild.displayName", fallback: "Deload & Rebuild")
         }
     }
 
     var explanation: String {
         switch self {
-        case .loadFirst: "Add a small weight increment while keeping reps the same."
-        case .repFirst: "Keep the same weight and aim for more reps before increasing load."
-        case .doubleProgression: "Hit the top of your rep range, then increase weight and drop back to the bottom."
-        case .variationProgression: "Move to a harder exercise variation to continue progressing."
-        case .tempoProgression: "Slow down the eccentric or add pauses for more tension without added load."
-        case .holdAndConsolidate: "Repeat at the current weight until performance stabilizes."
-        case .deloadAndRebuild: "Reduce weight by 10-15% and rebuild with better form and control."
+        case .loadFirst: L10n.tr("progression.strategy.loadFirst.explanation", fallback: "Add a small weight increment while keeping reps the same.")
+        case .repFirst: L10n.tr("progression.strategy.repFirst.explanation", fallback: "Keep the same weight and aim for more reps before increasing load.")
+        case .doubleProgression: L10n.tr("progression.strategy.doubleProgression.explanation", fallback: "Hit the top of your rep range, then increase weight and drop back to the bottom.")
+        case .variationProgression: L10n.tr("progression.strategy.variationProgression.explanation", fallback: "Move to a harder exercise variation to continue progressing.")
+        case .tempoProgression: L10n.tr("progression.strategy.tempoProgression.explanation", fallback: "Slow down the eccentric or add pauses for more tension without added load.")
+        case .holdAndConsolidate: L10n.tr("progression.strategy.holdAndConsolidate.explanation", fallback: "Repeat at the current weight until performance stabilizes.")
+        case .deloadAndRebuild: L10n.tr("progression.strategy.deloadAndRebuild.explanation", fallback: "Reduce weight by 10-15% and rebuild with better form and control.")
         }
     }
 }
@@ -42,10 +42,10 @@ nonisolated enum PlateauStatus: String, Codable, Sendable {
 
     var displayName: String {
         switch self {
-        case .progressing: "Progressing"
-        case .stalling: "Stalling"
-        case .plateaued: "Plateaued"
-        case .regressing: "Regressing"
+        case .progressing: L10n.tr("progression.plateauStatus.progressing.displayName", fallback: "Progressing")
+        case .stalling: L10n.tr("progression.plateauStatus.stalling.displayName", fallback: "Stalling")
+        case .plateaued: L10n.tr("progression.plateauStatus.plateaued.displayName", fallback: "Plateaued")
+        case .regressing: L10n.tr("progression.plateauStatus.regressing.displayName", fallback: "Regressing")
         }
     }
 
@@ -111,21 +111,21 @@ nonisolated enum TrainingPhase: String, Codable, Sendable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .build: "Build Phase"
-        case .push: "Push Phase"
-        case .fatigueManagement: "Recovery Phase"
-        case .deload: "Deload Phase"
-        case .rebalance: "Rebalance Phase"
+        case .build: L10n.tr("progression.trainingPhase.build.displayName", fallback: "Build Phase")
+        case .push: L10n.tr("progression.trainingPhase.push.displayName", fallback: "Push Phase")
+        case .fatigueManagement: L10n.tr("progression.trainingPhase.fatigueManagement.displayName", fallback: "Recovery Phase")
+        case .deload: L10n.tr("progression.trainingPhase.deload.displayName", fallback: "Deload")
+        case .rebalance: L10n.tr("progression.trainingPhase.rebalance.displayName", fallback: "Rebalance Phase")
         }
     }
 
     var description: String {
         switch self {
-        case .build: "Establishing training rhythm and building work capacity."
-        case .push: "Progressing load and volume toward new performance levels."
-        case .fatigueManagement: "Managing accumulated fatigue while maintaining fitness."
-        case .deload: "Reducing training stress to allow recovery and supercompensation."
-        case .rebalance: "Adjusting focus to address muscle imbalances or weak points."
+        case .build: L10n.tr("progression.trainingPhase.build.description", fallback: "Establishing training rhythm and building work capacity.")
+        case .push: L10n.tr("progression.trainingPhase.push.description", fallback: "Progressing load and volume toward new performance levels.")
+        case .fatigueManagement: L10n.tr("progression.trainingPhase.fatigueManagement.description", fallback: "Managing accumulated fatigue while maintaining fitness.")
+        case .deload: L10n.tr("progression.trainingPhase.deload.description", fallback: "Reducing training stress to allow recovery and supercompensation.")
+        case .rebalance: L10n.tr("progression.trainingPhase.rebalance.description", fallback: "Adjusting focus to address muscle imbalances or weak points.")
         }
     }
 
@@ -172,22 +172,22 @@ nonisolated enum TrainingPhase: String, Codable, Sendable, CaseIterable {
     /// Short coach-voice label for what this phase is optimizing.
     var optimizingFor: String {
         switch self {
-        case .build: return "Work capacity & rhythm"
-        case .push: return "Progressive overload"
-        case .fatigueManagement: return "Protect recovery, hold fitness"
-        case .deload: return "Supercompensate & reset"
-        case .rebalance: return "Close weak-point gaps"
+        case .build: return L10n.tr("progression.trainingPhase.build.optimizingFor", fallback: "Work capacity & rhythm")
+        case .push: return L10n.tr("progression.trainingPhase.push.optimizingFor", fallback: "Progressive overload")
+        case .fatigueManagement: return L10n.tr("progression.trainingPhase.fatigueManagement.optimizingFor", fallback: "Protect recovery, hold fitness")
+        case .deload: return L10n.tr("progression.trainingPhase.deload.optimizingFor", fallback: "Supercompensate & reset")
+        case .rebalance: return L10n.tr("progression.trainingPhase.rebalance.optimizingFor", fallback: "Close weak-point gaps")
         }
     }
 
     /// How hard training should feel inside this phase.
     var expectedIntensityLabel: String {
         switch self {
-        case .build: return "Moderate"
-        case .push: return "Hard"
-        case .fatigueManagement: return "Easier"
-        case .deload: return "Light"
-        case .rebalance: return "Moderate"
+        case .build: return L10n.tr("progression.trainingPhase.build.expectedIntensityLabel", fallback: "Moderate")
+        case .push: return L10n.tr("progression.trainingPhase.push.expectedIntensityLabel", fallback: "Hard")
+        case .fatigueManagement: return L10n.tr("progression.trainingPhase.fatigueManagement.expectedIntensityLabel", fallback: "Easier")
+        case .deload: return L10n.tr("progression.trainingPhase.deload.expectedIntensityLabel", fallback: "Light")
+        case .rebalance: return L10n.tr("progression.trainingPhase.rebalance.expectedIntensityLabel", fallback: "Moderate")
         }
     }
 
@@ -444,10 +444,10 @@ nonisolated enum VolumeStatus: String, Sendable {
 
     var displayName: String {
         switch self {
-        case .belowMEV: "Below Minimum"
-        case .maintenance: "Maintenance"
-        case .productive: "Productive"
-        case .aboveMRV: "Overreaching"
+        case .belowMEV: L10n.tr("progression.volumeStatus.belowMEV.displayName", fallback: "Below Minimum")
+        case .maintenance: L10n.tr("progression.volumeStatus.maintenance.displayName", fallback: "Maintenance")
+        case .productive: L10n.tr("progression.volumeStatus.productive.displayName", fallback: "Productive")
+        case .aboveMRV: L10n.tr("progression.volumeStatus.aboveMRV.displayName", fallback: "Overreaching")
         }
     }
 

@@ -42,12 +42,15 @@ struct ProgressionEngine {
         let relevantLogs = extractLogs(for: exerciseId, from: sessions)
 
         guard relevantLogs.count >= 2 else {
+            let baselineCoachNote = relevantLogs.isEmpty
+                ? L10n.tr("progression.coachNote.notEnoughData", fallback: "Not enough data yet.")
+                : L10n.tr("progression.coachNote.buildingBaseline", fallback: "Keep training — building baseline data.")
             return ExerciseProgressionState(
                 exerciseId: exerciseId,
                 sessionCount: relevantLogs.count,
                 plateauStatus: .progressing,
                 recommendedStrategy: family.progressionPriority,
-                coachNote: relevantLogs.isEmpty ? "Not enough data yet." : "Keep training — building baseline data."
+                coachNote: baselineCoachNote
             )
         }
 
@@ -112,50 +115,50 @@ struct ProgressionEngine {
         let totalWeeks = currentPhase.totalWeeksTrained
 
         if recoveryScore < 40 {
-            return (.deload, "Recovery is critically low. A deload week will help your body recover and come back stronger.")
+            return (.deload, L10n.tr("progression.phase.reason.criticalRecovery", fallback: "Recovery is critically low. A deload week will help your body recover and come back stronger."))
         }
 
         if recoveryScore < 55 && weeksInPhase >= 2 && currentPhase.currentPhase == .push {
-            return (.fatigueManagement, "Accumulated fatigue from the push phase is high. Backing off to protect long-term progress.")
+            return (.fatigueManagement, L10n.tr("progression.phase.reason.pushFatigueHigh", fallback: "Accumulated fatigue from the push phase is high. Backing off to protect long-term progress."))
         }
 
         if currentPhase.currentPhase == .deload && weeksInPhase >= 1 {
             let undertrained = muscleBalance.filter { $0.percentOfAverage < 0.75 }
             if undertrained.count >= 2 {
-                return (.rebalance, "Post-deload is a good time to address muscle imbalances before pushing again.")
+                return (.rebalance, L10n.tr("progression.phase.reason.postDeloadRebalance", fallback: "Post-deload is a good time to address muscle imbalances before pushing again."))
             }
-            return (.build, "Deload complete. Rebuilding work capacity before the next progression push.")
+            return (.build, L10n.tr("progression.phase.reason.deloadComplete", fallback: "Deload complete. Rebuilding work capacity before the next progression push."))
         }
 
         if currentPhase.currentPhase == .fatigueManagement && weeksInPhase >= 2 {
             if recoveryScore >= 70 {
-                return (.push, "Recovery has improved. Time to push for new progress.")
+                return (.push, L10n.tr("progression.phase.reason.recoveryImproved", fallback: "Recovery has improved. Time to push for new progress."))
             }
-            return (.deload, "Recovery hasn't improved enough. A structured deload is needed.")
+            return (.deload, L10n.tr("progression.phase.reason.recoveryNotImproved", fallback: "Recovery hasn't improved enough. A structured deload is needed."))
         }
 
         if currentPhase.currentPhase == .build && weeksInPhase >= 3 && recoveryScore >= 65 {
-            return (.push, "Work capacity is established. Time to push intensity and volume for progress.")
+            return (.push, L10n.tr("progression.phase.reason.workCapacityEstablished", fallback: "Work capacity is established. Time to push intensity and volume for progress."))
         }
 
         if currentPhase.currentPhase == .push && weeksInPhase >= 4 {
             if recoveryScore < 65 {
-                return (.fatigueManagement, "After \(weeksInPhase) weeks of pushing, fatigue signals suggest backing off.")
+                return (.fatigueManagement, L10n.format("progression.phase.reason.pushAfterWeeks", fallback: "After %d weeks of pushing, fatigue signals suggest backing off.", weeksInPhase))
             }
             if weeksInPhase >= 6 {
-                return (.fatigueManagement, "Extended push phase complete. Managing fatigue before the next block.")
+                return (.fatigueManagement, L10n.tr("progression.phase.reason.extendedPushComplete", fallback: "Extended push phase complete. Managing fatigue before the next block."))
             }
         }
 
         if currentPhase.currentPhase == .rebalance && weeksInPhase >= 3 {
-            return (.build, "Rebalance phase complete. Moving to build phase.")
+            return (.build, L10n.tr("progression.phase.reason.rebalanceComplete", fallback: "Rebalance phase complete. Moving to build phase."))
         }
 
         if totalWeeks > 0 && totalWeeks % 4 == 0 && currentPhase.currentPhase != .deload && recoveryScore < 70 {
-            return (.deload, "Every 4 weeks of consistent training benefits from a planned deload.")
+            return (.deload, L10n.tr("progression.phase.reason.plannedDeload", fallback: "Every 4 weeks of consistent training benefits from a planned deload."))
         }
 
-        return (currentPhase.currentPhase, "Continuing current \(currentPhase.currentPhase.displayName.lowercased()).")
+        return (currentPhase.currentPhase, L10n.format("progression.phase.reason.continueCurrent", fallback: "Continuing current %@.", currentPhase.currentPhase.displayName))
     }
 
     func assessPlanQuality(
@@ -238,8 +241,8 @@ struct ProgressionEngine {
     ) -> NextBestAction {
         if recoveryScore < 40 {
             return NextBestAction(
-                title: "Start Deload Week",
-                explanation: "Your recovery is critically low. A deload week will prevent overtraining and help you come back stronger.",
+                title: L10n.tr("progression.nextBestAction.startDeload.title", fallback: "Start Deload Week"),
+                explanation: L10n.tr("progression.nextBestAction.startDeload.explanation", fallback: "Your recovery is critically low. A deload week will prevent overtraining and help you come back stronger."),
                 icon: "arrow.down.to.line",
                 colorName: "purple",
                 confidence: 0.95,
@@ -249,8 +252,8 @@ struct ProgressionEngine {
 
         if recoveryScore < 55 {
             return NextBestAction(
-                title: "Go Lighter Next Session",
-                explanation: "Fatigue is accumulating. A lighter session maintains your training rhythm while protecting recovery.",
+                title: L10n.tr("progression.nextBestAction.lighterSession.title", fallback: "Go Lighter Next Session"),
+                explanation: L10n.tr("progression.nextBestAction.lighterSession.explanation", fallback: "Fatigue is accumulating. A lighter session maintains your training rhythm while protecting recovery."),
                 icon: "arrow.down.circle",
                 colorName: "orange",
                 confidence: 0.85,
@@ -261,9 +264,10 @@ struct ProgressionEngine {
         let plateaued = progressionStates.filter { $0.plateauStatus == .plateaued || $0.plateauStatus == .regressing }
         if plateaued.count >= 2 {
             let names = plateaued.prefix(2).compactMap { library.exercise(byId: $0.exerciseId)?.name }
+            let joinedNames = names.joined(separator: L10n.tr("progression.list.andSeparator", fallback: " and "))
             return NextBestAction(
-                title: "Swap Stalled Exercises",
-                explanation: "\(names.joined(separator: " and ")) have plateaued. Fresh exercise selection can restart progress.",
+                title: L10n.tr("progression.nextBestAction.swapStalled.title", fallback: "Swap Stalled Exercises"),
+                explanation: L10n.format("progression.nextBestAction.swapStalled.explanation", fallback: "%@ have plateaued. Fresh exercise selection can restart progress.", joinedNames),
                 icon: "arrow.triangle.2.circlepath",
                 colorName: "blue",
                 confidence: 0.8,
@@ -274,8 +278,8 @@ struct ProgressionEngine {
         let severeImbalance = muscleBalance.filter { $0.percentOfAverage < 0.7 }
         if severeImbalance.count >= 2 {
             return NextBestAction(
-                title: "Regenerate Next Week",
-                explanation: "Multiple muscle groups are significantly undertrained. A regenerated week can rebalance your training.",
+                title: L10n.tr("progression.nextBestAction.regenerateWeek.title", fallback: "Regenerate Next Week"),
+                explanation: L10n.tr("progression.nextBestAction.regenerateWeek.explanation", fallback: "Multiple muscle groups are significantly undertrained. A regenerated week can rebalance your training."),
                 icon: "arrow.triangle.2.circlepath.circle.fill",
                 colorName: "cyan",
                 confidence: 0.8,
@@ -285,9 +289,10 @@ struct ProgressionEngine {
 
         let undertrained = muscleBalance.filter { $0.percentOfAverage < 0.8 }
         if !undertrained.isEmpty {
+            let muscle = localizedMuscleName(undertrained.first!.muscle)
             return NextBestAction(
-                title: "Add \(undertrained.first!.muscle) Work",
-                explanation: "\(undertrained.first!.muscle) volume is below your recent average. Adding sets will improve balance.",
+                title: L10n.format("progression.nextBestAction.addWork.title", fallback: "Add %@ Work", muscle),
+                explanation: L10n.format("progression.nextBestAction.addWork.explanation", fallback: "%@ volume is below your recent average. Adding sets will improve balance.", muscle),
                 icon: "plus.circle.fill",
                 colorName: "orange",
                 confidence: 0.7,
@@ -298,8 +303,8 @@ struct ProgressionEngine {
         let progressing = progressionStates.filter { $0.plateauStatus == .progressing }
         if !progressing.isEmpty && recoveryScore >= 70 && phase == .push {
             return NextBestAction(
-                title: "Keep Pushing — Progress is Strong",
-                explanation: "Recovery is good and you're making progress. Stay the course and keep building.",
+                title: L10n.tr("progression.nextBestAction.keepPushing.title", fallback: "Keep Pushing — Progress is Strong"),
+                explanation: L10n.tr("progression.nextBestAction.keepPushing.explanation", fallback: "Recovery is good and you're making progress. Stay the course and keep building."),
                 icon: "arrow.up.right.circle.fill",
                 colorName: "green",
                 confidence: 0.85,
@@ -308,8 +313,8 @@ struct ProgressionEngine {
         }
 
         return NextBestAction(
-            title: "Continue As Planned",
-            explanation: "Your training is on track. Keep showing up and executing with intent.",
+            title: L10n.tr("progression.nextBestAction.continuePlanned.title", fallback: "Continue As Planned"),
+            explanation: L10n.tr("progression.nextBestAction.continuePlanned.explanation", fallback: "Your training is on track. Keep showing up and executing with intent."),
             icon: "checkmark.circle.fill",
             colorName: "green",
             confidence: 0.7,
@@ -326,6 +331,10 @@ struct ProgressionEngine {
             .compactMap { session in
                 session.exerciseLogs.first { $0.exerciseId == exerciseId && $0.isCompleted }
             }
+    }
+
+    private func localizedMuscleName(_ displayName: String) -> String {
+        MuscleGroup.localizedDisplayName(forDisplayName: displayName)
     }
 
     private func computePerformanceTrend(_ logs: [ExerciseLog]) -> [Double] {
@@ -435,9 +444,9 @@ struct ProgressionEngine {
             }
             return (lastWeight, "\(lastReps + 1)-\(min(lastReps + 3, topRep))")
         case .variationProgression:
-            return (nil, "Progress to harder variation")
+            return (nil, L10n.tr("progression.nextReps.harderVariation", fallback: "Progress to harder variation"))
         case .tempoProgression:
-            return (lastWeight, "\(lastReps) with slower tempo")
+            return (lastWeight, L10n.format("progression.nextReps.slowerTempo", fallback: "%d with slower tempo", lastReps))
         case .holdAndConsolidate:
             return (lastWeight, "\(lastReps)")
         case .deloadAndRebuild:
@@ -454,31 +463,31 @@ struct ProgressionEngine {
     ) -> String {
         switch plateau {
         case .regressing:
-            return "Performance is declining. Reduce load by 10-15% and rebuild with strict form. This is normal — it means you pushed hard."
+            return L10n.tr("progression.coachNote.regressing", fallback: "Performance is declining. Reduce load by 10-15% and rebuild with strict form. This is normal — it means you pushed hard.")
         case .plateaued:
             switch family {
             case .heavyCompound:
-                return "This lift has stalled. Hold the current weight for another session, then try a small increase. If it persists, consider a variation swap."
+                return L10n.tr("progression.coachNote.plateaued.heavyCompound", fallback: "This lift has stalled. Hold the current weight for another session, then try a small increase. If it persists, consider a variation swap.")
             case .bodyweightExercise, .calisthenicsProgression:
-                return "You've maxed out this variation. Progress to a harder version or add tempo/pause work to increase difficulty."
+                return L10n.tr("progression.coachNote.plateaued.bodyweight", fallback: "You've maxed out this variation. Progress to a harder version or add tempo/pause work to increase difficulty.")
             default:
-                return "Performance has plateaued. Try adding 1-2 reps before increasing weight, or switch to a similar exercise for fresh stimulus."
+                return L10n.tr("progression.coachNote.plateaued.default", fallback: "Performance has plateaued. Try adding 1-2 reps before increasing weight, or switch to a similar exercise for fresh stimulus.")
             }
         case .stalling:
             if phase == .push {
-                return "Progress is slowing. This is expected late in a push phase. Keep quality high and don't force weight increases."
+                return L10n.tr("progression.coachNote.stalling.push", fallback: "Progress is slowing. This is expected late in a push phase. Keep quality high and don't force weight increases.")
             }
-            return "Progress is slowing slightly. Focus on rep quality and controlled tempo. Progression will come."
+            return L10n.tr("progression.coachNote.stalling.default", fallback: "Progress is slowing slightly. Focus on rep quality and controlled tempo. Progression will come.")
         case .progressing:
             switch strategy {
             case .loadFirst:
-                return "Making good progress. Add a small increment next session while maintaining rep quality."
+                return L10n.tr("progression.coachNote.progressing.loadFirst", fallback: "Making good progress. Add a small increment next session while maintaining rep quality.")
             case .repFirst:
-                return "Building well. Add another rep or two at the same weight before increasing load."
+                return L10n.tr("progression.coachNote.progressing.repFirst", fallback: "Building well. Add another rep or two at the same weight before increasing load.")
             case .doubleProgression:
-                return "Working toward the top of your rep range. Once you hit it consistently, bump up the weight."
+                return L10n.tr("progression.coachNote.progressing.doubleProgression", fallback: "Working toward the top of your rep range. Once you hit it consistently, bump up the weight.")
             default:
-                return "On track. Keep training with intent and progression will follow."
+                return L10n.tr("progression.coachNote.progressing.default", fallback: "On track. Keep training with intent and progression will follow.")
             }
         }
     }

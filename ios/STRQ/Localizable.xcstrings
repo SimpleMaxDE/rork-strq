@@ -10951,6 +10951,836 @@
         }
       }
     },
+    "progression.coachNote.buildingBaseline": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weitertrainieren - Basisdaten werden aufgebaut."
+          }
+        }
+      }
+    },
+    "progression.coachNote.notEnoughData": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nicht genug Daten."
+          }
+        }
+      }
+    },
+    "progression.coachNote.plateaued.bodyweight": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du hast diese Variation ausgereizt. Wechsle zu einer schwereren Version oder nutze Tempo-/Pausenarbeit für mehr Schwierigkeit."
+          }
+        }
+      }
+    },
+    "progression.coachNote.plateaued.default": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Leistung ist im Plateau. Versuche 1-2 zusätzliche Wiederholungen vor der Gewichtserhöhung oder wechsle zu einer ähnlichen Übung für neuen Reiz."
+          }
+        }
+      }
+    },
+    "progression.coachNote.plateaued.heavyCompound": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Lift stockt. Halte das aktuelle Gewicht noch eine Einheit und versuche dann eine kleine Steigerung. Wenn es anhält, prüfe einen Variationstausch."
+          }
+        }
+      }
+    },
+    "progression.coachNote.progressing.default": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf Kurs. Trainiere mit Fokus weiter, dann folgt die Progression."
+          }
+        }
+      }
+    },
+    "progression.coachNote.progressing.doubleProgression": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du arbeitest auf das obere Ende des Wiederholungsbereichs hin. Wenn du es konstant erreichst, erhöhe das Gewicht."
+          }
+        }
+      }
+    },
+    "progression.coachNote.progressing.loadFirst": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guter Fortschritt. Erhöhe in der nächsten Einheit leicht und halte die Wiederholungsqualität."
+          }
+        }
+      }
+    },
+    "progression.coachNote.progressing.repFirst": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stabiler Aufbau. Ergänze ein bis zwei Wiederholungen mit gleichem Gewicht, bevor du die Last erhöhst."
+          }
+        }
+      }
+    },
+    "progression.coachNote.regressing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Leistung fällt ab. Reduziere die Last um 10-15 % und baue mit sauberer Technik neu auf. Das ist normal - es zeigt, dass du hart gepusht hast."
+          }
+        }
+      }
+    },
+    "progression.coachNote.stalling.default": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Fortschritt wird leicht langsamer. Fokus auf saubere Wiederholungen und kontrolliertes Tempo - die Progression kommt."
+          }
+        }
+      }
+    },
+    "progression.coachNote.stalling.push": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Fortschritt wird langsamer. Das ist spät in einer Push-Phase normal. Halte die Qualität hoch und erzwinge keine Gewichtssprünge."
+          }
+        }
+      }
+    },
+    "progression.list.andSeparator": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " und "
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.addWork.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Volumen für %@ liegt unter deinem letzten Durchschnitt. Zusätzliche Sätze verbessern die Balance."
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.addWork.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ergänzen"
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.continuePlanned.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Training ist auf Kurs. Bleib dran und führe die Einheiten sauber aus."
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.continuePlanned.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie geplant weitermachen"
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.keepPushing.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regeneration ist gut und du machst Fortschritt. Bleib auf Kurs und bau weiter auf."
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.keepPushing.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weiter pushen - der Fortschritt stimmt"
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.lighterSession.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ermüdung baut sich auf. Eine leichtere Einheit hält den Trainingsrhythmus und schützt die Regeneration."
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.lighterSession.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Einheit leichter"
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.regenerateWeek.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehrere Muskelgruppen sind deutlich untertrainiert. Eine neu geplante Woche kann dein Training ausbalancieren."
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.regenerateWeek.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Woche neu planen"
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.startDeload.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Regeneration ist kritisch niedrig. Eine Deload-Woche verhindert Übertraining und hilft dir, stärker zurückzukommen."
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.startDeload.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deload-Woche starten"
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.swapStalled.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ stocken. Frische Übungsauswahl kann den Fortschritt wieder anstoßen."
+          }
+        }
+      }
+    },
+    "progression.nextBestAction.swapStalled.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockende Übungen tauschen"
+          }
+        }
+      }
+    },
+    "progression.nextReps.harderVariation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zur schwereren Variation"
+          }
+        }
+      }
+    },
+    "progression.nextReps.slowerTempo": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d mit langsamerem Tempo"
+          }
+        }
+      }
+    },
+    "progression.phase.reason.continueCurrent": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktuelle Phase wird fortgesetzt: %@."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.criticalRecovery": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Regeneration ist kritisch niedrig. Eine Deload-Woche hilft deinem Körper, sich zu erholen und stärker zurückzukommen."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.deloadComplete": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deload abgeschlossen. Jetzt Arbeitskapazität für den nächsten Progressions-Push aufbauen."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.extendedPushComplete": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Längere Push-Phase abgeschlossen. Ermüdung vor dem nächsten Block managen."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.plannedDeload": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach 4 Wochen konsequentem Training hilft ein geplanter Deload."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.postDeloadRebalance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach dem Deload ist ein guter Zeitpunkt, Dysbalancen auszugleichen, bevor du wieder pushst."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.pushAfterWeeks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach %d Push-Wochen sprechen Ermüdungssignale dafür, etwas rauszunehmen."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.pushFatigueHigh": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Ermüdung aus der Push-Phase ist hoch. Wir nehmen etwas raus, um langfristigen Fortschritt zu schützen."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.rebalanceComplete": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgleichsphase abgeschlossen. Wechsel in die Aufbauphase."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.recoveryImproved": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Regeneration ist besser. Zeit, wieder auf Fortschritt zu pushen."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.recoveryNotImproved": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Regeneration hat sich noch nicht genug verbessert. Ein strukturierter Deload ist nötig."
+          }
+        }
+      }
+    },
+    "progression.phase.reason.workCapacityEstablished": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Arbeitskapazität sitzt. Zeit, Intensität und Volumen für Fortschritt zu pushen."
+          }
+        }
+      }
+    },
+    "progression.plateauStatus.plateaued.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plateau"
+          }
+        }
+      }
+    },
+    "progression.plateauStatus.progressing.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Fortschritt"
+          }
+        }
+      }
+    },
+    "progression.plateauStatus.regressing.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rückläufig"
+          }
+        }
+      }
+    },
+    "progression.plateauStatus.stalling.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockt"
+          }
+        }
+      }
+    },
+    "progression.strategy.deloadAndRebuild.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deload & sauber aufbauen"
+          }
+        }
+      }
+    },
+    "progression.strategy.deloadAndRebuild.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reduziere das Gewicht um 10-15 % und baue mit sauberer Technik neu auf."
+          }
+        }
+      }
+    },
+    "progression.strategy.doubleProgression.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doppelte Progression"
+          }
+        }
+      }
+    },
+    "progression.strategy.doubleProgression.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erreiche das obere Ende deines Wiederholungsbereichs, erhöhe dann das Gewicht und starte wieder unten."
+          }
+        }
+      }
+    },
+    "progression.strategy.holdAndConsolidate.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halten & festigen"
+          }
+        }
+      }
+    },
+    "progression.strategy.holdAndConsolidate.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiederhole das aktuelle Gewicht, bis die Leistung stabil sitzt."
+          }
+        }
+      }
+    },
+    "progression.strategy.loadFirst.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gewicht erhöhen"
+          }
+        }
+      }
+    },
+    "progression.strategy.loadFirst.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erhöhe das Gewicht leicht und halte die Wiederholungen gleich."
+          }
+        }
+      }
+    },
+    "progression.strategy.repFirst.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiederholungen erhöhen"
+          }
+        }
+      }
+    },
+    "progression.strategy.repFirst.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bleib beim gleichen Gewicht und peile mehr Wiederholungen an, bevor du die Last erhöhst."
+          }
+        }
+      }
+    },
+    "progression.strategy.tempoProgression.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempo-Progression"
+          }
+        }
+      }
+    },
+    "progression.strategy.tempoProgression.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verlangsame die Exzentrik oder setze Pausen, um ohne mehr Gewicht Spannung zu erhöhen."
+          }
+        }
+      }
+    },
+    "progression.strategy.variationProgression.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schwerere Variation"
+          }
+        }
+      }
+    },
+    "progression.strategy.variationProgression.explanation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wechsle zu einer schwereren Übungsvariation, um weiter Fortschritt zu machen."
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.build.description": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rhythmus finden und Arbeitskapazität aufbauen."
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.build.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufbauphase"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.build.expectedIntensityLabel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderat"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.build.optimizingFor": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arbeitskapazität & Rhythmus"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.deload.description": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainingsstress reduzieren, damit du dich erholst und wieder frischer pushen kannst."
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.deload.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deload"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.deload.expectedIntensityLabel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leicht"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.deload.optimizingFor": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erholen & Reset"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.fatigueManagement.description": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ermüdung managen und Fitness halten."
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.fatigueManagement.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erholungsphase"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.fatigueManagement.expectedIntensityLabel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leichter"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.fatigueManagement.optimizingFor": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regeneration schützen, Fitness halten"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.push.description": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last und Volumen gezielt steigern, um neue Leistungslevel zu erreichen."
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.push.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push-Phase"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.push.expectedIntensityLabel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hart"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.push.optimizingFor": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Progressive Overload"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.rebalance.description": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fokus anpassen, um Dysbalancen und Schwachstellen auszugleichen."
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.rebalance.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgleichsphase"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.rebalance.expectedIntensityLabel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderat"
+          }
+        }
+      }
+    },
+    "progression.trainingPhase.rebalance.optimizingFor": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schwachstellen schließen"
+          }
+        }
+      }
+    },
+    "progression.volumeStatus.aboveMRV.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu viel Volumen"
+          }
+        }
+      }
+    },
+    "progression.volumeStatus.belowMEV.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unter Minimum"
+          }
+        }
+      }
+    },
+    "progression.volumeStatus.maintenance.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erhalt"
+          }
+        }
+      }
+    },
+    "progression.volumeStatus.productive.displayName": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Produktiv"
+          }
+        }
+      }
+    },
     "What STRQ has picked up": {
       "localizations": {
         "de": {
