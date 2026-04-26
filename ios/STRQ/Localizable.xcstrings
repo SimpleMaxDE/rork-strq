@@ -1766,7 +1766,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schließe das Onboarding ab, um\ndeinen personalisierten Trainingsplan zu erstellen."
+            "value": "Schließ das Onboarding ab,\ndamit dein personalisierter Trainingsplan erstellt wird."
           }
         }
       }
@@ -4066,7 +4066,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erholen Sie sich mit Absicht"
+            "value": "Erhol dich mit Plan"
           }
         }
       }
@@ -5176,7 +5176,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@, starte jetzt Sitzung 1. STRQ wird den Rest vom echten Training abstimmen."
+            "value": "%@, starte jetzt Workout 1. STRQ passt den Rest mit echten Trainingsdaten an."
           }
         }
       }
@@ -5316,7 +5316,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%d-tägige Serie · %d Sitzungen protokolliert"
+            "value": "%d-Tage-Streak · %d Workouts geloggt"
           }
         }
       }
@@ -5326,7 +5326,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%d-tägiger Streak · Halten Sie das Signal stark"
+            "value": "%d-Tage-Streak · halte das Signal stark"
           }
         }
       }
@@ -5546,7 +5546,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eine Aufzeichnung der Entscheidungen, die der Coach für Sie getroffen hat – was sich verändert hat, warum es sich verändert hat und was es jetzt für das Training bedeutet."
+            "value": "Ein Verlauf der Coach-Entscheidungen: was sich geändert hat, warum und was das jetzt für dein Training bedeutet."
           }
         }
       }
@@ -5556,7 +5556,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein Trainingssystem, das auf Sie zugeschnitten ist."
+            "value": "Ein Trainingssystem, das sich an dich anpasst."
           }
         }
       }
@@ -5616,7 +5616,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adaptive Pläne, tiefergehende Fortschrittsanzeigen und jede Sitzung wird sicher auf Ihren Geräten übertragen."
+            "value": "Adaptive Pläne, präzisere Progression und jedes Workout sicher auf all deinen Geräten."
           }
         }
       }
@@ -5646,7 +5646,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fügen Sie einen kurzen Gedanken hinzu, um sich daran zu erinnern, wie sich diese Sitzung angefühlt hat."
+            "value": "Füg einen kurzen Gedanken hinzu, damit du weißt, wie sich das Workout angefühlt hat."
           }
         }
       }
@@ -5656,7 +5656,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sitzungsnotiz hinzufügen"
+            "value": "Workout-Notiz hinzufügen"
           }
         }
       }
@@ -5666,7 +5666,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Passen Sie bei Bedarf die Belastung oder die Wiederholungen an und protokollieren Sie dann den Satz %d."
+            "value": "Passe bei Bedarf Gewicht oder Wiederholungen an und logge dann Satz %d."
           }
         }
       }
@@ -5706,7 +5706,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alle Arbeitssätze werden protokolliert. Beenden Sie den Vorgang, wenn Sie bereit sind."
+            "value": "Alle Arbeitssätze sind geloggt. Beende, wenn du bereit bist."
           }
         }
       }
@@ -5736,7 +5736,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ordnen Sie Trainingseinheiten bestimmten Tagen zu. Tippen Sie auf einen Tag, um ihn zu ändern."
+            "value": "Ordne Workouts bestimmten Tagen zu. Tippe auf einen Tag, um ihn zu ändern."
           }
         }
       }
@@ -5886,7 +5886,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Basierend auf Ihrem Profil"
+            "value": "Basierend auf deinem Profil"
           }
         }
       }
@@ -5906,7 +5906,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Grundlasten hängen nun davon ab, was Sie tatsächlich gehoben haben."
+            "value": "Deine Ausgangsgewichte basieren jetzt auf dem, was du wirklich gehoben hast."
           }
         }
       }
@@ -5926,7 +5926,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schlagen Sie die letzte Sitzung – drücken Sie das nächste Mal"
+            "value": "Schlag dein letztes Workout — beim nächsten Mal mehr Druck"
           }
         }
       }
@@ -5936,7 +5936,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beginnen Sie mit dem Training"
+            "value": "Workout starten"
           }
         }
       }
@@ -6006,7 +6006,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erstellen Sie Ihren Plan"
+            "value": "Dein Plan wird erstellt"
           }
         }
       }
@@ -6116,7 +6116,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abgestimmt auf Ihren Körper, Ihr Ziel und Ihren Zeitplan"
+            "value": "Abgestimmt auf deinen Körper, dein Ziel und deinen Alltag"
           }
         }
       }
@@ -6166,7 +6166,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Coach kann jetzt Beladung und Lautstärke anpassen. Eine weitere Sitzung schärft die Musterlesungen."
+            "value": "Coach kann jetzt Gewicht und Volumen anpassen. Ein weiteres Workout schärft die Mustererkennung."
           }
         }
       }
@@ -6176,7 +6176,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Coach ist mit dem Rest Ihres Bildes zufrieden."
+            "value": "Coach hat jetzt ein stimmiges Gesamtbild von dir."
           }
         }
       }
@@ -6216,7 +6216,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Coaching, das Sie immer weiter lernt"
+            "value": "Coaching, das dich immer besser versteht"
           }
         }
       }
@@ -6226,7 +6226,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kommen Sie für Sitzung 2 zurück"
+            "value": "Komm für Workout 2 zurück"
           }
         }
       }
@@ -6236,7 +6236,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schließen Sie das Onboarding ab, um Ihren personalisierten Trainingsplan zu erstellen."
+            "value": "Schließ das Onboarding ab, um deinen personalisierten Trainingsplan zu erstellen."
           }
         }
       }
@@ -6256,7 +6256,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abgeschlossene Sitzungen geben STRQ genügend Kontext, um die Arbeitsbelastungsverteilung, den Wochenrhythmus und den Bewegungsmix zu lesen."
+            "value": "Abgeschlossene Workouts geben STRQ genug Kontext für Lastverteilung, Wochenrhythmus und Übungsmix."
           }
         }
       }
@@ -6266,7 +6266,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bestätigen Sie den Tausch"
+            "value": "Tausch bestätigen"
           }
         }
       }
@@ -6286,7 +6286,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erwägen Sie eine Änderung oder einen Reset"
+            "value": "Denk über eine Variation oder einen Reset nach"
           }
         }
       }
@@ -6306,7 +6306,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Trainieren Sie jetzt weiter"
+            "value": "Workout jetzt fortsetzen"
           }
         }
       }
@@ -6486,7 +6486,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erleichtern Sie die nächste Sitzung"
+            "value": "Nächstes Workout etwas leichter"
           }
         }
       }
@@ -6506,7 +6506,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bearbeiten Sie die Vertreter"
+            "value": "Wiederholungen bearbeiten"
           }
         }
       }
@@ -6526,7 +6526,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sitzungsnotiz bearbeiten"
+            "value": "Workout-Notiz bearbeiten"
           }
         }
       }
@@ -6546,7 +6546,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktivieren Sie die Körperverfolgung"
+            "value": "Physique-Tracking aktivieren"
           }
         }
       }
@@ -6616,7 +6616,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Ausführung blieb stabil, sodass Sie beim nächsten Anruf zuversichtlich bleiben können."
+            "value": "Ausführung war stabil, deshalb kann die nächste Entscheidung klar bleiben."
           }
         }
       }
@@ -6656,7 +6656,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Übungen werden auf Ihre Ausrüstung und eventuelle Einschränkungen abgestimmt."
+            "value": "Übungen werden auf dein Equipment und mögliche Einschränkungen abgestimmt."
           }
         }
       }
@@ -6736,7 +6736,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beenden Sie das Training, wenn Sie bereit sind, diese Sitzung zu speichern."
+            "value": "Beende das Workout, wenn du es speichern willst."
           }
         }
       }
@@ -6746,7 +6746,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abgeschlossene Sitzungen werden hier im Laufe Ihrer Woche gesammelt, sodass der Fortschritt später leicht überprüft werden kann."
+            "value": "Abgeschlossene Workouts sammeln sich hier über die Woche, damit dein Fortschritt später schnell prüfbar bleibt."
           }
         }
       }
@@ -6776,7 +6776,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Passt zu dieser Sitzung"
+            "value": "Passt zu diesem Workout"
           }
         }
       }
@@ -6806,7 +6806,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Machen Sie sich bereit für die nächste Anstrengung."
+            "value": "Mach dich bereit für den nächsten Einsatz."
           }
         }
       }
@@ -6836,7 +6836,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wie sich Schlaf auf Ihr Training auswirkt"
+            "value": "WIE SCHLAF DEIN TRAINING BEEINFLUSST"
           }
         }
       }
@@ -6846,7 +6846,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schwere Sätze und Wiederholungsbestleistungen werden hier zum Vorschein kommen, wenn Ihr Protokoll wächst."
+            "value": "Schwere Sätze und Rep-Bestleistungen erscheinen hier, sobald dein Log wächst."
           }
         }
       }
@@ -6906,7 +6906,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wie hat sich diese Sitzung angefühlt?"
+            "value": "Wie hat sich das Workout angefühlt?"
           }
         }
       }
@@ -6916,7 +6916,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wie Sie trainieren"
+            "value": "Wie du trainierst"
           }
         }
       }
@@ -6986,7 +6986,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Protokollieren Sie weiterhin Ankerlifte und STRQ verwandelt sie in einen lesbaren Stärketrend."
+            "value": "Logge weiter deine Ankerlifts, dann macht STRQ daraus einen klaren Krafttrend."
           }
         }
       }
@@ -7056,7 +7056,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lassen Sie die Erholung dies vorantreiben."
+            "value": "Lass die Regeneration den nächsten Schritt tragen."
           }
         }
       }
@@ -7136,7 +7136,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Protokollieren Sie den heutigen Schlaf"
+            "value": "Heutigen Schlaf loggen"
           }
         }
       }
@@ -7146,7 +7146,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Melden Sie sich an, um die heutige Anleitung freizuschalten."
+            "value": "Logge einen Satz, um die heutige Guidance freizuschalten."
           }
         }
       }
@@ -7236,7 +7236,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schwung auf Ihrer Seite"
+            "value": "Momentum auf deiner Seite"
           }
         }
       }
@@ -7276,7 +7276,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fahren Sie mit der nächsten Übung fort, wenn Sie bereit sind."
+            "value": "Wechsle zur nächsten Übung, wenn du bereit bist."
           }
         }
       }
@@ -7556,7 +7556,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sobald Coach die Lautstärke anpasst, einen Lift vertauscht oder Ihre Phase verschiebt, wird jede Änderung hier mit dem Grund dafür angezeigt."
+            "value": "Sobald Coach Volumen anpasst, einen Lift tauscht oder deine Phase verschiebt, siehst du hier jede Änderung inklusive Begründung."
           }
         }
       }
@@ -7596,7 +7596,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Optional. Speichern Sie einen Cue, einen Gewinn oder alles, woran Sie sich beim nächsten Mal erinnern möchten."
+            "value": "Optional: Speichere einen Cue, einen Win oder alles, was du fürs nächste Mal behalten willst."
           }
         }
       }
@@ -7746,7 +7746,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Zahlung wird Ihrem Apple-ID-Konto belastet. Das Abonnement verlängert sich automatisch, sofern es nicht mindestens 24 Stunden vor dem Ende des aktuellen Zeitraums gekündigt wird."
+            "value": "Die Zahlung erfolgt über deine Apple-ID. Das Abo verlängert sich automatisch, wenn du nicht mindestens 24 Stunden vor Ablauf der aktuellen Periode kündigst."
           }
         }
       }
@@ -7756,7 +7756,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pro Sitzung"
+            "value": "Pro Workout"
           }
         }
       }
@@ -7796,7 +7796,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wählen Sie eine rollenerhaltende Alternative"
+            "value": "Wähle eine passende Alternative für die gleiche Rolle"
           }
         }
       }
@@ -7856,7 +7856,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bereiten Sie sich auf %@ vor."
+            "value": "Mach dich bereit für %@."
           }
         }
       }
@@ -7906,7 +7906,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Fortschritt beginnt, sobald STRQ Ihre Daten der ersten Sitzung sieht."
+            "value": "Progression startet, sobald STRQ Daten aus deinem ersten Workout hat."
           }
         }
       }
@@ -7916,7 +7916,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fortschritt, der sich nach jeder Sitzung anpasst"
+            "value": "Progression, die sich nach jedem Workout anpasst"
           }
         }
       }
@@ -8046,7 +8046,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktuelle Sitzungen"
+            "value": "Letzte Workouts"
           }
         }
       }
@@ -8116,7 +8116,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wiederherstellungsbewusst. Kein Rätselraten über Last oder Lautstärke"
+            "value": "Recovery-bewusst. Keine Raterei bei Gewicht oder Volumen."
           }
         }
       }
@@ -8166,7 +8166,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Überprüfen Sie diese Woche und passen Sie sie an"
+            "value": "Diese Woche checken und anpassen"
           }
         }
       }
@@ -8256,7 +8256,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STRQ coacht Ihr Training und Ihre Erholung. Sie können die Körperverfolgung jederzeit aktivieren, um Körpergewichts- und Ernährungsinformationen hinzuzufügen – nur dann, wenn Sie es möchten."
+            "value": "STRQ coacht dein Training und deine Regeneration. Aktiviere Physique-Tracking jederzeit, um Gewicht und Ernährung mit einzubeziehen — nur wenn du willst."
           }
         }
       }
@@ -8266,7 +8266,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bei STRQ handelt es sich um das Lesen von Gleichgewicht, Ermüdung und Belastungstempo. Beenden Sie die Woche, um Ihre erste Bewertung freizuschalten."
+            "value": "STRQ analysiert Balance, Ermüdung und Laststeuerung. Schließ die Woche ab, um dein erstes Review freizuschalten."
           }
         }
       }
@@ -8276,7 +8276,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STRQ kennt jetzt Ihre Startlasten. Sitzung 2 schaltet echte Fortschrittsaufrufe ein."
+            "value": "STRQ kennt jetzt deine Startgewichte. Workout 2 schaltet echte Progressions-Entscheidungen frei."
           }
         }
       }
@@ -8286,7 +8286,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STRQ personalisiert alles von Ihrem Ziel bis zu Ihrem Zeitplan."
+            "value": "STRQ personalisiert alles — von deinem Ziel bis zu deinem Alltag."
           }
         }
       }
@@ -8396,7 +8396,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Siehe Mein Plan"
+            "value": "Meinen Plan ansehen"
           }
         }
       }
@@ -8406,7 +8406,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wählen Sie alle Problembereiche aus, damit die Übungen aus Sicherheitsgründen gefiltert werden können."
+            "value": "Wähle problematische Bereiche, damit Übungen sicher gefiltert werden können."
           }
         }
       }
@@ -8416,7 +8416,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sitzung 2 ist das nächste wichtige Signal."
+            "value": "Workout 2 ist das nächste wichtige Signal."
           }
         }
       }
@@ -8426,7 +8426,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sitzungsdauer"
+            "value": "Workout-Dauer"
           }
         }
       }
@@ -8456,7 +8456,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Setzen Sie %d · %@ × %d"
+            "value": "Satz %d · %@ × %d"
           }
         }
       }
@@ -8466,7 +8466,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sieben kurze Kapitel. Dann ein Plan, der tatsächlich passt."
+            "value": "7 kurze Schritte. Dann steht dein Plan."
           }
         }
       }
@@ -8536,7 +8536,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schlaf-, Wiege- und Ernährungseinträge machen auf dieser Registerkarte eine klarere Darstellung der Reaktion Ihres Körpers."
+            "value": "Schlaf-, Wiege- und Ernährungseinträge machen diesen Tab zu einem klaren Bild deiner Reaktion."
           }
         }
       }
@@ -8566,7 +8566,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starten Sie Sitzung 1"
+            "value": "Workout 1 starten"
           }
         }
       }
@@ -8576,7 +8576,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starten Sie jetzt Sitzung 1. STRQ wird den Rest vom echten Training abstimmen."
+            "value": "Starte jetzt Workout 1. STRQ stimmt den Rest mit echten Trainingsdaten ab."
           }
         }
       }
@@ -8586,7 +8586,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fangen Sie noch heute neu an"
+            "value": "Starte heute neu"
           }
         }
       }
@@ -8596,7 +8596,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beginnen Sie hier"
+            "value": "Hier starten"
           }
         }
       }
@@ -8666,7 +8666,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starker Start. STRQ liest bereits Auslastung, Wiederherstellung und Konsistenz."
+            "value": "Starker Start. STRQ erkennt bereits Last, Regeneration und Konstanz."
           }
         }
       }
@@ -8706,7 +8706,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vorschläge basierend auf den Fokusmuskeln und -lücken dieser Sitzung."
+            "value": "Vorschläge basierend auf Fokusmuskeln und Lücken dieses Workouts."
           }
         }
       }
@@ -8856,7 +8856,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gönnen Sie sich den Rest, den Sie brauchen. Der nächste Zug steht bereits in der Warteschlange."
+            "value": "Nimm dir die Pause, die du brauchst. Der nächste Schritt steht schon bereit."
           }
         }
       }
@@ -8866,7 +8866,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tippen Sie zum Bearbeiten auf einen beliebigen Wert. Wird zur Kalibrierung des Volumens und der Übungsauswahl verwendet."
+            "value": "Tippe auf einen Wert zum Bearbeiten. Dient zur Kalibrierung von Volumen und Übungsauswahl."
           }
         }
       }
@@ -8876,7 +8876,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tippen Sie hier, um ein Rezept zu erhalten"
+            "value": "Tippen für Vorgabe"
           }
         }
       }
@@ -8886,7 +8886,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tippen Sie auf die Muskeln, um ihnen mehr oder weniger Aufmerksamkeit zu schenken. Optional."
+            "value": "Tippe Muskeln an, um ihnen mehr oder weniger Fokus zu geben. Optional."
           }
         }
       }
@@ -8896,7 +8896,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tippen Sie auf die Muskeln, um die Priorität festzulegen"
+            "value": "Tippe Muskeln an, um Prioritäten zu setzen"
           }
         }
       }
@@ -8976,7 +8976,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dieser Lift ist fertig. Machen Sie weiter, wenn sich der Rest richtig anfühlt."
+            "value": "Dieser Lift ist erledigt. Geh weiter, sobald die Pause passt."
           }
         }
       }
@@ -8986,7 +8986,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Diese Notiz bleibt an die gespeicherte Sitzung angehängt."
+            "value": "Diese Notiz bleibt mit dem gespeicherten Workout verknüpft."
           }
         }
       }
@@ -9006,7 +9006,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heute lesen Sie leichter, was das Lasttempo von STRQ noch verbessert."
+            "value": "Heute war leichter — trotzdem schärft das STRQs Laststeuerung."
           }
         }
       }
@@ -9036,7 +9036,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Trainiere normal. STRQ legt anhand dieses Trainings Ihre tatsächliche Grundlinie fest."
+            "value": "Trainiere ganz normal. STRQ setzt aus diesem Workout deine echte Ausgangsbasis."
           }
         }
       }
@@ -9046,7 +9046,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Trainieren Sie, um das Signal scharf zu halten"
+            "value": "Trainiere weiter, damit das Signal scharf bleibt"
           }
         }
       }
@@ -9106,7 +9106,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Versuchen Sie es erneut"
+            "value": "Erneut versuchen"
           }
         }
       }
@@ -9116,7 +9116,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Testen Sie es kostenlos und kündigen Sie es jederzeit vor der Verlängerung"
+            "value": "Kostenlos testen, jederzeit vor Verlängerung kündigen"
           }
         }
       }
@@ -9126,7 +9126,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktivieren Sie die Körperverfolgung im Profil, um diesen Fokus freizuschalten."
+            "value": "Aktiviere Physique-Tracking im Profil, um diesen Fokus freizuschalten."
           }
         }
       }
@@ -9146,7 +9146,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kommende Sitzung"
+            "value": "Nächstes Workout"
           }
         }
       }
@@ -9156,7 +9156,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Verwenden Sie die untere Aktion, um fortzufahren, wenn Sie dazu bereit sind."
+            "value": "Nutze die untere Aktion, um weiterzugehen, wenn du bereit bist."
           }
         }
       }
@@ -9176,7 +9176,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lautstärkesignale"
+            "value": "Volumen-Signale"
           }
         }
       }
@@ -9186,7 +9186,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lautstärke geringer als letzte Woche"
+            "value": "Volumen niedriger als letzte Woche"
           }
         }
       }
@@ -9196,7 +9196,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lautstärke erhöhen %d%%"
+            "value": "Volumen höher um %d%%"
           }
         }
       }
@@ -9356,7 +9356,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wöchentliche Sitzungen"
+            "value": "Workouts pro Woche"
           }
         }
       }
@@ -9396,7 +9396,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Was ist Ihr Ziel?"
+            "value": "Was ist dein Ziel?"
           }
         }
       }
@@ -9416,7 +9416,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Warum STRQ Ihren Plan geändert hat"
+            "value": "Warum STRQ deinen Plan geändert hat"
           }
         }
       }
@@ -9436,7 +9436,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Siege"
+            "value": "Erfolge"
           }
         }
       }
@@ -9516,7 +9516,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "In der Zwischenzeit können Sie STRQ weiter erkunden."
+            "value": "In der Zwischenzeit kannst du STRQ weiter erkunden."
           }
         }
       }
@@ -9526,7 +9526,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sie haben mehr Arbeit erledigt als beim letzten Mal. Die Kapazität steigt."
+            "value": "Du hast mehr Volumen als letztes Mal bewegt. Deine Kapazität steigt."
           }
         }
       }
@@ -9536,7 +9536,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sie haben STRQ Pro"
+            "value": "Du hast STRQ Pro"
           }
         }
       }
@@ -9546,7 +9546,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sie gelangen direkt in die heutige Sitzung. Sie können den Plan später in Train verfeinern."
+            "value": "Du gehst direkt ins heutige Workout. Feintuning machst du später in Train."
           }
         }
       }
@@ -9556,7 +9556,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ihr Plan ist fertig"
+            "value": "Dein Plan ist bereit"
           }
         }
       }
@@ -9566,7 +9566,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ihre Grundlinie beginnt mit „Heute“."
+            "value": "Deine Ausgangsbasis startet heute."
           }
         }
       }
@@ -9576,7 +9576,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ihre Körperwerte"
+            "value": "Deine Körperdaten"
           }
         }
       }
@@ -9586,7 +9586,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ihr Konsistenzmuster wird hier abgebildet, sobald die Sitzungen beginnen."
+            "value": "Dein Konsistenzmuster erscheint hier, sobald erste Workouts drin sind."
           }
         }
       }
@@ -9596,7 +9596,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ihre Hauptübungen bilden den ersten echten Krafttest."
+            "value": "Deine Hauptlifts liefern das erste belastbare Kraftbild."
           }
         }
       }
@@ -9606,7 +9606,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ihr Name"
+            "value": "Dein Name"
           }
         }
       }
@@ -9616,7 +9616,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aus diesen Trainingsparametern werden Ihre Ernährungsziele berechnet. Durch Änderungen an Ihrem Trainingsprofil werden die Ernährungsempfehlungen aktualisiert."
+            "value": "Deine Ernährungsziele werden aus diesen Trainingsparametern berechnet. Änderungen im Trainingsprofil aktualisieren die Ernährungsempfehlungen."
           }
         }
       }
@@ -9626,7 +9626,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ihre jüngsten Änderungen beeinflussen den Ablauf dieser Woche."
+            "value": "Deine letzten Änderungen prägen den Verlauf dieser Woche."
           }
         }
       }
@@ -9646,7 +9646,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ihr oberer Satz wurde nach oben verschoben, sodass der Fortschritt weiter ansteigen kann."
+            "value": "Dein Top-Satz ist gestiegen, damit kann die Progression weiter hochgehen."
           }
         }
       }
@@ -9656,7 +9656,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ihr Trainingsprotokoll beginnt"
+            "value": "Dein Trainingslog startet"
           }
         }
       }
@@ -9806,7 +9806,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sitzung protokolliert"
+            "value": "Workout geloggt"
           }
         }
       }
@@ -9816,7 +9816,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sitzungen protokolliert"
+            "value": "Workouts geloggt"
           }
         }
       }
@@ -9926,7 +9926,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%d weitere Sitzung%@ und Ihre erste wöchentliche Lektüre wird in den Fokus gerückt"
+            "value": "%d weitere%@ Workout%@, dann wird dein erster Wochen-Read klarer"
           }
         }
       }
@@ -9936,7 +9936,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fast geschafft – eine weitere Sitzung rundet die Woche ab"
+            "value": "Fast da — ein weiteres Workout rundet die Woche ab"
           }
         }
       }
@@ -9986,7 +9986,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gehen Sie zur heutigen Sitzung"
+            "value": "Zum heutigen Workout"
           }
         }
       }
@@ -10016,7 +10016,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Überprüfen Sie Ihre Woche und passen Sie sie an"
+            "value": "Deine Woche prüfen und anpassen"
           }
         }
       }
@@ -10046,7 +10046,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Siehe Geschichte"
+            "value": "Verlauf ansehen"
           }
         }
       }
@@ -10056,7 +10056,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sehen Sie sich den heutigen Plan an"
+            "value": "Heutigen Plan ansehen"
           }
         }
       }
