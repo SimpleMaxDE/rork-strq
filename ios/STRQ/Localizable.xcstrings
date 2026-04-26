@@ -4890,6 +4890,256 @@
           }
         }
       }
+    },
+    "Upper/Lower": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oberkörper/Unterkörper"
+          }
+        }
+      }
+    },
+    "Body Part": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muskelgruppen"
+          }
+        }
+      }
+    },
+    "Full Body A": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganzkörper A"
+          }
+        }
+      }
+    },
+    "Full Body B": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganzkörper B"
+          }
+        }
+      }
+    },
+    "Full Body C": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganzkörper C"
+          }
+        }
+      }
+    },
+    "Full Body D": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganzkörper D"
+          }
+        }
+      }
+    },
+    "Upper A": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oberkörper A"
+          }
+        }
+      }
+    },
+    "Upper B": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oberkörper B"
+          }
+        }
+      }
+    },
+    "Upper C": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oberkörper C"
+          }
+        }
+      }
+    },
+    "Lower A": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unterkörper A"
+          }
+        }
+      }
+    },
+    "Lower B": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unterkörper B"
+          }
+        }
+      }
+    },
+    "Push": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push"
+          }
+        }
+      }
+    },
+    "Pull": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull"
+          }
+        }
+      }
+    },
+    "Legs": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beine"
+          }
+        }
+      }
+    },
+    "Legs & Core": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beine & Core"
+          }
+        }
+      }
+    },
+    "Push A": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push A"
+          }
+        }
+      }
+    },
+    "Pull A": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull A"
+          }
+        }
+      }
+    },
+    "Legs A": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beine A"
+          }
+        }
+      }
+    },
+    "Push B": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push B"
+          }
+        }
+      }
+    },
+    "Pull B": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pull B"
+          }
+        }
+      }
+    },
+    "Legs B & Core": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beine B & Core"
+          }
+        }
+      }
+    },
+    "Chest & Triceps": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brust & Trizeps"
+          }
+        }
+      }
+    },
+    "Back & Biceps": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rücken & Bizeps"
+          }
+        }
+      }
+    },
+    "Shoulders & Arms": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schultern & Arme"
+          }
+        }
+      }
+    },
+    "Glutes & Core": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesäß & Core"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
