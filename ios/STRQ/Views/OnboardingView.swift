@@ -656,14 +656,13 @@ struct OnboardingView: View {
                         .foregroundStyle(.white.opacity(0.5))
                         .padding(.bottom, 2)
 
-                    let commonInjuries = ["Shoulder", "Knee", "Lower Back", "Wrist", "Neck", "Hip", "Ankle", "Elbow"]
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
-                        ForEach(commonInjuries, id: \.self) { injury in
-                            selectionChip(L10n.tr(injury), selected: vm.profile.injuries.contains(injury)) {
-                                if vm.profile.injuries.contains(injury) {
-                                    vm.profile.injuries.removeAll { $0 == injury }
+                        ForEach(InjuryRestriction.allCases) { injury in
+                            selectionChip(injury.localizedDisplayName, selected: vm.profile.injuries.contains(injury.rawValue)) {
+                                if vm.profile.injuries.contains(injury.rawValue) {
+                                    vm.profile.injuries.removeAll { $0 == injury.rawValue }
                                 } else {
-                                    vm.profile.injuries.append(injury)
+                                    vm.profile.injuries.append(injury.rawValue)
                                 }
                             }
                         }

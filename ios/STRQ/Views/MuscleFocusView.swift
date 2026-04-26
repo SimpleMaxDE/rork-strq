@@ -13,10 +13,10 @@ struct MuscleFocusView: View {
         case focus, neglect
     }
 
-    private let muscleGroups: [(section: String, muscles: [MuscleGroup])] = [
-        ("Upper Body", [.chest, .shoulders, .back, .lats, .arms]),
-        ("Core", [.abs, .obliques, .lowerBack]),
-        ("Lower Body", [.glutes, .quads, .hamstrings, .calves])
+    private let muscleGroups: [(section: MuscleRegion, muscles: [MuscleGroup])] = [
+        (.upper, [.chest, .shoulders, .back, .lats, .arms]),
+        (.core, [.abs, .obliques, .lowerBack]),
+        (.lower, [.glutes, .quads, .hamstrings, .calves])
     ]
 
     private let focusColor: Color = STRQBrand.steel
@@ -55,8 +55,8 @@ struct MuscleFocusView: View {
 
     private var modeToggle: some View {
         HStack(spacing: 0) {
-            modeTab(.focus, icon: "flame.fill", label: "Focus", count: focusMuscles.count, color: focusColor)
-            modeTab(.neglect, icon: "arrow.down.right.circle.fill", label: "Reduce", count: neglectMuscles.count, color: neglectColor)
+            modeTab(.focus, icon: "flame.fill", label: L10n.tr("muscleFocus.focus", fallback: "Focus"), count: focusMuscles.count, color: focusColor)
+            modeTab(.neglect, icon: "arrow.down.right.circle.fill", label: L10n.tr("muscleFocus.reduce", fallback: "Reduce"), count: neglectMuscles.count, color: neglectColor)
         }
         .padding(3)
         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
@@ -124,10 +124,10 @@ struct MuscleFocusView: View {
 
     private var viewToggle: some View {
         HStack(spacing: 0) {
-            viewTab(label: "FRONT", isActive: !showingBack) {
+            viewTab(label: L10n.tr("muscleFocus.front", fallback: "FRONT"), isActive: !showingBack) {
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { showingBack = false }
             }
-            viewTab(label: "BACK", isActive: showingBack) {
+            viewTab(label: L10n.tr("muscleFocus.back", fallback: "BACK"), isActive: showingBack) {
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { showingBack = true }
             }
         }
@@ -235,7 +235,7 @@ struct MuscleFocusView: View {
             if anchor.side == .right {
                 dotConnector(color: color)
             }
-            Text(anchor.muscle.displayName)
+            Text(anchor.muscle.localizedDisplayName)
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundStyle(isFocus ? .black : .white)
                 .padding(.horizontal, 9)
@@ -277,7 +277,7 @@ struct MuscleFocusView: View {
 
             ForEach(muscleGroups, id: \.section) { group in
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(group.section.uppercased())
+                    Text(group.section.localizedDisplayName.uppercased())
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(.white.opacity(0.25))
                         .tracking(0.8)
@@ -314,7 +314,7 @@ struct MuscleFocusView: View {
             HStack(spacing: 5) {
                 Image(systemName: muscle.symbolName)
                     .font(.system(size: 11, weight: .medium))
-                Text(muscle.displayName)
+                Text(muscle.localizedDisplayName)
                     .font(.subheadline.weight(.medium))
             }
             .foregroundStyle(isSelected ? (state == .focus ? .black : .white) : .white.opacity(0.55))
@@ -338,12 +338,12 @@ struct MuscleFocusView: View {
         if !focusMuscles.isEmpty || !neglectMuscles.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 if !focusMuscles.isEmpty {
-                    summaryRow(title: "Focus", muscles: focusMuscles, color: focusColor) { m in
+                    summaryRow(title: L10n.tr("muscleFocus.focus", fallback: "Focus"), muscles: focusMuscles, color: focusColor) { m in
                         withAnimation(.spring(response: 0.3)) { focusMuscles.removeAll { $0 == m } }
                     }
                 }
                 if !neglectMuscles.isEmpty {
-                    summaryRow(title: "Reduce", muscles: neglectMuscles, color: neglectColor) { m in
+                    summaryRow(title: L10n.tr("muscleFocus.reduce", fallback: "Reduce"), muscles: neglectMuscles, color: neglectColor) { m in
                         withAnimation(.spring(response: 0.3)) { neglectMuscles.removeAll { $0 == m } }
                     }
                 }
@@ -364,7 +364,7 @@ struct MuscleFocusView: View {
                 ForEach(muscles) { muscle in
                     Button { onRemove(muscle) } label: {
                         HStack(spacing: 4) {
-                            Text(muscle.displayName)
+                            Text(muscle.localizedDisplayName)
                                 .font(.caption.weight(.medium))
                             Image(systemName: "xmark")
                                 .font(.system(size: 8, weight: .bold))

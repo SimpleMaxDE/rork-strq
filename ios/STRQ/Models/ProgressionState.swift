@@ -330,6 +330,15 @@ nonisolated struct PlanQualityScore: Sendable {
         }
     }
 
+    var localizedOverallLabel: String {
+        switch overall {
+        case 0.85...: return L10n.tr("quality.excellent", fallback: "Excellent")
+        case 0.7..<0.85: return L10n.tr("quality.good", fallback: "Good")
+        case 0.55..<0.7: return L10n.tr("quality.fair", fallback: "Fair")
+        default: return L10n.tr("quality.needsAdjustment", fallback: "Needs Adjustment")
+        }
+    }
+
     var overallColor: String {
         switch overall {
         case 0.85...: return "green"
@@ -352,6 +361,15 @@ nonisolated enum QualityRating: String, Sendable {
         case .good: "Good"
         case .fair: "Fair"
         case .poor: "Needs Work"
+        }
+    }
+
+    var localizedLabel: String {
+        switch self {
+        case .excellent: L10n.tr("quality.excellent", fallback: "Excellent")
+        case .good: L10n.tr("quality.good", fallback: "Good")
+        case .fair: L10n.tr("quality.fair", fallback: "Fair")
+        case .poor: L10n.tr("quality.needsWork", fallback: "Needs Work")
         }
     }
 

@@ -1471,16 +1471,19 @@ class AppViewModel {
         ))
 
         if !profile.injuries.isEmpty {
+            let restrictionNames = profile.injuries
+                .map { InjuryRestriction.localizedDisplayName(for: $0) }
+                .joined(separator: ", ")
             impacts.append(OnboardingImpact(
                 icon: "cross.circle.fill",
                 title: profile.injuries.count == 1 ? L10n.tr("1 restriction") : L10n.format("%d restrictions", profile.injuries.count),
-                detail: L10n.format("Exercises filtered to avoid %@ aggravation.", profile.injuries.joined(separator: ", ")),
+                detail: L10n.format("onboardingImpact.injuries.detail", fallback: "Exercises filtered to avoid %@ aggravation.", restrictionNames),
                 color: "red"
             ))
         }
 
         if !profile.focusMuscles.isEmpty {
-            let names = profile.focusMuscles.prefix(3).map(\.displayName).joined(separator: ", ")
+            let names = profile.focusMuscles.prefix(3).map(\.localizedDisplayName).joined(separator: ", ")
             impacts.append(OnboardingImpact(
                 icon: "scope",
                 title: L10n.format("Focus: %@", names),
@@ -1494,11 +1497,11 @@ class AppViewModel {
 
     private func goalImpactDetail() -> String {
         switch profile.goal {
-        case .strength: return "Heavier loads, lower reps, longer rest. Compound-first programming."
-        case .muscleGain: return "Moderate loads, higher volume, hypertrophy-optimized rep ranges."
-        case .fatLoss: return "Higher reps, shorter rest, increased metabolic demand."
-        case .endurance: return "High rep ranges, circuit-style structure, conditioning focus."
-        default: return "Balanced programming across strength and endurance."
+        case .strength: return L10n.tr("onboardingImpact.goal.strength", fallback: "Heavier loads, lower reps, longer rest. Compound-first programming.")
+        case .muscleGain: return L10n.tr("onboardingImpact.goal.muscleGain", fallback: "Moderate loads, higher volume, hypertrophy-optimized rep ranges.")
+        case .fatLoss: return L10n.tr("onboardingImpact.goal.fatLoss", fallback: "Higher reps, shorter rest, increased metabolic demand.")
+        case .endurance: return L10n.tr("onboardingImpact.goal.endurance", fallback: "High rep ranges, circuit-style structure, conditioning focus.")
+        default: return L10n.tr("onboardingImpact.goal.balanced", fallback: "Balanced programming across strength and endurance.")
         }
     }
 
@@ -1506,25 +1509,28 @@ class AppViewModel {
         if let target = profile.targetWeightKg {
             let diff = target - profile.weightKg
             if diff > 0 {
-                return "Starting load estimates calibrated to your body weight. Targeting +\(String(format: "%.0f", diff)) kg."
+                return L10n.format("onboardingImpact.weight.targetGain", fallback: "Starting load estimates calibrated to your body weight. Targeting +%.0f kg.", diff)
             } else if diff < 0 {
-                return "Starting load estimates calibrated to your body weight. Targeting \(String(format: "%.0f", diff)) kg."
+                return L10n.format("onboardingImpact.weight.targetLoss", fallback: "Starting load estimates calibrated to your body weight. Targeting %.0f kg.", diff)
             }
         }
-        return "Starting load estimates calibrated to your body weight."
+        return L10n.tr("onboardingImpact.weight.default", fallback: "Starting load estimates calibrated to your body weight.")
     }
 
     private func levelImpactDetail() -> String {
         switch profile.trainingLevel {
-        case .beginner: return "Simpler exercises, moderate volume, faster initial progression."
-        case .intermediate: return "More exercise variety, structured periodization, balanced volume."
-        case .advanced: return "Advanced techniques, higher volume, slower progression cycles."
+        case .beginner: return L10n.tr("onboardingImpact.level.beginner", fallback: "Simpler exercises, moderate volume, faster initial progression.")
+        case .intermediate: return L10n.tr("onboardingImpact.level.intermediate", fallback: "More exercise variety, structured periodization, balanced volume.")
+        case .advanced: return L10n.tr("onboardingImpact.level.advanced", fallback: "Advanced techniques, higher volume, slower progression cycles.")
         }
     }
 
     private func scheduleImpactDetail() -> String {
-        guard let plan = currentPlan else { return "Split optimized for \(profile.daysPerWeek) training days." }
-        return "\(plan.splitType) split — optimized for \(profile.daysPerWeek) days with \(profile.minutesPerSession)-minute sessions."
+        guard let plan = currentPlan else {
+            return L10n.format("onboardingImpact.schedule.fallback", fallback: "Split optimized for %d training days.", profile.daysPerWeek)
+        }
+        let split = SplitDisplayName.localizedDisplayName(for: plan.splitType)
+        return L10n.format("onboardingImpact.schedule.detail", fallback: "%@ split — optimized for %d days with %d-minute sessions.", split, profile.daysPerWeek, profile.minutesPerSession)
     }
 
     func sessionBriefing(for day: WorkoutDay) -> SessionBriefing {

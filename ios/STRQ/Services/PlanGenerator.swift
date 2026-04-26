@@ -322,13 +322,7 @@ struct PlanGenerator {
     }
 
     private func localizedSplitName(_ name: String) -> String {
-        switch name {
-        case "Full Body": return L10n.tr("Full Body")
-        case "Upper/Lower": return L10n.tr("Upper/Lower")
-        case "Push/Pull/Legs": return L10n.tr("Push/Pull/Legs")
-        case "Body Part": return L10n.tr("Body Part")
-        default: return name
-        }
+        SplitDisplayName.localizedDisplayName(for: name)
     }
 
     private func localizedWorkoutName(_ name: String) -> String {
@@ -1050,14 +1044,24 @@ struct PlanGenerator {
         let profile = context.profile
         var parts: [String] = []
 
-        parts.append("This \(split.name) plan is built around a weekly volume target for each muscle you're training — tuned for your \(profile.goal.displayName.lowercased()) goal as a \(profile.trainingLevel.shortName.lowercased()).")
+        parts.append(L10n.format(
+            "plan.explanation.intro",
+            fallback: "This %@ plan is built around a weekly volume target for each muscle you're training — tuned for your %@ goal as a %@.",
+            localizedSplitName(split.name),
+            profile.goal.localizedDisplayName,
+            profile.trainingLevel.localizedShortName
+        ))
 
         // Anchor summary — what's carrying progression.
         let anchorIds = days.compactMap { $0.exercises.first?.exerciseId }
         let anchorNames = anchorIds.compactMap { library.exercise(byId: $0)?.name }
         if !anchorNames.isEmpty {
             let list = Array(Set(anchorNames)).prefix(3).joined(separator: ", ")
-            parts.append("Anchor lifts — \(list) — are where progression happens each week. Everything else supports them.")
+            parts.append(L10n.format(
+                "plan.explanation.anchorSummary",
+                fallback: "Anchor lifts — %@ — are where progression happens each week. Everything else supports them.",
+                list
+            ))
         }
 
         // Weekly volume callouts for the top 3 targeted muscles.
@@ -1066,58 +1070,66 @@ struct PlanGenerator {
             .sorted { $0.value > $1.value }
             .prefix(3)
         if !topBudgets.isEmpty {
-            let summary = topBudgets.map { "\($0.key.displayName) \($0.value) sets" }.joined(separator: ", ")
-            parts.append("Weekly volume targets: \(summary).")
+            let summary = topBudgets
+                .map { L10n.format("plan.explanation.setTarget", fallback: "%@ %d sets", $0.key.localizedDisplayName, $0.value) }
+                .joined(separator: ", ")
+            parts.append(L10n.format("plan.explanation.weeklyVolume", fallback: "Weekly volume targets: %@.", summary))
         }
 
         // Focus muscles.
         if !profile.focusMuscles.isEmpty {
-            let focus = profile.focusMuscles.prefix(3).map { $0.displayName }.joined(separator: ", ")
-            parts.append("Extra sets are routed to \(focus) as priority muscles.")
+            let focus = profile.focusMuscles.prefix(3).map { $0.localizedDisplayName }.joined(separator: ", ")
+            parts.append(L10n.format("plan.explanation.focusMuscles", fallback: "Extra sets are routed to %@ as priority muscles.", focus))
         }
 
         // Neglect muscles.
         if !profile.neglectMuscles.isEmpty {
-            let skip = profile.neglectMuscles.prefix(2).map { $0.displayName }.joined(separator: ", ")
-            parts.append("Volume on \(skip) is kept minimal per your preference.")
+            let skip = profile.neglectMuscles.prefix(2).map { $0.localizedDisplayName }.joined(separator: ", ")
+            parts.append(L10n.format("plan.explanation.neglectMuscles", fallback: "Volume on %@ is kept minimal per your preference.", skip))
         }
 
         // Phase context.
         switch context.phase {
         case .deload:
-            parts.append("Deload week: volume and intensity are reduced — move well, stay fresh.")
+            parts.append(L10n.tr("plan.explanation.phase.deload", fallback: "Deload week: volume and intensity are reduced — move well, stay fresh."))
         case .fatigueManagement:
-            parts.append("Fatigue-management block: volume is pulled back to preserve progress.")
+            parts.append(L10n.tr("plan.explanation.phase.fatigueManagement", fallback: "Fatigue-management block: volume is pulled back to preserve progress."))
         case .push:
             if context.recoveryScore >= 70 {
-                parts.append("Push phase with recovery on your side — expect small PRs if you stay consistent.")
+                parts.append(L10n.tr("plan.explanation.phase.pushRecovered", fallback: "Push phase with recovery on your side — expect small PRs if you stay consistent."))
             } else {
-                parts.append("Push phase, but volume is kept honest given current recovery.")
+                parts.append(L10n.tr("plan.explanation.phase.pushConservative", fallback: "Push phase, but volume is kept honest given current recovery."))
             }
         case .rebalance:
             let undertrained = context.muscleBalance.filter { $0.percentOfAverage < 0.8 }
             if !undertrained.isEmpty {
-                let names = undertrained.prefix(2).map(\.muscle).joined(separator: " and ")
-                parts.append("Rebalance phase: prioritizing \(names) to close volume gaps.")
+                let names = undertrained
+                    .prefix(2)
+                    .map { MuscleGroup.localizedDisplayName(forDisplayName: $0.muscle) }
+                    .joined(separator: L10n.tr("list.separator.and", fallback: " and "))
+                parts.append(L10n.format("plan.explanation.phase.rebalance", fallback: "Rebalance phase: prioritizing %@ to close volume gaps.", names))
             }
         case .build:
             if context.recoveryScore < 60 {
-                parts.append("Volume is trimmed this cycle due to lower recovery — quality over quantity.")
+                parts.append(L10n.tr("plan.explanation.phase.buildLowRecovery", fallback: "Volume is trimmed this cycle due to lower recovery — quality over quantity."))
             } else if profile.recoveryCapacity == .low {
-                parts.append("Volume is set conservatively to match your recovery capacity.")
+                parts.append(L10n.tr("plan.explanation.phase.buildLowCapacity", fallback: "Volume is set conservatively to match your recovery capacity."))
             }
         }
 
         // Injuries.
         if !profile.injuries.isEmpty {
-            parts.append("Exercise selection avoids movements that could aggravate your noted restrictions.")
+            parts.append(L10n.tr("plan.explanation.injuries", fallback: "Exercise selection avoids movements that could aggravate your noted restrictions."))
         }
 
         // Muscle-balance drift.
         let undertrained = context.muscleBalance.filter { $0.percentOfAverage < 0.8 }
         if !undertrained.isEmpty && context.phase != .rebalance {
-            let names = undertrained.prefix(2).map(\.muscle).joined(separator: " and ")
-            parts.append("\(names) has been lagging lately — this plan adds extra work there.")
+            let names = undertrained
+                .prefix(2)
+                .map { MuscleGroup.localizedDisplayName(forDisplayName: $0.muscle) }
+                .joined(separator: L10n.tr("list.separator.and", fallback: " and "))
+            parts.append(L10n.format("plan.explanation.muscleBalanceDrift", fallback: "%@ has been lagging lately — this plan adds extra work there.", names))
         }
 
         return parts.joined(separator: " ")

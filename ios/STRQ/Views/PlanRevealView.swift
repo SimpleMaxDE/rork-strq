@@ -92,9 +92,9 @@ struct PlanRevealView: View {
         VStack(spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(plan.splitType)
+                    Text(SplitDisplayName.localizedDisplayName(for: plan.splitType))
                         .font(.headline)
-                    Text("\(profile.goal.displayName) · \(profile.trainingLevel.shortName)")
+                    Text("\(profile.goal.localizedDisplayName) · \(profile.trainingLevel.localizedShortName)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -185,7 +185,7 @@ struct PlanRevealView: View {
                 Text(day.name)
                     .font(.subheadline.weight(.semibold))
                 HStack(spacing: 4) {
-                    Text(day.focusMuscles.prefix(3).map(\.displayName).joined(separator: ", "))
+                    Text(day.focusMuscles.prefix(3).map(\.localizedDisplayName).joined(separator: ", "))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Text("·")
@@ -214,7 +214,7 @@ struct PlanRevealView: View {
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
                 Spacer()
-                Text(quality.overallLabel)
+                Text(quality.localizedOverallLabel)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(qualityColor(quality.overallColor))
                     .padding(.horizontal, 8)
@@ -263,7 +263,7 @@ struct PlanRevealView: View {
                 Text(label)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundStyle(.secondary)
-                Text(rating.label)
+                Text(rating.localizedLabel)
                     .font(.caption.weight(.semibold))
             }
             Spacer()

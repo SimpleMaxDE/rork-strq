@@ -747,7 +747,7 @@ struct CoachTabView: View {
                 HStack(spacing: 6) {
                     Text(L10n.tr("Plan Quality"))
                         .font(.subheadline.weight(.semibold))
-                    Text(quality.overallLabel)
+                    Text(quality.localizedOverallLabel)
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(overallColor)
                         .padding(.horizontal, 6)

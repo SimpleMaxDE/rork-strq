@@ -55,6 +55,38 @@ nonisolated enum MuscleGroup: String, Codable, CaseIterable, Identifiable, Senda
         }
     }
 
+    var localizedDisplayName: String {
+        switch self {
+        case .chest: L10n.tr("muscle.chest", fallback: "Chest")
+        case .back: L10n.tr("muscle.back", fallback: "Back")
+        case .lats: L10n.tr("muscle.lats", fallback: "Lats")
+        case .shoulders: L10n.tr("muscle.shoulders", fallback: "Shoulders")
+        case .biceps: L10n.tr("muscle.biceps", fallback: "Biceps")
+        case .triceps: L10n.tr("muscle.triceps", fallback: "Triceps")
+        case .forearms: L10n.tr("muscle.forearms", fallback: "Forearms")
+        case .traps: L10n.tr("muscle.traps", fallback: "Traps")
+        case .neck: L10n.tr("muscle.neck", fallback: "Neck")
+        case .arms: L10n.tr("muscle.arms", fallback: "Arms")
+        case .abs: L10n.tr("muscle.abs", fallback: "Abs")
+        case .obliques: L10n.tr("muscle.obliques", fallback: "Obliques")
+        case .lowerBack: L10n.tr("muscle.lowerBack", fallback: "Lower Back")
+        case .glutes: L10n.tr("muscle.glutes", fallback: "Glutes")
+        case .quads: L10n.tr("muscle.quads", fallback: "Quads")
+        case .hamstrings: L10n.tr("muscle.hamstrings", fallback: "Hamstrings")
+        case .calves: L10n.tr("muscle.calves", fallback: "Calves")
+        case .adductors: L10n.tr("muscle.adductors", fallback: "Adductors")
+        case .abductors: L10n.tr("muscle.abductors", fallback: "Abductors")
+        case .hipFlexors: L10n.tr("muscle.hipFlexors", fallback: "Hip Flexors")
+        case .tibialis: L10n.tr("muscle.tibialis", fallback: "Tibialis")
+        case .coreStability: L10n.tr("muscle.coreStability", fallback: "Core Stability")
+        case .rotationAntiRotation: L10n.tr("muscle.rotationAntiRotation", fallback: "Rotation")
+        }
+    }
+
+    static func localizedDisplayName(forDisplayName displayName: String) -> String {
+        allCases.first { $0.displayName == displayName }?.localizedDisplayName ?? displayName
+    }
+
     var region: MuscleRegion {
         switch self {
         case .chest, .back, .lats, .shoulders, .biceps, .triceps, .forearms, .traps, .neck, .arms:
@@ -105,6 +137,14 @@ nonisolated enum MuscleRegion: String, Codable, CaseIterable, Identifiable, Send
         case .upper: "Upper Body"
         case .core: "Core"
         case .lower: "Lower Body"
+        }
+    }
+
+    var localizedDisplayName: String {
+        switch self {
+        case .upper: L10n.tr("muscleRegion.upper", fallback: "Upper Body")
+        case .core: L10n.tr("muscleRegion.core", fallback: "Core")
+        case .lower: L10n.tr("muscleRegion.lower", fallback: "Lower Body")
         }
     }
 

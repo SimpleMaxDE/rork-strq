@@ -179,37 +179,40 @@ struct ProgressionEngine {
         var riskFlags: [String] = []
 
         if recoveryFit == .excellent || recoveryFit == .good {
-            strengths.append("Training load matches your recovery capacity")
+            strengths.append(L10n.tr("planQuality.strength.recoveryFit", fallback: "Training load matches your recovery capacity"))
         }
         if balance == .excellent || balance == .good {
-            strengths.append("Good muscle group coverage and balance")
+            strengths.append(L10n.tr("planQuality.strength.muscleBalance", fallback: "Good muscle group coverage and balance"))
         }
         if equipmentFit == .excellent {
-            strengths.append("All exercises match your available equipment")
+            strengths.append(L10n.tr("planQuality.strength.equipmentFit", fallback: "All exercises match your available equipment"))
         }
         if progressionReady == .excellent || progressionReady == .good {
-            strengths.append("Multiple exercises ready for progression")
+            strengths.append(L10n.tr("planQuality.strength.progressionReady", fallback: "Multiple exercises ready for progression"))
         }
 
         if recoveryFit == .poor {
-            riskFlags.append("Training volume may exceed recovery capacity")
+            riskFlags.append(L10n.tr("planQuality.risk.recoveryCapacity", fallback: "Training volume may exceed recovery capacity"))
         }
         if balance == .poor {
-            riskFlags.append("Significant muscle group imbalances detected")
+            riskFlags.append(L10n.tr("planQuality.risk.muscleBalance", fallback: "Significant muscle group imbalances detected"))
         }
 
         let plateaued = progressionStates.filter { $0.plateauStatus == .plateaued || $0.plateauStatus == .regressing }
         if plateaued.count >= 2 {
-            watchItems.append("\(plateaued.count) exercises showing stalled progress")
+            watchItems.append(L10n.format("planQuality.watch.stalledProgress", fallback: "%d exercises showing stalled progress", plateaued.count))
         }
 
         let undertrained = muscleBalance.filter { $0.percentOfAverage < 0.75 }
         if !undertrained.isEmpty {
-            watchItems.append("\(undertrained.map(\.muscle).joined(separator: ", ")) volume below target")
+            let names = undertrained
+                .map { MuscleGroup.localizedDisplayName(forDisplayName: $0.muscle) }
+                .joined(separator: ", ")
+            watchItems.append(L10n.format("planQuality.watch.volumeBelowTarget", fallback: "%@ volume below target", names))
         }
 
         if phase == .push && recoveryScore < 65 {
-            watchItems.append("Recovery trending low during push phase")
+            watchItems.append(L10n.tr("planQuality.watch.lowRecoveryPush", fallback: "Recovery trending low during push phase"))
         }
 
         return PlanQualityScore(

@@ -25,6 +25,8 @@ nonisolated enum FitnessGoal: String, Codable, CaseIterable, Identifiable, Senda
         }
     }
 
+    var localizedDisplayName: String { displayName }
+
     var symbolName: String {
         switch self {
         case .muscleGain: "figure.strengthtraining.traditional"
@@ -54,6 +56,8 @@ nonisolated enum TrainingLevel: String, Codable, CaseIterable, Identifiable, Sen
         }
     }
 
+    var localizedDisplayName: String { displayName }
+
     var shortName: String {
         switch self {
         case .beginner: L10n.tr("Beginner")
@@ -61,6 +65,8 @@ nonisolated enum TrainingLevel: String, Codable, CaseIterable, Identifiable, Sen
         case .advanced: L10n.tr("Advanced")
         }
     }
+
+    var localizedShortName: String { shortName }
 }
 
 nonisolated enum Gender: String, Codable, CaseIterable, Identifiable, Sendable {
@@ -123,6 +129,50 @@ nonisolated enum SplitPreference: String, Codable, CaseIterable, Identifiable, S
         case .pushPullLegs: L10n.tr("Push / Pull / Legs")
         case .bodyPart: L10n.tr("Body Part Split")
         case .muscleGroup: L10n.tr("Muscle Group")
+        }
+    }
+
+    var localizedDisplayName: String { displayName }
+}
+
+nonisolated enum InjuryRestriction: String, CaseIterable, Identifiable, Sendable {
+    case shoulder = "Shoulder"
+    case knee = "Knee"
+    case lowerBack = "Lower Back"
+    case wrist = "Wrist"
+    case neck = "Neck"
+    case hip = "Hip"
+    case ankle = "Ankle"
+    case elbow = "Elbow"
+
+    var id: String { rawValue }
+
+    var localizedDisplayName: String {
+        switch self {
+        case .shoulder: L10n.tr("injury.shoulder", fallback: rawValue)
+        case .knee: L10n.tr("injury.knee", fallback: rawValue)
+        case .lowerBack: L10n.tr("injury.lowerBack", fallback: rawValue)
+        case .wrist: L10n.tr("injury.wrist", fallback: rawValue)
+        case .neck: L10n.tr("injury.neck", fallback: rawValue)
+        case .hip: L10n.tr("injury.hip", fallback: rawValue)
+        case .ankle: L10n.tr("injury.ankle", fallback: rawValue)
+        case .elbow: L10n.tr("injury.elbow", fallback: rawValue)
+        }
+    }
+
+    static func localizedDisplayName(for rawValue: String) -> String {
+        allCases.first { $0.rawValue == rawValue }?.localizedDisplayName ?? rawValue
+    }
+}
+
+nonisolated enum SplitDisplayName {
+    static func localizedDisplayName(for rawName: String) -> String {
+        switch rawName {
+        case "Full Body": L10n.tr("split.fullBody", fallback: "Full Body")
+        case "Upper/Lower": L10n.tr("split.upperLower", fallback: "Upper/Lower")
+        case "Push/Pull/Legs": L10n.tr("split.pushPullLegs", fallback: "Push/Pull/Legs")
+        case "Body Part": L10n.tr("split.bodyPart", fallback: "Body Part")
+        default: L10n.tr(rawName, fallback: rawName)
         }
     }
 }

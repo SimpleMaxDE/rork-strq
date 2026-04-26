@@ -2906,7 +2906,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Muskelgruppen-Split"
+            "value": "Bodypart-Split"
           }
         }
       }
@@ -4016,7 +4016,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Drücken/Ziehen/Beine"
+            "value": "Push / Pull / Legs"
           }
         }
       }
@@ -4906,7 +4906,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Muskelgruppen"
+            "value": "Bodypart-Split"
           }
         }
       }
@@ -6576,7 +6576,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Passform der Ausrüstung"
+            "value": "Equipment"
           }
         }
       }
@@ -8076,7 +8076,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erholungsfit"
+            "value": "Regeneration"
           }
         }
       }
@@ -8996,7 +8996,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zeitfit"
+            "value": "Zeit"
           }
         }
       }
@@ -9496,7 +9496,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "IHRE EINGABEN HABEN DIESEN PLAN GEFORMT"
+            "value": "DEINE EINGABEN HABEN DIESEN PLAN GEFORMT"
           }
         }
       }
@@ -10077,6 +10077,876 @@
           "stringUnit": {
             "state": "translated",
             "value": "Der heutige Plan"
+          }
+        }
+      }
+    },
+    "injury.ankle": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprunggelenk"
+          }
+        }
+      }
+    },
+    "injury.elbow": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ellenbogen"
+          }
+        }
+      }
+    },
+    "injury.hip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hüfte"
+          }
+        }
+      }
+    },
+    "injury.knee": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Knie"
+          }
+        }
+      }
+    },
+    "injury.lowerBack": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unterer Rücken"
+          }
+        }
+      }
+    },
+    "injury.neck": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nacken"
+          }
+        }
+      }
+    },
+    "injury.shoulder": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schulter"
+          }
+        }
+      }
+    },
+    "injury.wrist": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Handgelenk"
+          }
+        }
+      }
+    },
+    "list.separator.and": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " und "
+          }
+        }
+      }
+    },
+    "muscle.abductors": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abduktoren"
+          }
+        }
+      }
+    },
+    "muscle.abs": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bauch"
+          }
+        }
+      }
+    },
+    "muscle.adductors": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adduktoren"
+          }
+        }
+      }
+    },
+    "muscle.arms": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arme"
+          }
+        }
+      }
+    },
+    "muscle.back": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rücken"
+          }
+        }
+      }
+    },
+    "muscle.biceps": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bizeps"
+          }
+        }
+      }
+    },
+    "muscle.calves": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waden"
+          }
+        }
+      }
+    },
+    "muscle.chest": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brust"
+          }
+        }
+      }
+    },
+    "muscle.coreStability": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Core-Stabilität"
+          }
+        }
+      }
+    },
+    "muscle.forearms": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unterarme"
+          }
+        }
+      }
+    },
+    "muscle.glutes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glutes"
+          }
+        }
+      }
+    },
+    "muscle.hamstrings": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beinbeuger"
+          }
+        }
+      }
+    },
+    "muscle.hipFlexors": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hüftbeuger"
+          }
+        }
+      }
+    },
+    "muscle.lats": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lat"
+          }
+        }
+      }
+    },
+    "muscle.lowerBack": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unterer Rücken"
+          }
+        }
+      }
+    },
+    "muscle.neck": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nacken"
+          }
+        }
+      }
+    },
+    "muscle.obliques": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seitliche Bauchmuskeln"
+          }
+        }
+      }
+    },
+    "muscle.quads": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quads"
+          }
+        }
+      }
+    },
+    "muscle.rotationAntiRotation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rotation"
+          }
+        }
+      }
+    },
+    "muscle.shoulders": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schultern"
+          }
+        }
+      }
+    },
+    "muscle.tibialis": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schienbein"
+          }
+        }
+      }
+    },
+    "muscle.traps": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traps"
+          }
+        }
+      }
+    },
+    "muscle.triceps": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trizeps"
+          }
+        }
+      }
+    },
+    "muscleFocus.back": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HINTEN"
+          }
+        }
+      }
+    },
+    "muscleFocus.focus": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fokus"
+          }
+        }
+      }
+    },
+    "muscleFocus.front": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VORNE"
+          }
+        }
+      }
+    },
+    "muscleFocus.reduce": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reduzieren"
+          }
+        }
+      }
+    },
+    "muscleRegion.core": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Core"
+          }
+        }
+      }
+    },
+    "muscleRegion.lower": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unterkörper"
+          }
+        }
+      }
+    },
+    "muscleRegion.upper": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oberkörper"
+          }
+        }
+      }
+    },
+    "onboardingImpact.goal.balanced": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgewogene Programmierung für Kraft und Ausdauer."
+          }
+        }
+      }
+    },
+    "onboardingImpact.goal.endurance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hohe Wiederholungsbereiche, Zirkelstruktur und Fokus auf Kondition."
+          }
+        }
+      }
+    },
+    "onboardingImpact.goal.fatLoss": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr Wiederholungen, kürzere Pausen und höhere metabolische Belastung."
+          }
+        }
+      }
+    },
+    "onboardingImpact.goal.muscleGain": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate Gewichte, mehr Volumen und Wiederholungsbereiche für Muskelaufbau."
+          }
+        }
+      }
+    },
+    "onboardingImpact.goal.strength": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schwerere Gewichte, weniger Wiederholungen und längere Pausen. Grundübungen zuerst."
+          }
+        }
+      }
+    },
+    "onboardingImpact.injuries.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übungen werden so gefiltert, dass diese Einschränkungen berücksichtigt werden: %@."
+          }
+        }
+      }
+    },
+    "onboardingImpact.level.advanced": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortgeschrittene Methoden, höheres Volumen und langsamere Progressionszyklen."
+          }
+        }
+      }
+    },
+    "onboardingImpact.level.beginner": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einfachere Übungen, moderates Volumen und schnellere Progression am Anfang."
+          }
+        }
+      }
+    },
+    "onboardingImpact.level.intermediate": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr Übungsvielfalt, strukturierte Periodisierung und ausgewogenes Volumen."
+          }
+        }
+      }
+    },
+    "onboardingImpact.schedule.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-Split, abgestimmt auf %d Tage mit %d Minuten pro Workout."
+          }
+        }
+      }
+    },
+    "onboardingImpact.schedule.fallback": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Split abgestimmt auf %d Trainingstage."
+          }
+        }
+      }
+    },
+    "onboardingImpact.weight.default": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startgewichte werden anhand deines Körpergewichts geschätzt."
+          }
+        }
+      }
+    },
+    "onboardingImpact.weight.targetGain": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startgewichte werden anhand deines Körpergewichts geschätzt. Ziel: +%.0f kg."
+          }
+        }
+      }
+    },
+    "onboardingImpact.weight.targetLoss": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startgewichte werden anhand deines Körpergewichts geschätzt. Ziel: %.0f kg."
+          }
+        }
+      }
+    },
+    "plan.explanation.anchorSummary": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die wichtigsten Lifts (%@) setzen die Basis für deine Progression. Die übrigen Übungen ergänzen Volumen und Balance."
+          }
+        }
+      }
+    },
+    "plan.explanation.focusMuscles": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zusätzliches Volumen geht an %@ als Priorität."
+          }
+        }
+      }
+    },
+    "plan.explanation.injuries": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Übungsauswahl vermeidet Bewegungen, die deine Einschränkungen reizen könnten."
+          }
+        }
+      }
+    },
+    "plan.explanation.intro": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser %@-Plan ist auf dein Trainingsziel %@ und dein aktuelles Niveau %@ abgestimmt."
+          }
+        }
+      }
+    },
+    "plan.explanation.muscleBalanceDrift": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ hinkt zuletzt etwas hinterher; dieser Plan ergänzt dort zusätzliche Arbeit."
+          }
+        }
+      }
+    },
+    "plan.explanation.neglectMuscles": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumen für %@ bleibt auf deinen Wunsch minimal."
+          }
+        }
+      }
+    },
+    "plan.explanation.phase.buildLowCapacity": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Volumen ist konservativ gesetzt und passt zu deiner Regenerationskapazität."
+          }
+        }
+      }
+    },
+    "plan.explanation.phase.buildLowRecovery": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Volumen ist in diesem Zyklus wegen niedrigerer Regeneration etwas reduziert: Qualität vor Quantität."
+          }
+        }
+      }
+    },
+    "plan.explanation.phase.deload": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deload-Woche: Volumen und Intensität sind reduziert, damit du frisch bleibst."
+          }
+        }
+      }
+    },
+    "plan.explanation.phase.fatigueManagement": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fatigue-Management: Das Volumen wird etwas zurückgenommen, um Fortschritt zu sichern."
+          }
+        }
+      }
+    },
+    "plan.explanation.phase.pushConservative": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push-Phase, aber das Volumen bleibt passend zu deiner aktuellen Regeneration."
+          }
+        }
+      }
+    },
+    "plan.explanation.phase.pushRecovered": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push-Phase mit genug Regeneration: Kleine PRs sind realistisch, wenn du konstant bleibst."
+          }
+        }
+      }
+    },
+    "plan.explanation.phase.rebalance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rebalance-Phase: %@ bekommt Priorität, um Volumenlücken zu schließen."
+          }
+        }
+      }
+    },
+    "plan.explanation.setTarget": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ %d Sätze"
+          }
+        }
+      }
+    },
+    "plan.explanation.weeklyVolume": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wöchentliche Volumenziele: %@."
+          }
+        }
+      }
+    },
+    "planQuality.risk.muscleBalance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deutliche Muskelgruppen-Imbalancen erkannt"
+          }
+        }
+      }
+    },
+    "planQuality.risk.recoveryCapacity": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Trainingsvolumen könnte deine Regeneration übersteigen"
+          }
+        }
+      }
+    },
+    "planQuality.strength.equipmentFit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Übungen passen zu deinem Equipment."
+          }
+        }
+      }
+    },
+    "planQuality.strength.muscleBalance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gute Abdeckung und Balance der Muskelgruppen."
+          }
+        }
+      }
+    },
+    "planQuality.strength.progressionReady": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehrere Übungen sind bereit für Progression."
+          }
+        }
+      }
+    },
+    "planQuality.strength.recoveryFit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Trainingsbelastung passt zu deiner Regeneration."
+          }
+        }
+      }
+    },
+    "planQuality.watch.lowRecoveryPush": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regeneration tendiert während der Push-Phase niedrig"
+          }
+        }
+      }
+    },
+    "planQuality.watch.stalledProgress": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Übungen zeigen stagnierenden Fortschritt"
+          }
+        }
+      }
+    },
+    "planQuality.watch.volumeBelowTarget": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ liegt unter dem Volumenziel"
+          }
+        }
+      }
+    },
+    "quality.excellent": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sehr gut"
+          }
+        }
+      }
+    },
+    "quality.fair": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okay"
+          }
+        }
+      }
+    },
+    "quality.good": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gut"
+          }
+        }
+      }
+    },
+    "quality.needsAdjustment": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anpassen"
+          }
+        }
+      }
+    },
+    "quality.needsWork": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausbaufähig"
+          }
+        }
+      }
+    },
+    "quality.poor": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schwach"
+          }
+        }
+      }
+    },
+    "split.bodyPart": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bodypart-Split"
+          }
+        }
+      }
+    },
+    "split.fullBody": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganzkörper"
+          }
+        }
+      }
+    },
+    "split.pushPullLegs": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push / Pull / Legs"
+          }
+        }
+      }
+    },
+    "split.upperLower": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oberkörper/Unterkörper"
           }
         }
       }
