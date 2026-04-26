@@ -51,9 +51,9 @@ struct SwapExerciseSheet: View {
     private var headerBar: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Swap Exercise")
+                Text(L10n.tr("Swap Exercise"))
                     .font(.headline)
-                Text("Pick a role-preserving alternative")
+                Text(L10n.tr("Pick a role-preserving alternative"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -65,7 +65,7 @@ struct SwapExerciseSheet: View {
                     .font(.title3)
                     .foregroundStyle(.secondary)
             }
-            .accessibilityLabel("Cancel swap")
+            .accessibilityLabel(L10n.tr("Cancel swap"))
         }
         .padding(.horizontal, 16)
         .padding(.top, 16)
@@ -80,7 +80,7 @@ struct SwapExerciseSheet: View {
                     Image(systemName: "arrow.triangle.2.circlepath")
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(STRQBrand.steel)
-                    Text("REPLACING")
+                    Text(L10n.tr("REPLACING"))
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(STRQBrand.steel)
                         .tracking(0.8)
@@ -163,7 +163,7 @@ struct SwapExerciseSheet: View {
                     Image(systemName: "magnifyingglass")
                         .font(.title2)
                         .foregroundStyle(.secondary)
-                    Text("No alternatives found")
+                    Text(L10n.tr("No alternatives found"))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -275,7 +275,7 @@ struct SwapExerciseSheet: View {
                     HStack(spacing: 6) {
                         Image(systemName: "arrow.triangle.2.circlepath")
                             .font(.caption2.weight(.semibold))
-                        Text("Confirm Swap")
+                        Text(L10n.tr("Confirm Swap"))
                             .font(.subheadline.weight(.semibold))
                     }
                     .frame(maxWidth: .infinity)

@@ -50,7 +50,7 @@ struct STRQBrandMark: View {
     var body: some View {
         HStack(spacing: 10) {
             STRQLogoView(size: 28, animated: false)
-            Text("STRQ")
+            Text(L10n.tr("STRQ"))
                 .font(.system(size: 18, weight: .black, design: .default))
                 .tracking(2)
                 .foregroundStyle(.white)

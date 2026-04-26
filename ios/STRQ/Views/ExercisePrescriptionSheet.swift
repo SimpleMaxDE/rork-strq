@@ -21,11 +21,11 @@ struct ExercisePrescriptionSheet: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Exercise Details")
+        .navigationTitle(L10n.tr("Exercise Details"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") { dismiss() }
+                Button(L10n.tr("Done")) { dismiss() }
             }
         }
         .onAppear {
@@ -45,7 +45,7 @@ struct ExercisePrescriptionSheet: View {
                 Image(systemName: t.decision.icon)
                     .font(.caption)
                     .foregroundStyle(color)
-                Text("TODAY")
+                Text(L10n.tr("TODAY"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(color)
                     .tracking(0.6)

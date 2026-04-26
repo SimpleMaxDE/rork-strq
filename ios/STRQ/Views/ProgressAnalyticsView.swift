@@ -49,7 +49,7 @@ struct ProgressAnalyticsView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Progress")
+        .navigationTitle(L10n.tr("Progress"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
@@ -69,36 +69,37 @@ struct ProgressAnalyticsView: View {
         let headline: (String, String) = {
             switch tier {
             case .fresh:
-                return ("0", "sessions logged")
+                return ("0", L10n.tr("sessions logged"))
             case .firstSession:
-                return ("1", "session logged")
+                return ("1", L10n.tr("session logged"))
             case .earlyWeek:
-                return ("\(vm.totalCompletedWorkouts)", "sessions logged")
+                return ("\(vm.totalCompletedWorkouts)", L10n.tr("sessions logged"))
             case .established:
                 if progressing > 0 {
-                    return ("\(progressing)", "lifts progressing")
+                    return ("\(progressing)", L10n.tr("lifts progressing"))
                 } else if prsThisMonth > 0 {
-                    return ("\(prsThisMonth)", "PRs this month")
+                    return ("\(prsThisMonth)", L10n.tr("PRs this month"))
                 } else {
-                    return ("\(vm.totalCompletedWorkouts)", "sessions logged")
+                    return ("\(vm.totalCompletedWorkouts)", L10n.tr("sessions logged"))
                 }
             }
         }()
         let sub: String = {
             switch tier {
             case .fresh:
-                return "Today starts the record. One logged workout turns this screen into signal."
+                return L10n.tr("Today starts the record. One logged workout turns this screen into signal.")
             case .firstSession:
-                return "Strong start. STRQ is already reading load, recovery, and consistency."
+                return L10n.tr("Strong start. STRQ is already reading load, recovery, and consistency.")
             case .earlyWeek:
-                return "\(vm.totalCompletedWorkouts) session\(vm.totalCompletedWorkouts == 1 ? "" : "s") in · first-week trends are starting to resolve"
+                return L10n.format(vm.totalCompletedWorkouts == 1 ? "%d session in · first-week trends are starting to resolve" : "%d sessions in · first-week trends are starting to resolve", vm.totalCompletedWorkouts)
             case .established:
                 if progressing > 0 && prsThisMonth > 0 {
-                    return "\(prsThisMonth) PR\(prsThisMonth == 1 ? "" : "s") this month · \(vm.streak)-day streak"
+                    let prLabel = prsThisMonth == 1 ? L10n.tr("PR this month") : L10n.tr("PRs this month")
+                    return L10n.format("%d %@ · %d-day streak", prsThisMonth, prLabel, vm.streak)
                 } else if vm.streak > 0 {
-                    return "\(vm.streak)-day streak · keep the signal strong"
+                    return L10n.format("%d-day streak · keep the signal strong", vm.streak)
                 } else {
-                    return "Train to keep the signal sharp"
+                    return L10n.tr("Train to keep the signal sharp")
                 }
             }
         }()
@@ -120,7 +121,7 @@ struct ProgressAnalyticsView: View {
             .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 10) {
-                Text("PROGRESS")
+                Text(L10n.tr("PROGRESS"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.4)
                     .foregroundStyle(STRQBrand.steel)
@@ -186,41 +187,41 @@ struct ProgressAnalyticsView: View {
         if vm.isEarlyStage {
             state = .info
             icon = vm.totalCompletedWorkouts == 0 ? "arrow.forward.circle.fill" : "waveform.path.ecg"
-            headline = vm.totalCompletedWorkouts == 0 ? "Your baseline starts with Today" : "Signal is coming in"
+            headline = vm.totalCompletedWorkouts == 0 ? L10n.tr("Your baseline starts with Today") : L10n.tr("Signal is coming in")
             detail = vm.totalCompletedWorkouts == 0
-                ? "One workout gives Progress real training signal to read."
-                : "\(vm.totalCompletedWorkouts) session\(vm.totalCompletedWorkouts == 1 ? "" : "s") logged · the first clear trends arrive through week one."
+                ? L10n.tr("One workout gives Progress real training signal to read.")
+                : L10n.format(vm.totalCompletedWorkouts == 1 ? "%d session logged · the first clear trends arrive through week one." : "%d sessions logged · the first clear trends arrive through week one.", vm.totalCompletedWorkouts)
         } else if prsThisWeek > 0 {
             state = .success
             icon = "trophy.fill"
-            headline = "\(prsThisWeek) new PR\(prsThisWeek == 1 ? "" : "s") this week"
-            detail = progressing > 0 ? "\(progressing) lift\(progressing == 1 ? "" : "s") still progressing" : "Strength is moving"
+            headline = L10n.format(prsThisWeek == 1 ? "%d new PR this week" : "%d new PRs this week", prsThisWeek)
+            detail = progressing > 0 ? L10n.format(progressing == 1 ? "%d lift still progressing" : "%d lifts still progressing", progressing) : L10n.tr("Strength is moving")
         } else if progressing > stalled && progressing > 0 {
             state = .success
             icon = "arrow.up.right"
-            headline = "\(progressing) lift\(progressing == 1 ? "" : "s") progressing"
-            detail = stalled > 0 ? "\(stalled) needs attention" : "Momentum on your side"
+            headline = L10n.format(progressing == 1 ? "%d lift progressing" : "%d lifts progressing", progressing)
+            detail = stalled > 0 ? L10n.format("%d needs attention", stalled) : L10n.tr("Momentum on your side")
         } else if stalled > progressing && stalled > 0 {
             state = .warning
             icon = "arrow.right"
-            headline = "\(stalled) lift\(stalled == 1 ? "" : "s") flat"
-            detail = progressing > 0 ? "\(progressing) still progressing" : "Consider a variation or reset"
+            headline = L10n.format(stalled == 1 ? "%d lift flat" : "%d lifts flat", stalled)
+            detail = progressing > 0 ? L10n.format("%d still progressing", progressing) : L10n.tr("Consider a variation or reset")
         } else if volumeThis > volumeLast && volumeLast > 0 {
             let pct = Int((volumeThis - volumeLast) / volumeLast * 100)
             state = .success
             icon = "chart.line.uptrend.xyaxis"
-            headline = "Volume up \(pct)%"
-            detail = "More work than last week"
+            headline = L10n.format("Volume up %d%%", pct)
+            detail = L10n.tr("More work than last week")
         } else if volumeLast > 0 && volumeThis < volumeLast * 0.85 {
             state = .warning
             icon = "chart.line.downtrend.xyaxis"
-            headline = "Lighter week"
-            detail = "Volume down vs last week"
+            headline = L10n.tr("Lighter week")
+            detail = L10n.tr("Volume down vs last week")
         } else {
             state = .neutral
             icon = "equal.circle"
-            headline = "Holding steady"
-            detail = "Consistent output across the week"
+            headline = L10n.tr("Holding steady")
+            detail = L10n.tr("Consistent output across the week")
         }
 
         return HStack(alignment: .center, spacing: 12) {
@@ -232,11 +233,11 @@ struct ProgressAnalyticsView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
-                    Text("WHAT CHANGED")
+                    Text(L10n.tr("WHAT CHANGED"))
                         .font(.system(size: 9, weight: .black))
                         .tracking(1.1)
                         .foregroundStyle(.tertiary)
-                    Text("· 7 days")
+                    Text(L10n.tr("· 7 days"))
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundStyle(.quaternary)
                 }
@@ -272,9 +273,9 @@ struct ProgressAnalyticsView: View {
 
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                ForgeSectionHeader(title: "Momentum")
+                ForgeSectionHeader(title: L10n.tr("Momentum"))
                 Spacer()
-                Text("by lift · body · streak")
+                Text(L10n.tr("by lift · body · streak"))
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.tertiary)
             }
@@ -282,13 +283,13 @@ struct ProgressAnalyticsView: View {
             VStack(spacing: 8) {
                 momentumPill(
                     icon: "arrow.up.right",
-                    title: "Strength",
+                    title: L10n.tr("Strength"),
                     state: progressing.count > stalled.count ? .success : (stalled.count > 0 ? .warning : .neutral),
                     detail: {
-                        if progressing.isEmpty && stalled.isEmpty { return "Calibrating" }
+                        if progressing.isEmpty && stalled.isEmpty { return L10n.tr("Calibrating") }
                         var parts: [String] = []
-                        if !progressing.isEmpty { parts.append("\(progressing.count) progressing") }
-                        if !stalled.isEmpty { parts.append("\(stalled.count) flat") }
+                        if !progressing.isEmpty { parts.append(L10n.format("%d progressing", progressing.count)) }
+                        if !stalled.isEmpty { parts.append(L10n.format("%d flat", stalled.count)) }
                         return parts.joined(separator: " · ")
                     }()
                 )
@@ -296,17 +297,17 @@ struct ProgressAnalyticsView: View {
                 if nutritionOn, let physique {
                     momentumPill(
                         icon: "figure.arms.open",
-                        title: "Physique",
+                        title: L10n.tr("Physique"),
                         state: mapVerdictState(physique.paceVerdict),
-                        detail: physique.summary ?? "Calibrating"
+                        detail: physique.summary ?? L10n.tr("Calibrating")
                     )
                 }
 
                 momentumPill(
                     icon: "flame.fill",
-                    title: "Consistency",
+                    title: L10n.tr("Consistency"),
                     state: vm.streak >= 7 ? .success : (vm.streak >= 3 ? .info : .neutral),
-                    detail: vm.streak > 0 ? "\(vm.streak)-day streak · \(vm.totalCompletedWorkouts) sessions logged" : "Start fresh today"
+                    detail: vm.streak > 0 ? L10n.format("%d-day streak · %d sessions logged", vm.streak, vm.totalCompletedWorkouts) : L10n.tr("Start fresh today")
                 )
             }
         }
@@ -359,15 +360,15 @@ struct ProgressAnalyticsView: View {
     private var signalStrip: some View {
         HStack(spacing: 8) {
             if vm.isEarlyStage {
-                signalPill(icon: "figure.strengthtraining.traditional", value: "\(vm.totalCompletedWorkouts)", label: "Logged", color: STRQBrand.steel)
-                signalPill(icon: "calendar.badge.clock", value: "\(vm.weeklyStats.sessions)/\(max(1, min(3, vm.profile.daysPerWeek)))", label: "Target", color: STRQBrand.steel)
-                signalPill(icon: "flame.fill", value: "\(vm.streak)", label: "Streak", color: STRQBrand.steel)
-                signalPill(icon: "heart.fill", value: "\(vm.effectiveRecoveryScore)%", label: "Recovery", color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+                signalPill(icon: "figure.strengthtraining.traditional", value: "\(vm.totalCompletedWorkouts)", label: L10n.tr("Logged"), color: STRQBrand.steel)
+                signalPill(icon: "calendar.badge.clock", value: "\(vm.weeklyStats.sessions)/\(max(1, min(3, vm.profile.daysPerWeek)))", label: L10n.tr("Target"), color: STRQBrand.steel)
+                signalPill(icon: "flame.fill", value: "\(vm.streak)", label: L10n.tr("Streak"), color: STRQBrand.steel)
+                signalPill(icon: "heart.fill", value: "\(vm.effectiveRecoveryScore)%", label: L10n.tr("Recovery"), color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
             } else {
-                signalPill(icon: "arrow.up.right", value: "\(vm.progressingExercises.count)", label: "Progressing", color: .green)
-                signalPill(icon: "flame.fill", value: "\(vm.streak)", label: "Streak", color: STRQBrand.steel)
-                signalPill(icon: "figure.strengthtraining.traditional", value: "\(vm.totalCompletedWorkouts)", label: "Workouts", color: STRQBrand.steel)
-                signalPill(icon: "heart.fill", value: "\(vm.effectiveRecoveryScore)%", label: "Recovery", color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+                signalPill(icon: "arrow.up.right", value: "\(vm.progressingExercises.count)", label: L10n.tr("Progressing"), color: .green)
+                signalPill(icon: "flame.fill", value: "\(vm.streak)", label: L10n.tr("Streak"), color: STRQBrand.steel)
+                signalPill(icon: "figure.strengthtraining.traditional", value: "\(vm.totalCompletedWorkouts)", label: L10n.tr("Workouts"), color: STRQBrand.steel)
+                signalPill(icon: "heart.fill", value: "\(vm.effectiveRecoveryScore)%", label: L10n.tr("Recovery"), color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
             }
         }
         .opacity(appeared ? 1 : 0)
@@ -403,7 +404,7 @@ struct ProgressAnalyticsView: View {
 
     private var tabSelector: some View {
         HStack(spacing: 0) {
-            ForEach(Array(["Strength", "Body", "Volume"].enumerated()), id: \.offset) { index, tab in
+            ForEach(Array([L10n.tr("Strength"), L10n.tr("Body"), L10n.tr("Volume")].enumerated()), id: \.offset) { index, tab in
                 Button {
                     withAnimation(.snappy(duration: 0.25)) { selectedTab = index }
                 } label: {
@@ -450,7 +451,7 @@ struct ProgressAnalyticsView: View {
 
     private var strengthBaselineCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: "Estimated 1RM", trailing: "First Signal")
+            ForgeSectionHeader(title: L10n.tr("Estimated 1RM"), trailing: L10n.tr("First Signal"))
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 10) {
@@ -460,11 +461,11 @@ struct ProgressAnalyticsView: View {
                         .frame(width: 40, height: 40)
                         .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 10))
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Strength trend starts here")
+                        Text(L10n.tr("Strength trend starts here"))
                             .font(.subheadline.weight(.semibold))
                         Text(vm.totalCompletedWorkouts == 0
-                             ? "Your main lifts create the first real strength read."
-                             : "Keep logging anchor lifts and STRQ will turn them into a readable strength trend.")
+                             ? L10n.tr("Your main lifts create the first real strength read.")
+                             : L10n.tr("Keep logging anchor lifts and STRQ will turn them into a readable strength trend."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -473,7 +474,7 @@ struct ProgressAnalyticsView: View {
                 }
 
                 HStack(spacing: 6) {
-                    ForEach(["Bench", "Squat", "Deadlift"], id: \.self) { lift in
+                    ForEach([L10n.tr("Bench"), L10n.tr("Squat"), L10n.tr("Deadlift")], id: \.self) { lift in
                         HStack(spacing: 4) {
                             Image(systemName: "circle.dashed")
                                 .font(.system(size: 9))
@@ -499,7 +500,7 @@ struct ProgressAnalyticsView: View {
 
     private var strengthChart: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: "Estimated 1RM", trailing: "8 Weeks")
+            ForgeSectionHeader(title: L10n.tr("Estimated 1RM"), trailing: L10n.tr("8 Weeks"))
 
             Chart {
                 ForEach(vm.strengthProgress) { entry in
@@ -527,9 +528,9 @@ struct ProgressAnalyticsView: View {
             .chartForegroundStyleScale(["Bench": Color.white, "Squat": STRQBrand.steel, "Deadlift": STRQBrand.slate])
 
             HStack(spacing: 16) {
-                legendDot(color: .white, label: "Bench")
-                legendDot(color: STRQBrand.steel, label: "Squat")
-                legendDot(color: STRQBrand.slate, label: "Deadlift")
+                legendDot(color: .white, label: L10n.tr("Bench"))
+                legendDot(color: STRQBrand.steel, label: L10n.tr("Squat"))
+                legendDot(color: STRQBrand.slate, label: L10n.tr("Deadlift"))
             }
             .frame(maxWidth: .infinity)
         }
@@ -552,7 +553,7 @@ struct ProgressAnalyticsView: View {
         let sortedPRs = vm.personalRecords.sorted { $0.date > $1.date }
         return VStack(alignment: .leading, spacing: 12) {
             HStack {
-                ForgeSectionHeader(title: "Personal Records")
+                ForgeSectionHeader(title: L10n.tr("Personal Records"))
                 Spacer()
                 if !sortedPRs.isEmpty {
                     Text("\(sortedPRs.count)")
@@ -569,7 +570,7 @@ struct ProgressAnalyticsView: View {
                     Image(systemName: "trophy")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("Heavy sets and rep bests will start surfacing here as your log grows.")
+                    Text(L10n.tr("Heavy sets and rep bests will start surfacing here as your log grows."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -607,7 +608,7 @@ struct ProgressAnalyticsView: View {
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text("LATEST PR")
+                Text(L10n.tr("LATEST PR"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(STRQPalette.gold)
@@ -624,11 +625,11 @@ struct ProgressAnalyticsView: View {
                     Text("\(Int(pr.weight))")
                         .font(.system(size: 22, weight: .heavy, design: .rounded).monospacedDigit())
                         .foregroundStyle(.white)
-                    Text("kg")
+                    Text(L10n.tr("kg"))
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.5))
                 }
-                Text("× \(pr.reps) · e1RM \(Int(pr.estimatedOneRepMax))")
+                Text(L10n.format("× %d · e1RM %d", pr.reps, Int(pr.estimatedOneRepMax)))
                     .font(.caption2.weight(.medium).monospacedDigit())
                     .foregroundStyle(.tertiary)
             }
@@ -645,7 +646,7 @@ struct ProgressAnalyticsView: View {
                 .font(.caption.weight(.medium))
                 .lineLimit(1)
             Spacer(minLength: 8)
-            Text("\(Int(pr.weight))kg × \(pr.reps)")
+            Text(L10n.format("%dkg × %d", Int(pr.weight), pr.reps))
                 .font(.system(size: 11, weight: .semibold, design: .rounded).monospacedDigit())
                 .foregroundStyle(.secondary)
             Text(pr.date.formatted(.dateTime.month(.abbreviated).day()))
@@ -673,40 +674,40 @@ struct ProgressAnalyticsView: View {
 
         return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
-                Text("RECENT IMPROVEMENT")
+                Text(L10n.tr("RECENT IMPROVEMENT"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(.secondary)
                 Spacer()
-                Text("vs last week")
+                Text(L10n.tr("vs last week"))
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.tertiary)
             }
 
             HStack(spacing: 8) {
                 improvementCell(
-                    label: "Volume",
+                    label: L10n.tr("Volume"),
                     delta: volumeDelta == 0 ? "—" : String(format: "%@%@", volumeDelta > 0 ? "+" : "", ForgeTheme.formatVolume(volumeDelta)),
-                    unit: volumeDelta == 0 ? nil : "kg",
+                    unit: volumeDelta == 0 ? nil : L10n.tr("kg"),
                     positive: volumeDelta > 0,
                     negative: volumeDelta < 0 && volumeLast > 0
                 )
                 improvementCell(
-                    label: "Sessions",
+                    label: L10n.tr("Sessions"),
                     delta: sessionsDelta == 0 ? "\(thisWeek.count)" : String(format: "%@%d", sessionsDelta > 0 ? "+" : "", sessionsDelta),
                     unit: nil,
                     positive: sessionsDelta > 0,
                     negative: sessionsDelta < 0
                 )
                 improvementCell(
-                    label: "New PRs",
+                    label: L10n.tr("New PRs"),
                     delta: "\(prsThisWeek)",
                     unit: nil,
                     positive: prsThisWeek > 0,
                     negative: false
                 )
                 improvementCell(
-                    label: "Progressing",
+                    label: L10n.tr("Progressing"),
                     delta: "\(progressing)",
                     unit: nil,
                     positive: progressing > 0,
@@ -759,12 +760,12 @@ struct ProgressAnalyticsView: View {
 
         return VStack(alignment: .leading, spacing: 10) {
             HStack {
-                ForgeSectionHeader(title: "Recent Sessions")
+                ForgeSectionHeader(title: L10n.tr("Recent Sessions"))
                 Spacer()
                 if !recent.isEmpty {
                     NavigationLink(value: ProgressRoute.history) {
                         HStack(spacing: 3) {
-                            Text("All")
+                            Text(L10n.tr("All"))
                                 .font(.caption.weight(.semibold))
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 9, weight: .bold))
@@ -779,7 +780,7 @@ struct ProgressAnalyticsView: View {
                     Image(systemName: "figure.strengthtraining.traditional")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("Each finished workout becomes a clean training record here.")
+                    Text(L10n.tr("Each finished workout becomes a clean training record here."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -834,11 +835,11 @@ struct ProgressAnalyticsView: View {
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 HStack(spacing: 4) {
-                    Text("\(duration)min")
+                    Text(L10n.format("%dmin", duration))
                     Text("·").foregroundStyle(.quaternary)
-                    Text("\(sets) sets")
+                    Text(L10n.format("%d sets", sets))
                     Text("·").foregroundStyle(.quaternary)
-                    Text(ForgeTheme.formatVolume(session.totalVolume) + "kg")
+                    Text(L10n.format("%@kg", ForgeTheme.formatVolume(session.totalVolume)))
                 }
                 .font(.caption2.monospacedDigit())
                 .foregroundStyle(.tertiary)
@@ -861,10 +862,10 @@ struct ProgressAnalyticsView: View {
 
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                ForgeSectionHeader(title: "28-Day Consistency")
+                ForgeSectionHeader(title: L10n.tr("28-Day Consistency"))
                 Spacer()
                 let count = last28Days.filter(\.1).count
-                Text("\(count) days")
+                Text(L10n.format("%d days", count))
                     .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
                     .foregroundStyle(STRQBrand.steel)
                     .padding(.horizontal, 8)
@@ -885,7 +886,7 @@ struct ProgressAnalyticsView: View {
                     Image(systemName: "calendar.badge.clock")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("Your consistency pattern will map here once sessions start landing.")
+                    Text(L10n.tr("Your consistency pattern will map here once sessions start landing."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -907,12 +908,12 @@ struct ProgressAnalyticsView: View {
     private var bodySignals: some View {
         if vm.goalPace == nil && vm.bodyWeightEntries.count < 2 && vm.recoveryTrendData.count < 3 && vm.nutritionLogs.isEmpty {
             signalRunwayCard(
-                title: "Body Signals",
-                trailing: "Gathering",
+                title: L10n.tr("Body Signals"),
+                trailing: L10n.tr("Gathering"),
                 icon: "heart.text.square.fill",
-                headline: "Recovery and body trends build from repeat logs",
-                detail: "Sleep, weigh-ins, and nutrition entries turn this tab into a cleaner read of how your body is responding.",
-                chips: [("moon.zzz.fill", "Recovery"), ("scalemass.fill", "Weight"), ("fork.knife", "Nutrition")]
+                headline: L10n.tr("Recovery and body trends build from repeat logs"),
+                detail: L10n.tr("Sleep, weigh-ins, and nutrition entries turn this tab into a cleaner read of how your body is responding."),
+                chips: [("moon.zzz.fill", L10n.tr("Recovery")), ("scalemass.fill", L10n.tr("Weight")), ("fork.knife", L10n.tr("Nutrition"))]
             )
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
@@ -991,7 +992,7 @@ struct ProgressAnalyticsView: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
-                    Text("Goal Pace")
+                    Text(L10n.tr("Goal Pace"))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(color)
                         .textCase(.uppercase)
@@ -1027,10 +1028,10 @@ struct ProgressAnalyticsView: View {
         if entries.count >= 2 {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    ForgeSectionHeader(title: "Body Weight")
+                    ForgeSectionHeader(title: L10n.tr("Body Weight"))
                     Spacer()
                     if let latest = entries.last {
-                        Text(String(format: "%.1f kg", latest.weightKg))
+                        Text(L10n.format("%.1f kg", latest.weightKg))
                             .font(.system(.subheadline, design: .rounded, weight: .bold).monospacedDigit())
                             .foregroundStyle(STRQBrand.steel)
                     }
@@ -1095,11 +1096,11 @@ struct ProgressAnalyticsView: View {
         if data.count >= 3 {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    ForgeSectionHeader(title: "Recovery Trend")
+                    ForgeSectionHeader(title: L10n.tr("Recovery Trend"))
                     Spacer()
                     let avgScore = data.map(\.score).reduce(0, +) / max(1, data.count)
                     let scoreColor: Color = avgScore >= 75 ? .green : avgScore >= 55 ? .yellow : .red
-                    Text("Avg \(avgScore)")
+                    Text(L10n.format("Avg %d", avgScore))
                         .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundStyle(scoreColor)
                         .padding(.horizontal, 8)
@@ -1150,10 +1151,10 @@ struct ProgressAnalyticsView: View {
         if !logs.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    ForgeSectionHeader(title: "Nutrition", trailing: "7 Days")
+                    ForgeSectionHeader(title: L10n.tr("Nutrition"), trailing: L10n.tr("7 Days"))
                     Spacer()
                     let avgProtein = logs.map(\.proteinGrams).reduce(0, +) / max(1, logs.count)
-                    Text("Avg \(avgProtein)g")
+                    Text(L10n.format("Avg %dg", avgProtein))
                         .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundStyle(STRQBrand.steel)
                         .padding(.horizontal, 8)
@@ -1196,12 +1197,12 @@ struct ProgressAnalyticsView: View {
     private var volumeSignals: some View {
         if vm.totalCompletedWorkouts < 2 {
             signalRunwayCard(
-                title: "Volume Signals",
-                trailing: "First Week",
+                title: L10n.tr("Volume Signals"),
+                trailing: L10n.tr("First Week"),
                 icon: "chart.bar.xaxis",
-                headline: "Session volume and balance sharpen after a few workouts",
-                detail: "Completed sessions give STRQ enough context to read workload distribution, weekly rhythm, and movement mix.",
-                chips: [("figure.strengthtraining.traditional", "Sessions"), ("square.stack.3d.up.fill", "Volume"), ("arrow.left.arrow.right", "Balance")]
+                headline: L10n.tr("Session volume and balance sharpen after a few workouts"),
+                detail: L10n.tr("Completed sessions give STRQ enough context to read workload distribution, weekly rhythm, and movement mix."),
+                chips: [("figure.strengthtraining.traditional", L10n.tr("Sessions")), ("square.stack.3d.up.fill", L10n.tr("Volume")), ("arrow.left.arrow.right", L10n.tr("Balance"))]
             )
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
@@ -1218,7 +1219,7 @@ struct ProgressAnalyticsView: View {
 
     private var muscleBalanceChart: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Muscle Balance", trailing: "vs 4-Week Avg")
+            ForgeSectionHeader(title: L10n.tr("Muscle Balance"), trailing: L10n.tr("vs 4-Week Avg"))
 
             ForEach(vm.muscleBalance) { entry in
                 HStack(spacing: 8) {
@@ -1258,12 +1259,12 @@ struct ProgressAnalyticsView: View {
             let weekStart = calendar.date(byAdding: .weekOfYear, value: -weekOffset, to: Date())!
             let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart)!
             let count = vm.workoutHistory.filter { $0.startTime >= weekStart && $0.startTime < weekEnd && $0.isCompleted }.count
-            let label = weekOffset == 0 ? "Now" : "\(weekOffset)w"
+            let label = weekOffset == 0 ? L10n.tr("Now") : L10n.format("%dw", weekOffset)
             return (label, count)
         }
 
         VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: "Weekly Sessions", trailing: "8 Weeks")
+            ForgeSectionHeader(title: L10n.tr("Weekly Sessions"), trailing: L10n.tr("8 Weeks"))
 
             Chart {
                 ForEach(last8Weeks, id: \.0) { week, count in
@@ -1293,14 +1294,14 @@ struct ProgressAnalyticsView: View {
 
     private var movementBalanceCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Movement Balance")
+            ForgeSectionHeader(title: L10n.tr("Movement Balance"))
 
             let data = movementBalanceData
             HStack(spacing: 8) {
                 movementBar(label: "Push", value: data.push, total: data.total, color: Color.white)
                 movementBar(label: "Pull", value: data.pull, total: data.total, color: STRQBrand.steel)
                 movementBar(label: "Legs", value: data.legs, total: data.total, color: STRQBrand.slate)
-                movementBar(label: "Core", value: data.core, total: data.total, color: STRQBrand.accentSecondary)
+                movementBar(label: L10n.tr("Core"), value: data.core, total: data.total, color: STRQBrand.accentSecondary)
             }
         }
         .padding(16)

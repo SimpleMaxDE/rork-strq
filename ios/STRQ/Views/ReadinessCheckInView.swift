@@ -136,12 +136,12 @@ struct ReadinessCheckInView: View {
             )
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Sleep quality")
+                fieldLabel(L10n.tr("Sleep quality"))
                 readinessSegment(selection: $sleepQuality)
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Energy right now")
+                fieldLabel(L10n.tr("Energy right now"))
                 readinessSegment(selection: $energyLevel)
             }
         }
@@ -156,12 +156,12 @@ struct ReadinessCheckInView: View {
             )
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Muscle soreness")
+                fieldLabel(L10n.tr("Muscle soreness"))
                 sorenessSegment
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Life stress")
+                fieldLabel(L10n.tr("Life stress"))
                 readinessSegment(selection: $stressLevel, invertSemantic: true)
             }
         }
@@ -178,15 +178,15 @@ struct ReadinessCheckInView: View {
             )
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Motivation")
+                fieldLabel(L10n.tr("Motivation"))
                 motivationSegment
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Pain or restriction")
+                fieldLabel(L10n.tr("Pain or restriction"))
                 painToggle
                 if painOrRestriction {
-                    TextField("e.g. Left shoulder, lower back", text: $painNote)
+                    TextField(L10n.tr("e.g. Left shoulder, lower back"), text: $painNote)
                         .textFieldStyle(.plain)
                         .focused($painFieldFocused)
                         .submitLabel(.done)
@@ -418,7 +418,7 @@ struct ReadinessCheckInView: View {
                     VStack(spacing: 2) {
                         Text("\(readiness.readinessScore)")
                             .font(.system(size: 44, weight: .heavy, design: .rounded).monospacedDigit())
-                        Text("READINESS")
+                        Text(L10n.tr("READINESS"))
                             .font(.system(size: 9, weight: .bold))
                             .tracking(0.8)
                             .foregroundStyle(.secondary)
@@ -557,7 +557,7 @@ struct ReadinessCheckInView: View {
                     Button {
                         withAnimation(.snappy(duration: 0.25)) { currentStep -= 1 }
                     } label: {
-                        Text("Back")
+                        Text(L10n.tr("Back"))
                             .font(.body.weight(.semibold))
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 18)

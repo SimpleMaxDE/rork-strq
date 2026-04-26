@@ -55,8 +55,8 @@ struct PlanGenerator {
         let explanation = generateExplanation(split: split, context: context, budgets: budgets, days: days)
 
         return WorkoutPlan(
-            name: "\(profile.name.isEmpty ? "Your" : profile.name + "'s") \(profile.goal.displayName) Plan",
-            description: "\(split.name) • \(profile.daysPerWeek) days/week • \(profile.minutesPerSession) min",
+            name: L10n.format("%@ %@ Plan", profile.name.isEmpty ? L10n.tr("Your") : profile.name + "'s", profile.goal.displayName),
+            description: L10n.format("%@ • %d days/week • %d min", localizedSplitName(split.name), profile.daysPerWeek, profile.minutesPerSession),
             days: days,
             splitType: split.name,
             explanation: explanation
@@ -311,7 +311,7 @@ struct PlanGenerator {
             let warmup = generateWarmupHint(for: adjustedMuscles, context: context)
             let minutes = adjustedSessionTime(context: context)
             return WorkoutDay(
-                name: dayConfig.name,
+                name: localizedWorkoutName(dayConfig.name),
                 focusMuscles: adjustedMuscles,
                 exercises: exercises,
                 dayIndex: dayConfig.index,
@@ -319,6 +319,45 @@ struct PlanGenerator {
                 estimatedMinutes: minutes
             )
         }
+    }
+
+    private func localizedSplitName(_ name: String) -> String {
+        switch name {
+        case "Full Body": return L10n.tr("Ganzkörper")
+        case "Upper/Lower": return L10n.tr("Oberkörper/Unterkörper")
+        case "Push/Pull/Legs": return L10n.tr("Push/Pull/Legs")
+        case "Body Part": return L10n.tr("Muskelgruppen")
+        default: return name
+        }
+    }
+
+    private func localizedWorkoutName(_ name: String) -> String {
+        let map: [String: String] = [
+            "Full Body A": "Ganzkörper A",
+            "Full Body B": "Ganzkörper B",
+            "Full Body C": "Ganzkörper C",
+            "Full Body D": "Ganzkörper D",
+            "Upper A": "Oberkörper A",
+            "Upper B": "Oberkörper B",
+            "Upper C": "Oberkörper C",
+            "Lower A": "Unterkörper A",
+            "Lower B": "Unterkörper B",
+            "Push": "Push",
+            "Pull": "Pull",
+            "Legs": "Beine",
+            "Legs & Core": "Beine & Core",
+            "Push A": "Push A",
+            "Pull A": "Pull A",
+            "Legs A": "Beine A",
+            "Push B": "Push B",
+            "Pull B": "Pull B",
+            "Legs B & Core": "Beine B & Core",
+            "Chest & Triceps": "Brust & Trizeps",
+            "Back & Biceps": "Rücken & Bizeps",
+            "Shoulders & Arms": "Schultern & Arme",
+            "Glutes & Core": "Gesäß & Core"
+        ]
+        return L10n.tr(map[name] ?? name)
     }
 
     private func prioritizeMuscles(_ muscles: [MuscleGroup], context: PlanContext) -> [MuscleGroup] {

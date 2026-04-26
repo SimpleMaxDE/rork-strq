@@ -55,13 +55,13 @@ struct MetricEditSheet: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button("Cancel") { dismiss() }
+                Button(L10n.tr("Cancel")) { dismiss() }
                     .foregroundStyle(.white.opacity(0.6))
                 Spacer()
                 Text(metric.title)
                     .font(.headline)
                 Spacer()
-                Button("Save") { save() }
+                Button(L10n.tr("Save")) { save() }
                     .fontWeight(.semibold)
                     .foregroundStyle(isValid ? .white : .white.opacity(0.3))
                     .disabled(!isValid)

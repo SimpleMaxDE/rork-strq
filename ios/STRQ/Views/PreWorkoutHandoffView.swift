@@ -75,7 +75,7 @@ struct PreWorkoutHandoffView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "brain.head.profile.fill")
                             .font(.system(size: 10))
-                        Text("Coach-Adjusted")
+                        Text(L10n.tr("Coach-Adjusted"))
                             .font(.caption2.weight(.bold))
                     }
                     .foregroundStyle(STRQBrand.steel)
@@ -104,7 +104,7 @@ struct PreWorkoutHandoffView: View {
                 .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1), value: appeared)
 
                 VStack(spacing: 6) {
-                    Text("TODAY'S SESSION")
+                    Text(L10n.tr("TODAY'S SESSION"))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(STRQBrand.steel)
                         .tracking(1.5)
@@ -225,12 +225,12 @@ struct PreWorkoutHandoffView: View {
     private var exercisePreviewList: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("SESSION PLAN")
+                Text(L10n.tr("SESSION PLAN"))
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
                 Spacer()
-                Text("Tap for prescription")
+                Text(L10n.tr("Tap for prescription"))
                     .font(.system(size: 10, weight: .medium))
                     .foregroundStyle(.tertiary)
             }
@@ -256,7 +256,7 @@ struct PreWorkoutHandoffView: View {
                                     .foregroundStyle(.primary)
                                     .lineLimit(1)
                                 if let ex = exercise, ex.category == .compound && index < 2 {
-                                    Text("KEY")
+                                    Text(L10n.tr("KEY"))
                                         .font(.system(size: 8, weight: .black))
                                         .foregroundStyle(.white)
                                         .padding(.horizontal, 5)
@@ -310,7 +310,7 @@ struct PreWorkoutHandoffView: View {
                 Image(systemName: "brain.head.profile.fill")
                     .font(.caption)
                     .foregroundStyle(STRQBrand.steel)
-                Text("WHY THIS SESSION")
+                Text(L10n.tr("WHY THIS SESSION"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
@@ -380,7 +380,7 @@ struct PreWorkoutHandoffView: View {
                 HStack(spacing: 10) {
                     Image(systemName: "bolt.fill")
                         .font(.subheadline)
-                    Text("Begin Workout")
+                    Text(L10n.tr("Begin Workout"))
                         .font(.body.weight(.bold))
                 }
                 .foregroundStyle(.black)

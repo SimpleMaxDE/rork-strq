@@ -19,11 +19,11 @@ struct ScheduleEditorSheet: View {
                 .padding(.bottom, 32)
             }
             .background(Color(.systemBackground))
-            .navigationTitle("Schedule")
+            .navigationTitle(L10n.tr("Schedule"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button(L10n.tr("Done")) { dismiss() }
                 }
             }
             .onAppear {
@@ -40,9 +40,9 @@ struct ScheduleEditorSheet: View {
                 .frame(width: 50, height: 50)
                 .background(STRQBrand.steel.opacity(0.1), in: Circle())
 
-            Text("Training Schedule")
+            Text(L10n.tr("Training Schedule"))
                 .font(.headline)
-            Text("Assign workouts to specific days. Tap a day to change it.")
+            Text(L10n.tr("Assign workouts to specific days. Tap a day to change it."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -88,7 +88,7 @@ struct ScheduleEditorSheet: View {
                             .foregroundStyle(STRQBrand.steel)
                             .lineLimit(1)
                     } else {
-                        Text("Rest")
+                        Text(L10n.tr("Rest"))
                             .font(.system(size: 8, weight: .medium))
                             .foregroundStyle(.tertiary)
                     }
@@ -109,7 +109,7 @@ struct ScheduleEditorSheet: View {
 
     private var dayAssignments: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("ASSIGN DAYS")
+            Text(L10n.tr("ASSIGN DAYS"))
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(STRQBrand.steel)
                 .tracking(0.5)
@@ -140,7 +140,7 @@ struct ScheduleEditorSheet: View {
                 Spacer()
 
                 if day.isSkipped {
-                    Text("Skipped")
+                    Text(L10n.tr("Skipped"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(STRQPalette.danger)
                         .padding(.horizontal, 10)
@@ -201,7 +201,7 @@ struct ScheduleEditorSheet: View {
                 HStack(spacing: 8) {
                     Image(systemName: "wand.and.stars")
                         .font(.subheadline)
-                    Text("Auto-Schedule")
+                    Text(L10n.tr("Auto-Schedule"))
                         .font(.subheadline.weight(.bold))
                 }
                 .foregroundStyle(.black)

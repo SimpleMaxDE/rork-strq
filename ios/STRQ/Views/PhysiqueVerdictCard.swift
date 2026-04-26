@@ -23,12 +23,12 @@ struct PhysiqueVerdictCard: View {
                 Image(systemName: "sparkles")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(STRQPalette.info)
-                Text("PHYSIQUE COACHING")
+                Text(L10n.tr("PHYSIQUE COACHING"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQPalette.info)
                     .tracking(0.8)
                 Spacer()
-                Text("OPTIONAL")
+                Text(L10n.tr("OPTIONAL"))
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
@@ -36,9 +36,9 @@ struct PhysiqueVerdictCard: View {
                     .padding(.vertical, 3)
                     .background(Color.white.opacity(0.06), in: Capsule())
             }
-            Text("Physique tracking is off.")
+            Text(L10n.tr("Physique tracking is off."))
                 .font(.title3.weight(.semibold))
-            Text("STRQ is coaching your training and recovery. Turn on physique tracking anytime to add bodyweight and nutrition intelligence — only when you want it.")
+            Text(L10n.tr("STRQ is coaching your training and recovery. Turn on physique tracking anytime to add bodyweight and nutrition intelligence — only when you want it."))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -50,7 +50,7 @@ struct PhysiqueVerdictCard: View {
                 HStack(spacing: 6) {
                     Image(systemName: "plus.circle.fill")
                         .font(.caption)
-                    Text("Enable Physique Tracking")
+                    Text(L10n.tr("Enable Physique Tracking"))
                         .font(.subheadline.weight(.semibold))
                 }
                 .foregroundStyle(.black)
@@ -212,7 +212,7 @@ struct PhysiqueVerdictCard: View {
 
     private func driversSection(drivers: [PhysiqueDriver]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("WHY")
+            Text(L10n.tr("WHY"))
                 .font(.system(size: 9, weight: .bold))
                 .foregroundStyle(.secondary)
                 .tracking(0.8)
@@ -260,7 +260,7 @@ struct PhysiqueVerdictCard: View {
                 .background(color.opacity(0.16), in: .rect(cornerRadius: 8))
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
-                    Text("THIS WEEK")
+                    Text(L10n.tr("THIS WEEK"))
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(color)
                         .tracking(0.8)

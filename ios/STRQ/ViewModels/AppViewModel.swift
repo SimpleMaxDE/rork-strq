@@ -1444,7 +1444,7 @@ class AppViewModel {
 
         impacts.append(OnboardingImpact(
             icon: "scalemass.fill",
-            title: "\(String(format: "%.0f", profile.weightKg)) kg",
+            title: L10n.format("%.0f kg", profile.weightKg),
             detail: weightImpactDetail(),
             color: "green"
         ))
@@ -1465,7 +1465,7 @@ class AppViewModel {
 
         impacts.append(OnboardingImpact(
             icon: "calendar",
-            title: "\(profile.daysPerWeek) days/week",
+            title: L10n.format("%d days/week", profile.daysPerWeek),
             detail: scheduleImpactDetail(),
             color: "steel"
         ))
@@ -1473,8 +1473,8 @@ class AppViewModel {
         if !profile.injuries.isEmpty {
             impacts.append(OnboardingImpact(
                 icon: "cross.circle.fill",
-                title: "\(profile.injuries.count) restriction\(profile.injuries.count == 1 ? "" : "s")",
-                detail: "Exercises filtered to avoid \(profile.injuries.joined(separator: ", ")) aggravation.",
+                title: profile.injuries.count == 1 ? L10n.tr("1 restriction") : L10n.format("%d restrictions", profile.injuries.count),
+                detail: L10n.format("Exercises filtered to avoid %@ aggravation.", profile.injuries.joined(separator: ", ")),
                 color: "red"
             ))
         }
@@ -1483,8 +1483,8 @@ class AppViewModel {
             let names = profile.focusMuscles.prefix(3).map(\.displayName).joined(separator: ", ")
             impacts.append(OnboardingImpact(
                 icon: "scope",
-                title: "Focus: \(names)",
-                detail: "Extra volume and exercise priority for these muscle groups.",
+                title: L10n.format("Focus: %@", names),
+                detail: L10n.tr("Extra volume and exercise priority for these muscle groups."),
                 color: "cyan"
             ))
         }
@@ -1985,28 +1985,31 @@ class AppViewModel {
         case .fresh:
             return EarlyStateGuidance(
                 tier: tier,
-                headline: "Let's lock in your baseline",
-                message: "Your plan is built. Your first session is the starting point — STRQ calibrates from what you actually lift.",
-                primaryAction: todaysWorkout == nil ? "Open your plan" : "Start your first session",
-                unlocksNext: "First session unlocks real progression signals",
+                headline: L10n.tr("Let's lock in your baseline"),
+                message: L10n.tr("Your plan is built. Your first session is the starting point — STRQ calibrates from what you actually lift."),
+                primaryAction: todaysWorkout == nil ? L10n.tr("Open your plan") : L10n.tr("Start your first session"),
+                unlocksNext: L10n.tr("First session unlocks real progression signals"),
                 icon: "sparkles"
             )
         case .firstSession:
             return EarlyStateGuidance(
                 tier: tier,
-                headline: "Baseline set. Build from here.",
-                message: "Your first session is in. A few more and STRQ will start spotting progression, balance, and fatigue patterns.",
-                primaryAction: "Log session 2",
-                unlocksNext: "Progression signals unlock around session 3",
+                headline: L10n.tr("Baseline set. Build from here."),
+                message: L10n.tr("Your first session is in. A few more and STRQ will start spotting progression, balance, and fatigue patterns."),
+                primaryAction: L10n.tr("Log session 2"),
+                unlocksNext: L10n.tr("Progression signals unlock around session 3"),
                 icon: "chart.line.uptrend.xyaxis"
             )
         case .earlyWeek:
+            let remainingSessions = max(0, max(1, profile.daysPerWeek - 1) - weeklyStats.sessions)
             return EarlyStateGuidance(
                 tier: tier,
-                headline: "Coach is calibrating",
-                message: "A couple more sessions and your coach will start making sharper calls on load, reps, and recovery.",
-                primaryAction: "Keep the week going",
-                unlocksNext: "Weekly review unlocks after \(max(0, max(1, profile.daysPerWeek - 1) - weeklyStats.sessions)) more session\(max(0, max(1, profile.daysPerWeek - 1) - weeklyStats.sessions) == 1 ? "" : "s") this week",
+                headline: L10n.tr("Coach is calibrating"),
+                message: L10n.tr("A couple more sessions and your coach will start making sharper calls on load, reps, and recovery."),
+                primaryAction: L10n.tr("Keep the week going"),
+                unlocksNext: remainingSessions == 1
+                    ? L10n.tr("Weekly review unlocks after 1 more session this week")
+                    : L10n.format("Weekly review unlocks after %d more sessions this week", remainingSessions),
                 icon: "waveform.path.ecg"
             )
         case .established:
@@ -2052,9 +2055,9 @@ class AppViewModel {
 
         steps.append(.init(
             kind: .planLocked,
-            title: "Plan built",
-            detail: "STRQ generated a plan shaped to your goal, recovery, and time.",
-            learning: "Inputs captured",
+            title: L10n.tr("Plan built"),
+            detail: L10n.tr("STRQ generated a plan shaped to your goal, recovery, and time."),
+            learning: L10n.tr("Inputs captured"),
             icon: "doc.text.fill",
             isComplete: currentPlan != nil,
             isActive: false
@@ -2062,9 +2065,9 @@ class AppViewModel {
 
         steps.append(.init(
             kind: .firstSession,
-            title: "First session",
-            detail: "Lock in your baseline. STRQ calibrates every load from what you actually lift.",
-            learning: completed >= 1 ? "Baseline loads locked in" : "Unlocks real load prescriptions",
+            title: L10n.tr("First session"),
+            detail: L10n.tr("Lock in your baseline. STRQ calibrates every load from what you actually lift."),
+            learning: completed >= 1 ? L10n.tr("Baseline loads locked in") : L10n.tr("Unlocks real load prescriptions"),
             icon: "figure.strengthtraining.traditional",
             isComplete: completed >= 1,
             isActive: completed == 0 && currentPlan != nil
@@ -2072,9 +2075,9 @@ class AppViewModel {
 
         steps.append(.init(
             kind: .secondSession,
-            title: "Session two",
-            detail: "Progression signals switch on. Coach starts adjusting load and volume.",
-            learning: completed >= 2 ? "Progression intelligence active" : "Unlocks progression calls",
+            title: L10n.tr("Session two"),
+            detail: L10n.tr("Progression signals switch on. Coach starts adjusting load and volume."),
+            learning: completed >= 2 ? L10n.tr("Progression intelligence active") : L10n.tr("Unlocks progression calls"),
             icon: "chart.line.uptrend.xyaxis",
             isComplete: completed >= 2,
             isActive: completed == 1
@@ -2082,9 +2085,9 @@ class AppViewModel {
 
         steps.append(.init(
             kind: .thirdSession,
-            title: "Session three",
-            detail: "Pattern reads sharpen — balance, fatigue, and load pacing get real.",
-            learning: completed >= 3 ? "Coach is reading your patterns" : "Unlocks pattern-level coaching",
+            title: L10n.tr("Session three"),
+            detail: L10n.tr("Pattern reads sharpen — balance, fatigue, and load pacing get real."),
+            learning: completed >= 3 ? L10n.tr("Coach is reading your patterns") : L10n.tr("Unlocks pattern-level coaching"),
             icon: "waveform.path.ecg",
             isComplete: completed >= 3,
             isActive: completed == 2
@@ -2092,18 +2095,18 @@ class AppViewModel {
 
         let weekDetail: String
         if weekCount >= weekTarget {
-            weekDetail = "Week one target hit — weekly signal is live."
+            weekDetail = L10n.tr("Week one target hit — weekly signal is live.")
         } else {
             let remaining = max(0, weekTarget - weekCount)
             weekDetail = remaining == 1
-                ? "One more session this week unlocks your weekly review."
-                : "\(remaining) more sessions this week unlock your weekly review."
+                ? L10n.tr("One more session this week unlocks your weekly review.")
+                : L10n.format("%d more sessions this week unlock your weekly review.", remaining)
         }
         steps.append(.init(
             kind: .firstWeek,
-            title: "Week one locked in",
+            title: L10n.tr("Week one locked in"),
             detail: weekDetail,
-            learning: weekCount >= weekTarget ? "Weekly review unlocked" : "Unlocks weekly review & balance reads",
+            learning: weekCount >= weekTarget ? L10n.tr("Weekly review unlocked") : L10n.tr("Unlocks weekly review & balance reads"),
             icon: "checkmark.seal.fill",
             isComplete: weekCount >= weekTarget && completed >= 3,
             isActive: completed >= 3 && weekCount < weekTarget
@@ -2117,20 +2120,20 @@ class AppViewModel {
         let subhead: String
         switch completedCount {
         case 0:
-            headline = "Your first week with STRQ"
-            subhead = "Session one locks your baseline. Every step sharpens the coach."
+            headline = L10n.tr("Your first week with STRQ")
+            subhead = L10n.tr("Session one locks your baseline. Every step sharpens the coach.")
         case 1:
-            headline = "Baseline locked. Build from here."
-            subhead = "Session two flips on progression. You're closer than you think."
+            headline = L10n.tr("Baseline locked. Build from here.")
+            subhead = L10n.tr("Session two flips on progression. You're closer than you think.")
         case 2:
-            headline = "Coach is calibrating fast"
-            subhead = "Session three unlocks real pattern-level coaching."
+            headline = L10n.tr("Coach is calibrating fast")
+            subhead = L10n.tr("Session three unlocks real pattern-level coaching.")
         case 3:
-            headline = "Pattern reads are live"
-            subhead = "Finish the week to unlock your first review."
+            headline = L10n.tr("Pattern reads are live")
+            subhead = L10n.tr("Finish the week to unlock your first review.")
         default:
-            headline = "Week one secured"
-            subhead = "Weekly signal is live — coach is fully calibrated to you."
+            headline = L10n.tr("Week one secured")
+            subhead = L10n.tr("Weekly signal is live — coach is fully calibrated to you.")
         }
 
         return ActivationRoadmap(
@@ -2155,10 +2158,10 @@ nonisolated enum DataMaturityTier: Int, Sendable, Comparable {
 
     var label: String {
         switch self {
-        case .fresh: return "Getting started"
-        case .firstSession: return "First session logged"
-        case .earlyWeek: return "Building your baseline"
-        case .established: return "Signal locked in"
+        case .fresh: return L10n.tr("Getting started")
+        case .firstSession: return L10n.tr("First session logged")
+        case .earlyWeek: return L10n.tr("Building your baseline")
+        case .established: return L10n.tr("Signal locked in")
         }
     }
 }

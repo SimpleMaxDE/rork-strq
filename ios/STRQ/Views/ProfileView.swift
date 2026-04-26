@@ -35,7 +35,7 @@ struct ProfileView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Profile")
+        .navigationTitle(L10n.tr("Profile"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             Analytics.shared.track(.profile_viewed, ["pro": store.isPro ? "true" : "false"])
@@ -43,13 +43,13 @@ struct ProfileView: View {
                 Analytics.shared.track(.subscription_active_viewed)
             }
         }
-        .alert("Reset All Data?", isPresented: $showResetAlert) {
-            Button("Reset", role: .destructive) {
+        .alert(L10n.tr("Reset All Data?"), isPresented: $showResetAlert) {
+            Button(L10n.tr("Reset"), role: .destructive) {
                 vm.resetAllData()
             }
-            Button("Cancel", role: .cancel) {}
+            Button(L10n.tr("Cancel"), role: .cancel) {}
         } message: {
-            Text("This will clear all your data and restart onboarding.")
+            Text(L10n.tr("This will clear all your data and restart onboarding."))
         }
         .sheet(isPresented: $showNutritionSettings) {
             NavigationStack {
@@ -72,44 +72,44 @@ struct ProfileView: View {
             STRQPaywallView(store: store)
                 .presentationDragIndicator(.visible)
         }
-        .alert("Sign Out?", isPresented: $showSignOutAlert) {
-            Button("Sign Out", role: .destructive) {
+        .alert(L10n.tr("Sign Out?"), isPresented: $showSignOutAlert) {
+            Button(L10n.tr("Sign Out"), role: .destructive) {
                 vm.account.signOut()
             }
-            Button("Cancel", role: .cancel) {}
+            Button(L10n.tr("Cancel"), role: .cancel) {}
         } message: {
-            Text("Your training stays on this device. You can sign in again later to sync or restore from iCloud.")
+            Text(L10n.tr("Your training stays on this device. You can sign in again later to sync or restore from iCloud."))
         }
-        .alert("Restore This Device?", isPresented: $showCloudRestoreConfirm) {
-            Button("Restore", role: .destructive) {
+        .alert(L10n.tr("Restore This Device?"), isPresented: $showCloudRestoreConfirm) {
+            Button(L10n.tr("Restore"), role: .destructive) {
                 let outcome = vm.restoreFromCloud(force: true)
                 cloudRestoreMessage = {
                     switch outcome {
-                    case .restored: return "This device has been updated from your latest iCloud snapshot."
-                    case .noSnapshot: return "No iCloud snapshot is available yet. Once you train while signed in, changes will sync automatically."
-                    case .unavailable: return "iCloud isn't available right now. Check that iCloud is enabled, then try again."
-                    case .staleIgnored: return "This device is already using your latest iCloud data."
-                    case .decodeFailed: return "We couldn't read your iCloud data right now. Try again in a moment."
+                    case .restored: return L10n.tr("This device has been updated from your latest iCloud snapshot.")
+                    case .noSnapshot: return L10n.tr("No iCloud snapshot is available yet. Once you train while signed in, changes will sync automatically.")
+                    case .unavailable: return L10n.tr("iCloud isn't available right now. Check that iCloud is enabled, then try again.")
+                    case .staleIgnored: return L10n.tr("This device is already using your latest iCloud data.")
+                    case .decodeFailed: return L10n.tr("We couldn't read your iCloud data right now. Try again in a moment.")
                     }
                 }()
                 showCloudRestoreMessage = true
             }
-            Button("Cancel", role: .cancel) {}
+            Button(L10n.tr("Cancel"), role: .cancel) {}
         } message: {
-            Text("Use your most recent iCloud snapshot on this device. Current local data will be replaced.")
+            Text(L10n.tr("Use your most recent iCloud snapshot on this device. Current local data will be replaced."))
         }
-        .alert("iCloud Sync", isPresented: $showCloudRestoreMessage) {
-            Button("OK") { cloudRestoreMessage = nil }
+        .alert(L10n.tr("iCloud Sync"), isPresented: $showCloudRestoreMessage) {
+            Button(L10n.tr("OK")) { cloudRestoreMessage = nil }
         } message: {
             Text(cloudRestoreMessage ?? "")
         }
-        .alert("Restore Purchases", isPresented: $showRestoreMessage) {
-            Button("OK") {
+        .alert(L10n.tr("Restore Purchases"), isPresented: $showRestoreMessage) {
+            Button(L10n.tr("OK")) {
                 store.restoreMessage = nil
                 store.error = nil
             }
         } message: {
-            Text(store.restoreMessage ?? store.error ?? "No active subscriptions found.")
+            Text(store.restoreMessage ?? store.error ?? L10n.tr("No active subscriptions found."))
         }
     }
 
@@ -117,7 +117,7 @@ struct ProfileView: View {
 
     private var accountSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Sync & Restore")
+            ForgeSectionHeader(title: L10n.tr("Sync & Restore"))
 
             if let account = vm.account.account {
                 VStack(spacing: 0) {
@@ -128,7 +128,7 @@ struct ProfileView: View {
                             .frame(width: 34, height: 34)
                             .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("iCloud Sync")
+                            Text(L10n.tr("iCloud Sync"))
                                 .font(.subheadline.weight(.bold))
                             Text(signedInCloudSummary(name: account.displayName))
                                 .font(.caption)
@@ -147,8 +147,8 @@ struct ProfileView: View {
                     } label: {
                         accountActionRow(
                             icon: "arrow.clockwise.icloud.fill",
-                            label: "Restore This Device",
-                            detail: "Replace local data with your latest iCloud snapshot"
+                            label: L10n.tr("Restore This Device"),
+                            detail: L10n.tr("Replace local data with your latest iCloud snapshot")
                         )
                     }
 
@@ -157,7 +157,7 @@ struct ProfileView: View {
                     Button {
                         showSignOutAlert = true
                     } label: {
-                        accountActionRow(icon: "rectangle.portrait.and.arrow.right", label: "Sign Out", tint: .red)
+                        accountActionRow(icon: "rectangle.portrait.and.arrow.right", label: L10n.tr("Sign Out"), tint: .red)
                     }
                 }
                 .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
@@ -174,9 +174,9 @@ struct ProfileView: View {
                             .frame(width: 34, height: 34)
                             .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("iCloud Sync")
+                            Text(L10n.tr("iCloud Sync"))
                                 .font(.subheadline.weight(.bold))
-                            Text("Sign in with Apple to keep your training backed up in iCloud and ready to restore on another device.")
+                            Text(L10n.tr("Sign in with Apple to keep your training backed up in iCloud and ready to restore on another device."))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -200,7 +200,7 @@ struct ProfileView: View {
                     .frame(height: 44)
                     .clipShape(.rect(cornerRadius: 11))
 
-                    Text("Your training stays local on this device until you turn sync on.")
+                    Text(L10n.tr("Your training stays local on this device until you turn sync on."))
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                 }
@@ -241,7 +241,7 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
                     .font(.subheadline.weight(.medium))
-                    .foregroundStyle(label == "Sign Out" ? .red : .primary)
+                    .foregroundStyle(label == L10n.tr("Sign Out") ? .red : .primary)
 
                 if let detail {
                     Text(detail)
@@ -264,32 +264,32 @@ struct ProfileView: View {
         let trimmedName: String? = name?.trimmingCharacters(in: .whitespacesAndNewlines)
         let accountLine: String
         if let trimmedName, !trimmedName.isEmpty {
-            accountLine = "Signed in as \(trimmedName)"
+            accountLine = L10n.format("Signed in as %@", trimmedName)
         } else {
-            accountLine = "Signed in with Apple"
+            accountLine = L10n.tr("Signed in with Apple")
         }
         return "\(accountLine) · \(cloudStatusText)"
     }
 
     private var cloudStatusText: String {
         guard vm.cloudSync.isAvailable else {
-            return "iCloud isn't available right now"
+            return L10n.tr("iCloud isn't available right now")
         }
         switch vm.cloudSync.status {
         case .syncing:
-            return "Saving recent changes"
+            return L10n.tr("Saving recent changes")
         case .failed(let reason):
             if reason.localizedCaseInsensitiveContains("too large") {
-                return "Some changes couldn't be saved to iCloud yet"
+                return L10n.tr("Some changes couldn't be saved to iCloud yet")
             }
-            return "Sync paused. Try again shortly"
+            return L10n.tr("Sync paused. Try again shortly")
         case .unavailable:
-            return "iCloud isn't available right now"
+            return L10n.tr("iCloud isn't available right now")
         case .success, .idle:
             if let text = vm.cloudSync.lastSyncText {
-                return "Last synced \(text)"
+                return L10n.format("Last synced %@", text)
             }
-            return "Changes sync automatically"
+            return L10n.tr("Changes sync automatically")
         }
     }
 
@@ -324,7 +324,7 @@ struct ProfileView: View {
                             .frame(width: 34, height: 34)
                             .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("STRQ Pro")
+                            Text(L10n.tr("STRQ Pro"))
                                 .font(.subheadline.weight(.bold))
                             Text(store.subscriptionStatusText)
                                 .font(.caption)
@@ -351,7 +351,7 @@ struct ProfileView: View {
                                 .font(.caption)
                                 .foregroundStyle(STRQBrand.steel)
                                 .frame(width: 24)
-                            Text("Manage Subscription")
+                            Text(L10n.tr("Manage Subscription"))
                                 .font(.subheadline.weight(.medium))
                             Spacer()
                             Image(systemName: "chevron.right")
@@ -380,9 +380,9 @@ struct ProfileView: View {
                                 .frame(width: 34, height: 34)
                                 .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 9))
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("STRQ Pro")
+                                Text(L10n.tr("STRQ Pro"))
                                     .font(.subheadline.weight(.bold))
-                                Text("Deeper coaching, plans that evolve, full ecosystem.")
+                                Text(L10n.tr("Deeper coaching, plans that evolve, full ecosystem."))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                     .lineLimit(2)
@@ -395,10 +395,10 @@ struct ProfileView: View {
                         }
 
                         HStack(spacing: 6) {
-                            proPillarChip(icon: "brain.head.profile.fill", label: "Adaptive")
-                            proPillarChip(icon: "arrow.triangle.2.circlepath", label: "Evolving")
-                            proPillarChip(icon: "icloud.fill", label: "Sync")
-                            proPillarChip(icon: "applewatch", label: "Watch")
+                            proPillarChip(icon: "brain.head.profile.fill", label: L10n.tr("Adaptive"))
+                            proPillarChip(icon: "arrow.triangle.2.circlepath", label: L10n.tr("Evolving"))
+                            proPillarChip(icon: "icloud.fill", label: L10n.tr("Sync"))
+                            proPillarChip(icon: "applewatch", label: L10n.tr("Watch"))
                         }
                     }
                     .padding(14)
@@ -432,7 +432,7 @@ struct ProfileView: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(vm.profile.name.isEmpty ? "Athlete" : vm.profile.name)
+                Text(vm.profile.name.isEmpty ? L10n.tr("Athlete") : vm.profile.name)
                     .font(.system(.title3, design: .rounded, weight: .bold))
                 HStack(spacing: 6) {
                     Text(vm.profile.trainingLevel.shortName)
@@ -485,27 +485,27 @@ struct ProfileView: View {
                 statusChip(
                     icon: "heart.fill",
                     value: "\(vm.effectiveRecoveryScore)%",
-                    label: "Recovery",
+                    label: L10n.tr("Recovery"),
                     color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore)
                 )
                 statusChip(
                     icon: "moon.zzz.fill",
                     value: String(format: "%.1fh", vm.averageSleepHours),
-                    label: "Sleep",
+                    label: L10n.tr("Sleep"),
                     color: ForgeTheme.sleepColor(for: vm.averageSleepHours)
                 )
                 if vm.profile.nutritionTrackingEnabled {
                     statusChip(
                         icon: "fork.knife",
                         value: "\(Int(vm.weeklyNutritionAdherence * 100))%",
-                        label: "Nutrition",
+                        label: L10n.tr("Nutrition"),
                         color: vm.weeklyNutritionAdherence >= 0.8 ? STRQPalette.success : STRQBrand.steel
                     )
                 } else {
                     statusChip(
                         icon: "flame.fill",
                         value: "\(vm.streak)",
-                        label: "Streak",
+                        label: L10n.tr("Streak"),
                         color: STRQBrand.steel
                     )
                 }
@@ -545,20 +545,20 @@ struct ProfileView: View {
 
     private var trainingSetup: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Training Setup")
+            ForgeSectionHeader(title: L10n.tr("Training Setup"))
 
             VStack(spacing: 1) {
-                profileRow("Days / Week", value: "\(vm.profile.daysPerWeek)")
-                profileRow("Session Length", value: "\(vm.profile.minutesPerSession) min")
-                profileRow("Split", value: vm.profile.splitPreference.displayName)
-                profileRow("Location", value: vm.profile.trainingLocation.displayName)
+                profileRow(L10n.tr("Days / Week"), value: "\(vm.profile.daysPerWeek)")
+                profileRow(L10n.tr("Session Length"), value: L10n.format("%d min", vm.profile.minutesPerSession))
+                profileRow(L10n.tr("Split"), value: vm.profile.splitPreference.displayName)
+                profileRow(L10n.tr("Location"), value: vm.profile.trainingLocation.displayName)
             }
             .clipShape(.rect(cornerRadius: 12))
 
             if !vm.profile.focusMuscles.isEmpty {
                 ScrollView(.horizontal) {
                     HStack(spacing: 6) {
-                        Text("Focus:")
+                        Text(L10n.tr("Focus:"))
                             .font(.caption.weight(.bold))
                             .foregroundStyle(.tertiary)
                         ForEach(vm.profile.focusMuscles) { muscle in
@@ -576,18 +576,18 @@ struct ProfileView: View {
 
     private var bodyNutrition: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Body & Nutrition")
+            ForgeSectionHeader(title: L10n.tr("Body & Nutrition"))
 
             trackingToggleCard
 
             VStack(spacing: 1) {
-                profileRow("Height", value: "\(Int(vm.profile.heightCm)) cm")
-                profileRow("Weight", value: String(format: "%.1f kg", vm.profile.weightKg))
-                profileRow("Age", value: "\(vm.profile.age)")
+                profileRow(L10n.tr("Height"), value: L10n.format("%d cm", Int(vm.profile.heightCm)))
+                profileRow(L10n.tr("Weight"), value: L10n.format("%.1f kg", vm.profile.weightKg))
+                profileRow(L10n.tr("Age"), value: "\(vm.profile.age)")
                 if vm.profile.nutritionTrackingEnabled {
-                    profileRow("Calories", value: "\(vm.nutritionTarget.calories) kcal")
-                    profileRow("Protein", value: "\(vm.nutritionTarget.proteinGrams)g")
-                    profileRow("Goal", value: vm.nutritionTarget.nutritionGoal.displayName)
+                    profileRow(L10n.tr("Calories"), value: L10n.format("%d kcal", vm.nutritionTarget.calories))
+                    profileRow(L10n.tr("Protein"), value: L10n.format("%dg", vm.nutritionTarget.proteinGrams))
+                    profileRow(L10n.tr("Goal"), value: vm.nutritionTarget.nutritionGoal.displayName)
                 }
             }
             .clipShape(.rect(cornerRadius: 12))
@@ -595,7 +595,7 @@ struct ProfileView: View {
             HStack(spacing: 10) {
                 if vm.profile.nutritionTrackingEnabled {
                     Button { showNutritionSettings = true } label: {
-                        Label("Edit Targets", systemImage: "slider.horizontal.3")
+                        Label(L10n.tr("Edit Targets"), systemImage: "slider.horizontal.3")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(STRQBrand.steel)
                             .frame(maxWidth: .infinity)
@@ -610,7 +610,7 @@ struct ProfileView: View {
                 }
 
                 Button { showSleepLog = true } label: {
-                    Label("Sleep Log", systemImage: "moon.zzz.fill")
+                    Label(L10n.tr("Sleep Log"), systemImage: "moon.zzz.fill")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(STRQBrand.steel)
                         .frame(maxWidth: .infinity)
@@ -645,11 +645,11 @@ struct ProfileView: View {
                         .frame(width: 30, height: 30)
                         .background((on ? STRQPalette.success : STRQPalette.info).opacity(0.12), in: .rect(cornerRadius: 8))
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Physique & Nutrition Coaching")
+                        Text(L10n.tr("Physique & Nutrition Coaching"))
                             .font(.subheadline.weight(.semibold))
                         Text(on
-                            ? "STRQ uses weigh-ins and nutrition logs to read body-composition progress."
-                            : "Optional. Training and recovery coaching stay fully active without food or bodyweight logs.")
+                            ? L10n.tr("STRQ uses weigh-ins and nutrition logs to read body-composition progress.")
+                            : L10n.tr("Optional. Training and recovery coaching stay fully active without food or bodyweight logs."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -682,10 +682,10 @@ struct ProfileView: View {
 
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 6) {
-                        Text("Coaching Style")
+                        Text(L10n.tr("Coaching Style"))
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.primary)
-                        Text("PERSONAL")
+                        Text(L10n.tr("PERSONAL"))
                             .font(.system(size: 9, weight: .black))
                             .tracking(0.8)
                             .foregroundStyle(STRQBrand.steel)
@@ -729,18 +729,18 @@ struct ProfileView: View {
 
     private var controlsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Notifications & Tools")
+            ForgeSectionHeader(title: L10n.tr("Notifications & Tools"))
 
             VStack(spacing: 1) {
                 NavigationLink {
                     NotificationSettingsView(vm: vm)
                 } label: {
-                    controlRowContent("Notifications", icon: "bell.fill", color: STRQBrand.steel)
+                    controlRowContent(L10n.tr("Notifications"), icon: "bell.fill", color: STRQBrand.steel)
                         .background(Color(.secondarySystemGroupedBackground))
                 }
-                controlRow("Restore Purchases", icon: "arrow.clockwise", color: STRQBrand.steel) {
+                controlRow(L10n.tr("Restore Purchases"), icon: "arrow.clockwise", color: STRQBrand.steel) {
                     guard store.isConfigured else {
-                        store.restoreMessage = "Subscriptions are not available in this environment."
+                        store.restoreMessage = L10n.tr("Subscriptions are not available in this environment.")
                         showRestoreMessage = true
                         return
                     }
@@ -749,7 +749,7 @@ struct ProfileView: View {
                         showRestoreMessage = true
                     }
                 }
-                controlRow("Regenerate Plan", icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
+                controlRow(L10n.tr("Regenerate Plan"), icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
                     vm.generatePlan()
                 }
             }
@@ -779,11 +779,11 @@ struct ProfileView: View {
 
     private var legalLinks: some View {
         HStack(spacing: 18) {
-            Link("Privacy", destination: STRQLinks.privacy)
+            Link(L10n.tr("Privacy"), destination: STRQLinks.privacy)
             Text("·").foregroundStyle(.quaternary)
-            Link("Terms", destination: STRQLinks.terms)
+            Link(L10n.tr("Terms"), destination: STRQLinks.terms)
             Text("·").foregroundStyle(.quaternary)
-            Link("Support", destination: STRQLinks.support)
+            Link(L10n.tr("Support"), destination: STRQLinks.support)
         }
         .font(.caption.weight(.medium))
         .foregroundStyle(.secondary)
@@ -792,10 +792,10 @@ struct ProfileView: View {
 
     private var dangerSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "Danger Zone")
+            ForgeSectionHeader(title: L10n.tr("Danger Zone"))
 
             VStack(spacing: 1) {
-                controlRow("Reset All Data", icon: "trash.fill", color: .red) {
+                controlRow(L10n.tr("Reset All Data"), icon: "trash.fill", color: .red) {
                     showResetAlert = true
                 }
             }
@@ -809,9 +809,9 @@ struct ProfileView: View {
 
     private var profileHeaderSummary: String {
         if vm.isEarlyStage {
-            return "Your setup is locked in. STRQ is building its first read on your training rhythm."
+            return L10n.tr("Your setup is locked in. STRQ is building its first read on your training rhythm.")
         }
-        return "Your coaching profile, recovery context, and continuity settings in one place."
+        return L10n.tr("Your coaching profile, recovery context, and continuity settings in one place.")
     }
 
     private var appVersionString: String {
@@ -853,7 +853,7 @@ struct ProfileView: View {
                 .background(color.opacity(0.12), in: .rect(cornerRadius: 8))
             Text(label)
                 .font(.subheadline)
-                .foregroundStyle(label.contains("Reset") ? .red : .primary)
+                .foregroundStyle(label.contains(L10n.tr("Reset")) ? .red : .primary)
             Spacer()
             Image(systemName: "chevron.right")
                 .font(.caption2.weight(.semibold))
@@ -865,14 +865,14 @@ struct ProfileView: View {
 
     private var goalDescription: String {
         switch vm.profile.goal {
-        case .muscleGain: "Hypertrophy-focused training for lean muscle growth"
-        case .strength: "Maximizing strength on key compound lifts"
-        case .fatLoss: "Training with metabolic demand for fat reduction"
-        case .generalFitness: "Balanced training for overall health"
-        case .endurance: "Building cardiovascular and muscular endurance"
-        case .flexibility: "Improving range of motion and mobility"
-        case .athleticPerformance: "Sport-specific training for peak performance"
-        case .rehabilitation: "Safe, progressive training for recovery"
+        case .muscleGain: L10n.tr("Hypertrophy-focused training for lean muscle growth")
+        case .strength: L10n.tr("Maximizing strength on key compound lifts")
+        case .fatLoss: L10n.tr("Training with metabolic demand for fat reduction")
+        case .generalFitness: L10n.tr("Balanced training for overall health")
+        case .endurance: L10n.tr("Building cardiovascular and muscular endurance")
+        case .flexibility: L10n.tr("Improving range of motion and mobility")
+        case .athleticPerformance: L10n.tr("Sport-specific training for peak performance")
+        case .rehabilitation: L10n.tr("Safe, progressive training for recovery")
         }
     }
 }

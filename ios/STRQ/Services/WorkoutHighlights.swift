@@ -111,12 +111,12 @@ nonisolated enum WorkoutHighlightBuilder {
             let score = 1000.0 + estimatedOneRM(set) - Double(idx) * 1.0
             out.append(WorkoutHighlight(
                 kind: .personalRecord,
-                title: "Personal Record",
+                title: L10n.tr("Personal Record"),
                 subtitle: name,
                 valuePrimary: formatWeightReps(set.weight, set.reps),
-                valueSecondary: String(format: "e1RM %.0f", estimatedOneRM(set)),
+                valueSecondary: L10n.format("e1RM %.0f", estimatedOneRM(set)),
                 score: score,
-                improvedLine: "New PR on \(name)"
+                improvedLine: L10n.format("New PR on %@", name)
             ))
         }
 
@@ -141,12 +141,12 @@ nonisolated enum WorkoutHighlightBuilder {
                 let score = 600.0 + imp.delta - Double(idx) * 1.0
                 out.append(WorkoutHighlight(
                     kind: .bestSet,
-                    title: "Best Set",
+                    title: L10n.tr("Best Set"),
                     subtitle: imp.name,
                     valuePrimary: formatWeightReps(imp.now.weight, imp.now.reps),
-                    valueSecondary: "vs \(formatWeightReps(imp.before.weight, imp.before.reps))",
+                    valueSecondary: L10n.format("vs %@", formatWeightReps(imp.before.weight, imp.before.reps)),
                     score: score,
-                    improvedLine: "Beat last \(imp.name)"
+                    improvedLine: L10n.format("Beat last %@", imp.name)
                 ))
             }
         }
@@ -162,24 +162,24 @@ nonisolated enum WorkoutHighlightBuilder {
                 let score = positive ? 400.0 + abs(pct) * 100 : 150.0 - abs(pct) * 100
                 out.append(WorkoutHighlight(
                     kind: positive ? .volumeUp : .volumeDown,
-                    title: positive ? "Volume Up" : "Volume Down",
-                    subtitle: "vs last session",
-                    valuePrimary: String(format: "%@%.0f kg", positive ? "+" : "", delta),
-                    valueSecondary: String(format: "%@%.0f%%", positive ? "+" : "", pct * 100),
+                    title: positive ? L10n.tr("Volume Up") : L10n.tr("Volume Down"),
+                    subtitle: L10n.tr("vs last session"),
+                    valuePrimary: L10n.format("%@%.0f kg", positive ? "+" : "", delta),
+                    valueSecondary: L10n.format("%@%.0f%%", positive ? "+" : "", pct * 100),
                     score: score,
-                    improvedLine: positive ? "Most volume in recent sessions" : nil
+                    improvedLine: positive ? L10n.tr("Most volume in recent sessions") : nil
                 ))
             }
         } else if previous == nil {
             // First session — meaningful baseline, score high to be the verdict.
             out.append(WorkoutHighlight(
                 kind: .firstTime,
-                title: "Baseline Set",
+                title: L10n.tr("Baseline Set"),
                 subtitle: session.dayName,
-                valuePrimary: String(format: "%.0f kg", session.totalVolume),
-                valueSecondary: "total volume",
+                valuePrimary: L10n.format("%.0f kg", session.totalVolume),
+                valueSecondary: L10n.tr("total volume"),
                 score: 700,
-                improvedLine: "First session logged — baseline set"
+                improvedLine: L10n.tr("First session logged — baseline set")
             ))
         }
 
@@ -190,12 +190,12 @@ nonisolated enum WorkoutHighlightBuilder {
             if allClean && matchedOrBetter {
                 out.append(WorkoutHighlight(
                     kind: .consolidation,
-                    title: "Consolidated",
-                    subtitle: "clean execution",
-                    valuePrimary: "HOLD",
-                    valueSecondary: "ready to push",
+                    title: L10n.tr("Consolidated"),
+                    subtitle: L10n.tr("clean execution"),
+                    valuePrimary: L10n.tr("HOLD"),
+                    valueSecondary: L10n.tr("ready to push"),
                     score: 350,
-                    improvedLine: "Technique held — ready to push next time"
+                    improvedLine: L10n.tr("Technique held — ready to push next time")
                 ))
             }
         }
@@ -209,10 +209,10 @@ nonisolated enum WorkoutHighlightBuilder {
             if duration >= previousLongest && duration > 30 && previousLongest > 0 {
                 out.append(WorkoutHighlight(
                     kind: .longestSession,
-                    title: "Longest Session",
-                    subtitle: "new personal best",
-                    valuePrimary: "\(duration) min",
-                    valueSecondary: "prev \(previousLongest) min",
+                    title: L10n.tr("Longest Session"),
+                    subtitle: L10n.tr("new personal best"),
+                    valuePrimary: L10n.format("%d min", duration),
+                    valueSecondary: L10n.format("prev %d min", previousLongest),
                     score: 220
                 ))
             }
@@ -222,10 +222,10 @@ nonisolated enum WorkoutHighlightBuilder {
         if [3, 5, 7, 10, 14, 21, 30, 50, 100].contains(streak) {
             out.append(WorkoutHighlight(
                 kind: .streakMilestone,
-                title: "Streak",
-                subtitle: "consecutive days",
-                valuePrimary: "\(streak)",
-                valueSecondary: "days",
+                title: L10n.tr("Streak"),
+                subtitle: L10n.tr("consecutive days"),
+                valuePrimary: L10n.format("%d", streak),
+                valueSecondary: L10n.tr("days"),
                 score: 120 + Double(streak)
             ))
         }
@@ -235,10 +235,10 @@ nonisolated enum WorkoutHighlightBuilder {
         if [50, 100, 250, 500, 1000, 2500, 5000].contains(totalHistorySets) {
             out.append(WorkoutHighlight(
                 kind: .setsMilestone,
-                title: "Sets Milestone",
-                subtitle: "lifetime",
-                valuePrimary: "\(totalHistorySets)",
-                valueSecondary: "total sets",
+                title: L10n.tr("Sets Milestone"),
+                subtitle: L10n.tr("lifetime"),
+                valuePrimary: L10n.format("%d", totalHistorySets),
+                valueSecondary: L10n.tr("total sets"),
                 score: 100
             ))
         }
@@ -272,27 +272,27 @@ nonisolated enum WorkoutHighlightBuilder {
         if let top = highlights.first {
             switch top.kind {
             case .personalRecord:
-                return SessionVerdict(kind: .personalRecord, eyebrow: "NEW PERSONAL RECORD", summary: top.improvedLine ?? "New PR set")
+                return SessionVerdict(kind: .personalRecord, eyebrow: L10n.tr("NEW PERSONAL RECORD"), summary: top.improvedLine ?? L10n.tr("New PR set"))
             case .bestSet:
-                return SessionVerdict(kind: .bestSet, eyebrow: "BEST SET", summary: top.improvedLine ?? "Beat your last session")
+                return SessionVerdict(kind: .bestSet, eyebrow: L10n.tr("BEST SET"), summary: top.improvedLine ?? L10n.tr("Beat your last session"))
             case .volumeUp:
-                return SessionVerdict(kind: .volumeUp, eyebrow: "VOLUME UP", summary: top.improvedLine ?? "More work than last time")
+                return SessionVerdict(kind: .volumeUp, eyebrow: L10n.tr("VOLUME UP"), summary: top.improvedLine ?? L10n.tr("More work than last time"))
             case .volumeDown:
-                return SessionVerdict(kind: .volumeDown, eyebrow: "SESSION LOGGED", summary: "Lighter day — quality over load")
+                return SessionVerdict(kind: .volumeDown, eyebrow: L10n.tr("SESSION LOGGED"), summary: L10n.tr("Lighter day — quality over load"))
             case .firstTime:
-                return SessionVerdict(kind: .firstSession, eyebrow: "FIRST SESSION", summary: top.improvedLine ?? "Baseline set")
+                return SessionVerdict(kind: .firstSession, eyebrow: L10n.tr("FIRST SESSION"), summary: top.improvedLine ?? L10n.tr("Baseline set"))
             case .consolidation:
-                return SessionVerdict(kind: .consolidated, eyebrow: "CONSOLIDATED", summary: top.improvedLine ?? "Technique held")
+                return SessionVerdict(kind: .consolidated, eyebrow: L10n.tr("CONSOLIDATED"), summary: top.improvedLine ?? L10n.tr("Technique held"))
             case .longestSession, .streakMilestone, .setsMilestone:
-                return SessionVerdict(kind: .bestSet, eyebrow: "SESSION LOGGED", summary: "Work put in")
+                return SessionVerdict(kind: .bestSet, eyebrow: L10n.tr("SESSION LOGGED"), summary: L10n.tr("Work put in"))
             }
         }
         // No highlights — still reasonable summary
         let previous = history.filter { $0.id != session.id && $0.isCompleted }.first
         if previous == nil {
-            return SessionVerdict(kind: .firstSession, eyebrow: "FIRST SESSION", summary: "Baseline set")
+            return SessionVerdict(kind: .firstSession, eyebrow: L10n.tr("FIRST SESSION"), summary: L10n.tr("Baseline set"))
         }
-        return SessionVerdict(kind: .consolidated, eyebrow: "SESSION LOGGED", summary: "Session in the bank")
+        return SessionVerdict(kind: .consolidated, eyebrow: L10n.tr("SESSION LOGGED"), summary: L10n.tr("Session in the bank"))
     }
 
     // MARK: - Helpers
