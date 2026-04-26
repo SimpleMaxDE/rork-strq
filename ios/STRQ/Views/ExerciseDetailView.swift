@@ -101,7 +101,7 @@ struct ExerciseDetailView: View {
                 }
             }
             ToolbarItem(placement: .topBarLeading) {
-                Button("Done") { dismiss() }
+                Button(L10n.tr("Done")) { dismiss() }
             }
         }
         .sheet(item: $selectedAlternative) { alt in
@@ -208,7 +208,7 @@ struct ExerciseDetailView: View {
             Image(systemName: "circle.dashed")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
-            Text("Log a set to unlock today's guidance.")
+            Text(L10n.tr("Log a set to unlock today's guidance."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Spacer()
@@ -242,7 +242,7 @@ struct ExerciseDetailView: View {
                 Image(systemName: "calendar.badge.clock")
                     .font(.caption)
                     .foregroundStyle(STRQPalette.info)
-                Text("WHY STRQ PICKED THIS")
+                Text(L10n.tr("WHY STRQ PICKED THIS"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQPalette.info)
                     .tracking(0.5)
@@ -299,7 +299,7 @@ struct ExerciseDetailView: View {
                 Image(systemName: "scalemass.fill")
                     .font(.caption)
                     .foregroundStyle(STRQPalette.success)
-                Text("SUGGESTED LOAD")
+                Text(L10n.tr("SUGGESTED LOAD"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
@@ -314,7 +314,7 @@ struct ExerciseDetailView: View {
 
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Weight")
+                    Text(L10n.tr("Weight"))
                         .font(.system(size: 9, weight: .medium))
                         .foregroundStyle(.tertiary)
                     Text(suggestion.formattedWeight)
@@ -322,7 +322,7 @@ struct ExerciseDetailView: View {
                         .foregroundStyle(STRQPalette.success)
                 }
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Reps")
+                    Text(L10n.tr("Reps"))
                         .font(.system(size: 9, weight: .medium))
                         .foregroundStyle(.tertiary)
                     Text(suggestion.repTarget)
@@ -346,7 +346,7 @@ struct ExerciseDetailView: View {
                 Image(systemName: g.icon)
                     .font(.caption)
                     .foregroundStyle(color)
-                Text("NEXT SESSION")
+                Text(L10n.tr("NEXT SESSION"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
@@ -385,7 +385,7 @@ struct ExerciseDetailView: View {
                 Image(systemName: prog.plateauStatus.icon)
                     .font(.caption)
                     .foregroundStyle(statusColor)
-                Text("PROGRESSION STATUS")
+                Text(L10n.tr("PROGRESSION STATUS"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
@@ -400,21 +400,21 @@ struct ExerciseDetailView: View {
 
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Last")
+                    Text(L10n.tr("Last"))
                         .font(.system(size: 9, weight: .medium))
                         .foregroundStyle(.tertiary)
                     Text("\(String(format: "%.1f", prog.lastWeight)) kg × \(prog.lastReps)")
                         .font(.caption.weight(.semibold))
                 }
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Sessions")
+                    Text(L10n.tr("Sessions"))
                         .font(.system(size: 9, weight: .medium))
                         .foregroundStyle(.tertiary)
                     Text("\(prog.sessionCount)")
                         .font(.caption.weight(.semibold))
                 }
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Strategy")
+                    Text(L10n.tr("Strategy"))
                         .font(.system(size: 9, weight: .medium))
                         .foregroundStyle(.tertiary)
                     Text(prog.recommendedStrategy.displayName)
@@ -449,7 +449,7 @@ struct ExerciseDetailView: View {
 
                 VStack(alignment: .leading, spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("PRIMARY")
+                        Text(L10n.tr("PRIMARY"))
                             .font(.system(size: 9, weight: .bold))
                             .foregroundStyle(STRQBrand.steel)
                             .tracking(0.5)
@@ -464,7 +464,7 @@ struct ExerciseDetailView: View {
 
                     if !exercise.secondaryMuscles.isEmpty {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("SECONDARY")
+                            Text(L10n.tr("SECONDARY"))
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundStyle(.secondary)
                                 .tracking(0.5)
@@ -549,7 +549,7 @@ struct ExerciseDetailView: View {
                 Image(systemName: "checkmark.seal.fill")
                     .font(.system(size: 10))
                     .foregroundStyle(STRQPalette.success)
-                Text("DO THIS")
+                Text(L10n.tr("DO THIS"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(0.8)
                     .foregroundStyle(STRQPalette.success)
@@ -582,7 +582,7 @@ struct ExerciseDetailView: View {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 10))
                     .foregroundStyle(STRQPalette.danger)
-                Text("AVOID THIS")
+                Text(L10n.tr("AVOID THIS"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(0.8)
                     .foregroundStyle(STRQPalette.danger)
@@ -762,7 +762,7 @@ struct ExerciseDetailView: View {
                         Text(exercise.name)
                             .font(.subheadline.weight(.semibold))
                         Spacer()
-                        Text("Current")
+                        Text(L10n.tr("Current"))
                             .font(.caption.weight(.bold))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 8)
@@ -828,7 +828,7 @@ struct ExerciseDetailView: View {
                                 Image(systemName: "arrow.up.right")
                                     .font(.system(size: 10))
                                     .foregroundStyle(.purple)
-                                Text("PROGRESSION PATH")
+                                Text(L10n.tr("PROGRESSION PATH"))
                                     .font(.system(size: 9, weight: .bold))
                                     .foregroundStyle(.purple)
                                     .tracking(0.5)
@@ -872,7 +872,7 @@ struct ExerciseDetailView: View {
                                 Image(systemName: "rectangle.stack.fill")
                                     .font(.system(size: 10))
                                     .foregroundStyle(.secondary)
-                                Text("FAMILY MEMBERS")
+                                Text(L10n.tr("FAMILY MEMBERS"))
                                     .font(.system(size: 9, weight: .bold))
                                     .foregroundStyle(.secondary)
                                     .tracking(0.5)

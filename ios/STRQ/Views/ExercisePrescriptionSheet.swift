@@ -21,11 +21,11 @@ struct ExercisePrescriptionSheet: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Exercise Details")
+        .navigationTitle(L10n.tr("Exercise Details"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") { dismiss() }
+                Button(L10n.tr("Done")) { dismiss() }
             }
         }
         .onAppear {
@@ -45,7 +45,7 @@ struct ExercisePrescriptionSheet: View {
                 Image(systemName: t.decision.icon)
                     .font(.caption)
                     .foregroundStyle(color)
-                Text("TODAY")
+                Text(L10n.tr("TODAY"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(color)
                     .tracking(0.6)
@@ -212,28 +212,28 @@ struct ExercisePrescriptionSheet: View {
         VStack(spacing: 12) {
             prescriptionCard(
                 icon: "questionmark.circle.fill",
-                label: "WHY THIS EXERCISE",
+                label: L10n.tr("WHY THIS EXERCISE"),
                 text: prescription.whyThisExercise,
                 color: STRQPalette.info
             )
 
             prescriptionCard(
                 icon: "rectangle.stack.fill",
-                label: "SETS & REPS",
+                label: L10n.tr("SETS & REPS"),
                 text: prescription.whySetsReps,
                 color: STRQBrand.slate
             )
 
             prescriptionCard(
                 icon: "scalemass.fill",
-                label: "SUGGESTED WEIGHT",
+                label: L10n.tr("SUGGESTED WEIGHT"),
                 text: prescription.whyWeight,
                 color: STRQPalette.success
             )
 
             prescriptionCard(
                 icon: "gauge.with.needle.fill",
-                label: "TARGET EFFORT",
+                label: L10n.tr("TARGET EFFORT"),
                 text: prescription.whyEffort,
                 color: STRQBrand.steel
             )

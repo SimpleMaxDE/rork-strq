@@ -115,17 +115,17 @@ struct STRQPaywallView: View {
             }
 
             VStack(spacing: 6) {
-                Text("STRQ PRO")
+                Text(L10n.tr("STRQ PRO"))
                     .font(.system(size: 11, weight: .black))
                     .tracking(2.4)
                     .foregroundStyle(STRQBrand.steel)
 
-                Text("Coaching that keeps learning you")
+                Text(L10n.tr("Coaching that keeps learning you"))
                     .font(.system(.title2, design: .rounded, weight: .bold))
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("Adaptive plans, deeper progression reads, and every session safely carried across your devices.")
+                Text(L10n.tr("Adaptive plans, deeper progression reads, and every session safely carried across your devices."))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -149,8 +149,8 @@ struct STRQPaywallView: View {
         [
             Pillar(
                 icon: "brain.head.profile.fill",
-                title: "Adaptive coaching",
-                detail: "Readiness-aware adjustments and weekly reviews that tune your plan as you train.",
+                title: L10n.tr("Adaptive coaching"),
+                detail: L10n.tr("Readiness-aware adjustments and weekly reviews that tune your plan as you train."),
                 bullets: [
                     "Smart swaps that preserve the training role",
                     "Weekly check-in that reasons about your week",
@@ -159,8 +159,8 @@ struct STRQPaywallView: View {
             ),
             Pillar(
                 icon: "chart.line.uptrend.xyaxis",
-                title: "Deeper progression",
-                detail: "Long-term phase reads, progression memory, and a change log you can trust.",
+                title: L10n.tr("Deeper progression"),
+                detail: L10n.tr("Long-term phase reads, progression memory, and a change log you can trust."),
                 bullets: [
                     "Mesocycle outlook — block, phase, and next shift",
                     "Per-lift progression signals and plateau reads",
@@ -169,8 +169,8 @@ struct STRQPaywallView: View {
             ),
             Pillar(
                 icon: "scalemass.fill",
-                title: "Physique intelligence",
-                detail: "Bodyweight trend and nutrition coaching tuned to your goal — fully opt-in.",
+                title: L10n.tr("Physique intelligence"),
+                detail: L10n.tr("Bodyweight trend and nutrition coaching tuned to your goal — fully opt-in."),
                 bullets: [
                     "Regression-based bodyweight trend with 4-week projection",
                     "Protein and calorie targets that follow your goal",
@@ -179,8 +179,8 @@ struct STRQPaywallView: View {
             ),
             Pillar(
                 icon: "icloud.fill",
-                title: "Ecosystem & continuity",
-                detail: "Your training carried safely across devices, with premium continuity features.",
+                title: L10n.tr("Ecosystem & continuity"),
+                detail: L10n.tr("Your training carried safely across devices, with premium continuity features."),
                 bullets: [
                     "iCloud sync across iPhone, iPad, and Mac",
                     "Smart reminders tuned to your week",
@@ -253,7 +253,7 @@ struct STRQPaywallView: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(STRQBrand.steelGradient)
                     .frame(width: 3, height: 14)
-                Text("WHAT YOU KEEP · WHAT PRO ADDS")
+                Text(L10n.tr("WHAT YOU KEEP · WHAT PRO ADDS"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(STRQBrand.steel)
@@ -262,13 +262,13 @@ struct STRQPaywallView: View {
 
             VStack(spacing: 0) {
                 compareRow(
-                    label: "Plan generation",
+                    label: L10n.tr("Plan generation"),
                     free: "Strong default plans",
                     pro: "Adaptive weekly tuning"
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: "Exercise library",
+                    label: L10n.tr("Exercise library"),
                     free: "Full curated catalog",
                     pro: "Smart swaps & alternatives"
                 )
@@ -280,13 +280,13 @@ struct STRQPaywallView: View {
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: "Physique coaching",
+                    label: L10n.tr("Physique coaching"),
                     free: "Training-only",
                     pro: "Trend · protein · bridge"
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: "Across devices",
+                    label: L10n.tr("Across devices"),
                     free: "This device",
                     pro: "iCloud continuity"
                 )
@@ -307,7 +307,7 @@ struct STRQPaywallView: View {
                 .frame(width: 110, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("FREE")
+                Text(L10n.tr("FREE"))
                     .font(.system(size: 8, weight: .black))
                     .tracking(0.8)
                     .foregroundStyle(.tertiary)
@@ -323,7 +323,7 @@ struct STRQPaywallView: View {
                 HStack(spacing: 3) {
                     Image(systemName: "bolt.fill")
                         .font(.system(size: 7, weight: .black))
-                    Text("PRO")
+                    Text(L10n.tr("PRO"))
                         .font(.system(size: 8, weight: .black))
                         .tracking(0.8)
                 }
@@ -348,7 +348,7 @@ struct STRQPaywallView: View {
             HStack(spacing: 6) {
                 Image(systemName: "lock.open.fill")
                     .font(.system(size: 10, weight: .bold))
-                Text("Try free, cancel anytime before it renews")
+                Text(L10n.tr("Try free, cancel anytime before it renews"))
                     .font(.caption2.weight(.semibold))
             }
             .foregroundStyle(.secondary)
@@ -559,14 +559,14 @@ struct STRQPaywallView: View {
         Button {
             Task { await store.restore() }
         } label: {
-            Text("Restore Purchases")
+            Text(L10n.tr("Restore Purchases"))
                 .font(.caption.weight(.medium))
                 .foregroundStyle(.secondary)
         }
     }
 
     private var legalText: some View {
-        Text("Payment is charged to your Apple ID account. Subscription auto-renews unless cancelled at least 24 hours before the end of the current period.")
+        Text(L10n.tr("Payment is charged to your Apple ID account. Subscription auto-renews unless cancelled at least 24 hours before the end of the current period."))
             .font(.system(size: 9))
             .foregroundStyle(.quaternary)
             .multilineTextAlignment(.center)
@@ -596,7 +596,7 @@ struct STRQPaywallView: View {
                 }
 
                 VStack(spacing: 8) {
-                    Text("You have STRQ Pro")
+                    Text(L10n.tr("You have STRQ Pro"))
                         .font(.system(.title2, design: .rounded, weight: .bold))
                         .tracking(0.3)
 
@@ -619,7 +619,7 @@ struct STRQPaywallView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Text("Done")
+                    Text(L10n.tr("Done"))
                         .font(.body.weight(.bold))
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
@@ -637,7 +637,7 @@ struct STRQPaywallView: View {
     private var loadingState: some View {
         VStack(spacing: 16) {
             ProgressView()
-            Text("Loading plans…")
+            Text(L10n.tr("Loading plans…"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -690,16 +690,16 @@ struct STRQPaywallView: View {
                 Image(systemName: "sparkles")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
-                Text("SUBSCRIPTIONS COMING SOON")
+                Text(L10n.tr("SUBSCRIPTIONS COMING SOON"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.4)
                     .foregroundStyle(STRQBrand.steel)
             }
-            Text("Premium plans will become available once App Store setup is complete.")
+            Text(L10n.tr("Premium plans will become available once App Store setup is complete."))
                 .font(.subheadline.weight(.semibold))
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            Text("You can continue exploring STRQ in the meantime.")
+            Text(L10n.tr("You can continue exploring STRQ in the meantime."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -719,7 +719,7 @@ struct STRQPaywallView: View {
             HStack(spacing: 8) {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 12, weight: .bold))
-                Text("Subscriptions coming soon")
+                Text(L10n.tr("Subscriptions coming soon"))
                     .font(.body.weight(.bold))
             }
             .foregroundStyle(.secondary)
@@ -730,7 +730,7 @@ struct STRQPaywallView: View {
                 RoundedRectangle(cornerRadius: 14)
                     .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
             )
-            Text("Premium plans will appear here once App Store setup is complete.")
+            Text(L10n.tr("Premium plans will appear here once App Store setup is complete."))
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
@@ -751,7 +751,7 @@ struct STRQPaywallView: View {
             Spacer().frame(height: 28)
 
             VStack(spacing: 14) {
-                Text("Subscription plans are currently unavailable.")
+                Text(L10n.tr("Subscription plans are currently unavailable."))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -759,7 +759,7 @@ struct STRQPaywallView: View {
                 Button {
                     Task { await store.fetchOfferings() }
                 } label: {
-                    Text("Try Again")
+                    Text(L10n.tr("Try Again"))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.black)
                         .padding(.horizontal, 28)

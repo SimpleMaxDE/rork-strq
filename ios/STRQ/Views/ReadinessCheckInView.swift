@@ -72,10 +72,10 @@ struct ReadinessCheckInView: View {
             }
             Spacer()
             VStack(spacing: 2) {
-                Text(showResult ? "Ready" : "Daily check-in")
+                Text(showResult ? "Ready" : L10n.tr("Daily check-in"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.primary)
-                Text(showResult ? "Today's plan" : contextLabel)
+                Text(showResult ? L10n.tr("Today's plan") : contextLabel)
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(.secondary)
                     .tracking(0.3)
@@ -131,17 +131,17 @@ struct ReadinessCheckInView: View {
     private var sleepEnergyStep: some View {
         VStack(spacing: 24) {
             stepHeader(
-                title: "How's your body?",
-                subtitle: "Sleep recovery and current energy are the biggest signals for today."
+                title: L10n.tr("How's your body?"),
+                subtitle: L10n.tr("Sleep recovery and current energy are the biggest signals for today.")
             )
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Sleep quality")
+                fieldLabel(L10n.tr("Sleep quality"))
                 readinessSegment(selection: $sleepQuality)
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Energy right now")
+                fieldLabel(L10n.tr("Energy right now"))
                 readinessSegment(selection: $energyLevel)
             }
         }
@@ -151,17 +151,17 @@ struct ReadinessCheckInView: View {
     private var loadStep: some View {
         VStack(spacing: 24) {
             stepHeader(
-                title: "What's taxing you?",
-                subtitle: "Soreness and stress affect what's worth pushing today."
+                title: L10n.tr("What's taxing you?"),
+                subtitle: L10n.tr("Soreness and stress affect what's worth pushing today.")
             )
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Muscle soreness")
+                fieldLabel(L10n.tr("Muscle soreness"))
                 sorenessSegment
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Life stress")
+                fieldLabel(L10n.tr("Life stress"))
                 readinessSegment(selection: $stressLevel, invertSemantic: true)
             }
         }
@@ -171,22 +171,22 @@ struct ReadinessCheckInView: View {
     private var mindsetStep: some View {
         VStack(spacing: 24) {
             stepHeader(
-                title: hasWorkoutToday ? "One more check" : "Mindset check",
+                title: hasWorkoutToday ? L10n.tr("One more check") : L10n.tr("Mindset check"),
                 subtitle: hasWorkoutToday
                     ? "Motivation shapes intent. Pain reshapes the whole session."
                     : "A quick note so STRQ can tune recovery and next session."
             )
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Motivation")
+                fieldLabel(L10n.tr("Motivation"))
                 motivationSegment
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                fieldLabel("Pain or restriction")
+                fieldLabel(L10n.tr("Pain or restriction"))
                 painToggle
                 if painOrRestriction {
-                    TextField("e.g. Left shoulder, lower back", text: $painNote)
+                    TextField(L10n.tr("e.g. Left shoulder, lower back"), text: $painNote)
                         .textFieldStyle(.plain)
                         .focused($painFieldFocused)
                         .submitLabel(.done)
@@ -342,7 +342,7 @@ struct ReadinessCheckInView: View {
     private var painToggle: some View {
         HStack(spacing: 8) {
             painChoiceButton(
-                title: "All clear",
+                title: L10n.tr("All clear"),
                 icon: "checkmark.circle.fill",
                 selected: !painOrRestriction,
                 color: STRQPalette.success
@@ -353,7 +353,7 @@ struct ReadinessCheckInView: View {
                 }
             }
             painChoiceButton(
-                title: "Something's off",
+                title: L10n.tr("Something's off"),
                 icon: "exclamationmark.triangle.fill",
                 selected: painOrRestriction,
                 color: STRQPalette.danger
@@ -418,7 +418,7 @@ struct ReadinessCheckInView: View {
                     VStack(spacing: 2) {
                         Text("\(readiness.readinessScore)")
                             .font(.system(size: 44, weight: .heavy, design: .rounded).monospacedDigit())
-                        Text("READINESS")
+                        Text(L10n.tr("READINESS"))
                             .font(.system(size: 9, weight: .bold))
                             .tracking(0.8)
                             .foregroundStyle(.secondary)
@@ -500,7 +500,7 @@ struct ReadinessCheckInView: View {
                 HStack(spacing: 8) {
                     Image(systemName: hasWorkoutToday ? "figure.strengthtraining.traditional" : "checkmark")
                         .font(.subheadline.weight(.semibold))
-                    Text(hasWorkoutToday ? "Go to today's session" : "Done")
+                    Text(hasWorkoutToday ? L10n.tr("Go to today's session") : "Done")
                         .font(.body.weight(.bold))
                 }
                 .foregroundStyle(.black)
@@ -523,7 +523,7 @@ struct ReadinessCheckInView: View {
             signalRow(label: "Soreness", value: readiness.soreness.label, color: sorenessColor(readiness.soreness))
             if readiness.painOrRestriction {
                 Divider().overlay(Color.white.opacity(0.05))
-                signalRow(label: "Flag", value: readiness.painNote.isEmpty ? "Pain reported" : readiness.painNote, color: STRQPalette.danger)
+                signalRow(label: "Flag", value: readiness.painNote.isEmpty ? L10n.tr("Pain reported") : readiness.painNote, color: STRQPalette.danger)
             }
         }
         .padding(.horizontal, 14)
@@ -557,7 +557,7 @@ struct ReadinessCheckInView: View {
                     Button {
                         withAnimation(.snappy(duration: 0.25)) { currentStep -= 1 }
                     } label: {
-                        Text("Back")
+                        Text(L10n.tr("Back"))
                             .font(.body.weight(.semibold))
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 18)
@@ -576,7 +576,7 @@ struct ReadinessCheckInView: View {
                     }
                 } label: {
                     HStack(spacing: 8) {
-                        Text(currentStep == totalSteps - 1 ? "See today's plan" : "Continue")
+                        Text(currentStep == totalSteps - 1 ? L10n.tr("See today's plan") : "Continue")
                             .font(.body.weight(.bold))
                         Image(systemName: currentStep == totalSteps - 1 ? "sparkles" : "arrow.right")
                             .font(.subheadline.weight(.bold))

@@ -21,7 +21,7 @@ struct SleepLogView: View {
             .padding(.bottom, 40)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Sleep & Recovery")
+        .navigationTitle(L10n.tr("Sleep & Recovery"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
@@ -39,7 +39,7 @@ struct SleepLogView: View {
                 Image(systemName: "moon.stars.fill")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(STRQBrand.steel)
-                Text("RECOVERY STATUS")
+                Text(L10n.tr("RECOVERY STATUS"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
@@ -67,7 +67,7 @@ struct SleepLogView: View {
                         Text("\(recoveryScore)")
                             .font(.system(size: 16, weight: .bold, design: .rounded).monospacedDigit())
                     }
-                    Text("Recovery")
+                    Text(L10n.tr("Recovery"))
                         .font(.system(size: 9, weight: .medium))
                         .foregroundStyle(.secondary)
                 }
@@ -80,7 +80,7 @@ struct SleepLogView: View {
                         VStack(alignment: .leading, spacing: 1) {
                             Text(String(format: "%.1fh avg", avgSleep))
                                 .font(.subheadline.weight(.semibold).monospacedDigit())
-                            Text("7-day sleep")
+                            Text(L10n.tr("7-day sleep"))
                                 .font(.system(size: 9))
                                 .foregroundStyle(.secondary)
                         }
@@ -93,7 +93,7 @@ struct SleepLogView: View {
                         VStack(alignment: .leading, spacing: 1) {
                             Text(vm.sleepQualityLabel)
                                 .font(.subheadline.weight(.semibold))
-                            Text("Sleep quality")
+                            Text(L10n.tr("Sleep quality"))
                                 .font(.system(size: 9))
                                 .foregroundStyle(.secondary)
                         }
@@ -107,7 +107,7 @@ struct SleepLogView: View {
                             Text(sleepTrainingImpact)
                                 .font(.subheadline.weight(.semibold))
                                 .lineLimit(1)
-                            Text("Training impact")
+                            Text(L10n.tr("Training impact"))
                                 .font(.system(size: 9))
                                 .foregroundStyle(.secondary)
                         }
@@ -132,10 +132,10 @@ struct SleepLogView: View {
         if entries.count >= 3 {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("Sleep Trend")
+                    Text(L10n.tr("Sleep Trend"))
                         .font(.subheadline.weight(.semibold))
                     Spacer()
-                    Text("14 Days")
+                    Text(L10n.tr("14 Days"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -154,7 +154,7 @@ struct SleepLogView: View {
                         .foregroundStyle(.green.opacity(0.5))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
                         .annotation(position: .top, alignment: .trailing) {
-                            Text("7h target")
+                            Text(L10n.tr("7h target"))
                                 .font(.system(size: 8, weight: .semibold))
                                 .foregroundStyle(.green)
                         }
@@ -176,11 +176,11 @@ struct SleepLogView: View {
                 HStack(spacing: 14) {
                     HStack(spacing: 4) {
                         RoundedRectangle(cornerRadius: 2).fill(Color.white).frame(width: 10, height: 10)
-                        Text("≥ 7h").font(.caption2).foregroundStyle(.secondary)
+                        Text(L10n.tr("≥ 7h")).font(.caption2).foregroundStyle(.secondary)
                     }
                     HStack(spacing: 4) {
                         RoundedRectangle(cornerRadius: 2).fill(STRQBrand.steel).frame(width: 10, height: 10)
-                        Text("< 7h").font(.caption2).foregroundStyle(.secondary)
+                        Text(L10n.tr("< 7h")).font(.caption2).foregroundStyle(.secondary)
                     }
                     Spacer()
                     let goodNights = entries.filter { $0.hoursSlept >= 7 }.count
@@ -199,12 +199,12 @@ struct SleepLogView: View {
 
     private var quickLogCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Log Tonight's Sleep")
+            Text(L10n.tr("Log Tonight's Sleep"))
                 .font(.headline)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("Hours Slept")
+                    Text(L10n.tr("Hours Slept"))
                         .font(.subheadline.weight(.medium))
                     Spacer()
                     Text(String(format: "%.1fh", hoursInput))
@@ -236,7 +236,7 @@ struct SleepLogView: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Sleep Quality")
+                Text(L10n.tr("Sleep Quality"))
                     .font(.subheadline.weight(.medium))
 
                 HStack(spacing: 6) {
@@ -272,7 +272,7 @@ struct SleepLogView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "moon.zzz.fill")
                         .font(.subheadline)
-                    Text("Log Sleep")
+                    Text(L10n.tr("Log Sleep"))
                         .font(.body.weight(.semibold))
                 }
                 .foregroundStyle(.black)
@@ -300,7 +300,7 @@ struct SleepLogView: View {
                     Image(systemName: "figure.strengthtraining.traditional")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(STRQBrand.steel)
-                    Text("HOW SLEEP AFFECTS YOUR TRAINING")
+                    Text(L10n.tr("HOW SLEEP AFFECTS YOUR TRAINING"))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(STRQBrand.steel)
                         .tracking(0.5)
@@ -340,7 +340,7 @@ struct SleepLogView: View {
     private var recentSleepList: some View {
         if !vm.sleepEntries.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Recent Sleep")
+                Text(L10n.tr("Recent Sleep"))
                     .font(.headline)
 
                 ForEach(vm.sleepEntries.prefix(10)) { entry in
@@ -405,28 +405,28 @@ struct SleepLogView: View {
             results.append((
                 icon: "exclamationmark.triangle.fill",
                 color: .red,
-                title: "Muscle Recovery Impaired",
-                message: "Under 6.5h average sleep significantly reduces muscle protein synthesis and growth hormone release."
+                title: L10n.tr("Muscle Recovery Impaired"),
+                message: L10n.tr("Under 6.5h average sleep significantly reduces muscle protein synthesis and growth hormone release.")
             ))
             results.append((
                 icon: "bolt.slash.fill",
                 color: STRQBrand.steel,
-                title: "Strength Output Reduced",
-                message: "Sleep debt reduces maximal strength by 5-10%. Consider lighter loads until sleep improves."
+                title: L10n.tr("Strength Output Reduced"),
+                message: L10n.tr("Sleep debt reduces maximal strength by 5-10%. Consider lighter loads until sleep improves.")
             ))
         } else if avg < 7.5 {
             results.append((
                 icon: "exclamationmark.circle.fill",
                 color: .yellow,
-                title: "Recovery Slightly Limited",
-                message: "Aim for 7.5h+ to fully support your training. Current sleep may slow progress slightly."
+                title: L10n.tr("Recovery Slightly Limited"),
+                message: L10n.tr("Aim for 7.5h+ to fully support your training. Current sleep may slow progress slightly.")
             ))
         } else {
             results.append((
                 icon: "checkmark.circle.fill",
                 color: .green,
-                title: "Recovery Well Supported",
-                message: "Your sleep is supporting muscle recovery and performance. Keep this consistency."
+                title: L10n.tr("Recovery Well Supported"),
+                message: L10n.tr("Your sleep is supporting muscle recovery and performance. Keep this consistency.")
             ))
         }
 
@@ -436,7 +436,7 @@ struct SleepLogView: View {
             results.append((
                 icon: "moon.haze.fill",
                 color: STRQBrand.steel,
-                title: "Sleep Quality Declining",
+                title: L10n.tr("Sleep Quality Declining"),
                 message: "\(poorNights) poor-quality nights this week. Quality matters as much as duration for recovery."
             ))
         }

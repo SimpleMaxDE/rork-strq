@@ -109,7 +109,7 @@ struct DashboardView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Today")
+        .navigationTitle(L10n.tr("Today"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
@@ -156,7 +156,7 @@ struct DashboardView: View {
                 Text(greeting)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Text(vm.profile.name.isEmpty ? "Athlete" : vm.profile.name)
+                Text(vm.profile.name.isEmpty ? L10n.tr("Athlete") : vm.profile.name)
                     .font(.system(.title2, design: .rounded, weight: .bold))
             }
             Spacer()
@@ -185,7 +185,7 @@ struct DashboardView: View {
                         Text("\(score)")
                             .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
                     }
-                    Text("Ready")
+                    Text(L10n.tr("Ready"))
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
@@ -314,7 +314,7 @@ struct DashboardView: View {
     private func primaryCTA(_ primary: DailyBriefing.Primary) -> some View {
         switch primary.kind {
         case .checkInBeforeTraining:
-            ForgePrimaryButton(icon: "heart.text.clipboard", title: "Check in") {
+            ForgePrimaryButton(icon: "heart.text.clipboard", title: L10n.tr("Check in")) {
                 showReadinessCheckIn = true
             }
         case .logBodyWeight:
@@ -323,13 +323,13 @@ struct DashboardView: View {
             }
         case .startFirstSession:
             if let day = vm.todaysWorkout ?? vm.nextWorkout {
-                ForgePrimaryButton(icon: "sparkles", title: "Start Session 1") {
+                ForgePrimaryButton(icon: "sparkles", title: L10n.tr("Start Session 1")) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
             }
         case .resumeWorkout:
             if let day = vm.todaysWorkout {
-                ForgePrimaryButton(icon: "play.fill", title: "Resume Workout") {
+                ForgePrimaryButton(icon: "play.fill", title: L10n.tr("Resume Workout")) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
             }
@@ -342,7 +342,7 @@ struct DashboardView: View {
         HStack(spacing: 4) {
             Image(systemName: "arrow.forward.circle.fill")
                 .font(.system(size: 9, weight: .bold))
-            Text("START HERE")
+            Text(L10n.tr("START HERE"))
                 .font(.system(size: 9, weight: .black))
                 .tracking(0.8)
         }
@@ -372,7 +372,7 @@ struct DashboardView: View {
             session: session,
             history: vm.workoutHistory,
             streak: vm.streak,
-            exerciseName: { id in vm.library.exercise(byId: id)?.name ?? "Exercise" }
+            exerciseName: { id in vm.library.exercise(byId: id)?.name ?? L10n.tr("Exercise") }
         )
         let completedExercises = session.exerciseLogs.filter(\.isCompleted).count
         let completedSets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
@@ -380,12 +380,18 @@ struct DashboardView: View {
         return PostWorkoutBridge(
             sessionName: session.dayName,
             timeLabel: postWorkoutTimeLabel(minutesAgo),
-            stats: "\(completedExercises) exercise\(completedExercises == 1 ? "" : "s") · \(completedSets) set\(completedSets == 1 ? "" : "s")",
+            stats: postWorkoutStatsText(exercises: completedExercises, sets: completedSets),
             takeaway: postWorkoutTakeaway(for: result.verdict.kind),
             nextStep: postWorkoutNextStep(),
             accent: postWorkoutAccent(for: result.verdict.kind),
             icon: postWorkoutIcon(for: result.verdict.kind)
         )
+    }
+
+    private func postWorkoutStatsText(exercises: Int, sets: Int) -> String {
+        let exerciseWord = L10n.tr(exercises == 1 ? "exercise.singular" : "exercise.plural")
+        let setWord = L10n.tr(sets == 1 ? "set.singular" : "set.plural")
+        return L10n.format("%d %@ · %d %@", exercises, exerciseWord, sets, setWord)
     }
 
     private func postWorkoutBridgeCard(_ bridge: PostWorkoutBridge) -> some View {
@@ -399,7 +405,7 @@ struct DashboardView: View {
 
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 6) {
-                        Text("JUST COMPLETED")
+                        Text(L10n.tr("JUST COMPLETED"))
                             .font(.system(size: 9, weight: .black))
                             .tracking(1.1)
                             .foregroundStyle(bridge.accent)
@@ -418,8 +424,8 @@ struct DashboardView: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                postWorkoutBridgeLine(label: "STRQ took", text: bridge.takeaway)
-                postWorkoutBridgeLine(label: "Next", text: bridge.nextStep)
+                postWorkoutBridgeLine(label: L10n.tr("STRQ took"), text: bridge.takeaway)
+                postWorkoutBridgeLine(label: L10n.tr("Next"), text: bridge.nextStep)
             }
         }
         .padding(14)
@@ -448,39 +454,39 @@ struct DashboardView: View {
     }
 
     private func postWorkoutTimeLabel(_ minutesAgo: Int) -> String {
-        if minutesAgo < 2 { return "JUST NOW" }
-        if minutesAgo < 60 { return "\(minutesAgo)M AGO" }
-        return "\(max(1, minutesAgo / 60))H AGO"
+        if minutesAgo < 2 { return L10n.tr("JUST NOW") }
+        if minutesAgo < 60 { return L10n.format("%dM AGO", minutesAgo) }
+        return L10n.format("%dH AGO", max(1, minutesAgo / 60))
     }
 
     private func postWorkoutTakeaway(for kind: SessionVerdict.Kind) -> String {
         switch kind {
         case .firstSession:
-            return "Baseline loads are now tied to what you actually lifted."
+            return L10n.tr("Baseline loads are now tied to what you actually lifted.")
         case .personalRecord:
-            return "That PR gives STRQ room to push the next exposure."
+            return L10n.tr("That PR gives STRQ room to push the next exposure.")
         case .bestSet:
-            return "Your top set moved up, so progression can keep climbing."
+            return L10n.tr("Your top set moved up, so progression can keep climbing.")
         case .volumeUp:
-            return "You handled more work than last time. Capacity is moving up."
+            return L10n.tr("You handled more work than last time. Capacity is moving up.")
         case .volumeDown:
-            return "Today read lighter, which still sharpens STRQ's load pacing."
+            return L10n.tr("Today read lighter, which still sharpens STRQ's load pacing.")
         case .consolidated:
-            return "Execution held steady, so the next call can stay confident."
+            return L10n.tr("Execution held steady, so the next call can stay confident.")
         }
     }
 
     private func postWorkoutNextStep() -> String {
         if vm.dataMaturityTier == .firstSession {
-            return "Session 2 is the next signal that matters."
+            return L10n.tr("Session 2 is the next signal that matters.")
         }
         if let title = vm.dailyBriefing?.primary.title {
             return title
         }
         if let day = nextScheduledDay {
-            return "Prep for \(day.name)."
+            return L10n.format("Prep for %@.", day.name)
         }
-        return "Let recovery carry this forward."
+        return L10n.tr("Let recovery carry this forward.")
     }
 
     private func postWorkoutAccent(for kind: SessionVerdict.Kind) -> Color {
@@ -558,9 +564,9 @@ struct DashboardView: View {
     }
 
     private func timeLabel(_ hours: Int) -> String {
-        if hours < 1 { return "JUST NOW" }
-        if hours < 24 { return "\(hours)H AGO" }
-        return "YESTERDAY"
+        if hours < 1 { return L10n.tr("JUST NOW") }
+        if hours < 24 { return L10n.format("%dH AGO", hours) }
+        return L10n.tr("YESTERDAY")
     }
 
     private var isPostFirstSessionState: Bool {
@@ -581,7 +587,7 @@ struct DashboardView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
-                        Text("CALIBRATING")
+                        Text(L10n.tr("CALIBRATING"))
                             .font(.system(size: 9, weight: .black))
                             .tracking(1.1)
                             .foregroundStyle(STRQBrand.steel)
@@ -637,7 +643,7 @@ struct DashboardView: View {
                             .foregroundStyle(.white.opacity(0.55))
                             .lineLimit(1)
                     } else {
-                        Text("TODAY")
+                        Text(L10n.tr("TODAY"))
                             .font(.system(size: 9, weight: .black))
                             .tracking(1.2)
                             .foregroundStyle(.white.opacity(0.4))
@@ -669,9 +675,9 @@ struct DashboardView: View {
                 Divider().opacity(0.3)
 
                 HStack(spacing: 0) {
-                    ForgeStatCell(value: "\(day.exercises.count)", label: "Exercises")
-                    ForgeStatCell(value: "~\(day.estimatedMinutes)m", label: "Duration")
-                    ForgeStatCell(value: "\(day.exercises.reduce(0) { $0 + $1.sets })", label: "Total Sets")
+                    ForgeStatCell(value: "\(day.exercises.count)", label: L10n.tr("Exercises"))
+                    ForgeStatCell(value: "~\(day.estimatedMinutes)m", label: L10n.tr("Duration"))
+                    ForgeStatCell(value: "\(day.exercises.reduce(0) { $0 + $1.sets })", label: L10n.tr("Total Sets"))
                 }
             }
             .padding(20)
@@ -683,7 +689,7 @@ struct DashboardView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "heart.text.clipboard")
-                            Text("Check in")
+                            Text(L10n.tr("Check in"))
                         }
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.primary)
@@ -702,7 +708,7 @@ struct DashboardView: View {
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "bolt.fill")
-                            Text("Start Workout")
+                            Text(L10n.tr("Start Workout"))
                         }
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(.black)
@@ -717,7 +723,7 @@ struct DashboardView: View {
             } else {
                 ForgePrimaryButton(
                     icon: primary.kind == .resumeWorkout ? "play.fill" : "bolt.fill",
-                    title: primary.kind == .resumeWorkout ? "Resume Workout" : (primary.kind == .startFirstSession ? "Start Session 1" : "Start Workout")
+                    title: primary.kind == .resumeWorkout ? L10n.tr("Resume Workout") : (primary.kind == .startFirstSession ? L10n.tr("Start Session 1") : L10n.tr("Start Workout"))
                 ) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
@@ -768,10 +774,10 @@ struct DashboardView: View {
         if let plan = vm.currentPlan, plan.days.contains(where: { $0.scheduledWeekday != nil }) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    ForgeSectionHeader(title: "Training Week", showAccent: true)
+                    ForgeSectionHeader(title: L10n.tr("Training Week"), showAccent: true)
                     Spacer()
                     if let next = nextScheduledDay {
-                        Text("Next: \(vm.weekdayName(next.scheduledWeekday ?? 0))")
+                        Text(L10n.format("Next: %@", vm.weekdayName(next.scheduledWeekday ?? 0)))
                             .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(STRQBrand.steel)
                             .padding(.horizontal, 8)
@@ -817,7 +823,7 @@ struct DashboardView: View {
                                     .foregroundStyle(isToday ? STRQBrand.steel : Color.gray)
                                     .lineLimit(1)
                             } else {
-                                Text(isToday ? "Rest" : "")
+                                Text(isToday ? L10n.tr("Rest") : "")
                                     .font(.system(size: 8, weight: .medium))
                                     .foregroundStyle(Color.gray)
                             }
@@ -865,7 +871,7 @@ struct DashboardView: View {
                 if vm.profile.nutritionTrackingEnabled {
                     signalButton(
                         icon: "fork.knife",
-                        label: "Protein",
+                        label: L10n.tr("Protein"),
                         value: "\(Int(vm.todayProteinProgress * 100))%",
                         progress: vm.todayProteinProgress,
                         color: STRQBrand.steel
@@ -876,7 +882,7 @@ struct DashboardView: View {
 
                 signalButton(
                     icon: "moon.zzz.fill",
-                    label: "Sleep",
+                    label: L10n.tr("Sleep"),
                     value: String(format: "%.1fh", vm.averageSleepHours),
                     progress: min(1.0, vm.averageSleepHours / 8.0),
                     color: ForgeTheme.sleepColor(for: vm.averageSleepHours)
@@ -887,7 +893,7 @@ struct DashboardView: View {
                 if vm.profile.nutritionTrackingEnabled {
                     signalButton(
                         icon: "scalemass.fill",
-                        label: "Weight",
+                        label: L10n.tr("Weight"),
                         value: vm.latestWeight.map { String(format: "%.1f", $0) } ?? "—",
                         progress: vm.latestWeight != nil ? 1.0 : 0.0,
                         color: STRQBrand.steel
@@ -909,9 +915,9 @@ struct DashboardView: View {
                             .frame(width: 28, height: 28)
                             .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 8))
                         VStack(alignment: .leading, spacing: 1) {
-                            Text("Weekly review ready")
+                            Text(L10n.tr("Weekly review ready"))
                                 .font(.subheadline.weight(.semibold))
-                            Text("Review this week and adjust")
+                            Text(L10n.tr("Review this week and adjust"))
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
@@ -979,7 +985,7 @@ struct DashboardView: View {
     private var weekPulse: some View {
         VStack(spacing: 14) {
             HStack {
-                ForgeSectionHeader(title: "This Week", showAccent: true)
+                ForgeSectionHeader(title: L10n.tr("This Week"), showAccent: true)
                 Spacer()
                 if let momentum = vm.momentumData {
                     let paceColor = ForgeTheme.color(for: momentum.weeklyPace.colorName)
@@ -1014,9 +1020,9 @@ struct DashboardView: View {
             }
 
             HStack(spacing: 12) {
-                ForgeStatCell(value: "\(vm.weeklyStats.sessions)/\(vm.profile.daysPerWeek)", label: "Sessions")
-                ForgeStatCell(value: ForgeTheme.formatVolume(vm.weeklyStats.volume), label: "Volume")
-                ForgeStatCell(value: "\(vm.effectiveRecoveryScore)%", label: "Recovery", valueColor: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+                ForgeStatCell(value: "\(vm.weeklyStats.sessions)/\(vm.profile.daysPerWeek)", label: L10n.tr("Sessions"))
+                ForgeStatCell(value: ForgeTheme.formatVolume(vm.weeklyStats.volume), label: L10n.tr("Volume"))
+                ForgeStatCell(value: "\(vm.effectiveRecoveryScore)%", label: L10n.tr("Recovery"), valueColor: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
             }
         }
         .padding(16)
@@ -1033,10 +1039,10 @@ struct DashboardView: View {
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
-        case 5..<12: return "Good morning"
-        case 12..<17: return "Good afternoon"
-        case 17..<22: return "Good evening"
-        default: return "Late night"
+        case 5..<12: return L10n.tr("Good morning")
+        case 12..<17: return L10n.tr("Good afternoon")
+        case 17..<22: return L10n.tr("Good evening")
+        default: return L10n.tr("Late night")
         }
     }
 }

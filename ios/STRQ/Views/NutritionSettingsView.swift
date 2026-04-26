@@ -25,7 +25,7 @@ struct NutritionSettingsView: View {
             .padding(.bottom, 40)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Nutrition Targets")
+        .navigationTitle(L10n.tr("Nutrition Targets"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             loadCurrentValues()
@@ -39,7 +39,7 @@ struct NutritionSettingsView: View {
                 Image(systemName: "target")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(STRQBrand.steel)
-                Text("NUTRITION GOAL")
+                Text(L10n.tr("NUTRITION GOAL"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
@@ -104,7 +104,7 @@ struct NutritionSettingsView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.triangle.2.circlepath")
                             .font(.subheadline)
-                        Text("Recompute Targets")
+                        Text(L10n.tr("Recompute Targets"))
                             .font(.body.weight(.semibold))
                     }
                     .foregroundStyle(.white)
@@ -128,12 +128,12 @@ struct NutritionSettingsView: View {
                 Image(systemName: "cpu")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.blue)
-                Text("COMPUTED TARGETS")
+                Text(L10n.tr("COMPUTED TARGETS"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.blue)
                     .tracking(0.5)
                 Spacer()
-                Text("Based on your profile")
+                Text(L10n.tr("Based on your profile"))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -152,9 +152,9 @@ struct NutritionSettingsView: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                computedRow("BMR-based TDEE", detail: "Activity: \(vm.profile.activityLevel.displayName)")
-                computedRow("Protein multiplier", detail: "\(vm.profile.trainingLevel.shortName) level + \(selectedGoal.displayName)")
-                computedRow("Weekly pace", detail: String(format: "%+.2f kg/wk", computed.targetWeeklyChangeKg))
+                computedRow(L10n.tr("BMR-based TDEE"), detail: "Activity: \(vm.profile.activityLevel.displayName)")
+                computedRow(L10n.tr("Protein multiplier"), detail: "\(vm.profile.trainingLevel.shortName) level + \(selectedGoal.displayName)")
+                computedRow(L10n.tr("Weekly pace"), detail: String(format: "%+.2f kg/wk", computed.targetWeeklyChangeKg))
             }
         }
         .padding(16)
@@ -199,12 +199,12 @@ struct NutritionSettingsView: View {
                 Image(systemName: "slider.horizontal.3")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.green)
-                Text("CUSTOM OVERRIDES")
+                Text(L10n.tr("CUSTOM OVERRIDES"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.green)
                     .tracking(0.5)
                 Spacer()
-                Text("Optional fine-tuning")
+                Text(L10n.tr("Optional fine-tuning"))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -222,7 +222,7 @@ struct NutritionSettingsView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.subheadline)
-                    Text("Save Custom Targets")
+                    Text(L10n.tr("Save Custom Targets"))
                         .font(.body.weight(.semibold))
                 }
                 .foregroundStyle(.white)
@@ -245,7 +245,7 @@ struct NutritionSettingsView: View {
                 .font(.caption.weight(.medium))
                 .foregroundStyle(color)
             HStack(spacing: 4) {
-                TextField("Auto", text: text)
+                TextField(L10n.tr("Auto"), text: text)
                     .keyboardType(.numberPad)
                     .font(.subheadline.weight(.semibold).monospacedDigit())
                 Text(unit)
@@ -264,7 +264,7 @@ struct NutritionSettingsView: View {
                 Image(systemName: "scalemass.fill")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.purple)
-                Text("BODY WEIGHT GOAL")
+                Text(L10n.tr("BODY WEIGHT GOAL"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.purple)
                     .tracking(0.5)
@@ -272,7 +272,7 @@ struct NutritionSettingsView: View {
 
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Current Weight")
+                    Text(L10n.tr("Current Weight"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Text(String(format: "%.1f kg", vm.profile.weightKg))
@@ -280,7 +280,7 @@ struct NutritionSettingsView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Target Weight")
+                    Text(L10n.tr("Target Weight"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     HStack(spacing: 4) {
@@ -297,7 +297,7 @@ struct NutritionSettingsView: View {
                 Spacer()
 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text("Direction")
+                    Text(L10n.tr("Direction"))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Text(vm.nutritionTarget.weightGoalDirection.displayName)
@@ -327,7 +327,7 @@ struct NutritionSettingsView: View {
             Button {
                 saveTargetWeight()
             } label: {
-                Text("Save Target Weight")
+                Text(L10n.tr("Save Target Weight"))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.purple)
                     .frame(maxWidth: .infinity)
@@ -348,7 +348,7 @@ struct NutritionSettingsView: View {
                 Image(systemName: "link")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.cyan)
-                Text("TRAINING CONNECTION")
+                Text(L10n.tr("TRAINING CONNECTION"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.cyan)
                     .tracking(0.5)
@@ -362,7 +362,7 @@ struct NutritionSettingsView: View {
                 connectionRow(icon: "heart.fill", color: .red, title: "Recovery Score", detail: "\(vm.effectiveRecoveryScore)%")
             }
 
-            Text("Your nutrition targets are computed from these training parameters. Changes to your training profile will update nutrition recommendations.")
+            Text(L10n.tr("Your nutrition targets are computed from these training parameters. Changes to your training profile will update nutrition recommendations."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

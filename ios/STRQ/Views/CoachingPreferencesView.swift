@@ -11,7 +11,7 @@ struct CoachingPreferencesView: View {
                 heroCard
 
                 section(
-                    eyebrow: "COACH VOICE",
+                    eyebrow: L10n.tr("COACH VOICE"),
                     title: "Tone",
                     caption: "How STRQ talks to you when it calls a play."
                 ) {
@@ -31,7 +31,7 @@ struct CoachingPreferencesView: View {
 
                 section(
                     eyebrow: "FOCUS",
-                    title: "What matters most",
+                    title: L10n.tr("What matters most"),
                     caption: "STRQ will rank today's signal around this priority."
                 ) {
                     VStack(spacing: 8) {
@@ -54,7 +54,7 @@ struct CoachingPreferencesView: View {
 
                 section(
                     eyebrow: "SURFACE",
-                    title: "How much to show",
+                    title: L10n.tr("How much to show"),
                     caption: "Coach and Today adapt to this."
                 ) {
                     VStack(spacing: 8) {
@@ -73,7 +73,7 @@ struct CoachingPreferencesView: View {
 
                 section(
                     eyebrow: "AUTOMATION",
-                    title: "How much STRQ adjusts for you",
+                    title: L10n.tr("How much STRQ adjusts for you"),
                     caption: "Balance between coach authority and user control."
                 ) {
                     VStack(spacing: 8) {
@@ -97,7 +97,7 @@ struct CoachingPreferencesView: View {
             .padding(.bottom, 40)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Coaching Style")
+        .navigationTitle(L10n.tr("Coaching Style"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear { withAnimation(.easeOut(duration: 0.45)) { appeared = true } }
     }
@@ -111,7 +111,7 @@ struct CoachingPreferencesView: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(STRQBrand.accentGradient)
                     .frame(width: 3, height: 14)
-                Text("YOUR COACH, YOUR WAY")
+                Text(L10n.tr("YOUR COACH, YOUR WAY"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(.primary)
@@ -128,7 +128,7 @@ struct CoachingPreferencesView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(summaryTitle)
                         .font(.title3.weight(.bold))
-                    Text("STRQ stays one coach — these tune how it speaks, what it emphasizes, and how much it adjusts on its own.")
+                    Text(L10n.tr("STRQ stays one coach — these tune how it speaks, what it emphasizes, and how much it adjusts on its own."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -268,7 +268,7 @@ struct CoachingPreferencesView: View {
                 Text(CoachingEmphasis.physique.displayName)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.secondary)
-                Text("Turn on physique tracking in Profile to unlock this focus.")
+                Text(L10n.tr("Turn on physique tracking in Profile to unlock this focus."))
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -292,7 +292,7 @@ struct CoachingPreferencesView: View {
             Image(systemName: "sparkles")
                 .font(.caption)
                 .foregroundStyle(STRQBrand.steel)
-            Text("Preferences shape the surface only. The underlying intelligence stays the same.")
+            Text(L10n.tr("Preferences shape the surface only. The underlying intelligence stays the same."))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
             Spacer(minLength: 0)

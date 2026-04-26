@@ -23,7 +23,7 @@ struct NotificationSettingsView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Notifications")
+        .navigationTitle(L10n.tr("Notifications"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             withAnimation(.easeOut(duration: 0.4)) { appeared = true }
@@ -59,7 +59,7 @@ struct NotificationSettingsView: View {
             }
             Spacer()
             if authStatus == .notDetermined {
-                Button("Enable") {
+                Button(L10n.tr("Enable")) {
                     Task {
                         _ = await NotificationScheduler.shared.requestAuthorizationIfNeeded()
                         authStatus = NotificationScheduler.shared.authorizationStatus
@@ -70,7 +70,7 @@ struct NotificationSettingsView: View {
                 .buttonStyle(.borderedProminent)
                 .tint(STRQBrand.steel)
             } else if authStatus == .denied {
-                Button("Settings") {
+                Button(L10n.tr("Settings")) {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
                     }
@@ -108,13 +108,13 @@ struct NotificationSettingsView: View {
             VStack(spacing: 1) {
                 toggleRow(
                     "Workout Planned Today",
-                    subtitle: "Get reminded when you have a session scheduled",
+                    subtitle: L10n.tr("Get reminded when you have a session scheduled"),
                     isOn: $vm.notificationSettings.workoutRemindersEnabled
                 )
 
                 if vm.notificationSettings.workoutRemindersEnabled {
                     HStack {
-                        Text("Reminder Time")
+                        Text(L10n.tr("Reminder Time"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -141,13 +141,13 @@ struct NotificationSettingsView: View {
             VStack(spacing: 1) {
                 toggleRow(
                     "Daily Readiness Check-In",
-                    subtitle: "Morning reminder to log how you're feeling",
+                    subtitle: L10n.tr("Morning reminder to log how you're feeling"),
                     isOn: $vm.notificationSettings.readinessCheckInEnabled
                 )
 
                 if vm.notificationSettings.readinessCheckInEnabled {
                     HStack {
-                        Text("Check-In Time")
+                        Text(L10n.tr("Check-In Time"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -174,13 +174,13 @@ struct NotificationSettingsView: View {
             VStack(spacing: 1) {
                 toggleRow(
                     "Weekly Review Ready",
-                    subtitle: "Get notified when your weekly check-in is available",
+                    subtitle: L10n.tr("Get notified when your weekly check-in is available"),
                     isOn: $vm.notificationSettings.weeklyReviewEnabled
                 )
 
                 if vm.notificationSettings.weeklyReviewEnabled {
                     HStack {
-                        Text("Review Day")
+                        Text(L10n.tr("Review Day"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -210,7 +210,7 @@ struct NotificationSettingsView: View {
             VStack(spacing: 1) {
                 toggleRow(
                     "Coach Recommendations",
-                    subtitle: "When your coach has important adjustments or insights",
+                    subtitle: L10n.tr("When your coach has important adjustments or insights"),
                     isOn: $vm.notificationSettings.coachNudgesEnabled
                 )
             }
@@ -228,7 +228,7 @@ struct NotificationSettingsView: View {
             VStack(spacing: 1) {
                 toggleRow(
                     "Streak at Risk",
-                    subtitle: "Reminder when your streak might break tomorrow",
+                    subtitle: L10n.tr("Reminder when your streak might break tomorrow"),
                     isOn: $vm.notificationSettings.streakReminderEnabled
                 )
             }
@@ -263,9 +263,9 @@ struct NotificationSettingsView: View {
                         }
                     )) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Sync with Apple Health")
+                            Text(L10n.tr("Sync with Apple Health"))
                                 .font(.subheadline)
-                            Text("Read body weight and sleep, write workouts and weigh-ins")
+                            Text(L10n.tr("Read body weight and sleep, write workouts and weigh-ins"))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
