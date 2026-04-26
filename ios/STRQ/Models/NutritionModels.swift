@@ -94,6 +94,23 @@ nonisolated struct NutritionTarget: Codable, Sendable {
         self.weightGoalDirection = weightGoalDirection
         self.targetWeeklyChangeKg = targetWeeklyChangeKg
     }
+
+    enum CodingKeys: String, CodingKey {
+        case calories, proteinGrams, carbsGrams, fatGrams, nutritionGoal
+        case weightGoalDirection, targetWeeklyChangeKg
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let defaults = NutritionTarget()
+        self.calories = try c.decodeIfPresent(Int.self, forKey: .calories) ?? defaults.calories
+        self.proteinGrams = try c.decodeIfPresent(Int.self, forKey: .proteinGrams) ?? defaults.proteinGrams
+        self.carbsGrams = try c.decodeIfPresent(Int.self, forKey: .carbsGrams) ?? defaults.carbsGrams
+        self.fatGrams = try c.decodeIfPresent(Int.self, forKey: .fatGrams) ?? defaults.fatGrams
+        self.nutritionGoal = try c.decodeIfPresent(NutritionGoal.self, forKey: .nutritionGoal) ?? defaults.nutritionGoal
+        self.weightGoalDirection = try c.decodeIfPresent(WeightGoalDirection.self, forKey: .weightGoalDirection) ?? defaults.weightGoalDirection
+        self.targetWeeklyChangeKg = try c.decodeIfPresent(Double.self, forKey: .targetWeeklyChangeKg) ?? defaults.targetWeeklyChangeKg
+    }
 }
 
 nonisolated struct DailyNutritionLog: Codable, Identifiable, Sendable {
@@ -122,6 +139,21 @@ nonisolated struct DailyNutritionLog: Codable, Identifiable, Sendable {
         self.fatGrams = fatGrams
         self.waterLiters = waterLiters
     }
+
+    enum CodingKeys: String, CodingKey {
+        case id, date, calories, proteinGrams, carbsGrams, fatGrams, waterLiters
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.date = try c.decodeIfPresent(Date.self, forKey: .date) ?? Date()
+        self.calories = try c.decodeIfPresent(Int.self, forKey: .calories) ?? 0
+        self.proteinGrams = try c.decodeIfPresent(Int.self, forKey: .proteinGrams) ?? 0
+        self.carbsGrams = try c.decodeIfPresent(Int.self, forKey: .carbsGrams) ?? 0
+        self.fatGrams = try c.decodeIfPresent(Int.self, forKey: .fatGrams) ?? 0
+        self.waterLiters = try c.decodeIfPresent(Double.self, forKey: .waterLiters) ?? 0
+    }
 }
 
 nonisolated struct BodyWeightEntry: Codable, Identifiable, Sendable {
@@ -144,6 +176,19 @@ nonisolated struct BodyWeightEntry: Codable, Identifiable, Sendable {
         self.bodyFatPercent = bodyFatPercent
         self.note = note
     }
+
+    enum CodingKeys: String, CodingKey {
+        case id, date, weightKg, bodyFatPercent, note
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.date = try c.decodeIfPresent(Date.self, forKey: .date) ?? Date()
+        self.weightKg = try c.decodeIfPresent(Double.self, forKey: .weightKg) ?? 0
+        self.bodyFatPercent = try c.decodeIfPresent(Double.self, forKey: .bodyFatPercent)
+        self.note = try c.decodeIfPresent(String.self, forKey: .note) ?? ""
+    }
 }
 
 nonisolated struct SleepEntry: Codable, Identifiable, Sendable {
@@ -162,6 +207,18 @@ nonisolated struct SleepEntry: Codable, Identifiable, Sendable {
         self.date = date
         self.hoursSlept = hoursSlept
         self.quality = quality
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, date, hoursSlept, quality
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.date = try c.decodeIfPresent(Date.self, forKey: .date) ?? Date()
+        self.hoursSlept = try c.decodeIfPresent(Double.self, forKey: .hoursSlept) ?? 7
+        self.quality = try c.decodeIfPresent(ReadinessLevel.self, forKey: .quality) ?? .good
     }
 }
 

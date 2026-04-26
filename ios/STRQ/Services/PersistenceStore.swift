@@ -5,6 +5,30 @@ nonisolated struct ActiveWorkoutDraft: Codable, Sendable {
     var currentExerciseIndex: Int
     var currentSetIndex: Int
     var plannedExercises: [PlannedExercise]
+
+    enum CodingKeys: String, CodingKey {
+        case session, currentExerciseIndex, currentSetIndex, plannedExercises
+    }
+
+    init(
+        session: WorkoutSession,
+        currentExerciseIndex: Int,
+        currentSetIndex: Int,
+        plannedExercises: [PlannedExercise]
+    ) {
+        self.session = session
+        self.currentExerciseIndex = currentExerciseIndex
+        self.currentSetIndex = currentSetIndex
+        self.plannedExercises = plannedExercises
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.session = try c.decode(WorkoutSession.self, forKey: .session)
+        self.currentExerciseIndex = try c.decodeIfPresent(Int.self, forKey: .currentExerciseIndex) ?? 0
+        self.currentSetIndex = try c.decodeIfPresent(Int.self, forKey: .currentSetIndex) ?? 0
+        self.plannedExercises = try c.decodeIfPresent([PlannedExercise].self, forKey: .plannedExercises) ?? []
+    }
 }
 
 nonisolated struct PersistedAppState: Codable, Sendable {
@@ -96,28 +120,28 @@ nonisolated struct PersistedAppState: Codable, Sendable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        self.version = try c.decode(Int.self, forKey: .version)
-        self.hasCompletedOnboarding = try c.decode(Bool.self, forKey: .hasCompletedOnboarding)
-        self.profile = try c.decode(UserProfile.self, forKey: .profile)
+        self.version = try c.decodeIfPresent(Int.self, forKey: .version) ?? 0
+        self.hasCompletedOnboarding = try c.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? false
+        self.profile = try c.decodeIfPresent(UserProfile.self, forKey: .profile) ?? UserProfile()
         self.currentPlan = try c.decodeIfPresent(WorkoutPlan.self, forKey: .currentPlan)
-        self.workoutHistory = try c.decode([WorkoutSession].self, forKey: .workoutHistory)
-        self.personalRecords = try c.decode([PersonalRecord].self, forKey: .personalRecords)
-        self.progressEntries = try c.decode([ProgressEntry].self, forKey: .progressEntries)
-        self.favoriteExerciseIds = try c.decode([String].self, forKey: .favoriteExerciseIds)
-        self.progressionStates = try c.decode([ExerciseProgressionState].self, forKey: .progressionStates)
-        self.trainingPhaseState = try c.decode(TrainingPhaseState.self, forKey: .trainingPhaseState)
-        self.coachAdjustments = try c.decode([CoachAdjustment].self, forKey: .coachAdjustments)
-        self.appliedActionIds = try c.decode([String].self, forKey: .appliedActionIds)
+        self.workoutHistory = try c.decodeIfPresent([WorkoutSession].self, forKey: .workoutHistory) ?? []
+        self.personalRecords = try c.decodeIfPresent([PersonalRecord].self, forKey: .personalRecords) ?? []
+        self.progressEntries = try c.decodeIfPresent([ProgressEntry].self, forKey: .progressEntries) ?? []
+        self.favoriteExerciseIds = try c.decodeIfPresent([String].self, forKey: .favoriteExerciseIds) ?? []
+        self.progressionStates = try c.decodeIfPresent([ExerciseProgressionState].self, forKey: .progressionStates) ?? []
+        self.trainingPhaseState = try c.decodeIfPresent(TrainingPhaseState.self, forKey: .trainingPhaseState) ?? TrainingPhaseState()
+        self.coachAdjustments = try c.decodeIfPresent([CoachAdjustment].self, forKey: .coachAdjustments) ?? []
+        self.appliedActionIds = try c.decodeIfPresent([String].self, forKey: .appliedActionIds) ?? []
         self.weekAdjustmentActive = try c.decodeIfPresent(CoachAdjustmentType.self, forKey: .weekAdjustmentActive)
         self.previousPlanBeforeWeekAction = try c.decodeIfPresent(WorkoutPlan.self, forKey: .previousPlanBeforeWeekAction)
-        self.weeklyReviewDismissed = try c.decode(Bool.self, forKey: .weeklyReviewDismissed)
+        self.weeklyReviewDismissed = try c.decodeIfPresent(Bool.self, forKey: .weeklyReviewDismissed) ?? false
         self.todaysReadiness = try c.decodeIfPresent(DailyReadiness.self, forKey: .todaysReadiness)
-        self.readinessHistory = try c.decode([DailyReadiness].self, forKey: .readinessHistory)
-        self.notificationSettings = try c.decode(NotificationSettings.self, forKey: .notificationSettings)
-        self.nutritionTarget = try c.decode(NutritionTarget.self, forKey: .nutritionTarget)
-        self.nutritionLogs = try c.decode([DailyNutritionLog].self, forKey: .nutritionLogs)
-        self.bodyWeightEntries = try c.decode([BodyWeightEntry].self, forKey: .bodyWeightEntries)
-        self.sleepEntries = try c.decode([SleepEntry].self, forKey: .sleepEntries)
+        self.readinessHistory = try c.decodeIfPresent([DailyReadiness].self, forKey: .readinessHistory) ?? []
+        self.notificationSettings = try c.decodeIfPresent(NotificationSettings.self, forKey: .notificationSettings) ?? NotificationSettings()
+        self.nutritionTarget = try c.decodeIfPresent(NutritionTarget.self, forKey: .nutritionTarget) ?? NutritionTarget()
+        self.nutritionLogs = try c.decodeIfPresent([DailyNutritionLog].self, forKey: .nutritionLogs) ?? []
+        self.bodyWeightEntries = try c.decodeIfPresent([BodyWeightEntry].self, forKey: .bodyWeightEntries) ?? []
+        self.sleepEntries = try c.decodeIfPresent([SleepEntry].self, forKey: .sleepEntries) ?? []
         self.activeWorkoutDraft = try c.decodeIfPresent(ActiveWorkoutDraft.self, forKey: .activeWorkoutDraft)
         // Tolerant: pre-existing snapshots will be missing this; fall back to nil.
         self.familyResponseProfile = try c.decodeIfPresent(ExerciseFamilyResponseProfile.self, forKey: .familyResponseProfile)
@@ -149,8 +173,11 @@ nonisolated final class PersistenceStore: Sendable {
             decoder.dateDecodingStrategy = .iso8601
             return try decoder.decode(PersistedAppState.self, from: data)
         } catch {
-            print("[STRQ] Persistence load failed — using defaults: \(error)")
-            try? FileManager.default.removeItem(at: url)
+            let preservedURL = quarantineUnreadableState(at: url, error: error)
+            print("[STRQ] Persistence load failed - using defaults: \(error)")
+            if let preservedURL {
+                print("[STRQ] Unreadable local state preserved at \(preservedURL.lastPathComponent)")
+            }
             return nil
         }
     }
@@ -173,4 +200,41 @@ nonisolated final class PersistenceStore: Sendable {
     }
 
     var version: Int { currentVersion }
+
+    private func quarantineUnreadableState(at url: URL, error: Error) -> URL? {
+        let backupURL = backupURL(for: url)
+        let loadError = error.localizedDescription
+        do {
+            try FileManager.default.moveItem(at: url, to: backupURL)
+            let backupName = backupURL.lastPathComponent
+            Task { @MainActor in
+                ErrorReporter.shared.reportMessage("Local persistence decode failed: \(loadError)", level: .error, context: [
+                    "source": "local_persistence",
+                    "state": "quarantined",
+                    "backup": backupName
+                ])
+            }
+            return backupURL
+        } catch {
+            let quarantineError = error.localizedDescription
+            Task { @MainActor in
+                ErrorReporter.shared.reportMessage("Local persistence quarantine failed: \(quarantineError)", level: .error, context: [
+                    "source": "local_persistence",
+                    "state": "quarantine_failed"
+                ])
+            }
+            print("[STRQ] Persistence quarantine failed: \(error)")
+            return nil
+        }
+    }
+
+    private func backupURL(for url: URL) -> URL {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyyMMdd-HHmmss"
+        let stamp = formatter.string(from: Date())
+        let name = "strq_state_v1.corrupt-\(stamp)-\(UUID().uuidString).json"
+        return url.deletingLastPathComponent().appendingPathComponent(name)
+    }
 }

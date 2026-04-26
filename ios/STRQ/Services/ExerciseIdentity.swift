@@ -43,6 +43,14 @@ nonisolated enum ExerciseIdentity {
 /// old snapshots don't fragment history / progression / response.
 @MainActor
 enum ExerciseIdentityMigration {
+    /// Return a copy of an in-progress workout with exercise references
+    /// rewritten to canonical ids. Cursor/rest/session progress is untouched.
+    static func canonicalized(_ active: ActiveWorkoutState) -> ActiveWorkoutState {
+        var copy = active
+        _ = canonicalizeActiveWorkout(&copy)
+        return copy
+    }
+
     /// Rewrite known id-carrying fields on the view model to canonical ids.
     /// Only touches fields where a legacy alias id is observed — leaves
     /// everything else untouched. Returns the number of references migrated,
@@ -166,25 +174,31 @@ enum ExerciseIdentityMigration {
 
         // Active workout — if any slot still points at a legacy id, rewrite.
         if var active = vm.activeWorkout {
-            for i in active.plannedExercises.indices {
-                let original = active.plannedExercises[i].exerciseId
-                let c = ExerciseIdentity.canonical(original)
-                if c != original {
-                    active.plannedExercises[i].exerciseId = c
-                    changed += 1
-                }
-            }
-            for i in active.session.exerciseLogs.indices {
-                let original = active.session.exerciseLogs[i].exerciseId
-                let c = ExerciseIdentity.canonical(original)
-                if c != original {
-                    active.session.exerciseLogs[i].exerciseId = c
-                    changed += 1
-                }
-            }
+            changed += canonicalizeActiveWorkout(&active)
             vm.activeWorkout = active
         }
 
+        return changed
+    }
+
+    private static func canonicalizeActiveWorkout(_ active: inout ActiveWorkoutState) -> Int {
+        var changed = 0
+        for i in active.plannedExercises.indices {
+            let original = active.plannedExercises[i].exerciseId
+            let c = ExerciseIdentity.canonical(original)
+            if c != original {
+                active.plannedExercises[i].exerciseId = c
+                changed += 1
+            }
+        }
+        for i in active.session.exerciseLogs.indices {
+            let original = active.session.exerciseLogs[i].exerciseId
+            let c = ExerciseIdentity.canonical(original)
+            if c != original {
+                active.session.exerciseLogs[i].exerciseId = c
+                changed += 1
+            }
+        }
         return changed
     }
 }

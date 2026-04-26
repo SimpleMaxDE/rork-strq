@@ -455,3 +455,49 @@ nonisolated struct CoachingPreferences: Codable, Sendable {
         self.automation = (try? c.decode(CoachingAutomation.self, forKey: .automation)) ?? .guided
     }
 }
+
+extension UserProfile {
+    enum CodingKeys: String, CodingKey {
+        case name, age, gender, heightCm, weightKg, bodyFatPercentage
+        case goal, trainingLevel, trainingMonths, daysPerWeek, minutesPerSession
+        case splitPreference, trainingLocation, availableEquipment, injuries
+        case focusMuscles, neglectMuscles, preferredExercises, avoidedExercises
+        case sleepQuality, stressLevel, activityLevel, recoveryCapacity
+        case targetWeightKg, startWeightKg, hasCompletedOnboarding
+        case preferredTrainingDays, nutritionTrackingEnabled, coachingPreferences
+    }
+
+    init(from decoder: Decoder) throws {
+        self.init()
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try c.decodeIfPresent(String.self, forKey: .name) ?? name
+        self.age = try c.decodeIfPresent(Int.self, forKey: .age) ?? age
+        self.gender = try c.decodeIfPresent(Gender.self, forKey: .gender) ?? gender
+        self.heightCm = try c.decodeIfPresent(Double.self, forKey: .heightCm) ?? heightCm
+        self.weightKg = try c.decodeIfPresent(Double.self, forKey: .weightKg) ?? weightKg
+        self.bodyFatPercentage = try c.decodeIfPresent(Double.self, forKey: .bodyFatPercentage)
+        self.goal = try c.decodeIfPresent(FitnessGoal.self, forKey: .goal) ?? goal
+        self.trainingLevel = try c.decodeIfPresent(TrainingLevel.self, forKey: .trainingLevel) ?? trainingLevel
+        self.trainingMonths = try c.decodeIfPresent(Int.self, forKey: .trainingMonths) ?? trainingMonths
+        self.daysPerWeek = try c.decodeIfPresent(Int.self, forKey: .daysPerWeek) ?? daysPerWeek
+        self.minutesPerSession = try c.decodeIfPresent(Int.self, forKey: .minutesPerSession) ?? minutesPerSession
+        self.splitPreference = try c.decodeIfPresent(SplitPreference.self, forKey: .splitPreference) ?? splitPreference
+        self.trainingLocation = try c.decodeIfPresent(TrainingLocation.self, forKey: .trainingLocation) ?? trainingLocation
+        self.availableEquipment = try c.decodeIfPresent([Equipment].self, forKey: .availableEquipment) ?? availableEquipment
+        self.injuries = try c.decodeIfPresent([String].self, forKey: .injuries) ?? injuries
+        self.focusMuscles = try c.decodeIfPresent([MuscleGroup].self, forKey: .focusMuscles) ?? focusMuscles
+        self.neglectMuscles = try c.decodeIfPresent([MuscleGroup].self, forKey: .neglectMuscles) ?? neglectMuscles
+        self.preferredExercises = try c.decodeIfPresent([String].self, forKey: .preferredExercises) ?? preferredExercises
+        self.avoidedExercises = try c.decodeIfPresent([String].self, forKey: .avoidedExercises) ?? avoidedExercises
+        self.sleepQuality = try c.decodeIfPresent(SleepQuality.self, forKey: .sleepQuality) ?? sleepQuality
+        self.stressLevel = try c.decodeIfPresent(StressLevel.self, forKey: .stressLevel) ?? stressLevel
+        self.activityLevel = try c.decodeIfPresent(ActivityLevel.self, forKey: .activityLevel) ?? activityLevel
+        self.recoveryCapacity = try c.decodeIfPresent(RecoveryCapacity.self, forKey: .recoveryCapacity) ?? recoveryCapacity
+        self.targetWeightKg = try c.decodeIfPresent(Double.self, forKey: .targetWeightKg)
+        self.startWeightKg = try c.decodeIfPresent(Double.self, forKey: .startWeightKg)
+        self.hasCompletedOnboarding = try c.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? hasCompletedOnboarding
+        self.preferredTrainingDays = try c.decodeIfPresent([Int].self, forKey: .preferredTrainingDays) ?? preferredTrainingDays
+        self.nutritionTrackingEnabled = try c.decodeIfPresent(Bool.self, forKey: .nutritionTrackingEnabled) ?? nutritionTrackingEnabled
+        self.coachingPreferences = try c.decodeIfPresent(CoachingPreferences.self, forKey: .coachingPreferences) ?? coachingPreferences
+    }
+}

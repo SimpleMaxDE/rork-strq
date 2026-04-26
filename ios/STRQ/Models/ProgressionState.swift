@@ -266,6 +266,31 @@ nonisolated struct ExerciseProgressionState: Identifiable, Codable, Sendable {
         self.coachNote = coachNote
     }
 
+    enum CodingKeys: String, CodingKey {
+        case id, exerciseId, lastWeight, lastReps, lastRPE, sessionCount
+        case consecutiveSamePerformance, plateauStatus, recommendedStrategy
+        case suggestedNextWeight, suggestedNextReps, performanceTrend
+        case lastUpdated, coachNote
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.exerciseId = try c.decodeIfPresent(String.self, forKey: .exerciseId) ?? ""
+        self.lastWeight = try c.decodeIfPresent(Double.self, forKey: .lastWeight) ?? 0
+        self.lastReps = try c.decodeIfPresent(Int.self, forKey: .lastReps) ?? 0
+        self.lastRPE = try c.decodeIfPresent(Double.self, forKey: .lastRPE)
+        self.sessionCount = try c.decodeIfPresent(Int.self, forKey: .sessionCount) ?? 0
+        self.consecutiveSamePerformance = try c.decodeIfPresent(Int.self, forKey: .consecutiveSamePerformance) ?? 0
+        self.plateauStatus = try c.decodeIfPresent(PlateauStatus.self, forKey: .plateauStatus) ?? .progressing
+        self.recommendedStrategy = try c.decodeIfPresent(ProgressionStrategy.self, forKey: .recommendedStrategy) ?? .loadFirst
+        self.suggestedNextWeight = try c.decodeIfPresent(Double.self, forKey: .suggestedNextWeight)
+        self.suggestedNextReps = try c.decodeIfPresent(String.self, forKey: .suggestedNextReps)
+        self.performanceTrend = try c.decodeIfPresent([Double].self, forKey: .performanceTrend) ?? []
+        self.lastUpdated = try c.decodeIfPresent(Date.self, forKey: .lastUpdated) ?? Date()
+        self.coachNote = try c.decodeIfPresent(String.self, forKey: .coachNote) ?? ""
+    }
+
     var estimatedOneRepMax: Double {
         guard lastReps > 0, lastWeight > 0 else { return 0 }
         return lastWeight * (1 + Double(lastReps) / 30.0)
@@ -292,6 +317,19 @@ nonisolated struct TrainingPhaseState: Codable, Sendable {
         self.lastPhaseChange = lastPhaseChange
         self.phaseHistory = phaseHistory
     }
+
+    enum CodingKeys: String, CodingKey {
+        case currentPhase, weeksInPhase, totalWeeksTrained, lastPhaseChange, phaseHistory
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.currentPhase = try c.decodeIfPresent(TrainingPhase.self, forKey: .currentPhase) ?? .build
+        self.weeksInPhase = try c.decodeIfPresent(Int.self, forKey: .weeksInPhase) ?? 1
+        self.totalWeeksTrained = try c.decodeIfPresent(Int.self, forKey: .totalWeeksTrained) ?? 0
+        self.lastPhaseChange = try c.decodeIfPresent(Date.self, forKey: .lastPhaseChange) ?? Date()
+        self.phaseHistory = try c.decodeIfPresent([PhaseEntry].self, forKey: .phaseHistory) ?? []
+    }
 }
 
 nonisolated struct PhaseEntry: Codable, Identifiable, Sendable {
@@ -307,6 +345,19 @@ nonisolated struct PhaseEntry: Codable, Identifiable, Sendable {
         self.startDate = startDate
         self.endDate = endDate
         self.reason = reason
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, phase, startDate, endDate, reason
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.phase = try c.decodeIfPresent(TrainingPhase.self, forKey: .phase) ?? .build
+        self.startDate = try c.decodeIfPresent(Date.self, forKey: .startDate) ?? Date()
+        self.endDate = try c.decodeIfPresent(Date.self, forKey: .endDate)
+        self.reason = try c.decodeIfPresent(String.self, forKey: .reason) ?? ""
     }
 }
 

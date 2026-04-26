@@ -33,4 +33,24 @@ nonisolated struct NotificationSettings: Codable, Sendable {
         self.readinessCheckInTime = readinessCheckInTime
         self.weeklyReviewDay = weeklyReviewDay
     }
+
+    enum CodingKeys: String, CodingKey {
+        case workoutRemindersEnabled, readinessCheckInEnabled, weeklyReviewEnabled
+        case coachNudgesEnabled, streakReminderEnabled, healthKitSyncEnabled
+        case workoutReminderTime, readinessCheckInTime, weeklyReviewDay
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let defaults = NotificationSettings()
+        self.workoutRemindersEnabled = try c.decodeIfPresent(Bool.self, forKey: .workoutRemindersEnabled) ?? defaults.workoutRemindersEnabled
+        self.readinessCheckInEnabled = try c.decodeIfPresent(Bool.self, forKey: .readinessCheckInEnabled) ?? defaults.readinessCheckInEnabled
+        self.weeklyReviewEnabled = try c.decodeIfPresent(Bool.self, forKey: .weeklyReviewEnabled) ?? defaults.weeklyReviewEnabled
+        self.coachNudgesEnabled = try c.decodeIfPresent(Bool.self, forKey: .coachNudgesEnabled) ?? defaults.coachNudgesEnabled
+        self.streakReminderEnabled = try c.decodeIfPresent(Bool.self, forKey: .streakReminderEnabled) ?? defaults.streakReminderEnabled
+        self.healthKitSyncEnabled = try c.decodeIfPresent(Bool.self, forKey: .healthKitSyncEnabled) ?? defaults.healthKitSyncEnabled
+        self.workoutReminderTime = try c.decodeIfPresent(Date.self, forKey: .workoutReminderTime) ?? defaults.workoutReminderTime
+        self.readinessCheckInTime = try c.decodeIfPresent(Date.self, forKey: .readinessCheckInTime) ?? defaults.readinessCheckInTime
+        self.weeklyReviewDay = try c.decodeIfPresent(Int.self, forKey: .weeklyReviewDay) ?? defaults.weeklyReviewDay
+    }
 }

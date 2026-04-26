@@ -7,6 +7,25 @@ import Foundation
 @Suite("PersistenceStore")
 struct PersistenceStoreTests {
 
+    private func stateDirectory() throws -> URL {
+        try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+    }
+
+    private func removeQuarantinedStates(in dir: URL) {
+        guard let files = try? FileManager.default.contentsOfDirectory(
+            at: dir,
+            includingPropertiesForKeys: nil
+        ) else { return }
+        for file in files where file.lastPathComponent.hasPrefix("strq_state_v1.corrupt-") {
+            try? FileManager.default.removeItem(at: file)
+        }
+    }
+
     private func makeState(onboarded: Bool = true, history: [WorkoutSession] = []) -> PersistedAppState {
         PersistedAppState(
             version: 1,
@@ -69,15 +88,21 @@ struct PersistenceStoreTests {
     @Test func corruptedDataRecoversGracefully() async throws {
         let store = PersistenceStore.shared
         store.clear()
-        defer { store.clear() }
+        let dir = try stateDirectory()
+        removeQuarantinedStates(in: dir)
+        defer {
+            store.clear()
+            removeQuarantinedStates(in: dir)
+        }
 
-        let dir = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         let url = dir.appendingPathComponent("strq_state_v1.json")
         try "{ not valid json".data(using: .utf8)!.write(to: url)
 
         let loaded = store.load()
         #expect(loaded == nil)
         #expect(!FileManager.default.fileExists(atPath: url.path))
+        let quarantined = (try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? []
+        #expect(quarantined.contains { $0.lastPathComponent.hasPrefix("strq_state_v1.corrupt-") })
     }
 
     @Test func activeWorkoutDraftSurvivesRoundTrip() async throws {

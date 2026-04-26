@@ -141,14 +141,7 @@ class AppViewModel {
             // resolve through one identity per exercise.
             ExerciseIdentityMigration.migrate(self)
             if let draft = saved.activeWorkoutDraft {
-                self.activeWorkout = ActiveWorkoutState(
-                    session: draft.session,
-                    currentExerciseIndex: draft.currentExerciseIndex,
-                    currentSetIndex: draft.currentSetIndex,
-                    isResting: false,
-                    restTimeRemaining: 0,
-                    plannedExercises: draft.plannedExercises
-                )
+                self.activeWorkout = activeWorkoutState(from: draft)
                 Analytics.shared.track(.active_workout_restored, ["day": draft.session.dayName])
             }
             isHydrating = false
@@ -174,6 +167,17 @@ class AppViewModel {
         reminderWidgetCoordinator.refreshWidgetSnapshot()
         WatchConnectivityService.shared.pushActiveWorkoutState()
         continuityCoordinator.uploadIfSignedIn(snapshot)
+    }
+
+    private func activeWorkoutState(from draft: ActiveWorkoutDraft) -> ActiveWorkoutState {
+        ExerciseIdentityMigration.canonicalized(ActiveWorkoutState(
+            session: draft.session,
+            currentExerciseIndex: draft.currentExerciseIndex,
+            currentSetIndex: draft.currentSetIndex,
+            isResting: false,
+            restTimeRemaining: 0,
+            plannedExercises: draft.plannedExercises
+        ))
     }
 
     // MARK: - Cloud Sync
@@ -219,17 +223,10 @@ class AppViewModel {
         // so restored data doesn't fragment history / progression / response.
         ExerciseIdentityMigration.migrate(self)
         if let preservedActive {
-            activeWorkout = preservedActive
+            activeWorkout = ExerciseIdentityMigration.canonicalized(preservedActive)
             ErrorReporter.shared.breadcrumb("Snapshot applied — active workout preserved", category: "sync")
         } else if let draft = saved.activeWorkoutDraft {
-            activeWorkout = ActiveWorkoutState(
-                session: draft.session,
-                currentExerciseIndex: draft.currentExerciseIndex,
-                currentSetIndex: draft.currentSetIndex,
-                isResting: false,
-                restTimeRemaining: 0,
-                plannedExercises: draft.plannedExercises
-            )
+            activeWorkout = activeWorkoutState(from: draft)
         } else {
             activeWorkout = nil
         }

@@ -24,6 +24,25 @@ nonisolated struct WorkoutSession: Codable, Identifiable, Sendable {
         self.totalVolume = totalVolume
         self.notes = notes
     }
+
+    enum CodingKeys: String, CodingKey {
+        case id, planId, dayId, dayName, startTime, endTime, exerciseLogs
+        case isCompleted, totalVolume, notes
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.planId = try c.decodeIfPresent(String.self, forKey: .planId) ?? ""
+        self.dayId = try c.decodeIfPresent(String.self, forKey: .dayId) ?? ""
+        self.dayName = try c.decodeIfPresent(String.self, forKey: .dayName) ?? ""
+        self.startTime = try c.decodeIfPresent(Date.self, forKey: .startTime) ?? Date()
+        self.endTime = try c.decodeIfPresent(Date.self, forKey: .endTime)
+        self.exerciseLogs = try c.decodeIfPresent([ExerciseLog].self, forKey: .exerciseLogs) ?? []
+        self.isCompleted = try c.decodeIfPresent(Bool.self, forKey: .isCompleted) ?? false
+        self.totalVolume = try c.decodeIfPresent(Double.self, forKey: .totalVolume) ?? 0
+        self.notes = try c.decodeIfPresent(String.self, forKey: .notes) ?? ""
+    }
 }
 
 nonisolated struct ExerciseLog: Codable, Identifiable, Sendable {
@@ -37,6 +56,18 @@ nonisolated struct ExerciseLog: Codable, Identifiable, Sendable {
         self.exerciseId = exerciseId
         self.sets = sets
         self.isCompleted = isCompleted
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, exerciseId, sets, isCompleted
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.exerciseId = try c.decodeIfPresent(String.self, forKey: .exerciseId) ?? ""
+        self.sets = try c.decodeIfPresent([SetLog].self, forKey: .sets) ?? []
+        self.isCompleted = try c.decodeIfPresent(Bool.self, forKey: .isCompleted) ?? false
     }
 }
 
@@ -67,12 +98,12 @@ nonisolated struct SetLog: Codable, Identifiable, Sendable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = try c.decode(String.self, forKey: .id)
-        self.setNumber = try c.decode(Int.self, forKey: .setNumber)
-        self.weight = try c.decode(Double.self, forKey: .weight)
-        self.reps = try c.decode(Int.self, forKey: .reps)
-        self.isCompleted = try c.decode(Bool.self, forKey: .isCompleted)
-        self.isPR = try c.decode(Bool.self, forKey: .isPR)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.setNumber = try c.decodeIfPresent(Int.self, forKey: .setNumber) ?? 1
+        self.weight = try c.decodeIfPresent(Double.self, forKey: .weight) ?? 0
+        self.reps = try c.decodeIfPresent(Int.self, forKey: .reps) ?? 0
+        self.isCompleted = try c.decodeIfPresent(Bool.self, forKey: .isCompleted) ?? false
+        self.isPR = try c.decodeIfPresent(Bool.self, forKey: .isPR) ?? false
         self.rpe = try c.decodeIfPresent(Double.self, forKey: .rpe)
         self.quality = try c.decodeIfPresent(SetQuality.self, forKey: .quality)
     }
@@ -157,6 +188,20 @@ nonisolated struct PersonalRecord: Codable, Identifiable, Sendable {
         self.date = date
         self.estimatedOneRepMax = estimatedOneRepMax
     }
+
+    enum CodingKeys: String, CodingKey {
+        case id, exerciseId, weight, reps, date, estimatedOneRepMax
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.exerciseId = try c.decodeIfPresent(String.self, forKey: .exerciseId) ?? ""
+        self.weight = try c.decodeIfPresent(Double.self, forKey: .weight) ?? 0
+        self.reps = try c.decodeIfPresent(Int.self, forKey: .reps) ?? 0
+        self.date = try c.decodeIfPresent(Date.self, forKey: .date) ?? Date()
+        self.estimatedOneRepMax = try c.decodeIfPresent(Double.self, forKey: .estimatedOneRepMax) ?? 0
+    }
 }
 
 nonisolated struct ProgressEntry: Codable, Identifiable, Sendable {
@@ -178,6 +223,23 @@ nonisolated struct ProgressEntry: Codable, Identifiable, Sendable {
         self.totalReps = totalReps
         self.totalVolume = totalVolume
         self.workoutDuration = workoutDuration
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, date, bodyWeight, muscleGroupVolume, totalSets, totalReps
+        case totalVolume, workoutDuration
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.date = try c.decodeIfPresent(Date.self, forKey: .date) ?? Date()
+        self.bodyWeight = try c.decodeIfPresent(Double.self, forKey: .bodyWeight)
+        self.muscleGroupVolume = try c.decodeIfPresent([String: Double].self, forKey: .muscleGroupVolume) ?? [:]
+        self.totalSets = try c.decodeIfPresent(Int.self, forKey: .totalSets) ?? 0
+        self.totalReps = try c.decodeIfPresent(Int.self, forKey: .totalReps) ?? 0
+        self.totalVolume = try c.decodeIfPresent(Double.self, forKey: .totalVolume) ?? 0
+        self.workoutDuration = try c.decodeIfPresent(Int.self, forKey: .workoutDuration) ?? 0
     }
 }
 

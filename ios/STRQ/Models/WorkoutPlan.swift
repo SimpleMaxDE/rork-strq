@@ -20,6 +20,22 @@ nonisolated struct WorkoutPlan: Codable, Identifiable, Sendable {
         self.durationWeeks = durationWeeks
         self.explanation = explanation
     }
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, description, days, createdAt, splitType, durationWeeks, explanation
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.name = try c.decodeIfPresent(String.self, forKey: .name) ?? ""
+        self.description = try c.decodeIfPresent(String.self, forKey: .description) ?? ""
+        self.days = try c.decodeIfPresent([WorkoutDay].self, forKey: .days) ?? []
+        self.createdAt = try c.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
+        self.splitType = try c.decodeIfPresent(String.self, forKey: .splitType) ?? ""
+        self.durationWeeks = try c.decodeIfPresent(Int.self, forKey: .durationWeeks) ?? 8
+        self.explanation = try c.decodeIfPresent(String.self, forKey: .explanation) ?? ""
+    }
 }
 
 nonisolated struct WorkoutDay: Codable, Identifiable, Sendable {
@@ -44,6 +60,24 @@ nonisolated struct WorkoutDay: Codable, Identifiable, Sendable {
         self.scheduledWeekday = scheduledWeekday
         self.isSkipped = isSkipped
     }
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, focusMuscles, exercises, dayIndex, warmupHint
+        case estimatedMinutes, scheduledWeekday, isSkipped
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.name = try c.decodeIfPresent(String.self, forKey: .name) ?? ""
+        self.focusMuscles = try c.decodeIfPresent([MuscleGroup].self, forKey: .focusMuscles) ?? []
+        self.exercises = try c.decodeIfPresent([PlannedExercise].self, forKey: .exercises) ?? []
+        self.dayIndex = try c.decodeIfPresent(Int.self, forKey: .dayIndex) ?? 0
+        self.warmupHint = try c.decodeIfPresent(String.self, forKey: .warmupHint) ?? ""
+        self.estimatedMinutes = try c.decodeIfPresent(Int.self, forKey: .estimatedMinutes) ?? 60
+        self.scheduledWeekday = try c.decodeIfPresent(Int.self, forKey: .scheduledWeekday)
+        self.isSkipped = try c.decodeIfPresent(Bool.self, forKey: .isSkipped) ?? false
+    }
 }
 
 nonisolated struct CoachDefault: Codable, Sendable, Equatable {
@@ -52,6 +86,27 @@ nonisolated struct CoachDefault: Codable, Sendable, Equatable {
     var restSeconds: Int
     var rpe: Double?
     var role: String
+
+    enum CodingKeys: String, CodingKey {
+        case sets, reps, restSeconds, rpe, role
+    }
+
+    init(sets: Int, reps: String, restSeconds: Int, rpe: Double? = nil, role: String = "") {
+        self.sets = sets
+        self.reps = reps
+        self.restSeconds = restSeconds
+        self.rpe = rpe
+        self.role = role
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.sets = try c.decodeIfPresent(Int.self, forKey: .sets) ?? 0
+        self.reps = try c.decodeIfPresent(String.self, forKey: .reps) ?? ""
+        self.restSeconds = try c.decodeIfPresent(Int.self, forKey: .restSeconds) ?? 90
+        self.rpe = try c.decodeIfPresent(Double.self, forKey: .rpe)
+        self.role = try c.decodeIfPresent(String.self, forKey: .role) ?? ""
+    }
 }
 
 nonisolated struct PlannedExercise: Codable, Identifiable, Sendable {
@@ -75,6 +130,23 @@ nonisolated struct PlannedExercise: Codable, Identifiable, Sendable {
         self.notes = notes
         self.order = order
         self.coachDefault = coachDefault
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, exerciseId, sets, reps, restSeconds, rpe, notes, order, coachDefault
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.exerciseId = try c.decodeIfPresent(String.self, forKey: .exerciseId) ?? ""
+        self.sets = try c.decodeIfPresent(Int.self, forKey: .sets) ?? 1
+        self.reps = try c.decodeIfPresent(String.self, forKey: .reps) ?? ""
+        self.restSeconds = try c.decodeIfPresent(Int.self, forKey: .restSeconds) ?? 90
+        self.rpe = try c.decodeIfPresent(Double.self, forKey: .rpe)
+        self.notes = try c.decodeIfPresent(String.self, forKey: .notes) ?? ""
+        self.order = try c.decodeIfPresent(Int.self, forKey: .order) ?? 0
+        self.coachDefault = try c.decodeIfPresent(CoachDefault.self, forKey: .coachDefault)
     }
 
     var isCustomized: Bool {

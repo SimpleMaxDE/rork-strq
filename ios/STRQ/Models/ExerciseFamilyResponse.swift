@@ -68,6 +68,24 @@ nonisolated struct PersonalExerciseResponse: Codable, Sendable, Equatable {
         self.lastUpdated = lastUpdated
     }
 
+    enum CodingKeys: String, CodingKey {
+        case familyId, progressionSignal, fatigueCost, jointTolerance
+        case adherenceScore, confidence, sessionCount, recentExposure, lastUpdated
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.familyId = try c.decodeIfPresent(String.self, forKey: .familyId) ?? ""
+        self.progressionSignal = try c.decodeIfPresent(Double.self, forKey: .progressionSignal) ?? 0
+        self.fatigueCost = try c.decodeIfPresent(Double.self, forKey: .fatigueCost) ?? 0.5
+        self.jointTolerance = try c.decodeIfPresent(Double.self, forKey: .jointTolerance) ?? 0
+        self.adherenceScore = try c.decodeIfPresent(Double.self, forKey: .adherenceScore) ?? 1.0
+        self.confidence = try c.decodeIfPresent(Double.self, forKey: .confidence) ?? 0
+        self.sessionCount = try c.decodeIfPresent(Int.self, forKey: .sessionCount) ?? 0
+        self.recentExposure = try c.decodeIfPresent(Int.self, forKey: .recentExposure) ?? 0
+        self.lastUpdated = try c.decodeIfPresent(Date.self, forKey: .lastUpdated) ?? Date()
+    }
+
     /// Minimum exposures before this response is allowed to meaningfully
     /// nudge plan generation or swap ranking.
     static let confidenceThresholdSessions: Int = 3
@@ -91,6 +109,16 @@ nonisolated struct ExerciseFamilyResponseProfile: Codable, Sendable, Equatable {
     ) {
         self.familyResponses = familyResponses
         self.lastUpdated = lastUpdated
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case familyResponses, lastUpdated
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.familyResponses = try c.decodeIfPresent([String: PersonalExerciseResponse].self, forKey: .familyResponses) ?? [:]
+        self.lastUpdated = try c.decodeIfPresent(Date.self, forKey: .lastUpdated) ?? Date()
     }
 
     static let empty: ExerciseFamilyResponseProfile = .init()

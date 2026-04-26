@@ -33,6 +33,7 @@ final class WorkoutController {
     }
 
     private var pendingSetUndo: PendingSetUndo?
+    private var pendingPersistenceTask: Task<Void, Never>?
 
     init(vm: AppViewModel) {
         self.vm = vm
@@ -158,7 +159,7 @@ final class WorkoutController {
         guard workout.session.notes != normalized else { return }
         workout.session.notes = normalized
         vm.activeWorkout = workout
-        vm.persist()
+        persistActiveWorkoutChange()
     }
 
     /// Pauses and leaves the current workout — session stays as a draft so it
@@ -232,7 +233,7 @@ final class WorkoutController {
             "new": newExercise.id
         ])
         updateLiveActivity()
-        vm.persist()
+        persistActiveWorkoutChange()
     }
 
     // MARK: - Set edits
@@ -244,6 +245,7 @@ final class WorkoutController {
         workout.session.exerciseLogs[exerciseIndex].sets[setIndex].weight = max(0, weight)
         workout.session.exerciseLogs[exerciseIndex].sets[setIndex].reps = max(0, reps)
         vm.activeWorkout = workout
+        persistActiveWorkoutChange(debounced: true)
     }
 
     /// Marks the set complete, advances the cursor, and returns the planned
@@ -284,6 +286,7 @@ final class WorkoutController {
         pendingSetUndo = undo
         vm.activeWorkout = workout
         updateLiveActivity(restEndsAt: Date().addingTimeInterval(TimeInterval(rest)))
+        persistActiveWorkoutChange()
         return rest
     }
 
@@ -309,6 +312,7 @@ final class WorkoutController {
         pendingSetUndo = nil
         vm.activeWorkout = workout
         updateLiveActivity()
+        persistActiveWorkoutChange()
         return true
     }
 
@@ -322,6 +326,7 @@ final class WorkoutController {
               setIndex < workout.session.exerciseLogs[exerciseIndex].sets.count else { return }
         workout.session.exerciseLogs[exerciseIndex].sets[setIndex].quality = quality
         vm.activeWorkout = workout
+        persistActiveWorkoutChange()
     }
 
     // MARK: - Cursor moves
@@ -454,5 +459,21 @@ final class WorkoutController {
             nextExerciseName: nextName,
             isCompleted: allDone
         )
+    }
+
+    private func persistActiveWorkoutChange(debounced: Bool = false) {
+        guard vm.activeWorkout != nil else { return }
+        pendingPersistenceTask?.cancel()
+        pendingPersistenceTask = nil
+        guard debounced else {
+            vm.persist()
+            return
+        }
+        pendingPersistenceTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            guard !Task.isCancelled else { return }
+            self.vm.persist()
+            self.pendingPersistenceTask = nil
+        }
     }
 }

@@ -113,6 +113,24 @@ nonisolated struct DailyReadiness: Codable, Identifiable, Sendable {
         self.painNote = painNote
     }
 
+    enum CodingKeys: String, CodingKey {
+        case id, date, sleepQuality, energyLevel, stressLevel, soreness
+        case motivation, painOrRestriction, painNote
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try c.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.date = try c.decodeIfPresent(Date.self, forKey: .date) ?? Date()
+        self.sleepQuality = try c.decodeIfPresent(ReadinessLevel.self, forKey: .sleepQuality) ?? .good
+        self.energyLevel = try c.decodeIfPresent(ReadinessLevel.self, forKey: .energyLevel) ?? .good
+        self.stressLevel = try c.decodeIfPresent(ReadinessLevel.self, forKey: .stressLevel) ?? .okay
+        self.soreness = try c.decodeIfPresent(SorenessLevel.self, forKey: .soreness) ?? .mild
+        self.motivation = try c.decodeIfPresent(DailyMotivation.self, forKey: .motivation) ?? .high
+        self.painOrRestriction = try c.decodeIfPresent(Bool.self, forKey: .painOrRestriction) ?? false
+        self.painNote = try c.decodeIfPresent(String.self, forKey: .painNote) ?? ""
+    }
+
     var readinessScore: Int {
         let sleepW = Double(sleepQuality.rawValue) * 0.3
         let energyW = Double(energyLevel.rawValue) * 0.25
