@@ -2192,7 +2192,7 @@ private struct NumericInputSheet: View {
                     .foregroundStyle(.secondary)
                     .padding(.top, 8)
 
-                TextField(L10n.tr(""), text: $text)
+                TextField("", text: $text)
                     .keyboardType(context.field == .weight ? .decimalPad : .numberPad)
                     .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
                     .multilineTextAlignment(.center)

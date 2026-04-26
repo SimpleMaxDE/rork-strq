@@ -3266,7 +3266,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Advanced (3+ Jahre)"
+            "value": "Fortgeschritten (3+ Jahre)"
           }
         }
       }
@@ -5866,7 +5866,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adaptive Pläne, deeper progression reads, and every session safely carried across your devices."
+            "value": "Adaptive Pläne, tiefere Progressionsanalysen und jede Session sicher über deine Geräte hinweg synchronisiert."
           }
         }
       }
@@ -6116,7 +6116,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Woche in Review"
+            "value": "Woche im Rückblick"
           }
         }
       }
@@ -6126,7 +6126,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volumen Comparison"
+            "value": "Volumenvergleich"
           }
         }
       }
@@ -6446,7 +6446,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "FORTSCHRITTING"
+            "value": "FORTSCHREITEND"
           }
         }
       }
@@ -7787,6 +7787,206 @@
           "stringUnit": {
             "state": "translated",
             "value": "dich"
+          }
+        }
+      }
+    },
+    "sessions logged": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessions geloggt"
+          }
+        }
+      }
+    },
+    "session logged": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Session geloggt"
+          }
+        }
+      }
+    },
+    "lifts progressing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lifts im Fortschritt"
+          }
+        }
+      }
+    },
+    "PRs this month": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PRs diesen Monat"
+          }
+        }
+      }
+    },
+    "Today starts the record. One logged workout turns this screen into signal.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute startet dein Verlauf. Ein geloggtes Workout macht diesen Screen direkt aussagekräftig."
+          }
+        }
+      }
+    },
+    "Strong start. STRQ is already reading load, recovery, and consistency.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starker Start. STRQ liest bereits Last, Regeneration und Konstanz."
+          }
+        }
+      }
+    },
+    "PR this month": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PR diesen Monat"
+          }
+        }
+      }
+    },
+    "%d %@ · %d-day streak": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d %@ · %d-Tage-Streak"
+          }
+        }
+      }
+    },
+    "%d-day streak · keep the signal strong": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d-Tage-Streak · halte das Signal stark"
+          }
+        }
+      }
+    },
+    "Train to keep the signal sharp": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainiere, damit das Signal scharf bleibt"
+          }
+        }
+      }
+    },
+    "Calibrating": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalibrierung läuft"
+          }
+        }
+      }
+    },
+    "%d progressing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d im Fortschritt"
+          }
+        }
+      }
+    },
+    "%d flat": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d stagnierend"
+          }
+        }
+      }
+    },
+    "%d-day streak · %d sessions logged": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d-Tage-Streak · %d Sessions geloggt"
+          }
+        }
+      }
+    },
+    "Start fresh today": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starte heute neu"
+          }
+        }
+      }
+    },
+    "%dmin": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Min"
+          }
+        }
+      }
+    },
+    "%d sets": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Sets"
+          }
+        }
+      }
+    },
+    "%d days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Tage"
+          }
+        }
+      }
+    },
+    "Avg %d": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ø %d"
+          }
+        }
+      }
+    },
+    "Avg %dg": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ø %dg"
           }
         }
       }

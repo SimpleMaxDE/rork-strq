@@ -69,36 +69,37 @@ struct ProgressAnalyticsView: View {
         let headline: (String, String) = {
             switch tier {
             case .fresh:
-                return ("0", "sessions logged")
+                return ("0", L10n.tr("sessions logged"))
             case .firstSession:
-                return ("1", "session logged")
+                return ("1", L10n.tr("session logged"))
             case .earlyWeek:
-                return ("\(vm.totalCompletedWorkouts)", "sessions logged")
+                return ("\(vm.totalCompletedWorkouts)", L10n.tr("sessions logged"))
             case .established:
                 if progressing > 0 {
-                    return ("\(progressing)", "lifts progressing")
+                    return ("\(progressing)", L10n.tr("lifts progressing"))
                 } else if prsThisMonth > 0 {
-                    return ("\(prsThisMonth)", "PRs this month")
+                    return ("\(prsThisMonth)", L10n.tr("PRs this month"))
                 } else {
-                    return ("\(vm.totalCompletedWorkouts)", "sessions logged")
+                    return ("\(vm.totalCompletedWorkouts)", L10n.tr("sessions logged"))
                 }
             }
         }()
         let sub: String = {
             switch tier {
             case .fresh:
-                return "Today starts the record. One logged workout turns this screen into signal."
+                return L10n.tr("Today starts the record. One logged workout turns this screen into signal.")
             case .firstSession:
-                return "Strong start. STRQ is already reading load, recovery, and consistency."
+                return L10n.tr("Strong start. STRQ is already reading load, recovery, and consistency.")
             case .earlyWeek:
-                return "\(vm.totalCompletedWorkouts) session\(vm.totalCompletedWorkouts == 1 ? "" : "s") in · first-week trends are starting to resolve"
+                return L10n.format(vm.totalCompletedWorkouts == 1 ? "%d session in · first-week trends are starting to resolve" : "%d sessions in · first-week trends are starting to resolve", vm.totalCompletedWorkouts)
             case .established:
                 if progressing > 0 && prsThisMonth > 0 {
-                    return "\(prsThisMonth) PR\(prsThisMonth == 1 ? "" : "s") this month · \(vm.streak)-day streak"
+                    let prLabel = prsThisMonth == 1 ? L10n.tr("PR this month") : L10n.tr("PRs this month")
+                    return L10n.format("%d %@ · %d-day streak", prsThisMonth, prLabel, vm.streak)
                 } else if vm.streak > 0 {
-                    return "\(vm.streak)-day streak · keep the signal strong"
+                    return L10n.format("%d-day streak · keep the signal strong", vm.streak)
                 } else {
-                    return "Train to keep the signal sharp"
+                    return L10n.tr("Train to keep the signal sharp")
                 }
             }
         }()
@@ -285,10 +286,10 @@ struct ProgressAnalyticsView: View {
                     title: "Strength",
                     state: progressing.count > stalled.count ? .success : (stalled.count > 0 ? .warning : .neutral),
                     detail: {
-                        if progressing.isEmpty && stalled.isEmpty { return "Calibrating" }
+                        if progressing.isEmpty && stalled.isEmpty { return L10n.tr("Calibrating") }
                         var parts: [String] = []
-                        if !progressing.isEmpty { parts.append("\(progressing.count) progressing") }
-                        if !stalled.isEmpty { parts.append("\(stalled.count) flat") }
+                        if !progressing.isEmpty { parts.append(L10n.format("%d progressing", progressing.count)) }
+                        if !stalled.isEmpty { parts.append(L10n.format("%d flat", stalled.count)) }
                         return parts.joined(separator: " · ")
                     }()
                 )
@@ -298,7 +299,7 @@ struct ProgressAnalyticsView: View {
                         icon: "figure.arms.open",
                         title: "Physique",
                         state: mapVerdictState(physique.paceVerdict),
-                        detail: physique.summary ?? "Calibrating"
+                        detail: physique.summary ?? L10n.tr("Calibrating")
                     )
                 }
 
@@ -306,7 +307,7 @@ struct ProgressAnalyticsView: View {
                     icon: "flame.fill",
                     title: "Consistency",
                     state: vm.streak >= 7 ? .success : (vm.streak >= 3 ? .info : .neutral),
-                    detail: vm.streak > 0 ? "\(vm.streak)-day streak · \(vm.totalCompletedWorkouts) sessions logged" : "Start fresh today"
+                    detail: vm.streak > 0 ? L10n.format("%d-day streak · %d sessions logged", vm.streak, vm.totalCompletedWorkouts) : L10n.tr("Start fresh today")
                 )
             }
         }
@@ -834,9 +835,9 @@ struct ProgressAnalyticsView: View {
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 HStack(spacing: 4) {
-                    Text("\(duration)min")
+                    Text(L10n.format("%dmin", duration))
                     Text("·").foregroundStyle(.quaternary)
-                    Text("\(sets) sets")
+                    Text(L10n.format("%d sets", sets))
                     Text("·").foregroundStyle(.quaternary)
                     Text(ForgeTheme.formatVolume(session.totalVolume) + "kg")
                 }
@@ -864,7 +865,7 @@ struct ProgressAnalyticsView: View {
                 ForgeSectionHeader(title: "28-Day Consistency")
                 Spacer()
                 let count = last28Days.filter(\.1).count
-                Text("\(count) days")
+                Text(L10n.format("%d days", count))
                     .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
                     .foregroundStyle(STRQBrand.steel)
                     .padding(.horizontal, 8)
@@ -1099,7 +1100,7 @@ struct ProgressAnalyticsView: View {
                     Spacer()
                     let avgScore = data.map(\.score).reduce(0, +) / max(1, data.count)
                     let scoreColor: Color = avgScore >= 75 ? .green : avgScore >= 55 ? .yellow : .red
-                    Text("Avg \(avgScore)")
+                    Text(L10n.format("Avg %d", avgScore))
                         .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundStyle(scoreColor)
                         .padding(.horizontal, 8)
@@ -1153,7 +1154,7 @@ struct ProgressAnalyticsView: View {
                     ForgeSectionHeader(title: "Nutrition", trailing: "7 Days")
                     Spacer()
                     let avgProtein = logs.map(\.proteinGrams).reduce(0, +) / max(1, logs.count)
-                    Text("Avg \(avgProtein)g")
+                    Text(L10n.format("Avg %dg", avgProtein))
                         .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundStyle(STRQBrand.steel)
                         .padding(.horizontal, 8)
