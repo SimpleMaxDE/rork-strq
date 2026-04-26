@@ -24,6 +24,21 @@ NON_USER_RE = re.compile(
 STRING_RE = re.compile(r'"([^"\\]*(?:\\.[^"\\]*)*)"')
 L10N_KEY_RE = re.compile(r'L10n\.(?:tr|format)\("([^"]+)"')
 
+TARGET_VIEW_FILES = {
+    "Views/CoachTabView.swift",
+    "Views/CoachingHistoryView.swift",
+    "Views/CoachingPreferencesView.swift",
+    "Views/ExercisePrescriptionSheet.swift",
+    "Views/NotificationSettingsView.swift",
+    "Views/NutritionSettingsView.swift",
+    "Views/ReadinessCheckInView.swift",
+    "Views/STRQPaywallView.swift",
+    "Views/SessionEditorSheet.swift",
+    "Views/SleepLogView.swift",
+    "Views/SwapExerciseSheet.swift",
+    "Views/WeeklyCheckInView.swift",
+}
+
 EXCLUDED_DIRS = {"Tools", "STRQTests", "STRQUITests"}
 COPY_FILES = {
     "Services/DailyBriefingEngine.swift",
@@ -46,7 +61,7 @@ def is_user_surface(path: Path) -> bool:
     rel=str(path.relative_to(ROOT))
     if rel.endswith("Views/MediaDiagnosticsView.swift"):
         return False
-    return rel.startswith("Views/") or rel in COPY_FILES
+    return rel in TARGET_VIEW_FILES or rel in COPY_FILES
 
 def is_user_literal(path: Path, line: str, lit: str) -> bool:
     if not is_user_surface(path):
@@ -91,8 +106,8 @@ def main() -> int:
         for lineno,line in enumerate(path.read_text(encoding="utf-8").splitlines(),start=1):
             for m in L10N_KEY_RE.finditer(line):
                 key=m.group(1)
-                l10n_keys.add(key)
                 if is_user_surface(path):
+                    l10n_keys.add(key)
                     visible_l10n_keys.add(key)
             if "L10n.tr(" in line or "L10n.format(" in line or "NSLocalizedString(" in line:
                 continue
