@@ -6,97 +6,226 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 XCSTRINGS_PATH = ROOT / "Localizable.xcstrings"
 
-ALLOW_TERMS = {
-    "STRQ", "STRQ Pro", "iCloud", "Apple", "PR", "e1RM", "RPE", "kg", "min", "kcal",
-    "Coach", "Pro", "Push", "Pull", "Legs", "Core", "Deload",
-}
-
-USER_CONTEXT_TOKENS = [
-    "Text(", "Button(", "Label(", "NavigationLink(", "navigationTitle(", "alert(",
-    "confirmationDialog(", "searchable(", "accessibilityLabel(", "accessibilityHint(",
-    "ForgeSectionHeader(", "controlRow(", "controlRowContent(", "profileRow(",
-    "statusChip(", "proPillarChip(", "selectionChip(", "stepHero(", "fieldGroup(",
-    "title:", "detail:", "summary:", "eyebrow:", "cta:", "ctaTitle:", "displayName:",
-    "shortName:", "description:", "headline:", "subtitle:", "message:", "note:", "label:",
+UI_CONTEXT_TOKENS = [
+    "Text(", "Button(", "Label(", "navigationTitle(", "alert(",
+    "confirmationDialog(", "Toggle(", "Picker(", "Section(", "TextField(",
+    "SecureField(", "Stepper(", "Menu(", "LabeledContent(",
+    "ForgeSectionHeader(", "controlRow(", "profileRow(", "statusChip(",
+    "proPillarChip(", "selectionChip(", "stepHero(", "fieldGroup(",
 ]
 
 NON_USER_CONTEXT_TOKENS = [
-    "Analytics.", "ErrorReporter.", "print(", "debugPrint(", "logger.", "os_log",
-    "systemName:", "symbolName:", "icon:", "colorName:", "id:", "identifier", "rawValue",
-    "imageName:", "file", "path", "URL", "http", "https", "SF Symbol", "UserDefaults", "forKey:",
+    "print(", "debugPrint(", "logger.", "os_log", "Analytics.", "ErrorReporter.",
+    "NSPredicate(", "URL(", "http://", "https://", "UserDefaults", "forKey:",
+    "rawValue", "identifier", "id:", "systemName:", "symbolName:", "imageName:",
+    "accessibilityIdentifier(", "fatalError(", "preconditionFailure(",
 ]
+
+EXCLUDED_PATH_PARTS = {
+    "Tools",
+    "Tests",
+    "Preview Content",
+    "Previews",
+    "Fixtures",
+    "Generated",
+}
+
+EXCLUDED_FILE_HINTS = (
+    "+Debug", "Debug", "Preview", "Mock", "Stub", "Fixture", "Snapshot", "Harness", "Diagnostics"
+)
+
+# Terms commonly unchanged in German product copy.
+IDENTICAL_DE_ALLOWLIST = {
+    "STRQ",
+    "STRQ Pro",
+    "PR",
+    "RPE",
+    "kg",
+    "kcal",
+    "min",
+    "Push",
+    "Pull",
+    "Push A",
+    "Push B",
+    "Pull A",
+    "Pull B",
+    "Auto",
+    "BW",
+    "EX %d/%d",
+    "Motivation",
+    "OK",
+    "OPTIONAL",
+    "Optional",
+    "PRO",
+    "Protein",
+    "REPS",
+    "RPE %@",
+    "Rehabilitation",
+    "STRQ PRO",
+    "Standard",
+    "Stress",
+    "e1RM %.0f",
+    "vs %@",
+    "~%dm",
+    "× %d · e1RM %d",
+    "≥ 7h",
+    "< 7h",
+    "%.0f kg",
+    "%.1f kg",
+    "%@ · %@ × %d",
+    "%@%.0f kg",
+    "%@%.0f%%",
+    "%@kg",
+    "%d %@ · %d %@",
+    "%d cm",
+    "%d kcal",
+    "%dg",
+    "%dkg × %d",
+    "%dm",
+    "%dmin",
+    "%dw",
+    "%dwk",
+    " — %@",
+}
 
 STRING_RE = re.compile(r'"([^"\\]*(?:\\.[^"\\]*)*)"')
 L10N_KEY_RE = re.compile(r'L10n\.(?:tr|format)\("([^"]+)"')
-
-
-def looks_like_user_facing_literal(line: str, literal: str) -> bool:
-    s = literal.strip()
-    if not s or s in ALLOW_TERMS:
-        return False
-    if re.fullmatch(r"[\W_]+", s) or re.fullmatch(r"[0-9.:%+\-–—/ ]+", s):
-        return False
-    if re.fullmatch(r"[A-Za-z0-9_.:/-]+", s) and " " not in s:
-        return False
-    if any(token in line for token in NON_USER_CONTEXT_TOKENS):
-        return False
-    if not any(token in line for token in USER_CONTEXT_TOKENS):
-        return False
-    return bool(re.search(r"[A-Za-z]", s))
+ENGLISH_CHAR_RE = re.compile(r"[A-Za-z]")
 
 
 def iter_scoped_files() -> list[Path]:
-    swift_files = sorted(ROOT.rglob("*.swift"))
-    target_suffixes = {
-        "Views/ProfileView.swift",
-        "Views/DashboardView.swift",
-        "Views/ActiveWorkoutView.swift",
-        "Views/OnboardingView.swift",
-        "Views/TrainingPlanView.swift",
-        "Views/WorkoutCompletionView.swift",
-        "Views/PlanRevealView.swift",
-        "Views/ProgressAnalyticsView.swift",
-        "Services/DailyBriefingEngine.swift",
-        "Services/PlanGenerator.swift",
-        "Services/WorkoutHighlights.swift",
-        "ViewModels/StoreViewModel.swift",
-        "ViewModels/AppViewModel.swift",
-        "Models/UserProfile.swift",
-    }
-    return [p for p in swift_files if any(str(p.relative_to(ROOT)).endswith(suffix) for suffix in target_suffixes)]
+    files: list[Path] = []
+    for path in sorted(ROOT.rglob("*.swift")):
+        rel = path.relative_to(ROOT)
+        parts = set(rel.parts)
+        if parts & EXCLUDED_PATH_PARTS:
+            continue
+        if any(hint in path.name for hint in EXCLUDED_FILE_HINTS):
+            continue
+        files.append(path)
+    return files
+
+
+def looks_like_user_facing_english_literal(line: str, literal: str) -> bool:
+    text = literal.strip()
+    if not text:
+        return False
+
+    if "\\(" in text:
+        return False
+
+    if any(token in line for token in NON_USER_CONTEXT_TOKENS):
+        return False
+
+    if not any(token in line for token in UI_CONTEXT_TOKENS):
+        return False
+
+    if not ENGLISH_CHAR_RE.search(text):
+        return False
+
+    if "%" in text or "%@" in text:
+        return False
+
+    if "))" in text or "\\(" in text:
+        return False
+
+    if re.fullmatch(r"[A-Z0-9_./:-]+", text):
+        return False
+
+    if re.fullmatch(r"[%0-9.\-+()/: ]+", text):
+        return False
+
+    if re.fullmatch(r"[a-z0-9]+(?:\.[a-z0-9]+)+", text):
+        return False
+
+    # Focus on phrase-like literals that are most likely visible copy.
+    if " " not in text:
+        return False
+
+    return True
+
+
+def read_de_value(entry: dict) -> str | None:
+    locs = entry.get("localizations", {})
+    de = locs.get("de")
+    if not isinstance(de, dict):
+        return None
+
+    string_unit = de.get("stringUnit")
+    if isinstance(string_unit, dict):
+        value = string_unit.get("value")
+        if isinstance(value, str):
+            return value
+
+    variations = de.get("variations")
+    if isinstance(variations, dict):
+        for variation in variations.values():
+            if not isinstance(variation, dict):
+                continue
+            for variant in variation.values():
+                if not isinstance(variant, dict):
+                    continue
+                unit = variant.get("stringUnit")
+                if isinstance(unit, dict) and isinstance(unit.get("value"), str):
+                    return unit["value"]
+
+    return None
 
 
 def main() -> int:
     issues: list[tuple[str, int, str]] = []
     l10n_keys: set[str] = set()
+    files = iter_scoped_files()
 
-    for path in iter_scoped_files():
+    for path in files:
         rel = path.relative_to(ROOT)
         for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
-            for m in L10N_KEY_RE.finditer(line):
-                l10n_keys.add(m.group(1))
+            for match in L10N_KEY_RE.finditer(line):
+                l10n_keys.add(match.group(1))
 
             if "L10n.tr(" in line or "L10n.format(" in line or "NSLocalizedString(" in line:
                 continue
 
-            for m in STRING_RE.finditer(line):
-                lit = m.group(1)
-                if looks_like_user_facing_literal(line, lit):
-                    issues.append((str(rel), lineno, lit))
+            for match in STRING_RE.finditer(line):
+                literal = match.group(1)
+                if looks_like_user_facing_english_literal(line, literal):
+                    issues.append((str(rel), lineno, literal))
 
     catalog = json.loads(XCSTRINGS_PATH.read_text(encoding="utf-8"))
-    available = set(catalog.get("strings", {}).keys())
+    strings = catalog.get("strings", {})
+    available = set(strings.keys())
     missing_keys = sorted(k for k in l10n_keys if k not in available)
 
-    print(f"Scanned {len(iter_scoped_files())} Swift files")
-    print(f"Likely user-facing hardcoded literals: {len(issues)}")
+    missing_de_keys: list[str] = []
+    identical_de_keys: list[str] = []
+    for key in sorted(l10n_keys & available):
+        entry = strings.get(key, {})
+        de_value = read_de_value(entry) if isinstance(entry, dict) else None
+        if not de_value:
+            missing_de_keys.append(key)
+            continue
+        if key not in IDENTICAL_DE_ALLOWLIST and de_value.strip() == key.strip():
+            identical_de_keys.append(key)
+
+    print(f"Scanned {len(files)} Swift files")
+    print(f"Likely user-facing hardcoded English literals: {len(issues)}")
     for rel, lineno, lit in issues[:250]:
         print(f"{rel}:{lineno}: {lit}")
+
     print(f"Missing L10n keys in Localizable.xcstrings: {len(missing_keys)}")
     for key in missing_keys[:250]:
-        print(f"MISSING: {key}")
+        print(f"MISSING_KEY: {key}")
 
-    return 0
+    print(f"Missing visible German translations: {len(missing_de_keys)}")
+    for key in missing_de_keys[:250]:
+        print(f"MISSING_DE: {key}")
+
+    print(f"Visible German translations identical to English key: {len(identical_de_keys)}")
+    for key in identical_de_keys[:250]:
+        print(f"IDENTICAL_DE: {key}")
+
+    has_failures = bool(issues or missing_keys or missing_de_keys or identical_de_keys)
+    return 1 if has_failures else 0
 
 
 if __name__ == "__main__":

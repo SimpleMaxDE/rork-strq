@@ -324,7 +324,7 @@ struct SwapExerciseSheet: View {
         HStack(spacing: 4) {
             Image(systemName: preserved ? "checkmark.shield.fill" : roleIcon(role))
                 .font(.system(size: 9, weight: .bold))
-            Text(preserved ? "Same role" : role.displayName)
+            Text(preserved ? L10n.tr("Same role") : role.displayName)
                 .font(.system(size: 10, weight: .semibold))
         }
         .foregroundStyle(preserved ? STRQPalette.success : roleColor(role))

@@ -323,39 +323,39 @@ struct PlanGenerator {
 
     private func localizedSplitName(_ name: String) -> String {
         switch name {
-        case "Full Body": return L10n.tr("Ganzkörper")
-        case "Upper/Lower": return L10n.tr("Oberkörper/Unterkörper")
+        case "Full Body": return L10n.tr("Full Body")
+        case "Upper/Lower": return L10n.tr("Upper/Lower")
         case "Push/Pull/Legs": return L10n.tr("Push/Pull/Legs")
-        case "Body Part": return L10n.tr("Muskelgruppen")
+        case "Body Part": return L10n.tr("Body Part")
         default: return name
         }
     }
 
     private func localizedWorkoutName(_ name: String) -> String {
         let map: [String: String] = [
-            "Full Body A": "Ganzkörper A",
-            "Full Body B": "Ganzkörper B",
-            "Full Body C": "Ganzkörper C",
-            "Full Body D": "Ganzkörper D",
-            "Upper A": "Oberkörper A",
-            "Upper B": "Oberkörper B",
-            "Upper C": "Oberkörper C",
-            "Lower A": "Unterkörper A",
-            "Lower B": "Unterkörper B",
+            "Full Body A": "Full Body A",
+            "Full Body B": "Full Body B",
+            "Full Body C": "Full Body C",
+            "Full Body D": "Full Body D",
+            "Upper A": "Upper A",
+            "Upper B": "Upper B",
+            "Upper C": "Upper C",
+            "Lower A": "Lower A",
+            "Lower B": "Lower B",
             "Push": "Push",
             "Pull": "Pull",
-            "Legs": "Beine",
-            "Legs & Core": "Beine & Core",
+            "Legs": "Legs",
+            "Legs & Core": "Legs & Core",
             "Push A": "Push A",
             "Pull A": "Pull A",
-            "Legs A": "Beine A",
+            "Legs A": "Legs A",
             "Push B": "Push B",
             "Pull B": "Pull B",
-            "Legs B & Core": "Beine B & Core",
-            "Chest & Triceps": "Brust & Trizeps",
-            "Back & Biceps": "Rücken & Bizeps",
-            "Shoulders & Arms": "Schultern & Arme",
-            "Glutes & Core": "Gesäß & Core"
+            "Legs B & Core": "Legs B & Core",
+            "Chest & Triceps": "Chest & Triceps",
+            "Back & Biceps": "Back & Biceps",
+            "Shoulders & Arms": "Shoulders & Arms",
+            "Glutes & Core": "Glutes & Core"
         ]
         return L10n.tr(map[name] ?? name)
     }

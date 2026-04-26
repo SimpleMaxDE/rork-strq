@@ -501,7 +501,7 @@ struct CoachTabView: View {
         ]
 
         return VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: "What STRQ has picked up")
+            ForgeSectionHeader(title: L10n.tr("What STRQ has picked up"))
 
             VStack(spacing: 8) {
                 ForEach(Array(items.enumerated()), id: \.offset) { _, item in
@@ -541,7 +541,7 @@ struct CoachTabView: View {
         let progressing = vm.progressingExercises.prefix(2)
         if !stalled.isEmpty || !progressing.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                ForgeSectionHeader(title: "Lift Tracker")
+                ForgeSectionHeader(title: L10n.tr("Lift Tracker"))
 
                 ForEach(Array(stalled)) { state in
                     liftRow(state: state, isStalled: true)
@@ -686,17 +686,17 @@ struct CoachTabView: View {
                     vm.generateWeeklyReview()
                     showWeeklyReview = true
                 } label: {
-                    weeklyReviewLabel(subtitle: "Review your week and adjust", ready: true)
+                    weeklyReviewLabel(subtitle: L10n.tr("Review your week and adjust"), ready: true)
                 }
             } else if vm.isEarlyStage {
-                weeklyReviewLabel(subtitle: vm.sessionsUntilReviewReady == 0 ? "Almost there — one more session rounds out the week" : "\(vm.sessionsUntilReviewReady) more session\(vm.sessionsUntilReviewReady == 1 ? "" : "s") and your first weekly read will come into focus", ready: false)
+                weeklyReviewLabel(subtitle: vm.sessionsUntilReviewReady == 0 ? L10n.tr("Almost there — one more session rounds out the week") : L10n.format("%d more session%@ and your first weekly read will come into focus", vm.sessionsUntilReviewReady, vm.sessionsUntilReviewReady == 1 ? "" : "s"), ready: false)
                     .opacity(0.7)
             } else {
                 Button {
                     vm.generateWeeklyReview()
                     showWeeklyReview = true
                 } label: {
-                    weeklyReviewLabel(subtitle: "Review your week and adjust", ready: true)
+                    weeklyReviewLabel(subtitle: L10n.tr("Review your week and adjust"), ready: true)
                 }
             }
         }

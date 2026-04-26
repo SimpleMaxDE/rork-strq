@@ -654,7 +654,7 @@ struct PrescriptionEditSheet: View {
     private var rpeCard: some View {
         builderCard(title: "EFFORT", trailing: rpeEnabled ? "RPE \(String(format: "%.1f", rpeValue))" : "Coach") {
             VStack(spacing: 10) {
-                Toggle("Target RPE", isOn: $rpeEnabled)
+                Toggle(L10n.tr("Target RPE"), isOn: $rpeEnabled)
                     .tint(STRQBrand.steel)
                     .font(.caption.weight(.semibold))
                 if rpeEnabled {
