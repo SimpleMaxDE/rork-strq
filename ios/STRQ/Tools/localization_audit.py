@@ -31,7 +31,7 @@ EXCLUDED_PATH_PARTS = {
 }
 
 EXCLUDED_FILE_HINTS = (
-    "+Debug", "Debug", "Preview", "Mock", "Stub", "Fixture", "Snapshot", "Harness"
+    "+Debug", "Debug", "Preview", "Mock", "Stub", "Fixture", "Snapshot", "Harness", "Diagnostics"
 )
 
 # Terms commonly unchanged in German product copy.
@@ -49,6 +49,43 @@ IDENTICAL_DE_ALLOWLIST = {
     "Push B",
     "Pull A",
     "Pull B",
+    "Auto",
+    "BW",
+    "EX %d/%d",
+    "Motivation",
+    "OK",
+    "OPTIONAL",
+    "Optional",
+    "PRO",
+    "Protein",
+    "REPS",
+    "RPE %@",
+    "Rehabilitation",
+    "STRQ PRO",
+    "Standard",
+    "Stress",
+    "e1RM %.0f",
+    "vs %@",
+    "~%dm",
+    "× %d · e1RM %d",
+    "≥ 7h",
+    "< 7h",
+    "%.0f kg",
+    "%.1f kg",
+    "%@ · %@ × %d",
+    "%@%.0f kg",
+    "%@%.0f%%",
+    "%@kg",
+    "%d %@ · %d %@",
+    "%d cm",
+    "%d kcal",
+    "%dg",
+    "%dkg × %d",
+    "%dm",
+    "%dmin",
+    "%dw",
+    "%dwk",
+    " — %@",
 }
 
 STRING_RE = re.compile(r'"([^"\\]*(?:\\.[^"\\]*)*)"')
@@ -86,14 +123,23 @@ def looks_like_user_facing_english_literal(line: str, literal: str) -> bool:
     if not ENGLISH_CHAR_RE.search(text):
         return False
 
+    if "%" in text or "%@" in text:
+        return False
+
+    if "))" in text or "\\(" in text:
+        return False
+
     if re.fullmatch(r"[A-Z0-9_./:-]+", text):
         return False
 
     if re.fullmatch(r"[%0-9.\-+()/: ]+", text):
         return False
 
-    # Skip single tokens that are likely technical identifiers.
-    if " " not in text and text.count("-") == 0 and text.lower() == text and len(text) <= 3:
+    if re.fullmatch(r"[a-z0-9]+(?:\.[a-z0-9]+)+", text):
+        return False
+
+    # Focus on phrase-like literals that are most likely visible copy.
+    if " " not in text:
         return False
 
     return True

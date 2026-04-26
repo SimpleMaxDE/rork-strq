@@ -72,10 +72,10 @@ struct ReadinessCheckInView: View {
             }
             Spacer()
             VStack(spacing: 2) {
-                Text(showResult ? "Ready" : "Daily check-in")
+                Text(showResult ? L10n.tr("Ready") : L10n.tr("Daily check-in"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.primary)
-                Text(showResult ? "Today's plan" : contextLabel)
+                Text(showResult ? L10n.tr("Today's plan") : contextLabel)
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(.secondary)
                     .tracking(0.3)
@@ -500,7 +500,7 @@ struct ReadinessCheckInView: View {
                 HStack(spacing: 8) {
                     Image(systemName: hasWorkoutToday ? "figure.strengthtraining.traditional" : "checkmark")
                         .font(.subheadline.weight(.semibold))
-                    Text(hasWorkoutToday ? "Go to today's session" : "Done")
+                    Text(hasWorkoutToday ? L10n.tr("Go to today's session") : L10n.tr("Done"))
                         .font(.body.weight(.bold))
                 }
                 .foregroundStyle(.black)
@@ -576,7 +576,7 @@ struct ReadinessCheckInView: View {
                     }
                 } label: {
                     HStack(spacing: 8) {
-                        Text(currentStep == totalSteps - 1 ? "See today's plan" : "Continue")
+                        Text(currentStep == totalSteps - 1 ? L10n.tr("See today's plan") : L10n.tr("Continue"))
                             .font(.body.weight(.bold))
                         Image(systemName: currentStep == totalSteps - 1 ? "sparkles" : "arrow.right")
                             .font(.subheadline.weight(.bold))

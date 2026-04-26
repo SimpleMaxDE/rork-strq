@@ -739,7 +739,7 @@ struct ExerciseLibraryView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    filterSection("Difficulty") {
+                    filterSection(L10n.tr("Difficulty")) {
                         HStack(spacing: 8) {
                             ForEach(ExerciseDifficulty.allCases) { diff in
                                 filterChip(diff.displayName, selected: selectedDifficulty == diff, color: diffColor(diff)) {
@@ -749,16 +749,16 @@ struct ExerciseLibraryView: View {
                         }
                     }
 
-                    filterSection("Attributes") {
+                    filterSection(L10n.tr("Attributes")) {
                         VStack(spacing: 8) {
-                            Toggle("Bodyweight Only", isOn: $bodyweightOnly)
+                            Toggle(L10n.tr("Bodyweight Only"), isOn: $bodyweightOnly)
                                 .tint(STRQBrand.steel)
-                            Toggle("Joint-Friendly Only", isOn: $jointFriendlyOnly)
+                            Toggle(L10n.tr("Joint-Friendly Only"), isOn: $jointFriendlyOnly)
                                 .tint(STRQBrand.steel)
                         }
                     }
 
-                    filterSection("Muscle Group") {
+                    filterSection(L10n.tr("Muscle Group")) {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 8)], spacing: 8) {
                             ForEach(MuscleGroup.allCases) { muscle in
                                 filterChip(muscle.displayName, selected: selectedMuscle == muscle, color: STRQBrand.steel) {

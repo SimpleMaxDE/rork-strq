@@ -287,7 +287,7 @@ struct CoachMemoryBridgeRow: View {
                     .tracking(1.2)
                     .foregroundStyle(.primary)
                 Spacer()
-                Text(totalCount > 1 ? "See all \(totalCount)" : "See history")
+                Text(totalCount > 1 ? L10n.format("See all %d", totalCount) : L10n.tr("See history"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
                 Image(systemName: "chevron.right")
