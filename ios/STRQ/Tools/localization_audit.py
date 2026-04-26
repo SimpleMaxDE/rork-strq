@@ -76,6 +76,8 @@ IDENTICAL_DE_ALLOWLIST = {
     "%@%.0f kg",
     "%@%.0f%%",
     "%@kg",
+    "%d",
+    "%d %@",
     "%d %@ · %d %@",
     "%d cm",
     "%d kcal",
