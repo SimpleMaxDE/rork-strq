@@ -27,7 +27,7 @@ struct TrainingPlanView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Train")
+        .navigationTitle(L10n.tr("Train"))
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -36,24 +36,24 @@ struct TrainingPlanView: View {
                         Button {
                             showSessionEditor = true
                         } label: {
-                            Label("Edit Session", systemImage: "slider.horizontal.3")
+                            Label(L10n.tr("Edit Session"), systemImage: "slider.horizontal.3")
                         }
                     }
                     Button {
                         showScheduleEditor = true
                     } label: {
-                        Label("Schedule", systemImage: "calendar.badge.clock")
+                        Label(L10n.tr("Schedule"), systemImage: "calendar.badge.clock")
                     }
                     Button {
                         showLibrary = true
                     } label: {
-                        Label("Exercise Library", systemImage: "books.vertical.fill")
+                        Label(L10n.tr("Exercise Library"), systemImage: "books.vertical.fill")
                     }
                     Divider()
                     Button {
                         vm.generatePlan()
                     } label: {
-                        Label("Regenerate Plan", systemImage: "arrow.triangle.2.circlepath")
+                        Label(L10n.tr("Regenerate Plan"), systemImage: "arrow.triangle.2.circlepath")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle").font(.body)
@@ -235,7 +235,7 @@ struct TrainingPlanView: View {
                     .foregroundStyle(isSelected ? Color.white : isSkipped ? Color.secondary : Color.primary)
                     .lineLimit(1)
                 if isSkipped {
-                    Text("Skipped")
+                    Text(L10n.tr("Skipped"))
                         .font(.system(size: 8, weight: .bold))
                         .foregroundStyle(STRQPalette.danger.opacity(0.8))
                 } else if hasAdj {
@@ -494,7 +494,7 @@ struct TrainingPlanView: View {
                                 .foregroundStyle(STRQBrand.steel)
                         }
                         if isCustom {
-                            Text("CUSTOM")
+                            Text(L10n.tr("CUSTOM"))
                                 .font(.system(size: 7, weight: .black))
                                 .tracking(0.4)
                                 .foregroundStyle(STRQPalette.warning)
@@ -557,19 +557,19 @@ struct TrainingPlanView: View {
         .contextMenu {
             Button {
                 selectedPrescriptionIndex = index
-            } label: { Label("Edit Prescription", systemImage: "slider.horizontal.3") }
+            } label: { Label(L10n.tr("Edit Prescription"), systemImage: "slider.horizontal.3") }
             Button {
                 swapTargetPlanned = planned
-            } label: { Label("Swap Exercise", systemImage: "arrow.triangle.2.circlepath") }
+            } label: { Label(L10n.tr("Swap Exercise"), systemImage: "arrow.triangle.2.circlepath") }
             if planned.isCustomized {
                 Button {
                     vm.restoreCoachDefault(dayId: day.id, plannedId: planned.id)
-                } label: { Label("Restore Coach Default", systemImage: "arrow.uturn.backward") }
+                } label: { Label(L10n.tr("Restore Coach Default"), systemImage: "arrow.uturn.backward") }
             }
             Divider()
             Button(role: .destructive) {
                 vm.removePlannedExercise(dayId: day.id, plannedId: planned.id)
-            } label: { Label("Remove", systemImage: "trash") }
+            } label: { Label(L10n.tr("Remove"), systemImage: "trash") }
         }
     }
 
@@ -606,7 +606,7 @@ struct TrainingPlanView: View {
             Button {
                 withAnimation(.snappy(duration: 0.3)) { vm.undoAdjustment(adj) }
             } label: {
-                Text("Undo")
+                Text(L10n.tr("Undo"))
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 10)
@@ -633,7 +633,7 @@ struct TrainingPlanView: View {
             Button {
                 withAnimation(.snappy(duration: 0.3)) { vm.undoAdjustment(adj) }
             } label: {
-                Text("Revert")
+                Text(L10n.tr("Revert"))
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(color)
                     .padding(.horizontal, 10)
@@ -687,7 +687,7 @@ struct TrainingPlanView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "arrow.right")
                             .font(.system(size: 9))
-                        Text("Move")
+                        Text(L10n.tr("Move"))
                             .font(.caption2.weight(.semibold))
                     }
                     .foregroundStyle(STRQBrand.steel)

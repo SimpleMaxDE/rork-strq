@@ -74,7 +74,7 @@ struct CoachTabView: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("Coach")
+        .navigationTitle(L10n.tr("Coach"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
@@ -180,7 +180,7 @@ struct CoachTabView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "heart.text.clipboard")
                                 .font(.system(size: 9))
-                            Text("Check in")
+                            Text(L10n.tr("Check in"))
                                 .font(.system(size: 10, weight: .bold))
                         }
                         .foregroundStyle(.black)
@@ -292,7 +292,7 @@ struct CoachTabView: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(tint)
                     .frame(width: 3, height: 14)
-                Text("PRIMARY MOVE")
+                Text(L10n.tr("PRIMARY MOVE"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(.primary)
@@ -356,7 +356,7 @@ struct CoachTabView: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(tint)
                     .frame(width: 3, height: 12)
-                Text("WATCH")
+                Text(L10n.tr("WATCH"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(.primary)
@@ -398,7 +398,7 @@ struct CoachTabView: View {
                 .background(STRQPalette.successSoft, in: .rect(cornerRadius: 10))
 
             VStack(alignment: .leading, spacing: 1) {
-                Text("MOMENTUM")
+                Text(L10n.tr("MOMENTUM"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.1)
                     .foregroundStyle(STRQPalette.success)
@@ -426,7 +426,7 @@ struct CoachTabView: View {
                     RoundedRectangle(cornerRadius: 2)
                         .fill(STRQBrand.accentGradient)
                         .frame(width: 3, height: 14)
-                    Text("COACH")
+                    Text(L10n.tr("COACH"))
                         .font(.system(size: 10, weight: .black))
                         .tracking(1.2)
                         .foregroundStyle(.primary)
@@ -632,10 +632,10 @@ struct CoachTabView: View {
                         .frame(width: 24, height: 24)
                         .background(STRQBrand.steelGradient.opacity(0.5), in: .rect(cornerRadius: 7))
                     VStack(alignment: .leading, spacing: 1) {
-                        Text("Coaching memory")
+                        Text(L10n.tr("Coaching memory"))
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.primary)
-                        Text("No changes yet — every decision will be logged here.")
+                        Text(L10n.tr("No changes yet — every decision will be logged here."))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -714,7 +714,7 @@ struct CoachTabView: View {
                 .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("Weekly Check-In")
+                Text(L10n.tr("Weekly Check-In"))
                     .font(.subheadline.weight(.semibold))
                 Text(subtitle)
                     .font(.caption)
@@ -745,7 +745,7 @@ struct CoachTabView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
-                    Text("Plan Quality")
+                    Text(L10n.tr("Plan Quality"))
                         .font(.subheadline.weight(.semibold))
                     Text(quality.overallLabel)
                         .font(.system(size: 10, weight: .bold))
@@ -827,9 +827,9 @@ struct MoreSignalsSheet: View {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.title)
                             .foregroundStyle(STRQPalette.success)
-                        Text("Nothing else to flag")
+                        Text(L10n.tr("Nothing else to flag"))
                             .font(.subheadline.weight(.semibold))
-                        Text("Coach is satisfied with the rest of your picture.")
+                        Text(L10n.tr("Coach is satisfied with the rest of your picture."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -841,11 +841,11 @@ struct MoreSignalsSheet: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle("More signals")
+        .navigationTitle(L10n.tr("More signals"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Done") { dismiss() }
+                Button(L10n.tr("Done")) { dismiss() }
                     .font(.subheadline.weight(.semibold))
             }
         }

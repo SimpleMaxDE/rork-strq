@@ -18,14 +18,14 @@ struct WorkoutCompletionView: View {
         guard let session else {
             return WorkoutHighlightBuilder.Result(
                 highlights: [],
-                verdict: SessionVerdict(kind: .consolidated, eyebrow: "SESSION LOGGED", summary: "Work put in")
+                verdict: SessionVerdict(kind: .consolidated, eyebrow: L10n.tr("SESSION LOGGED"), summary: L10n.tr("Work put in"))
             )
         }
         return WorkoutHighlightBuilder.buildResult(
             session: session,
             history: vm.workoutHistory,
             streak: vm.streak,
-            exerciseName: { id in vm.library.exercise(byId: id)?.name ?? "Exercise" }
+            exerciseName: { id in vm.library.exercise(byId: id)?.name ?? L10n.tr("Exercise") }
         )
     }
 
@@ -178,16 +178,16 @@ struct WorkoutCompletionView: View {
 
             VStack(spacing: 10) {
                 HStack(spacing: 8) {
-                    completionStat("Time", value: "\(duration)", unit: "min")
-                    completionStat("Exercises", value: "\(completedExercises)", unit: nil)
-                    completionStat("Sets", value: "\(totalSets)", unit: nil)
-                    completionStat("Reps", value: "\(totalReps)", unit: nil)
+                    completionStat(L10n.tr("Time"), value: "\(duration)", unit: "min")
+                    completionStat(L10n.tr("Exercises"), value: "\(completedExercises)", unit: nil)
+                    completionStat(L10n.tr("Sets"), value: "\(totalSets)", unit: nil)
+                    completionStat(L10n.tr("Reps"), value: "\(totalReps)", unit: nil)
                 }
 
                 if session.totalVolume > 0 {
                     HStack {
                         VStack(alignment: .leading, spacing: 3) {
-                            Text("TOTAL VOLUME")
+                            Text(L10n.tr("TOTAL VOLUME"))
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundStyle(.white.opacity(0.42))
                                 .tracking(1.2)
@@ -230,25 +230,25 @@ struct WorkoutCompletionView: View {
         switch vm.totalCompletedWorkouts {
         case 1:
             return .init(
-                headline: "Baseline locked in",
-                detail: "STRQ now knows your starting loads. Session 2 switches on real progression calls.",
+                headline: L10n.tr("Baseline locked in"),
+                detail: L10n.tr("STRQ now knows your starting loads. Session 2 switches on real progression calls."),
                 icon: "scalemass.fill"
             )
         case 2:
             return .init(
-                headline: "Progression is live",
-                detail: "Coach can now adjust load and volume. One more session sharpens pattern reads.",
+                headline: L10n.tr("Progression is live"),
+                detail: L10n.tr("Coach can now adjust load and volume. One more session sharpens pattern reads."),
                 icon: "chart.line.uptrend.xyaxis"
             )
         case 3:
             return .init(
-                headline: "Pattern reads unlocked",
-                detail: "STRQ is reading balance, fatigue, and load pacing. Finish the week to unlock your first review.",
+                headline: L10n.tr("Pattern reads unlocked"),
+                detail: L10n.tr("STRQ is reading balance, fatigue, and load pacing. Finish the week to unlock your first review."),
                 icon: "waveform.path.ecg"
             )
         default:
             return .init(
-                headline: "Step \(roadmap.completedCount) of \(roadmap.steps.count)",
+                headline: L10n.format("Step %d of %d", roadmap.completedCount, roadmap.steps.count),
                 detail: roadmap.subhead,
                 icon: "sparkles"
             )
@@ -273,7 +273,7 @@ struct WorkoutCompletionView: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(spacing: 6) {
-                            Text("COACH CALIBRATION")
+                            Text(L10n.tr("COACH CALIBRATION"))
                                 .font(.system(size: 9, weight: .black))
                                 .tracking(1.2)
                                 .foregroundStyle(STRQBrand.steel)
@@ -320,7 +320,7 @@ struct WorkoutCompletionView: View {
     private var highlightsSection: some View {
         if !highlights.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                sectionHeader(title: "WHAT IMPROVED", count: highlights.count)
+                sectionHeader(title: L10n.tr("WHAT IMPROVED"), count: highlights.count)
 
                 VStack(spacing: 8) {
                     ForEach(Array(highlights.enumerated()), id: \.element.id) { idx, h in
@@ -347,7 +347,7 @@ struct WorkoutCompletionView: View {
         let items = nextSessionItems()
         if !items.isEmpty || nextDayName != nil {
             VStack(alignment: .leading, spacing: 10) {
-                sectionHeader(title: "NEXT SESSION", count: nil)
+                sectionHeader(title: L10n.tr("NEXT SESSION"), count: nil)
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(alignment: .center, spacing: 10) {
@@ -357,7 +357,7 @@ struct WorkoutCompletionView: View {
                             .frame(width: 28, height: 28)
                             .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 8))
                         VStack(alignment: .leading, spacing: 1) {
-                            Text(nextDayName ?? "Upcoming session")
+                            Text(nextDayName ?? L10n.tr("Upcoming session"))
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundStyle(.white)
                             Text(nextDaySubtitle)
@@ -434,16 +434,17 @@ struct WorkoutCompletionView: View {
     private var nextDaySubtitle: String {
         if let date = vm.nextScheduledWorkoutDate {
             let cal = Calendar.current
-            if cal.isDateInToday(date) { return "scheduled today" }
-            if cal.isDateInTomorrow(date) { return "scheduled tomorrow" }
+            if cal.isDateInToday(date) { return L10n.tr("scheduled today") }
+            if cal.isDateInTomorrow(date) { return L10n.tr("scheduled tomorrow") }
             let days = cal.dateComponents([.day], from: cal.startOfDay(for: Date()), to: cal.startOfDay(for: date)).day ?? 0
             if days > 0 && days < 7 {
                 let f = DateFormatter()
+                f.locale = Locale.current
                 f.dateFormat = "EEEE"
-                return "scheduled \(f.string(from: date).lowercased())"
+                return L10n.format("scheduled %@", f.string(from: date).localizedLowercase)
             }
         }
-        return "STRQ will adapt from today's data"
+        return L10n.tr("STRQ will adapt from today's data")
     }
 
     private struct BridgeItem: Identifiable {
@@ -467,14 +468,14 @@ struct WorkoutCompletionView: View {
             pushed.insert(name)
             let detail: String
             if h.kind == .personalRecord {
-                detail = "Confirmed progression — load up next time"
+                detail = L10n.tr("Confirmed progression — load up next time")
             } else {
-                detail = "Beat last session — push next time"
+                detail = L10n.tr("Beat last session — push next time")
             }
             items.append(BridgeItem(
                 exerciseName: name,
                 detail: detail,
-                tag: "PUSH",
+                tag: L10n.tr("PUSH"),
                 icon: "arrow.up.right.circle.fill",
                 color: STRQPalette.success
             ))
@@ -491,24 +492,24 @@ struct WorkoutCompletionView: View {
             case .loadFirst where state.plateauStatus == .progressing:
                 items.append(BridgeItem(
                     exerciseName: ex.name,
-                    detail: "Next: \(String(format: "%.1f", state.lastWeight + 2.5)) kg × \(state.lastReps)",
-                    tag: "PUSH",
+                    detail: L10n.format("Next: %.1f kg × %d", state.lastWeight + 2.5, state.lastReps),
+                    tag: L10n.tr("PUSH"),
                     icon: "arrow.up.right.circle.fill",
                     color: STRQPalette.success
                 ))
             case .holdAndConsolidate:
                 items.append(BridgeItem(
                     exerciseName: ex.name,
-                    detail: "Hold load — consolidate technique",
-                    tag: "HOLD",
+                    detail: L10n.tr("Hold load — consolidate technique"),
+                    tag: L10n.tr("HOLD"),
                     icon: "pause.circle.fill",
                     color: STRQPalette.warning
                 ))
             case .deloadAndRebuild:
                 items.append(BridgeItem(
                     exerciseName: ex.name,
-                    detail: String(format: "Deload to %.1f kg — rebuild clean", state.lastWeight * 0.85),
-                    tag: "DROP",
+                    detail: L10n.format("Deload to %.1f kg — rebuild clean", state.lastWeight * 0.85),
+                    tag: L10n.tr("DROP"),
                     icon: "arrow.down.circle.fill",
                     color: STRQPalette.danger
                 ))
@@ -530,7 +531,7 @@ struct WorkoutCompletionView: View {
                 .frame(height: 40)
             VStack(spacing: 10) {
                 Button { onDismiss() } label: {
-                    Text("Back to Today")
+                    Text(L10n.tr("Back to Today"))
                         .font(.body.weight(.bold))
                         .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
@@ -662,7 +663,7 @@ private struct HighlightRow: View {
                         .font(.system(size: highlight.isPrimary ? 14 : 13, weight: highlight.isPrimary ? .heavy : .bold))
                         .foregroundStyle(.white)
                     if highlight.isPrimary {
-                        Text("TOP")
+                        Text(L10n.tr("TOP"))
                             .font(.system(size: 8, weight: .black))
                             .tracking(0.8)
                             .foregroundStyle(palette.color)

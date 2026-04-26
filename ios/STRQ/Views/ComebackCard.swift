@@ -103,7 +103,7 @@ struct ComebackCard: View {
                     HStack(spacing: 6) {
                         Image(systemName: "heart.text.clipboard")
                             .font(.caption)
-                        Text("Check in")
+                        Text(L10n.tr("Check in"))
                             .font(.subheadline.weight(.semibold))
                     }
                     .foregroundStyle(.primary)
@@ -123,7 +123,7 @@ struct ComebackCard: View {
                     HStack(spacing: 6) {
                         Image(systemName: "leaf.arrow.triangle.circlepath")
                             .font(.caption)
-                        Text("Ease next session")
+                        Text(L10n.tr("Ease next session"))
                             .font(.subheadline.weight(.bold))
                             .lineLimit(1)
                     }
