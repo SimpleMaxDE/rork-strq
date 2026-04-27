@@ -3,6 +3,7 @@ import SwiftUI
 struct ActiveWorkoutView: View {
     @Bindable var vm: AppViewModel
     let onCompletionDismiss: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var elapsedSeconds: Int = 0
     @State private var restTimerActive: Bool = false
     @State private var restTimeRemaining: Int = 0
@@ -23,6 +24,8 @@ struct ActiveWorkoutView: View {
     @State private var undoPrompt: LoggedSetUndoPrompt?
     @State private var undoDismissTask: Task<Void, Never>?
     @State private var showWorkoutDetails: Bool = false
+    @State private var rewardMoment: STRQRewardMoment?
+    @State private var workoutCompletedTrigger: Bool = false
 
     private var workout: ActiveWorkoutState? { vm.activeWorkout }
     private var completedSession: WorkoutSession? { vm.completedWorkoutHandoff }
@@ -101,9 +104,10 @@ struct ActiveWorkoutView: View {
                 }
             }
             .preferredColorScheme(.dark)
+            .strqRewardToast($rewardMoment, duration: 1.8, topPadding: 76)
             .onAppear {
                 startTimer(startTime: workout.session.startTime)
-                withAnimation(.easeOut(duration: 0.4)) { appeared = true }
+                withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.4)) { appeared = true }
             }
             .onDisappear {
                 timerTask?.cancel()
@@ -177,6 +181,7 @@ struct ActiveWorkoutView: View {
             }
             .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.6), trigger: setCompletedTrigger)
             .sensoryFeedback(.success, trigger: swapFeedbackTrigger)
+            .sensoryFeedback(.success, trigger: workoutCompletedTrigger)
         }
     }
 
@@ -261,7 +266,7 @@ struct ActiveWorkoutView: View {
                 Rectangle().fill(Color.white.opacity(0.06))
                 Rectangle().fill(STRQBrand.steelGradient)
                     .frame(width: geo.size.width * progress)
-                    .animation(.spring(response: 0.4), value: progress)
+                    .animation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.4), value: progress)
             }
         }
         .frame(height: 2)
@@ -362,7 +367,9 @@ struct ActiveWorkoutView: View {
                 }
                 .opacity(appeared ? 1 : 0)
                 .offset(y: appeared ? 0 : 10)
-                .animation(.easeOut(duration: 0.4), value: appeared)
+                .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.4), value: appeared)
+                .id("\(exerciseIndex)-\(activeSetNumber)")
+                .transition(reduceMotion ? .opacity : .opacity.combined(with: .move(edge: .top)))
             }
         }
     }
@@ -374,7 +381,7 @@ struct ActiveWorkoutView: View {
     ) -> some View {
         VStack(spacing: 6) {
             Button {
-                withAnimation(.snappy(duration: 0.2)) {
+                withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.2)) {
                     showWorkoutDetails.toggle()
                 }
             } label: {
@@ -610,6 +617,9 @@ struct ActiveWorkoutView: View {
                     RoundedRectangle(cornerRadius: 16)
                         .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
                 )
+                .id(setLog.id)
+                .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.98)))
+                .animation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.32, dampingFraction: 0.84), value: setLog.id)
             } else {
                 let isLastExercise = exerciseIndex >= workout.session.exerciseLogs.count - 1
                 VStack(spacing: 10) {
@@ -1444,6 +1454,10 @@ struct ActiveWorkoutView: View {
                             RoundedRectangle(cornerRadius: 20)
                                 .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
                         )
+                        .overlay(alignment: .topTrailing) {
+                            STRQSuccessPulse(size: 34, color: STRQPalette.success, icon: "checkmark")
+                                .padding(12)
+                        }
                     }
 
                     VStack(spacing: 10) {
@@ -1459,7 +1473,7 @@ struct ActiveWorkoutView: View {
                                 )
                                 .frame(width: 176, height: 176)
                                 .rotationEffect(.degrees(-90))
-                                .animation(.linear(duration: 1), value: restTimeRemaining)
+                                .animation(reduceMotion ? .easeOut(duration: 0.12) : .linear(duration: 1), value: restTimeRemaining)
 
                             VStack(spacing: 6) {
                                 Text(L10n.tr("REST"))
@@ -1818,7 +1832,7 @@ struct ActiveWorkoutView: View {
             ? L10n.format("Current exercise updated to %@", newExerciseName)
             : L10n.format("Swapped %@ for %@", oldExerciseName, newExerciseName)
         swapFeedbackTask?.cancel()
-        withAnimation(.easeOut(duration: 0.2)) {
+        withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.2)) {
             swapConfirmationText = message
         }
         swapFeedbackTrigger.toggle()
@@ -1826,7 +1840,7 @@ struct ActiveWorkoutView: View {
             try? await Task.sleep(for: .seconds(2))
             guard !Task.isCancelled else { return }
             await MainActor.run {
-                withAnimation(.easeOut(duration: 0.2)) {
+                withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.2)) {
                     swapConfirmationText = nil
                 }
             }
@@ -1845,6 +1859,7 @@ struct ActiveWorkoutView: View {
         restTimerActive = false
         showExitDialog = false
         confirmDiscard = false
+        workoutCompletedTrigger.toggle()
         vm.completeWorkout()
     }
 
@@ -1915,7 +1930,7 @@ struct ActiveWorkoutView: View {
     }
 
     private func updateSet(exerciseIndex: Int, setIndex: Int, weight: Double, reps: Int) {
-        withAnimation(.snappy(duration: 0.15)) {
+        withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.15)) {
             vm.updateSetLoad(exerciseIndex: exerciseIndex, setIndex: setIndex, weight: weight, reps: reps)
         }
     }
@@ -1926,6 +1941,11 @@ struct ActiveWorkoutView: View {
         setCompletedTrigger.toggle()
         lastLoggedSet = (exerciseIndex, setIndex)
         if let prompt {
+            presentRewardMoment(
+                title: L10n.tr("Set logged"),
+                subtitle: prompt.subtitle,
+                style: .success
+            )
             presentUndoPrompt(prompt)
         }
         guard rest > 0 else { return }
@@ -1989,7 +2009,7 @@ struct ActiveWorkoutView: View {
 
     private func presentUndoPrompt(_ prompt: LoggedSetUndoPrompt) {
         undoDismissTask?.cancel()
-        withAnimation(.spring(response: 0.28, dampingFraction: 0.9)) {
+        withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.28, dampingFraction: 0.9)) {
             undoPrompt = prompt
         }
         undoDismissTask = Task {
@@ -2001,11 +2021,17 @@ struct ActiveWorkoutView: View {
         }
     }
 
+    private func presentRewardMoment(title: String, subtitle: String?, style: STRQRewardMoment.Style) {
+        withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.32, dampingFraction: 0.84)) {
+            rewardMoment = STRQRewardMoment(title: title, subtitle: subtitle, style: style)
+        }
+    }
+
     private func dismissUndoPrompt() {
         undoDismissTask?.cancel()
         undoDismissTask = nil
         vm.clearLastCompletedSetUndo()
-        withAnimation(.easeOut(duration: 0.2)) {
+        withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.2)) {
             undoPrompt = nil
         }
     }
@@ -2014,7 +2040,7 @@ struct ActiveWorkoutView: View {
         let restored = vm.undoLastCompletedSet()
         undoDismissTask?.cancel()
         undoDismissTask = nil
-        withAnimation(.easeOut(duration: 0.2)) {
+        withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.2)) {
             undoPrompt = nil
         }
         guard restored else { return }

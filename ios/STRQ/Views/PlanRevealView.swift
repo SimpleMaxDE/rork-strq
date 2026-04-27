@@ -7,6 +7,7 @@ struct PlanRevealView: View {
     let onStart: () -> Void
     var impacts: [OnboardingImpact] = []
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var appeared: Bool = false
     @State private var showDays: Bool = false
     @State private var showQuality: Bool = false
@@ -53,10 +54,10 @@ struct PlanRevealView: View {
         }
         .preferredColorScheme(.dark)
         .onAppear {
-            withAnimation(.easeOut(duration: 0.7)) { appeared = true }
-            withAnimation(.easeOut(duration: 0.5).delay(0.5)) { showDays = true }
-            withAnimation(.easeOut(duration: 0.5).delay(0.6)) { showImpacts = true }
-            withAnimation(.easeOut(duration: 0.5).delay(0.8)) { showQuality = true }
+            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.7)) { appeared = true }
+            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.5)) { showDays = true }
+            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.6)) { showImpacts = true }
+            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.8)) { showQuality = true }
         }
     }
 
@@ -69,11 +70,13 @@ struct PlanRevealView: View {
                     .fill(Color.white.opacity(0.04))
                     .frame(width: 100, height: 100)
                     .blur(radius: 20)
+                STRQSuccessPulse(size: 94, color: STRQBrand.steel, icon: "bolt.fill")
+                    .opacity(0.58)
                 STRQLogoView(size: 56, animated: true)
             }
             .scaleEffect(appeared ? 1 : 0.5)
             .opacity(appeared ? 1 : 0)
-            .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1), value: appeared)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.5, dampingFraction: 0.7).delay(0.1), value: appeared)
 
             VStack(spacing: 6) {
                 Text(L10n.tr("Your Plan is Ready"))
@@ -85,7 +88,12 @@ struct PlanRevealView: View {
             }
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 12)
-            .animation(.easeOut(duration: 0.5).delay(0.2), value: appeared)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.2), value: appeared)
+
+            STRQCelebrationBadge(title: L10n.tr("Plan created"), icon: "checkmark.seal.fill", variant: .green)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 8)
+                .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.32), value: appeared)
         }
     }
 
@@ -110,10 +118,10 @@ struct PlanRevealView: View {
             Divider().opacity(0.3)
 
             HStack(spacing: 0) {
-                overviewStat(value: "\(plan.days.count)", label: L10n.tr("Days/Week"), icon: "calendar")
-                overviewStat(value: L10n.format("%dm", profile.minutesPerSession), label: L10n.tr("Per Session"), icon: "clock")
-                overviewStat(value: L10n.format("%dwk", plan.durationWeeks), label: L10n.tr("Duration"), icon: "repeat")
-                overviewStat(value: totalExercises, label: L10n.tr("Exercises"), icon: "figure.strengthtraining.traditional")
+                overviewStat(value: Double(plan.days.count), suffix: "", label: L10n.tr("Days/Week"), icon: "calendar")
+                overviewStat(value: Double(profile.minutesPerSession), suffix: "m", label: L10n.tr("Per Session"), icon: "clock")
+                overviewStat(value: Double(plan.durationWeeks), suffix: "wk", label: L10n.tr("Duration"), icon: "repeat")
+                overviewStat(value: Double(totalExerciseCount), suffix: "", label: L10n.tr("Exercises"), icon: "figure.strengthtraining.traditional")
             }
         }
         .padding(18)
@@ -124,15 +132,17 @@ struct PlanRevealView: View {
         )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 16)
-        .animation(.easeOut(duration: 0.5).delay(0.35), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.35), value: appeared)
     }
 
-    private func overviewStat(value: String, label: String, icon: String) -> some View {
+    private func overviewStat(value: Double, suffix: String, label: String, icon: String) -> some View {
         VStack(spacing: 6) {
             Image(systemName: icon)
                 .font(.caption)
                 .foregroundStyle(STRQBrand.steel)
-            Text(value)
+            STRQCountUpText(value: value, duration: 0.65) { current in
+                "\(Int(current.rounded()))\(suffix)"
+            }
                 .font(.subheadline.bold().monospacedDigit())
             Text(label)
                 .font(.system(size: 9, weight: .medium))
@@ -141,9 +151,8 @@ struct PlanRevealView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private var totalExercises: String {
-        let count = Set(plan.days.flatMap { $0.exercises.map(\.exerciseId) }).count
-        return "\(count)"
+    private var totalExerciseCount: Int {
+        Set(plan.days.flatMap { $0.exercises.map(\.exerciseId) }).count
     }
 
     private var weekPreview: some View {
@@ -161,7 +170,7 @@ struct PlanRevealView: View {
                     .opacity(showDays ? 1 : 0)
                     .offset(x: showDays ? 0 : -20)
                     .animation(
-                        .spring(response: 0.4, dampingFraction: 0.8)
+                        reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.4, dampingFraction: 0.8)
                             .delay(Double(index) * 0.08),
                         value: showDays
                     )
@@ -306,7 +315,7 @@ struct PlanRevealView: View {
                 .opacity(showImpacts ? 1 : 0)
                 .offset(x: showImpacts ? 0 : -16)
                 .animation(
-                    .spring(response: 0.4, dampingFraction: 0.8)
+                    reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.4, dampingFraction: 0.8)
                         .delay(Double(index) * 0.06),
                     value: showImpacts
                 )
@@ -335,7 +344,7 @@ struct PlanRevealView: View {
     private var explanationSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
-                withAnimation(.snappy(duration: 0.22)) {
+                withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.22)) {
                     showCoachNote.toggle()
                 }
             } label: {
@@ -374,7 +383,7 @@ struct PlanRevealView: View {
         )
         .opacity(showQuality ? 1 : 0)
         .offset(y: showQuality ? 0 : 12)
-        .animation(.easeOut(duration: 0.5).delay(1.0), value: showQuality)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(1.0), value: showQuality)
     }
 
     private var stickyStartBar: some View {
@@ -408,7 +417,7 @@ struct PlanRevealView: View {
             .background(Color.black)
         }
         .opacity(showQuality ? 1 : 0)
-        .animation(.easeOut(duration: 0.5).delay(1.0), value: showQuality)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(1.0), value: showQuality)
     }
 
     private func qualityColor(_ name: String) -> Color {

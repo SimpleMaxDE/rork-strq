@@ -7,6 +7,7 @@ enum ProgressRoute: Hashable {
 
 struct ProgressAnalyticsView: View {
     let vm: AppViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var selectedTab: Int = 0
     @State private var appeared: Bool = false
 
@@ -52,7 +53,7 @@ struct ProgressAnalyticsView: View {
         .navigationTitle(L10n.tr("Progress"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
-            withAnimation(.easeOut(duration: 0.5)) { appeared = true }
+            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5)) { appeared = true }
             Analytics.shared.track(.progress_viewed)
         }
     }
@@ -121,15 +122,21 @@ struct ProgressAnalyticsView: View {
             .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 10) {
-                Text(L10n.tr("PROGRESS"))
+                Text(L10n.tr("Your Progress"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.4)
                     .foregroundStyle(STRQBrand.steel)
 
                 HStack(alignment: .lastTextBaseline, spacing: 10) {
-                    Text(headline.0)
-                        .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
-                        .foregroundStyle(.white)
+                    if let numeric = Double(headline.0) {
+                        STRQCountUpText(value: numeric, duration: 0.7)
+                            .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.white)
+                    } else {
+                        Text(headline.0)
+                            .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.white)
+                    }
                     Text(headline.1)
                         .font(.system(.title3, design: .rounded, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.55))
@@ -139,6 +146,8 @@ struct ProgressAnalyticsView: View {
                 Text(sub)
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(.white.opacity(0.6))
+
+                achievementChips
             }
             .padding(20)
         }
@@ -161,7 +170,36 @@ struct ProgressAnalyticsView: View {
         .shadow(color: .black.opacity(0.22), radius: 16, y: 5)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
-        .animation(.easeOut(duration: 0.5), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5), value: appeared)
+    }
+
+    private var achievementChips: some View {
+        let calendar = Calendar.current
+        let now = Date()
+        let weekAgo = calendar.date(byAdding: .day, value: -7, to: now) ?? now
+        let twoWeeksAgo = calendar.date(byAdding: .day, value: -14, to: now) ?? now
+        let prsThisMonth = vm.personalRecords.filter { calendar.isDate($0.date, equalTo: now, toGranularity: .month) }.count
+        let thisWeek = vm.workoutHistory.filter { $0.startTime > weekAgo && $0.isCompleted }
+        let lastWeek = vm.workoutHistory.filter { $0.startTime > twoWeeksAgo && $0.startTime <= weekAgo && $0.isCompleted }
+        let volumeThis = thisWeek.reduce(0.0) { $0 + $1.totalVolume }
+        let volumeLast = lastWeek.reduce(0.0) { $0 + $1.totalVolume }
+        let consistencyTarget = max(1, min(vm.profile.daysPerWeek, 4))
+
+        return LazyVGrid(columns: [GridItem(.adaptive(minimum: 108), spacing: 8)], alignment: .leading, spacing: 8) {
+            if prsThisMonth > 0 {
+                STRQCelebrationBadge(title: L10n.tr("PR"), subtitle: L10n.format("%d this month", prsThisMonth), icon: "trophy.fill", variant: .gold)
+            }
+            if vm.streak > 1 {
+                STRQCelebrationBadge(title: L10n.tr("Streak"), subtitle: L10n.format("%d days", vm.streak), icon: "flame.fill", variant: .gold)
+            }
+            if volumeLast > 0 && volumeThis > volumeLast {
+                STRQCelebrationBadge(title: L10n.tr("Volume up"), icon: "chart.line.uptrend.xyaxis", variant: .green)
+            }
+            if vm.weeklyStats.sessions >= consistencyTarget {
+                STRQCelebrationBadge(title: L10n.tr("Consistency"), icon: "checkmark.seal.fill", variant: .green)
+            }
+        }
+        .padding(.top, 4)
     }
 
     // MARK: - What Changed Strip
@@ -406,7 +444,7 @@ struct ProgressAnalyticsView: View {
         HStack(spacing: 0) {
             ForEach(Array([L10n.tr("Strength"), L10n.tr("Body"), L10n.tr("Volume")].enumerated()), id: \.offset) { index, tab in
                 Button {
-                    withAnimation(.snappy(duration: 0.25)) { selectedTab = index }
+                    withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.25)) { selectedTab = index }
                 } label: {
                     Text(tab)
                         .font(.system(size: 13, weight: .semibold))
@@ -1232,7 +1270,11 @@ struct ProgressAnalyticsView: View {
                             Capsule().fill(Color(.tertiarySystemGroupedBackground)).frame(height: 6)
                             Capsule()
                                 .fill(balanceColor(entry.percentOfAverage).gradient)
-                                .frame(width: max(0, geo.size.width * min(CGFloat(entry.percentOfAverage), 1.3) / 1.3), height: 6)
+                                .frame(
+                                    width: max(0, geo.size.width * (appeared || reduceMotion ? min(CGFloat(entry.percentOfAverage), 1.3) / 1.3 : 0)),
+                                    height: 6
+                                )
+                                .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.45), value: appeared)
                         }
                     }
                     .frame(height: 6)
@@ -1268,12 +1310,13 @@ struct ProgressAnalyticsView: View {
 
             Chart {
                 ForEach(last8Weeks, id: \.0) { week, count in
-                    BarMark(x: .value("Week", week), y: .value("Sessions", count))
+                    BarMark(x: .value("Week", week), y: .value("Sessions", appeared || reduceMotion ? count : 0))
                         .foregroundStyle(ForgeTheme.accentGradient)
                         .clipShape(.rect(cornerRadius: 3))
                 }
             }
             .frame(height: 120)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5), value: appeared)
             .chartYAxis {
                 AxisMarks(position: .leading) { _ in
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3)).foregroundStyle(Color(.separator).opacity(0.3))

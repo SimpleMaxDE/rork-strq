@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CoachTabView: View {
     let vm: AppViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var appeared: Bool = false
     @State private var expandedInsightIds: Set<String> = []
     @State private var expandedRecIds: Set<String> = []
@@ -9,6 +10,7 @@ struct CoachTabView: View {
     @State private var showReadinessCheckIn: Bool = false
     @State private var showMoreSignals: Bool = false
     @State private var showCoachingHistory: Bool = false
+    @State private var showWatchDetails: Bool = false
     @State private var toast: STRQToast?
     @State private var lastAppliedCount: Int = 0
 
@@ -46,7 +48,7 @@ struct CoachTabView: View {
                         )
                         .opacity(appeared ? 1 : 0)
                         .offset(y: appeared ? 0 : 10)
-                        .animation(.easeOut(duration: 0.5).delay(0.04), value: appeared)
+                        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.04), value: appeared)
                         .onAppear {
                             Analytics.shared.track(.comeback_card_viewed, [
                                 "tier": comeback.tier.rawValue,
@@ -62,7 +64,7 @@ struct CoachTabView: View {
                     PhaseOutlookCard(outlook: outlook)
                         .opacity(appeared ? 1 : 0)
                         .offset(y: appeared ? 0 : 10)
-                        .animation(.easeOut(duration: 0.5).delay(0.12), value: appeared)
+                        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.12), value: appeared)
                 }
 
                 recentChangeBridge
@@ -77,7 +79,7 @@ struct CoachTabView: View {
         .navigationTitle(L10n.tr("Coach"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
-            withAnimation(.easeOut(duration: 0.5)) { appeared = true }
+            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5)) { appeared = true }
             lastAppliedCount = vm.appliedActionIds.count
             Analytics.shared.track(.coach_viewed)
         }
@@ -139,8 +141,8 @@ struct CoachTabView: View {
                         .stroke(color, style: StrokeStyle(lineWidth: 5, lineCap: .round))
                         .frame(width: 66, height: 66)
                         .rotationEffect(.degrees(-90))
-                        .animation(.easeOut(duration: 1.0).delay(0.15), value: appeared)
-                    Text("\(score)")
+                        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 1.0).delay(0.15), value: appeared)
+                    STRQCountUpText(value: Double(score), duration: 0.75)
                         .font(.system(size: 22, weight: .heavy, design: .rounded).monospacedDigit())
                 }
 
@@ -285,21 +287,21 @@ struct CoachTabView: View {
             }
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.5).delay(0.05), value: appeared)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.05), value: appeared)
         }
     }
 
     private func primaryMoveCard(_ primary: DailyBriefing.Primary) -> some View {
         let tint = ForgeTheme.color(for: primary.colorName)
-        return VStack(alignment: .leading, spacing: 12) {
+        return VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 6) {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(tint)
                     .frame(width: 3, height: 14)
-                Text(L10n.tr("PRIMARY MOVE"))
+                Text(L10n.tr("COACH RECOMMENDS"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(tint)
                 Spacer()
                 Text(primary.eyebrow)
                     .font(.system(size: 9, weight: .bold))
@@ -314,20 +316,27 @@ struct CoachTabView: View {
                 Image(systemName: primary.icon)
                     .font(.title3.weight(.medium))
                     .foregroundStyle(.white)
-                    .frame(width: 46, height: 46)
-                    .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 12))
+                    .frame(width: 50, height: 50)
+                    .background(tint.opacity(0.20), in: .rect(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(tint.opacity(0.24), lineWidth: 1)
+                    )
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(primary.title)
-                        .font(.body.weight(.bold))
+                        .font(.system(.title3, design: .rounded, weight: .bold))
                         .foregroundStyle(.primary)
                     Text(primary.detail)
-                        .font(.caption)
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 0)
             }
+
+            coachPrimaryCTA(primary)
 
             if let sinceLast = vm.dailyBriefing?.sinceLast {
                 HStack(spacing: 10) {
@@ -346,11 +355,52 @@ struct CoachTabView: View {
             }
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+        .background(
+            LinearGradient(
+                colors: [Color(.secondarySystemGroupedBackground), tint.opacity(0.08)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 20)
         )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .strokeBorder(tint.opacity(0.22), lineWidth: 1)
+        )
+        .shadow(color: tint.opacity(0.10), radius: 18, y: 6)
+    }
+
+    @ViewBuilder
+    private func coachPrimaryCTA(_ primary: DailyBriefing.Primary) -> some View {
+        switch primary.kind {
+        case .checkInBeforeTraining:
+            ForgePrimaryButton(icon: "heart.text.clipboard", title: L10n.tr("Check in")) {
+                showReadinessCheckIn = true
+            }
+        case .startFirstSession:
+            if let day = vm.todaysWorkout ?? vm.nextWorkout {
+                ForgePrimaryButton(icon: "sparkles", title: L10n.tr("Start Session 1")) {
+                    vm.prepareWorkoutHandoff(day: day)
+                }
+            }
+        case .resumeWorkout:
+            if let day = vm.todaysWorkout {
+                ForgePrimaryButton(icon: "play.fill", title: L10n.tr("Resume Workout")) {
+                    vm.prepareWorkoutHandoff(day: day)
+                }
+            }
+        case .trainToday, .recoverToday:
+            if let day = vm.todaysWorkout {
+                ForgePrimaryButton(
+                    icon: primary.kind == .recoverToday ? "heart.circle.fill" : "bolt.fill",
+                    title: primary.kind == .recoverToday ? L10n.tr("Start Light Session") : L10n.tr("Start Workout")
+                ) {
+                    vm.prepareWorkoutHandoff(day: day)
+                }
+            }
+        default:
+            EmptyView()
+        }
     }
 
     private func watchCard(_ watch: DailyBriefing.Watch) -> some View {
@@ -377,10 +427,28 @@ struct CoachTabView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(watch.title)
                         .font(.subheadline.weight(.semibold))
-                    Text(watch.detail)
-                        .font(.caption)
+                    Button {
+                        withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.22)) {
+                            showWatchDetails.toggle()
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(L10n.tr("common.details", fallback: "Details"))
+                                .font(.caption.weight(.semibold))
+                            Image(systemName: showWatchDetails ? "chevron.up" : "chevron.down")
+                                .font(.caption2.weight(.bold))
+                        }
                         .foregroundStyle(.secondary)
-                        .lineLimit(3)
+                    }
+                    .buttonStyle(.plain)
+
+                    if showWatchDetails {
+                        Text(watch.detail)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(4)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
                 }
                 Spacer(minLength: 0)
             }
@@ -477,7 +545,7 @@ struct CoachTabView: View {
             )
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.5).delay(0.05), value: appeared)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.05), value: appeared)
         }
     }
 
@@ -540,7 +608,7 @@ struct CoachTabView: View {
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
-        .animation(.easeOut(duration: 0.5).delay(0.1), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.1), value: appeared)
     }
 
     // MARK: - Lift Tracker
@@ -630,7 +698,7 @@ struct CoachTabView: View {
             .buttonStyle(.plain)
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.5).delay(0.16), value: appeared)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.16), value: appeared)
         } else if !vm.isEarlyStage {
             Button {
                 showCoachingHistory = true
@@ -665,7 +733,7 @@ struct CoachTabView: View {
             .buttonStyle(.plain)
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.5).delay(0.16), value: appeared)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.16), value: appeared)
         }
     }
 
@@ -712,7 +780,7 @@ struct CoachTabView: View {
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
-        .animation(.easeOut(duration: 0.5).delay(0.18), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.18), value: appeared)
     }
 
     private func weeklyReviewLabel(subtitle: String, ready: Bool) -> some View {

@@ -14232,6 +14232,78 @@
     "readiness.details.summary": {
       "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schlaf, Energie, Stress, Muskelkater" } } }
     },
+    "COACH RECOMMENDS": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Trainer empfiehlt" } } }
+    },
+    "Milestone": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Meilenstein" } } }
+    },
+    "Plan created": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Plan erstellt" } } }
+    },
+    "PR": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "PR" } } }
+    },
+    "Recovery first": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Regeneration zuerst" } } }
+    },
+    "Set logged": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Satz geloggt" } } }
+    },
+    "Start Light Session": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Leichte Einheit starten" } } }
+    },
+    "STRQ learned from this session.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "STRQ hat aus dieser Einheit gelernt." } } }
+    },
+    "Volume up": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Mehr Volumen" } } }
+    },
+    "Your Progress": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Dein Fortschritt" } } }
+    },
+    "%d this month": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d diesen Monat" } } }
+    },
+    "A lighter week to let accumulated fatigue dissipate. You keep the same structure and movements, but at reduced intensity.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Eine leichtere Woche, damit angesammelte Ermüdung abklingen kann. Struktur und Bewegungen bleiben gleich, nur mit geringerer Intensität." } } }
+    },
+    "Apply Regenerated Week": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Neu erstellte Woche anwenden" } } }
+    },
+    "Changes": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Änderungen" } } }
+    },
+    "Day-by-Day Preview": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Tagesvorschau" } } }
+    },
+    "Deload": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Deload" } } }
+    },
+    "min total": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Min. gesamt" } } }
+    },
+    "Regenerate Week": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Woche neu erstellen" } } }
+    },
+    "sets": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Sätze" } } }
+    },
+    "Smart Week Regeneration": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Smarte Wochen-Neuerstellung" } } }
+    },
+    "Start Deload Week": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Deload-Woche starten" } } }
+    },
+    "Strategic Deload Week": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Strategische Deload-Woche" } } }
+    },
+    "Week Comparison": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Wochenvergleich" } } }
+    },
+    "Your upcoming week will be intelligently rebuilt based on your recent training data, recovery, and muscle balance.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Deine kommende Woche wird anhand deiner letzten Trainingsdaten, Erholung und Muskelbalance intelligent neu aufgebaut." } } }
+    },
     "regeneratePlan.activeWorkout.message": {
       "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Es läuft noch ein Workout. Beende oder verwirf es, bevor du deinen Plan neu erstellst." } } }
     },

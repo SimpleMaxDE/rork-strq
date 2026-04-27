@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DashboardView: View {
     let vm: AppViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var appeared: Bool = false
     @State private var showReadinessCheckIn: Bool = false
     @State private var showWeeklyReview: Bool = false
@@ -54,7 +55,7 @@ struct DashboardView: View {
                     }
 
                     if let roadmap = vm.activationRoadmap {
-                        ActivationRoadmapCard(roadmap: roadmap)
+                        ActivationRoadmapCard(roadmap: roadmap, compact: true)
                             .padding(.horizontal, 16)
                             .onAppear {
                                 Analytics.shared.track(.activation_roadmap_viewed, [
@@ -113,7 +114,7 @@ struct DashboardView: View {
         .navigationTitle(L10n.tr("Today"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
-            withAnimation(.easeOut(duration: 0.5)) { appeared = true }
+            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5)) { appeared = true }
             vm.refreshDailyState()
             Analytics.shared.track(.today_viewed)
         }
@@ -182,8 +183,8 @@ struct DashboardView: View {
                             .stroke(color, style: StrokeStyle(lineWidth: 4, lineCap: .round))
                             .frame(width: 46, height: 46)
                             .rotationEffect(.degrees(-90))
-                            .animation(.easeOut(duration: 0.8).delay(0.2), value: appeared)
-                        Text("\(score)")
+                            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.8).delay(0.2), value: appeared)
+                        STRQCountUpText(value: Double(score), duration: 0.7)
                             .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
                     }
                     Text(L10n.tr("Ready"))
@@ -308,7 +309,7 @@ struct DashboardView: View {
         )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
-        .animation(.easeOut(duration: 0.5).delay(0.05), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.05), value: appeared)
     }
 
     @ViewBuilder
@@ -437,7 +438,7 @@ struct DashboardView: View {
         )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 8)
-        .animation(.easeOut(duration: 0.5).delay(0.06), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.06), value: appeared)
     }
 
     private func postWorkoutBridgeLine(label: String, text: String) -> some View {
@@ -561,7 +562,7 @@ struct DashboardView: View {
         )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
-        .animation(.easeOut(duration: 0.5).delay(0.06), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.06), value: appeared)
     }
 
     private func timeLabel(_ hours: Int) -> String {
@@ -619,7 +620,7 @@ struct DashboardView: View {
         )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 8)
-        .animation(.easeOut(duration: 0.5).delay(0.07), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.07), value: appeared)
     }
 
     // MARK: - Workout Card (training-day primary)
@@ -627,6 +628,8 @@ struct DashboardView: View {
     private func workoutCard(_ day: WorkoutDay, briefing: DailyBriefing) -> some View {
         let primary = briefing.primary
         let tint = ForgeTheme.color(for: primary.colorName)
+        let isRecovery = primary.kind == .recoverToday
+        let isFirstSession = primary.kind == .startFirstSession
         return VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 6) {
@@ -638,6 +641,10 @@ struct DashboardView: View {
                     Spacer()
                     if vm.isEarlyStage {
                         todayPriorityPill
+                    } else if isRecovery {
+                        STRQCelebrationBadge(title: L10n.tr("Recovery first"), icon: "heart.circle.fill", variant: .steel)
+                    } else if isFirstSession {
+                        STRQCelebrationBadge(title: L10n.tr("Milestone"), icon: "sparkles", variant: .gold)
                     } else if let momentum = briefing.momentum {
                         Text(momentum.title)
                             .font(.system(size: 9, weight: .bold))
@@ -653,7 +660,7 @@ struct DashboardView: View {
                 .foregroundStyle(tint)
 
                 Text(day.name)
-                    .font(.system(size: 28, weight: .heavy, design: .rounded))
+                    .font(.system(size: isRecovery ? 25 : 29, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(2)
                     .minimumScaleFactor(0.7)
@@ -673,7 +680,7 @@ struct DashboardView: View {
                     }
                 }
 
-                Divider().opacity(0.3)
+                Divider().opacity(0.22)
 
                 HStack(spacing: 0) {
                     ForgeStatCell(value: "\(day.exercises.count)", label: L10n.tr("Exercises"))
@@ -692,15 +699,11 @@ struct DashboardView: View {
                             Image(systemName: "heart.text.clipboard")
                             Text(L10n.tr("Check in"))
                         }
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(.black)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 13)
-                        .background(Color.white.opacity(0.1), in: .rect(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
-                        )
+                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 12))
                     }
                     .buttonStyle(.strqPressable)
 
@@ -712,10 +715,14 @@ struct DashboardView: View {
                             Text(L10n.tr("Start Workout"))
                         }
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.white.opacity(0.82))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 13)
-                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 12))
+                        .background(Color.white.opacity(0.08), in: .rect(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                        )
                     }
                     .buttonStyle(.strqPressable)
                 }
@@ -724,7 +731,7 @@ struct DashboardView: View {
             } else {
                 ForgePrimaryButton(
                     icon: primary.kind == .resumeWorkout ? "play.fill" : "bolt.fill",
-                    title: primary.kind == .resumeWorkout ? L10n.tr("Resume Workout") : (primary.kind == .startFirstSession ? L10n.tr("Start Session 1") : L10n.tr("Start Workout"))
+                    title: workoutPrimaryTitle(for: primary.kind)
                 ) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
@@ -734,24 +741,40 @@ struct DashboardView: View {
         }
         .background(
             LinearGradient(
-                colors: [Color(white: 0.16), Color(white: 0.10)],
+                colors: isRecovery
+                    ? [Color(white: 0.14), Color(white: 0.10)]
+                    : [Color(white: 0.19), Color(white: 0.09)],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             ),
             in: .rect(cornerRadius: 22)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 22)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                .strokeBorder(tint.opacity(isRecovery ? 0.18 : 0.32), lineWidth: 1)
         )
         .overlay(alignment: .top) {
             tint
                 .frame(height: 3)
                 .clipShape(.rect(cornerRadii: .init(topLeading: 22, bottomLeading: 0, bottomTrailing: 0, topTrailing: 22)))
         }
+        .shadow(color: tint.opacity(isRecovery ? 0.10 : 0.16), radius: 22, y: 8)
         .shadow(color: .black.opacity(0.25), radius: 18, y: 6)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
-        .animation(.easeOut(duration: 0.5).delay(0.05), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.05), value: appeared)
+    }
+
+    private func workoutPrimaryTitle(for kind: DailyBriefing.PrimaryKind) -> String {
+        switch kind {
+        case .resumeWorkout:
+            return L10n.tr("Resume Workout")
+        case .startFirstSession:
+            return L10n.tr("Start Session 1")
+        case .recoverToday:
+            return L10n.tr("Start Light Session")
+        default:
+            return L10n.tr("Start Workout")
+        }
     }
 
     private func coachAdjustmentChip(_ adj: CoachAdjustment) -> some View {
@@ -843,7 +866,7 @@ struct DashboardView: View {
             )
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.5).delay(0.07), value: appeared)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.07), value: appeared)
         }
     }
 
@@ -939,7 +962,7 @@ struct DashboardView: View {
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
-        .animation(.easeOut(duration: 0.5).delay(0.1), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.1), value: appeared)
     }
 
     private func signalButton(icon: String, label: String, value: String, progress: Double, color: Color, action: @escaping () -> Void) -> some View {
@@ -986,7 +1009,7 @@ struct DashboardView: View {
     private var weekPulse: some View {
         VStack(spacing: 14) {
             Button {
-                withAnimation(.snappy(duration: 0.22)) {
+                withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.22)) {
                     showWeekPulseDetails.toggle()
                 }
             } label: {
@@ -1047,7 +1070,7 @@ struct DashboardView: View {
         )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
-        .animation(.easeOut(duration: 0.5).delay(0.12), value: appeared)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.12), value: appeared)
     }
 
     private var greeting: String {

@@ -68,7 +68,9 @@ struct WorkoutCompletionView: View {
                 VStack(spacing: 24) {
                     Spacer(minLength: 28)
                     heroSection
+                    primaryAchievementBadge
                     statsSection
+                    coachLearningLine
                     activationRibbon
                     highlightsSection
                     nextSessionBridge
@@ -169,6 +171,22 @@ struct WorkoutCompletionView: View {
     // MARK: - Stats
 
     @ViewBuilder
+    private var primaryAchievementBadge: some View {
+        if let highlight = highlights.first {
+            STRQCelebrationBadge(
+                title: highlight.title,
+                subtitle: highlight.subtitle,
+                icon: badgeIcon(for: highlight.kind),
+                variant: badgeVariant(for: highlight.kind)
+            )
+            .padding(.horizontal, 20)
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.45).delay(0.22), value: appeared)
+        }
+    }
+
+    @ViewBuilder
     private var statsSection: some View {
         if let session {
             let duration = session.endTime.map { Int($0.timeIntervalSince(session.startTime) / 60) } ?? 0
@@ -191,7 +209,9 @@ struct WorkoutCompletionView: View {
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundStyle(.white.opacity(0.42))
                                 .tracking(1.2)
-                            Text(String(format: "%.0f kg", session.totalVolume))
+                            STRQCountUpText(value: session.totalVolume) { value in
+                                String(format: "%.0f kg", value)
+                            }
                                 .font(.system(size: 26, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                         }
@@ -212,8 +232,36 @@ struct WorkoutCompletionView: View {
             .padding(.horizontal, 20)
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 12)
-            .animation(.easeOut(duration: 0.5).delay(0.3), value: appeared)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.3), value: appeared)
         }
+    }
+
+    private var coachLearningLine: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "brain.head.profile.fill")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(primaryAccent)
+                .frame(width: 28, height: 28)
+                .background(primaryAccent.opacity(0.14), in: .rect(cornerRadius: 8))
+
+            Text(L10n.tr("STRQ learned from this session."))
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.68))
+                .lineLimit(2)
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+        )
+        .padding(.horizontal, 20)
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 10)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.45).delay(0.36), value: appeared)
     }
 
     // MARK: - Highlights
@@ -569,9 +617,15 @@ struct WorkoutCompletionView: View {
     private func completionStat(_ title: String, value: String, unit: String?) -> some View {
         VStack(spacing: 5) {
             HStack(alignment: .lastTextBaseline, spacing: 2) {
-                Text(value)
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                if let numeric = Double(value) {
+                    STRQCountUpText(value: numeric)
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                } else {
+                    Text(value)
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                }
                 if let unit {
                     Text(unit)
                         .font(.system(size: 10, weight: .semibold))
@@ -590,6 +644,40 @@ struct WorkoutCompletionView: View {
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
         )
+    }
+
+    private func badgeVariant(for kind: WorkoutHighlight.Kind) -> STRQCelebrationBadge.Variant {
+        switch kind {
+        case .personalRecord, .longestSession, .streakMilestone, .setsMilestone:
+            return .gold
+        case .bestSet, .volumeUp, .firstTime:
+            return .green
+        case .volumeDown, .consolidation:
+            return .steel
+        }
+    }
+
+    private func badgeIcon(for kind: WorkoutHighlight.Kind) -> String {
+        switch kind {
+        case .personalRecord:
+            return "trophy.fill"
+        case .bestSet:
+            return "bolt.fill"
+        case .volumeUp:
+            return "arrow.up.right.circle.fill"
+        case .volumeDown:
+            return "equal.circle.fill"
+        case .firstTime:
+            return "sparkles"
+        case .consolidation:
+            return "checkmark.seal.fill"
+        case .longestSession:
+            return "timer"
+        case .streakMilestone:
+            return "flame.fill"
+        case .setsMilestone:
+            return "checkmark.seal.fill"
+        }
     }
 
     private func onFirstAppear() {
@@ -732,25 +820,29 @@ private struct SparkField: View {
     }
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { context in
-            Canvas { ctx, _ in
-                let now = context.date.timeIntervalSinceReferenceDate
-                for p in particles {
-                    let alpha = max(0, 1.0 - (now - p.life) / p.maxLife)
-                    guard alpha > 0 else { continue }
-                    let color: Color = p.isAccent
-                        ? accent.opacity(alpha)
-                        : Color.white.opacity(alpha * 0.85)
-                    let rect = CGRect(x: p.x - p.size / 2, y: p.y - p.size / 2, width: p.size, height: p.size)
-                    ctx.fill(Path(ellipseIn: rect), with: .color(color))
-                    if p.isAccent {
-                        let glow = CGRect(x: p.x - p.size, y: p.y - p.size, width: p.size * 2, height: p.size * 2)
-                        ctx.fill(Path(ellipseIn: glow), with: .color(accent.opacity(alpha * 0.18)))
+        ZStack {
+            if !particles.isEmpty {
+                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
+                    Canvas { ctx, _ in
+                        let now = context.date.timeIntervalSinceReferenceDate
+                        for p in particles {
+                            let alpha = max(0, 1.0 - (now - p.life) / p.maxLife)
+                            guard alpha > 0 else { continue }
+                            let color: Color = p.isAccent
+                                ? accent.opacity(alpha)
+                                : Color.white.opacity(alpha * 0.85)
+                            let rect = CGRect(x: p.x - p.size / 2, y: p.y - p.size / 2, width: p.size, height: p.size)
+                            ctx.fill(Path(ellipseIn: rect), with: .color(color))
+                            if p.isAccent {
+                                let glow = CGRect(x: p.x - p.size, y: p.y - p.size, width: p.size * 2, height: p.size * 2)
+                                ctx.fill(Path(ellipseIn: glow), with: .color(accent.opacity(alpha * 0.18)))
+                            }
+                        }
+                    }
+                    .onChange(of: context.date) { _, date in
+                        step(at: date.timeIntervalSinceReferenceDate, size: UIScreen.main.bounds.size)
                     }
                 }
-            }
-            .onChange(of: context.date) { _, date in
-                step(at: date.timeIntervalSinceReferenceDate, size: UIScreen.main.bounds.size)
             }
         }
         .onChange(of: trigger) { _, _ in
