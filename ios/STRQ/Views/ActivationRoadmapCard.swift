@@ -79,12 +79,12 @@ struct ActivationRoadmapCard: View {
     private var compactHeader: some View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(L10n.tr("activationRoadmap.title", fallback: "Deine erste Woche"))
+                Text(L10n.tr("activationRoadmap.title", fallback: "Your first week"))
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
                 Text(L10n.format(
                     "activationRoadmap.progressDone",
-                    fallback: "%d/%d erledigt",
+                    fallback: "%d/%d done",
                     roadmap.completedCount,
                     roadmap.steps.count
                 ))
@@ -139,7 +139,7 @@ struct ActivationRoadmapCard: View {
 
     private var nextStepLine: String {
         if nextStep.isComplete {
-            return L10n.tr("activationRoadmap.complete", fallback: "Woche eins ist erledigt.")
+            return L10n.tr("activationRoadmap.complete", fallback: "Week one is complete.")
         }
         return nextStep.title
     }

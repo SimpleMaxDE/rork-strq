@@ -55,7 +55,7 @@ struct TrainingPlanView: View {
                         Analytics.shared.track(.regenerate_plan_dialog_opened, ["surface": "train"])
                         showPlanRegenerationDialog = true
                     } label: {
-                        Label(L10n.tr("profile.regeneratePlan", fallback: "Plan neu erstellen"), systemImage: "arrow.triangle.2.circlepath")
+                        Label(L10n.tr("profile.regeneratePlan", fallback: "Regenerate Plan"), systemImage: "arrow.triangle.2.circlepath")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle").font(.body)

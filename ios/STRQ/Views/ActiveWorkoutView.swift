@@ -1556,7 +1556,7 @@ struct ActiveWorkoutView: View {
         if restTimeRemaining <= 30 {
             return L10n.tr("Reset, then go again.")
         }
-        return L10n.tr("activeWorkout.rest.nextQueued", fallback: "Nächster Satz ist bereit.")
+        return L10n.tr("activeWorkout.rest.nextQueued", fallback: "Next set is ready.")
     }
 
     private func restNextActionCard(_ nextRec: NextSetRec) -> some View {

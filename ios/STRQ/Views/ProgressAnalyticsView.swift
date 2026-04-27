@@ -87,7 +87,7 @@ struct ProgressAnalyticsView: View {
         let sub: String = {
             switch tier {
             case .fresh:
-                return L10n.tr("progress.fresh.subtitle", fallback: "Logge ein Workout, dann wird Progress nützlich.")
+                return L10n.tr("progress.fresh.subtitle", fallback: "Log one workout, then Progress becomes useful.")
             case .firstSession:
                 return L10n.tr("Strong start. STRQ is already reading load, recovery, and consistency.")
             case .earlyWeek:
@@ -912,7 +912,7 @@ struct ProgressAnalyticsView: View {
                 trailing: L10n.tr("Gathering"),
                 icon: "heart.text.square.fill",
                 headline: L10n.tr("Body"),
-                detail: L10n.tr("progress.body.runway.detail", fallback: "Schlaf, Gewicht und Nutrition schärfen den Read."),
+                detail: L10n.tr("progress.body.runway.detail", fallback: "Sleep, weight, and nutrition sharpen the read."),
                 chips: [("moon.zzz.fill", L10n.tr("Recovery")), ("scalemass.fill", L10n.tr("Weight")), ("fork.knife", L10n.tr("Nutrition"))]
             )
             .opacity(appeared ? 1 : 0)
@@ -1201,7 +1201,7 @@ struct ProgressAnalyticsView: View {
                 trailing: L10n.tr("First Week"),
                 icon: "chart.bar.xaxis",
                 headline: L10n.tr("Volume"),
-                detail: L10n.tr("progress.volume.runway.detail", fallback: "Ein paar Workouts zeigen Rhythmus, Mix und Workload."),
+                detail: L10n.tr("progress.volume.runway.detail", fallback: "A few workouts reveal rhythm, mix, and workload."),
                 chips: [("figure.strengthtraining.traditional", L10n.tr("Sessions")), ("square.stack.3d.up.fill", L10n.tr("Volume")), ("arrow.left.arrow.right", L10n.tr("Balance"))]
             )
             .opacity(appeared ? 1 : 0)

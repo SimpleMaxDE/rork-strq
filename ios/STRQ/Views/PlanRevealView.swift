@@ -343,7 +343,7 @@ struct PlanRevealView: View {
                     Image(systemName: "brain.head.profile.fill")
                         .font(.caption)
                         .foregroundStyle(STRQBrand.steel)
-                    Text(L10n.tr("coachNote.title", fallback: "Coach-Hinweis"))
+                    Text(L10n.tr("coachNote.title", fallback: "Coach note"))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(STRQBrand.steel)
                         .tracking(0.5)

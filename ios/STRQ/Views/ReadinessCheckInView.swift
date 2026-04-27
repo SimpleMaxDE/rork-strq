@@ -527,7 +527,7 @@ struct ReadinessCheckInView: View {
                     Text(L10n.tr("common.details", fallback: "Details"))
                         .font(.caption.weight(.semibold))
                     Spacer()
-                    Text(L10n.tr("readiness.details.summary", fallback: "Schlaf, Energie, Stress, Muskelkater"))
+                    Text(L10n.tr("readiness.details.summary", fallback: "Sleep, energy, stress, soreness"))
                         .font(.caption2.weight(.medium))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)

@@ -753,7 +753,7 @@ struct ProfileView: View {
                         showRestoreMessage = true
                     }
                 }
-                controlRow(L10n.tr("profile.regeneratePlan", fallback: "Plan neu erstellen"), icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
+                controlRow(L10n.tr("profile.regeneratePlan", fallback: "Regenerate Plan"), icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
                     Analytics.shared.track(.regenerate_plan_dialog_opened, ["surface": "profile"])
                     showPlanRegenerationDialog = true
                 }

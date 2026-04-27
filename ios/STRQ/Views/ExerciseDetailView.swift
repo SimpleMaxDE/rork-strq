@@ -304,11 +304,11 @@ struct ExerciseDetailView: View {
 
     private func localizedRoleRationale(_ role: ExerciseRole) -> String {
         switch role {
-        case .keyLift: return L10n.tr("exercise.role.keyLift.rationale", fallback: "Hauptlift: stärkster Reiz, höchste Priorität.")
-        case .supportLift: return L10n.tr("exercise.role.supportLift.rationale", fallback: "Ergänzt den Hauptlift mit einem passenden Winkel.")
-        case .accessory: return L10n.tr("exercise.role.accessory.rationale", fallback: "Gezieltes Volumen für Fokus- oder Nachholmuskeln.")
-        case .warmup: return L10n.tr("exercise.role.warmup.rationale", fallback: "Bereitet die Bewegung vor.")
-        case .saferSubstitute: return L10n.tr("exercise.role.saferSubstitute.rationale", fallback: "Gewählt wegen Gelenk- oder Recovery-Signal.")
+        case .keyLift: return L10n.tr("exercise.role.keyLift.rationale", fallback: "Key lift: strongest stimulus, highest priority.")
+        case .supportLift: return L10n.tr("exercise.role.supportLift.rationale", fallback: "Supports the key lift with a matching angle.")
+        case .accessory: return L10n.tr("exercise.role.accessory.rationale", fallback: "Targeted volume for focus or lagging muscles.")
+        case .warmup: return L10n.tr("exercise.role.warmup.rationale", fallback: "Prepares the movement.")
+        case .saferSubstitute: return L10n.tr("exercise.role.saferSubstitute.rationale", fallback: "Selected because of a joint or recovery signal.")
         }
     }
 
