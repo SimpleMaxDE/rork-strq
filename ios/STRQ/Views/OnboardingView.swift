@@ -923,8 +923,9 @@ struct OnboardingView: View {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(selected ? .black : .white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .multilineTextAlignment(.center)
                 if selected {
                     Image(systemName: "checkmark")
                         .font(.caption2.weight(.black))

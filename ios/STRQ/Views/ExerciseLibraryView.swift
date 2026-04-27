@@ -108,13 +108,13 @@ struct ExerciseLibraryView: View {
 
     private var libraryHero: some View {
         HStack(alignment: .center, spacing: 0) {
-            libraryStatColumn(value: "\(catalog.all.count)", label: "Exercises")
+            libraryStatColumn(value: "\(catalog.all.count)", label: L10n.tr("Exercises"))
             libraryDivider
-            libraryStatColumn(value: "\(ExerciseFamilyService.shared.families.count)", label: "Families")
+            libraryStatColumn(value: "\(ExerciseFamilyService.shared.families.count)", label: L10n.tr("Families"))
             libraryDivider
-            libraryStatColumn(value: "\(MuscleGroup.allCases.count)", label: "Muscles")
+            libraryStatColumn(value: "\(MuscleGroup.allCases.count)", label: L10n.tr("Muscles"))
             libraryDivider
-            libraryStatColumn(value: "\(vm.favoriteExerciseIds.count)", label: "Favorites")
+            libraryStatColumn(value: "\(vm.favoriteExerciseIds.count)", label: L10n.tr("Favorites"))
         }
         .padding(.vertical, 14)
         .padding(.horizontal, 4)
@@ -177,12 +177,12 @@ struct ExerciseLibraryView: View {
                         .foregroundStyle(.primary)
                         .lineLimit(1)
                     HStack(spacing: 6) {
-                        Text(exercise.primaryMuscle.displayName)
+                        Text(exercise.primaryMuscle.localizedDisplayName)
                             .font(.system(size: 11))
                             .foregroundStyle(.secondary)
                         if let p = progression {
                             Circle().fill(Color(.separator)).frame(width: 2, height: 2)
-                            Text("\(p.sessionCount) sessions")
+                            Text(L10n.format("%d sessions", p.sessionCount))
                                 .font(.system(size: 11))
                                 .foregroundStyle(.tertiary)
                         }
@@ -348,7 +348,7 @@ struct ExerciseLibraryView: View {
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
 
-            Text(exercise.primaryMuscle.displayName)
+            Text(exercise.primaryMuscle.localizedDisplayName)
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(.secondary)
         }
@@ -411,7 +411,7 @@ struct ExerciseLibraryView: View {
                     .lineLimit(1)
 
                 HStack(spacing: 4) {
-                    Text(exercise.primaryMuscle.displayName)
+                    Text(exercise.primaryMuscle.localizedDisplayName)
                         .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(STRQBrand.steel)
                     Circle().fill(Color(.separator)).frame(width: 3, height: 3)
@@ -491,7 +491,7 @@ struct ExerciseLibraryView: View {
                                     .foregroundStyle(.primary)
                                     .lineLimit(1)
 
-                                Text(family.primaryMuscles.prefix(2).map { $0.displayName }.joined(separator: ", "))
+                            Text(family.primaryMuscles.prefix(2).map { $0.localizedDisplayName }.joined(separator: ", "))
                                     .font(.system(size: 10, weight: .medium))
                                     .foregroundStyle(.secondary)
                                     .lineLimit(1)
@@ -606,7 +606,7 @@ struct ExerciseLibraryView: View {
                     HStack(spacing: 5) {
                         Image(systemName: selectedPattern?.icon ?? "arrow.triangle.swap")
                             .font(.system(size: 12))
-                        Text(selectedPattern?.displayName ?? "Pattern")
+                        Text(selectedPattern?.displayName ?? L10n.tr("Pattern"))
                             .font(.subheadline.weight(.medium))
                     }
                     .foregroundStyle(isActive ? .white : .primary)
@@ -619,13 +619,13 @@ struct ExerciseLibraryView: View {
                 ForEach(MuscleRegion.allCases) { region in
                     Menu {
                         ForEach(region.muscles) { muscle in
-                            Button(muscle.displayName) {
+                            Button(muscle.localizedDisplayName) {
                                 selectedMuscle = selectedMuscle == muscle ? nil : muscle
                             }
                         }
                     } label: {
                         let isActive = selectedMuscle.map { region.muscles.contains($0) } ?? false
-                        Text(region.displayName)
+                        Text(region.localizedDisplayName)
                             .font(.subheadline.weight(.medium))
                             .foregroundStyle(isActive ? .white : .primary)
                             .padding(.horizontal, 14)
@@ -659,7 +659,7 @@ struct ExerciseLibraryView: View {
 
     private var exerciseCountBar: some View {
         HStack {
-            Text("\(filteredExercises.count) exercises")
+            Text(L10n.format("%d exercises", filteredExercises.count))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Spacer()
@@ -713,7 +713,7 @@ struct ExerciseLibraryView: View {
                         Image(systemName: muscle.symbolName)
                             .font(.caption)
                             .foregroundStyle(STRQBrand.steel)
-                        Text(muscle.displayName.uppercased())
+                        Text(muscle.localizedDisplayName.uppercased())
                             .font(.system(size: 11, weight: .black))
                             .tracking(1.0)
                             .foregroundStyle(.secondary)
@@ -761,7 +761,7 @@ struct ExerciseLibraryView: View {
                     filterSection(L10n.tr("Muscle Group")) {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 8)], spacing: 8) {
                             ForEach(MuscleGroup.allCases) { muscle in
-                                filterChip(muscle.displayName, selected: selectedMuscle == muscle, color: STRQBrand.steel) {
+                                filterChip(muscle.localizedDisplayName, selected: selectedMuscle == muscle, color: STRQBrand.steel) {
                                     selectedMuscle = selectedMuscle == muscle ? nil : muscle
                                 }
                             }
@@ -858,14 +858,14 @@ nonisolated enum MovementPatternGroup: String, CaseIterable, Identifiable, Senda
 
     var displayName: String {
         switch self {
-        case .push: "Push"
-        case .pull: "Pull"
-        case .squat: "Squat"
-        case .hinge: "Hinge"
-        case .lunge: "Lunge"
-        case .carry: "Carry"
-        case .core: "Core"
-        case .isolation: "Isolation"
+        case .push: L10n.tr("Push")
+        case .pull: L10n.tr("Pull")
+        case .squat: L10n.tr("Squat")
+        case .hinge: L10n.tr("Hinge")
+        case .lunge: L10n.tr("Lunge")
+        case .carry: L10n.tr("Carry")
+        case .core: L10n.tr("Core")
+        case .isolation: L10n.tr("Isolation")
         }
     }
 
@@ -926,7 +926,7 @@ struct ExerciseCard: View {
                     }
 
                     HStack(spacing: 5) {
-                        Text(exercise.primaryMuscle.displayName)
+                        Text(exercise.primaryMuscle.localizedDisplayName)
                             .font(.system(size: 10.5, weight: .medium))
                             .foregroundStyle(.secondary)
 

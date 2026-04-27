@@ -11,9 +11,9 @@ struct CoachingPreferencesView: View {
                 heroCard
 
                 section(
-                    eyebrow: "COACH VOICE",
-                    title: "Tone",
-                    caption: "How STRQ talks to you when it calls a play."
+                    eyebrow: L10n.tr("COACH VOICE"),
+                    title: L10n.tr("Tone"),
+                    caption: L10n.tr("How STRQ talks to you when it calls a play.")
                 ) {
                     VStack(spacing: 8) {
                         ForEach(CoachingTone.allCases) { tone in
@@ -30,9 +30,9 @@ struct CoachingPreferencesView: View {
                 }
 
                 section(
-                    eyebrow: "FOCUS",
-                    title: "What matters most",
-                    caption: "STRQ will rank today's signal around this priority."
+                    eyebrow: L10n.tr("FOCUS"),
+                    title: L10n.tr("What matters most"),
+                    caption: L10n.tr("STRQ will rank today's signal around this priority.")
                 ) {
                     VStack(spacing: 8) {
                         ForEach(CoachingEmphasis.allCases) { emphasis in
@@ -53,9 +53,9 @@ struct CoachingPreferencesView: View {
                 }
 
                 section(
-                    eyebrow: "SURFACE",
-                    title: "How much to show",
-                    caption: "Coach and Today adapt to this."
+                    eyebrow: L10n.tr("SURFACE"),
+                    title: L10n.tr("How much to show"),
+                    caption: L10n.tr("Coach and Today adapt to this.")
                 ) {
                     VStack(spacing: 8) {
                         ForEach(CoachingDensity.allCases) { density in
@@ -72,9 +72,9 @@ struct CoachingPreferencesView: View {
                 }
 
                 section(
-                    eyebrow: "AUTOMATION",
-                    title: "How much STRQ adjusts for you",
-                    caption: "Balance between coach authority and user control."
+                    eyebrow: L10n.tr("AUTOMATION"),
+                    title: L10n.tr("How much STRQ adjusts for you"),
+                    caption: L10n.tr("Balance between coach authority and user control.")
                 ) {
                     VStack(spacing: 8) {
                         ForEach(CoachingAutomation.allCases) { level in
@@ -156,11 +156,11 @@ struct CoachingPreferencesView: View {
     private var summaryTitle: String {
         let e = vm.profile.coachingPreferences.emphasis
         switch e {
-        case .performance: return "Performance-first coaching"
-        case .physique: return "Physique-first coaching"
-        case .recovery: return "Recovery-first coaching"
-        case .consistency: return "Consistency-first coaching"
-        case .simplicity: return "Just the next step"
+        case .performance: return L10n.tr("Performance-first coaching")
+        case .physique: return L10n.tr("Physique-first coaching")
+        case .recovery: return L10n.tr("Recovery-first coaching")
+        case .consistency: return L10n.tr("Consistency-first coaching")
+        case .simplicity: return L10n.tr("Just the next step")
         }
     }
 

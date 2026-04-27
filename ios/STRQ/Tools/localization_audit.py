@@ -17,6 +17,10 @@ UI_CONTEXT_TOKENS = [
     "SecureField(", "Stepper(", "Menu(", "LabeledContent(",
     "ForgeSectionHeader(", "controlRow(", "profileRow(", "statusChip(",
     "proPillarChip(", "selectionChip(", "stepHero(", "fieldGroup(",
+    "ContentUnavailableView(", "ForgePrimaryButton(", "ForgeSecondaryButton(",
+    "metricPill(", "signalPill(", "momentumPill(", "roadmapRow(",
+    "overviewStat(", "summaryItem(", "libraryStatColumn(", "filterChip(",
+    "builderCard(", "roleSummaryChip(", "painChoiceButton(",
 ]
 
 GENERATED_COPY_CONTEXT_TOKENS = [
@@ -27,6 +31,8 @@ GENERATED_COPY_CONTEXT_TOKENS = [
 USER_FACING_PROPERTY_NAMES = (
     "label", "title", "subtitle", "detail", "message", "free", "pro",
     "badge", "trailing", "explanation", "coachNote", "displayName",
+    "headline", "footnote", "prompt", "caption", "eyebrow", "summary",
+    "options", "status", "section", "items",
 )
 USER_FACING_PROPERTY_RE = re.compile(
     r"\b(" + "|".join(USER_FACING_PROPERTY_NAMES) + r")\s*:"
@@ -37,6 +43,19 @@ PAYWALL_COPY_SCOPE_RE = re.compile(
     r"perMonthLine|trialBadge|purchaseButtonTitle|trustRow)\b"
 )
 EXERCISE_DISPLAY_NAME_RE = re.compile(r"\bvar\s+displayName\s*:\s*String\b")
+SCREEN_COPY_SCOPE_RE = re.compile(
+    r"\b(?:private\s+)?(?:var|func)\s+"
+    r"(contextLabel|summaryTitle|shortLabel|sleepTrainingImpact|"
+    r"sleepTrainingInsights|readinessLabel|streakMessage|paceMessage|"
+    r"taskHeaderTitle|taskHeaderDetail|roleGroups|headlineHero|"
+    r"whatChangedStrip|signalStrip|libraryHero|filterChips|"
+    r"exerciseCountBar|resultView|signalBreakdown)\b"
+)
+USER_FACING_ARRAY_RE = re.compile(
+    r"\b(?:let|var)\s+\w*(?:steps|options|status|statuses|items|"
+    r"signals|sections|rows|chips|insights|adjustments)\w*"
+    r"\s*(?::[^=]+)?=\s*\["
+)
 
 GENERATED_COPY_INITIALIZERS = [
     "NextBestAction(",
@@ -63,6 +82,19 @@ GENERATED_COPY_FILE_NAMES = {
 TARGETED_COPY_FILES = {
     Path("STRQ/Views/STRQPaywallView.swift"),
     Path("STRQ/Models/Exercise.swift"),
+    Path("STRQ/Models/DailyReadiness.swift"),
+    Path("STRQ/Models/UserProfile.swift"),
+    Path("STRQ/Views/ActiveWorkoutView.swift"),
+    Path("STRQ/Views/CoachingPreferencesView.swift"),
+    Path("STRQ/Views/ExerciseLibraryView.swift"),
+    Path("STRQ/Views/PlanGenerationView.swift"),
+    Path("STRQ/Views/PlanRevealView.swift"),
+    Path("STRQ/Views/PreWorkoutHandoffView.swift"),
+    Path("STRQ/Views/ProgressAnalyticsView.swift"),
+    Path("STRQ/Views/ReadinessCheckInView.swift"),
+    Path("STRQ/Views/SessionEditorSheet.swift"),
+    Path("STRQ/Views/SleepLogView.swift"),
+    Path("STRQ/Services/DailyCoachEngine.swift"),
     Path("STRQWatch/ContentView.swift"),
     Path("STRQWidget/WorkoutLiveActivity.swift"),
 }
@@ -71,10 +103,13 @@ NON_USER_CONTEXT_TOKENS = [
     "print(", "debugPrint(", "logger.", "os_log", "Analytics.", "ErrorReporter.",
     "NSPredicate(", "URL(", "http://", "https://", "UserDefaults", "forKey:",
     "accessibilityIdentifier(", "fatalError(", "preconditionFailure(",
+    "rawValue", "exerciseId", "productIdentifier", "ProductIdentifier",
+    "WCSession", "send([", "receive", "debug", "Debug",
 ]
 NON_USER_LITERAL_PROPERTY_RE = re.compile(
     r"\b(systemName|icon|color|rawValue|identifier|id|symbolName|imageName|"
-    r"accessibilityIdentifier|colorName)\s*:\s*$"
+    r"accessibilityIdentifier|colorName|analyticsKey|productId|productID|"
+    r"exerciseId)\s*:\s*$"
 )
 
 EXCLUDED_PATH_PARTS = {
@@ -89,6 +124,24 @@ EXCLUDED_PATH_PARTS = {
 EXCLUDED_FILE_HINTS = (
     "+Debug", "Debug", "Preview", "Mock", "Stub", "Fixture", "Snapshot", "Harness", "Diagnostics"
 )
+
+EXCLUDED_FILE_NAMES = {
+    "CuratedImportedMediaBridge.swift",
+    "ExerciseCatalog.swift",
+    "ExerciseDBProImporter.swift",
+    "ExerciseFactory.swift",
+    "ExerciseIdentity.swift",
+    "ExerciseLibrary.swift",
+    "ExerciseLibraryArms.swift",
+    "ExerciseLibraryBack.swift",
+    "ExerciseLibraryChest.swift",
+    "ExerciseLibraryCore.swift",
+    "ExerciseLibraryFunctional.swift",
+    "ExerciseLibraryLegs.swift",
+    "ExerciseLibraryMobility.swift",
+    "ExerciseLibraryShoulders.swift",
+    "ExerciseLibrarySpecialty.swift",
+}
 
 # Terms commonly unchanged in German product copy.
 IDENTICAL_DE_ALLOWLIST = {
@@ -165,6 +218,8 @@ def iter_scoped_files() -> list[Path]:
                 continue
             if any(hint in path.name for hint in EXCLUDED_FILE_HINTS):
                 continue
+            if path.name in EXCLUDED_FILE_NAMES:
+                continue
             files.append(path)
     return files
 
@@ -192,6 +247,9 @@ def looks_like_user_facing_english_literal(
         text = INTERPOLATION_RE.sub(" ", text).strip()
         if not text:
             return False
+
+    if text in IDENTICAL_DE_ALLOWLIST:
+        return False
 
     if not user_context and not any(token in line for token in UI_CONTEXT_TOKENS):
         return False
@@ -273,6 +331,9 @@ def main() -> int:
         pending_paywall_copy_scope = False
         exercise_display_brace_depth: int | None = None
         pending_exercise_display_scope = False
+        screen_copy_brace_depth: int | None = None
+        pending_screen_copy_scope = False
+        user_facing_array_depth: int | None = None
 
         for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
             if scans_generated_copy and (GENERATED_COPY_PROPERTY_RE.search(line) or GENERATED_COPY_FUNCTION_RE.search(line)):
@@ -293,6 +354,12 @@ def main() -> int:
             if scans_exercise_metadata and EXERCISE_DISPLAY_NAME_RE.search(line):
                 pending_exercise_display_scope = True
 
+            if targeted_copy_file and SCREEN_COPY_SCOPE_RE.search(line):
+                pending_screen_copy_scope = True
+
+            if targeted_copy_file and USER_FACING_ARRAY_RE.search(line) and user_facing_array_depth is None:
+                user_facing_array_depth = 0
+
             generated_context = (
                 (
                     scans_generated_copy
@@ -310,21 +377,28 @@ def main() -> int:
                     )
                 )
             )
-            property_context = bool(USER_FACING_PROPERTY_RE.search(line))
+            raw_property_context = bool(USER_FACING_PROPERTY_RE.search(line))
+            property_context = targeted_copy_file and raw_property_context
             paywall_context = scans_paywall_copy and (
                 paywall_copy_brace_depth is not None
                 or pending_paywall_copy_scope
-                or property_context
+                or raw_property_context
             )
             exercise_metadata_context = scans_exercise_metadata and (
                 exercise_display_brace_depth is not None
                 or pending_exercise_display_scope
+            )
+            screen_copy_context = targeted_copy_file and (
+                screen_copy_brace_depth is not None
+                or pending_screen_copy_scope
+                or user_facing_array_depth is not None
             )
             user_context = (
                 generated_context
                 or property_context
                 or paywall_context
                 or exercise_metadata_context
+                or screen_copy_context
                 or any(token in line for token in UI_CONTEXT_TOKENS)
             )
 
@@ -360,6 +434,15 @@ def main() -> int:
                     pending_exercise_display_scope = False
                 if exercise_display_brace_depth is not None and brace_depth < exercise_display_brace_depth:
                     exercise_display_brace_depth = None
+                if pending_screen_copy_scope and "{" in line:
+                    screen_copy_brace_depth = brace_depth
+                    pending_screen_copy_scope = False
+                if screen_copy_brace_depth is not None and brace_depth < screen_copy_brace_depth:
+                    screen_copy_brace_depth = None
+                if user_facing_array_depth is not None:
+                    user_facing_array_depth += line.count("[") - line.count("]")
+                    if user_facing_array_depth <= 0:
+                        user_facing_array_depth = None
                 continue
 
             for match in STRING_RE.finditer(line):
@@ -403,6 +486,15 @@ def main() -> int:
                 pending_exercise_display_scope = False
             if exercise_display_brace_depth is not None and brace_depth < exercise_display_brace_depth:
                 exercise_display_brace_depth = None
+            if pending_screen_copy_scope and "{" in line:
+                screen_copy_brace_depth = brace_depth
+                pending_screen_copy_scope = False
+            if screen_copy_brace_depth is not None and brace_depth < screen_copy_brace_depth:
+                screen_copy_brace_depth = None
+            if user_facing_array_depth is not None:
+                user_facing_array_depth += line.count("[") - line.count("]")
+                if user_facing_array_depth <= 0:
+                    user_facing_array_depth = None
 
     catalog = json.loads(XCSTRINGS_PATH.read_text(encoding="utf-8"))
     strings = catalog.get("strings", {})

@@ -1160,7 +1160,7 @@ struct ActiveWorkoutView: View {
                     Rectangle()
                         .fill(Color.white.opacity(0.1))
                         .frame(height: 0.5)
-                    Text("\(total) left")
+                    Text(L10n.format("%d left", total))
                         .font(.system(size: 10, weight: .bold).monospacedDigit())
                         .foregroundStyle(.white.opacity(0.55))
                 }
@@ -1197,7 +1197,7 @@ struct ActiveWorkoutView: View {
                     .foregroundStyle(isImmediate ? .white : .white.opacity(0.75))
                     .lineLimit(1)
                 if let ex = exercise {
-                    Text("\(ex.primaryMuscle.displayName) · \(log.sets.count) sets")
+                    Text(L10n.format("%@ · %d sets", ex.primaryMuscle.localizedDisplayName, log.sets.count))
                         .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(.white.opacity(isImmediate ? 0.55 : 0.42))
                 }
@@ -1716,7 +1716,7 @@ struct ActiveWorkoutView: View {
                                 Text(exercise?.name ?? log.exerciseId)
                                     .font(.subheadline.weight(isCurrent ? .bold : .medium))
                                     .foregroundStyle(isCurrent ? .white : .primary)
-                                Text("\(completedSets)/\(totalSets) sets")
+                                Text(L10n.format("%d/%d sets", completedSets, totalSets))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -1867,7 +1867,7 @@ struct ActiveWorkoutView: View {
 
     private func taskHeaderDetail(currentSet: SetLog?, totalSets: Int) -> String {
         if let currentSet {
-            return L10n.format("Adjust load or reps if needed, then log set %d.", currentSet.setNumber)
+            return L10n.tr("Rest as needed. Adjust load or reps by feel.")
         }
         return totalSets == 0 ? L10n.tr("This exercise is ready.") : L10n.tr("Use the bottom action to move forward when you're ready.")
     }

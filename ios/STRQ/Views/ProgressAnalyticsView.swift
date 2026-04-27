@@ -91,7 +91,7 @@ struct ProgressAnalyticsView: View {
             case .firstSession:
                 return L10n.tr("Strong start. STRQ is already reading load, recovery, and consistency.")
             case .earlyWeek:
-                return L10n.format(vm.totalCompletedWorkouts == 1 ? "%d session in · first-week trends are starting to resolve" : "%d sessions in · first-week trends are starting to resolve", vm.totalCompletedWorkouts)
+                return L10n.format(vm.totalCompletedWorkouts == 1 ? "%d session logged - the first clear trends arrive after a few more workouts." : "%d sessions logged - the first clear trends arrive after a few more workouts.", vm.totalCompletedWorkouts)
             case .established:
                 if progressing > 0 && prsThisMonth > 0 {
                     let prLabel = prsThisMonth == 1 ? L10n.tr("PR this month") : L10n.tr("PRs this month")
@@ -190,7 +190,7 @@ struct ProgressAnalyticsView: View {
             headline = vm.totalCompletedWorkouts == 0 ? L10n.tr("Your baseline starts with Today") : L10n.tr("Signal is coming in")
             detail = vm.totalCompletedWorkouts == 0
                 ? L10n.tr("One workout gives Progress real training signal to read.")
-                : L10n.format(vm.totalCompletedWorkouts == 1 ? "%d session logged · the first clear trends arrive through week one." : "%d sessions logged · the first clear trends arrive through week one.", vm.totalCompletedWorkouts)
+                : L10n.format(vm.totalCompletedWorkouts == 1 ? "%d session logged - the first clear trends arrive after a few more workouts." : "%d sessions logged - the first clear trends arrive after a few more workouts.", vm.totalCompletedWorkouts)
         } else if prsThisWeek > 0 {
             state = .success
             icon = "trophy.fill"

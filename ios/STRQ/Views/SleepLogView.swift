@@ -78,7 +78,7 @@ struct SleepLogView: View {
                             .font(.system(size: 11))
                             .foregroundStyle(STRQBrand.steel)
                         VStack(alignment: .leading, spacing: 1) {
-                            Text(String(format: "%.1fh avg", avgSleep))
+                            Text(L10n.format("Ø %.1f h sleep/day", avgSleep))
                                 .font(.subheadline.weight(.semibold).monospacedDigit())
                             Text(L10n.tr("7-day sleep"))
                                 .font(.system(size: 9))
@@ -184,7 +184,7 @@ struct SleepLogView: View {
                     }
                     Spacer()
                     let goodNights = entries.filter { $0.hoursSlept >= 7 }.count
-                    Text("\(goodNights)/\(entries.count) good nights")
+                    Text(L10n.format("%d/%d good nights", goodNights, entries.count))
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(STRQBrand.steel)
                 }
@@ -248,7 +248,7 @@ struct SleepLogView: View {
                             VStack(spacing: 4) {
                                 Text(level.emoji)
                                     .font(.title3)
-                                Text(level.label)
+                                Text(level.sleepQualityLabel)
                                     .font(.system(size: 9, weight: .medium))
                                     .lineLimit(1)
                             }
@@ -347,13 +347,13 @@ struct SleepLogView: View {
                     let isToday = Calendar.current.isDateInToday(entry.date)
                     HStack(spacing: 12) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(isToday ? "Today" : entry.date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))
+                            Text(isToday ? L10n.tr("Today") : entry.date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))
                                 .font(.subheadline.weight(isToday ? .semibold : .medium))
                             HStack(spacing: 6) {
                                 Text(String(format: "%.1fh", entry.hoursSlept))
                                     .font(.caption.weight(.semibold).monospacedDigit())
                                     .foregroundStyle(entry.hoursSlept >= 7 ? Color.white : STRQBrand.steel)
-                                Text(entry.quality.label)
+                                Text(entry.quality.sleepQualityLabel)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -392,9 +392,9 @@ struct SleepLogView: View {
 
     private var sleepTrainingImpact: String {
         let avg = vm.averageSleepHours
-        if avg >= 7.5 { return "Supporting gains" }
-        if avg >= 6.5 { return "Slightly limiting" }
-        return "Hurting recovery"
+        if avg >= 7.5 { return L10n.tr("Supporting gains") }
+        if avg >= 6.5 { return L10n.tr("Slightly limiting") }
+        return L10n.tr("Hurting recovery")
     }
 
     private var sleepTrainingInsights: [(icon: String, color: Color, title: String, message: String)] {
@@ -405,28 +405,28 @@ struct SleepLogView: View {
             results.append((
                 icon: "exclamationmark.triangle.fill",
                 color: .red,
-                title: "Muscle Recovery Impaired",
-                message: "Under 6.5h average sleep significantly reduces muscle protein synthesis and growth hormone release."
+                title: L10n.tr("Muscle Recovery Impaired"),
+                message: L10n.tr("Under 6.5h average sleep significantly reduces muscle protein synthesis and growth hormone release.")
             ))
             results.append((
                 icon: "bolt.slash.fill",
                 color: STRQBrand.steel,
-                title: "Strength Output Reduced",
-                message: "Sleep debt reduces maximal strength by 5-10%. Consider lighter loads until sleep improves."
+                title: L10n.tr("Strength Output Reduced"),
+                message: L10n.tr("Sleep debt reduces maximal strength by 5-10%. Consider lighter loads until sleep improves.")
             ))
         } else if avg < 7.5 {
             results.append((
                 icon: "exclamationmark.circle.fill",
                 color: .yellow,
-                title: "Recovery Slightly Limited",
-                message: "Aim for 7.5h+ to fully support your training. Current sleep may slow progress slightly."
+                title: L10n.tr("Recovery Slightly Limited"),
+                message: L10n.tr("Aim for 7.5h+ to fully support your training. Current sleep may slow progress slightly.")
             ))
         } else {
             results.append((
                 icon: "checkmark.circle.fill",
                 color: .green,
-                title: "Recovery Well Supported",
-                message: "Your sleep is supporting muscle recovery and performance. Keep this consistency."
+                title: L10n.tr("Recovery Well Supported"),
+                message: L10n.tr("Your sleep is supporting muscle recovery and performance. Keep this consistency.")
             ))
         }
 
@@ -436,8 +436,8 @@ struct SleepLogView: View {
             results.append((
                 icon: "moon.haze.fill",
                 color: STRQBrand.steel,
-                title: "Sleep Quality Declining",
-                message: "\(poorNights) poor-quality nights this week. Quality matters as much as duration for recovery."
+                title: L10n.tr("Sleep Quality Declining"),
+                message: L10n.format("%d poor-quality nights this week. Quality matters as much as duration for recovery.", poorNights)
             ))
         }
 

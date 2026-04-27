@@ -9,12 +9,12 @@ struct PlanGenerationView: View {
     @State private var progress: CGFloat = 0
 
     private let steps: [(icon: String, text: String)] = [
-        ("person.text.rectangle", "Analyzing your profile"),
-        ("figure.strengthtraining.traditional", "Selecting exercises"),
-        ("chart.bar.fill", "Calibrating volume"),
-        ("arrow.left.arrow.right", "Balancing muscle groups"),
-        ("brain.head.profile.fill", "Applying coach intelligence"),
-        ("sparkles", "Finalizing your plan"),
+        ("person.text.rectangle", L10n.tr("Analyzing your profile")),
+        ("figure.strengthtraining.traditional", L10n.tr("Selecting exercises")),
+        ("chart.bar.fill", L10n.tr("Calibrating volume")),
+        ("arrow.left.arrow.right", L10n.tr("Balancing muscle groups")),
+        ("brain.head.profile.fill", L10n.tr("Applying coach intelligence")),
+        ("sparkles", L10n.tr("Finalizing your plan")),
     ]
 
     var body: some View {
@@ -116,15 +116,15 @@ struct PlanGenerationView: View {
     private var profileSummary: some View {
         VStack(spacing: 10) {
             HStack(spacing: 20) {
-                summaryItem(label: "Goal", value: profile.goal.displayName)
-                summaryItem(label: "Level", value: profile.trainingLevel.shortName)
-                summaryItem(label: "Days", value: "\(profile.daysPerWeek)/wk")
+                summaryItem(label: L10n.tr("Goal"), value: profile.goal.displayName)
+                summaryItem(label: L10n.tr("Level"), value: profile.trainingLevel.shortName)
+                summaryItem(label: L10n.tr("Days"), value: "\(profile.daysPerWeek)/wk")
             }
             HStack(spacing: 20) {
-                summaryItem(label: "Session", value: "\(profile.minutesPerSession) min")
-                summaryItem(label: "Location", value: profile.trainingLocation.displayName)
+                summaryItem(label: L10n.tr("Workout"), value: "\(profile.minutesPerSession) min")
+                summaryItem(label: L10n.tr("Location"), value: profile.trainingLocation.displayName)
                 if !profile.focusMuscles.isEmpty {
-                    summaryItem(label: "Focus", value: "\(profile.focusMuscles.count) muscles")
+                    summaryItem(label: L10n.tr("Focus"), value: L10n.format("%d muscles", profile.focusMuscles.count))
                 }
             }
         }

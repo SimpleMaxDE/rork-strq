@@ -11,11 +11,21 @@ nonisolated enum ReadinessLevel: Int, Codable, Sendable, CaseIterable, Identifia
 
     var label: String {
         switch self {
-        case .terrible: "Terrible"
-        case .poor: "Poor"
-        case .okay: "Okay"
-        case .good: "Good"
-        case .great: "Great"
+        case .terrible: L10n.tr("Terrible")
+        case .poor: L10n.tr("Poor")
+        case .okay: L10n.tr("Okay")
+        case .good: L10n.tr("Good")
+        case .great: L10n.tr("Great")
+        }
+    }
+
+    var sleepQualityLabel: String {
+        switch self {
+        case .terrible: L10n.tr("Sleep quality: Terrible")
+        case .poor: L10n.tr("Sleep quality: Poor")
+        case .okay: L10n.tr("Sleep quality: Okay")
+        case .good: L10n.tr("Sleep quality: Good")
+        case .great: L10n.tr("Sleep quality: Great")
         }
     }
 
@@ -51,11 +61,11 @@ nonisolated enum SorenessLevel: Int, Codable, Sendable, CaseIterable, Identifiab
 
     var label: String {
         switch self {
-        case .none: "None"
-        case .mild: "Mild"
-        case .moderate: "Moderate"
-        case .significant: "Significant"
-        case .severe: "Severe"
+        case .none: L10n.tr("None")
+        case .mild: L10n.tr("Mild")
+        case .moderate: L10n.tr("Moderate")
+        case .significant: L10n.tr("Significant")
+        case .severe: L10n.tr("Severe")
         }
     }
 }
@@ -71,11 +81,11 @@ nonisolated enum DailyMotivation: Int, Codable, Sendable, CaseIterable, Identifi
 
     var label: String {
         switch self {
-        case .veryLow: "Very Low"
-        case .low: "Low"
-        case .neutral: "Neutral"
-        case .high: "High"
-        case .veryHigh: "Fired Up"
+        case .veryLow: L10n.tr("Very Low")
+        case .low: L10n.tr("Low")
+        case .neutral: L10n.tr("Neutral")
+        case .high: L10n.tr("High")
+        case .veryHigh: L10n.tr("Fired Up")
         }
     }
 }
@@ -143,11 +153,11 @@ nonisolated struct DailyReadiness: Codable, Identifiable, Sendable {
 
     var readinessLabel: String {
         switch readinessScore {
-        case 85...: return "Peak Readiness"
-        case 70..<85: return "Well Prepared"
-        case 55..<70: return "Moderate"
-        case 40..<55: return "Low Readiness"
-        default: return "Rest Recommended"
+        case 85...: return L10n.tr("Peak Readiness")
+        case 70..<85: return L10n.tr("Well Prepared")
+        case 55..<70: return L10n.tr("Moderate")
+        case 40..<55: return L10n.tr("Low Readiness")
+        default: return L10n.tr("Rest Recommended")
         }
     }
 
@@ -191,13 +201,13 @@ nonisolated enum TrainingAdvice: String, Sendable {
 
     var label: String {
         switch self {
-        case .trainAsPlanned: "Train as Planned"
-        case .trainButLighter: "Go Lighter Today"
-        case .shortenSession: "Shorten Session"
-        case .reduceAccessories: "Reduce Accessories"
-        case .useSaferVariations: "Use Safer Variations"
-        case .restDay: "Rest Day Recommended"
-        case .pushHard: "Good Day to Push"
+        case .trainAsPlanned: L10n.tr("Train as Planned")
+        case .trainButLighter: L10n.tr("Go Lighter Today")
+        case .shortenSession: L10n.tr("Shorten Workout")
+        case .reduceAccessories: L10n.tr("Reduce Accessories")
+        case .useSaferVariations: L10n.tr("Use Safer Variations")
+        case .restDay: L10n.tr("Rest Day Recommended")
+        case .pushHard: L10n.tr("Good Day to Push")
         }
     }
 

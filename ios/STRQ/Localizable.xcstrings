@@ -776,7 +776,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Session ist bereit"
+            "value": "Dein Workout ist bereit"
           }
         }
       }
@@ -806,7 +806,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Perfekter Zeitpunkt für Session 2. Bleib im Flow."
+            "value": "Perfekter Zeitpunkt für Workout 2. Bleib im Flow."
           }
         }
       }
@@ -826,7 +826,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dein Plan ist startklar. Leg mit der ersten Session los."
+            "value": "Dein Plan ist startklar. Leg mit dem ersten Workout los."
           }
         }
       }
@@ -896,7 +896,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kurzer Check-in, dann passt STRQ die Session besser an dich an."
+            "value": "Kurzer Check-in, dann passt STRQ das Workout besser an dich an."
           }
         }
       }
@@ -956,7 +956,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Noch eine Session heute hält deinen Rhythmus am Leben."
+            "value": "Noch ein Workout heute hält deinen Rhythmus am Leben."
           }
         }
       }
@@ -1016,7 +1016,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Du bist noch im Rhythmus. Eine Session heute hält den Schwung."
+            "value": "Du bist noch im Rhythmus. Ein Workout heute hält den Schwung."
           }
         }
       }
@@ -1026,7 +1026,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kurzer Reminder: Eine Session bringt dich direkt zurück in den Flow."
+            "value": "Kurzer Reminder: Ein Workout bringt dich direkt zurück in den Flow."
           }
         }
       }
@@ -1046,7 +1046,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starte locker rein. Eine gute Session reicht, um wieder drin zu sein."
+            "value": "Starte locker rein. Ein gutes Workout reicht, um wieder drin zu sein."
           }
         }
       }
@@ -1066,7 +1066,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lange Pause? Kein Problem. Mit einer Session beginnt der Neustart."
+            "value": "Lange Pause? Kein Problem. Mit einem Workout beginnt der Neustart."
           }
         }
       }
@@ -1086,7 +1086,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nimm dir eine leichte Session vor und bau den Rhythmus Schritt für Schritt auf."
+            "value": "Nimm dir ein leichtes Workout vor und bau den Rhythmus Schritt für Schritt auf."
           }
         }
       }
@@ -1266,7 +1266,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erinnert dich, wenn für heute eine Session geplant ist"
+            "value": "Erinnert dich, wenn für heute ein Workout geplant ist"
           }
         }
       }
@@ -1466,7 +1466,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Session bearbeiten"
+            "value": "Workout bearbeiten"
           }
         }
       }
@@ -1566,7 +1566,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schlüsselaufzüge"
+            "value": "HAUPTÜBUNGEN"
           }
         }
       }
@@ -1576,7 +1576,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unterstützung"
+            "value": "ERGÄNZUNG"
           }
         }
       }
@@ -1736,7 +1736,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Leichtere Session"
+            "value": "Leichteres Workout"
           }
         }
       }
@@ -2116,7 +2116,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Session-Länge"
+            "value": "Workout-Dauer"
           }
         }
       }
@@ -2336,7 +2336,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alle geloggten Sätze dieser Session gehen verloren. Das kann nicht rückgängig gemacht werden."
+            "value": "Alle geloggten Sätze dieses Workouts gehen verloren. Das kann nicht rückgängig gemacht werden."
           }
         }
       }
@@ -2416,7 +2416,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Session-Notiz"
+            "value": "Workout-Notiz"
           }
         }
       }
@@ -2446,7 +2446,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alle Sätze sind geloggt. Beende das Workout, um diese Session zurück an Heute zu übergeben."
+            "value": "Alle Sätze sind geloggt. Beende das Workout, um es zurück an Heute zu übergeben."
           }
         }
       }
@@ -3176,7 +3176,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erste Einheit geloggt"
+            "value": "Erstes Workout geloggt"
           }
         }
       }
@@ -3186,7 +3186,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erste Einheit geloggt — Baseline gesetzt"
+            "value": "Erstes Workout geloggt — Baseline gesetzt"
           }
         }
       }
@@ -3466,7 +3466,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STRQ entscheiden lassen"
+            "value": "STRQ entscheidet"
           }
         }
       }
@@ -3846,7 +3846,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Physik"
+            "value": "Physique"
           }
         }
       }
@@ -4116,7 +4116,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "EINHEIT GELOGGT"
+            "value": "WORKOUT GELOGGT"
           }
         }
       }
@@ -5301,6 +5301,36 @@
         }
       }
     },
+    "%d left": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "noch %d"
+          }
+        }
+      }
+    },
+    "%@ · %d sets": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ · %d Sätze"
+          }
+        }
+      }
+    },
+    "%d/%d sets": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d/%d Sätze"
+          }
+        }
+      }
+    },
     "%d still progressing": {
       "localizations": {
         "de": {
@@ -5596,7 +5626,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "VERMEIDEN SIE DAS"
+            "value": "VERMEIDEN"
           }
         }
       }
@@ -6226,7 +6256,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Komm zu Workout 2 wieder"
+            "value": "Komm für Workout 2 wieder"
           }
         }
       }
@@ -6361,12 +6391,22 @@
         }
       }
     },
+    "Was %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorher %@"
+          }
+        }
+      }
+    },
     "DO THIS": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "TUN SIE DAS"
+            "value": "MACH DAS"
           }
         }
       }
@@ -7116,7 +7156,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Protokollsatz %d"
+            "value": "Satz %d"
           }
         }
       }
@@ -7156,7 +7196,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Protokollsatz %d von %d für %@"
+            "value": "Satz %d von %d für %@"
           }
         }
       }
@@ -7366,7 +7406,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "NÄCHSTE SITZUNG"
+            "value": "NÄCHSTES WORKOUT"
           }
         }
       }
@@ -7986,7 +8026,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WIEDERHERSTELLUNGSSTATUS"
+            "value": "ERHOLUNGSSTATUS"
           }
         }
       }
@@ -8006,7 +8046,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "REPS"
+            "value": "WDH."
           }
         }
       }
@@ -8126,7 +8166,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vertreter"
+            "value": "Wdh."
           }
         }
       }
@@ -8186,7 +8226,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "SITZUNGSPLAN"
+            "value": "WORKOUT-PLAN"
           }
         }
       }
@@ -8226,7 +8266,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STARTEN SIE HIER"
+            "value": "HIER STARTEN"
           }
         }
       }
@@ -8296,7 +8336,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STRQ bleibt ein Trainer – sie bestimmen, wie es spricht, was es betont und wie sehr es sich selbstständig anpasst."
+            "value": "STRQ bleibt ein Coach – du bestimmst, wie er spricht, was er betont und wie stark er selbstständig anpasst."
           }
         }
       }
@@ -8796,7 +8836,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "HEUTE SITZUNG"
+            "value": "HEUTIGES WORKOUT"
           }
         }
       }
@@ -9266,7 +9306,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WAS SIE BEHALTEN · WAS PRO HINZUFÜGT"
+            "value": "WAS DU BEHÄLTST · WAS PRO HINZUFÜGT"
           }
         }
       }
@@ -9296,7 +9336,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "WARUM DIESE SITZUNG"
+            "value": "WARUM DIESES WORKOUT"
           }
         }
       }
@@ -9766,7 +9806,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vertreter"
+            "value": "Wdh."
           }
         }
       }
@@ -11376,7 +11416,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Im Fortschritt"
+            "value": "Im Plan"
           }
         }
       }
@@ -11946,7 +11986,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heute zählt der nächste Schritt. Nach deiner ersten echten Session passt Coach Load und Recovery gezielter an."
+            "value": "Heute zählt der nächste Schritt. Nach deinem ersten echten Workout passt Coach Last und Regeneration gezielter an."
           }
         }
       }
@@ -13534,6 +13574,615 @@
           }
         }
       }
+    },
+    "Analyzing your profile": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Dein Profil wird analysiert" } } }
+    },
+    "Selecting exercises": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Übungen werden ausgewählt" } } }
+    },
+    "Calibrating volume": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Volumen wird kalibriert" } } }
+    },
+    "Balancing muscle groups": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Muskelgruppen werden ausbalanciert" } } }
+    },
+    "Applying coach intelligence": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Coach-Intelligenz wird angewendet" } } }
+    },
+    "Finalizing your plan": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Dein Plan wird erstellt" } } }
+    },
+    "Level": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Level" } } }
+    },
+    "Days": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Tage" } } }
+    },
+    "Workout": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Workout" } } }
+    },
+    "Focus": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Fokus" } } }
+    },
+    "%d muscles": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d Muskeln" } } }
+    },
+    "Before training": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Vor dem Training" } } }
+    },
+    "Rest day check": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Pausentag-Check" } } }
+    },
+    "How's your body?": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Wie fühlt sich dein Körper an?" } } }
+    },
+    "Sleep recovery and current energy are the biggest signals for today.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schlaf und Energie sind heute die wichtigsten Signale." } } }
+    },
+    "What's taxing you?": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Was belastet dich gerade?" } } }
+    },
+    "Soreness and stress affect what's worth pushing today.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Muskelkater und Stress beeinflussen, wie hart du heute gehen solltest." } } }
+    },
+    "One more check": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ein letzter Check" } } }
+    },
+    "Mindset check": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Mindset-Check" } } }
+    },
+    "Motivation shapes intent. Pain reshapes the whole session.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Motivation beeinflusst den Fokus. Schmerzen verändern das ganze Workout." } } }
+    },
+    "A quick note so STRQ can tune recovery and next session.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ein kurzer Hinweis, damit STRQ Regeneration und nächstes Workout besser abstimmen kann." } } }
+    },
+    "All clear": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Alles okay" } } }
+    },
+    "Something's off": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Etwas stimmt nicht" } } }
+    },
+    "Energy": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Energie" } } }
+    },
+    "Soreness": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Muskelkater" } } }
+    },
+    "Flag": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Hinweis" } } }
+    },
+    "Pain reported": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schmerz gemeldet" } } }
+    },
+    "Bad": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schlecht" } } }
+    },
+    "Low": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Niedrig" } } }
+    },
+    "Ok": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Okay" } } }
+    },
+    "Good": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Gut" } } }
+    },
+    "Peak": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Top" } } }
+    },
+    "Terrible": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Sehr schlecht" } } }
+    },
+    "Poor": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schwach" } } }
+    },
+    "Okay": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Okay" } } }
+    },
+    "Great": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Top" } } }
+    },
+    "Sleep quality: Terrible": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Sehr schlecht" } } }
+    },
+    "Sleep quality: Poor": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schlecht" } } }
+    },
+    "Sleep quality: Okay": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Okay" } } }
+    },
+    "Sleep quality: Good": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Gut" } } }
+    },
+    "Sleep quality: Great": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Sehr gut" } } }
+    },
+    "None": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Kein" } } }
+    },
+    "Mild": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Leicht" } } }
+    },
+    "Moderate": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Mittel" } } }
+    },
+    "Significant": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Deutlich" } } }
+    },
+    "Severe": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Stark" } } }
+    },
+    "Very Low": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Sehr niedrig" } } }
+    },
+    "Neutral": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Neutral" } } }
+    },
+    "High": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Hoch" } } }
+    },
+    "Fired Up": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Voll bereit" } } }
+    },
+    "Peak Readiness": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Top bereit" } } }
+    },
+    "Well Prepared": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Gut vorbereitet" } } }
+    },
+    "Low Readiness": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Niedrige Bereitschaft" } } }
+    },
+    "Rest Recommended": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Pause empfohlen" } } }
+    },
+    "Train as Planned": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Wie geplant trainieren" } } }
+    },
+    "Go Lighter Today": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Heute leichter" } } }
+    },
+    "Shorten Workout": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Workout kürzen" } } }
+    },
+    "Reduce Accessories": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Zubehör reduzieren" } } }
+    },
+    "Use Safer Variations": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Sicherere Varianten nutzen" } } }
+    },
+    "Rest Day Recommended": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Pausentag empfohlen" } } }
+    },
+    "Good Day to Push": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Guter Tag zum Pushen" } } }
+    },
+    "Skip today": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Heute pausieren" } } }
+    },
+    "Multiple systems are flagged. Training today costs more than it pays. Move the session - STRQ will rebalance the week.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Mehrere Signale sind belastet. Training würde heute mehr kosten als bringen. Verschiebe das Workout – STRQ passt die Woche an." } } }
+    },
+    "No lifting today": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Heute kein Krafttraining" } } }
+    },
+    "Light walk, stretch, sunlight": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Leichter Spaziergang, Mobility, Tageslicht" } } }
+    },
+    "Eat well, sleep early": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Gut essen, früh schlafen" } } }
+    },
+    "Re-check tomorrow morning": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Morgen früh neu checken" } } }
+    },
+    "Rest & rebuild": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Pausieren & erholen" } } }
+    },
+    "No training today": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Heute kein Training" } } }
+    },
+    "Re-check tomorrow": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Morgen neu checken" } } }
+    },
+    "Rest as needed. Adjust load or reps by feel.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Pause bei Bedarf. Gewicht oder Wiederholungen nach Gefühl anpassen." } } }
+    },
+    "Ø %.1f h sleep/day": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ø %.1f h Schlaf/Tag" } } }
+    },
+    "%d/%d good nights": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d/%d gute Nächte" } } }
+    },
+    "Supporting gains": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Unterstützt Fortschritt" } } }
+    },
+    "Slightly limiting": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Leicht bremsend" } } }
+    },
+    "Hurting recovery": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Bremst die Regeneration" } } }
+    },
+    "Muscle Recovery Impaired": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Muskelregeneration eingeschränkt" } } }
+    },
+    "Under 6.5h average sleep significantly reduces muscle protein synthesis and growth hormone release.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Weniger als 6,5 h Schlaf im Schnitt kann Regeneration und Trainingsleistung deutlich verschlechtern." } } }
+    },
+    "Strength Output Reduced": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Kraftleistung reduziert" } } }
+    },
+    "Sleep debt reduces maximal strength by 5-10%. Consider lighter loads until sleep improves.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schlafdefizit kann Maximalkraft reduzieren. Wähle leichtere Lasten, bis der Schlaf besser wird." } } }
+    },
+    "Recovery Slightly Limited": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Regeneration leicht eingeschränkt" } } }
+    },
+    "Aim for 7.5h+ to fully support your training. Current sleep may slow progress slightly.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ziele auf 7,5 h+, um dein Training voll zu unterstützen. Dein aktueller Schlaf kann Fortschritt leicht bremsen." } } }
+    },
+    "Recovery Well Supported": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Regeneration gut unterstützt" } } }
+    },
+    "Your sleep is supporting muscle recovery and performance. Keep this consistency.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Dein Schlaf unterstützt Muskelregeneration und Leistung. Behalte diese Konstanz." } } }
+    },
+    "Sleep Quality Declining": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schlafqualität sinkt" } } }
+    },
+    "%d poor-quality nights this week. Quality matters as much as duration for recovery.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d Nächte mit schwacher Schlafqualität diese Woche. Qualität zählt für Regeneration genauso wie Dauer." } } }
+    },
+    "COACH VOICE": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "COACH-STIMME" } } }
+    },
+    "Tone": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ton" } } }
+    },
+    "How STRQ talks to you when it calls a play.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Wie STRQ mit dir spricht, wenn es eine Empfehlung gibt." } } }
+    },
+    "What matters most": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Was heute zählt" } } }
+    },
+    "STRQ will rank today's signal around this priority.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "STRQ priorisiert heutige Signale nach diesem Fokus." } } }
+    },
+    "SURFACE": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "ANZEIGE" } } }
+    },
+    "How much to show": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Detailtiefe" } } }
+    },
+    "Coach and Today adapt to this.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Coach und Heute passen sich daran an." } } }
+    },
+    "AUTOMATION": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "AUTOMATIK" } } }
+    },
+    "How much STRQ adjusts for you": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Wie stark STRQ für dich anpasst" } } }
+    },
+    "Balance between coach authority and user control.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Balance zwischen Coach-Automatik und deiner Kontrolle." } } }
+    },
+    "Performance-first coaching": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Leistungsorientiertes Coaching" } } }
+    },
+    "Physique-first coaching": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Physique-orientiertes Coaching" } } }
+    },
+    "Recovery-first coaching": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Regenerationsorientiertes Coaching" } } }
+    },
+    "Consistency-first coaching": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Konstanzorientiertes Coaching" } } }
+    },
+    "Just the next step": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Nur der nächste Schritt" } } }
+    },
+    "Families": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Familien" } } }
+    },
+    "Muscles": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Muskeln" } } }
+    },
+    "Pattern": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Muster" } } }
+    },
+    "%d sessions": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d Workouts" } } }
+    },
+    "Push": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Push" } } }
+    },
+    "Pull": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Pull" } } }
+    },
+    "Squat": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Kniebeuge" } } }
+    },
+    "Hinge": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Hinge" } } }
+    },
+    "Lunge": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ausfallschritt" } } }
+    },
+    "Carry": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Carry" } } }
+    },
+    "Isolation": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Isolation" } } }
+    },
+    "Workout not found": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Workout nicht gefunden" } } }
+    },
+    "%d key": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d Haupt" } } }
+    },
+    "%d support": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d Ergänzung" } } }
+    },
+    "%d accessory": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d Zubehör" } } }
+    },
+    "%d warm-up": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d Warm-up" } } }
+    },
+    "%d exercises · %d sets · ~%dm": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d Übungen · %d Sätze · ~%d min" } } }
+    },
+    "%d · %d sets": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d · %d Sätze" } } }
+    },
+    "SETS": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "SÄTZE" } } }
+    },
+    "EFFORT": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "INTENSITÄT" } } }
+    },
+    "Fills %@ gap": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schließt %@-Lücke" } } }
+    },
+    "Matches %@ focus": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Passt zum %@-Fokus" } } }
+    },
+    "%d session logged - the first clear trends arrive after a few more workouts.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d Workout geloggt – erste klare Trends entstehen nach weiteren Einheiten." } } }
+    },
+    "%d sessions logged - the first clear trends arrive after a few more workouts.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d Workouts geloggt – erste klare Trends entstehen nach weiteren Einheiten." } } }
+    },
+    " around %@": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": " bei %@" } } }
+    },
+    "Train around it": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Drumherum trainieren" } } }
+    },
+    "Protect it today": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Heute schützen" } } }
+    },
+    "You flagged something off%@. Keep the workout, but stay out of the pain path. Swap risky variations, drop load where needed, and end a set early if form breaks.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Du hast etwas gemeldet%@. Mach das Workout, aber bleib aus dem Schmerzbereich. Tausche riskante Varianten, reduziere Last bei Bedarf und beende einen Satz früher, wenn die Form kippt." } } }
+    },
+    "You flagged something off%@. Treat today as a recovery day: mobility, circulation, and sleep. Don't test it.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Du hast etwas gemeldet%@. Behandle heute als Erholungstag: Mobility, Durchblutung und Schlaf. Teste es nicht." } } }
+    },
+    "Swap to joint-friendly variations": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Auf gelenkfreundliche Varianten wechseln" } } }
+    },
+    "Drop load ~15% on affected patterns": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Last bei betroffenen Mustern um ~15 % reduzieren" } } }
+    },
+    "Stop a set the moment form slips": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Satz stoppen, sobald die Form kippt" } } }
+    },
+    "Mobility + light cardio only": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Nur Mobility + leichtes Cardio" } } }
+    },
+    "Prioritize sleep and protein": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schlaf und Protein priorisieren" } } }
+    },
+    "Re-check tomorrow before training": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Morgen vor dem Training neu checken" } } }
+    },
+    "Bank the recovery": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Regeneration mitnehmen" } } }
+    },
+    "You're fresh and firing, but no workout is planned. Don't burn it on junk volume. Keep today active and easy so tomorrow's workout gets the benefit.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Du bist frisch und bereit, aber kein Workout ist geplant. Verbrenn es nicht mit unnötigem Volumen. Bleib heute aktiv und locker, damit morgen profitiert." } } }
+    },
+    "Walk, mobility, or light skill work": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Spaziergang, Mobility oder leichte Technik" } } }
+    },
+    "Hit protein + sleep targets": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Protein- und Schlafziele treffen" } } }
+    },
+    "Prep tomorrow's lifts mentally": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Morgen-Lifts mental vorbereiten" } } }
+    },
+    "You're in a push phase - this is a progression day.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Du bist in einer Push-Phase - heute ist ein Progressionstag." } } }
+    },
+    "Green light - push": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Grünes Licht - pushen" } } }
+    },
+    "Sleep, energy, and recovery are all stacked.%@ Attack the top set and look for a real rep or load PR on the anchor lift.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schlaf, Energie und Regeneration stehen gut.%@ Greif den Top-Satz an und such beim Ankerlift nach einem echten Wiederholungs- oder Last-PR." } } }
+    },
+    "Warm up thoroughly - earn the intensity": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Gründlich aufwärmen - Intensität verdienen" } } }
+    },
+    "Push anchor lift: +1 rep or +2.5 kg": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ankerlift pushen: +1 Wdh. oder +2,5 kg" } } }
+    },
+    "Keep accessory quality, not just tonnage": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Bei Zubehör Qualität halten, nicht nur Tonnage" } } }
+    },
+    "Solid baseline": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Solide Basis" } } }
+    },
+    "Recovery is on track and no workout is scheduled. Log your inputs and keep the signal clean for STRQ.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Regeneration ist im Plan und kein Workout ist angesetzt. Logge deine Inputs und halte das Signal für STRQ sauber." } } }
+    },
+    "Log weight and sleep": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Gewicht und Schlaf loggen" } } }
+    },
+    "Keep steps moving": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schritte sammeln" } } }
+    },
+    "Stay on nutrition": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ernährung einhalten" } } }
+    },
+    "Run the plan": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Plan durchziehen" } } }
+    },
+    "You're well-recovered. Follow today's prescription exactly - this is the kind of day progress is built on. Nothing fancy.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Du bist gut erholt. Folge heute genau der Vorgabe - auf solchen Tagen entsteht Fortschritt. Nichts extra." } } }
+    },
+    "Hit target reps at target RPE": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ziel-Wdh. bei Ziel-RPE treffen" } } }
+    },
+    "Clean tempo, full ROM": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Sauberes Tempo, volle ROM" } } }
+    },
+    "Log every set honestly": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Jeden Satz ehrlich loggen" } } }
+    },
+    "Stack recovery": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Regeneration stapeln" } } }
+    },
+    "You're not quite fresh and no workout is planned - that's a fit. Use the day to rebuild: sleep, food, and light movement.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Du bist nicht ganz frisch und kein Workout ist geplant - das passt. Nutze den Tag zum Aufbauen: Schlaf, Essen und leichte Bewegung." } } }
+    },
+    "20-30 min walk or mobility": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "20-30 min Spaziergang oder Mobility" } } }
+    },
+    "Hit protein target": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Proteinziel treffen" } } }
+    },
+    "Target 7h+ sleep tonight": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Heute Nacht 7 h+ Schlaf anpeilen" } } }
+    },
+    "Warm-up sets matter - don't rush them": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Aufwärmsätze zählen - nicht hetzen" } } }
+    },
+    "Cut last accessory set on sore muscles": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Letzten Zubehörsatz bei müden Muskeln streichen" } } }
+    },
+    "Cap workout at ~45 min": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Workout auf ~45 min begrenzen" } } }
+    },
+    "Hold load, stay ~1 RIR lighter than usual": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Last halten, ~1 RIR leichter als sonst bleiben" } } }
+    },
+    "Train, but tune it down": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Trainieren, aber runterregeln" } } }
+    },
+    "Recovery is mixed. Don't chase a PR today - anchor lifts at planned load, accessories trimmed. Quality > tonnage.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Regeneration ist gemischt. Heute keinen PR jagen - Ankerlifts mit geplanter Last, Zubehör gekürzt. Qualität > Tonnage." } } }
+    },
+    "Full recovery day": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Voller Erholungstag" } } }
+    },
+    "Your body is telling you it needs time. Let it. Sleep, food, and walking will pay off more than anything else today.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Dein Körper sagt, dass er Zeit braucht. Gib sie ihm. Schlaf, Essen und Gehen bringen heute mehr als alles andere." } } }
+    },
+    "Extra hour of sleep if possible": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Wenn möglich eine Stunde extra schlafen" } } }
+    },
+    "Protein + water first": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Protein + Wasser zuerst" } } }
+    },
+    "Drop working load ~15-20%": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Arbeitslast um ~15-20 % senken" } } }
+    },
+    "Cut 1-2 accessory exercises": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "1-2 Zubehörübungen streichen" } } }
+    },
+    "Keep workout under 40 min": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Workout unter 40 min halten" } } }
+    },
+    "If it still feels wrong - swap to mobility": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Wenn es sich weiter falsch anfühlt - auf Mobility wechseln" } } }
+    },
+    "Movement, not a grind": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Bewegung, kein Durchbeißen" } } }
+    },
+    "Readiness is low. A short, lighter workout beats skipping outright - but do not push through pain or form breakdown. Bank the rep quality, not the intensity.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Readiness ist niedrig. Ein kurzes, leichteres Workout ist besser als komplett auszulassen - aber nicht durch Schmerz oder Formverlust pushen. Sichere Satzqualität, nicht Intensität." } } }
+    },
+    "Multiple systems are flagged. Let today be about recovery. You'll come back measurably stronger.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Mehrere Signale sind belastet. Heute geht es um Erholung. Du kommst messbar stärker zurück." } } }
+    },
+    "You're ready - let's train": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Du bist bereit - los trainieren" } } }
+    },
+    "Readiness is high and today's workout is waiting. Make it count.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Readiness ist hoch und dein Workout wartet. Mach es wertvoll." } } }
+    },
+    "Recovery comes first today": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Regeneration geht heute vor" } } }
+    },
+    "Your body is asking for rest. Light movement or a full rest day is the smart play.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Dein Körper fragt nach Pause. Leichte Bewegung oder ein voller Ruhetag ist der smarte Move." } } }
+    },
+    "Weekly target hit": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Wochenziel erreicht" } } }
+    },
+    "You've completed all planned workouts. Great discipline - enjoy the rest.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Du hast alle geplanten Workouts erledigt. Starke Disziplin - genieß die Pause." } } }
+    },
+    "One workout to go this week": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ein Workout diese Woche noch" } } }
+    },
+    "Finish strong and you'll complete your weekly target.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schließ stark ab und du erreichst dein Wochenziel." } } }
+    },
+    "Momentum is building": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Momentum baut sich auf" } } }
+    },
+    "%d-day streak. Consistency like this drives real results.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d-Tage-Streak. Diese Konstanz bringt echte Ergebnisse." } } }
+    },
+    "Training day": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Trainingstag" } } }
+    },
+    "Today's workout is ready. Warm up well and focus on quality.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Dein heutiges Workout ist bereit. Wärm dich gut auf und fokussiere Qualität." } } }
+    },
+    "Active recovery day": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Aktiver Erholungstag" } } }
+    },
+    "No workout planned. Light movement, stretching, or complete rest - you choose.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Kein Workout geplant. Leichte Bewegung, Stretching oder komplette Pause - du entscheidest." } } }
+    },
+    "Incredible discipline. %d days and counting.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Starke Disziplin. %d Tage und es läuft weiter." } } }
+    },
+    "Strong momentum. Keep the streak alive.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Starkes Momentum. Halt den Streak am Leben." } } }
+    },
+    "Building consistency. Stay on track.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Konstanz baut sich auf. Bleib dran." } } }
+    },
+    "Getting started. Every workout counts.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Der Anfang läuft. Jedes Workout zählt." } } }
+    },
+    "Start fresh today. One workout at a time.": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Heute frisch starten. Ein Workout nach dem anderen." } } }
+    },
+    "Ahead of schedule this week": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Diese Woche vor dem Plan" } } }
+    },
+    "On track for your weekly target": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Auf Kurs fürs Wochenziel" } } }
+    },
+    "Behind this week - time to catch up": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Diese Woche im Rückstand - Zeit aufzuholen" } } }
+    },
+    "No workouts yet this week": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Noch keine Workouts diese Woche" } } }
     }
   },
   "version": "1.0"

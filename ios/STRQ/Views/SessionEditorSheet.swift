@@ -63,7 +63,7 @@ struct SessionEditorSheet: View {
                         .presentationDragIndicator(.visible)
                     }
             } else {
-                ContentUnavailableView("Session not found", systemImage: "questionmark.folder")
+                ContentUnavailableView(L10n.tr("Workout not found"), systemImage: "questionmark.folder")
             }
         }
     }
@@ -119,7 +119,7 @@ struct SessionEditorSheet: View {
                     Text(day.name)
                         .font(.headline)
                         .lineLimit(1)
-                    Text("\(day.exercises.count) exercises · \(totalSets) sets · ~\(day.estimatedMinutes)m")
+                    Text(L10n.format("%d exercises · %d sets · ~%dm", day.exercises.count, totalSets, day.estimatedMinutes))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
@@ -128,10 +128,10 @@ struct SessionEditorSheet: View {
             }
 
             HStack(spacing: 6) {
-                if counts.key > 0 { roleSummaryChip(label: "\(counts.key) Key", color: .primary, bg: STRQBrand.steel.opacity(0.18)) }
-                if counts.support > 0 { roleSummaryChip(label: "\(counts.support) Support", color: STRQPalette.info, bg: STRQPalette.info.opacity(0.12)) }
-                if counts.accessory > 0 { roleSummaryChip(label: "\(counts.accessory) Accessory", color: STRQBrand.steel, bg: STRQBrand.steel.opacity(0.12)) }
-                if counts.warm > 0 { roleSummaryChip(label: "\(counts.warm) Warm-Up", color: STRQPalette.warning, bg: STRQPalette.warning.opacity(0.12)) }
+                if counts.key > 0 { roleSummaryChip(label: L10n.format("%d key", counts.key), color: .primary, bg: STRQBrand.steel.opacity(0.18)) }
+                if counts.support > 0 { roleSummaryChip(label: L10n.format("%d support", counts.support), color: STRQPalette.info, bg: STRQPalette.info.opacity(0.12)) }
+                if counts.accessory > 0 { roleSummaryChip(label: L10n.format("%d accessory", counts.accessory), color: STRQBrand.steel, bg: STRQBrand.steel.opacity(0.12)) }
+                if counts.warm > 0 { roleSummaryChip(label: L10n.format("%d warm-up", counts.warm), color: STRQPalette.warning, bg: STRQPalette.warning.opacity(0.12)) }
             }
         }
         .padding(14)
@@ -170,7 +170,7 @@ struct SessionEditorSheet: View {
                             .tracking(0.8)
                             .foregroundStyle(group.color == .white ? Color.primary : group.color)
                         Spacer()
-                        Text("\(group.items.count) · \(group.totalSets) sets")
+                        Text(L10n.format("%d · %d sets", group.items.count, group.totalSets))
                             .font(.system(size: 10, weight: .semibold).monospacedDigit())
                             .foregroundStyle(.tertiary)
                     }
@@ -350,10 +350,10 @@ struct SessionEditorSheet: View {
             }
         }
         var out: [BuilderGroup] = []
-        if !warm.isEmpty { out.append(BuilderGroup(title: "Warm-Up", color: STRQPalette.warning, items: warm)) }
-        if !key.isEmpty { out.append(BuilderGroup(title: "Key Lifts", color: .white, items: key)) }
-        if !support.isEmpty { out.append(BuilderGroup(title: "Support", color: STRQPalette.info, items: support)) }
-        if !accessory.isEmpty { out.append(BuilderGroup(title: "Accessory", color: STRQBrand.steel, items: accessory)) }
+        if !warm.isEmpty { out.append(BuilderGroup(title: L10n.tr("Warm-Up"), color: STRQPalette.warning, items: warm)) }
+        if !key.isEmpty { out.append(BuilderGroup(title: L10n.tr("Key Lifts"), color: .white, items: key)) }
+        if !support.isEmpty { out.append(BuilderGroup(title: L10n.tr("Support"), color: STRQPalette.info, items: support)) }
+        if !accessory.isEmpty { out.append(BuilderGroup(title: L10n.tr("Accessory"), color: STRQBrand.steel, items: accessory)) }
         return out
     }
 
@@ -495,7 +495,7 @@ struct PrescriptionEditSheet: View {
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 HStack(spacing: 5) {
-                    Text(exercise?.primaryMuscle.displayName ?? "")
+                    Text(exercise?.primaryMuscle.localizedDisplayName ?? "")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     if isCustom {
@@ -532,7 +532,8 @@ struct PrescriptionEditSheet: View {
                 Text(L10n.tr("Customized from coach default"))
                     .font(.caption.weight(.semibold))
                 if let cd = coachDefault {
-                    Text("Was \(cd.sets)×\(cd.reps) · \(formatRest(cd.restSeconds))\(cd.rpe.map { " · RPE\(Int($0))" } ?? "")")
+                    let previousPrescription = "\(cd.sets)×\(cd.reps) · \(formatRest(cd.restSeconds))\(cd.rpe.map { " · RPE\(Int($0))" } ?? "")"
+                    Text(L10n.format("Was %@", previousPrescription))
                         .font(.caption2.monospacedDigit())
                         .foregroundStyle(.secondary)
                 }
@@ -571,7 +572,7 @@ struct PrescriptionEditSheet: View {
     }
 
     private var setsCard: some View {
-        builderCard(title: "SETS", trailing: "\(sets)") {
+        builderCard(title: L10n.tr("SETS"), trailing: "\(sets)") {
             HStack(spacing: 6) {
                 ForEach([1, 2, 3, 4, 5, 6], id: \.self) { n in
                     Button {
@@ -592,7 +593,7 @@ struct PrescriptionEditSheet: View {
     }
 
     private var repsCard: some View {
-        builderCard(title: "REPS", trailing: repsText) {
+        builderCard(title: L10n.tr("REPS"), trailing: repsText) {
             VStack(spacing: 8) {
                 HStack(spacing: 6) {
                     ForEach(["3-5", "6-8", "8-10", "10-12"], id: \.self) { preset in
@@ -631,7 +632,7 @@ struct PrescriptionEditSheet: View {
     }
 
     private var restCard: some View {
-        builderCard(title: "REST", trailing: formatRest(restSeconds)) {
+        builderCard(title: L10n.tr("REST"), trailing: formatRest(restSeconds)) {
             HStack(spacing: 6) {
                 ForEach([45, 60, 90, 120, 180, 240], id: \.self) { preset in
                     Button {
@@ -652,7 +653,7 @@ struct PrescriptionEditSheet: View {
     }
 
     private var rpeCard: some View {
-        builderCard(title: "EFFORT", trailing: rpeEnabled ? "RPE \(String(format: "%.1f", rpeValue))" : "Coach") {
+        builderCard(title: L10n.tr("EFFORT"), trailing: rpeEnabled ? "RPE \(String(format: "%.1f", rpeValue))" : "Coach") {
             VStack(spacing: 10) {
                 Toggle(L10n.tr("Target RPE"), isOn: $rpeEnabled)
                     .tint(STRQBrand.steel)
@@ -784,7 +785,7 @@ struct AddExerciseSheet: View {
                             Button {
                                 selectedMuscle = selectedMuscle == muscle ? nil : muscle
                             } label: {
-                                chipLabel(muscle.displayName, active: selectedMuscle == muscle)
+                            chipLabel(muscle.localizedDisplayName, active: selectedMuscle == muscle)
                             }
                         }
                     }
@@ -813,7 +814,7 @@ struct AddExerciseSheet: View {
                     }
 
                     ForEach(grouped, id: \.0) { muscle, exercises in
-                        Section(muscle.displayName) {
+                        Section(muscle.localizedDisplayName) {
                             ForEach(exercises) { ex in
                                 resultRow(ex)
                             }
@@ -837,7 +838,9 @@ struct AddExerciseSheet: View {
         let focus = Set(day?.focusMuscles ?? [])
         let existing = Set((day?.exercises ?? []).compactMap { vm.library.exercise(byId: $0.exerciseId)?.primaryMuscle })
         let isMissing = focus.contains(ex.primaryMuscle) && !existing.contains(ex.primaryMuscle)
-        let hint: String = isMissing ? "Fills \(ex.primaryMuscle.displayName) gap" : "Matches \(ex.primaryMuscle.displayName) focus"
+        let hint: String = isMissing
+            ? L10n.format("Fills %@ gap", ex.primaryMuscle.localizedDisplayName)
+            : L10n.format("Matches %@ focus", ex.primaryMuscle.localizedDisplayName)
         let hintColor: Color = isMissing ? STRQPalette.warning : STRQPalette.success
 
         return Button {

@@ -89,7 +89,7 @@ struct ReadinessCheckInView: View {
     }
 
     private var contextLabel: String {
-        hasWorkoutToday ? "Before training" : "Rest day check"
+        hasWorkoutToday ? L10n.tr("Before training") : L10n.tr("Rest day check")
     }
 
     private var progressBar: some View {
@@ -131,8 +131,8 @@ struct ReadinessCheckInView: View {
     private var sleepEnergyStep: some View {
         VStack(spacing: 24) {
             stepHeader(
-                title: "How's your body?",
-                subtitle: "Sleep recovery and current energy are the biggest signals for today."
+                title: L10n.tr("How's your body?"),
+                subtitle: L10n.tr("Sleep recovery and current energy are the biggest signals for today.")
             )
 
             VStack(alignment: .leading, spacing: 10) {
@@ -151,8 +151,8 @@ struct ReadinessCheckInView: View {
     private var loadStep: some View {
         VStack(spacing: 24) {
             stepHeader(
-                title: "What's taxing you?",
-                subtitle: "Soreness and stress affect what's worth pushing today."
+                title: L10n.tr("What's taxing you?"),
+                subtitle: L10n.tr("Soreness and stress affect what's worth pushing today.")
             )
 
             VStack(alignment: .leading, spacing: 10) {
@@ -171,10 +171,10 @@ struct ReadinessCheckInView: View {
     private var mindsetStep: some View {
         VStack(spacing: 24) {
             stepHeader(
-                title: hasWorkoutToday ? "One more check" : "Mindset check",
+                title: hasWorkoutToday ? L10n.tr("One more check") : L10n.tr("Mindset check"),
                 subtitle: hasWorkoutToday
-                    ? "Motivation shapes intent. Pain reshapes the whole session."
-                    : "A quick note so STRQ can tune recovery and next session."
+                    ? L10n.tr("Motivation shapes intent. Pain reshapes the whole session.")
+                    : L10n.tr("A quick note so STRQ can tune recovery and next session.")
             )
 
             VStack(alignment: .leading, spacing: 10) {
@@ -342,7 +342,7 @@ struct ReadinessCheckInView: View {
     private var painToggle: some View {
         HStack(spacing: 8) {
             painChoiceButton(
-                title: "All clear",
+                title: L10n.tr("All clear"),
                 icon: "checkmark.circle.fill",
                 selected: !painOrRestriction,
                 color: STRQPalette.success
@@ -353,7 +353,7 @@ struct ReadinessCheckInView: View {
                 }
             }
             painChoiceButton(
-                title: "Something's off",
+                title: L10n.tr("Something's off"),
                 icon: "exclamationmark.triangle.fill",
                 selected: painOrRestriction,
                 color: STRQPalette.danger
@@ -500,7 +500,7 @@ struct ReadinessCheckInView: View {
                 HStack(spacing: 8) {
                     Image(systemName: hasWorkoutToday ? "figure.strengthtraining.traditional" : "checkmark")
                         .font(.subheadline.weight(.semibold))
-                    Text(hasWorkoutToday ? L10n.tr("Go to today's session") : L10n.tr("Done"))
+                    Text(hasWorkoutToday ? L10n.tr("See today's plan") : L10n.tr("Done"))
                         .font(.body.weight(.bold))
                 }
                 .foregroundStyle(.black)
@@ -514,16 +514,16 @@ struct ReadinessCheckInView: View {
 
     private func signalBreakdown(readiness: DailyReadiness) -> some View {
         VStack(spacing: 0) {
-            signalRow(label: "Sleep", value: readiness.sleepQuality.label, color: readinessColor(readiness.sleepQuality))
+            signalRow(label: L10n.tr("Sleep"), value: readiness.sleepQuality.label, color: readinessColor(readiness.sleepQuality))
             Divider().overlay(Color.white.opacity(0.05))
-            signalRow(label: "Energy", value: readiness.energyLevel.label, color: readinessColor(readiness.energyLevel))
+            signalRow(label: L10n.tr("Energy"), value: readiness.energyLevel.label, color: readinessColor(readiness.energyLevel))
             Divider().overlay(Color.white.opacity(0.05))
-            signalRow(label: "Stress", value: readiness.stressLevel.label, color: readinessColor(readiness.stressLevel, inverted: true))
+            signalRow(label: L10n.tr("Stress"), value: readiness.stressLevel.label, color: readinessColor(readiness.stressLevel, inverted: true))
             Divider().overlay(Color.white.opacity(0.05))
-            signalRow(label: "Soreness", value: readiness.soreness.label, color: sorenessColor(readiness.soreness))
+            signalRow(label: L10n.tr("Soreness"), value: readiness.soreness.label, color: sorenessColor(readiness.soreness))
             if readiness.painOrRestriction {
                 Divider().overlay(Color.white.opacity(0.05))
-                signalRow(label: "Flag", value: readiness.painNote.isEmpty ? "Pain reported" : readiness.painNote, color: STRQPalette.danger)
+                signalRow(label: L10n.tr("Flag"), value: readiness.painNote.isEmpty ? L10n.tr("Pain reported") : readiness.painNote, color: STRQPalette.danger)
             }
         }
         .padding(.horizontal, 14)
@@ -598,11 +598,11 @@ struct ReadinessCheckInView: View {
 
     private func shortLabel(_ level: ReadinessLevel) -> String {
         switch level {
-        case .terrible: "Bad"
-        case .poor: "Low"
-        case .okay: "Ok"
-        case .good: "Good"
-        case .great: "Peak"
+        case .terrible: L10n.tr("Bad")
+        case .poor: L10n.tr("Low")
+        case .okay: L10n.tr("Ok")
+        case .good: L10n.tr("Good")
+        case .great: L10n.tr("Peak")
         }
     }
 

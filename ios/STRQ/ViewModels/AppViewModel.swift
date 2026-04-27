@@ -1750,9 +1750,9 @@ class AppViewModel {
 
     var sleepQualityLabel: String {
         let avg = averageSleepHours
-        if avg >= 7.5 { return "Good" }
-        if avg >= 6.5 { return "Fair" }
-        return "Poor"
+        if avg >= 7.5 { return L10n.tr("Good") }
+        if avg >= 6.5 { return L10n.tr("Okay") }
+        return L10n.tr("Poor")
     }
 
     func logNutrition(_ log: DailyNutritionLog) {
