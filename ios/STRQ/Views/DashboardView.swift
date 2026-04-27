@@ -8,6 +8,7 @@ struct DashboardView: View {
     @State private var showNutritionLog: Bool = false
     @State private var showSleepLog: Bool = false
     @State private var showWeightLog: Bool = false
+    @State private var showWeekPulseDetails: Bool = false
 
     var body: some View {
         ScrollView {
@@ -25,12 +26,6 @@ struct DashboardView: View {
                 }
 
                 if isPostFirstSessionState {
-                    scheduleTimeline
-                        .padding(.horizontal, 16)
-
-                    dailySignalsRow
-                        .padding(.horizontal, 16)
-
                     if let roadmap = vm.activationRoadmap {
                         ActivationRoadmapCard(roadmap: roadmap, compact: true)
                             .padding(.horizontal, 16)
@@ -41,6 +36,12 @@ struct DashboardView: View {
                                 ])
                             }
                     }
+
+                    scheduleTimeline
+                        .padding(.horizontal, 16)
+
+                    dailySignalsRow
+                        .padding(.horizontal, 16)
 
                     if let since = vm.dailyBriefing?.sinceLast, postWorkoutBridge == nil {
                         sinceLastCard(since)
@@ -984,19 +985,29 @@ struct DashboardView: View {
 
     private var weekPulse: some View {
         VStack(spacing: 14) {
-            HStack {
-                ForgeSectionHeader(title: L10n.tr("This Week"), showAccent: true)
-                Spacer()
-                if let momentum = vm.momentumData {
-                    let paceColor = ForgeTheme.color(for: momentum.weeklyPace.colorName)
-                    Text(momentum.paceMessage)
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(paceColor)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(paceColor.opacity(0.1), in: Capsule())
+            Button {
+                withAnimation(.snappy(duration: 0.22)) {
+                    showWeekPulseDetails.toggle()
+                }
+            } label: {
+                HStack {
+                    ForgeSectionHeader(title: L10n.tr("This Week"), showAccent: true)
+                    Spacer()
+                    if let momentum = vm.momentumData {
+                        let paceColor = ForgeTheme.color(for: momentum.weeklyPace.colorName)
+                        Text(momentum.paceMessage)
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(paceColor)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(paceColor.opacity(0.1), in: Capsule())
+                    }
+                    Image(systemName: showWeekPulseDetails ? "chevron.up" : "chevron.down")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.tertiary)
                 }
             }
+            .buttonStyle(.plain)
 
             HStack(spacing: 0) {
                 ForEach(vm.weeklyActivity) { day in
@@ -1019,10 +1030,13 @@ struct DashboardView: View {
                 }
             }
 
-            HStack(spacing: 12) {
-                ForgeStatCell(value: "\(vm.weeklyStats.sessions)/\(vm.profile.daysPerWeek)", label: L10n.tr("Sessions"))
-                ForgeStatCell(value: ForgeTheme.formatVolume(vm.weeklyStats.volume), label: L10n.tr("Volume"))
-                ForgeStatCell(value: "\(vm.effectiveRecoveryScore)%", label: L10n.tr("Recovery"), valueColor: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+            if showWeekPulseDetails {
+                HStack(spacing: 12) {
+                    ForgeStatCell(value: "\(vm.weeklyStats.sessions)/\(vm.profile.daysPerWeek)", label: L10n.tr("Sessions"))
+                    ForgeStatCell(value: ForgeTheme.formatVolume(vm.weeklyStats.volume), label: L10n.tr("Volume"))
+                    ForgeStatCell(value: "\(vm.effectiveRecoveryScore)%", label: L10n.tr("Recovery"), valueColor: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
         .padding(16)

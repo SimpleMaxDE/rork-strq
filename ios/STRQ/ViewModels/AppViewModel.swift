@@ -14,6 +14,7 @@ class AppViewModel {
     var workoutMinimized: Bool = false
     var completedWorkoutHandoff: WorkoutSession?
     var hasCompletedOnboarding: Bool
+    var todayTabRequestID: Int = 0
 
     let library = ExerciseLibrary.shared
     private let actionManager = CoachActionManager()
@@ -302,11 +303,13 @@ class AppViewModel {
     }
 
     func finishPlanGeneration() {
-        workoutHistory = []
-        personalRecords = []
-        progressEntries = []
-        trainingPhaseState = TrainingPhaseState()
-        progressionStates = []
+        if !hasTrackedTrainingData {
+            workoutHistory = []
+            personalRecords = []
+            progressEntries = []
+            trainingPhaseState = TrainingPhaseState()
+            progressionStates = []
+        }
         generatePlan()
         refreshIntelligence()
         onboardingPhase = .reveal
@@ -336,6 +339,45 @@ class AppViewModel {
         refreshDailyState()
         refreshNutritionInsights()
         persist()
+    }
+
+    @discardableResult
+    func regeneratePlanFromCurrentProfile() -> Bool {
+        guard activeWorkout == nil else { return false }
+        cancelHandoff()
+        completedWorkoutHandoff = nil
+        workoutMinimized = false
+        generatePlan()
+        refreshIntelligence()
+        refreshDailyState()
+        return true
+    }
+
+    @discardableResult
+    func restartOnboardingPreservingHistory() -> Bool {
+        guard activeWorkout == nil else { return false }
+        cancelHandoff()
+        completedWorkoutHandoff = nil
+        workoutMinimized = false
+        currentPlan = nil
+        profile.hasCompletedOnboarding = false
+        hasCompletedOnboarding = false
+        onboardingPhase = .form
+        UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+        refreshDailyState()
+        persist()
+        return true
+    }
+
+    func requestTodayTab() {
+        todayTabRequestID += 1
+    }
+
+    private var hasTrackedTrainingData: Bool {
+        !workoutHistory.isEmpty ||
+        !personalRecords.isEmpty ||
+        !progressEntries.isEmpty ||
+        !progressionStates.isEmpty
     }
 
     func refreshFamilyResponseProfile() {

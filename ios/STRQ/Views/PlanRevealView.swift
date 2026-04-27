@@ -11,6 +11,7 @@ struct PlanRevealView: View {
     @State private var showDays: Bool = false
     @State private var showQuality: Bool = false
     @State private var showImpacts: Bool = false
+    @State private var showCoachNote: Bool = false
 
     var body: some View {
         ZStack {
@@ -333,20 +334,37 @@ struct PlanRevealView: View {
 
     private var explanationSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: "brain.head.profile.fill")
-                    .font(.caption)
-                    .foregroundStyle(STRQBrand.steel)
-                Text(L10n.tr("COACH NOTE"))
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(STRQBrand.steel)
-                    .tracking(0.5)
+            Button {
+                withAnimation(.snappy(duration: 0.22)) {
+                    showCoachNote.toggle()
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "brain.head.profile.fill")
+                        .font(.caption)
+                        .foregroundStyle(STRQBrand.steel)
+                    Text(L10n.tr("coachNote.title", fallback: "Coach-Hinweis"))
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(STRQBrand.steel)
+                        .tracking(0.5)
+                    Spacer()
+                    Text(L10n.tr("common.details", fallback: "Details"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    Image(systemName: showCoachNote ? "chevron.up" : "chevron.down")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.secondary)
+                }
             }
+            .buttonStyle(.plain)
 
-            Text(plan.explanation)
-                .font(.callout)
-                .foregroundStyle(.white.opacity(0.66))
-                .lineSpacing(2)
+            if showCoachNote {
+                Text(plan.explanation)
+                    .font(.callout)
+                    .foregroundStyle(.white.opacity(0.66))
+                    .lineSpacing(2)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
         }
         .padding(18)
         .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 18))

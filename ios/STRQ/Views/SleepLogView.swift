@@ -7,6 +7,7 @@ struct SleepLogView: View {
     @State private var hoursInput: Double = 7.0
     @State private var qualitySelection: ReadinessLevel = .good
     @State private var appeared: Bool = false
+    @State private var showTrainingImpactDetails: Bool = false
 
     var body: some View {
         ScrollView {
@@ -291,41 +292,57 @@ struct SleepLogView: View {
 
     @ViewBuilder
     private var trainingImpactCard: some View {
-        let avgSleep = vm.averageSleepHours
         let insights = sleepTrainingInsights
 
         if !insights.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 6) {
-                    Image(systemName: "figure.strengthtraining.traditional")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(STRQBrand.steel)
-                    Text(L10n.tr("HOW SLEEP AFFECTS YOUR TRAINING"))
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(STRQBrand.steel)
-                        .tracking(0.5)
-                }
-
-                ForEach(insights, id: \.title) { insight in
-                    HStack(spacing: 12) {
-                        Image(systemName: insight.icon)
-                            .font(.subheadline)
-                            .foregroundStyle(insight.color)
-                            .frame(width: 32, height: 32)
-                            .background(insight.color.opacity(0.12), in: .rect(cornerRadius: 8))
-
+                Button {
+                    withAnimation(.snappy(duration: 0.22)) {
+                        showTrainingImpactDetails.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "figure.strengthtraining.traditional")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(STRQBrand.steel)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(insight.title)
+                            Text(L10n.tr("Training impact"))
                                 .font(.subheadline.weight(.semibold))
-                            Text(insight.message)
+                            Text(insights.first?.title ?? sleepTrainingImpact)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                                .lineLimit(2)
+                                .lineLimit(1)
                         }
                         Spacer()
+                        Image(systemName: showTrainingImpactDetails ? "chevron.up" : "chevron.down")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(.secondary)
                     }
-                    .padding(12)
-                    .background(Color(.tertiarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+
+                if showTrainingImpactDetails {
+                    ForEach(insights, id: \.title) { insight in
+                        HStack(spacing: 12) {
+                            Image(systemName: insight.icon)
+                                .font(.subheadline)
+                                .foregroundStyle(insight.color)
+                                .frame(width: 32, height: 32)
+                                .background(insight.color.opacity(0.12), in: .rect(cornerRadius: 8))
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(insight.title)
+                                    .font(.subheadline.weight(.semibold))
+                                Text(insight.message)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                            }
+                            Spacer()
+                        }
+                        .padding(12)
+                        .background(Color(.tertiarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+                    }
                 }
             }
             .padding(16)

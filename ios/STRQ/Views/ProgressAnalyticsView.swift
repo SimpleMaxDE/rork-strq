@@ -87,7 +87,7 @@ struct ProgressAnalyticsView: View {
         let sub: String = {
             switch tier {
             case .fresh:
-                return L10n.tr("Today starts the record. One logged workout turns this screen into signal.")
+                return L10n.tr("progress.fresh.subtitle", fallback: "Logge ein Workout, dann wird Progress nützlich.")
             case .firstSession:
                 return L10n.tr("Strong start. STRQ is already reading load, recovery, and consistency.")
             case .earlyWeek:
@@ -911,8 +911,8 @@ struct ProgressAnalyticsView: View {
                 title: L10n.tr("Body Signals"),
                 trailing: L10n.tr("Gathering"),
                 icon: "heart.text.square.fill",
-                headline: L10n.tr("Recovery and body trends build from repeat logs"),
-                detail: L10n.tr("Sleep, weigh-ins, and nutrition entries turn this tab into a cleaner read of how your body is responding."),
+                headline: L10n.tr("Body"),
+                detail: L10n.tr("progress.body.runway.detail", fallback: "Schlaf, Gewicht und Nutrition schärfen den Read."),
                 chips: [("moon.zzz.fill", L10n.tr("Recovery")), ("scalemass.fill", L10n.tr("Weight")), ("fork.knife", L10n.tr("Nutrition"))]
             )
             .opacity(appeared ? 1 : 0)
@@ -1200,8 +1200,8 @@ struct ProgressAnalyticsView: View {
                 title: L10n.tr("Volume Signals"),
                 trailing: L10n.tr("First Week"),
                 icon: "chart.bar.xaxis",
-                headline: L10n.tr("Session volume and balance sharpen after a few workouts"),
-                detail: L10n.tr("Completed sessions give STRQ enough context to read workload distribution, weekly rhythm, and movement mix."),
+                headline: L10n.tr("Volume"),
+                detail: L10n.tr("progress.volume.runway.detail", fallback: "Ein paar Workouts zeigen Rhythmus, Mix und Workload."),
                 chips: [("figure.strengthtraining.traditional", L10n.tr("Sessions")), ("square.stack.3d.up.fill", L10n.tr("Volume")), ("arrow.left.arrow.right", L10n.tr("Balance"))]
             )
             .opacity(appeared ? 1 : 0)

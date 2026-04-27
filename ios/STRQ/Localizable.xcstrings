@@ -14183,6 +14183,84 @@
     },
     "No workouts yet this week": {
       "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Noch keine Workouts diese Woche" } } }
+    },
+    "activeWorkout.rest.nextQueued": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Nächster Satz ist bereit." } } }
+    },
+    "activationRoadmap.complete": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Woche eins ist erledigt." } } }
+    },
+    "activationRoadmap.progressDone": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "%d/%d erledigt" } } }
+    },
+    "activationRoadmap.title": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Deine erste Woche" } } }
+    },
+    "coachNote.title": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Coach-Hinweis" } } }
+    },
+    "common.details": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Details" } } }
+    },
+    "exercise.role.accessory.rationale": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Gezieltes Volumen für Fokus- oder Nachholmuskeln." } } }
+    },
+    "exercise.role.keyLift.rationale": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Hauptlift: stärkster Reiz, höchste Priorität." } } }
+    },
+    "exercise.role.saferSubstitute.rationale": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Gewählt wegen Gelenk- oder Recovery-Signal." } } }
+    },
+    "exercise.role.supportLift.rationale": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ergänzt den Hauptlift mit einem passenden Winkel." } } }
+    },
+    "exercise.role.warmup.rationale": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Bereitet die Bewegung vor." } } }
+    },
+    "profile.regeneratePlan": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Plan neu erstellen" } } }
+    },
+    "progress.body.runway.detail": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schlaf, Gewicht und Nutrition schärfen den Read." } } }
+    },
+    "progress.fresh.subtitle": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Logge ein Workout, dann wird Progress nützlich." } } }
+    },
+    "progress.volume.runway.detail": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Ein paar Workouts zeigen Rhythmus, Mix und Workload." } } }
+    },
+    "readiness.details.summary": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Schlaf, Energie, Stress, Muskelkater" } } }
+    },
+    "regeneratePlan.activeWorkout.message": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Es läuft noch ein Workout. Beende oder verwirf es, bevor du deinen Plan neu erstellst." } } }
+    },
+    "regeneratePlan.activeWorkout.title": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Workout läuft" } } }
+    },
+    "regeneratePlan.currentProfile": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Mit aktuellen Angaben neu erstellen" } } }
+    },
+    "regeneratePlan.dialog.message": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "STRQ erstellt deinen Trainingsplan neu. Dein bisheriger Plan wird ersetzt. Geloggte Workouts und Fortschritt bleiben erhalten." } } }
+    },
+    "regeneratePlan.dialog.title": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Plan neu erstellen?" } } }
+    },
+    "regeneratePlan.onboarding.message": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Du passt deine Angaben neu an. Dein aktueller Plan wird ersetzt. Geloggte Workouts und Fortschritt bleiben erhalten." } } }
+    },
+    "regeneratePlan.onboarding.start": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Onboarding starten" } } }
+    },
+    "regeneratePlan.onboarding.title": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Onboarding neu starten?" } } }
+    },
+    "regeneratePlan.restartOnboarding": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Onboarding erneut durchlaufen" } } }
+    },
+    "regeneratePlan.success": {
+      "localizations": { "de": { "stringUnit": { "state": "translated", "value": "Neuer Plan erstellt" } } }
     }
   },
   "version": "1.0"

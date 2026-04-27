@@ -15,6 +15,7 @@ struct ReadinessCheckInView: View {
     @State private var showResult: Bool = false
     @State private var coachResponse: ReadinessCoachResponse?
     @State private var appeared: Bool = false
+    @State private var showReadinessDetails: Bool = false
     @FocusState private var painFieldFocused: Bool
     @Environment(\.dismiss) private var dismiss
 
@@ -489,7 +490,10 @@ struct ReadinessCheckInView: View {
                     .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
             )
 
-            // Signal breakdown
+            if readiness.painOrRestriction {
+                painWarningCard(readiness)
+            }
+
             signalBreakdown(readiness: readiness)
 
             // Done
@@ -514,22 +518,58 @@ struct ReadinessCheckInView: View {
 
     private func signalBreakdown(readiness: DailyReadiness) -> some View {
         VStack(spacing: 0) {
-            signalRow(label: L10n.tr("Sleep"), value: readiness.sleepQuality.label, color: readinessColor(readiness.sleepQuality))
-            Divider().overlay(Color.white.opacity(0.05))
-            signalRow(label: L10n.tr("Energy"), value: readiness.energyLevel.label, color: readinessColor(readiness.energyLevel))
-            Divider().overlay(Color.white.opacity(0.05))
-            signalRow(label: L10n.tr("Stress"), value: readiness.stressLevel.label, color: readinessColor(readiness.stressLevel, inverted: true))
-            Divider().overlay(Color.white.opacity(0.05))
-            signalRow(label: L10n.tr("Soreness"), value: readiness.soreness.label, color: sorenessColor(readiness.soreness))
-            if readiness.painOrRestriction {
+            Button {
+                withAnimation(.snappy(duration: 0.22)) {
+                    showReadinessDetails.toggle()
+                }
+            } label: {
+                HStack {
+                    Text(L10n.tr("common.details", fallback: "Details"))
+                        .font(.caption.weight(.semibold))
+                    Spacer()
+                    Text(L10n.tr("readiness.details.summary", fallback: "Schlaf, Energie, Stress, Muskelkater"))
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    Image(systemName: showReadinessDetails ? "chevron.up" : "chevron.down")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 10)
+            }
+            .buttonStyle(.plain)
+
+            if showReadinessDetails {
                 Divider().overlay(Color.white.opacity(0.05))
-                signalRow(label: L10n.tr("Flag"), value: readiness.painNote.isEmpty ? L10n.tr("Pain reported") : readiness.painNote, color: STRQPalette.danger)
+                signalRow(label: L10n.tr("Sleep"), value: readiness.sleepQuality.label, color: readinessColor(readiness.sleepQuality))
+                Divider().overlay(Color.white.opacity(0.05))
+                signalRow(label: L10n.tr("Energy"), value: readiness.energyLevel.label, color: readinessColor(readiness.energyLevel))
+                Divider().overlay(Color.white.opacity(0.05))
+                signalRow(label: L10n.tr("Stress"), value: readiness.stressLevel.label, color: readinessColor(readiness.stressLevel, inverted: true))
+                Divider().overlay(Color.white.opacity(0.05))
+                signalRow(label: L10n.tr("Soreness"), value: readiness.soreness.label, color: sorenessColor(readiness.soreness))
             }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 4)
         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
         .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(STRQBrand.cardBorder, lineWidth: 1))
+    }
+
+    private func painWarningCard(_ readiness: DailyReadiness) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(STRQPalette.danger)
+            Text(readiness.painNote.isEmpty ? L10n.tr("Pain reported") : readiness.painNote)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.primary)
+                .lineLimit(2)
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(STRQPalette.danger.opacity(0.10), in: .rect(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(STRQPalette.danger.opacity(0.18), lineWidth: 1))
     }
 
     private func signalRow(label: String, value: String, color: Color) -> some View {

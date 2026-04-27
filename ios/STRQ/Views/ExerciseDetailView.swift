@@ -8,6 +8,7 @@ struct ExerciseDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedAlternative: Exercise?
     @State private var appeared: Bool = false
+    @State private var showPlanContextDetails: Bool = false
 
     private let library = ExerciseLibrary.shared
 
@@ -259,9 +260,27 @@ struct ExerciseDetailView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            Text(roleRationale(ctx.role))
-                .font(.system(size: 11))
-                .foregroundStyle(.tertiary)
+            Button {
+                withAnimation(.snappy(duration: 0.22)) {
+                    showPlanContextDetails.toggle()
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Text(L10n.tr("common.details", fallback: "Details"))
+                        .font(.caption.weight(.semibold))
+                    Image(systemName: showPlanContextDetails ? "chevron.up" : "chevron.down")
+                        .font(.caption2.weight(.bold))
+                }
+                .foregroundStyle(STRQBrand.steel)
+            }
+            .buttonStyle(.plain)
+
+            if showPlanContextDetails {
+                Text(localizedRoleRationale(ctx.role))
+                    .font(.system(size: 11))
+                    .foregroundStyle(.tertiary)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
 
             HStack(spacing: 12) {
                 Label("\(ctx.sets) × \(ctx.reps)", systemImage: "rectangle.stack.fill")
@@ -281,6 +300,16 @@ struct ExerciseDetailView: View {
         }
         .padding(14)
         .background(STRQPalette.info.opacity(0.05), in: .rect(cornerRadius: 14))
+    }
+
+    private func localizedRoleRationale(_ role: ExerciseRole) -> String {
+        switch role {
+        case .keyLift: return L10n.tr("exercise.role.keyLift.rationale", fallback: "Hauptlift: stärkster Reiz, höchste Priorität.")
+        case .supportLift: return L10n.tr("exercise.role.supportLift.rationale", fallback: "Ergänzt den Hauptlift mit einem passenden Winkel.")
+        case .accessory: return L10n.tr("exercise.role.accessory.rationale", fallback: "Gezieltes Volumen für Fokus- oder Nachholmuskeln.")
+        case .warmup: return L10n.tr("exercise.role.warmup.rationale", fallback: "Bereitet die Bewegung vor.")
+        case .saferSubstitute: return L10n.tr("exercise.role.saferSubstitute.rationale", fallback: "Gewählt wegen Gelenk- oder Recovery-Signal.")
+        }
     }
 
     private func roleRationale(_ role: ExerciseRole) -> String {

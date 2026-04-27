@@ -6,6 +6,7 @@ struct STRQPaywallView: View {
     var source: String = "profile"
     @Environment(\.dismiss) private var dismiss
     @State private var selectedPackage: Package?
+    @State private var expandedPillars: Set<Int> = []
 
     var body: some View {
         ZStack {
@@ -193,12 +194,14 @@ struct STRQPaywallView: View {
     private var pillarList: some View {
         VStack(spacing: 10) {
             ForEach(pillars.indices, id: \.self) { i in
-                pillarRow(pillars[i])
+                pillarRow(pillars[i], index: i)
             }
         }
     }
 
-    private func pillarRow(_ p: Pillar) -> some View {
+    private func pillarRow(_ p: Pillar, index: Int) -> some View {
+        let isExpanded = expandedPillars.contains(index)
+
         HStack(alignment: .top, spacing: 14) {
             Image(systemName: p.icon)
                 .font(.system(size: 15, weight: .semibold))
@@ -218,22 +221,43 @@ struct STRQPaywallView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    ForEach(p.bullets, id: \.self) { line in
-                        HStack(alignment: .top, spacing: 6) {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundStyle(STRQPalette.success)
-                                .frame(width: 10, alignment: .leading)
-                                .padding(.top, 2)
-                            Text(line)
-                                .font(.system(size: 11.5, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.78))
-                                .fixedSize(horizontal: false, vertical: true)
+                Button {
+                    withAnimation(.snappy(duration: 0.22)) {
+                        if isExpanded {
+                            expandedPillars.remove(index)
+                        } else {
+                            expandedPillars.insert(index)
                         }
                     }
+                } label: {
+                    HStack(spacing: 5) {
+                        Text(L10n.tr("common.details", fallback: "Details"))
+                            .font(.caption.weight(.semibold))
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .font(.caption2.weight(.bold))
+                    }
+                    .foregroundStyle(STRQBrand.steel)
                 }
-                .padding(.top, 2)
+                .buttonStyle(.plain)
+
+                if isExpanded {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(p.bullets, id: \.self) { line in
+                            HStack(alignment: .top, spacing: 6) {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundStyle(STRQPalette.success)
+                                    .frame(width: 10, alignment: .leading)
+                                    .padding(.top, 2)
+                                Text(line)
+                                    .font(.system(size: 11.5, weight: .medium))
+                                    .foregroundStyle(.white.opacity(0.78))
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                    .padding(.top, 2)
+                }
             }
             Spacer(minLength: 0)
         }

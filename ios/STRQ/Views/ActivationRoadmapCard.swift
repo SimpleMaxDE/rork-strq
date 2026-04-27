@@ -3,19 +3,39 @@ import SwiftUI
 struct ActivationRoadmapCard: View {
     let roadmap: ActivationRoadmap
     var compact: Bool = false
+    @State private var isExpanded: Bool
+
+    init(roadmap: ActivationRoadmap, compact: Bool = false) {
+        self.roadmap = roadmap
+        self.compact = compact
+        _isExpanded = State(initialValue: !compact)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            header
-
-            if !compact {
-                progressTrack
+            if compact {
+                Button {
+                    withAnimation(.snappy(duration: 0.22)) {
+                        isExpanded.toggle()
+                    }
+                } label: {
+                    compactHeader
+                }
+                .buttonStyle(.plain)
+            } else {
+                header
             }
 
-            VStack(spacing: 10) {
-                ForEach(Array(roadmap.steps.enumerated()), id: \.element.id) { index, step in
-                    stepRow(step, isLast: index == roadmap.steps.count - 1)
+            if isExpanded {
+                progressTrack
+
+                VStack(spacing: 10) {
+                    ForEach(Array(roadmap.steps.enumerated()), id: \.element.id) { index, step in
+                        stepRow(step, isLast: index == roadmap.steps.count - 1)
+                    }
                 }
+            } else {
+                collapsedNextStep
             }
         }
         .padding(16)
@@ -56,6 +76,50 @@ struct ActivationRoadmapCard: View {
         }
     }
 
+    private var compactHeader: some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(L10n.tr("activationRoadmap.title", fallback: "Deine erste Woche"))
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.primary)
+                Text(L10n.format(
+                    "activationRoadmap.progressDone",
+                    fallback: "%d/%d erledigt",
+                    roadmap.completedCount,
+                    roadmap.steps.count
+                ))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(STRQBrand.steel)
+            }
+
+            Spacer(minLength: 0)
+
+            Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.secondary)
+        }
+        .contentShape(.rect)
+    }
+
+    private var collapsedNextStep: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: nextStep.icon)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(STRQBrand.steel)
+                .frame(width: 22, height: 22)
+                .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 7))
+
+            Text(nextStepLine)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+
+            Spacer(minLength: 0)
+        }
+        .padding(.top, -4)
+    }
+
     private var progressTrack: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
@@ -67,6 +131,17 @@ struct ActivationRoadmapCard: View {
             }
         }
         .frame(height: 4)
+    }
+
+    private var nextStep: ActivationRoadmap.Step {
+        roadmap.steps.first(where: { !$0.isComplete }) ?? roadmap.steps.last!
+    }
+
+    private var nextStepLine: String {
+        if nextStep.isComplete {
+            return L10n.tr("activationRoadmap.complete", fallback: "Woche eins ist erledigt.")
+        }
+        return nextStep.title
     }
 
     private func stepRow(_ step: ActivationRoadmap.Step, isLast: Bool) -> some View {

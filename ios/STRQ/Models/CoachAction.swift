@@ -124,7 +124,7 @@ struct CoachActionMapper {
                     icon: "calendar.badge.plus",
                     explanation: "Adjust your training plan to match your actual workout frequency for better volume distribution.",
                     whyItMatters: "Matching your plan to reality ensures volume is properly distributed across sessions.",
-                    previewText: "Regenerate plan with updated session count"
+                    previewText: "Plan frequency updated from your logs"
                 )
             ]
         case .prCongrats:

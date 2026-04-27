@@ -22,6 +22,7 @@ struct ActiveWorkoutView: View {
     @State private var swapFeedbackTask: Task<Void, Never>?
     @State private var undoPrompt: LoggedSetUndoPrompt?
     @State private var undoDismissTask: Task<Void, Never>?
+    @State private var showWorkoutDetails: Bool = false
 
     private var workout: ActiveWorkoutState? { vm.activeWorkout }
     private var completedSession: WorkoutSession? { vm.completedWorkoutHandoff }
@@ -355,35 +356,68 @@ struct ActiveWorkoutView: View {
                     .clipShape(.rect(cornerRadius: 14))
 
                     // Context strip: PREV · BEST · TARGET
-                    contextStrip(log: log, planned: planned)
+                    workoutDetailsDisclosure(log: log, planned: planned, guidance: guidance)
                         .padding(.top, 6)
 
-                    if let g = guidance {
-                        HStack(spacing: 6) {
-                            Image(systemName: g.icon)
-                                .font(.system(size: 10))
-                                .foregroundStyle(guidanceColor(g.color))
-                            Text(g.action)
-                                .font(.system(size: 11, weight: .semibold))
-                                .foregroundStyle(.white.opacity(0.82))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.85)
-                            Spacer(minLength: 0)
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(guidanceColor(g.color).opacity(0.10), in: .rect(cornerRadius: 9))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 9)
-                                .strokeBorder(guidanceColor(g.color).opacity(0.22), lineWidth: 1)
-                        )
-                        .padding(.top, 6)
-                    }
                 }
                 .opacity(appeared ? 1 : 0)
                 .offset(y: appeared ? 0 : 10)
                 .animation(.easeOut(duration: 0.4), value: appeared)
+            }
+        }
+    }
+
+    private func workoutDetailsDisclosure(
+        log: ExerciseLog,
+        planned: PlannedExercise?,
+        guidance: NextSessionGuidance?
+    ) -> some View {
+        VStack(spacing: 6) {
+            Button {
+                withAnimation(.snappy(duration: 0.2)) {
+                    showWorkoutDetails.toggle()
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 10, weight: .semibold))
+                    Text(L10n.tr("common.details", fallback: "Details"))
+                        .font(.system(size: 11, weight: .semibold))
+                    Spacer(minLength: 0)
+                    Image(systemName: showWorkoutDetails ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 9, weight: .bold))
+                }
+                .foregroundStyle(.white.opacity(0.56))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 9))
+            }
+            .buttonStyle(.plain)
+
+            if showWorkoutDetails {
+                contextStrip(log: log, planned: planned)
+
+                if let g = guidance {
+                    HStack(spacing: 6) {
+                        Image(systemName: g.icon)
+                            .font(.system(size: 10))
+                            .foregroundStyle(guidanceColor(g.color))
+                        Text(g.action)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.82))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(guidanceColor(g.color).opacity(0.10), in: .rect(cornerRadius: 9))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 9)
+                            .strokeBorder(guidanceColor(g.color).opacity(0.22), lineWidth: 1)
+                    )
+                }
             }
         }
     }
@@ -1522,7 +1556,7 @@ struct ActiveWorkoutView: View {
         if restTimeRemaining <= 30 {
             return L10n.tr("Reset, then go again.")
         }
-        return L10n.tr("Take the rest you need. The next move is already queued.")
+        return L10n.tr("activeWorkout.rest.nextQueued", fallback: "Nächster Satz ist bereit.")
     }
 
     private func restNextActionCard(_ nextRec: NextSetRec) -> some View {

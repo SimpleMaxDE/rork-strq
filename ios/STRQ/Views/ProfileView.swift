@@ -16,6 +16,7 @@ struct ProfileView: View {
     @State private var cloudRestoreMessage: String?
     @State private var showCloudRestoreMessage: Bool = false
     @State private var showMediaDiagnostics: Bool = false
+    @State private var showPlanRegenerationDialog: Bool = false
 
     var body: some View {
         ScrollView {
@@ -67,6 +68,9 @@ struct ProfileView: View {
         }
         .sheet(isPresented: $showMediaDiagnostics) {
             NavigationStack { MediaDiagnosticsView() }
+        }
+        .planRegenerationFlow(vm: vm, isPresented: $showPlanRegenerationDialog) {
+            vm.requestTodayTab()
         }
         .sheet(isPresented: $showPaywall) {
             STRQPaywallView(store: store)
@@ -749,8 +753,9 @@ struct ProfileView: View {
                         showRestoreMessage = true
                     }
                 }
-                controlRow(L10n.tr("Regenerate Plan"), icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
-                    vm.generatePlan()
+                controlRow(L10n.tr("profile.regeneratePlan", fallback: "Plan neu erstellen"), icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
+                    Analytics.shared.track(.regenerate_plan_dialog_opened, ["surface": "profile"])
+                    showPlanRegenerationDialog = true
                 }
             }
             .clipShape(.rect(cornerRadius: 12))

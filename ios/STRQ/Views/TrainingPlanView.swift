@@ -11,6 +11,7 @@ struct TrainingPlanView: View {
     @State private var selectedPrescriptionIndex: Int?
     @State private var showSessionEditor: Bool = false
     @State private var swapTargetPlanned: PlannedExercise?
+    @State private var showPlanRegenerationDialog: Bool = false
 
     var body: some View {
         ScrollView {
@@ -51,15 +52,17 @@ struct TrainingPlanView: View {
                     }
                     Divider()
                     Button {
-                        vm.generatePlan()
+                        Analytics.shared.track(.regenerate_plan_dialog_opened, ["surface": "train"])
+                        showPlanRegenerationDialog = true
                     } label: {
-                        Label(L10n.tr("Regenerate Plan"), systemImage: "arrow.triangle.2.circlepath")
+                        Label(L10n.tr("profile.regeneratePlan", fallback: "Plan neu erstellen"), systemImage: "arrow.triangle.2.circlepath")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle").font(.body)
                 }
             }
         }
+        .planRegenerationFlow(vm: vm, isPresented: $showPlanRegenerationDialog)
         .sheet(item: $showExerciseDetail) { exercise in
             NavigationStack {
                 ExerciseDetailView(exercise: exercise, vm: vm, planContext: exerciseDetailContext)

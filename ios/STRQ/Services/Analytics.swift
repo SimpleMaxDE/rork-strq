@@ -92,6 +92,10 @@ nonisolated enum AnalyticsEvent: String {
     case plan_generation_completed
     case plan_reveal_viewed
     case plan_reveal_started_training
+    case regenerate_plan_dialog_opened
+    case regenerate_plan_current_profile_confirmed
+    case regenerate_plan_onboarding_restart_confirmed
+    case regenerate_plan_cancelled
 
     // Training
     case today_viewed

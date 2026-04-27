@@ -92,6 +92,11 @@ struct ContentView: View {
         .onChange(of: notificationDeepLinkCenter.pendingRoute) { _, _ in
             handlePendingNotificationRoute()
         }
+        .onChange(of: vm.todayTabRequestID) { _, _ in
+            withAnimation(.snappy(duration: 0.25)) {
+                selectedTab = 0
+            }
+        }
         .sheet(item: $presentedDeepLinkSheet) { sheet in
             switch sheet {
             case .readinessCheckIn:
