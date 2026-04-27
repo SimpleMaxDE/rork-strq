@@ -202,7 +202,7 @@ struct STRQPaywallView: View {
     private func pillarRow(_ p: Pillar, index: Int) -> some View {
         let isExpanded = expandedPillars.contains(index)
 
-        HStack(alignment: .top, spacing: 14) {
+        return HStack(alignment: .top, spacing: 14) {
             Image(systemName: p.icon)
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(.white)
