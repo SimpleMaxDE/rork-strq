@@ -1,6 +1,6 @@
 import Foundation
 
-extension ExerciseLibrary {
+nonisolated extension ExerciseLibrary {
     static let backExercises: [Exercise] = [
         ExerciseBuilder.make("pull-up", "Pull-Up", primary: .lats, secondary: [.biceps, .back, .forearms], cat: .bodyweight, move: .verticalPull, worlds: [.gymStrength, .calisthenics, .homeGym], equip: [.pullUpBar], diff: .intermediate, bw: true, desc: "The gold standard upper body pull. Builds a wide, strong back.", instructions: ["Hang from bar with overhand grip", "Pull chest to bar", "Lower with control", "Full extension at bottom"], mistakes: ["Kipping or swinging", "Half reps", "Shrugging shoulders"], cues: ["Drive elbows to hips", "Chest to bar", "Squeeze lats at top"], alts: ["lat-pulldown", "assisted-pull-up"], tags: ["fundamental", "strength", "mass"]),
         ExerciseBuilder.make("assisted-pull-up", "Assisted Pull-Up", primary: .lats, secondary: [.biceps, .back], cat: .bodyweight, move: .verticalPull, worlds: [.gymStrength], equip: [.machine], diff: .beginner, beginnerOk: true, bw: true, prog: .regression, regOf: "pull-up", desc: "Machine-assisted pull-up for building toward unassisted.", alts: ["pull-up", "lat-pulldown"], tags: ["beginner", "regression"]),

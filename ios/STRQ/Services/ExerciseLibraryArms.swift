@@ -1,6 +1,6 @@
 import Foundation
 
-extension ExerciseLibrary {
+nonisolated extension ExerciseLibrary {
     static let armExercises: [Exercise] = [
         ExerciseBuilder.make("barbell-curl", "Barbell Curl", primary: .biceps, cat: .isolation, move: .flexion, equip: [.barbell], beginnerOk: true, desc: "Classic bicep builder with a barbell.", instructions: ["Stand with barbell at arms length", "Curl up keeping elbows pinned", "Squeeze at top", "Lower with control"], mistakes: ["Swinging body", "Moving elbows forward"], cues: ["Pin elbows to sides", "Control the negative"], alts: ["dumbbell-curl", "ez-bar-curl"], tags: ["biceps", "mass"]),
         ExerciseBuilder.make("dumbbell-curl", "Dumbbell Curl", primary: .biceps, cat: .isolation, move: .flexion, equip: [.dumbbell], beginnerOk: true, desc: "Fundamental dumbbell bicep curl.", instructions: ["Hold dumbbells at sides", "Curl up with supinated grip", "Squeeze at top", "Lower slowly"], alts: ["barbell-curl", "hammer-curl"], tags: ["biceps", "fundamental"]),

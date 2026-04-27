@@ -456,7 +456,7 @@ nonisolated struct CoachingPreferences: Codable, Sendable {
     }
 }
 
-extension UserProfile {
+nonisolated extension UserProfile {
     enum CodingKeys: String, CodingKey {
         case name, age, gender, heightCm, weightKg, bodyFatPercentage
         case goal, trainingLevel, trainingMonths, daysPerWeek, minutesPerSession

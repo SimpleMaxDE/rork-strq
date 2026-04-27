@@ -37,10 +37,10 @@ final class CloudSyncService {
             object: store,
             queue: .main
         ) { [weak self] _ in
+            guard let service = self else { return }
             Task { @MainActor in
-                guard let self else { return }
-                self.refreshRemoteAvailability()
-                self.onRemoteChange?()
+                service.refreshRemoteAvailability()
+                service.onRemoteChange?()
             }
         }
     }

@@ -1,6 +1,6 @@
 import Foundation
 
-extension ExerciseLibrary {
+nonisolated extension ExerciseLibrary {
     static let pilatesExercises: [Exercise] = [
         ExerciseBuilder.make("the-hundred", "The Hundred", primary: .abs, secondary: [.coreStability], cat: .pilates, move: .isometric, worlds: [.pilates, .homeNoEquipment], equip: [.mat], loc: .anywhere, diff: .intermediate, beginnerOk: false, bw: true, jointFriendly: true, desc: "Classic Pilates breathing exercise with pumping arms and legs held at 45 degrees.", instructions: ["Lie on back, lift head and shoulders", "Extend legs at 45 degrees", "Pump arms up and down vigorously", "Inhale 5 counts, exhale 5 counts", "Complete 100 pumps total"], cues: ["Scoop belly button to spine", "Keep lower back pressed down"], alts: ["roll-up", "crunch"], tags: ["pilates", "classic", "breathing"]),
         ExerciseBuilder.make("roll-up", "Roll Up", primary: .abs, secondary: [.hipFlexors], cat: .pilates, move: .flexion, worlds: [.pilates, .homeNoEquipment], equip: [.mat], loc: .anywhere, diff: .intermediate, bw: true, jointFriendly: true, desc: "Controlled articulated roll up from lying to seated. Spinal mobility and ab strength.", instructions: ["Lie flat with arms overhead", "Curl up one vertebra at a time", "Reach past toes", "Roll back down with control"], cues: ["Peel spine off mat", "Use abs not momentum"], alts: ["the-hundred", "crunch"], tags: ["pilates", "classic", "spinal articulation"]),

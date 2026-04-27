@@ -9,7 +9,7 @@ import Foundation
 ///
 /// Plan generation and substitution logic keep using `ExerciseLibrary.shared`
 /// directly until individual imported exercises are explicitly promoted.
-struct ExerciseCatalog {
+nonisolated struct ExerciseCatalog: Sendable {
     static let shared = ExerciseCatalog()
 
     let curated: [Exercise]

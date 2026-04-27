@@ -84,12 +84,12 @@ final class AccountManager: NSObject {
         isCheckingCredential = true
         let provider = ASAuthorizationAppleIDProvider()
         provider.getCredentialState(forUserID: userId) { [weak self] state, _ in
+            guard let manager = self else { return }
             Task { @MainActor in
-                guard let self else { return }
-                self.isCheckingCredential = false
+                manager.isCheckingCredential = false
                 switch state {
                 case .revoked, .notFound:
-                    self.signOut()
+                    manager.signOut()
                 default:
                     break
                 }

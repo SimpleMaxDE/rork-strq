@@ -1,6 +1,6 @@
 import Foundation
 
-struct ExerciseFamilyService {
+nonisolated struct ExerciseFamilyService: Sendable {
     static let shared = ExerciseFamilyService()
 
     let families: [ExerciseFamilyGroup]

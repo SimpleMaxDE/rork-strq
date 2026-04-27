@@ -1,6 +1,6 @@
 import Foundation
 
-struct ExerciseLibrary {
+nonisolated struct ExerciseLibrary: Sendable {
     static let shared = ExerciseLibrary()
 
     let exercises: [Exercise]

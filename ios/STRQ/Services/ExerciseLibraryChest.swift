@@ -1,6 +1,6 @@
 import Foundation
 
-extension ExerciseLibrary {
+nonisolated extension ExerciseLibrary {
     static let chestExercises: [Exercise] = [
         ExerciseBuilder.make("barbell-bench-press", "Barbell Bench Press", primary: .chest, secondary: [.triceps, .shoulders], move: .horizontalPush, equip: [.barbell, .bench], diff: .intermediate, desc: "The king of chest exercises. Builds overall chest mass and pressing strength.", instructions: ["Lie on bench with eyes under bar", "Grip bar slightly wider than shoulders", "Unrack and lower to mid-chest", "Press up to lockout"], mistakes: ["Bouncing bar off chest", "Flaring elbows too wide", "Lifting hips off bench"], cues: ["Drive feet into floor", "Squeeze shoulder blades together", "Control the descent"], alts: ["dumbbell-bench-press", "machine-chest-press"], tags: ["strength", "mass", "powerlifting"]),
         ExerciseBuilder.make("dumbbell-bench-press", "Dumbbell Bench Press", primary: .chest, secondary: [.triceps, .shoulders], move: .horizontalPush, equip: [.dumbbell, .bench], beginnerOk: true, desc: "Greater range of motion than barbell. Excellent for chest development.", instructions: ["Sit on bench with dumbbells on thighs", "Lie back and press dumbbells up", "Lower with control to chest level", "Press back up squeezing chest"], mistakes: ["Going too heavy too fast", "Not controlling the negative"], cues: ["Feel the stretch at the bottom", "Press in a slight arc"], alts: ["barbell-bench-press", "machine-chest-press"], tags: ["mass", "hypertrophy"]),

@@ -1,6 +1,6 @@
 import Foundation
 
-extension ExerciseLibrary {
+nonisolated extension ExerciseLibrary {
     static let shoulderExercises: [Exercise] = [
         ExerciseBuilder.make("overhead-press", "Overhead Press", primary: .shoulders, secondary: [.triceps, .traps], move: .verticalPush, equip: [.barbell], desc: "Standing barbell press. The premier shoulder builder.", instructions: ["Grip bar at shoulder width", "Press overhead to lockout", "Lower to front of shoulders", "Keep core braced"], mistakes: ["Excessive back lean", "Flaring elbows"], cues: ["Push head through at top", "Brace core tight"], alts: ["dumbbell-shoulder-press", "machine-shoulder-press"], tags: ["strength", "compound", "mass"]),
         ExerciseBuilder.make("dumbbell-shoulder-press", "Dumbbell Shoulder Press", primary: .shoulders, secondary: [.triceps, .traps], move: .verticalPush, equip: [.dumbbell, .bench], beginnerOk: true, desc: "Seated or standing dumbbell press for shoulder development.", instructions: ["Hold dumbbells at shoulder height", "Press overhead", "Lower with control"], alts: ["overhead-press", "machine-shoulder-press"], tags: ["mass", "hypertrophy"]),

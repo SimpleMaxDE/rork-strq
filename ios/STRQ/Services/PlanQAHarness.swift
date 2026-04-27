@@ -9,7 +9,8 @@ import Foundation
 // changes, re-running the harness surfaces regressions (missing anchors,
 // movement-pattern overload, imported pollution, weak home plans, etc.)
 // without hand-eyeballing every profile.
-nonisolated struct PlanQAHarness: Sendable {
+@MainActor
+struct PlanQAHarness: Sendable {
     private let library = ExerciseLibrary.shared
 
     func run() -> PlanQAReport {

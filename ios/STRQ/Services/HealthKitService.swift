@@ -165,5 +165,3 @@ final class HealthKitService {
         #endif
     }
 }
-
-extension HKQuantity: @unchecked @retroactive Sendable {}

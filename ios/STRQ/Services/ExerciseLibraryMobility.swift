@@ -1,6 +1,6 @@
 import Foundation
 
-extension ExerciseLibrary {
+nonisolated extension ExerciseLibrary {
     static let extendedMobilityExercises: [Exercise] = [
         ExerciseBuilder.make("couch-stretch", "Couch Stretch", primary: .hipFlexors, secondary: [.quads], cat: .mobility, move: .extension_, worlds: [.mobilityStretching, .recoveryRehab, .homeNoEquipment], equip: [.none], loc: .anywhere, diff: .beginner, beginnerOk: true, bw: true, jointFriendly: true, desc: "Deep hip flexor stretch with rear foot elevated against a wall.", alts: ["hip-90-90", "pigeon-stretch"], tags: ["hip flexors", "stretch", "desk worker"]),
         ExerciseBuilder.make("hamstring-stretch-standing", "Standing Hamstring Stretch", primary: .hamstrings, cat: .mobility, move: .flexion, worlds: [.mobilityStretching, .recoveryRehab, .homeNoEquipment], equip: [.none], loc: .anywhere, diff: .beginner, beginnerOk: true, bw: true, jointFriendly: true, desc: "Foot elevated on bench or step for standing hamstring stretch.", alts: ["pigeon-stretch"], tags: ["stretch", "hamstrings"]),

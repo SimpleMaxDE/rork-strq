@@ -24,7 +24,8 @@ nonisolated struct AdaptiveResponseQAReport: Sendable {
     var allPassed: Bool { failedCount == 0 }
 }
 
-nonisolated struct AdaptiveResponseQAHarness: Sendable {
+@MainActor
+struct AdaptiveResponseQAHarness: Sendable {
 
     func run() -> AdaptiveResponseQAReport {
         var cases: [AdaptiveResponseQACase] = []

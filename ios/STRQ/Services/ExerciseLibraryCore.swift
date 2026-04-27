@@ -1,6 +1,6 @@
 import Foundation
 
-extension ExerciseLibrary {
+nonisolated extension ExerciseLibrary {
     static let coreExercises: [Exercise] = [
         ExerciseBuilder.make("plank", "Plank", primary: .coreStability, secondary: [.abs, .shoulders], cat: .bodyweight, move: .isometric, worlds: [.homeNoEquipment, .warmupActivation, .calisthenics], equip: [.none], loc: .anywhere, diff: .beginner, beginnerOk: true, bw: true, jointFriendly: true, desc: "Isometric core hold. Foundation of core training.", instructions: ["Forearms and toes on floor", "Body in straight line", "Brace core", "Hold position"], mistakes: ["Hips sagging", "Hips too high", "Holding breath"], cues: ["Squeeze glutes", "Draw belly button in", "Breathe steadily"], alts: ["side-plank", "dead-bug"], tags: ["fundamental", "isometric", "core"]),
         ExerciseBuilder.make("side-plank", "Side Plank", primary: .obliques, secondary: [.coreStability], cat: .bodyweight, move: .isometric, worlds: [.homeNoEquipment, .calisthenics], equip: [.none], loc: .anywhere, diff: .beginner, beginnerOk: true, bw: true, jointFriendly: true, desc: "Lateral core stability hold.", alts: ["plank", "oblique-crunch"], tags: ["obliques", "stability"]),

@@ -1,6 +1,6 @@
 import Foundation
 
-struct ExerciseBuilder {
+nonisolated struct ExerciseBuilder {
     static func make(
         _ id: String,
         _ name: String,

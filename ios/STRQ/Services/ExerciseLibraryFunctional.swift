@@ -1,6 +1,6 @@
 import Foundation
 
-extension ExerciseLibrary {
+nonisolated extension ExerciseLibrary {
     static let functionalExercises: [Exercise] = [
         ExerciseBuilder.make("sled-push", "Sled Push", primary: .quads, secondary: [.glutes, .calves, .coreStability], cat: .compound, move: .locomotion, worlds: [.functionalAthletic, .cardioConditioning], equip: [.machine], diff: .intermediate, desc: "Push a weighted sled for explosive leg drive and conditioning.", instructions: ["Grip sled handles at chest height", "Drive through legs pushing forward", "Keep core braced and hips low", "Maintain consistent pace"], mistakes: ["Standing too upright", "Pushing only with arms"], cues: ["Drive with your legs", "Stay low and powerful"], alts: ["leg-press", "kettlebell-swing"], tags: ["conditioning", "power", "legs"]),
         ExerciseBuilder.make("sled-pull", "Sled Pull", primary: .back, secondary: [.biceps, .hamstrings, .glutes], cat: .compound, move: .horizontalPull, worlds: [.functionalAthletic, .cardioConditioning], equip: [.machine], diff: .intermediate, desc: "Pull a sled toward you hand over hand for back and grip.", alts: ["barbell-row"], tags: ["conditioning", "grip", "back"]),

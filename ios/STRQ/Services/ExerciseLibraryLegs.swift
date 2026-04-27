@@ -1,6 +1,6 @@
 import Foundation
 
-extension ExerciseLibrary {
+nonisolated extension ExerciseLibrary {
     static let legExercises: [Exercise] = [
         ExerciseBuilder.make("barbell-squat", "Barbell Back Squat", primary: .quads, secondary: [.glutes, .hamstrings, .coreStability], move: .squat, equip: [.barbell], desc: "The king of lower body exercises. Builds total leg mass and strength.", instructions: ["Bar on upper traps, feet shoulder width", "Descend by breaking at hips and knees", "Go to parallel or below", "Drive up through heels"], mistakes: ["Knees caving inward", "Heels rising", "Excessive forward lean"], cues: ["Chest up, knees out", "Sit between your legs", "Drive the floor away"], alts: ["goblet-squat", "leg-press", "smith-squat"], tags: ["strength", "mass", "powerlifting"]),
         ExerciseBuilder.make("front-squat", "Front Squat", primary: .quads, secondary: [.glutes, .coreStability], move: .squat, equip: [.barbell], diff: .advanced, desc: "Barbell on front delts. More quad-dominant and upright.", alts: ["barbell-squat", "goblet-squat"], tags: ["quads", "advanced"]),

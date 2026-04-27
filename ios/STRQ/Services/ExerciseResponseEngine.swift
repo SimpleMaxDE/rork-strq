@@ -8,7 +8,6 @@ import Foundation
 
 nonisolated struct ExerciseResponseEngine: Sendable {
     private let familyService = ExerciseFamilyService.shared
-    private let library = ExerciseLibrary.shared
 
     // Tunable horizons.
     private let recentWindowDays: Int = 21
