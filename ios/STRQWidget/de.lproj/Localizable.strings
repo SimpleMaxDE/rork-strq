@@ -11,3 +11,12 @@
 "Completed" = "Abgeschlossen";
 "Workout" = "Training";
 "Recovery" = "Erholung";
+"Done" = "Fertig";
+"REST" = "PAUSE";
+"SET" = "SATZ";
+"Exercise %d of %d" = "Übung %d von %d";
+"Complete" = "Abgeschlossen";
+"Exercise %d/%d" = "Übung %d/%d";
+"Set %d/%d" = "Satz %d/%d";
+"%d of %d sets" = "%d von %d Sätzen";
+"Next" = "Nächste";

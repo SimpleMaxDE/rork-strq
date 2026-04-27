@@ -14,14 +14,14 @@ nonisolated enum ExerciseCategory: String, Codable, CaseIterable, Identifiable, 
 
     var displayName: String {
         switch self {
-        case .compound: "Compound"
-        case .isolation: "Isolation"
-        case .bodyweight: "Bodyweight"
-        case .cardio: "Cardio"
-        case .mobility: "Mobility"
-        case .warmup: "Warm-Up"
-        case .recovery: "Recovery"
-        case .pilates: "Pilates"
+        case .compound: L10n.tr("exercise.category.compound.displayName")
+        case .isolation: L10n.tr("exercise.category.isolation.displayName")
+        case .bodyweight: L10n.tr("exercise.category.bodyweight.displayName")
+        case .cardio: L10n.tr("exercise.category.cardio.displayName")
+        case .mobility: L10n.tr("exercise.category.mobility.displayName")
+        case .warmup: L10n.tr("exercise.category.warmup.displayName")
+        case .recovery: L10n.tr("exercise.category.recovery.displayName")
+        case .pilates: L10n.tr("exercise.category.pilates.displayName")
         }
     }
 }
@@ -49,23 +49,23 @@ nonisolated enum MovementPattern: String, Codable, CaseIterable, Identifiable, S
 
     var displayName: String {
         switch self {
-        case .horizontalPush: "Horizontal Push"
-        case .horizontalPull: "Horizontal Pull"
-        case .verticalPush: "Vertical Push"
-        case .verticalPull: "Vertical Pull"
-        case .hipHinge: "Hip Hinge"
-        case .squat: "Squat"
-        case .lunge: "Lunge"
-        case .carry: "Carry"
-        case .rotation: "Rotation"
-        case .antiRotation: "Anti-Rotation"
-        case .flexion: "Flexion"
-        case .extension_: "Extension"
-        case .abduction: "Abduction"
-        case .adduction: "Adduction"
-        case .isometric: "Isometric"
-        case .plyometric: "Plyometric"
-        case .locomotion: "Locomotion"
+        case .horizontalPush: L10n.tr("exercise.movementPattern.horizontalPush.displayName")
+        case .horizontalPull: L10n.tr("exercise.movementPattern.horizontalPull.displayName")
+        case .verticalPush: L10n.tr("exercise.movementPattern.verticalPush.displayName")
+        case .verticalPull: L10n.tr("exercise.movementPattern.verticalPull.displayName")
+        case .hipHinge: L10n.tr("exercise.movementPattern.hipHinge.displayName")
+        case .squat: L10n.tr("exercise.movementPattern.squat.displayName")
+        case .lunge: L10n.tr("exercise.movementPattern.lunge.displayName")
+        case .carry: L10n.tr("exercise.movementPattern.carry.displayName")
+        case .rotation: L10n.tr("exercise.movementPattern.rotation.displayName")
+        case .antiRotation: L10n.tr("exercise.movementPattern.antiRotation.displayName")
+        case .flexion: L10n.tr("exercise.movementPattern.flexion.displayName")
+        case .extension_: L10n.tr("exercise.movementPattern.extension.displayName")
+        case .abduction: L10n.tr("exercise.movementPattern.abduction.displayName")
+        case .adduction: L10n.tr("exercise.movementPattern.adduction.displayName")
+        case .isometric: L10n.tr("exercise.movementPattern.isometric.displayName")
+        case .plyometric: L10n.tr("exercise.movementPattern.plyometric.displayName")
+        case .locomotion: L10n.tr("exercise.movementPattern.locomotion.displayName")
         }
     }
 }
@@ -86,16 +86,16 @@ nonisolated enum TrainingWorld: String, Codable, CaseIterable, Identifiable, Sen
 
     var displayName: String {
         switch self {
-        case .gymStrength: "Gym Strength"
-        case .homeGym: "Home Gym"
-        case .homeNoEquipment: "Home (No Equipment)"
-        case .calisthenics: "Calisthenics"
-        case .pilates: "Pilates"
-        case .mobilityStretching: "Mobility & Stretching"
-        case .recoveryRehab: "Recovery & Rehab"
-        case .warmupActivation: "Warm-Up & Activation"
-        case .functionalAthletic: "Functional & Athletic"
-        case .cardioConditioning: "Cardio & Conditioning"
+        case .gymStrength: L10n.tr("exercise.trainingWorld.gymStrength.displayName")
+        case .homeGym: L10n.tr("exercise.trainingWorld.homeGym.displayName")
+        case .homeNoEquipment: L10n.tr("exercise.trainingWorld.homeNoEquipment.displayName")
+        case .calisthenics: L10n.tr("exercise.trainingWorld.calisthenics.displayName")
+        case .pilates: L10n.tr("exercise.trainingWorld.pilates.displayName")
+        case .mobilityStretching: L10n.tr("exercise.trainingWorld.mobilityStretching.displayName")
+        case .recoveryRehab: L10n.tr("exercise.trainingWorld.recoveryRehab.displayName")
+        case .warmupActivation: L10n.tr("exercise.trainingWorld.warmupActivation.displayName")
+        case .functionalAthletic: L10n.tr("exercise.trainingWorld.functionalAthletic.displayName")
+        case .cardioConditioning: L10n.tr("exercise.trainingWorld.cardioConditioning.displayName")
         }
     }
 
@@ -155,25 +155,25 @@ nonisolated enum Equipment: String, Codable, CaseIterable, Identifiable, Sendabl
 
     var displayName: String {
         switch self {
-        case .none: "No Equipment"
-        case .barbell: "Barbell"
-        case .dumbbell: "Dumbbell"
-        case .kettlebell: "Kettlebell"
-        case .cable: "Cable"
-        case .machine: "Machine"
-        case .smithMachine: "Smith Machine"
-        case .resistanceBand: "Resistance Band"
-        case .pullUpBar: "Pull-Up Bar"
-        case .bench: "Bench"
-        case .dipStation: "Dip Station"
-        case .stabilityBall: "Stability Ball"
-        case .foamRoller: "Foam Roller"
-        case .mat: "Mat"
-        case .box: "Box"
-        case .trx: "TRX"
-        case .medicineBall: "Medicine Ball"
-        case .abWheel: "Ab Wheel"
-        case .rings: "Rings"
+        case .none: L10n.tr("exercise.equipment.none.displayName")
+        case .barbell: L10n.tr("exercise.equipment.barbell.displayName")
+        case .dumbbell: L10n.tr("exercise.equipment.dumbbell.displayName")
+        case .kettlebell: L10n.tr("exercise.equipment.kettlebell.displayName")
+        case .cable: L10n.tr("exercise.equipment.cable.displayName")
+        case .machine: L10n.tr("exercise.equipment.machine.displayName")
+        case .smithMachine: L10n.tr("exercise.equipment.smithMachine.displayName")
+        case .resistanceBand: L10n.tr("exercise.equipment.resistanceBand.displayName")
+        case .pullUpBar: L10n.tr("exercise.equipment.pullUpBar.displayName")
+        case .bench: L10n.tr("exercise.equipment.bench.displayName")
+        case .dipStation: L10n.tr("exercise.equipment.dipStation.displayName")
+        case .stabilityBall: L10n.tr("exercise.equipment.stabilityBall.displayName")
+        case .foamRoller: L10n.tr("exercise.equipment.foamRoller.displayName")
+        case .mat: L10n.tr("exercise.equipment.mat.displayName")
+        case .box: L10n.tr("exercise.equipment.box.displayName")
+        case .trx: L10n.tr("exercise.equipment.trx.displayName")
+        case .medicineBall: L10n.tr("exercise.equipment.medicineBall.displayName")
+        case .abWheel: L10n.tr("exercise.equipment.abWheel.displayName")
+        case .rings: L10n.tr("exercise.equipment.rings.displayName")
         }
     }
 }
@@ -187,9 +187,9 @@ nonisolated enum ExerciseDifficulty: String, Codable, CaseIterable, Identifiable
 
     var displayName: String {
         switch self {
-        case .beginner: "Beginner"
-        case .intermediate: "Intermediate"
-        case .advanced: "Advanced"
+        case .beginner: L10n.tr("exercise.difficulty.beginner.displayName")
+        case .intermediate: L10n.tr("exercise.difficulty.intermediate.displayName")
+        case .advanced: L10n.tr("exercise.difficulty.advanced.displayName")
         }
     }
 
@@ -212,10 +212,10 @@ nonisolated enum LocationType: String, Codable, CaseIterable, Identifiable, Send
 
     var displayName: String {
         switch self {
-        case .gym: "Gym"
-        case .homeGym: "Home Gym"
-        case .homeNoEquipment: "Home (No Equipment)"
-        case .anywhere: "Anywhere"
+        case .gym: L10n.tr("exercise.location.gym.displayName")
+        case .homeGym: L10n.tr("exercise.location.homeGym.displayName")
+        case .homeNoEquipment: L10n.tr("exercise.location.homeNoEquipment.displayName")
+        case .anywhere: L10n.tr("exercise.location.anywhere.displayName")
         }
     }
 }
@@ -229,9 +229,9 @@ nonisolated enum ProgressionLevel: Int, Codable, CaseIterable, Identifiable, Sen
 
     var displayName: String {
         switch self {
-        case .regression: "Easier"
-        case .standard: "Standard"
-        case .progression: "Harder"
+        case .regression: L10n.tr("exercise.progressionLevel.regression.displayName")
+        case .standard: L10n.tr("exercise.progressionLevel.standard.displayName")
+        case .progression: L10n.tr("exercise.progressionLevel.progression.displayName")
         }
     }
 }

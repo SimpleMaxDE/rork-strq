@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+IOS_ROOT = ROOT.parent
 XCSTRINGS_PATH = ROOT / "Localizable.xcstrings"
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -22,6 +23,20 @@ GENERATED_COPY_CONTEXT_TOKENS = [
     "title:", "explanation:", "coachNote:", "reason:",
     "displayName:", "description:", "optimizingFor:", "expectedIntensityLabel:",
 ]
+
+USER_FACING_PROPERTY_NAMES = (
+    "label", "title", "subtitle", "detail", "message", "free", "pro",
+    "badge", "trailing", "explanation", "coachNote", "displayName",
+)
+USER_FACING_PROPERTY_RE = re.compile(
+    r"\b(" + "|".join(USER_FACING_PROPERTY_NAMES) + r")\s*:"
+)
+PAYWALL_COPY_SCOPE_RE = re.compile(
+    r"\b(?:private\s+)?(?:var|func)\s+"
+    r"(pillars|compareBlock|packageSelector|savingsBadge|annualSubtitle|"
+    r"perMonthLine|trialBadge|purchaseButtonTitle|trustRow)\b"
+)
+EXERCISE_DISPLAY_NAME_RE = re.compile(r"\bvar\s+displayName\s*:\s*String\b")
 
 GENERATED_COPY_INITIALIZERS = [
     "NextBestAction(",
@@ -45,14 +60,22 @@ GENERATED_COPY_FILE_NAMES = {
     "ProgressionState.swift",
     "ProgressionEngine.swift",
 }
+TARGETED_COPY_FILES = {
+    Path("STRQ/Views/STRQPaywallView.swift"),
+    Path("STRQ/Models/Exercise.swift"),
+    Path("STRQWatch/ContentView.swift"),
+    Path("STRQWidget/WorkoutLiveActivity.swift"),
+}
 
 NON_USER_CONTEXT_TOKENS = [
     "print(", "debugPrint(", "logger.", "os_log", "Analytics.", "ErrorReporter.",
     "NSPredicate(", "URL(", "http://", "https://", "UserDefaults", "forKey:",
-    "rawValue", "identifier", "id:", "systemName:", "symbolName:", "imageName:",
-    "accessibilityIdentifier(", "fatalError(", "preconditionFailure(", "icon:",
-    "colorName:",
+    "accessibilityIdentifier(", "fatalError(", "preconditionFailure(",
 ]
+NON_USER_LITERAL_PROPERTY_RE = re.compile(
+    r"\b(systemName|icon|color|rawValue|identifier|id|symbolName|imageName|"
+    r"accessibilityIdentifier|colorName)\s*:\s*$"
+)
 
 EXCLUDED_PATH_PARTS = {
     "Tools",
@@ -91,6 +114,7 @@ IDENTICAL_DE_ALLOWLIST = {
     "Optional",
     "PRO",
     "Protein",
+    "Progression",
     "REPS",
     "RPE %@",
     "Rehabilitation",
@@ -125,51 +149,65 @@ IDENTICAL_DE_ALLOWLIST = {
 
 STRING_RE = re.compile(r'"([^"\\]*(?:\\.[^"\\]*)*)"')
 L10N_KEY_RE = re.compile(r'L10n\.(?:tr|format)\("([^"]+)"')
+LOCALIZED_CALL_RE = re.compile(r'\b(?:L10n|WatchL10n|WidgetL10n)\.(?:tr|format)\(|NSLocalizedString\(')
 ENGLISH_CHAR_RE = re.compile(r"[A-Za-z]")
 
 
 def iter_scoped_files() -> list[Path]:
     files: list[Path] = []
-    for path in sorted(ROOT.rglob("*.swift")):
-        rel = path.relative_to(ROOT)
-        parts = set(rel.parts)
-        if parts & EXCLUDED_PATH_PARTS:
+    for scan_root in (ROOT, IOS_ROOT / "STRQWatch", IOS_ROOT / "STRQWidget"):
+        if not scan_root.exists():
             continue
-        if any(hint in path.name for hint in EXCLUDED_FILE_HINTS):
-            continue
-        files.append(path)
+        for path in sorted(scan_root.rglob("*.swift")):
+            rel = path.relative_to(IOS_ROOT)
+            parts = set(rel.parts)
+            if parts & EXCLUDED_PATH_PARTS:
+                continue
+            if any(hint in path.name for hint in EXCLUDED_FILE_HINTS):
+                continue
+            files.append(path)
     return files
 
 
-def looks_like_user_facing_english_literal(line: str, literal: str, generated_context: bool = False) -> bool:
+def is_non_user_literal_context(line: str, start: int) -> bool:
+    if any(token in line for token in NON_USER_CONTEXT_TOKENS):
+        return True
+    return bool(NON_USER_LITERAL_PROPERTY_RE.search(line[:start]))
+
+
+def looks_like_user_facing_english_literal(
+    line: str,
+    literal: str,
+    user_context: bool = False,
+    allow_single_word: bool = False,
+    allow_uppercase: bool = False,
+) -> bool:
     text = literal.strip()
     if not text:
         return False
 
     if "\\(" in text:
-        if not generated_context:
+        if not user_context:
             return False
         text = INTERPOLATION_RE.sub(" ", text).strip()
         if not text:
             return False
 
-    if any(token in line for token in NON_USER_CONTEXT_TOKENS):
-        return False
-
-    if not generated_context and not any(token in line for token in UI_CONTEXT_TOKENS):
+    if not user_context and not any(token in line for token in UI_CONTEXT_TOKENS):
         return False
 
     if not ENGLISH_CHAR_RE.search(text):
         return False
 
-    if not generated_context and ("%" in text or "%@" in text):
+    if not user_context and ("%" in text or "%@" in text):
         return False
 
-    if not generated_context and ("))" in text or "\\(" in text):
+    if not user_context and ("))" in text or "\\(" in text):
         return False
 
     if re.fullmatch(r"[A-Z0-9_./:-]+", text):
-        return False
+        if not allow_uppercase:
+            return False
 
     if re.fullmatch(r"[%0-9.\-+()/: ]+", text):
         return False
@@ -178,7 +216,7 @@ def looks_like_user_facing_english_literal(line: str, literal: str, generated_co
         return False
 
     # Focus on phrase-like literals that are most likely visible copy.
-    if not generated_context and " " not in text:
+    if not allow_single_word and " " not in text:
         return False
 
     return True
@@ -217,9 +255,12 @@ def main() -> int:
     files = iter_scoped_files()
 
     for path in files:
-        rel = path.relative_to(ROOT)
+        rel = path.relative_to(IOS_ROOT)
         scans_generated_copy = path.name in GENERATED_COPY_FILE_NAMES
-        scans_coach_tab_copy = rel.as_posix() == "Views/CoachTabView.swift"
+        scans_coach_tab_copy = rel.as_posix() == "STRQ/Views/CoachTabView.swift"
+        scans_paywall_copy = rel.as_posix() == "STRQ/Views/STRQPaywallView.swift"
+        scans_exercise_metadata = rel.as_posix() == "STRQ/Models/Exercise.swift"
+        targeted_copy_file = rel in TARGETED_COPY_FILES
         brace_depth = 0
         paren_depth = 0
         generated_brace_depth: int | None = None
@@ -228,6 +269,10 @@ def main() -> int:
         coach_tab_copy_brace_depth: int | None = None
         pending_coach_tab_copy_scope = False
         coach_tab_copy_array_depth: int | None = None
+        paywall_copy_brace_depth: int | None = None
+        pending_paywall_copy_scope = False
+        exercise_display_brace_depth: int | None = None
+        pending_exercise_display_scope = False
 
         for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
             if scans_generated_copy and (GENERATED_COPY_PROPERTY_RE.search(line) or GENERATED_COPY_FUNCTION_RE.search(line)):
@@ -241,6 +286,12 @@ def main() -> int:
 
             if scans_coach_tab_copy and COACH_TAB_COPY_ARRAY_RE.search(line) and coach_tab_copy_array_depth is None:
                 coach_tab_copy_array_depth = 0
+
+            if scans_paywall_copy and PAYWALL_COPY_SCOPE_RE.search(line):
+                pending_paywall_copy_scope = True
+
+            if scans_exercise_metadata and EXERCISE_DISPLAY_NAME_RE.search(line):
+                pending_exercise_display_scope = True
 
             generated_context = (
                 (
@@ -259,11 +310,28 @@ def main() -> int:
                     )
                 )
             )
+            property_context = bool(USER_FACING_PROPERTY_RE.search(line))
+            paywall_context = scans_paywall_copy and (
+                paywall_copy_brace_depth is not None
+                or pending_paywall_copy_scope
+                or property_context
+            )
+            exercise_metadata_context = scans_exercise_metadata and (
+                exercise_display_brace_depth is not None
+                or pending_exercise_display_scope
+            )
+            user_context = (
+                generated_context
+                or property_context
+                or paywall_context
+                or exercise_metadata_context
+                or any(token in line for token in UI_CONTEXT_TOKENS)
+            )
 
             for match in L10N_KEY_RE.finditer(line):
                 l10n_keys.add(match.group(1))
 
-            if "L10n.tr(" in line or "L10n.format(" in line or "NSLocalizedString(" in line:
+            if LOCALIZED_CALL_RE.search(line):
                 brace_depth += line.count("{") - line.count("}")
                 paren_depth += line.count("(") - line.count(")")
                 if pending_generated_brace_scope and "{" in line:
@@ -282,11 +350,29 @@ def main() -> int:
                     coach_tab_copy_array_depth += line.count("[") - line.count("]")
                     if coach_tab_copy_array_depth <= 0:
                         coach_tab_copy_array_depth = None
+                if pending_paywall_copy_scope and "{" in line:
+                    paywall_copy_brace_depth = brace_depth
+                    pending_paywall_copy_scope = False
+                if paywall_copy_brace_depth is not None and brace_depth < paywall_copy_brace_depth:
+                    paywall_copy_brace_depth = None
+                if pending_exercise_display_scope and "{" in line:
+                    exercise_display_brace_depth = brace_depth
+                    pending_exercise_display_scope = False
+                if exercise_display_brace_depth is not None and brace_depth < exercise_display_brace_depth:
+                    exercise_display_brace_depth = None
                 continue
 
             for match in STRING_RE.finditer(line):
                 literal = match.group(1)
-                if looks_like_user_facing_english_literal(line, literal, generated_context):
+                if is_non_user_literal_context(line, match.start()):
+                    continue
+                if looks_like_user_facing_english_literal(
+                    line,
+                    literal,
+                    user_context,
+                    allow_single_word=targeted_copy_file or exercise_metadata_context,
+                    allow_uppercase=targeted_copy_file,
+                ):
                     issues.append((str(rel), lineno, literal))
 
             brace_depth += line.count("{") - line.count("}")
@@ -307,6 +393,16 @@ def main() -> int:
                 coach_tab_copy_array_depth += line.count("[") - line.count("]")
                 if coach_tab_copy_array_depth <= 0:
                     coach_tab_copy_array_depth = None
+            if pending_paywall_copy_scope and "{" in line:
+                paywall_copy_brace_depth = brace_depth
+                pending_paywall_copy_scope = False
+            if paywall_copy_brace_depth is not None and brace_depth < paywall_copy_brace_depth:
+                paywall_copy_brace_depth = None
+            if pending_exercise_display_scope and "{" in line:
+                exercise_display_brace_depth = brace_depth
+                pending_exercise_display_scope = False
+            if exercise_display_brace_depth is not None and brace_depth < exercise_display_brace_depth:
+                exercise_display_brace_depth = None
 
     catalog = json.loads(XCSTRINGS_PATH.read_text(encoding="utf-8"))
     strings = catalog.get("strings", {})

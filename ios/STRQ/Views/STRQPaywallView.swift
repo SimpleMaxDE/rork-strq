@@ -149,42 +149,42 @@ struct STRQPaywallView: View {
         [
             Pillar(
                 icon: "brain.head.profile.fill",
-                title: "Adaptive coaching",
-                detail: "Readiness-aware adjustments and weekly reviews that tune your plan as you train.",
+                title: L10n.tr("Adaptive coaching"),
+                detail: L10n.tr("Readiness-aware adjustments and weekly reviews that tune your plan as you train."),
                 bullets: [
-                    "Smart swaps that preserve the training role",
-                    "Weekly check-in that reasons about your week",
-                    "Comeback guidance after missed sessions"
+                    L10n.tr("Smart swaps that preserve the training role"),
+                    L10n.tr("Weekly check-in that reasons about your week"),
+                    L10n.tr("Comeback guidance after missed sessions")
                 ]
             ),
             Pillar(
                 icon: "chart.line.uptrend.xyaxis",
-                title: "Deeper progression",
-                detail: "Long-term phase reads, progression memory, and a change log you can trust.",
+                title: L10n.tr("Deeper progression"),
+                detail: L10n.tr("Long-term phase reads, progression memory, and a change log you can trust."),
                 bullets: [
-                    "Mesocycle outlook — block, phase, and next shift",
-                    "Per-lift progression signals and plateau reads",
-                    "Coaching memory: what changed, why, and when"
+                    L10n.tr("Mesocycle outlook — block, phase, and next shift"),
+                    L10n.tr("Per-lift progression signals and plateau reads"),
+                    L10n.tr("Coaching memory: what changed, why, and when")
                 ]
             ),
             Pillar(
                 icon: "scalemass.fill",
-                title: "Physique intelligence",
-                detail: "Bodyweight trend and nutrition coaching tuned to your goal — fully opt-in.",
+                title: L10n.tr("Physique intelligence"),
+                detail: L10n.tr("Bodyweight trend and nutrition coaching tuned to your goal — fully opt-in."),
                 bullets: [
-                    "Regression-based bodyweight trend with 4-week projection",
-                    "Protein and calorie targets that follow your goal",
-                    "Nutrition × training bridge, not a calorie tracker"
+                    L10n.tr("Regression-based bodyweight trend with 4-week projection"),
+                    L10n.tr("Protein and calorie targets that follow your goal"),
+                    L10n.tr("Nutrition × training bridge, not a calorie tracker")
                 ]
             ),
             Pillar(
                 icon: "icloud.fill",
-                title: "Ecosystem & continuity",
-                detail: "Your training carried safely across devices, with premium continuity features.",
+                title: L10n.tr("Ecosystem & continuity"),
+                detail: L10n.tr("Your training carried safely across devices, with premium continuity features."),
                 bullets: [
-                    "iCloud sync across iPhone, iPad, and Mac",
-                    "Smart reminders tuned to your week",
-                    "Priority updates and early-access features"
+                    L10n.tr("iCloud sync across iPhone, iPad, and Mac"),
+                    L10n.tr("Smart reminders tuned to your week"),
+                    L10n.tr("Priority updates and early-access features")
                 ]
             )
         ]
@@ -262,33 +262,33 @@ struct STRQPaywallView: View {
 
             VStack(spacing: 0) {
                 compareRow(
-                    label: "Plan generation",
-                    free: "Strong default plans",
-                    pro: "Adaptive weekly tuning"
+                    label: L10n.tr("Plan generation"),
+                    free: L10n.tr("Strong default plans"),
+                    pro: L10n.tr("Adaptive weekly tuning")
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: "Exercise library",
-                    free: "Full curated catalog",
-                    pro: "Smart swaps & alternatives"
+                    label: L10n.tr("Exercise library"),
+                    free: L10n.tr("Full curated catalog"),
+                    pro: L10n.tr("Smart swaps & alternatives")
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: "Progression",
-                    free: "Per-session logging",
-                    pro: "Phase outlook & memory"
+                    label: L10n.tr("Progression"),
+                    free: L10n.tr("Per-session logging"),
+                    pro: L10n.tr("Phase outlook & memory")
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: "Physique coaching",
-                    free: "Training-only",
-                    pro: "Trend · protein · bridge"
+                    label: L10n.tr("Physique coaching"),
+                    free: L10n.tr("Training-only"),
+                    pro: L10n.tr("Trend · protein · bridge")
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: "Across devices",
-                    free: "This device",
-                    pro: "iCloud continuity"
+                    label: L10n.tr("Across devices"),
+                    free: L10n.tr("This device"),
+                    pro: L10n.tr("iCloud continuity")
                 )
             }
             .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
@@ -362,7 +362,7 @@ struct STRQPaywallView: View {
             if let annual = store.annualPackage {
                 packageCard(
                     package: annual,
-                    title: "Yearly",
+                    title: L10n.tr("Yearly"),
                     subtitle: annualSubtitle(annual),
                     trailing: perMonthLine(for: annual),
                     badge: trialBadge(annual) ?? savingsBadge(),
@@ -372,8 +372,8 @@ struct STRQPaywallView: View {
             if let monthly = store.monthlyPackage {
                 packageCard(
                     package: monthly,
-                    title: "Monthly",
-                    subtitle: "\(monthly.storeProduct.localizedPriceString)/month",
+                    title: L10n.tr("Monthly"),
+                    subtitle: L10n.format("%@/month", monthly.storeProduct.localizedPriceString),
                     trailing: nil,
                     badge: nil,
                     isSelected: selectedPackage?.identifier == monthly.identifier
@@ -391,12 +391,12 @@ struct STRQPaywallView: View {
         guard monthlyAsYear > 0 else { return nil }
         let saved = 1.0 - (annualPrice.doubleValue / monthlyAsYear)
         guard saved > 0.1 else { return nil }
-        return "Save \(Int(saved * 100))%"
+        return L10n.format("Save %d%%", Int(saved * 100))
     }
 
     private func annualSubtitle(_ package: Package) -> String {
         let price = package.storeProduct.localizedPriceString
-        return "\(price)/year"
+        return L10n.format("%@/year", price)
     }
 
     private func perMonthLine(for package: Package) -> String? {
@@ -411,18 +411,18 @@ struct STRQPaywallView: View {
         }
         formatter.maximumFractionDigits = monthly < 10 ? 2 : 0
         guard let formatted = formatter.string(from: NSNumber(value: monthly)) else { return nil }
-        return "\(formatted)/mo"
+        return L10n.format("%@/mo", formatted)
     }
 
     private func trialBadge(_ package: Package) -> String? {
         guard let intro = package.storeProduct.introductoryDiscount else { return nil }
         let period = intro.subscriptionPeriod
         if period.unit == .day {
-            return "\(period.value)-day free trial"
+            return L10n.format("%d-day free trial", period.value)
         } else if period.unit == .week {
-            return "\(period.value)-week free trial"
+            return L10n.format("%d-week free trial", period.value)
         }
-        return "Free trial"
+        return L10n.tr("Free trial")
     }
 
     private func packageCard(package: Package, title: String, subtitle: String, trailing: String?, badge: String?, isSelected: Bool) -> some View {
@@ -521,20 +521,20 @@ struct STRQPaywallView: View {
     }
 
     private var purchaseButtonTitle: String {
-        guard let pkg = selectedPackage else { return "Continue" }
+        guard let pkg = selectedPackage else { return L10n.tr("Continue") }
         if pkg.storeProduct.introductoryDiscount != nil {
-            return "Start Free Trial"
+            return L10n.tr("Start Free Trial")
         }
-        return "Subscribe"
+        return L10n.tr("Subscribe")
     }
 
     private var trustRow: some View {
         HStack(spacing: 14) {
-            trustItem(icon: "lock.shield.fill", label: "Secure")
+            trustItem(icon: "lock.shield.fill", label: L10n.tr("Secure"))
             trustDivider
-            trustItem(icon: "xmark.circle.fill", label: "Cancel anytime")
+            trustItem(icon: "xmark.circle.fill", label: L10n.tr("Cancel anytime"))
             trustDivider
-            trustItem(icon: "apple.logo", label: "Via Apple")
+            trustItem(icon: "apple.logo", label: L10n.tr("Via Apple"))
         }
         .frame(maxWidth: .infinity)
     }

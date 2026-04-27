@@ -1,6 +1,17 @@
 import ActivityKit
+import Foundation
 import WidgetKit
 import SwiftUI
+
+private enum WidgetL10n {
+    static func tr(_ key: String, comment: String = "") -> String {
+        NSLocalizedString(key, comment: comment)
+    }
+
+    static func format(_ key: String, _ arguments: CVarArg..., comment: String = "") -> String {
+        String(format: tr(key, comment: comment), locale: Locale.current, arguments: arguments)
+    }
+}
 
 @available(iOS 16.1, *)
 struct WorkoutLiveActivity: Widget {
@@ -25,12 +36,12 @@ struct WorkoutLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     if context.state.isCompleted {
-                        Label("Done", systemImage: "checkmark.circle.fill")
+                        Label(WidgetL10n.tr("Done"), systemImage: "checkmark.circle.fill")
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(.green)
                     } else if let rest = context.state.restEndsAt, rest > Date() {
                         VStack(alignment: .trailing, spacing: 1) {
-                            Text("REST")
+                            Text(WidgetL10n.tr("REST"))
                                 .font(.system(size: 9, weight: .heavy))
                                 .tracking(0.8)
                                 .foregroundStyle(liveSteel)
@@ -42,7 +53,7 @@ struct WorkoutLiveActivity: Widget {
                         }
                     } else {
                         VStack(alignment: .trailing, spacing: 1) {
-                            Text("SET")
+                            Text(WidgetL10n.tr("SET"))
                                 .font(.system(size: 9, weight: .heavy))
                                 .tracking(0.8)
                                 .foregroundStyle(liveSteel)
@@ -57,7 +68,7 @@ struct WorkoutLiveActivity: Widget {
                         ProgressView(value: progress(context.state))
                             .tint(.white)
                         HStack(spacing: 6) {
-                            Text("Exercise \(context.state.currentExerciseIndex + 1) of \(context.state.totalExercises)")
+                            Text(WidgetL10n.format("Exercise %d of %d", context.state.currentExerciseIndex + 1, context.state.totalExercises))
                                 .font(.system(size: 11, weight: .semibold))
                                 .foregroundStyle(.white.opacity(0.7))
                             Spacer()
@@ -123,7 +134,7 @@ struct WorkoutLiveActivity: Widget {
                     .foregroundStyle(liveSteel)
                 Spacer()
                 if context.state.isCompleted {
-                    Label("Complete", systemImage: "checkmark.circle.fill")
+                    Label(WidgetL10n.tr("Complete"), systemImage: "checkmark.circle.fill")
                         .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(.green)
                 } else {
@@ -142,13 +153,13 @@ struct WorkoutLiveActivity: Widget {
                         .foregroundStyle(.white)
                         .lineLimit(1)
                     HStack(spacing: 6) {
-                        Text("Exercise \(context.state.currentExerciseIndex + 1)/\(context.state.totalExercises)")
+                        Text(WidgetL10n.format("Exercise %d/%d", context.state.currentExerciseIndex + 1, context.state.totalExercises))
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundStyle(.white.opacity(0.65))
                         if !context.state.isCompleted {
                             Text("·")
                                 .foregroundStyle(.white.opacity(0.3))
-                            Text("Set \(context.state.currentSetNumber)/\(context.state.totalSets)")
+                            Text(WidgetL10n.format("Set %d/%d", context.state.currentSetNumber, context.state.totalSets))
                                 .font(.system(size: 11, weight: .semibold))
                                 .foregroundStyle(.white.opacity(0.65))
                         }
@@ -157,7 +168,7 @@ struct WorkoutLiveActivity: Widget {
                 Spacer()
                 if !context.state.isCompleted, let rest = context.state.restEndsAt, rest > Date() {
                     VStack(alignment: .trailing, spacing: 2) {
-                        Text("REST")
+                        Text(WidgetL10n.tr("REST"))
                             .font(.system(size: 9, weight: .heavy))
                             .tracking(1.0)
                             .foregroundStyle(liveSteel)
@@ -183,13 +194,13 @@ struct WorkoutLiveActivity: Widget {
                 }
                 .frame(height: 4)
                 HStack {
-                    Text("\(context.state.completedSets) of \(context.state.totalSessionSets) sets")
+                    Text(WidgetL10n.format("%d of %d sets", context.state.completedSets, context.state.totalSessionSets))
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.6))
                     Spacer()
                     if let next = context.state.nextExerciseName, !context.state.isCompleted {
                         HStack(spacing: 3) {
-                            Text("Next")
+                            Text(WidgetL10n.tr("Next"))
                                 .foregroundStyle(.white.opacity(0.4))
                             Text(next)
                                 .foregroundStyle(.white.opacity(0.75))

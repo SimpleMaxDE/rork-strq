@@ -11,3 +11,12 @@
 "Completed" = "Completed";
 "Workout" = "Workout";
 "Recovery" = "Recovery";
+"Done" = "Done";
+"REST" = "REST";
+"SET" = "SET";
+"Exercise %d of %d" = "Exercise %d of %d";
+"Complete" = "Complete";
+"Exercise %d/%d" = "Exercise %d/%d";
+"Set %d/%d" = "Set %d/%d";
+"%d of %d sets" = "%d of %d sets";
+"Next" = "Next";

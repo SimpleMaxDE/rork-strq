@@ -1,4 +1,15 @@
+import Foundation
 import SwiftUI
+
+private enum WatchL10n {
+    static func tr(_ key: String, comment: String = "") -> String {
+        NSLocalizedString(key, comment: comment)
+    }
+
+    static func format(_ key: String, _ arguments: CVarArg..., comment: String = "") -> String {
+        String(format: tr(key, comment: comment), locale: Locale.current, arguments: arguments)
+    }
+}
 
 struct ContentView: View {
     @Bindable var store: WatchWorkoutStore
@@ -28,10 +39,10 @@ struct IdleWatchView: View {
             Image(systemName: completed ? "checkmark.seal.fill" : "dumbbell.fill")
                 .font(.system(size: 30, weight: .semibold))
                 .foregroundStyle(completed ? Color.green : .white.opacity(0.75))
-            Text(completed ? "Session Logged" : "STRQ")
+            Text(completed ? WatchL10n.tr("Session Logged") : WatchL10n.tr("STRQ"))
                 .font(.system(size: 16, weight: .bold))
                 .foregroundStyle(.white)
-            Text(completed ? (dayName.isEmpty ? "Nice work" : dayName) : "Start a workout on iPhone")
+            Text(completed ? (dayName.isEmpty ? WatchL10n.tr("Nice work") : dayName) : WatchL10n.tr("Start a workout on iPhone"))
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(.white.opacity(0.55))
                 .multilineTextAlignment(.center)
@@ -71,14 +82,14 @@ struct ActiveWorkoutWatchView: View {
 
             HStack(spacing: 0) {
                 stepperColumn(
-                    label: "KG",
+                    label: WatchL10n.tr("KG"),
                     value: store.weight <= 0 ? "BW" : formatWeight(store.weight),
                     onMinus: { store.adjustWeight(-2.5) },
                     onPlus: { store.adjustWeight(2.5) }
                 )
                 Rectangle().fill(Color.white.opacity(0.08)).frame(width: 1, height: 38)
                 stepperColumn(
-                    label: "REPS",
+                    label: WatchL10n.tr("REPS"),
                     value: "\(store.reps)",
                     onMinus: { store.adjustReps(-1) },
                     onPlus: { store.adjustReps(1) }
@@ -94,7 +105,7 @@ struct ActiveWorkoutWatchView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "checkmark")
                         .font(.system(size: 12, weight: .bold))
-                    Text("Log Set \(store.setNumber)")
+                    Text(WatchL10n.format("Log Set %d", store.setNumber))
                         .font(.system(size: 14, weight: .bold))
                 }
                 .foregroundStyle(.black)
@@ -110,7 +121,7 @@ struct ActiveWorkoutWatchView: View {
     private var header: some View {
         VStack(spacing: 2) {
             HStack(spacing: 6) {
-                Text("SET \(store.setNumber) / \(store.totalSets)")
+                Text(WatchL10n.format("SET %d / %d", store.setNumber, store.totalSets))
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.1)
                     .foregroundStyle(.white.opacity(0.55))
@@ -163,7 +174,7 @@ struct ActiveWorkoutWatchView: View {
     // Page 2 — secondary actions
     private var controlsPage: some View {
         VStack(spacing: 8) {
-            Text("CONTROLS")
+            Text(WatchL10n.tr("CONTROLS"))
                 .font(.system(size: 9, weight: .black))
                 .tracking(1.3)
                 .foregroundStyle(.white.opacity(0.45))
@@ -175,7 +186,7 @@ struct ActiveWorkoutWatchView: View {
             } label: {
                 HStack {
                     Image(systemName: "forward.end.fill")
-                    Text("Next Exercise")
+                    Text(WatchL10n.tr("Next Exercise"))
                     Spacer()
                 }
                 .font(.system(size: 13, weight: .semibold))
@@ -192,7 +203,7 @@ struct ActiveWorkoutWatchView: View {
             } label: {
                 HStack {
                     Image(systemName: "waveform.path.ecg")
-                    Text("Set Feel")
+                    Text(WatchL10n.tr("Set Feel"))
                     Spacer()
                 }
                 .font(.system(size: 13, weight: .semibold))
@@ -212,7 +223,7 @@ struct ActiveWorkoutWatchView: View {
     private var infoPage: some View {
         VStack(alignment: .leading, spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("DAY")
+                Text(WatchL10n.tr("DAY"))
                     .font(.system(size: 8, weight: .black))
                     .tracking(1.1)
                     .foregroundStyle(.white.opacity(0.4))
@@ -223,18 +234,18 @@ struct ActiveWorkoutWatchView: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("PROGRESS")
+                Text(WatchL10n.tr("PROGRESS"))
                     .font(.system(size: 8, weight: .black))
                     .tracking(1.1)
                     .foregroundStyle(.white.opacity(0.4))
-                Text("Exercise \(store.exerciseIndex + 1) of \(store.totalExercises)")
+                Text(WatchL10n.format("Exercise %d of %d", store.exerciseIndex + 1, store.totalExercises))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.85))
             }
 
             if let next = store.nextExerciseName {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("NEXT")
+                    Text(WatchL10n.tr("NEXT"))
                         .font(.system(size: 8, weight: .black))
                         .tracking(1.1)
                         .foregroundStyle(.white.opacity(0.4))
@@ -254,15 +265,15 @@ struct ActiveWorkoutWatchView: View {
     // Quality sheet
     private var qualitySheet: some View {
         let qualities: [(raw: String, label: String, icon: String, color: Color)] = [
-            ("tooEasy", "Easy", "arrow.up.circle", .blue),
-            ("onTarget", "Clean", "checkmark.circle.fill", .green),
-            ("grinder", "Grind", "flame.fill", .orange),
-            ("formBreakdown", "Form", "exclamationmark.triangle.fill", .yellow),
-            ("pain", "Pain", "cross.case.fill", .red)
+            ("tooEasy", WatchL10n.tr("Easy"), "arrow.up.circle", .blue),
+            ("onTarget", WatchL10n.tr("Clean"), "checkmark.circle.fill", .green),
+            ("grinder", WatchL10n.tr("Grind"), "flame.fill", .orange),
+            ("formBreakdown", WatchL10n.tr("Form"), "exclamationmark.triangle.fill", .yellow),
+            ("pain", WatchL10n.tr("Pain"), "cross.case.fill", .red)
         ]
         return ScrollView {
             VStack(spacing: 6) {
-                Text("SET FEEL")
+                Text(WatchL10n.tr("SET FEEL"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.3)
                     .foregroundStyle(.white.opacity(0.5))
