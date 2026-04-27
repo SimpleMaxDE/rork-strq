@@ -70,18 +70,18 @@ struct ProgressAnalyticsView: View {
         let headline: (String, String) = {
             switch tier {
             case .fresh:
-                return ("0", L10n.tr("sessions logged"))
+                return ("0", L10n.tr("workouts logged"))
             case .firstSession:
-                return ("1", L10n.tr("session logged"))
+                return ("1", L10n.tr("workout logged"))
             case .earlyWeek:
-                return ("\(vm.totalCompletedWorkouts)", L10n.tr("sessions logged"))
+                return ("\(vm.totalCompletedWorkouts)", L10n.tr("workouts logged"))
             case .established:
                 if progressing > 0 {
                     return ("\(progressing)", L10n.tr("lifts progressing"))
                 } else if prsThisMonth > 0 {
                     return ("\(prsThisMonth)", L10n.tr("PRs this month"))
                 } else {
-                    return ("\(vm.totalCompletedWorkouts)", L10n.tr("sessions logged"))
+                    return ("\(vm.totalCompletedWorkouts)", L10n.tr("workouts logged"))
                 }
             }
         }()
@@ -92,7 +92,7 @@ struct ProgressAnalyticsView: View {
             case .firstSession:
                 return L10n.tr("Strong start. STRQ is already reading load, recovery, and consistency.")
             case .earlyWeek:
-                return L10n.format(vm.totalCompletedWorkouts == 1 ? "%d session logged - the first clear trends arrive after a few more workouts." : "%d sessions logged - the first clear trends arrive after a few more workouts.", vm.totalCompletedWorkouts)
+                return L10n.tr("First trends form after a few more workouts.")
             case .established:
                 if progressing > 0 && prsThisMonth > 0 {
                     let prLabel = prsThisMonth == 1 ? L10n.tr("PR this month") : L10n.tr("PRs this month")
@@ -153,7 +153,7 @@ struct ProgressAnalyticsView: View {
         }
         .background(
             LinearGradient(
-                colors: [Color(white: 0.17), Color(white: 0.09)],
+                colors: [Color(white: 0.14), Color(white: 0.055)],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             ),
             in: .rect(cornerRadius: 22)
@@ -163,8 +163,8 @@ struct ProgressAnalyticsView: View {
                 .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
         )
         .overlay(alignment: .top) {
-            STRQBrand.accentGradient
-                .frame(height: 3)
+            STRQBrand.steel.opacity(0.34)
+                .frame(height: 1)
                 .clipShape(.rect(cornerRadii: .init(topLeading: 22, bottomLeading: 0, bottomTrailing: 0, topTrailing: 22)))
         }
         .shadow(color: .black.opacity(0.22), radius: 16, y: 5)
@@ -225,10 +225,10 @@ struct ProgressAnalyticsView: View {
         if vm.isEarlyStage {
             state = .info
             icon = vm.totalCompletedWorkouts == 0 ? "arrow.forward.circle.fill" : "waveform.path.ecg"
-            headline = vm.totalCompletedWorkouts == 0 ? L10n.tr("Your baseline starts with Today") : L10n.tr("Signal is coming in")
+            headline = vm.totalCompletedWorkouts == 0 ? L10n.tr("Your baseline starts with Today") : L10n.tr("Early signals are forming")
             detail = vm.totalCompletedWorkouts == 0
                 ? L10n.tr("One workout gives Progress real training signal to read.")
-                : L10n.format(vm.totalCompletedWorkouts == 1 ? "%d session logged - the first clear trends arrive after a few more workouts." : "%d sessions logged - the first clear trends arrive after a few more workouts.", vm.totalCompletedWorkouts)
+                : L10n.tr("First trends form after a few more workouts.")
         } else if prsThisWeek > 0 {
             state = .success
             icon = "trophy.fill"
@@ -345,12 +345,12 @@ struct ProgressAnalyticsView: View {
                     icon: "flame.fill",
                     title: L10n.tr("Consistency"),
                     state: vm.streak >= 7 ? .success : (vm.streak >= 3 ? .info : .neutral),
-                    detail: vm.streak > 0 ? L10n.format("%d-day streak · %d sessions logged", vm.streak, vm.totalCompletedWorkouts) : L10n.tr("Start fresh today")
+                    detail: vm.streak > 0 ? L10n.format("%d-day streak · %d workouts logged", vm.streak, vm.totalCompletedWorkouts) : L10n.tr("Start fresh today")
                 )
             }
         }
         .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.105), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -431,7 +431,7 @@ struct ProgressAnalyticsView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 10)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+        .background(Color(white: 0.10), in: .rect(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -459,7 +459,7 @@ struct ProgressAnalyticsView: View {
             }
         }
         .padding(3)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+        .background(Color(white: 0.10), in: .rect(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -731,7 +731,7 @@ struct ProgressAnalyticsView: View {
                     negative: volumeDelta < 0 && volumeLast > 0
                 )
                 improvementCell(
-                    label: L10n.tr("Sessions"),
+                    label: L10n.tr("Workouts"),
                     delta: sessionsDelta == 0 ? "\(thisWeek.count)" : String(format: "%@%d", sessionsDelta > 0 ? "+" : "", sessionsDelta),
                     unit: nil,
                     positive: sessionsDelta > 0,
@@ -798,7 +798,7 @@ struct ProgressAnalyticsView: View {
 
         return VStack(alignment: .leading, spacing: 10) {
             HStack {
-                ForgeSectionHeader(title: L10n.tr("Recent Sessions"))
+                ForgeSectionHeader(title: L10n.tr("Recent Workouts"))
                 Spacer()
                 if !recent.isEmpty {
                     NavigationLink(value: ProgressRoute.history) {
@@ -924,7 +924,7 @@ struct ProgressAnalyticsView: View {
                     Image(systemName: "calendar.badge.clock")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(L10n.tr("Your consistency pattern will map here once sessions start landing."))
+                    Text(L10n.tr("Your consistency pattern will map here once workouts start landing."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1240,7 +1240,7 @@ struct ProgressAnalyticsView: View {
                 icon: "chart.bar.xaxis",
                 headline: L10n.tr("Volume"),
                 detail: L10n.tr("progress.volume.runway.detail", fallback: "A few workouts reveal rhythm, mix, and workload."),
-                chips: [("figure.strengthtraining.traditional", L10n.tr("Sessions")), ("square.stack.3d.up.fill", L10n.tr("Volume")), ("arrow.left.arrow.right", L10n.tr("Balance"))]
+                chips: [("figure.strengthtraining.traditional", L10n.tr("Workouts")), ("square.stack.3d.up.fill", L10n.tr("Volume")), ("arrow.left.arrow.right", L10n.tr("Balance"))]
             )
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
@@ -1306,11 +1306,11 @@ struct ProgressAnalyticsView: View {
         }
 
         VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: L10n.tr("Weekly Sessions"), trailing: L10n.tr("8 Weeks"))
+            ForgeSectionHeader(title: L10n.tr("Weekly Workouts"), trailing: L10n.tr("8 Weeks"))
 
             Chart {
                 ForEach(last8Weeks, id: \.0) { week, count in
-                    BarMark(x: .value("Week", week), y: .value("Sessions", appeared || reduceMotion ? count : 0))
+                    BarMark(x: .value("Week", week), y: .value("Workouts", appeared || reduceMotion ? count : 0))
                         .foregroundStyle(ForgeTheme.accentGradient)
                         .clipShape(.rect(cornerRadius: 3))
                 }

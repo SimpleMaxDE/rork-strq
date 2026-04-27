@@ -379,7 +379,7 @@ struct CoachTabView: View {
             }
         case .startFirstSession:
             if let day = vm.todaysWorkout ?? vm.nextWorkout {
-                ForgePrimaryButton(icon: "sparkles", title: L10n.tr("Start Session 1")) {
+                ForgePrimaryButton(icon: "sparkles", title: L10n.tr("Start Workout 1")) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
             }
@@ -393,7 +393,7 @@ struct CoachTabView: View {
             if let day = vm.todaysWorkout {
                 ForgePrimaryButton(
                     icon: primary.kind == .recoverToday ? "heart.circle.fill" : "bolt.fill",
-                    title: primary.kind == .recoverToday ? L10n.tr("Start Light Session") : L10n.tr("Start Workout")
+                    title: primary.kind == .recoverToday ? L10n.tr("Start Light Workout") : L10n.tr("Start Workout")
                 ) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
@@ -552,7 +552,7 @@ struct CoachTabView: View {
     private var coachEarlyStateMessage: String {
         switch vm.dataMaturityTier {
         case .fresh:
-            return L10n.tr("Today owns the next step. Coach will start shaping load and recovery once your first real session is in.")
+            return L10n.tr("Today owns the next step. Coach will start shaping load and recovery once your first real workout is in.")
         case .firstSession:
             return L10n.tr("Baseline is set. Keep the week moving and Coach will sharpen the details quietly in the background.")
         case .earlyWeek:
@@ -767,7 +767,7 @@ struct CoachTabView: View {
                     weeklyReviewLabel(subtitle: L10n.tr("Review your week and adjust"), ready: true)
                 }
             } else if vm.isEarlyStage {
-                weeklyReviewLabel(subtitle: vm.sessionsUntilReviewReady == 0 ? L10n.tr("Almost there — one more session rounds out the week") : L10n.format("%d more session%@ and your first weekly read will come into focus", vm.sessionsUntilReviewReady, vm.sessionsUntilReviewReady == 1 ? "" : "s"), ready: false)
+                weeklyReviewLabel(subtitle: vm.sessionsUntilReviewReady == 0 ? L10n.tr("Almost there — one more workout rounds out the week") : L10n.format(vm.sessionsUntilReviewReady == 1 ? "%d more workout and your first weekly read will come into focus" : "%d more workouts and your first weekly read will come into focus", vm.sessionsUntilReviewReady), ready: false)
                     .opacity(0.7)
             } else {
                 Button {

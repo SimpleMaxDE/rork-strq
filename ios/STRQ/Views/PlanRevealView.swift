@@ -81,7 +81,7 @@ struct PlanRevealView: View {
             VStack(spacing: 6) {
                 Text(L10n.tr("Your Plan is Ready"))
                     .font(.title.bold())
-                Text(profile.name.isEmpty ? L10n.tr("Start Session 1 now. STRQ will tune the rest from real training.") : L10n.format("%@, start Session 1 now. STRQ will tune the rest from real training.", profile.name))
+                Text(profile.name.isEmpty ? L10n.tr("Start Workout 1 now. STRQ will tune the rest from real training.") : L10n.format("%@, start Workout 1 now. STRQ will tune the rest from real training.", profile.name))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -119,16 +119,16 @@ struct PlanRevealView: View {
 
             HStack(spacing: 0) {
                 overviewStat(value: Double(plan.days.count), suffix: "", label: L10n.tr("Days/Week"), icon: "calendar")
-                overviewStat(value: Double(profile.minutesPerSession), suffix: "m", label: L10n.tr("Per Session"), icon: "clock")
+                overviewStat(value: Double(profile.minutesPerSession), suffix: "m", label: L10n.tr("Per Workout"), icon: "clock")
                 overviewStat(value: Double(plan.durationWeeks), suffix: "wk", label: L10n.tr("Duration"), icon: "repeat")
                 overviewStat(value: Double(totalExerciseCount), suffix: "", label: L10n.tr("Exercises"), icon: "figure.strengthtraining.traditional")
             }
         }
         .padding(18)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 18))
+        .background(Color.white.opacity(0.055), in: .rect(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
         )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 16)
@@ -395,7 +395,7 @@ struct PlanRevealView: View {
                     onStart()
                 } label: {
                     HStack(spacing: 10) {
-                        Text(L10n.tr("Start Session 1"))
+                        Text(L10n.tr("Start Workout 1"))
                             .font(.body.weight(.bold))
                         Image(systemName: "arrow.right")
                             .font(.subheadline.weight(.bold))
@@ -404,11 +404,11 @@ struct PlanRevealView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
                     .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
-                    .shadow(color: .white.opacity(0.1), radius: 14, y: 3)
+                    .shadow(color: .white.opacity(0.16), radius: 16, y: 4)
                 }
                 .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: showQuality)
 
-                Text(L10n.tr("You'll go straight into today's session. You can fine-tune the plan later in Train."))
+                Text(L10n.tr("You'll go straight into today's workout. You can fine-tune the plan later in Train."))
                     .font(.caption2)
                     .foregroundStyle(.white.opacity(0.35))
             }
@@ -439,14 +439,14 @@ struct PlanRevealView: View {
             VStack(spacing: 0) {
                 roadmapRow(
                     index: 1,
-                    title: L10n.tr("Start Session 1"),
+                    title: L10n.tr("Start Workout 1"),
                     detail: L10n.tr("Train normally. STRQ sets your real baseline from this workout."),
                     isLast: false
                 )
                 roadmapRow(
                     index: 2,
-                    title: L10n.tr("Come back for Session 2"),
-                    detail: L10n.tr("Progression starts once STRQ sees your first-session data."),
+                    title: L10n.tr("Come back for Workout 2"),
+                    detail: L10n.tr("Progression starts once STRQ sees your first-workout data."),
                     isLast: false
                 )
                 roadmapRow(
@@ -458,7 +458,7 @@ struct PlanRevealView: View {
             }
         }
         .padding(18)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 18))
+        .background(Color.white.opacity(0.055), in: .rect(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)

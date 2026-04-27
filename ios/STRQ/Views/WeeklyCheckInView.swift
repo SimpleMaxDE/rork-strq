@@ -118,7 +118,7 @@ struct WeeklyCheckInView: View {
                 VStack(spacing: 2) {
                     Text("\(review.summary.completedWorkouts)/\(review.summary.plannedWorkouts)")
                         .font(.title2.bold())
-                    Text(L10n.tr("Sessions"))
+                    Text(L10n.tr("Workouts"))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }

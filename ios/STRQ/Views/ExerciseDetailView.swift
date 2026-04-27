@@ -375,7 +375,7 @@ struct ExerciseDetailView: View {
                 Image(systemName: g.icon)
                     .font(.caption)
                     .foregroundStyle(color)
-                Text(L10n.tr("NEXT SESSION"))
+                Text(L10n.tr("NEXT WORKOUT"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.secondary)
                     .tracking(0.5)
@@ -436,7 +436,7 @@ struct ExerciseDetailView: View {
                         .font(.caption.weight(.semibold))
                 }
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(L10n.tr("Sessions"))
+                    Text(L10n.tr("Workouts"))
                         .font(.system(size: 9, weight: .medium))
                         .foregroundStyle(.tertiary)
                     Text("\(prog.sessionCount)")

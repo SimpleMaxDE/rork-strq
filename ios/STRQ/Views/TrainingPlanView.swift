@@ -37,7 +37,7 @@ struct TrainingPlanView: View {
                         Button {
                             showSessionEditor = true
                         } label: {
-                            Label(L10n.tr("Edit Session"), systemImage: "slider.horizontal.3")
+                            Label(L10n.tr("Edit Workout"), systemImage: "slider.horizontal.3")
                         }
                     }
                     Button {
@@ -749,7 +749,7 @@ struct TrainingPlanView: View {
         switch type {
         case .volumeReduced: return L10n.tr("Volume Reduced")
         case .exerciseSwapped: return L10n.tr("Exercise Swapped")
-        case .lighterSession: return L10n.tr("Lighter Session")
+        case .lighterSession: return L10n.tr("Lighter Workout")
         case .weekRegenerated: return L10n.tr("Week Regenerated")
         case .deloadWeek: return L10n.tr("Deload Week")
         }

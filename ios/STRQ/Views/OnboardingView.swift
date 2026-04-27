@@ -235,7 +235,7 @@ struct OnboardingView: View {
             Spacer()
             VStack(spacing: 14) {
                 welcomeFeatureRow(icon: "slider.horizontal.3", text: L10n.tr("Calibrated to your body, goal, and schedule"))
-                welcomeFeatureRow(icon: "chart.line.uptrend.xyaxis", text: L10n.tr("Progression that adapts after every session"))
+                welcomeFeatureRow(icon: "chart.line.uptrend.xyaxis", text: L10n.tr("Progression that adapts after every workout"))
                 welcomeFeatureRow(icon: "waveform.path.ecg", text: L10n.tr("Recovery-aware. No guesswork on load or volume"))
             }
             .padding(.horizontal, 24)
@@ -476,7 +476,7 @@ struct OnboardingView: View {
                     }
                 }
 
-                fieldGroup(L10n.tr("Session length")) {
+                fieldGroup(L10n.tr("Workout length")) {
                     let presets = [30, 45, 60, 75, 90, 120]
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 6), GridItem(.flexible(), spacing: 6), GridItem(.flexible(), spacing: 6)], spacing: 6) {
                         ForEach(presets, id: \.self) { m in

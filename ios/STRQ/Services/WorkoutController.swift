@@ -62,8 +62,9 @@ final class WorkoutController {
         let exerciseLogs = day.exercises.map { planned -> ExerciseLog in
             let today = vm.todayPrescription(for: planned)
             let prefillWeight = today.suggestedWeight
+            let prefillReps = defaultReps(for: planned, suggestedRange: today.suggestedRepRange)
             let setCount = max(1, today.suggestedSets)
-            let sets = (1...setCount).map { SetLog(setNumber: $0, weight: prefillWeight) }
+            let sets = (1...setCount).map { SetLog(setNumber: $0, weight: prefillWeight, reps: prefillReps) }
             return ExerciseLog(exerciseId: planned.exerciseId, sets: sets)
         }
         vm.activeWorkout = ActiveWorkoutState(
@@ -215,7 +216,8 @@ final class WorkoutController {
         let today = vm.todayPrescription(for: newPlanned)
         let setCount = max(1, today.suggestedSets)
         let prefill = today.suggestedWeight
-        let sets = (1...setCount).map { SetLog(setNumber: $0, weight: prefill) }
+        let prefillReps = defaultReps(for: newPlanned, suggestedRange: today.suggestedRepRange)
+        let sets = (1...setCount).map { SetLog(setNumber: $0, weight: prefill, reps: prefillReps) }
         let oldLog = workout.session.exerciseLogs[exerciseIndex]
         var newLog = ExerciseLog(exerciseId: newExercise.id, sets: sets)
         if oldLog.sets.allSatisfy({ !$0.isCompleted }) == false {
@@ -255,6 +257,7 @@ final class WorkoutController {
         guard var workout = vm.activeWorkout,
               exerciseIndex < workout.session.exerciseLogs.count,
               setIndex < workout.session.exerciseLogs[exerciseIndex].sets.count else { return 0 }
+        guard workout.session.exerciseLogs[exerciseIndex].sets[setIndex].reps > 0 else { return 0 }
 
         let undo = PendingSetUndo(
             exerciseIndex: exerciseIndex,
@@ -475,5 +478,17 @@ final class WorkoutController {
             self.vm.persist()
             self.pendingPersistenceTask = nil
         }
+    }
+
+    private func defaultReps(for planned: PlannedExercise, suggestedRange: String? = nil) -> Int {
+        parseTopReps(suggestedRange) ?? parseTopReps(planned.reps) ?? 8
+    }
+
+    private func parseTopReps(_ reps: String?) -> Int? {
+        guard let reps else { return nil }
+        let numbers = reps
+            .split(whereSeparator: { !$0.isNumber })
+            .compactMap { Int($0) }
+        return numbers.max()
     }
 }

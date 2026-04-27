@@ -325,7 +325,7 @@ struct DashboardView: View {
             }
         case .startFirstSession:
             if let day = vm.todaysWorkout ?? vm.nextWorkout {
-                ForgePrimaryButton(icon: "sparkles", title: L10n.tr("Start Session 1")) {
+                ForgePrimaryButton(icon: "sparkles", title: L10n.tr("Start Workout 1")) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
             }
@@ -391,9 +391,21 @@ struct DashboardView: View {
     }
 
     private func postWorkoutStatsText(exercises: Int, sets: Int) -> String {
-        let exerciseWord = L10n.tr(exercises == 1 ? "exercise.singular" : "exercise.plural")
-        let setWord = L10n.tr(sets == 1 ? "set.singular" : "set.plural")
-        return L10n.format("%d %@ · %d %@", exercises, exerciseWord, sets, setWord)
+        let exerciseText = L10n.countLabel(
+            exercises,
+            singularKey: "count.exercise.one",
+            pluralKey: "count.exercise.other",
+            singularFallback: "exercise",
+            pluralFallback: "exercises"
+        )
+        let setText = L10n.countLabel(
+            sets,
+            singularKey: "count.set.one",
+            pluralKey: "count.set.other",
+            singularFallback: "set",
+            pluralFallback: "sets"
+        )
+        return "\(exerciseText) · \(setText)"
     }
 
     private func postWorkoutBridgeCard(_ bridge: PostWorkoutBridge) -> some View {
@@ -431,7 +443,7 @@ struct DashboardView: View {
             }
         }
         .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.105), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -480,7 +492,7 @@ struct DashboardView: View {
 
     private func postWorkoutNextStep() -> String {
         if vm.dataMaturityTier == .firstSession {
-            return L10n.tr("Session 2 is the next signal that matters.")
+            return L10n.tr("Workout 2 is the next signal that matters.")
         }
         if let title = vm.dailyBriefing?.primary.title {
             return title
@@ -769,9 +781,9 @@ struct DashboardView: View {
         case .resumeWorkout:
             return L10n.tr("Resume Workout")
         case .startFirstSession:
-            return L10n.tr("Start Session 1")
+            return L10n.tr("Start Workout 1")
         case .recoverToday:
-            return L10n.tr("Start Light Session")
+            return L10n.tr("Start Light Workout")
         default:
             return L10n.tr("Start Workout")
         }
@@ -1055,7 +1067,7 @@ struct DashboardView: View {
 
             if showWeekPulseDetails {
                 HStack(spacing: 12) {
-                    ForgeStatCell(value: "\(vm.weeklyStats.sessions)/\(vm.profile.daysPerWeek)", label: L10n.tr("Sessions"))
+                    ForgeStatCell(value: "\(vm.weeklyStats.sessions)/\(vm.profile.daysPerWeek)", label: L10n.tr("Workouts"))
                     ForgeStatCell(value: ForgeTheme.formatVolume(vm.weeklyStats.volume), label: L10n.tr("Volume"))
                     ForgeStatCell(value: "\(vm.effectiveRecoveryScore)%", label: L10n.tr("Recovery"), valueColor: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
                 }

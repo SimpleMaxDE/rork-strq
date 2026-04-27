@@ -18,7 +18,7 @@ struct SessionEditorSheet: View {
         NavigationStack {
             if let day = day {
                 content(for: day)
-                    .navigationTitle(L10n.tr("Edit Session"))
+                    .navigationTitle(L10n.tr("Edit Workout"))
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
@@ -805,10 +805,10 @@ struct AddExerciseSheet: View {
                                 Image(systemName: "sparkles")
                                     .font(.system(size: 10))
                                     .foregroundStyle(STRQBrand.steel)
-                                Text(L10n.tr("Fits this session"))
+                                Text(L10n.tr("Fits this workout"))
                             }
                         } footer: {
-                            Text(L10n.tr("Suggestions based on this session's focus muscles and gaps."))
+                            Text(L10n.tr("Suggestions based on this workout's focus muscles and gaps."))
                                 .font(.caption2)
                         }
                     }

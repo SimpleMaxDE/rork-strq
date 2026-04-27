@@ -40,7 +40,7 @@ struct ComebackCard: View {
                 .tracking(1.2)
                 .foregroundStyle(tint)
             Spacer()
-            Text("\(guidance.daysSinceLastWorkout)D SINCE LAST SESSION")
+            Text(L10n.format("%dD SINCE LAST WORKOUT", guidance.daysSinceLastWorkout))
                 .font(.system(size: 9, weight: .bold).monospacedDigit())
                 .tracking(0.6)
                 .foregroundStyle(STRQBrand.steel)
@@ -123,7 +123,7 @@ struct ComebackCard: View {
                     HStack(spacing: 6) {
                         Image(systemName: "leaf.arrow.triangle.circlepath")
                             .font(.caption)
-                        Text(L10n.tr("Ease next session"))
+                        Text(L10n.tr("Ease next workout"))
                             .font(.subheadline.weight(.bold))
                             .lineLimit(1)
                     }

@@ -104,7 +104,7 @@ struct PreWorkoutHandoffView: View {
                 .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1), value: appeared)
 
                 VStack(spacing: 6) {
-                    Text(L10n.tr("TODAY'S SESSION"))
+                    Text(L10n.tr("TODAY'S WORKOUT"))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(STRQBrand.steel)
                         .tracking(1.5)
@@ -225,7 +225,7 @@ struct PreWorkoutHandoffView: View {
     private var exercisePreviewList: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(L10n.tr("SESSION PLAN"))
+                Text(L10n.tr("WORKOUT PLAN"))
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
@@ -310,7 +310,7 @@ struct PreWorkoutHandoffView: View {
                 Image(systemName: "brain.head.profile.fill")
                     .font(.caption)
                     .foregroundStyle(STRQBrand.steel)
-                Text(L10n.tr("WHY THIS SESSION"))
+                Text(L10n.tr("WHY THIS WORKOUT"))
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)

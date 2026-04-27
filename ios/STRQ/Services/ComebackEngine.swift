@@ -164,9 +164,9 @@ nonisolated struct ComebackEngine: Sendable {
         case .pause:
             let detail: String
             if hasWorkoutToday {
-                detail = "You missed a couple of days. Today's session is still the right move — run it as planned and let the rhythm rebuild itself."
+                detail = "You missed a couple of days. Today's workout is still the right move — run it as planned and let the rhythm rebuild itself."
             } else if hasNextScheduledWorkout {
-                detail = "It's been \(days) days. No reset needed — your next scheduled session picks the plan right back up."
+                detail = "It's been \(days) days. No reset needed — your next scheduled workout picks the plan right back up."
             } else {
                 detail = "It's been \(days) days. A short session or a check-in tonight is enough to keep the plan honest."
             }

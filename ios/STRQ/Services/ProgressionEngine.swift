@@ -252,8 +252,8 @@ struct ProgressionEngine {
 
         if recoveryScore < 55 {
             return NextBestAction(
-                title: L10n.tr("progression.nextBestAction.lighterSession.title", fallback: "Go Lighter Next Session"),
-                explanation: L10n.tr("progression.nextBestAction.lighterSession.explanation", fallback: "Fatigue is accumulating. A lighter session maintains your training rhythm while protecting recovery."),
+                title: L10n.tr("progression.nextBestAction.lighterSession.title", fallback: "Go Lighter Next Workout"),
+                explanation: L10n.tr("progression.nextBestAction.lighterSession.explanation", fallback: "Fatigue is accumulating. A lighter workout maintains your training rhythm while protecting recovery."),
                 icon: "arrow.down.circle",
                 colorName: "orange",
                 confidence: 0.85,

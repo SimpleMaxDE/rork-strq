@@ -163,11 +163,11 @@ nonisolated enum WorkoutHighlightBuilder {
                 out.append(WorkoutHighlight(
                     kind: positive ? .volumeUp : .volumeDown,
                     title: positive ? L10n.tr("Volume Up") : L10n.tr("Volume Down"),
-                    subtitle: L10n.tr("vs last session"),
+                    subtitle: L10n.tr("vs last workout"),
                     valuePrimary: L10n.format("%@%.0f kg", positive ? "+" : "", delta),
                     valueSecondary: L10n.format("%@%.0f%%", positive ? "+" : "", pct * 100),
                     score: score,
-                    improvedLine: positive ? L10n.tr("Most volume in recent sessions") : nil
+                    improvedLine: positive ? L10n.tr("Most volume in recent workouts") : nil
                 ))
             }
         } else if previous == nil {
@@ -179,7 +179,7 @@ nonisolated enum WorkoutHighlightBuilder {
                 valuePrimary: L10n.format("%.0f kg", session.totalVolume),
                 valueSecondary: L10n.tr("total volume"),
                 score: 700,
-                improvedLine: L10n.tr("First session logged — baseline set")
+                improvedLine: L10n.tr("First workout logged — baseline set")
             ))
         }
 
@@ -209,7 +209,7 @@ nonisolated enum WorkoutHighlightBuilder {
             if duration >= previousLongest && duration > 30 && previousLongest > 0 {
                 out.append(WorkoutHighlight(
                     kind: .longestSession,
-                    title: L10n.tr("Longest Session"),
+                    title: L10n.tr("Longest Workout"),
                     subtitle: L10n.tr("new personal best"),
                     valuePrimary: L10n.format("%d min", duration),
                     valueSecondary: L10n.format("prev %d min", previousLongest),
@@ -274,25 +274,25 @@ nonisolated enum WorkoutHighlightBuilder {
             case .personalRecord:
                 return SessionVerdict(kind: .personalRecord, eyebrow: L10n.tr("NEW PERSONAL RECORD"), summary: top.improvedLine ?? L10n.tr("New PR set"))
             case .bestSet:
-                return SessionVerdict(kind: .bestSet, eyebrow: L10n.tr("BEST SET"), summary: top.improvedLine ?? L10n.tr("Beat your last session"))
+                return SessionVerdict(kind: .bestSet, eyebrow: L10n.tr("BEST SET"), summary: top.improvedLine ?? L10n.tr("Beat your last workout"))
             case .volumeUp:
                 return SessionVerdict(kind: .volumeUp, eyebrow: L10n.tr("VOLUME UP"), summary: top.improvedLine ?? L10n.tr("More work than last time"))
             case .volumeDown:
-                return SessionVerdict(kind: .volumeDown, eyebrow: L10n.tr("SESSION LOGGED"), summary: L10n.tr("Lighter day — quality over load"))
+                return SessionVerdict(kind: .volumeDown, eyebrow: L10n.tr("WORKOUT LOGGED"), summary: L10n.tr("Lighter day — quality over load"))
             case .firstTime:
-                return SessionVerdict(kind: .firstSession, eyebrow: L10n.tr("FIRST SESSION"), summary: top.improvedLine ?? L10n.tr("Baseline set"))
+                return SessionVerdict(kind: .firstSession, eyebrow: L10n.tr("FIRST WORKOUT"), summary: top.improvedLine ?? L10n.tr("Baseline set"))
             case .consolidation:
                 return SessionVerdict(kind: .consolidated, eyebrow: L10n.tr("CONSOLIDATED"), summary: top.improvedLine ?? L10n.tr("Technique held"))
             case .longestSession, .streakMilestone, .setsMilestone:
-                return SessionVerdict(kind: .bestSet, eyebrow: L10n.tr("SESSION LOGGED"), summary: L10n.tr("Work put in"))
+                return SessionVerdict(kind: .bestSet, eyebrow: L10n.tr("WORKOUT LOGGED"), summary: L10n.tr("Work put in"))
             }
         }
         // No highlights — still reasonable summary
         let previous = history.filter { $0.id != session.id && $0.isCompleted }.first
         if previous == nil {
-            return SessionVerdict(kind: .firstSession, eyebrow: L10n.tr("FIRST SESSION"), summary: L10n.tr("Baseline set"))
+            return SessionVerdict(kind: .firstSession, eyebrow: L10n.tr("FIRST WORKOUT"), summary: L10n.tr("Baseline set"))
         }
-        return SessionVerdict(kind: .consolidated, eyebrow: L10n.tr("SESSION LOGGED"), summary: L10n.tr("Session in the bank"))
+        return SessionVerdict(kind: .consolidated, eyebrow: L10n.tr("WORKOUT LOGGED"), summary: L10n.tr("Workout in the bank"))
     }
 
     // MARK: - Helpers

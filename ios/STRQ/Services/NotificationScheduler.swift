@@ -120,7 +120,7 @@ final class NotificationScheduler {
             ), todaysReminder > now, calendar.isDateInToday(todaysReminder) {
                 let content = UNMutableNotificationContent()
                 content.title = input.isEarlyStage
-                    ? L10n.tr("Your session is ready")
+                    ? L10n.tr("Your workout is ready")
                     : L10n.format("notification.workout.today.title", workoutName)
                 content.body = buildWorkoutBody(input: input, workoutName: workoutName)
                 content.sound = .default

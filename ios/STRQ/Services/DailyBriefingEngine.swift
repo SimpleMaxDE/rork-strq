@@ -194,8 +194,8 @@ nonisolated struct DailyBriefingEngine: Sendable {
             return .init(
                 kind: .startFirstSession,
                 eyebrow: L10n.tr("LET'S BEGIN"),
-                title: L10n.tr("Start your first session"),
-                detail: L10n.tr("STRQ calibrates from what you actually lift. Log session one to unlock real coaching."),
+                title: L10n.tr("Start your first workout"),
+                detail: L10n.tr("STRQ calibrates from what you actually lift. Log workout one to unlock real coaching."),
                 icon: "sparkles",
                 colorName: "green",
                 ctaTitle: L10n.tr("Begin")
@@ -220,10 +220,10 @@ nonisolated struct DailyBriefingEngine: Sendable {
                     kind: .recoverToday,
                     eyebrow: L10n.tr("RECOVERY FIRST"),
                     title: L10n.tr("Keep it light today"),
-                    detail: L10n.tr("Readiness is low. A shorter, lighter session beats a grind you can't absorb."),
+                    detail: L10n.tr("Readiness is low. A shorter, lighter workout beats a grind you can't absorb."),
                     icon: "heart.circle.fill",
                     colorName: "orange",
-                    ctaTitle: L10n.tr("Open lighter session")
+                    ctaTitle: L10n.tr("Open lighter workout")
                 )
             }
             if !i.hasCheckedInToday && i.hour < 12 {
@@ -242,10 +242,10 @@ nonisolated struct DailyBriefingEngine: Sendable {
                 kind: .trainToday,
                 eyebrow: L10n.tr("TRAINING DAY"),
                 title: L10n.format("Train %@", name),
-                detail: L10n.format("Today's session is ready%@. Warm up well, lead with the anchor lifts.", focusBit),
+                detail: L10n.format("Today's workout is ready%@. Warm up well, lead with the anchor lifts.", focusBit),
                 icon: "bolt.fill",
                 colorName: "green",
-                ctaTitle: L10n.tr("Start session")
+                ctaTitle: L10n.tr("Start workout")
             )
         }
 
@@ -268,10 +268,10 @@ nonisolated struct DailyBriefingEngine: Sendable {
                 kind: .prepNextSession,
                 eyebrow: L10n.tr("RECOVERY DAY"),
                 title: L10n.format("Prep for %@", next),
-                detail: L10n.format("Next session is %@. Sleep, protein, and a short walk set you up to push.", when),
+                detail: L10n.format("Next workout is %@. Sleep, protein, and a short walk set you up to push.", when),
                 icon: "calendar.badge.clock",
                 colorName: "blue",
-                ctaTitle: L10n.tr("Preview session")
+                ctaTitle: L10n.tr("Preview workout")
             )
         }
 
@@ -279,10 +279,10 @@ nonisolated struct DailyBriefingEngine: Sendable {
             kind: .recoveryDay,
             eyebrow: L10n.tr("RECOVERY DAY"),
             title: L10n.tr("Let recovery do its job"),
-            detail: L10n.tr("No session planned. Light movement, protein, and sleep will compound everything you've already banked."),
+            detail: L10n.tr("No workout planned. Light movement, protein, and sleep will compound everything you've already banked."),
             icon: "leaf.fill",
             colorName: "green",
-            ctaTitle: nil != i.lastCompletedSessionName ? L10n.tr("Review last session") : L10n.tr("View plan")
+            ctaTitle: nil != i.lastCompletedSessionName ? L10n.tr("Review last workout") : L10n.tr("View plan")
         )
     }
 
@@ -342,7 +342,7 @@ nonisolated struct DailyBriefingEngine: Sendable {
         if i.effectiveRecoveryScore < 60 {
             lines.append(("heart.fill", L10n.tr("Protect recovery"), L10n.tr("Stay hydrated, eat protein, keep movement light today.")))
         } else if let days = i.nextWorkoutInDays, days <= 1 {
-            lines.append(("bolt.fill", L10n.tr("Prime for the next push"), L10n.tr("Good sleep and a full protein day today = a stronger session.")))
+            lines.append(("bolt.fill", L10n.tr("Prime for the next push"), L10n.tr("Good sleep and a full protein day today = a stronger workout.")))
         }
         guard let first = lines.first else { return nil }
         return DailyBriefing.RestPrep(title: first.1, detail: first.2, icon: first.0)

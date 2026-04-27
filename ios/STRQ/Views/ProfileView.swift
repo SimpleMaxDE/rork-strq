@@ -224,10 +224,13 @@ struct ProfileView: View {
                 .font(.system(size: 9, weight: .semibold))
             Text(label)
                 .font(.system(size: 10, weight: .semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
         }
         .foregroundStyle(STRQBrand.steel)
         .padding(.horizontal, 8)
         .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
         .background(STRQBrand.steel.opacity(0.12), in: Capsule())
         .overlay(
             Capsule()
@@ -398,15 +401,15 @@ struct ProfileView: View {
                                 .foregroundStyle(.tertiary)
                         }
 
-                        HStack(spacing: 6) {
+                        HStack(spacing: 5) {
                             proPillarChip(icon: "brain.head.profile.fill", label: L10n.tr("Adaptive"))
                             proPillarChip(icon: "arrow.triangle.2.circlepath", label: L10n.tr("Evolving"))
                             proPillarChip(icon: "icloud.fill", label: L10n.tr("Sync"))
-                            proPillarChip(icon: "applewatch", label: L10n.tr("Watch"))
+                            proPillarChip(icon: "applewatch", label: L10n.tr("Apple Watch"))
                         }
                     }
                     .padding(14)
-                    .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+                    .background(Color(white: 0.105), in: .rect(cornerRadius: 14))
                     .overlay(
                         RoundedRectangle(cornerRadius: 14)
                             .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
@@ -453,6 +456,7 @@ struct ProfileView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Spacer()
         }
@@ -516,7 +520,7 @@ struct ProfileView: View {
             }
         }
         .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.105), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -538,7 +542,7 @@ struct ProfileView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 10)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 10))
+        .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 10))
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .strokeBorder(Color.white.opacity(0.06), lineWidth: 0.5)
@@ -553,7 +557,7 @@ struct ProfileView: View {
 
             VStack(spacing: 1) {
                 profileRow(L10n.tr("Days / Week"), value: "\(vm.profile.daysPerWeek)")
-                profileRow(L10n.tr("Session Length"), value: L10n.format("%d min", vm.profile.minutesPerSession))
+                profileRow(L10n.tr("Workout Length"), value: L10n.format("%d min", vm.profile.minutesPerSession))
                 profileRow(L10n.tr("Split"), value: vm.profile.splitPreference.displayName)
                 profileRow(L10n.tr("Location"), value: vm.profile.trainingLocation.displayName)
             }
@@ -814,9 +818,9 @@ struct ProfileView: View {
 
     private var profileHeaderSummary: String {
         if vm.isEarlyStage {
-            return L10n.tr("Your setup is locked in. STRQ is building its first read on your training rhythm.")
+            return L10n.tr("Setup locked. STRQ is learning your training rhythm.")
         }
-        return L10n.tr("Your coaching profile, recovery context, and continuity settings in one place.")
+        return L10n.tr("Coaching profile, recovery, and sync in one place.")
     }
 
     private var appVersionString: String {

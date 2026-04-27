@@ -73,10 +73,10 @@ struct ActiveWorkoutView: View {
                         }
                     }
                 }
-
-                if restTimerActive {
-                    restTimerOverlay(workout)
-                }
+                .blur(radius: restTimerActive ? 8 : 0)
+                .saturation(restTimerActive ? 0.45 : 1)
+                .opacity(restTimerActive ? 0.38 : 1)
+                .allowsHitTesting(!restTimerActive)
 
                 if let swapConfirmationText {
                     VStack {
@@ -96,11 +96,20 @@ struct ActiveWorkoutView: View {
                             .padding(.bottom, restTimerActive ? 28 : 92)
                     }
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(restTimerActive ? 4 : 1)
                 }
 
                 VStack {
                     Spacer()
                     bottomAction(workout)
+                }
+                .blur(radius: restTimerActive ? 8 : 0)
+                .opacity(restTimerActive ? 0.24 : 1)
+                .allowsHitTesting(!restTimerActive)
+
+                if restTimerActive {
+                    restTimerOverlay(workout)
+                        .zIndex(3)
                 }
             }
             .preferredColorScheme(.dark)
@@ -177,7 +186,7 @@ struct ActiveWorkoutView: View {
                 }
                 Button(L10n.tr("Keep Workout"), role: .cancel) { }
             } message: {
-                Text(L10n.tr("All logged sets for this session will be lost. This can't be undone."))
+                Text(L10n.tr("All logged sets for this workout will be lost. This can't be undone."))
             }
             .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.6), trigger: setCompletedTrigger)
             .sensoryFeedback(.success, trigger: swapFeedbackTrigger)
@@ -505,6 +514,7 @@ struct ActiveWorkoutView: View {
                 let exerciseForIncrement = vm.library.exercise(byId: log.exerciseId)
                 let increment = weightIncrement(for: exerciseForIncrement)
                 let isBodyweight = exerciseForIncrement?.category == .bodyweight || (exerciseForIncrement?.isBodyweight ?? false)
+                let canLogSet = setLog.reps > 0
 
                 VStack(spacing: 10) {
                     activeTaskHeader(
@@ -588,6 +598,7 @@ struct ActiveWorkoutView: View {
                     }
 
                     Button {
+                        guard canLogSet else { return }
                         completeSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex)
                     } label: {
                         HStack(spacing: 8) {
@@ -596,13 +607,31 @@ struct ActiveWorkoutView: View {
                             Text(L10n.format("Log Set %d", setLog.setNumber))
                                 .font(.body.weight(.heavy))
                         }
-                        .foregroundStyle(.black)
+                        .foregroundStyle(canLogSet ? .black : .white.opacity(0.42))
                         .frame(maxWidth: .infinity)
                         .frame(height: 46)
-                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 12))
-                        .shadow(color: .white.opacity(0.12), radius: 10, y: 2)
+                        .background(
+                            canLogSet
+                                ? AnyShapeStyle(STRQBrand.accentGradient)
+                                : AnyShapeStyle(Color.white.opacity(0.07)),
+                            in: .rect(cornerRadius: 12)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Color.white.opacity(canLogSet ? 0 : 0.08), lineWidth: 1)
+                        )
+                        .shadow(color: .white.opacity(canLogSet ? 0.12 : 0), radius: 10, y: 2)
                     }
                     .buttonStyle(.strqPressable)
+                    .disabled(!canLogSet)
+                    .accessibilityHint(canLogSet ? "" : L10n.tr("Add reps to log this set."))
+
+                    if !canLogSet {
+                        Text(L10n.tr("Add reps to log this set."))
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.48))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
                 .padding(.horizontal, 13)
                 .padding(.vertical, 12)
@@ -629,7 +658,7 @@ struct ActiveWorkoutView: View {
                     Text(isLastExercise ? L10n.tr("Last exercise complete") : L10n.tr("Exercise complete"))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
-                    Text(isLastExercise ? L10n.tr("Finish Workout when you're ready to save this session.") : L10n.tr("Move to the next exercise when you're ready."))
+                    Text(isLastExercise ? L10n.tr("Finish Workout when you're ready to save this workout.") : L10n.tr("Move to the next exercise when you're ready."))
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -1039,10 +1068,10 @@ struct ActiveWorkoutView: View {
                     .background(hasNote ? Color.white.opacity(0.06) : STRQBrand.steel.opacity(0.14), in: .rect(cornerRadius: 11))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(L10n.tr("Session Note"))
+                    Text(L10n.tr("Workout Note"))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
-                    Text(hasNote ? note : L10n.tr("Add one quick thought to remember how this session felt."))
+                    Text(hasNote ? note : L10n.tr("Add one quick thought to remember how this workout felt."))
                         .font(.footnote)
                         .foregroundStyle(hasNote ? .white.opacity(0.72) : .white.opacity(0.48))
                         .multilineTextAlignment(.leading)
@@ -1076,7 +1105,7 @@ struct ActiveWorkoutView: View {
             )
         }
         .buttonStyle(.strqPressable)
-        .accessibilityLabel(hasNote ? L10n.tr("Edit session note") : L10n.tr("Add session note"))
+        .accessibilityLabel(hasNote ? L10n.tr("Edit workout note") : L10n.tr("Add workout note"))
     }
 
     private struct PersonalBest {
@@ -1316,7 +1345,7 @@ struct ActiveWorkoutView: View {
             Group {
                 if allDone {
                     VStack(spacing: 10) {
-                        Text(L10n.tr("All sets are logged. Finish Workout to hand this session back to Today."))
+                        Text(L10n.tr("All sets are logged. Finish Workout to hand this workout back to Today."))
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(.white.opacity(0.7))
                             .multilineTextAlignment(.center)
@@ -1373,8 +1402,24 @@ struct ActiveWorkoutView: View {
         let progress = totalRest > 0 ? CGFloat(restTimeRemaining) / CGFloat(totalRest) : 0
 
         ZStack {
-            Color.black.opacity(0.84).ignoresSafeArea()
+            Color.black.opacity(0.80)
+                .ignoresSafeArea()
                 .onTapGesture { }
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .opacity(0.18)
+                .ignoresSafeArea()
+            LinearGradient(
+                colors: [
+                    Color.black.opacity(0.18),
+                    Color.black.opacity(0.02),
+                    Color.black.opacity(0.24)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
 
             VStack(spacing: 0) {
                 Spacer(minLength: 20)
@@ -1499,7 +1544,7 @@ struct ActiveWorkoutView: View {
                     }
 
                     HStack(spacing: 12) {
-                        restTimerAdjustmentButton(title: "−15s") {
+                        restTimerAdjustmentButton(title: L10n.tr("-15s")) {
                             let updatedTime = max(0, restTimeRemaining - 15)
                             restTimeRemaining = updatedTime
                             if updatedTime == 0 {
@@ -1521,7 +1566,7 @@ struct ActiveWorkoutView: View {
                         .buttonStyle(.strqPressable)
                         .accessibilityLabel(L10n.tr("Continue workout now"))
 
-                        restTimerAdjustmentButton(title: "+15s") {
+                        restTimerAdjustmentButton(title: L10n.tr("+15s")) {
                             restTimeRemaining += 15
                         }
                     }
@@ -1529,18 +1574,23 @@ struct ActiveWorkoutView: View {
                 .padding(20)
                 .frame(maxWidth: 380)
                 .background(
-                    LinearGradient(
-                        colors: [Color.white.opacity(0.08), Color.white.opacity(0.04)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
+                    Color(white: 0.075).opacity(0.96),
                     in: .rect(cornerRadius: 28)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 28)
-                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.11), Color.white.opacity(0.035)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .clipShape(.rect(cornerRadius: 28))
+                    .allowsHitTesting(false)
                 )
-                .shadow(color: .black.opacity(0.3), radius: 22, y: 12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28)
+                        .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.48), radius: 28, y: 16)
                 .padding(.horizontal, 20)
 
                 Spacer(minLength: 92)
@@ -1552,12 +1602,12 @@ struct ActiveWorkoutView: View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.78))
+                .foregroundStyle(.white.opacity(0.88))
                 .frame(width: 72, height: 46)
-                .background(Color.white.opacity(0.05), in: Capsule())
+                .background(Color.white.opacity(0.09), in: Capsule())
                 .overlay(
                     Capsule()
-                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                        .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
                 )
         }
         .buttonStyle(.strqPressable)
@@ -1936,6 +1986,10 @@ struct ActiveWorkoutView: View {
     }
 
     private func completeSet(exerciseIndex: Int, setIndex: Int) {
+        guard let workout,
+              exerciseIndex < workout.session.exerciseLogs.count,
+              setIndex < workout.session.exerciseLogs[exerciseIndex].sets.count,
+              workout.session.exerciseLogs[exerciseIndex].sets[setIndex].reps > 0 else { return }
         let prompt = undoPromptDetails(exerciseIndex: exerciseIndex, setIndex: setIndex)
         let rest = vm.completeCurrentSet(exerciseIndex: exerciseIndex, setIndex: setIndex)
         setCompletedTrigger.toggle()
@@ -2171,7 +2225,7 @@ private struct WorkoutNoteSheet: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
-                TextField(L10n.tr("How did this session feel?"), text: $draftNote, axis: .vertical)
+                TextField(L10n.tr("How did this workout feel?"), text: $draftNote, axis: .vertical)
                     .lineLimit(4...8)
                     .padding(14)
                     .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
@@ -2181,14 +2235,14 @@ private struct WorkoutNoteSheet: View {
                     )
                     .focused($focused)
 
-                Text(trimmedNote.isEmpty ? L10n.tr("Optional. Save a cue, win, or anything you want to remember next time.") : L10n.tr("This note stays attached to the saved session."))
+                Text(trimmedNote.isEmpty ? L10n.tr("Optional. Save a cue, win, or anything you want to remember next time.") : L10n.tr("This note stays attached to the saved workout."))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
 
                 Spacer(minLength: 0)
             }
             .padding(20)
-            .navigationTitle(L10n.tr("Session Note"))
+            .navigationTitle(L10n.tr("Workout Note"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {

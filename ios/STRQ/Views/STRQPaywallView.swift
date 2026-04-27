@@ -126,7 +126,7 @@ struct STRQPaywallView: View {
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text(L10n.tr("Adaptive plans, deeper progression reads, and every session safely carried across your devices."))
+                Text(L10n.tr("Adaptive plans, deeper progression reads, and every workout safely carried across your devices."))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -155,7 +155,7 @@ struct STRQPaywallView: View {
                 bullets: [
                     L10n.tr("Smart swaps that preserve the training role"),
                     L10n.tr("Weekly check-in that reasons about your week"),
-                    L10n.tr("Comeback guidance after missed sessions")
+                    L10n.tr("Comeback guidance after missed workouts")
                 ]
             ),
             Pillar(
@@ -299,7 +299,7 @@ struct STRQPaywallView: View {
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
                     label: L10n.tr("Progression"),
-                    free: L10n.tr("Per-session logging"),
+                    free: L10n.tr("Per-workout logging"),
                     pro: L10n.tr("Phase outlook & memory")
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)

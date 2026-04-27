@@ -174,8 +174,8 @@ struct ReadinessCheckInView: View {
             stepHeader(
                 title: hasWorkoutToday ? L10n.tr("One more check") : L10n.tr("Mindset check"),
                 subtitle: hasWorkoutToday
-                    ? L10n.tr("Motivation shapes intent. Pain reshapes the whole session.")
-                    : L10n.tr("A quick note so STRQ can tune recovery and next session.")
+                    ? L10n.tr("Motivation shapes intent. Pain reshapes the whole workout.")
+                    : L10n.tr("A quick note so STRQ can tune recovery and next workout.")
             )
 
             VStack(alignment: .leading, spacing: 10) {

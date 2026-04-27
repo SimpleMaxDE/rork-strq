@@ -18,7 +18,7 @@ struct WorkoutCompletionView: View {
         guard let session else {
             return WorkoutHighlightBuilder.Result(
                 highlights: [],
-                verdict: SessionVerdict(kind: .consolidated, eyebrow: L10n.tr("SESSION LOGGED"), summary: L10n.tr("Work put in"))
+                verdict: SessionVerdict(kind: .consolidated, eyebrow: L10n.tr("WORKOUT LOGGED"), summary: L10n.tr("Work put in"))
             )
         }
         return WorkoutHighlightBuilder.buildResult(
@@ -244,7 +244,7 @@ struct WorkoutCompletionView: View {
                 .frame(width: 28, height: 28)
                 .background(primaryAccent.opacity(0.14), in: .rect(cornerRadius: 8))
 
-            Text(L10n.tr("STRQ learned from this session."))
+            Text(L10n.tr("STRQ learned from this workout."))
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(.white.opacity(0.68))
                 .lineLimit(2)
@@ -279,13 +279,13 @@ struct WorkoutCompletionView: View {
         case 1:
             return .init(
                 headline: L10n.tr("Baseline locked in"),
-                detail: L10n.tr("STRQ now knows your starting loads. Session 2 switches on real progression calls."),
+                detail: L10n.tr("STRQ now knows your starting loads. Workout 2 switches on real progression calls."),
                 icon: "scalemass.fill"
             )
         case 2:
             return .init(
                 headline: L10n.tr("Progression is live"),
-                detail: L10n.tr("Coach can now adjust load and volume. One more session sharpens pattern reads."),
+                detail: L10n.tr("Coach can now adjust load and volume. One more workout sharpens pattern reads."),
                 icon: "chart.line.uptrend.xyaxis"
             )
         case 3:
@@ -395,7 +395,7 @@ struct WorkoutCompletionView: View {
         let items = nextSessionItems()
         if !items.isEmpty || nextDayName != nil {
             VStack(alignment: .leading, spacing: 10) {
-                sectionHeader(title: L10n.tr("NEXT SESSION"), count: nil)
+                sectionHeader(title: L10n.tr("NEXT WORKOUT"), count: nil)
 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(alignment: .center, spacing: 10) {
@@ -405,7 +405,7 @@ struct WorkoutCompletionView: View {
                             .frame(width: 28, height: 28)
                             .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 8))
                         VStack(alignment: .leading, spacing: 1) {
-                            Text(nextDayName ?? L10n.tr("Upcoming session"))
+                            Text(nextDayName ?? L10n.tr("Upcoming workout"))
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundStyle(.white)
                             Text(nextDaySubtitle)
@@ -518,7 +518,7 @@ struct WorkoutCompletionView: View {
             if h.kind == .personalRecord {
                 detail = L10n.tr("Confirmed progression — load up next time")
             } else {
-                detail = L10n.tr("Beat last session — push next time")
+                detail = L10n.tr("Beat last workout — push next time")
             }
             items.append(BridgeItem(
                 exerciseName: name,

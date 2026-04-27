@@ -19,7 +19,7 @@ enum STRQBrand {
         endPoint: .bottomTrailing
     )
     static let subtleGradient = LinearGradient(
-        colors: [Color.white.opacity(0.08), Color.white.opacity(0.02)],
+        colors: [Color.white.opacity(0.10), Color.white.opacity(0.03)],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
@@ -28,8 +28,8 @@ enum STRQBrand {
         startPoint: .leading,
         endPoint: .trailing
     )
-    static let cardBorder = Color.white.opacity(0.09)
-    static let cardElevated = Color(white: 0.13)
+    static let cardBorder = Color.white.opacity(0.12)
+    static let cardElevated = Color(white: 0.11)
 }
 
 enum ForgeTheme {
@@ -86,7 +86,7 @@ struct ForgeCard<Content: View>: View {
             content
                 .padding(14)
         }
-        .background(elevated ? STRQBrand.cardElevated : Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(elevated ? STRQBrand.cardElevated : Color(white: 0.105), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(elevated ? Color.white.opacity(0.12) : STRQBrand.cardBorder, lineWidth: 1)
@@ -206,7 +206,7 @@ struct ForgePrimaryButton: View {
                     .allowsHitTesting(false)
                 , alignment: .top
             )
-            .shadow(color: .white.opacity(0.08), radius: 12, y: 2)
+            .shadow(color: .white.opacity(0.13), radius: 14, y: 3)
         }
         .buttonStyle(.strqPressable)
     }

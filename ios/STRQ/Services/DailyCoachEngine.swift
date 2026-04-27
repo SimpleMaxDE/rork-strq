@@ -203,7 +203,7 @@ struct DailyCoachEngine {
         return ReadinessCoachResponse(
             headline: hasWorkout ? L10n.tr("Skip today") : L10n.tr("Rest & rebuild"),
             message: hasWorkout
-                ? L10n.tr("Multiple systems are flagged. Training today costs more than it pays. Move the session - STRQ will rebalance the week.")
+                ? L10n.tr("Multiple systems are flagged. Training today costs more than it pays. Move the workout - STRQ will rebalance the week.")
                 : L10n.tr("Multiple systems are flagged. Let today be about recovery. You'll come back measurably stronger."),
             icon: "bed.double.fill",
             colorName: "red",

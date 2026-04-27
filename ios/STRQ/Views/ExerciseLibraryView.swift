@@ -182,7 +182,7 @@ struct ExerciseLibraryView: View {
                             .foregroundStyle(.secondary)
                         if let p = progression {
                             Circle().fill(Color(.separator)).frame(width: 2, height: 2)
-                            Text(L10n.format("%d sessions", p.sessionCount))
+                            Text(L10n.format("%d workouts", p.sessionCount))
                                 .font(.system(size: 11))
                                 .foregroundStyle(.tertiary)
                         }
