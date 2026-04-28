@@ -62,38 +62,32 @@ struct PlanRevealView: View {
     }
 
     private var heroSection: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 22) {
             Spacer().frame(height: 24)
 
-            ZStack {
-                Circle()
-                    .fill(Color.white.opacity(0.04))
-                    .frame(width: 100, height: 100)
-                    .blur(radius: 20)
-                STRQSuccessPulse(size: 94, color: STRQBrand.steel, icon: "bolt.fill")
-                    .opacity(0.58)
-                STRQLogoView(size: 56, animated: true)
+            STRQPulseMark(size: 72, tint: STRQBrand.steel, line: .horizontal) {
+                Text("STRQ")
+                    .font(.system(size: 13, weight: .black, design: .default))
+                    .tracking(1.6)
+                    .foregroundStyle(.white)
             }
-            .scaleEffect(appeared ? 1 : 0.5)
+            .scaleEffect(appeared ? 1 : 0.82)
             .opacity(appeared ? 1 : 0)
             .animation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.5, dampingFraction: 0.7).delay(0.1), value: appeared)
 
             VStack(spacing: 6) {
                 Text(L10n.tr("Your Plan is Ready"))
-                    .font(.title.bold())
+                    .font(.system(size: 31, weight: .heavy, design: .rounded))
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
                 Text(profile.name.isEmpty ? L10n.tr("Start Workout 1 now. STRQ will tune the rest from real training.") : L10n.format("%@, start Workout 1 now. STRQ will tune the rest from real training.", profile.name))
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.58))
                     .multilineTextAlignment(.center)
             }
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 12)
             .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.2), value: appeared)
-
-            STRQCelebrationBadge(title: L10n.tr("Plan created"), icon: "checkmark.seal.fill", variant: .green)
-                .opacity(appeared ? 1 : 0)
-                .offset(y: appeared ? 0 : 8)
-                .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.32), value: appeared)
         }
     }
 
@@ -125,10 +119,10 @@ struct PlanRevealView: View {
             }
         }
         .padding(18)
-        .background(Color.white.opacity(0.055), in: .rect(cornerRadius: 18))
+        .background(Color(white: 0.105), in: .rect(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.14), lineWidth: 1)
         )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 16)
@@ -177,10 +171,10 @@ struct PlanRevealView: View {
             }
         }
         .padding(18)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 18))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
         )
     }
 
@@ -255,10 +249,10 @@ struct PlanRevealView: View {
             }
         }
         .padding(18)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 18))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
         )
         .opacity(showQuality ? 1 : 0)
         .offset(y: showQuality ? 0 : 16)
@@ -322,10 +316,10 @@ struct PlanRevealView: View {
             }
         }
         .padding(18)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 18))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
         )
     }
 
@@ -376,10 +370,10 @@ struct PlanRevealView: View {
             }
         }
         .padding(18)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 18))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
         )
         .opacity(showQuality ? 1 : 0)
         .offset(y: showQuality ? 0 : 12)
@@ -458,10 +452,10 @@ struct PlanRevealView: View {
             }
         }
         .padding(18)
-        .background(Color.white.opacity(0.055), in: .rect(cornerRadius: 18))
+        .background(Color(white: 0.105), in: .rect(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
         )
         .opacity(showDays ? 1 : 0)
         .offset(y: showDays ? 0 : 12)

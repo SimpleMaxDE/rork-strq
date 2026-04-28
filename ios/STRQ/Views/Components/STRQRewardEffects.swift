@@ -44,6 +44,161 @@ struct STRQSuccessPulse: View {
     }
 }
 
+struct STRQPulseMark<Content: View>: View {
+    enum EnergyLine: Equatable {
+        case none
+        case horizontal
+        case vertical
+    }
+
+    var size: CGFloat = 64
+    var tint: Color = STRQBrand.steel
+    var line: EnergyLine = .none
+    var trigger: Int = 0
+    let content: Content
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var pulse: Bool = false
+
+    init(
+        size: CGFloat = 64,
+        tint: Color = STRQBrand.steel,
+        line: EnergyLine = .none,
+        trigger: Int = 0,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.size = size
+        self.tint = tint
+        self.line = line
+        self.trigger = trigger
+        self.content = content()
+    }
+
+    var body: some View {
+        ZStack {
+            energyLine
+            ringStack
+
+            content
+                .frame(width: size * 0.72, height: size * 0.58)
+        }
+        .frame(width: frameWidth, height: frameHeight)
+        .onAppear(perform: runPulse)
+        .onChange(of: trigger) { _, _ in runPulse() }
+    }
+
+    private var frameWidth: CGFloat {
+        line == .horizontal ? size * 2.1 : size
+    }
+
+    private var frameHeight: CGFloat {
+        line == .vertical ? size * 2.1 : size
+    }
+
+    @ViewBuilder
+    private var energyLine: some View {
+        switch line {
+        case .horizontal:
+            Capsule()
+                .fill(lineGradient(start: .leading, end: .trailing))
+                .frame(width: size * 2.05, height: 1)
+                .overlay(
+                    Capsule()
+                        .fill(tint.opacity(0.14))
+                        .frame(height: 5)
+                        .blur(radius: 5)
+                )
+        case .vertical:
+            Capsule()
+                .fill(lineGradient(start: .top, end: .bottom))
+                .frame(width: 1, height: size * 2.05)
+                .overlay(
+                    Capsule()
+                        .fill(tint.opacity(0.14))
+                        .frame(width: 5)
+                        .blur(radius: 5)
+                )
+        case .none:
+            EmptyView()
+        }
+    }
+
+    private var ringStack: some View {
+        ZStack {
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [tint.opacity(0.18), Color.white.opacity(0.025), Color.clear],
+                        center: .center,
+                        startRadius: 1,
+                        endRadius: size * 0.62
+                    )
+                )
+
+            Circle()
+                .stroke(tint.opacity(reduceMotion ? 0.18 : (pulse ? 0 : 0.34)), lineWidth: 1.2)
+                .scaleEffect(reduceMotion ? 1.06 : (pulse ? 1.24 : 0.84))
+
+            Circle()
+                .stroke(
+                    AngularGradient(
+                        colors: [
+                            Color.white.opacity(0.04),
+                            tint.opacity(0.72),
+                            Color.white.opacity(0.24),
+                            tint.opacity(0.18),
+                            Color.white.opacity(0.04)
+                        ],
+                        center: .center
+                    ),
+                    lineWidth: 1.1
+                )
+
+            Circle()
+                .strokeBorder(Color.white.opacity(0.12), lineWidth: 0.8)
+        }
+        .frame(width: size, height: size)
+    }
+
+    private func lineGradient(start: UnitPoint, end: UnitPoint) -> LinearGradient {
+        LinearGradient(
+            colors: [
+                Color.clear,
+                tint.opacity(0.18),
+                Color.white.opacity(0.62),
+                tint.opacity(0.18),
+                Color.clear
+            ],
+            startPoint: start,
+            endPoint: end
+        )
+    }
+
+    private func runPulse() {
+        pulse = false
+        guard !reduceMotion else {
+            pulse = true
+            return
+        }
+        withAnimation(.easeOut(duration: 1.1)) {
+            pulse = true
+        }
+    }
+}
+
+extension STRQPulseMark where Content == EmptyView {
+    init(
+        size: CGFloat = 64,
+        tint: Color = STRQBrand.steel,
+        line: EnergyLine = .none,
+        trigger: Int = 0
+    ) {
+        self.init(size: size, tint: tint, line: line, trigger: trigger) {
+            EmptyView()
+        }
+    }
+}
+
 struct STRQCountUpText: View {
     let value: Double
     var duration: Double = 0.55

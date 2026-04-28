@@ -70,7 +70,7 @@ struct WorkoutCompletionView: View {
                     heroSection
                     primaryAchievementBadge
                     statsSection
-                    coachLearningLine
+                    whatChangedSection
                     activationRibbon
                     highlightsSection
                     nextSessionBridge
@@ -116,26 +116,9 @@ struct WorkoutCompletionView: View {
 
     private var heroSection: some View {
         VStack(spacing: 18) {
-            ZStack {
-                Circle()
-                    .fill(Color.white.opacity(0.04))
-                    .frame(width: 132, height: 132)
-                Circle()
-                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
-                    .frame(width: 132, height: 132)
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [primaryAccent.opacity(hasPR ? 0.32 : 0.22), Color.clear],
-                            center: .center,
-                            startRadius: 4,
-                            endRadius: 72
-                        )
-                    )
-                    .frame(width: 132, height: 132)
-
+            STRQPulseMark(size: 118, tint: primaryAccent, trigger: sparkTrigger) {
                 Image(systemName: verdictIcon)
-                    .font(.system(size: 50, weight: .semibold))
+                    .font(.system(size: 44, weight: .semibold))
                     .foregroundStyle(hasPR ? AnyShapeStyle(STRQPalette.goldGradient) : AnyShapeStyle(primaryAccent.gradient))
                     .scaleEffect(trophyPulse ? 1.04 : 1.0)
                     .animation(reduceMotion ? nil : .easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: trophyPulse)
@@ -222,10 +205,10 @@ struct WorkoutCompletionView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 14)
-                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
+                    .background(Color(white: 0.095), in: .rect(cornerRadius: 14))
                     .overlay(
                         RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
+                            .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
                     )
                 }
             }
@@ -236,32 +219,183 @@ struct WorkoutCompletionView: View {
         }
     }
 
-    private var coachLearningLine: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "brain.head.profile.fill")
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(primaryAccent)
-                .frame(width: 28, height: 28)
-                .background(primaryAccent.opacity(0.14), in: .rect(cornerRadius: 8))
+    private struct ChangedInsight: Identifiable {
+        let id = UUID()
+        let title: String
+        let detail: String?
+        let icon: String
+        let color: Color
+    }
 
-            Text(L10n.tr("STRQ learned from this workout."))
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.68))
-                .lineLimit(2)
+    @ViewBuilder
+    private var whatChangedSection: some View {
+        let insights = whatChangedInsights
+        if !insights.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    STRQPulseMark(size: 34, tint: primaryAccent) {
+                        Image(systemName: "waveform.path.ecg")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(primaryAccent)
+                    }
+
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(L10n.tr("STRQ learned"))
+                            .font(.system(size: 9, weight: .black))
+                            .tracking(1.1)
+                            .foregroundStyle(primaryAccent)
+                        Text(L10n.tr("What changed"))
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundStyle(.white)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+
+                VStack(spacing: 8) {
+                    ForEach(insights) { insight in
+                        whatChangedRow(insight)
+                    }
+                }
+            }
+            .padding(14)
+            .background(Color(white: 0.085), in: .rect(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(primaryAccent.opacity(0.22), lineWidth: 1)
+            )
+            .padding(.horizontal, 20)
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.45).delay(0.36), value: appeared)
+        }
+    }
+
+    private var whatChangedInsights: [ChangedInsight] {
+        guard let session else { return [] }
+        var insights: [ChangedInsight] = []
+
+        if let top = highlights.first {
+            insights.append(ChangedInsight(
+                title: top.improvedLine ?? top.title,
+                detail: top.valuePrimary,
+                icon: badgeIcon(for: top.kind),
+                color: primaryAccent
+            ))
+        }
+
+        if let focus = dominantFocus(for: session) {
+            let title = hasPreviousSignal(for: focus, before: session)
+                ? L10n.format("%@ volume updated", focus.localizedDisplayName)
+                : L10n.format("First %@ signal collected", focus.localizedDisplayName)
+            insights.append(ChangedInsight(
+                title: title,
+                detail: L10n.tr("Next targets will use this"),
+                icon: focus.symbolName,
+                color: STRQBrand.steel
+            ))
+        }
+
+        if let next = nextSessionItems().first {
+            insights.append(ChangedInsight(
+                title: L10n.tr("Next targets will adapt"),
+                detail: next.exerciseName,
+                icon: next.icon,
+                color: next.color
+            ))
+        }
+
+        let completedSets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
+        if insights.count < 2 && completedSets > 0 {
+            let setLabel = L10n.countLabel(
+                completedSets,
+                singularKey: "count.set.one",
+                pluralKey: "count.set.other",
+                singularFallback: "set",
+                pluralFallback: "sets"
+            )
+            insights.append(ChangedInsight(
+                title: L10n.format("%@ completed", setLabel),
+                detail: session.dayName,
+                icon: "checkmark.circle.fill",
+                color: STRQPalette.success
+            ))
+        }
+
+        if insights.count < 3 && session.totalVolume > 0 {
+            insights.append(ChangedInsight(
+                title: L10n.tr("Workout volume updated"),
+                detail: String(format: "%.0f kg", session.totalVolume),
+                icon: "chart.bar.fill",
+                color: STRQBrand.steel
+            ))
+        }
+
+        if insights.isEmpty {
+            insights.append(ChangedInsight(
+                title: L10n.tr("First signal collected"),
+                detail: L10n.tr("Next targets will use this"),
+                icon: "waveform.path.ecg",
+                color: STRQBrand.steel
+            ))
+        }
+
+        return Array(insights.prefix(3))
+    }
+
+    private func whatChangedRow(_ insight: ChangedInsight) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: insight.icon)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(insight.color)
+                .frame(width: 26, height: 26)
+                .background(insight.color.opacity(0.14), in: .rect(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(insight.title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                if let detail = insight.detail, !detail.isEmpty {
+                    Text(detail)
+                        .font(.system(size: 10.5, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.54))
+                        .lineLimit(1)
+                }
+            }
 
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 14))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
-        )
-        .padding(.horizontal, 20)
-        .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 10)
-        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.45).delay(0.36), value: appeared)
+        .padding(.vertical, 1)
+    }
+
+    private func dominantFocus(for session: WorkoutSession) -> MuscleGroup? {
+        var counts: [MuscleGroup: Int] = [:]
+        for log in session.exerciseLogs {
+            let completedSetCount = log.sets.filter(\.isCompleted).count
+            guard completedSetCount > 0, let exercise = vm.library.exercise(byId: log.exerciseId) else { continue }
+            counts[exercise.primaryMuscle, default: 0] += completedSetCount
+        }
+        return counts.max { lhs, rhs in lhs.value < rhs.value }?.key
+    }
+
+    private func hasPreviousSignal(for muscle: MuscleGroup, before session: WorkoutSession) -> Bool {
+        vm.workoutHistory.contains { historySession in
+            historySession.id != session.id &&
+            historySession.isCompleted &&
+            historySession.startTime < session.startTime &&
+            sessionFocusMuscles(historySession).contains(muscle)
+        }
+    }
+
+    private func sessionFocusMuscles(_ session: WorkoutSession) -> Set<MuscleGroup> {
+        var muscles: Set<MuscleGroup> = []
+        for log in session.exerciseLogs where log.sets.contains(where: \.isCompleted) {
+            if let exercise = vm.library.exercise(byId: log.exerciseId) {
+                muscles.insert(exercise.primaryMuscle)
+            }
+        }
+        return muscles
     }
 
     // MARK: - Highlights
@@ -639,10 +773,10 @@ struct WorkoutCompletionView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 14)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 12))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
         )
     }
 

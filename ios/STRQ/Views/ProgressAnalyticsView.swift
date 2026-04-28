@@ -18,7 +18,7 @@ struct ProgressAnalyticsView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 4)
 
-                whatChangedStrip
+                whatsImprovingCard
                     .padding(.horizontal, 16)
 
                 signalStrip
@@ -200,6 +200,159 @@ struct ProgressAnalyticsView: View {
             }
         }
         .padding(.top, 4)
+    }
+
+    // MARK: - What's Improving
+
+    private struct ImprovementSignal {
+        let title: String
+        let detail: String
+        let icon: String
+        let state: STRQPalette.State
+    }
+
+    private var whatsImprovingCard: some View {
+        let signal = strongestImprovementSignal
+        let tint = STRQPalette.color(for: signal.state)
+
+        return HStack(alignment: .center, spacing: 12) {
+            STRQPulseMark(size: 44, tint: tint) {
+                Image(systemName: signal.icon)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(tint)
+            }
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(L10n.tr("What's improving"))
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(1.1)
+                    .foregroundStyle(tint)
+                Text(signal.title)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                Text(signal.detail)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.58))
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(13)
+        .background(
+            LinearGradient(
+                colors: [Color(white: 0.13), Color(white: 0.075)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 16)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(tint.opacity(0.24), lineWidth: 1)
+        )
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 6)
+    }
+
+    private var strongestImprovementSignal: ImprovementSignal {
+        if vm.totalCompletedWorkouts < 3 {
+            let countLabel = vm.totalCompletedWorkouts == 1 ? L10n.tr("workout logged") : L10n.tr("workouts logged")
+            return ImprovementSignal(
+                title: L10n.tr("Clear trends appear after a few workouts."),
+                detail: "\(vm.totalCompletedWorkouts) \(countLabel)",
+                icon: "waveform.path.ecg",
+                state: .info
+            )
+        }
+
+        let calendar = Calendar.current
+        let now = Date()
+        let weekAgo = calendar.date(byAdding: .day, value: -7, to: now) ?? now
+        let twoWeeksAgo = calendar.date(byAdding: .day, value: -14, to: now) ?? now
+        let thisWeek = vm.workoutHistory.filter { $0.startTime > weekAgo && $0.isCompleted }
+        let lastWeek = vm.workoutHistory.filter { $0.startTime > twoWeeksAgo && $0.startTime <= weekAgo && $0.isCompleted }
+        let volumeThis = thisWeek.reduce(0.0) { $0 + $1.totalVolume }
+        let volumeLast = lastWeek.reduce(0.0) { $0 + $1.totalVolume }
+        let prsThisMonth = vm.personalRecords.filter { calendar.isDate($0.date, equalTo: now, toGranularity: .month) }.count
+        let progressing = vm.progressingExercises.count
+        let consistencyTarget = max(1, min(vm.profile.daysPerWeek, 4))
+
+        if prsThisMonth > 0 {
+            return ImprovementSignal(
+                title: prsThisMonth == 1 ? L10n.tr("PR this month") : L10n.tr("PRs this month"),
+                detail: L10n.format("%d this month", prsThisMonth),
+                icon: "trophy.fill",
+                state: .gold
+            )
+        }
+
+        if progressing > 0 {
+            return ImprovementSignal(
+                title: L10n.format(progressing == 1 ? "%d lift progressing" : "%d lifts progressing", progressing),
+                detail: L10n.tr("Strength signal is active"),
+                icon: "arrow.up.right.circle.fill",
+                state: .success
+            )
+        }
+
+        if volumeLast > 0 && volumeThis > volumeLast {
+            let pct = Int((volumeThis - volumeLast) / volumeLast * 100)
+            return ImprovementSignal(
+                title: L10n.format("Volume up %d%%", pct),
+                detail: L10n.tr("More work than last week"),
+                icon: "chart.line.uptrend.xyaxis",
+                state: .success
+            )
+        }
+
+        if vm.weeklyStats.sessions >= consistencyTarget {
+            return ImprovementSignal(
+                title: L10n.tr("Consistency is building"),
+                detail: L10n.format("%d workouts", vm.weeklyStats.sessions),
+                icon: "flame.fill",
+                state: .success
+            )
+        }
+
+        if let muscle = strongestMuscleThisWeek {
+            return ImprovementSignal(
+                title: L10n.format("%@ is your main focus", muscle.localizedDisplayName),
+                detail: L10n.tr("Primary focus this week"),
+                icon: muscle.symbolName,
+                state: .neutral
+            )
+        }
+
+        if vm.effectiveRecoveryScore >= 70 {
+            return ImprovementSignal(
+                title: L10n.tr("Recovery is supporting training"),
+                detail: L10n.format("%d%% recovery score", vm.effectiveRecoveryScore),
+                icon: "heart.fill",
+                state: .success
+            )
+        }
+
+        return ImprovementSignal(
+            title: L10n.tr("You're building momentum"),
+            detail: L10n.format("%d workouts", vm.totalCompletedWorkouts),
+            icon: "checkmark.seal.fill",
+            state: .neutral
+        )
+    }
+
+    private var strongestMuscleThisWeek: MuscleGroup? {
+        let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+        var counts: [MuscleGroup: Int] = [:]
+        for session in vm.workoutHistory where session.startTime > weekAgo && session.isCompleted {
+            for log in session.exerciseLogs {
+                let completedSetCount = log.sets.filter(\.isCompleted).count
+                guard completedSetCount > 0, let exercise = vm.library.exercise(byId: log.exerciseId) else { continue }
+                counts[exercise.primaryMuscle, default: 0] += completedSetCount
+            }
+        }
+        return counts.max { lhs, rhs in lhs.value < rhs.value }?.key
     }
 
     // MARK: - What Changed Strip

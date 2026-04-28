@@ -358,7 +358,7 @@ struct DashboardView: View {
         let sessionName: String
         let timeLabel: String
         let stats: String
-        let takeaway: String
+        let outcomes: [String]
         let nextStep: String
         let accent: Color
         let icon: String
@@ -383,7 +383,7 @@ struct DashboardView: View {
             sessionName: session.dayName,
             timeLabel: postWorkoutTimeLabel(minutesAgo),
             stats: postWorkoutStatsText(exercises: completedExercises, sets: completedSets),
-            takeaway: postWorkoutTakeaway(for: result.verdict.kind),
+            outcomes: postWorkoutOutcomes(session: session, result: result, completedSets: completedSets),
             nextStep: postWorkoutNextStep(),
             accent: postWorkoutAccent(for: result.verdict.kind),
             icon: postWorkoutIcon(for: result.verdict.kind)
@@ -409,62 +409,116 @@ struct DashboardView: View {
     }
 
     private func postWorkoutBridgeCard(_ bridge: PostWorkoutBridge) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 13) {
             HStack(spacing: 12) {
-                Image(systemName: bridge.icon)
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(bridge.accent)
-                    .frame(width: 34, height: 34)
-                    .background(bridge.accent.opacity(0.16), in: .rect(cornerRadius: 10))
+                STRQPulseMark(size: 38, tint: bridge.accent) {
+                    Image(systemName: bridge.icon)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(bridge.accent)
+                }
 
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 6) {
-                        Text(L10n.tr("JUST COMPLETED"))
+                        Text(L10n.tr("Workout saved"))
                             .font(.system(size: 9, weight: .black))
                             .tracking(1.1)
                             .foregroundStyle(bridge.accent)
                         Text(bridge.timeLabel)
                             .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.white.opacity(0.38))
                     }
                     Text(bridge.sessionName)
-                        .font(.subheadline.weight(.semibold))
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(.white)
                     Text(bridge.stats)
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.58))
                 }
 
                 Spacer(minLength: 0)
             }
 
-            VStack(alignment: .leading, spacing: 8) {
-                postWorkoutBridgeLine(label: L10n.tr("STRQ took"), text: bridge.takeaway)
-                postWorkoutBridgeLine(label: L10n.tr("Next"), text: bridge.nextStep)
+            VStack(alignment: .leading, spacing: 7) {
+                ForEach(Array(bridge.outcomes.prefix(2)), id: \.self) { outcome in
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(bridge.accent)
+                        Text(outcome)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.88))
+                            .lineLimit(1)
+                    }
+                }
+            }
+
+            Rectangle()
+                .fill(Color.white.opacity(0.08))
+                .frame(height: 1)
+
+            HStack(alignment: .top, spacing: 10) {
+                Text(L10n.tr("NEXT ACTION"))
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.9)
+                    .foregroundStyle(.white.opacity(0.42))
+                    .frame(width: 78, alignment: .leading)
+                Text(bridge.nextStep)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.88))
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
             }
         }
-        .padding(14)
-        .background(Color(white: 0.105), in: .rect(cornerRadius: 16))
+        .padding(15)
+        .background(
+            LinearGradient(
+                colors: [Color(white: 0.13), Color(white: 0.075)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 16)
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                .strokeBorder(bridge.accent.opacity(0.24), lineWidth: 1)
         )
+        .shadow(color: bridge.accent.opacity(0.12), radius: 16, y: 6)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 8)
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.06), value: appeared)
     }
 
-    private func postWorkoutBridgeLine(label: String, text: String) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Text(label.uppercased())
-                .font(.system(size: 9, weight: .black))
-                .tracking(0.8)
-                .foregroundStyle(.tertiary)
-                .frame(width: 60, alignment: .leading)
-            Text(text)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.primary)
-                .fixedSize(horizontal: false, vertical: true)
+    private func postWorkoutOutcomes(
+        session: WorkoutSession,
+        result: WorkoutHighlightBuilder.Result,
+        completedSets: Int
+    ) -> [String] {
+        var outcomes: [String] = []
+
+        if let line = result.highlights.first?.improvedLine {
+            outcomes.append(line)
         }
+
+        if completedSets > 0 {
+            let setLabel = L10n.countLabel(
+                completedSets,
+                singularKey: "count.set.one",
+                pluralKey: "count.set.other",
+                singularFallback: "set",
+                pluralFallback: "sets"
+            )
+            outcomes.append(L10n.format("%@ completed", setLabel))
+        }
+
+        if session.totalVolume > 0 && outcomes.count < 2 {
+            outcomes.append(L10n.format("Volume updated: %@", ForgeTheme.formatVolume(session.totalVolume)))
+        }
+
+        if outcomes.isEmpty {
+            outcomes.append(L10n.tr("First signal collected"))
+        }
+
+        return Array(outcomes.prefix(2))
     }
 
     private func postWorkoutTimeLabel(_ minutesAgo: Int) -> String {
@@ -492,7 +546,7 @@ struct DashboardView: View {
 
     private func postWorkoutNextStep() -> String {
         if vm.dataMaturityTier == .firstSession {
-            return L10n.tr("Workout 2 is the next signal that matters.")
+            return L10n.tr("Come back for Workout 2")
         }
         if let title = vm.dailyBriefing?.primary.title {
             return title
