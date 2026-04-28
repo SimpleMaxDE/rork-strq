@@ -70,9 +70,9 @@ enum STRQSurfaceVariant: Equatable {
 
     var cornerRadius: CGFloat {
         switch self {
-        case .standard: return 16
-        case .elevated: return 18
-        case .hero: return 22
+        case .standard: return 20
+        case .elevated: return 24
+        case .hero: return 24
         }
     }
 
@@ -149,19 +149,19 @@ struct STRQSurface<Content: View>: View {
         switch variant {
         case .standard:
             return LinearGradient(
-                colors: [STRQPalette.sandowCard, STRQPalette.sandowInset],
+                colors: [STRQPalette.sandowSurfaceElevated, STRQPalette.sandowSurface],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         case .elevated:
             return LinearGradient(
-                colors: [STRQPalette.sandowCardRaised, STRQPalette.sandowCard],
+                colors: [STRQPalette.sandowSurfaceHigh, STRQPalette.sandowSurfaceElevated],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         case .hero:
             return LinearGradient(
-                colors: [STRQPalette.sandowCardRaised, STRQPalette.sandowCard, STRQPalette.sandowInset],
+                colors: [STRQPalette.sandowSurfaceHigh, STRQPalette.sandowSurfaceElevated, STRQPalette.sandowSurface],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -181,8 +181,8 @@ struct STRQSurface<Content: View>: View {
 
     private var shadowRadius: CGFloat {
         switch variant {
-        case .standard: return 10
-        case .elevated: return 16
+        case .standard: return 12
+        case .elevated: return 18
         case .hero: return 24
         }
     }
@@ -206,12 +206,14 @@ struct STRQMetricTile: View {
     var compact: Bool = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: compact ? 5 : 8) {
+        VStack(alignment: .leading, spacing: compact ? 7 : 10) {
             if icon != nil || delta != nil {
                 HStack(spacing: 6) {
                     if let icon {
                         Image(systemName: icon)
-                            .font(.system(size: compact ? 10 : 11, weight: .bold))
+                            .font(.system(size: compact ? 11 : 14, weight: .bold))
+                            .frame(width: compact ? 28 : 34, height: compact ? 28 : 34)
+                            .background(tint.opacity(0.14), in: .rect(cornerRadius: compact ? 9 : 11))
                     }
                     Spacer(minLength: 0)
                     if let delta {
@@ -225,15 +227,14 @@ struct STRQMetricTile: View {
             }
 
             Text(value)
-                .font(.system(size: compact ? 18 : 22, weight: .heavy, design: .rounded).monospacedDigit())
+                .font(.system(size: compact ? 18 : 24, weight: .heavy, design: .rounded).monospacedDigit())
                 .foregroundStyle(STRQPalette.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.68)
 
-            Text(label.uppercased())
-                .font(.system(size: compact ? 8 : 9, weight: .black))
-                .tracking(0.8)
-                .foregroundStyle(STRQPalette.textMuted)
+            Text(label)
+                .font(.system(size: compact ? 10 : 12, weight: .semibold))
+                .foregroundStyle(STRQPalette.textSecondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
 
@@ -250,13 +251,13 @@ struct STRQMetricTile: View {
                 .frame(height: 4)
             }
         }
-        .frame(maxWidth: .infinity, minHeight: compact ? 58 : 76, alignment: .leading)
-        .padding(.horizontal, compact ? 10 : 12)
-        .padding(.vertical, compact ? 9 : 12)
-        .background(STRQPalette.sandowInset.opacity(compact ? 0.86 : 0.72), in: .rect(cornerRadius: compact ? 12 : 14))
+        .frame(maxWidth: .infinity, minHeight: compact ? 74 : 112, alignment: .leading)
+        .padding(.horizontal, compact ? 11 : 14)
+        .padding(.vertical, compact ? 10 : 14)
+        .background(STRQPalette.sandowSurface.opacity(compact ? 0.92 : 1), in: .rect(cornerRadius: compact ? 18 : 20))
         .overlay(
-            RoundedRectangle(cornerRadius: compact ? 12 : 14, style: .continuous)
-                .strokeBorder(tint.opacity(0.14), lineWidth: 1)
+            RoundedRectangle(cornerRadius: compact ? 18 : 20, style: .continuous)
+                .strokeBorder(STRQPalette.sandowBorder, lineWidth: 1)
         )
     }
 }
@@ -285,7 +286,7 @@ struct STRQBadgeChip: View {
 
         var fill: Color {
             switch self {
-            case .neutral: return Color.white.opacity(0.07)
+            case .neutral: return STRQPalette.sandowControl
             case .orange: return STRQPalette.sandowOrangeSoft
             case .ice: return STRQPalette.signalIceSoft
             case .violet: return STRQPalette.pulseVioletSoft
@@ -313,8 +314,8 @@ struct STRQBadgeChip: View {
                 .minimumScaleFactor(0.72)
         }
         .foregroundStyle(variant.tint)
-        .padding(.horizontal, 9)
-        .padding(.vertical, 5)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
         .background(variant.fill, in: Capsule())
         .overlay(
             Capsule()
@@ -341,18 +342,18 @@ struct STRQPrimaryCTA: View {
             .foregroundStyle(Color.white)
             .frame(maxWidth: .infinity)
             .frame(height: 54)
-            .background(STRQPalette.sandowOrange, in: .rect(cornerRadius: 15))
+            .background(STRQPalette.sandowOrange, in: .rect(cornerRadius: 18))
             .overlay(alignment: .top) {
-                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .fill(Color.white.opacity(0.12))
                     .frame(height: 26)
                     .allowsHitTesting(false)
             }
             .overlay(
-                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
             )
-            .shadow(color: Color.black.opacity(0.34), radius: 16, y: 8)
+            .shadow(color: STRQPalette.sandowShadow, radius: 16, y: 8)
         }
         .buttonStyle(.strqPressable)
     }
@@ -364,22 +365,49 @@ struct STRQSectionTitle: View {
     var tint: Color = STRQPalette.sandowOrange
 
     var body: some View {
-        HStack(spacing: 8) {
-            Capsule()
-                .fill(tint.gradient)
-                .frame(width: 3, height: 16)
-            Text(title.uppercased())
-                .font(.system(size: 11, weight: .black))
-                .tracking(1.0)
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(title)
+                .font(.system(size: 16, weight: .bold))
                 .foregroundStyle(STRQPalette.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
             Spacer()
             if let trailing {
                 Text(trailing)
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(STRQPalette.textMuted)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(tint)
                     .lineLimit(1)
             }
         }
+    }
+}
+
+struct STRQSectionHeader<Trailing: View>: View {
+    let title: String
+    let trailing: Trailing
+
+    init(_ title: String, @ViewBuilder trailing: () -> Trailing) {
+        self.title = title
+        self.trailing = trailing()
+    }
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 10) {
+            Text(title)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(STRQPalette.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
+            Spacer(minLength: 8)
+            trailing
+        }
+    }
+}
+
+extension STRQSectionHeader where Trailing == EmptyView {
+    init(_ title: String) {
+        self.title = title
+        self.trailing = EmptyView()
     }
 }
 
@@ -422,6 +450,36 @@ struct STRQMiniProgressRing<Content: View>: View {
         }
         .frame(width: size, height: size)
         .shadow(color: Color.black.opacity(0.22), radius: 12, y: 6)
+    }
+}
+
+struct STRQAchievementBadgeMark: View {
+    let icon: String
+    var tint: Color = STRQPalette.sandowOrange
+    var progress: Double = 1
+    var size: CGFloat = 64
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: size * 0.32, style: .continuous)
+                .fill(tint.opacity(0.16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: size * 0.32, style: .continuous)
+                        .strokeBorder(tint.opacity(0.32), lineWidth: 1)
+                )
+
+            Circle()
+                .trim(from: 0, to: min(max(progress, 0), 1))
+                .stroke(tint, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .padding(8)
+
+            Image(systemName: icon)
+                .font(.system(size: size * 0.32, weight: .black))
+                .foregroundStyle(tint)
+        }
+        .frame(width: size, height: size)
+        .shadow(color: tint.opacity(0.12), radius: 14, y: 8)
     }
 }
 
@@ -527,6 +585,65 @@ struct STRQDashboardHeroCard: View {
     }
 }
 
+struct STRQProgressRow: View {
+    let label: String
+    let value: String
+    var detail: String?
+    var icon: String = "waveform.path.ecg"
+    var progress: Double
+    var tint: Color = STRQPalette.sandowOrange
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(tint)
+                    .frame(width: 34, height: 34)
+                    .background(tint.opacity(0.14), in: .rect(cornerRadius: 11))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(label)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(STRQPalette.textPrimary)
+                        .lineLimit(1)
+                    if let detail {
+                        Text(detail)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(STRQPalette.textMuted)
+                            .lineLimit(1)
+                    }
+                }
+
+                Spacer(minLength: 8)
+
+                Text(value)
+                    .font(.system(size: 14, weight: .black, design: .rounded).monospacedDigit())
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.08))
+                    Capsule()
+                        .fill(tint)
+                        .frame(width: max(6, geo.size.width * min(max(progress, 0), 1)))
+                }
+            }
+            .frame(height: 7)
+        }
+        .padding(12)
+        .background(STRQPalette.sandowSurface.opacity(0.95), in: .rect(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .strokeBorder(STRQPalette.sandowBorder, lineWidth: 1)
+        )
+    }
+}
+
 struct STRQSignalBar: View {
     let label: String
     let value: String
@@ -536,58 +653,13 @@ struct STRQSignalBar: View {
     var tint: Color = STRQPalette.sandowOrange
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            HStack(spacing: 10) {
-                Image(systemName: icon)
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(tint)
-                    .frame(width: 28, height: 28)
-                    .background(tint.opacity(0.14), in: .rect(cornerRadius: 9))
-
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(label)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(STRQPalette.textPrimary)
-                        .lineLimit(1)
-                    if let detail {
-                        Text(detail)
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(STRQPalette.textMuted)
-                            .lineLimit(1)
-                    }
-                }
-
-                Spacer(minLength: 8)
-
-                Text(value)
-                    .font(.system(size: 13, weight: .black, design: .rounded).monospacedDigit())
-                    .foregroundStyle(STRQPalette.textPrimary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-            }
-
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(Color.white.opacity(0.075))
-                    Capsule()
-                        .fill(
-                            LinearGradient(
-                                colors: [tint, tint.opacity(0.72)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .frame(width: max(6, geo.size.width * min(max(progress, 0), 1)))
-                }
-            }
-            .frame(height: 6)
-        }
-        .padding(12)
-        .background(STRQPalette.sandowInset.opacity(0.78), in: .rect(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(tint.opacity(0.13), lineWidth: 1)
+        STRQProgressRow(
+            label: label,
+            value: value,
+            detail: detail,
+            icon: icon,
+            progress: progress,
+            tint: tint
         )
     }
 }
@@ -604,26 +676,33 @@ struct STRQAchievementPreviewCard: View {
     var body: some View {
         STRQSurface(variant: .elevated, accent: tint, padding: 14) {
             HStack(spacing: 14) {
-                STRQMiniProgressRing(progress: progress, tint: tint, size: 62, lineWidth: 6) {
-                    Image(systemName: icon)
-                        .font(.system(size: 20, weight: .black))
-                        .foregroundStyle(tint)
-                }
+                STRQAchievementBadgeMark(icon: icon, tint: tint, progress: progress, size: 64)
 
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(eyebrow.uppercased())
-                        .font(.system(size: 9, weight: .black))
-                        .tracking(1.1)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(eyebrow)
+                        .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(tint)
+                        .lineLimit(1)
                     Text(title)
                         .font(.system(size: 17, weight: .heavy, design: .rounded))
                         .foregroundStyle(STRQPalette.textPrimary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)
                     Text(detail)
-                        .font(.caption.weight(.semibold))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(STRQPalette.textSecondary)
                         .lineLimit(2)
+
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color.white.opacity(0.08))
+                            Capsule()
+                                .fill(tint)
+                                .frame(width: max(6, geo.size.width * min(max(progress, 0), 1)))
+                        }
+                    }
+                    .frame(height: 6)
                 }
 
                 Spacer(minLength: 6)

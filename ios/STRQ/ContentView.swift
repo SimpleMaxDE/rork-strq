@@ -162,13 +162,18 @@ struct STRQTabBar: View {
                 }
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.top, 8)
-        .padding(.bottom, 4)
+        .padding(.horizontal, 10)
+        .padding(.top, 9)
+        .padding(.bottom, 5)
         .background {
-            Rectangle()
-                .fill(.ultraThinMaterial)
+            STRQPalette.sandowBackground
                 .ignoresSafeArea()
+                .overlay(alignment: .top) {
+                    Rectangle()
+                        .fill(STRQPalette.sandowBorder)
+                        .frame(height: 1)
+                }
+                .shadow(color: Color.black.opacity(0.38), radius: 18, y: -8)
         }
     }
 
@@ -178,16 +183,19 @@ struct STRQTabBar: View {
         return Button {
             withAnimation(.snappy(duration: 0.2)) { selectedTab = item.index }
         } label: {
-            VStack(spacing: 3) {
+            VStack(spacing: 5) {
+                Capsule()
+                    .fill(isSelected ? STRQPalette.sandowOrange : Color.clear)
+                    .frame(width: 24, height: 3)
                 Image(systemName: item.icon)
                     .font(.system(size: 18, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
+                    .foregroundStyle(isSelected ? STRQPalette.sandowOrange : STRQPalette.textMuted)
                 Text(item.labelKey)
                     .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
+                    .foregroundStyle(isSelected ? STRQPalette.textPrimary : STRQPalette.textMuted)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 44)
+            .frame(height: 50)
         }
         .sensoryFeedback(.selection, trigger: selectedTab)
     }
@@ -203,31 +211,36 @@ struct STRQTabBar: View {
                     Circle()
                         .fill(
                             isSelected
-                                ? AnyShapeStyle(STRQBrand.accentGradient)
-                                : AnyShapeStyle(Color.white.opacity(0.1))
+                                ? AnyShapeStyle(STRQPalette.sandowOrange)
+                                : AnyShapeStyle(Color.white)
                         )
-                        .frame(width: 50, height: 50)
-                        .shadow(color: isSelected ? .white.opacity(0.12) : .clear, radius: 10, y: 2)
+                        .frame(width: 56, height: 56)
+                        .overlay(
+                            Circle()
+                                .strokeBorder(hasWorkoutToday ? STRQPalette.sandowOrange.opacity(0.72) : Color.white.opacity(0.16), lineWidth: 2)
+                        )
+                        .shadow(color: isSelected ? STRQPalette.sandowOrange.opacity(0.28) : Color.black.opacity(0.28), radius: 14, y: 6)
 
                     if isSelected {
                         Circle()
-                            .fill(.white.opacity(0.12))
-                            .frame(width: 50, height: 50)
-                            .blur(radius: 10)
+                            .fill(STRQPalette.sandowOrange.opacity(0.18))
+                            .frame(width: 60, height: 60)
+                            .blur(radius: 12)
                     }
 
                     Image(systemName: item.icon)
                         .font(.system(size: 20, weight: .bold))
-                        .foregroundStyle(isSelected ? .black : .white.opacity(0.6))
+                        .foregroundStyle(isSelected ? Color.white : Color.black)
                 }
-                .offset(y: -6)
+                .offset(y: -10)
 
                 Text(item.labelKey)
                     .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
-                    .offset(y: -4)
+                    .foregroundStyle(isSelected ? STRQPalette.sandowOrange : STRQPalette.textMuted)
+                    .offset(y: -7)
             }
             .frame(maxWidth: .infinity)
+            .frame(height: 58)
         }
         .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.4), trigger: selectedTab)
     }

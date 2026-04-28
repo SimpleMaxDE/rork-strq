@@ -21,6 +21,26 @@
         }
       }
     },
+    "dashboard.metrics.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesundheitswerte"
+          }
+        }
+      }
+    },
+    "dashboard.metric.sleep.log": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eintragen"
+          }
+        }
+      }
+    },
     "dashboard.hero.title": {
       "localizations": {
         "de": {

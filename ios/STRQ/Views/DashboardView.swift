@@ -21,6 +21,9 @@ struct DashboardView: View {
                 dashboardHero
                     .padding(.horizontal, 16)
 
+                dashboardMetricsStrip
+                    .padding(.horizontal, 16)
+
                 primaryActionCard
                     .padding(.horizontal, 16)
 
@@ -155,9 +158,56 @@ struct DashboardView: View {
         let progress: Double
     }
 
+    private var dashboardMetricsStrip: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            STRQSectionHeader(L10n.tr("dashboard.metrics.title", fallback: "Health Metrics"))
+
+            HStack(spacing: 10) {
+                STRQMetricTile(
+                    value: "\(vm.effectiveRecoveryScore)%",
+                    label: L10n.tr("dashboard.metric.recovery", fallback: "Recovery"),
+                    icon: "waveform.path.ecg",
+                    tint: dashboardRecoveryTint(for: vm.effectiveRecoveryScore),
+                    progress: Double(vm.effectiveRecoveryScore) / 100,
+                    compact: true
+                )
+
+                STRQMetricTile(
+                    value: "\(vm.weeklyStats.sessions)/\(max(1, vm.profile.daysPerWeek))",
+                    label: L10n.tr("dashboard.metric.week", fallback: "Week"),
+                    icon: "calendar.badge.checkmark",
+                    tint: trainingLoadTint,
+                    progress: min(1, Double(vm.weeklyStats.sessions) / Double(max(1, vm.profile.daysPerWeek))),
+                    compact: true
+                )
+
+                Button {
+                    showSleepLog = true
+                } label: {
+                    STRQMetricTile(
+                        value: dashboardSleepMetricValue,
+                        label: L10n.tr("dashboard.metric.sleep", fallback: "Sleep"),
+                        icon: "moon.zzz.fill",
+                        tint: dashboardSleepTint(for: vm.averageSleepHours),
+                        progress: min(1.0, max(0, vm.averageSleepHours / 8.0)),
+                        compact: true
+                    )
+                }
+                .buttonStyle(.strqPressable)
+            }
+        }
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 10)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.03), value: appeared)
+    }
+
     private var dashboardHeader: some View {
         HStack(alignment: .center, spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 5) {
+                Text(dashboardDateLabel)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(STRQPalette.sandowOrange)
+                    .lineLimit(1)
                 Text(L10n.tr("Today"))
                     .font(.system(size: 34, weight: .black, design: .rounded))
                     .foregroundStyle(STRQPalette.textPrimary)
@@ -292,6 +342,20 @@ struct DashboardView: View {
         return vm.currentPhase.shortLabel
     }
 
+    private var dashboardSleepMetricValue: String {
+        guard vm.averageSleepHours > 0 else {
+            return L10n.tr("dashboard.metric.sleep.log", fallback: "Log")
+        }
+        return String(format: "%.1fh", vm.averageSleepHours)
+    }
+
+    private var dashboardDateLabel: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("EEE, d MMM")
+        return formatter.string(from: Date())
+    }
+
     private var compactGreeting: String {
         let name = vm.profile.name.isEmpty ? L10n.tr("Athlete") : vm.profile.name
         return "\(greeting), \(name)"
@@ -354,8 +418,7 @@ struct DashboardView: View {
         let tint = dashboardAccent(for: primary.colorName)
         return STRQSurface(variant: .elevated, accent: tint, padding: 16) {
             VStack(alignment: .leading, spacing: 15) {
-                HStack(alignment: .center, spacing: 10) {
-                    STRQSectionTitle(title: L10n.tr("dashboard.action.title", fallback: "Next Move"), tint: tint)
+                STRQSectionHeader(L10n.tr("dashboard.action.title", fallback: "Next Move")) {
                     if vm.isEarlyStage {
                         todayPriorityPill
                     } else if let momentum = briefing.momentum {
@@ -799,8 +862,7 @@ struct DashboardView: View {
         return STRQSurface(variant: .elevated, accent: tint, padding: 0) {
             VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 10) {
-                    STRQSectionTitle(title: L10n.tr("dashboard.action.title", fallback: "Next Move"), tint: tint)
+                STRQSectionHeader(L10n.tr("dashboard.action.title", fallback: "Next Move")) {
                     if vm.isEarlyStage {
                         todayPriorityPill
                     } else if isRecovery {
@@ -929,8 +991,7 @@ struct DashboardView: View {
     private var analysisModule: some View {
         STRQSurface(variant: .standard, accent: STRQPalette.sandowOrange, padding: 14) {
             VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    STRQSectionTitle(title: L10n.tr("dashboard.analysis.title", fallback: "Analysis"))
+                STRQSectionHeader(L10n.tr("dashboard.analysis.title", fallback: "Analysis")) {
                     if vm.isWeeklyReviewReady {
                         Button {
                             vm.generateWeeklyReview()
@@ -1068,9 +1129,7 @@ struct DashboardView: View {
         if let plan = vm.currentPlan, plan.days.contains(where: { $0.scheduledWeekday != nil }) {
             STRQSurface(variant: .standard, padding: 14) {
                 VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        STRQSectionTitle(title: L10n.tr("Training Week"))
-                        Spacer()
+                    STRQSectionHeader(L10n.tr("Training Week")) {
                         STRQBadgeChip(
                             label: "\(vm.weeklyStats.sessions)/\(max(1, vm.profile.daysPerWeek))",
                             icon: "checkmark",
