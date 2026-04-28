@@ -62,8 +62,14 @@ struct PlanRevealView: View {
         VStack(spacing: 20) {
             Spacer().frame(height: 18)
 
-            STRQPulseMark(size: 84, tint: STRQBrand.steel.opacity(0.78), line: reduceMotion ? .none : .horizontal) {
-                STRQLogoView(size: 48, animated: false)
+            STRQPulseMark(
+                size: 84,
+                tint: STRQBrand.steel.opacity(0.78),
+                line: reduceMotion ? .none : .horizontal,
+                ringOpacityMultiplier: 0.88,
+                lineOpacityMultiplier: 0.76
+            ) {
+                STRQLogoView(size: 54, animated: false)
                     .opacity(0.96)
             }
             .scaleEffect(appeared ? 1 : 0.82)

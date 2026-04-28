@@ -54,6 +54,8 @@ struct STRQPulseMark<Content: View>: View {
     var size: CGFloat = 64
     var tint: Color = STRQBrand.steel
     var line: EnergyLine = .none
+    var ringOpacityMultiplier: Double = 1
+    var lineOpacityMultiplier: Double = 1
     var trigger: Int = 0
     let content: Content
 
@@ -64,12 +66,16 @@ struct STRQPulseMark<Content: View>: View {
         size: CGFloat = 64,
         tint: Color = STRQBrand.steel,
         line: EnergyLine = .none,
+        ringOpacityMultiplier: Double = 1,
+        lineOpacityMultiplier: Double = 1,
         trigger: Int = 0,
         @ViewBuilder content: () -> Content
     ) {
         self.size = size
         self.tint = tint
         self.line = line
+        self.ringOpacityMultiplier = ringOpacityMultiplier
+        self.lineOpacityMultiplier = lineOpacityMultiplier
         self.trigger = trigger
         self.content = content()
     }
@@ -78,6 +84,7 @@ struct STRQPulseMark<Content: View>: View {
         ZStack {
             energyLine
             ringStack
+                .opacity(ringOpacityMultiplier)
 
             content
                 .frame(width: size * 0.72, height: size * 0.58)
@@ -108,6 +115,7 @@ struct STRQPulseMark<Content: View>: View {
                         .frame(height: 5)
                         .blur(radius: 5)
                 )
+                .opacity(lineOpacityMultiplier)
         case .vertical:
             Capsule()
                 .fill(lineGradient(start: .top, end: .bottom))
@@ -118,6 +126,7 @@ struct STRQPulseMark<Content: View>: View {
                         .frame(width: 5)
                         .blur(radius: 5)
                 )
+                .opacity(lineOpacityMultiplier)
         case .none:
             EmptyView()
         }
@@ -191,9 +200,18 @@ extension STRQPulseMark where Content == EmptyView {
         size: CGFloat = 64,
         tint: Color = STRQBrand.steel,
         line: EnergyLine = .none,
+        ringOpacityMultiplier: Double = 1,
+        lineOpacityMultiplier: Double = 1,
         trigger: Int = 0
     ) {
-        self.init(size: size, tint: tint, line: line, trigger: trigger) {
+        self.init(
+            size: size,
+            tint: tint,
+            line: line,
+            ringOpacityMultiplier: ringOpacityMultiplier,
+            lineOpacityMultiplier: lineOpacityMultiplier,
+            trigger: trigger
+        ) {
             EmptyView()
         }
     }
