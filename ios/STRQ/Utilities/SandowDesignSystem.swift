@@ -31,6 +31,12 @@ enum SandowColors {
     static let successSoft = Color(sandowHex: 0x3F6212)
     static let successDim = Color(sandowHex: 0x1A2E05)
 
+    static let warning = Color(sandowHex: 0xF59E0B)
+    static let warningSoft = Color(sandowHex: 0x451A03)
+    static let blue = Color(sandowHex: 0x2563EB)
+    static let blueSoft = Color(sandowHex: 0x172554)
+    static let gold = Color(sandowHex: 0xFACC15)
+
     static let danger = Color(sandowHex: 0xF43F5E)
     static let dangerSoft = Color(sandowHex: 0x9F1239)
     static let dangerDim = Color(sandowHex: 0x4C0519)
@@ -48,11 +54,16 @@ enum SandowTypography {
     static let title = Font.custom(fontFamily, size: 24).weight(.semibold)
     static let heading = Font.custom(fontFamily, size: 20).weight(.semibold)
     static let cardTitle = Font.custom(fontFamily, size: 18).weight(.semibold)
+    static let largeValue = Font.custom(fontFamily, size: 24).weight(.bold).monospacedDigit()
     static let metricNumber = Font.custom(fontFamily, size: 30).weight(.semibold).monospacedDigit()
+    static let metricCompactNumber = Font.custom(fontFamily, size: 20).weight(.bold).monospacedDigit()
     static let label = Font.custom(fontFamily, size: 14).weight(.bold)
     static let body = Font.custom(fontFamily, size: 14).weight(.medium)
+    static let bodyRegular = Font.custom(fontFamily, size: 14).weight(.regular)
     static let caption = Font.custom(fontFamily, size: 12).weight(.medium)
+    static let captionRegular = Font.custom(fontFamily, size: 12).weight(.regular)
     static let button = Font.custom(fontFamily, size: 18).weight(.semibold)
+    static let buttonCompact = Font.custom(fontFamily, size: 14).weight(.semibold)
     static let chip = Font.custom(fontFamily, size: 14).weight(.medium)
     static let tabLabel = Font.custom(fontFamily, size: 12).weight(.medium)
 
@@ -191,11 +202,19 @@ struct SandowButton: View {
         case primary
         case secondary
         case tertiary
+        case destructive
+    }
+
+    enum Size: Equatable {
+        case regular
+        case compact
+        case text
     }
 
     let title: String
     var icon: SandowIconAsset?
     var hierarchy: Hierarchy = .primary
+    var size: Size = .regular
     var isDisabled: Bool = false
     let action: () -> Void
 
@@ -211,14 +230,14 @@ struct SandowButton: View {
                 }
 
                 Text(title)
-                    .font(SandowTypography.button)
+                    .font(size == .regular ? SandowTypography.button : SandowTypography.buttonCompact)
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
             }
             .foregroundStyle(foregroundColor)
-            .frame(maxWidth: .infinity)
-            .frame(height: 56)
-            .padding(.horizontal, SandowSpacing.xl)
+            .frame(maxWidth: size == .text ? nil : .infinity)
+            .frame(height: buttonHeight)
+            .padding(.horizontal, horizontalPadding)
             .background(backgroundColor, in: .rect(cornerRadius: SandowRadii.button))
             .overlay(
                 RoundedRectangle(cornerRadius: SandowRadii.button, style: .continuous)
@@ -239,6 +258,8 @@ struct SandowButton: View {
             return SandowColors.orangeDim
         case .tertiary:
             return SandowColors.surfaceSecondary
+        case .destructive:
+            return SandowColors.danger
         }
     }
 
@@ -248,6 +269,8 @@ struct SandowButton: View {
             return SandowColors.textOnBrand
         case .tertiary:
             return SandowColors.textPrimary
+        case .destructive:
+            return SandowColors.textOnBrand
         }
     }
 
@@ -259,11 +282,29 @@ struct SandowButton: View {
             return SandowColors.orangePrimary
         case .tertiary:
             return SandowColors.borderMuted
+        case .destructive:
+            return .clear
         }
     }
 
     private var borderWidth: CGFloat {
         hierarchy == .primary ? 0 : 1
+    }
+
+    private var buttonHeight: CGFloat {
+        switch size {
+        case .regular: return 56
+        case .compact: return 32
+        case .text: return 20
+        }
+    }
+
+    private var horizontalPadding: CGFloat {
+        switch size {
+        case .regular: return SandowSpacing.xl
+        case .compact: return 10
+        case .text: return 0
+        }
     }
 }
 
@@ -271,13 +312,20 @@ struct SandowChip: View {
     enum Tone {
         case neutral
         case brand
+        case brandSoft
         case success
         case danger
+    }
+
+    enum Size: Equatable {
+        case regular
+        case compact
     }
 
     let label: String
     var icon: SandowIconAsset?
     var tone: Tone = .neutral
+    var size: Size = .regular
 
     var body: some View {
         HStack(spacing: SandowSpacing.chipGap) {
@@ -286,18 +334,18 @@ struct SandowChip: View {
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 20, height: 20)
+                    .frame(width: iconSize, height: iconSize)
             }
 
             Text(label)
-                .font(SandowTypography.chip)
+                .font(size == .regular ? SandowTypography.chip : SandowTypography.caption)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
         .foregroundStyle(foregroundColor)
-        .padding(.horizontal, 10)
-        .padding(.vertical, SandowSpacing.xxs)
-        .frame(minHeight: 32)
+        .padding(.horizontal, size == .regular ? 10 : 6)
+        .padding(.vertical, size == .regular ? SandowSpacing.xxs : 2)
+        .frame(minHeight: size == .regular ? 32 : 20)
         .background(backgroundColor, in: .rect(cornerRadius: SandowRadii.chip))
         .overlay(
             RoundedRectangle(cornerRadius: SandowRadii.chip, style: .continuous)
@@ -312,6 +360,8 @@ struct SandowChip: View {
             return SandowColors.textSecondary
         case .brand:
             return SandowColors.textOnBrand
+        case .brandSoft:
+            return SandowColors.orangePrimary
         case .success:
             return SandowColors.success
         case .danger:
@@ -325,6 +375,8 @@ struct SandowChip: View {
             return SandowColors.surfaceSecondary
         case .brand:
             return SandowColors.orangePrimary
+        case .brandSoft:
+            return SandowColors.orangeDim
         case .success:
             return SandowColors.successDim
         case .danger:
@@ -338,11 +390,17 @@ struct SandowChip: View {
             return SandowColors.borderMuted
         case .brand:
             return .clear
+        case .brandSoft:
+            return SandowColors.orangeSoft
         case .success:
             return SandowColors.successSoft
         case .danger:
             return SandowColors.dangerSoft
         }
+    }
+
+    private var iconSize: CGFloat {
+        size == .regular ? 20 : 16
     }
 }
 
@@ -395,23 +453,37 @@ struct SandowMetricCard: View {
     let value: String
     let label: String
     var icon: SandowIconAsset?
+    var unit: String?
     var detail: String?
     var progress: Double?
     var tint: Color = SandowColors.orangePrimary
+    var valueFont: Font = SandowTypography.metricNumber
+    var iconBackground: Color? = nil
+    var minHeight: CGFloat = 108
 
     var body: some View {
         SandowSurface(padding: SandowSpacing.md, radius: SandowRadii.card) {
             VStack(alignment: .leading, spacing: SandowSpacing.sm) {
                 if let icon {
-                    SandowIconContainer(icon: icon, size: .lg, tint: tint)
+                    SandowIconContainer(icon: icon, size: .lg, tint: tint, background: iconBackground)
                 }
 
                 VStack(alignment: .leading, spacing: SandowSpacing.xxs) {
-                    Text(value)
-                        .font(SandowTypography.metricNumber)
-                        .foregroundStyle(SandowColors.textPrimary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                    HStack(alignment: .firstTextBaseline, spacing: 2) {
+                        Text(value)
+                            .font(valueFont)
+                            .foregroundStyle(SandowColors.textPrimary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+
+                        if let unit {
+                            Text(unit)
+                                .font(SandowTypography.body)
+                                .foregroundStyle(SandowColors.textSecondary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                        }
+                    }
 
                     Text(label)
                         .font(SandowTypography.caption)
@@ -432,7 +504,7 @@ struct SandowMetricCard: View {
                     SandowProgressBar(value: progress, tint: tint)
                 }
             }
-            .frame(maxWidth: .infinity, minHeight: 108, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .leading)
         }
     }
 }
@@ -441,14 +513,17 @@ struct SandowProgressRow: View {
     let label: String
     let value: String
     var detail: String?
-    var icon: SandowIconAsset = .recovery
+    var icon: SandowIconAsset? = .recovery
     var progress: Double
     var tint: Color = SandowColors.orangePrimary
+    var boxed: Bool = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: SandowSpacing.sm) {
             HStack(spacing: SandowSpacing.sm) {
-                SandowIconContainer(icon: icon, size: .md, tint: tint)
+                if let icon {
+                    SandowIconContainer(icon: icon, size: .md, tint: tint)
+                }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(label)
@@ -475,12 +550,14 @@ struct SandowProgressRow: View {
 
             SandowProgressBar(value: progress, height: 8, tint: tint)
         }
-        .padding(SandowSpacing.sm)
-        .background(SandowColors.surfacePrimary, in: .rect(cornerRadius: SandowRadii.lg))
-        .overlay(
-            RoundedRectangle(cornerRadius: SandowRadii.lg, style: .continuous)
-                .strokeBorder(SandowColors.borderMuted, lineWidth: 1)
-        )
+        .padding(boxed ? SandowSpacing.sm : 0)
+        .background(boxed ? SandowColors.surfacePrimary : Color.clear, in: .rect(cornerRadius: SandowRadii.lg))
+        .overlay {
+            if boxed {
+                RoundedRectangle(cornerRadius: SandowRadii.lg, style: .continuous)
+                    .strokeBorder(SandowColors.borderMuted, lineWidth: 1)
+            }
+        }
     }
 }
 

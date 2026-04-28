@@ -1,5 +1,9 @@
 import SwiftUI
 
+#if DEBUG
+private let showsSandowHomeStaticCloneDebugRoute = true
+#endif
+
 struct ContentView: View {
     @Bindable var vm: AppViewModel
     var store: StoreViewModel
@@ -52,7 +56,15 @@ struct ContentView: View {
                 TabView(selection: $selectedTab) {
                     Tab(value: 0) {
                         NavigationStack {
+                            #if DEBUG
+                            if showsSandowHomeStaticCloneDebugRoute {
+                                SandowHomeStaticCloneView()
+                            } else {
+                                DashboardView(vm: vm)
+                            }
+                            #else
                             DashboardView(vm: vm)
+                            #endif
                         }
                     }
                     Tab(value: 1) {
@@ -81,7 +93,13 @@ struct ContentView: View {
                 .preferredColorScheme(.dark)
                 .toolbar(.hidden, for: .tabBar)
                 .safeAreaInset(edge: .bottom, spacing: 0) {
+                    #if DEBUG
+                    if !(showsSandowHomeStaticCloneDebugRoute && selectedTab == 0) {
+                        STRQTabBar(selectedTab: $selectedTab, hasWorkoutToday: vm.todaysWorkout != nil)
+                    }
+                    #else
                     STRQTabBar(selectedTab: $selectedTab, hasWorkoutToday: vm.todaysWorkout != nil)
+                    #endif
                 }
             }
         }
