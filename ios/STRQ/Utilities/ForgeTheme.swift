@@ -503,84 +503,63 @@ struct STRQDashboardHeroCard: View {
 
     var body: some View {
         STRQSurface(variant: .hero, accent: accent, padding: 0) {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .center, spacing: 14) {
-                    VStack(spacing: 1) {
-                        Text("\(score)")
-                            .font(.system(size: 34, weight: .black, design: .rounded).monospacedDigit())
-                            .foregroundStyle(accent)
-                            .contentTransition(.numericText())
-                        Text(scoreLabel.uppercased())
-                            .font(.system(size: 8, weight: .black))
-                            .tracking(0.7)
-                            .foregroundStyle(STRQPalette.backgroundDeep.opacity(0.70))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.58)
-                    }
-                    .frame(width: 76, height: 76)
-                    .background(STRQPalette.sandowCream, in: .rect(cornerRadius: 18))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .strokeBorder(accent.opacity(0.88), lineWidth: 1)
-                    )
-                    .shadow(color: Color.black.opacity(0.18), radius: 10, y: 6)
-
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(title.uppercased())
-                            .font(.system(size: 10, weight: .black))
-                            .tracking(1.0)
-                            .foregroundStyle(accent)
-
-                        Text(status)
-                            .font(.system(size: 24, weight: .heavy, design: .rounded))
-                            .foregroundStyle(STRQPalette.textPrimary)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.72)
-
-                        Text(insight)
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(STRQPalette.textSecondary)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Spacer(minLength: 0)
+            HStack(alignment: .center, spacing: 12) {
+                VStack(spacing: 0) {
+                    Text("\(score)")
+                        .font(.system(size: 30, weight: .bold, design: .rounded).monospacedDigit())
+                        .foregroundStyle(accent)
+                        .contentTransition(.numericText())
+                    Text(scoreLabel.uppercased())
+                        .font(.system(size: 7, weight: .black))
+                        .tracking(0.5)
+                        .foregroundStyle(STRQPalette.backgroundDeep.opacity(0.70))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.58)
                 }
+                .frame(width: 64, height: 64)
+                .background(STRQPalette.sandowCream, in: .rect(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .strokeBorder(accent.opacity(0.88), lineWidth: 1)
+                )
+                .shadow(color: Color.black.opacity(0.18), radius: 10, y: 6)
 
-                HStack(spacing: 8) {
-                    ForEach(metrics.prefix(3)) { metric in
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack(spacing: 5) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(status)
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundStyle(STRQPalette.textPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.74)
+
+                    Text(insight)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(STRQPalette.textSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.76)
+
+                    HStack(spacing: 8) {
+                        ForEach(metrics.prefix(2)) { metric in
+                            HStack(spacing: 4) {
                                 if let icon = metric.icon {
                                     Image(systemName: icon)
-                                        .font(.system(size: 10, weight: .bold))
+                                        .font(.system(size: 11, weight: .bold))
                                 }
-                                Text(metric.label.uppercased())
-                                    .font(.system(size: 8, weight: .black))
-                                    .tracking(0.7)
+                                Text(metric.value)
+                                    .font(.system(size: 13, weight: .medium).monospacedDigit())
                                     .lineLimit(1)
-                                    .minimumScaleFactor(0.7)
                             }
                             .foregroundStyle(metric.tint)
-
-                            Text(metric.value)
-                                .font(.system(size: 16, weight: .heavy, design: .rounded).monospacedDigit())
-                                .foregroundStyle(STRQPalette.textPrimary)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.7)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 9)
-                        .background(STRQPalette.sandowInset.opacity(0.78), in: .rect(cornerRadius: 14))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .strokeBorder(metric.tint.opacity(0.16), lineWidth: 1)
-                        )
                     }
                 }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(STRQPalette.textMuted)
             }
-            .padding(18)
+            .padding(16)
         }
     }
 }

@@ -21,6 +21,26 @@
         }
       }
     },
+    "dashboard.header.hello": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hallo, %@!"
+          }
+        }
+      }
+    },
+    "dashboard.metrics.trailing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute"
+          }
+        }
+      }
+    },
     "dashboard.metrics.title": {
       "localizations": {
         "de": {
@@ -37,6 +57,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eintragen"
+          }
+        }
+      }
+    },
+    "dashboard.metric.streak": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serie"
+          }
+        }
+      }
+    },
+    "dashboard.metric.completed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erledigt"
+          }
+        }
+      }
+    },
+    "dashboard.workout.trailing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute"
           }
         }
       }
@@ -241,6 +291,56 @@
         }
       }
     },
+    "dashboard.activity.complete": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziel erreicht"
+          }
+        }
+      }
+    },
+    "dashboard.activity.active": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Plan"
+          }
+        }
+      }
+    },
+    "dashboard.activity.lowData": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereit"
+          }
+        }
+      }
+    },
+    "dashboard.activity.lowData.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Woche ist noch kein Workout geloggt."
+          }
+        }
+      }
+    },
+    "dashboard.activity.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d von %d geplanten Workouts erledigt."
+          }
+        }
+      }
+    },
     "dashboard.metric.recovery": {
       "localizations": {
         "de": {
@@ -387,6 +487,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Als Nächstes: %@"
+          }
+        }
+      }
+    },
+    "dashboard.schedule.upcoming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kommender Plan"
+          }
+        }
+      }
+    },
+    "dashboard.schedule.item.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ - %d Übungen - ~%d Min."
           }
         }
       }

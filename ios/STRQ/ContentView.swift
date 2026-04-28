@@ -192,7 +192,7 @@ struct STRQTabBar: View {
                     .foregroundStyle(isSelected ? STRQPalette.sandowOrange : STRQPalette.textMuted)
                 Text(item.labelKey)
                     .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? STRQPalette.textPrimary : STRQPalette.textMuted)
+                    .foregroundStyle(isSelected ? STRQPalette.sandowOrange : STRQPalette.textMuted)
             }
             .frame(maxWidth: .infinity)
             .frame(height: 50)

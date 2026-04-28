@@ -9,20 +9,13 @@ struct DashboardView: View {
     @State private var showNutritionLog: Bool = false
     @State private var showSleepLog: Bool = false
     @State private var showWeightLog: Bool = false
-    @State private var showWeekPulseDetails: Bool = false
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 14) {
-                dashboardHeader
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
-
-                dashboardHero
-                    .padding(.horizontal, 16)
+            VStack(spacing: 8) {
+                dashboardTopDeck
 
                 dashboardMetricsStrip
-                    .padding(.horizontal, 16)
 
                 primaryActionCard
                     .padding(.horizontal, 16)
@@ -43,36 +36,6 @@ struct DashboardView: View {
                 scheduleTimeline
                     .padding(.horizontal, 16)
 
-                if let comeback = vm.comebackGuidance, !vm.isEarlyStage {
-                    ComebackCard(
-                        guidance: comeback,
-                        onEaseNext: comeback.offersLighterSession ? {
-                            Analytics.shared.track(.comeback_cta_tapped, [
-                                "action": "ease",
-                                "tier": comeback.tier.rawValue,
-                                "surface": "today"
-                            ])
-                            vm.applyComebackLighterSession()
-                        } : nil,
-                        onCheckIn: vm.hasCheckedInToday ? nil : {
-                            Analytics.shared.track(.comeback_cta_tapped, [
-                                "action": "checkin",
-                                "tier": comeback.tier.rawValue,
-                                "surface": "today"
-                            ])
-                            showReadinessCheckIn = true
-                        }
-                    )
-                        .padding(.horizontal, 16)
-                        .onAppear {
-                            Analytics.shared.track(.comeback_card_viewed, [
-                                "tier": comeback.tier.rawValue,
-                                "days_since": String(comeback.daysSinceLastWorkout),
-                                "surface": "today"
-                            ])
-                        }
-                }
-
                 if let achievement = dashboardAchievement {
                     STRQAchievementPreviewCard(
                         eyebrow: achievement.eyebrow,
@@ -91,10 +54,10 @@ struct DashboardView: View {
                                     "surface": "today"
                                 ])
                             }
-                        }
+                    }
                 }
             }
-            .padding(.bottom, 32)
+            .padding(.bottom, 24)
         }
         .background(STRQPalette.sandowBackground.ignoresSafeArea())
         .navigationTitle("")
@@ -158,28 +121,70 @@ struct DashboardView: View {
         let progress: Double
     }
 
-    private var dashboardMetricsStrip: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            STRQSectionHeader(L10n.tr("dashboard.metrics.title", fallback: "Health Metrics"))
+    private var dashboardTopDeck: some View {
+        VStack(spacing: 0) {
+            dashboardHeader
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
 
-            HStack(spacing: 10) {
+            dashboardHero
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 16)
+        }
+        .background {
+            ZStack(alignment: .bottom) {
+                STRQPalette.sandowBackground
+                STRQPalette.sandowOrange
+                    .opacity(0.18)
+                    .frame(height: 84)
+                    .blur(radius: 26)
+                    .allowsHitTesting(false)
+            }
+        }
+        .clipShape(
+            UnevenRoundedRectangle(
+                cornerRadii: .init(topLeading: 0, bottomLeading: 32, bottomTrailing: 32, topTrailing: 0),
+                style: .continuous
+            )
+        )
+        .overlay(alignment: .bottom) {
+            RoundedRectangle(cornerRadius: 32, style: .continuous)
+                .strokeBorder(STRQPalette.sandowOrange.opacity(0.18), lineWidth: 1)
+                .frame(height: 118)
+                .allowsHitTesting(false)
+        }
+    }
+
+    private var dashboardMetricsStrip: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            STRQSectionHeader(L10n.tr("dashboard.metrics.title", fallback: "Health Metrics")) {
+                Text(L10n.tr("dashboard.metrics.trailing", fallback: "Today"))
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(STRQPalette.sandowOrange)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
                 STRQMetricTile(
                     value: "\(vm.effectiveRecoveryScore)%",
                     label: L10n.tr("dashboard.metric.recovery", fallback: "Recovery"),
                     icon: "waveform.path.ecg",
                     tint: dashboardRecoveryTint(for: vm.effectiveRecoveryScore),
-                    progress: Double(vm.effectiveRecoveryScore) / 100,
-                    compact: true
+                    progress: Double(vm.effectiveRecoveryScore) / 100
                 )
+                .frame(width: 160, height: 140)
 
                 STRQMetricTile(
                     value: "\(vm.weeklyStats.sessions)/\(max(1, vm.profile.daysPerWeek))",
                     label: L10n.tr("dashboard.metric.week", fallback: "Week"),
                     icon: "calendar.badge.checkmark",
                     tint: trainingLoadTint,
-                    progress: min(1, Double(vm.weeklyStats.sessions) / Double(max(1, vm.profile.daysPerWeek))),
-                    compact: true
+                    progress: min(1, Double(vm.weeklyStats.sessions) / Double(max(1, vm.profile.daysPerWeek)))
                 )
+                .frame(width: 160, height: 140)
 
                 Button {
                     showSleepLog = true
@@ -189,11 +194,26 @@ struct DashboardView: View {
                         label: L10n.tr("dashboard.metric.sleep", fallback: "Sleep"),
                         icon: "moon.zzz.fill",
                         tint: dashboardSleepTint(for: vm.averageSleepHours),
-                        progress: min(1.0, max(0, vm.averageSleepHours / 8.0)),
-                        compact: true
+                        progress: min(1.0, max(0, vm.averageSleepHours / 8.0))
                     )
                 }
                 .buttonStyle(.strqPressable)
+                .frame(width: 160, height: 140)
+
+                STRQMetricTile(
+                    value: vm.streak > 0 ? "\(vm.streak)" : "\(vm.totalCompletedWorkouts)",
+                    label: vm.streak > 0
+                        ? L10n.tr("dashboard.metric.streak", fallback: "Streak")
+                        : L10n.tr("dashboard.metric.completed", fallback: "Done"),
+                    icon: vm.streak > 0 ? "flame.fill" : "checkmark.seal.fill",
+                    tint: vm.streak > 0 ? STRQPalette.sandowOrange : STRQPalette.signalGreen,
+                    progress: min(1, Double(max(vm.streak, vm.totalCompletedWorkouts)) / 7.0)
+                )
+                .frame(width: 160, height: 140)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 4)
+                .padding(.bottom, 12)
             }
         }
         .opacity(appeared ? 1 : 0)
@@ -204,28 +224,54 @@ struct DashboardView: View {
     private var dashboardHeader: some View {
         HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 5) {
-                Text(dashboardDateLabel)
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(STRQPalette.sandowOrange)
-                    .lineLimit(1)
-                Text(L10n.tr("Today"))
-                    .font(.system(size: 34, weight: .black, design: .rounded))
+                HStack(spacing: 6) {
+                    Text(dashboardDateLabel)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(STRQPalette.textSecondary)
+                        .lineLimit(1)
+
+                    STRQBadgeChip(
+                        label: vm.streak > 0 ? "\(vm.streak)" : "\(vm.weeklyStats.sessions)",
+                        icon: vm.streak > 0 ? "flame.fill" : "bolt.fill",
+                        variant: .orange
+                    )
+                }
+
+                Text(headerGreeting)
+                    .font(.system(size: 24, weight: .semibold, design: .rounded))
                     .foregroundStyle(STRQPalette.textPrimary)
-                    .lineLimit(1)
-                Text(compactGreeting)
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(STRQPalette.textSecondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.78)
             }
 
             Spacer(minLength: 8)
 
-            STRQBadgeChip(
-                label: L10n.tr("dashboard.status.ready", fallback: "STRQ READY"),
-                icon: "waveform.path.ecg",
-                variant: .orange
-            )
+            HStack(spacing: 8) {
+                Button {
+                    showReadinessCheckIn = true
+                } label: {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(STRQPalette.textPrimary)
+                        .frame(width: 40, height: 40)
+                        .background(STRQPalette.sandowSurfaceElevated, in: Circle())
+                        .overlay(Circle().strokeBorder(STRQPalette.sandowBorderStrong, lineWidth: 1))
+                }
+                .buttonStyle(.strqPressable)
+
+                Image("STRQSigil")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(8)
+                    .frame(width: 40, height: 40)
+                    .background(STRQPalette.sandowOrange, in: Circle())
+                    .overlay(alignment: .bottomTrailing) {
+                        Circle()
+                            .fill(STRQPalette.signalGreen)
+                            .frame(width: 10, height: 10)
+                            .overlay(Circle().strokeBorder(STRQPalette.sandowBackground, lineWidth: 1.5))
+                    }
+            }
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 6)
@@ -356,9 +402,9 @@ struct DashboardView: View {
         return formatter.string(from: Date())
     }
 
-    private var compactGreeting: String {
+    private var headerGreeting: String {
         let name = vm.profile.name.isEmpty ? L10n.tr("Athlete") : vm.profile.name
-        return "\(greeting), \(name)"
+        return L10n.format("dashboard.header.hello", fallback: "Hello, %@!", name)
     }
 
     private var trainingLoadTint: Color {
@@ -859,114 +905,163 @@ struct DashboardView: View {
         let tint = dashboardAccent(for: primary.colorName)
         let isRecovery = primary.kind == .recoverToday
         let isFirstSession = primary.kind == .startFirstSession
-        return STRQSurface(variant: .elevated, accent: tint, padding: 0) {
-            VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 14) {
-                STRQSectionHeader(L10n.tr("dashboard.action.title", fallback: "Next Move")) {
-                    if vm.isEarlyStage {
-                        todayPriorityPill
-                    } else if isRecovery {
-                        STRQBadgeChip(label: L10n.tr("Recovery first"), icon: "heart.circle.fill", variant: .orange)
-                    } else if isFirstSession {
-                        STRQBadgeChip(label: L10n.tr("Milestone"), icon: "sparkles", variant: .orange)
-                    } else if let momentum = briefing.momentum {
-                        STRQBadgeChip(label: momentum.title, icon: momentum.icon, variant: .neutral)
-                    } else {
-                        STRQBadgeChip(label: primary.eyebrow, icon: vm.currentPhase.icon, variant: actionChipVariant(for: primary.colorName))
-                    }
-                }
-
-                Text(day.name)
-                    .font(.system(size: isRecovery ? 25 : 28, weight: .heavy, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.7)
-
-                Text(primary.detail)
-                    .font(.footnote)
-                    .foregroundStyle(.white.opacity(0.7))
-                    .fixedSize(horizontal: false, vertical: true)
-
-                if let adj = vm.adjustment(for: day.id) {
-                    coachAdjustmentChip(adj)
-                }
-
-                HStack(spacing: 6) {
-                    ForEach(day.focusMuscles.prefix(3)) { muscle in
-                        STRQBadgeChip(label: muscle.displayName, variant: .neutral)
-                    }
-                }
-
-                Divider().opacity(0.22)
-
-                HStack(spacing: 8) {
-                    STRQMetricTile(
-                        value: "\(day.exercises.count)",
-                        label: L10n.tr("Exercises"),
-                        icon: "figure.strengthtraining.traditional",
-                        tint: tint,
-                        compact: true
-                    )
-                    STRQMetricTile(
-                        value: "~\(day.estimatedMinutes)m",
-                        label: L10n.tr("Duration"),
-                        icon: "clock.fill",
-                        tint: STRQPalette.sandowOrange,
-                        compact: true
-                    )
-                    STRQMetricTile(
-                        value: "\(day.exercises.reduce(0) { $0 + $1.sets })",
-                        label: L10n.tr("Total Sets"),
-                        icon: "square.stack.3d.up.fill",
-                        tint: STRQPalette.textSecondary,
-                        compact: true
-                    )
-                }
+        return VStack(alignment: .leading, spacing: 8) {
+            STRQSectionHeader(L10n.tr("Workouts")) {
+                Text(L10n.tr("dashboard.workout.trailing", fallback: "Today"))
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(STRQPalette.sandowOrange)
             }
-            .padding(20)
 
-            if primary.kind == .checkInBeforeTraining {
-                HStack(spacing: 10) {
-                    STRQPrimaryCTA(icon: "heart.text.clipboard", title: L10n.tr("Check in")) {
-                        showReadinessCheckIn = true
-                    }
+            STRQSurface(variant: .elevated, accent: tint, padding: 0) {
+                VStack(spacing: 0) {
+                    ZStack(alignment: .topLeading) {
+                        STRQPalette.sandowInset
 
-                    Button {
-                        vm.prepareWorkoutHandoff(day: day)
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "bolt.fill")
-                            Text(L10n.tr("Start Workout"))
+                        Image("STRQSigil")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 148, height: 148)
+                            .opacity(0.08)
+                            .offset(x: 174, y: -24)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                STRQBadgeChip(
+                                    label: primary.eyebrow,
+                                    icon: primary.icon,
+                                    variant: actionChipVariant(for: primary.colorName)
+                                )
+                                Spacer(minLength: 0)
+                                Image(systemName: "ellipsis")
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundStyle(STRQPalette.textMuted)
+                            }
+
+                            Spacer(minLength: 0)
+
+                            Text(day.name)
+                                .font(.system(size: isRecovery ? 24 : 26, weight: .heavy, design: .rounded))
+                                .foregroundStyle(.white)
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.7)
+
+                            HStack(spacing: 8) {
+                                workoutMetadataItem(icon: "figure.strengthtraining.traditional", value: "\(day.exercises.count)")
+                                dotDivider
+                                workoutMetadataItem(icon: "clock.fill", value: "~\(day.estimatedMinutes)m")
+                                dotDivider
+                                workoutMetadataItem(
+                                    icon: "square.stack.3d.up.fill",
+                                    value: "\(day.exercises.reduce(0) { $0 + $1.sets })"
+                                )
+                            }
                         }
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(STRQPalette.textPrimary.opacity(0.86))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(Color.white.opacity(0.08), in: .rect(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
-                        )
+                        .padding(16)
                     }
-                    .buttonStyle(.strqPressable)
+                    .frame(height: 172)
+
+                    VStack(alignment: .leading, spacing: 14) {
+                        HStack(alignment: .top, spacing: 12) {
+                            STRQPulseMark(size: 44, tint: tint) {
+                                Image(systemName: isRecovery ? "heart.fill" : "bolt.fill")
+                                    .font(.system(size: 16, weight: .black))
+                                    .foregroundStyle(tint)
+                            }
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(spacing: 7) {
+                                    if vm.isEarlyStage {
+                                        todayPriorityPill
+                                    } else if isRecovery {
+                                        STRQBadgeChip(label: L10n.tr("Recovery first"), icon: "heart.circle.fill", variant: .orange)
+                                    } else if isFirstSession {
+                                        STRQBadgeChip(label: L10n.tr("Milestone"), icon: "sparkles", variant: .orange)
+                                    } else if let momentum = briefing.momentum {
+                                        STRQBadgeChip(label: momentum.title, icon: momentum.icon, variant: .neutral)
+                                    }
+                                }
+
+                                Text(primary.detail)
+                                    .font(.footnote.weight(.medium))
+                                    .foregroundStyle(.white.opacity(0.70))
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+
+                            Spacer(minLength: 0)
+                        }
+
+                        if let adj = vm.adjustment(for: day.id) {
+                            coachAdjustmentChip(adj)
+                        }
+
+                        HStack(spacing: 6) {
+                            ForEach(day.focusMuscles.prefix(3)) { muscle in
+                                STRQBadgeChip(label: muscle.displayName, variant: .neutral)
+                            }
+                        }
+                    }
+                    .padding(16)
+
+                    if primary.kind == .checkInBeforeTraining {
+                        HStack(spacing: 10) {
+                            STRQPrimaryCTA(icon: "heart.text.clipboard", title: L10n.tr("Check in")) {
+                                showReadinessCheckIn = true
+                            }
+
+                            Button {
+                                vm.prepareWorkoutHandoff(day: day)
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "bolt.fill")
+                                    Text(L10n.tr("Start Workout"))
+                                }
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(STRQPalette.textPrimary.opacity(0.86))
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 54)
+                                .background(Color.white.opacity(0.08), in: .rect(cornerRadius: 12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                                )
+                            }
+                            .buttonStyle(.strqPressable)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 16)
+                    } else {
+                        STRQPrimaryCTA(
+                            icon: primary.kind == .resumeWorkout ? "play.fill" : "bolt.fill",
+                            title: workoutPrimaryTitle(for: primary.kind)
+                        ) {
+                            vm.prepareWorkoutHandoff(day: day)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 16)
+                    }
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
-            } else {
-                STRQPrimaryCTA(
-                    icon: primary.kind == .resumeWorkout ? "play.fill" : "bolt.fill",
-                    title: workoutPrimaryTitle(for: primary.kind)
-                ) {
-                    vm.prepareWorkoutHandoff(day: day)
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
-            }
             }
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.05), value: appeared)
+    }
+
+    private func workoutMetadataItem(icon: String, value: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .bold))
+            Text(value)
+                .font(.system(size: 13, weight: .semibold).monospacedDigit())
+                .lineLimit(1)
+        }
+        .foregroundStyle(STRQPalette.textPrimary)
+    }
+
+    private var dotDivider: some View {
+        Circle()
+            .fill(STRQPalette.sandowDivider)
+            .frame(width: 4, height: 4)
     }
 
     private func workoutPrimaryTitle(for kind: DailyBriefing.PrimaryKind) -> String {
@@ -990,8 +1085,8 @@ struct DashboardView: View {
 
     private var analysisModule: some View {
         STRQSurface(variant: .standard, accent: STRQPalette.sandowOrange, padding: 14) {
-            VStack(alignment: .leading, spacing: 12) {
-                STRQSectionHeader(L10n.tr("dashboard.analysis.title", fallback: "Analysis")) {
+            VStack(alignment: .leading, spacing: 14) {
+                STRQSectionHeader(L10n.tr("Activity")) {
                     if vm.isWeeklyReviewReady {
                         Button {
                             vm.generateWeeklyReview()
@@ -1007,8 +1102,42 @@ struct DashboardView: View {
                     }
                 }
 
+                HStack(alignment: .center, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(activityStatusTitle)
+                            .font(.system(size: 24, weight: .heavy, design: .rounded))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.76)
+
+                        Text(activityStatusDetail)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(STRQPalette.textSecondary)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    STRQMiniProgressRing(
+                        progress: weekCompletionProgress,
+                        tint: trainingLoadTint,
+                        size: 64,
+                        lineWidth: 6
+                    ) {
+                        VStack(spacing: 0) {
+                            Text("\(Int((weekCompletionProgress * 100).rounded()))")
+                                .font(.system(size: 16, weight: .black, design: .rounded).monospacedDigit())
+                                .foregroundStyle(STRQPalette.textPrimary)
+                            Text("%")
+                                .font(.system(size: 8, weight: .bold))
+                                .foregroundStyle(STRQPalette.textMuted)
+                        }
+                    }
+                }
+
                 VStack(spacing: 8) {
-                    ForEach(dashboardAnalysisRows) { row in
+                    ForEach(Array(dashboardAnalysisRows.prefix(3))) { row in
                         STRQSignalBar(
                             label: row.label,
                             value: row.value,
@@ -1026,9 +1155,36 @@ struct DashboardView: View {
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.08), value: appeared)
     }
 
+    private var weekCompletionProgress: Double {
+        min(1, Double(vm.weeklyStats.sessions) / Double(max(1, vm.profile.daysPerWeek)))
+    }
+
+    private var activityStatusTitle: String {
+        if vm.weeklyStats.sessions >= max(1, vm.profile.daysPerWeek) {
+            return L10n.tr("dashboard.activity.complete", fallback: "Target Hit")
+        }
+        if vm.weeklyStats.sessions > 0 {
+            return L10n.tr("dashboard.activity.active", fallback: "On Track")
+        }
+        return L10n.tr("dashboard.activity.lowData", fallback: "Ready")
+    }
+
+    private var activityStatusDetail: String {
+        let planned = max(1, vm.profile.daysPerWeek)
+        if vm.weeklyStats.sessions == 0 {
+            return L10n.tr("dashboard.activity.lowData.detail", fallback: "No workout logged this week yet.")
+        }
+        return L10n.format(
+            "dashboard.activity.detail",
+            fallback: "%d of %d planned workouts completed.",
+            vm.weeklyStats.sessions,
+            planned
+        )
+    }
+
     private var dashboardAnalysisRows: [DashboardAnalysisRow] {
         let planned = max(1, vm.profile.daysPerWeek)
-        let weekProgress = min(1, Double(vm.weeklyStats.sessions) / Double(planned))
+        let weekProgress = weekCompletionProgress
         let consistencySource = max(vm.streak, vm.weeklyStats.sessions)
         let consistencyProgress = min(1, Double(consistencySource) / Double(max(3, planned)))
         let sleepProgress = min(1, max(0, vm.averageSleepHours / 8.0))
@@ -1197,6 +1353,33 @@ struct DashboardView: View {
                         }
                         .padding(.top, 1)
                     }
+
+                    if !upcomingScheduleDays.isEmpty {
+                        Rectangle()
+                            .fill(STRQPalette.sandowDivider)
+                            .frame(height: 1)
+
+                        Text(L10n.tr("dashboard.schedule.upcoming", fallback: "Upcoming Schedule"))
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(STRQPalette.textPrimary)
+
+                        VStack(spacing: 0) {
+                            ForEach(Array(upcomingScheduleDays.enumerated()), id: \.offset) { index, day in
+                                scheduleListRow(day)
+                                if index < upcomingScheduleDays.count - 1 {
+                                    Rectangle()
+                                        .fill(STRQPalette.sandowDivider)
+                                        .frame(height: 1)
+                                        .padding(.leading, 48)
+                                }
+                            }
+                        }
+                        .background(STRQPalette.sandowInset.opacity(0.66), in: .rect(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .strokeBorder(STRQPalette.sandowBorder, lineWidth: 1)
+                        )
+                    }
                 }
             }
             .opacity(appeared ? 1 : 0)
@@ -1222,6 +1405,57 @@ struct DashboardView: View {
         return plan.days.filter { !$0.isSkipped && $0.scheduledWeekday != nil }
             .sorted { ($0.scheduledWeekday ?? 0) < ($1.scheduledWeekday ?? 0) }
             .first
+    }
+
+    private var upcomingScheduleDays: [WorkoutDay] {
+        guard let plan = vm.currentPlan else { return [] }
+        let todayWeekday = Calendar.current.component(.weekday, from: Date())
+        let scheduled = plan.days
+            .filter { !$0.isSkipped && $0.scheduledWeekday != nil }
+            .sorted { ($0.scheduledWeekday ?? 0) < ($1.scheduledWeekday ?? 0) }
+        let future = scheduled.filter { ($0.scheduledWeekday ?? 0) >= todayWeekday }
+        return Array((future.isEmpty ? scheduled : future).prefix(2))
+    }
+
+    private func scheduleListRow(_ day: WorkoutDay) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "figure.strengthtraining.traditional")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(STRQPalette.sandowOrange)
+                .frame(width: 36, height: 36)
+                .background(STRQPalette.sandowOrangeSoft, in: .rect(cornerRadius: 10))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(day.name)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                Text(scheduleListDetail(day))
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
+
+            Spacer(minLength: 0)
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(STRQPalette.textMuted)
+        }
+        .padding(12)
+    }
+
+    private func scheduleListDetail(_ day: WorkoutDay) -> String {
+        let weekday = day.scheduledWeekday.map { vm.weekdayName($0) } ?? L10n.tr("Training")
+        return L10n.format(
+            "dashboard.schedule.item.detail",
+            fallback: "%@ - %d exercises - ~%dm",
+            weekday,
+            day.exercises.count,
+            day.estimatedMinutes
+        )
     }
 
     private func shortName(_ name: String) -> String {
@@ -1321,87 +1555,6 @@ struct DashboardView: View {
             )
         }
         .buttonStyle(.strqPressable)
-    }
-
-    // MARK: - Week Pulse
-
-    private var weekPulse: some View {
-        STRQSurface(variant: .standard, padding: 16) {
-            VStack(spacing: 14) {
-            Button {
-                withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.22)) {
-                    showWeekPulseDetails.toggle()
-                }
-            } label: {
-                HStack {
-                    STRQSectionTitle(title: L10n.tr("This Week"))
-                    Spacer()
-                    if let momentum = vm.momentumData {
-                        let paceName = momentum.weeklyPace.colorName
-                        STRQBadgeChip(
-                            label: momentum.paceMessage,
-                            variant: ["green", "mint"].contains(paceName) ? .success : .orange
-                        )
-                    }
-                    Image(systemName: showWeekPulseDetails ? "chevron.up" : "chevron.down")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(STRQPalette.textMuted)
-                }
-            }
-            .buttonStyle(.plain)
-
-            HStack(spacing: 0) {
-                ForEach(vm.weeklyActivity) { day in
-                    VStack(spacing: 6) {
-                        Text(day.label)
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundStyle(STRQPalette.textMuted)
-                        Circle()
-                            .fill(day.didTrain ? STRQPalette.signalGreen : Color.white.opacity(0.06))
-                            .frame(width: 28, height: 28)
-                            .overlay {
-                                if day.didTrain {
-                                    Image(systemName: "checkmark")
-                                        .font(.system(size: 9, weight: .bold))
-                                        .foregroundStyle(Color.white)
-                                }
-                            }
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-            }
-
-            if showWeekPulseDetails {
-                HStack(spacing: 8) {
-                    STRQMetricTile(
-                        value: "\(vm.weeklyStats.sessions)/\(vm.profile.daysPerWeek)",
-                        label: L10n.tr("Workouts"),
-                        icon: "checkmark.seal.fill",
-                        tint: STRQPalette.signalGreen,
-                        compact: true
-                    )
-                    STRQMetricTile(
-                        value: ForgeTheme.formatVolume(vm.weeklyStats.volume),
-                        label: L10n.tr("Volume"),
-                        icon: "chart.bar.fill",
-                        tint: STRQPalette.sandowOrange,
-                        compact: true
-                    )
-                    STRQMetricTile(
-                        value: "\(vm.effectiveRecoveryScore)%",
-                        label: L10n.tr("Recovery"),
-                        icon: "waveform.path.ecg",
-                        tint: dashboardRecoveryTint(for: vm.effectiveRecoveryScore),
-                        compact: true
-                    )
-                }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-            }
-        }
-        .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 10)
-        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.12), value: appeared)
     }
 
     private var greeting: String {
