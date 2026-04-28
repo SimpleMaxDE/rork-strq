@@ -1,35 +1,39 @@
 import SwiftUI
 
 enum STRQBrand {
-    static let accent = Color.white
-    static let accentSecondary = Color(white: 0.75)
-    static let steel = Color(red: 0.55, green: 0.6, blue: 0.67)
-    static let graphite = Color(white: 0.22)
-    static let obsidian = Color(white: 0.08)
-    static let slate = Color(red: 0.42, green: 0.45, blue: 0.50)
+    static let accent = Color(red: 0.976, green: 0.451, blue: 0.086)
+    static let accentSecondary = Color(red: 1.0, green: 0.722, blue: 0.290)
+    static let steel = Color(red: 0.655, green: 0.659, blue: 0.678)
+    static let graphite = Color(red: 0.125, green: 0.129, blue: 0.141)
+    static let obsidian = Color(red: 0.031, green: 0.035, blue: 0.043)
+    static let slate = Color(red: 0.439, green: 0.443, blue: 0.467)
 
     static let accentGradient = LinearGradient(
-        colors: [Color.white, Color(white: 0.82)],
+        colors: [
+            Color(red: 1.0, green: 0.541, blue: 0.180),
+            accent,
+            Color(red: 0.761, green: 0.220, blue: 0.047)
+        ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
     static let steelGradient = LinearGradient(
-        colors: [Color(white: 0.58), Color(white: 0.40)],
+        colors: [Color(red: 0.655, green: 0.659, blue: 0.678), Color(red: 0.439, green: 0.443, blue: 0.467)],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
     static let subtleGradient = LinearGradient(
-        colors: [Color.white.opacity(0.10), Color.white.opacity(0.03)],
+        colors: [Color.white.opacity(0.08), Color.white.opacity(0.025)],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
     static let cardAccentGradient = LinearGradient(
-        colors: [Color(white: 0.45), Color(white: 0.3)],
+        colors: [graphite, obsidian],
         startPoint: .leading,
         endPoint: .trailing
     )
-    static let cardBorder = Color.white.opacity(0.12)
-    static let cardElevated = Color(white: 0.11)
+    static let cardBorder = Color.white.opacity(0.10)
+    static let cardElevated = Color(red: 0.094, green: 0.098, blue: 0.110)
 }
 
 enum ForgeTheme {
@@ -40,10 +44,11 @@ enum ForgeTheme {
     static func color(for name: String) -> Color {
         switch name {
         case "green", "mint": return STRQPalette.signalGreen
-        case "yellow", "orange": return STRQPalette.warningAmber
+        case "yellow": return STRQPalette.warningAmber
+        case "orange": return STRQPalette.energyAccent
         case "red": return STRQPalette.dangerRed
-        case "blue", "cyan", "teal": return STRQPalette.signalIce
-        case "purple", "pink": return STRQPalette.pulseViolet
+        case "blue", "cyan", "teal": return STRQPalette.steel
+        case "purple", "pink": return STRQPalette.steel
         case "gold": return STRQPalette.gold
         default: return STRQBrand.steel
         }
@@ -120,8 +125,8 @@ struct STRQSurface<Content: View>: View {
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    (accent ?? STRQPalette.signalIce).opacity(0.24),
-                                    STRQPalette.pulseViolet.opacity(0.08),
+                                    (accent ?? STRQPalette.energyAccent).opacity(0.14),
+                                    STRQPalette.surfaceStrong.opacity(0.32),
                                     Color.clear
                                 ],
                                 center: .topLeading,
@@ -157,13 +162,13 @@ struct STRQSurface<Content: View>: View {
             )
         case .elevated:
             return LinearGradient(
-                colors: [STRQPalette.surfaceRaised, STRQPalette.surfaceCarbon],
+                colors: [STRQPalette.surfaceRaised, STRQPalette.surfaceBase],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         case .hero:
             return LinearGradient(
-                colors: [STRQPalette.surfaceHero, STRQPalette.surfaceCarbon, STRQPalette.backgroundDeep],
+                colors: [STRQPalette.surfaceHero, STRQPalette.surfaceBase, STRQPalette.backgroundPrimary],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -177,7 +182,7 @@ struct STRQSurface<Content: View>: View {
         case .elevated:
             return .black.opacity(0.28)
         case .hero:
-            return (accent ?? STRQPalette.signalIce).opacity(0.14)
+            return (accent ?? STRQPalette.energyAccent).opacity(0.10)
         }
     }
 
@@ -203,7 +208,7 @@ struct STRQMetricTile: View {
     let label: String
     var icon: String?
     var delta: String?
-    var tint: Color = STRQPalette.signalIce
+    var tint: Color = STRQPalette.energyAccent
     var progress: Double?
     var compact: Bool = false
 
@@ -266,16 +271,16 @@ struct STRQMetricTile: View {
 struct STRQBadgeChip: View {
     enum Variant {
         case neutral
-        case ice
-        case violet
+        case accent
+        case muted
         case success
         case warning
 
         var tint: Color {
             switch self {
             case .neutral: return STRQPalette.textSecondary
-            case .ice: return STRQPalette.signalIce
-            case .violet: return STRQPalette.pulseViolet
+            case .accent: return STRQPalette.energyAccent
+            case .muted: return STRQPalette.steel
             case .success: return STRQPalette.signalGreen
             case .warning: return STRQPalette.warningAmber
             }
@@ -284,8 +289,8 @@ struct STRQBadgeChip: View {
         var fill: Color {
             switch self {
             case .neutral: return Color.white.opacity(0.07)
-            case .ice: return STRQPalette.signalIceSoft
-            case .violet: return STRQPalette.pulseVioletSoft
+            case .accent: return STRQPalette.energyAccentSoft
+            case .muted: return STRQPalette.steelSoft
             case .success: return STRQPalette.successSoft
             case .warning: return STRQPalette.warningSoft
             }
@@ -338,15 +343,7 @@ struct STRQPrimaryCTA: View {
             .frame(maxWidth: .infinity)
             .frame(height: 54)
             .background(
-                LinearGradient(
-                    colors: [
-                        STRQPalette.signalIce,
-                        Color(red: 0.64, green: 0.94, blue: 1.0),
-                        STRQPalette.pulseViolet.opacity(0.88)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
+                STRQPalette.energyAccentGradient,
                 in: .rect(cornerRadius: 15)
             )
             .overlay(alignment: .top) {
@@ -359,8 +356,8 @@ struct STRQPrimaryCTA: View {
                 RoundedRectangle(cornerRadius: 15, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.28), lineWidth: 1)
             )
-            .shadow(color: STRQPalette.signalIce.opacity(0.22), radius: 18, y: 7)
-            .shadow(color: STRQPalette.pulseViolet.opacity(0.14), radius: 22, y: 9)
+            .shadow(color: STRQPalette.energyAccent.opacity(0.18), radius: 18, y: 7)
+            .shadow(color: .black.opacity(0.28), radius: 22, y: 9)
         }
         .buttonStyle(.strqPressable)
     }
@@ -369,7 +366,7 @@ struct STRQPrimaryCTA: View {
 struct STRQSectionTitle: View {
     let title: String
     var trailing: String?
-    var tint: Color = STRQPalette.signalIce
+    var tint: Color = STRQPalette.energyAccent
 
     var body: some View {
         HStack(spacing: 8) {
@@ -532,7 +529,7 @@ struct ForgePrimaryButton: View {
                     .allowsHitTesting(false)
                 , alignment: .top
             )
-            .shadow(color: .white.opacity(0.13), radius: 14, y: 3)
+            .shadow(color: STRQPalette.energyAccent.opacity(0.13), radius: 14, y: 3)
         }
         .buttonStyle(.strqPressable)
     }

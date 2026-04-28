@@ -112,7 +112,7 @@ struct DashboardView: View {
         }
         .background {
             LinearGradient(
-                colors: [STRQPalette.backgroundCarbon, STRQPalette.backgroundDeep],
+                colors: [STRQPalette.backgroundPrimary, STRQPalette.backgroundCarbon],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -160,7 +160,7 @@ struct DashboardView: View {
     // MARK: - Today Hero
 
     private var todayHero: some View {
-        let accent = vm.todaysReadiness.map { ForgeTheme.recoveryColor(for: $0.readinessScore) } ?? STRQPalette.signalIce
+        let accent = vm.todaysReadiness.map { ForgeTheme.recoveryColor(for: $0.readinessScore) } ?? STRQPalette.borderStrong
 
         return STRQSurface(variant: .hero, accent: accent, padding: 18) {
             HStack(alignment: .center, spacing: 16) {
@@ -198,7 +198,7 @@ struct DashboardView: View {
                 .frame(width: 94)
                 .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.8).delay(0.2), value: appeared)
             } else if vm.streak > 0 {
-                STRQBadgeChip(label: "\(vm.streak)", icon: "flame.fill", variant: .ice)
+                STRQBadgeChip(label: "\(vm.streak)", icon: "flame.fill", variant: .accent)
             }
         }
     }
@@ -273,9 +273,9 @@ struct DashboardView: View {
                 HStack(spacing: 10) {
                     Image(systemName: rest.icon)
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(STRQPalette.signalIce)
+                        .foregroundStyle(STRQPalette.steel)
                         .frame(width: 24, height: 24)
-                        .background(STRQPalette.signalIceSoft, in: .rect(cornerRadius: 7))
+                        .background(STRQPalette.steelSoft, in: .rect(cornerRadius: 7))
                     VStack(alignment: .leading, spacing: 1) {
                         Text(rest.title)
                             .font(.caption.weight(.semibold))
@@ -337,7 +337,7 @@ struct DashboardView: View {
         .foregroundStyle(.black)
         .padding(.horizontal, 8)
         .padding(.vertical, 3)
-        .background(STRQPalette.signalIce, in: Capsule())
+        .background(STRQPalette.energyAccent, in: Capsule())
         .overlay(Capsule().strokeBorder(Color.white.opacity(0.28), lineWidth: 0.7))
     }
 
@@ -541,7 +541,7 @@ struct DashboardView: View {
         case .volumeDown:
             return STRQPalette.warning
         case .firstSession:
-            return STRQPalette.info
+            return STRQPalette.energyAccent
         case .consolidated:
             return STRQBrand.steel
         }
@@ -621,14 +621,14 @@ struct DashboardView: View {
 
     private func earlyStageHint(_ guidance: EarlyStateGuidance) -> some View {
         let tierIndex = max(0, min(3, guidance.tier.rawValue))
-        return STRQSurface(variant: .standard, accent: STRQPalette.pulseViolet, padding: 12) {
+        return STRQSurface(variant: .standard, accent: STRQPalette.energyAccent, padding: 12) {
             VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: guidance.icon)
                     .font(.subheadline.weight(.medium))
-                    .foregroundStyle(STRQPalette.pulseViolet)
+                    .foregroundStyle(STRQPalette.energyAccent)
                     .frame(width: 32, height: 32)
-                    .background(STRQPalette.pulseVioletSoft, in: .rect(cornerRadius: 9))
+                    .background(STRQPalette.energyAccentSoft, in: .rect(cornerRadius: 9))
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
@@ -651,7 +651,7 @@ struct DashboardView: View {
             HStack(spacing: 4) {
                 ForEach(0..<4, id: \.self) { i in
                     Capsule()
-                        .fill(i <= tierIndex ? AnyShapeStyle(STRQPalette.signalIce.gradient) : AnyShapeStyle(Color.white.opacity(0.08)))
+                        .fill(i <= tierIndex ? AnyShapeStyle(STRQPalette.energyAccent.gradient) : AnyShapeStyle(Color.white.opacity(0.08)))
                         .frame(height: 3)
                 }
             }
@@ -682,9 +682,9 @@ struct DashboardView: View {
                     if vm.isEarlyStage {
                         todayPriorityPill
                     } else if isRecovery {
-                        STRQBadgeChip(label: L10n.tr("Recovery first"), icon: "heart.circle.fill", variant: .ice)
+                        STRQBadgeChip(label: L10n.tr("Recovery first"), icon: "heart.circle.fill", variant: .success)
                     } else if isFirstSession {
-                        STRQBadgeChip(label: L10n.tr("Milestone"), icon: "sparkles", variant: .violet)
+                        STRQBadgeChip(label: L10n.tr("Milestone"), icon: "sparkles", variant: .accent)
                     } else if let momentum = briefing.momentum {
                         STRQBadgeChip(label: momentum.title, icon: momentum.icon, variant: .neutral)
                     } else {
@@ -731,14 +731,14 @@ struct DashboardView: View {
                         value: "~\(day.estimatedMinutes)m",
                         label: L10n.tr("Duration"),
                         icon: "clock.fill",
-                        tint: STRQPalette.signalIce,
+                        tint: STRQPalette.steel,
                         compact: true
                     )
                     STRQMetricTile(
                         value: "\(day.exercises.reduce(0) { $0 + $1.sets })",
                         label: L10n.tr("Total Sets"),
                         icon: "square.stack.3d.up.fill",
-                        tint: STRQPalette.pulseViolet,
+                        tint: STRQPalette.textSecondary,
                         compact: true
                     )
                 }
@@ -803,7 +803,7 @@ struct DashboardView: View {
     }
 
     private func coachAdjustmentChip(_ adj: CoachAdjustment) -> some View {
-        STRQBadgeChip(label: adj.description, icon: "brain.head.profile.fill", variant: .violet)
+        STRQBadgeChip(label: adj.description, icon: "brain.head.profile.fill", variant: .muted)
     }
 
     // MARK: - Schedule Timeline
@@ -819,7 +819,7 @@ struct DashboardView: View {
                     if let next = nextScheduledDay {
                         STRQBadgeChip(
                             label: L10n.format("Next: %@", vm.weekdayName(next.scheduledWeekday ?? 0)),
-                            variant: .ice
+                            variant: .accent
                         )
                     }
                 }
@@ -838,7 +838,7 @@ struct DashboardView: View {
                             ZStack {
                                 if matchingDay != nil {
                                     Circle()
-                                        .fill(isToday ? STRQPalette.signalIce : isPast ? STRQPalette.signalGreen.opacity(0.26) : STRQPalette.textSecondary.opacity(0.36))
+                                        .fill(isToday ? STRQPalette.energyAccent : isPast ? STRQPalette.signalGreen.opacity(0.26) : STRQPalette.textSecondary.opacity(0.36))
                                         .frame(width: 28, height: 28)
                                     Image(systemName: "figure.strengthtraining.traditional")
                                         .font(.system(size: 10, weight: .medium))
@@ -849,7 +849,7 @@ struct DashboardView: View {
                                         .frame(width: 28, height: 28)
                                     if isToday {
                                         Circle()
-                                            .strokeBorder(STRQPalette.signalIce.opacity(0.5), lineWidth: 1.5)
+                                            .strokeBorder(STRQPalette.energyAccent.opacity(0.5), lineWidth: 1.5)
                                             .frame(width: 28, height: 28)
                                     }
                                 }
@@ -858,7 +858,7 @@ struct DashboardView: View {
                             if let day = matchingDay {
                                 Text(shortName(day.name))
                                     .font(.system(size: 8, weight: .medium))
-                                    .foregroundStyle(isToday ? STRQPalette.signalIce : STRQPalette.textMuted)
+                                    .foregroundStyle(isToday ? STRQPalette.energyAccent : STRQPalette.textMuted)
                                     .lineLimit(1)
                             } else {
                                 Text(isToday ? L10n.tr("Rest") : "")
@@ -907,7 +907,7 @@ struct DashboardView: View {
                         label: L10n.tr("Protein"),
                         value: "\(Int(vm.todayProteinProgress * 100))%",
                         progress: vm.todayProteinProgress,
-                        color: STRQPalette.signalIce
+                        color: STRQPalette.signalGreen
                     ) {
                         showNutritionLog = true
                     }
@@ -929,7 +929,7 @@ struct DashboardView: View {
                         label: L10n.tr("Weight"),
                         value: vm.latestWeight.map { String(format: "%.1f", $0) } ?? "—",
                         progress: vm.latestWeight != nil ? 1.0 : 0.0,
-                        color: STRQPalette.pulseViolet
+                        color: STRQPalette.steel
                     ) {
                         showWeightLog = true
                     }
@@ -944,9 +944,9 @@ struct DashboardView: View {
                     HStack(spacing: 10) {
                         Image(systemName: "doc.text.magnifyingglass")
                             .font(.subheadline)
-                            .foregroundStyle(STRQPalette.signalIce)
+                            .foregroundStyle(STRQPalette.energyAccent)
                             .frame(width: 28, height: 28)
-                            .background(STRQPalette.signalIceSoft, in: .rect(cornerRadius: 8))
+                            .background(STRQPalette.energyAccentSoft, in: .rect(cornerRadius: 8))
                         VStack(alignment: .leading, spacing: 1) {
                             Text(L10n.tr("Weekly review ready"))
                                 .font(.subheadline.weight(.semibold))
@@ -964,7 +964,7 @@ struct DashboardView: View {
                     .background(STRQPalette.surfaceCarbon, in: .rect(cornerRadius: 12))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(STRQPalette.signalIce.opacity(0.18), lineWidth: 1)
+                            .strokeBorder(STRQPalette.borderSubtle, lineWidth: 1)
                     )
                 }
                 .buttonStyle(.strqPressable)
@@ -1006,7 +1006,7 @@ struct DashboardView: View {
                         let paceName = momentum.weeklyPace.colorName
                         STRQBadgeChip(
                             label: momentum.paceMessage,
-                            variant: ["green", "mint"].contains(paceName) ? .success : (["yellow", "orange"].contains(paceName) ? .warning : .ice)
+                            variant: ["green", "mint"].contains(paceName) ? .success : (["yellow", "orange"].contains(paceName) ? .warning : .neutral)
                         )
                     }
                     Image(systemName: showWeekPulseDetails ? "chevron.up" : "chevron.down")
@@ -1050,7 +1050,7 @@ struct DashboardView: View {
                         value: ForgeTheme.formatVolume(vm.weeklyStats.volume),
                         label: L10n.tr("Volume"),
                         icon: "chart.bar.fill",
-                        tint: STRQPalette.signalIce,
+                        tint: STRQPalette.steel,
                         compact: true
                     )
                     STRQMetricTile(

@@ -3,35 +3,47 @@ import SwiftUI
 /// Central semantic color system for STRQ.
 ///
 /// Rule: color is used to clarify meaning, never to decorate.
-/// - success → progressing / on-track / approved / PR secondary
-/// - warning → monitor / mixed / caution / moderate
-/// - danger  → off-track / underperforming / pain / reset
-/// - info    → informational / neutral support
-/// - steel   → baseline / coach-default / inert numeric
-/// - gold    → earned moments (PRs, milestones, streak highlights)
+/// - success: progressing / on-track / approved / PR secondary
+/// - warning: monitor / mixed / caution / moderate
+/// - danger: off-track / underperforming / pain / reset
+/// - info: informational / neutral support
+/// - steel: baseline / coach-default / inert numeric
+/// - gold: earned moments (PRs, milestones, streak highlights)
 enum STRQPalette {
     // MARK: - STRQ visual foundation
 
-    static let backgroundCarbon = Color(red: 0.02, green: 0.024, blue: 0.031)
-    static let backgroundDeep = Color(red: 0.006, green: 0.008, blue: 0.012)
-    static let surfaceCarbon = Color(red: 0.043, green: 0.055, blue: 0.071)
-    static let surfaceRaised = Color(red: 0.067, green: 0.090, blue: 0.125)
-    static let surfaceHero = Color(red: 0.055, green: 0.083, blue: 0.120)
+    static let backgroundPrimary = Color(red: 0.012, green: 0.012, blue: 0.012)
+    static let backgroundCarbon = Color(red: 0.031, green: 0.035, blue: 0.043)
+    static let backgroundDeep = Color(red: 0.020, green: 0.020, blue: 0.020)
+    static let surfaceBase = Color(red: 0.067, green: 0.067, blue: 0.075)
+    static let surfaceRaised = Color(red: 0.094, green: 0.098, blue: 0.110)
+    static let surfaceStrong = Color(red: 0.125, green: 0.129, blue: 0.141)
+    static let surfaceCarbon = surfaceBase
+    static let surfaceHero = surfaceRaised
 
-    static let borderHairline = Color(red: 0.149, green: 0.192, blue: 0.239)
-    static let borderStrong = Color(red: 0.275, green: 0.365, blue: 0.455)
+    static let borderSubtle = Color(red: 0.165, green: 0.169, blue: 0.184)
+    static let borderStrong = Color(red: 0.227, green: 0.231, blue: 0.251)
+    static let borderHairline = borderSubtle
 
-    static let textPrimary = Color.white
-    static let textSecondary = Color.white.opacity(0.72)
-    static let textMuted = Color.white.opacity(0.46)
+    static let textPrimary = Color(red: 0.969, green: 0.969, blue: 0.973)
+    static let textSecondary = Color(red: 0.655, green: 0.659, blue: 0.678)
+    static let textMuted = Color(red: 0.439, green: 0.443, blue: 0.467)
 
-    static let signalIce = Color(red: 0.471, green: 0.886, blue: 1.0)
-    static let signalIceSoft = Color(red: 0.471, green: 0.886, blue: 1.0).opacity(0.16)
-    static let pulseViolet = Color(red: 0.549, green: 0.361, blue: 1.0)
-    static let pulseVioletSoft = Color(red: 0.549, green: 0.361, blue: 1.0).opacity(0.16)
-    static let signalGreen = Color(red: 0.302, green: 1.0, blue: 0.553)
-    static let warningAmber = Color(red: 1.0, green: 0.78, blue: 0.28)
-    static let dangerRed = Color(red: 1.0, green: 0.36, blue: 0.40)
+    static let energyAccent = Color(red: 0.976, green: 0.451, blue: 0.086)
+    static let energyAccentSoft = energyAccent.opacity(0.16)
+    static let energyAccentGradient = LinearGradient(
+        colors: [
+            Color(red: 1.0, green: 0.541, blue: 0.180),
+            energyAccent,
+            Color(red: 0.761, green: 0.220, blue: 0.047)
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let signalGreen = Color(red: 0.290, green: 0.871, blue: 0.502)
+    static let warningAmber = Color(red: 1.0, green: 0.722, blue: 0.290)
+    static let dangerRed = Color(red: 1.0, green: 0.302, blue: 0.427)
 
     // MARK: - State
 
@@ -44,8 +56,8 @@ enum STRQPalette {
     static let danger = dangerRed
     static let dangerSoft = dangerRed.opacity(0.16)
 
-    static let info = signalIce
-    static let infoSoft = signalIceSoft
+    static let info = STRQBrand.steel
+    static let infoSoft = STRQBrand.steel.opacity(0.14)
 
     // MARK: - Neutral / Brand
 

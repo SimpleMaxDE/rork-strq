@@ -77,7 +77,7 @@ struct ContentView: View {
                     }
                 }
                 .tabViewStyle(.sidebarAdaptable)
-                .tint(.white)
+                .tint(STRQPalette.energyAccent)
                 .preferredColorScheme(.dark)
                 .toolbar(.hidden, for: .tabBar)
                 .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -181,10 +181,10 @@ struct STRQTabBar: View {
             VStack(spacing: 3) {
                 Image(systemName: item.icon)
                     .font(.system(size: 18, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
+                    .foregroundStyle(isSelected ? STRQPalette.energyAccent : .white.opacity(0.4))
                 Text(item.labelKey)
                     .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
+                    .foregroundStyle(isSelected ? STRQPalette.energyAccent : .white.opacity(0.4))
             }
             .frame(maxWidth: .infinity)
             .frame(height: 44)
@@ -203,11 +203,11 @@ struct STRQTabBar: View {
                     Circle()
                         .fill(
                             isSelected
-                                ? AnyShapeStyle(STRQBrand.accentGradient)
+                                ? AnyShapeStyle(STRQPalette.energyAccentGradient)
                                 : AnyShapeStyle(Color.white.opacity(0.1))
                         )
                         .frame(width: 50, height: 50)
-                        .shadow(color: isSelected ? .white.opacity(0.12) : .clear, radius: 10, y: 2)
+                        .shadow(color: isSelected ? STRQPalette.energyAccent.opacity(0.18) : .clear, radius: 10, y: 2)
 
                     if isSelected {
                         Circle()
@@ -224,7 +224,7 @@ struct STRQTabBar: View {
 
                 Text(item.labelKey)
                     .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
+                    .foregroundStyle(isSelected ? STRQPalette.energyAccent : .white.opacity(0.4))
                     .offset(y: -4)
             }
             .frame(maxWidth: .infinity)

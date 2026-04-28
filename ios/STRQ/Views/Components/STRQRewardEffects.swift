@@ -111,9 +111,9 @@ struct STRQPulseMark<Content: View>: View {
                 .frame(width: size * 2.05, height: 1)
                 .overlay(
                     Capsule()
-                        .fill(tint.opacity(0.14))
+                        .fill(tint.opacity(0.10))
                         .frame(height: 5)
-                        .blur(radius: 5)
+                        .blur(radius: 4)
                 )
                 .opacity(lineOpacityMultiplier)
         case .vertical:
@@ -122,9 +122,9 @@ struct STRQPulseMark<Content: View>: View {
                 .frame(width: 1, height: size * 2.05)
                 .overlay(
                     Capsule()
-                        .fill(tint.opacity(0.14))
+                        .fill(tint.opacity(0.10))
                         .frame(width: 5)
-                        .blur(radius: 5)
+                        .blur(radius: 4)
                 )
                 .opacity(lineOpacityMultiplier)
         case .none:
@@ -137,7 +137,7 @@ struct STRQPulseMark<Content: View>: View {
             Circle()
                 .fill(
                     RadialGradient(
-                        colors: [tint.opacity(0.18), Color.white.opacity(0.025), Color.clear],
+                        colors: [tint.opacity(0.12), Color.white.opacity(0.025), Color.clear],
                         center: .center,
                         startRadius: 1,
                         endRadius: size * 0.62
@@ -145,7 +145,7 @@ struct STRQPulseMark<Content: View>: View {
                 )
 
             Circle()
-                .stroke(tint.opacity(reduceMotion ? 0.18 : (pulse ? 0 : 0.34)), lineWidth: 1.2)
+                .stroke(tint.opacity(reduceMotion ? 0.14 : (pulse ? 0 : 0.24)), lineWidth: 1.2)
                 .scaleEffect(reduceMotion ? 1.06 : (pulse ? 1.24 : 0.84))
 
             Circle()
@@ -153,9 +153,9 @@ struct STRQPulseMark<Content: View>: View {
                     AngularGradient(
                         colors: [
                             Color.white.opacity(0.04),
-                            tint.opacity(0.72),
-                            Color.white.opacity(0.24),
-                            tint.opacity(0.18),
+                            tint.opacity(0.44),
+                            Color.white.opacity(0.18),
+                            tint.opacity(0.12),
                             Color.white.opacity(0.04)
                         ],
                         center: .center
@@ -164,7 +164,7 @@ struct STRQPulseMark<Content: View>: View {
                 )
 
             Circle()
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 0.8)
+                .strokeBorder(Color.white.opacity(0.10), lineWidth: 0.8)
         }
         .frame(width: size, height: size)
     }
@@ -173,9 +173,9 @@ struct STRQPulseMark<Content: View>: View {
         LinearGradient(
             colors: [
                 Color.clear,
-                tint.opacity(0.18),
-                Color.white.opacity(0.62),
-                tint.opacity(0.18),
+                tint.opacity(0.12),
+                Color.white.opacity(0.48),
+                tint.opacity(0.12),
                 Color.clear
             ],
             startPoint: start,
@@ -344,7 +344,7 @@ struct STRQRewardMoment: Identifiable, Equatable {
             switch self {
             case .success: return STRQPalette.success
             case .gold: return STRQPalette.gold
-            case .calm: return STRQPalette.info
+            case .calm: return STRQPalette.steel
             case .steel: return STRQBrand.steel
             }
         }
@@ -408,7 +408,7 @@ struct STRQRewardToast: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(moment.style.tint.opacity(0.24), lineWidth: 1)
+                .strokeBorder(moment.style.tint.opacity(0.20), lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.34), radius: 16, y: 8)
     }
