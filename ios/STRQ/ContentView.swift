@@ -1,9 +1,5 @@
 import SwiftUI
 
-#if DEBUG
-private let showsSandowHomeStaticCloneDebugRoute = true
-#endif
-
 struct ContentView: View {
     @Bindable var vm: AppViewModel
     var store: StoreViewModel
@@ -56,15 +52,7 @@ struct ContentView: View {
                 TabView(selection: $selectedTab) {
                     Tab(value: 0) {
                         NavigationStack {
-                            #if DEBUG
-                            if showsSandowHomeStaticCloneDebugRoute {
-                                SandowHomeStaticCloneView()
-                            } else {
-                                DashboardView(vm: vm)
-                            }
-                            #else
                             DashboardView(vm: vm)
-                            #endif
                         }
                     }
                     Tab(value: 1) {
@@ -93,13 +81,7 @@ struct ContentView: View {
                 .preferredColorScheme(.dark)
                 .toolbar(.hidden, for: .tabBar)
                 .safeAreaInset(edge: .bottom, spacing: 0) {
-                    #if DEBUG
-                    if !(showsSandowHomeStaticCloneDebugRoute && selectedTab == 0) {
-                        STRQTabBar(selectedTab: $selectedTab, hasWorkoutToday: vm.todaysWorkout != nil)
-                    }
-                    #else
                     STRQTabBar(selectedTab: $selectedTab, hasWorkoutToday: vm.todaysWorkout != nil)
-                    #endif
                 }
             }
         }
@@ -180,18 +162,13 @@ struct STRQTabBar: View {
                 }
             }
         }
-        .padding(.horizontal, 10)
-        .padding(.top, 9)
-        .padding(.bottom, 5)
+        .padding(.horizontal, 8)
+        .padding(.top, 8)
+        .padding(.bottom, 4)
         .background {
-            STRQPalette.sandowBackground
+            Rectangle()
+                .fill(.ultraThinMaterial)
                 .ignoresSafeArea()
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(STRQPalette.sandowBorder)
-                        .frame(height: 1)
-                }
-                .shadow(color: Color.black.opacity(0.38), radius: 18, y: -8)
         }
     }
 
@@ -201,19 +178,16 @@ struct STRQTabBar: View {
         return Button {
             withAnimation(.snappy(duration: 0.2)) { selectedTab = item.index }
         } label: {
-            VStack(spacing: 5) {
-                Capsule()
-                    .fill(isSelected ? STRQPalette.sandowOrange : Color.clear)
-                    .frame(width: 24, height: 3)
+            VStack(spacing: 3) {
                 Image(systemName: item.icon)
                     .font(.system(size: 18, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? STRQPalette.sandowOrange : STRQPalette.textMuted)
+                    .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
                 Text(item.labelKey)
                     .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? STRQPalette.sandowOrange : STRQPalette.textMuted)
+                    .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 50)
+            .frame(height: 44)
         }
         .sensoryFeedback(.selection, trigger: selectedTab)
     }
@@ -229,36 +203,31 @@ struct STRQTabBar: View {
                     Circle()
                         .fill(
                             isSelected
-                                ? AnyShapeStyle(STRQPalette.sandowOrange)
-                                : AnyShapeStyle(Color.white)
+                                ? AnyShapeStyle(STRQBrand.accentGradient)
+                                : AnyShapeStyle(Color.white.opacity(0.1))
                         )
-                        .frame(width: 56, height: 56)
-                        .overlay(
-                            Circle()
-                                .strokeBorder(hasWorkoutToday ? STRQPalette.sandowOrange.opacity(0.72) : Color.white.opacity(0.16), lineWidth: 2)
-                        )
-                        .shadow(color: isSelected ? STRQPalette.sandowOrange.opacity(0.28) : Color.black.opacity(0.28), radius: 14, y: 6)
+                        .frame(width: 50, height: 50)
+                        .shadow(color: isSelected ? .white.opacity(0.12) : .clear, radius: 10, y: 2)
 
                     if isSelected {
                         Circle()
-                            .fill(STRQPalette.sandowOrange.opacity(0.18))
-                            .frame(width: 60, height: 60)
-                            .blur(radius: 12)
+                            .fill(.white.opacity(0.12))
+                            .frame(width: 50, height: 50)
+                            .blur(radius: 10)
                     }
 
                     Image(systemName: item.icon)
                         .font(.system(size: 20, weight: .bold))
-                        .foregroundStyle(isSelected ? Color.white : Color.black)
+                        .foregroundStyle(isSelected ? .black : .white.opacity(0.6))
                 }
-                .offset(y: -10)
+                .offset(y: -6)
 
                 Text(item.labelKey)
                     .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(isSelected ? STRQPalette.sandowOrange : STRQPalette.textMuted)
-                    .offset(y: -7)
+                    .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
+                    .offset(y: -4)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 58)
         }
         .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.4), trigger: selectedTab)
     }
