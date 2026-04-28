@@ -65,8 +65,8 @@ struct WorkoutCompletionView: View {
             }
 
             ScrollView {
-                VStack(spacing: 24) {
-                    Spacer(minLength: 28)
+                VStack(spacing: 18) {
+                    Spacer(minLength: 18)
                     heroSection
                     primaryAchievementBadge
                     statsSection
@@ -74,15 +74,13 @@ struct WorkoutCompletionView: View {
                     activationRibbon
                     highlightsSection
                     nextSessionBridge
-                    Color.clear.frame(height: 110)
+                    Color.clear.frame(height: 24)
                 }
             }
             .scrollIndicators(.hidden)
-
-            VStack {
-                Spacer()
-                bottomActions
-            }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            bottomActions
         }
         .preferredColorScheme(.dark)
         .sensoryFeedback(.success, trigger: celebrationTrigger)
@@ -115,10 +113,10 @@ struct WorkoutCompletionView: View {
     // MARK: - Hero
 
     private var heroSection: some View {
-        VStack(spacing: 18) {
-            STRQPulseMark(size: 118, tint: primaryAccent, trigger: sparkTrigger) {
+        VStack(spacing: 14) {
+            STRQPulseMark(size: 96, tint: primaryAccent, trigger: sparkTrigger) {
                 Image(systemName: verdictIcon)
-                    .font(.system(size: 44, weight: .semibold))
+                    .font(.system(size: 36, weight: .semibold))
                     .foregroundStyle(hasPR ? AnyShapeStyle(STRQPalette.goldGradient) : AnyShapeStyle(primaryAccent.gradient))
                     .scaleEffect(trophyPulse ? 1.04 : 1.0)
                     .animation(reduceMotion ? nil : .easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: trophyPulse)
@@ -133,7 +131,7 @@ struct WorkoutCompletionView: View {
                     .foregroundStyle(primaryAccent)
                     .tracking(3)
                 Text(verdict.summary)
-                    .font(.system(size: 26, weight: .bold))
+                    .font(.system(size: 24, weight: .bold))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
@@ -173,9 +171,9 @@ struct WorkoutCompletionView: View {
     private var statsSection: some View {
         if let session {
             let duration = session.endTime.map { Int($0.timeIntervalSince(session.startTime) / 60) } ?? 0
-            let totalSets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
-            let totalReps = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).reduce(0) { $0 + $1.reps }
-            let completedExercises = session.exerciseLogs.filter(\.isCompleted).count
+            let totalSets = session.completedSetCount
+            let totalReps = session.completedRepCount
+            let completedExercises = session.distinctCompletedExerciseCount
 
             VStack(spacing: 10) {
                 HStack(spacing: 8) {
@@ -305,7 +303,7 @@ struct WorkoutCompletionView: View {
             ))
         }
 
-        let completedSets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
+        let completedSets = session.completedSetCount
         if insights.count < 2 && completedSets > 0 {
             let setLabel = L10n.countLabel(
                 completedSets,

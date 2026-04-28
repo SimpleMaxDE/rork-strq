@@ -45,7 +45,13 @@ struct SessionHistoryView: View {
                                         .tracking(1.2)
                                         .foregroundStyle(.secondary)
                                     Spacer()
-                                    Text("\(monthSessions.count) \(monthSessions.count == 1 ? "session" : "sessions")")
+                                    Text(L10n.countLabel(
+                                        monthSessions.count,
+                                        singularKey: "Workout",
+                                        pluralKey: "Workouts",
+                                        singularFallback: "workout",
+                                        pluralFallback: "workouts"
+                                    ))
                                         .font(.system(size: 10, weight: .semibold).monospacedDigit())
                                         .foregroundStyle(.tertiary)
                                 }
@@ -97,7 +103,7 @@ struct SessionHistoryView: View {
         }.reduce(0, +)
 
         return HStack(spacing: 10) {
-            logbookStat(value: "\(sessions.count)", label: "Sessions")
+            logbookStat(value: "\(sessions.count)", label: L10n.tr("Workouts"))
             logbookStat(value: ForgeTheme.formatVolume(totalVolume), label: "Volume", unit: "kg")
             logbookStat(value: "\(totalSets)", label: "Sets")
             logbookStat(value: "\(totalMinutes / 60)", label: "Hours")
@@ -195,7 +201,7 @@ struct SessionHistoryView: View {
                 HStack(spacing: 6) {
                     logMetric("\(duration)", unit: "min")
                     dot
-                    logMetric("\(session.exerciseLogs.filter(\.isCompleted).count)", unit: "ex")
+                    logMetric("\(session.distinctCompletedExerciseCount)", unit: "ex")
                     dot
                     logMetric("\(sets)", unit: "sets")
                     dot
@@ -373,12 +379,12 @@ struct SessionDetailView: View {
 
     private var statsRow: some View {
         let duration = session.endTime.map { Int($0.timeIntervalSince(session.startTime) / 60) } ?? 0
-        let sets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
-        let reps = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).reduce(0) { $0 + $1.reps }
+        let sets = session.completedSetCount
+        let reps = session.completedRepCount
 
         return HStack(spacing: 8) {
             detailStat(value: "\(duration)", unit: "min", label: "Time")
-            detailStat(value: "\(session.exerciseLogs.filter(\.isCompleted).count)", unit: nil, label: "Exercises")
+            detailStat(value: "\(session.distinctCompletedExerciseCount)", unit: nil, label: "Exercises")
             detailStat(value: "\(sets)", unit: nil, label: "Sets")
             detailStat(value: "\(reps)", unit: nil, label: "Reps")
             detailStat(value: ForgeTheme.formatVolume(session.totalVolume), unit: "kg", label: "Volume")

@@ -23,7 +23,7 @@ nonisolated enum CoachMemoryScope: String, Sendable {
 
     var label: String {
         switch self {
-        case .session: "Session"
+        case .session: "Workout"
         case .week:    "Week"
         case .block:   "Block"
         }
@@ -248,7 +248,7 @@ struct CoachingMemoryService {
         switch type {
         case .volumeReduced:   return "Recent recovery signal called for less accessory work."
         case .exerciseSwapped: return "The previous movement was not progressing on its own."
-        case .lighterSession:  return "One deliberately easier session was the right protection."
+        case .lighterSession:  return "One deliberately easier workout was the right protection."
         case .weekRegenerated: return "Coach rebalanced the week around your latest signal."
         case .deloadWeek:      return "Multi-week fatigue trend earned a structured back-off."
         }
@@ -256,7 +256,7 @@ struct CoachingMemoryService {
 
     private func defaultExpectation(for type: CoachAdjustmentType) -> String {
         switch type {
-        case .volumeReduced:   return "Session should feel slightly easier with the same compound work intact."
+        case .volumeReduced:   return "Workout should feel slightly easier with the same compound work intact."
         case .exerciseSwapped: return "Start lighter on the new movement, then rebuild load."
         case .lighterSession:  return "Leave reps in reserve everywhere — save the push for the next one."
         case .weekRegenerated: return "Expect cleaner volume distribution across your days."

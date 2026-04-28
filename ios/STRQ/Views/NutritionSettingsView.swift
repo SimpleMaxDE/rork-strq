@@ -357,7 +357,7 @@ struct NutritionSettingsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 connectionRow(icon: "figure.strengthtraining.traditional", color: STRQBrand.steel, title: "Training Goal", detail: vm.profile.goal.displayName)
                 connectionRow(icon: "dumbbell.fill", color: .blue, title: "Training Level", detail: vm.profile.trainingLevel.shortName)
-                connectionRow(icon: "calendar", color: .green, title: "Sessions/Week", detail: "\(vm.profile.daysPerWeek)")
+            connectionRow(icon: "calendar", color: .green, title: "Workouts/Week", detail: "\(vm.profile.daysPerWeek)")
                 connectionRow(icon: "moon.zzz.fill", color: .purple, title: "Avg Sleep", detail: String(format: "%.1fh", vm.averageSleepHours))
                 connectionRow(icon: "heart.fill", color: .red, title: "Recovery Score", detail: "\(vm.effectiveRecoveryScore)%")
             }

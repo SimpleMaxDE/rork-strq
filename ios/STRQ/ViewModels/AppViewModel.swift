@@ -1569,7 +1569,7 @@ class AppViewModel {
             return L10n.format("onboardingImpact.schedule.fallback", fallback: "Split optimized for %d training days.", profile.daysPerWeek)
         }
         let split = SplitDisplayName.localizedDisplayName(for: plan.splitType)
-        return L10n.format("onboardingImpact.schedule.detail", fallback: "%@ split — optimized for %d days with %d-minute sessions.", split, profile.daysPerWeek, profile.minutesPerSession)
+        return L10n.format("onboardingImpact.schedule.detail", fallback: "%@ split — optimized for %d days with %d-minute workouts.", split, profile.daysPerWeek, profile.minutesPerSession)
     }
 
     func sessionBriefing(for day: WorkoutDay) -> SessionBriefing {

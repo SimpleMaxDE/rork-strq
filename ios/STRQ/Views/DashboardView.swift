@@ -376,8 +376,8 @@ struct DashboardView: View {
             streak: vm.streak,
             exerciseName: { id in vm.library.exercise(byId: id)?.name ?? L10n.tr("Exercise") }
         )
-        let completedExercises = session.exerciseLogs.filter(\.isCompleted).count
-        let completedSets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
+        let completedExercises = session.distinctCompletedExerciseCount
+        let completedSets = session.completedSetCount
 
         return PostWorkoutBridge(
             sessionName: session.dayName,

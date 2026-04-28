@@ -45,6 +45,30 @@ nonisolated struct WorkoutSession: Codable, Identifiable, Sendable {
     }
 }
 
+extension WorkoutSession {
+    var completedSetCount: Int {
+        exerciseLogs.reduce(0) { total, log in
+            total + log.sets.filter(\.isCompleted).count
+        }
+    }
+
+    var completedRepCount: Int {
+        exerciseLogs.reduce(0) { total, log in
+            total + log.sets.filter(\.isCompleted).reduce(0) { $0 + $1.reps }
+        }
+    }
+
+    var distinctCompletedExerciseCount: Int {
+        let exerciseIds = Set(
+            exerciseLogs
+                .filter { $0.sets.contains(where: \.isCompleted) }
+                .map(\.exerciseId)
+        )
+        let count = exerciseIds.count
+        return completedSetCount > 0 && count == 0 ? 1 : count
+    }
+}
+
 nonisolated struct ExerciseLog: Codable, Identifiable, Sendable {
     let id: String
     var exerciseId: String

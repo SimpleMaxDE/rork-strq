@@ -17,21 +17,13 @@ struct STRQLogoView: View {
                     .animation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true), value: glowPulse)
             }
 
-            AsyncImage(url: URL(string: "https://r2-pub.rork.com/generated-images/e2cba9b6-2ed2-43b0-bf09-6a33a4c168ce.png")) { phase in
-                if let image = phase.image {
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: size, height: size)
-                } else {
-                    Text("S")
-                        .font(.system(size: size * 0.5, weight: .black, design: .default))
-                        .foregroundStyle(.white)
-                }
-            }
-            .opacity(animated ? (revealed ? 1 : 0) : 1)
-            .scaleEffect(animated ? (revealed ? 1 : 0.7) : 1)
-            .offset(x: animated ? (revealed ? 0 : -8) : 0)
+            Image("STRQSigil")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: size, height: size)
+                .opacity(animated ? (revealed ? 1 : 0) : 1)
+                .scaleEffect(animated ? (revealed ? 1 : 0.7) : 1)
+                .offset(x: animated ? (revealed ? 0 : -8) : 0)
         }
         .onAppear {
             if animated {

@@ -163,7 +163,7 @@ struct WeeklyReviewGenerator {
         if summary.completedWorkouts >= summary.plannedWorkouts {
             wins.append(ReviewHighlight(
                 icon: "checkmark.seal.fill",
-                title: "All Sessions Completed",
+                title: "All Workouts Completed",
                 detail: "You hit \(summary.completedWorkouts)/\(summary.plannedWorkouts) planned workouts this week.",
                 color: "green"
             ))
@@ -171,7 +171,7 @@ struct WeeklyReviewGenerator {
             wins.append(ReviewHighlight(
                 icon: "figure.strengthtraining.traditional",
                 title: "Strong Week",
-                detail: "\(summary.completedWorkouts) of \(summary.plannedWorkouts) sessions completed — solid consistency.",
+                detail: "\(summary.completedWorkouts) of \(summary.plannedWorkouts) workouts completed — solid consistency.",
                 color: "green"
             ))
         }
@@ -240,7 +240,7 @@ struct WeeklyReviewGenerator {
             let missed = summary.plannedWorkouts - summary.completedWorkouts
             areas.append(ReviewHighlight(
                 icon: "calendar.badge.exclamationmark",
-                title: "\(missed) Missed Session\(missed > 1 ? "s" : "")",
+                title: "\(missed) Missed Workout\(missed > 1 ? "s" : "")",
                 detail: "You completed \(summary.completedWorkouts) of \(summary.plannedWorkouts) planned. Try to stay consistent next week.",
                 color: "yellow"
             ))

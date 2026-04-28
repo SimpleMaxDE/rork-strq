@@ -17,19 +17,27 @@ struct TrainingPlanView: View {
         ScrollView {
             VStack(spacing: 0) {
                 if let plan = vm.currentPlan {
-                    weekCalendarHeader(plan)
-                        .padding(.top, 4)
-                    daySelector(plan)
+                    if usesWeekRail(for: plan) {
+                        weekCalendarHeader(plan)
+                            .padding(.top, 4)
+                    } else {
+                        daySelector(plan)
+                    }
                     dayContent(plan)
                 } else {
                     emptyPlanState
                 }
             }
-            .padding(.bottom, 32)
+            .padding(.bottom, 24)
         }
         .background(Color(.systemBackground))
         .navigationTitle(L10n.tr("Train"))
         .navigationBarTitleDisplayMode(.large)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if let day = selectedDay, !day.isSkipped {
+                trainStartBar(day)
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
@@ -283,9 +291,6 @@ struct TrainingPlanView: View {
                 missionCard(day: day, briefing: briefing)
                     .padding(.horizontal, 16)
 
-                scheduleControlRow(day: day)
-                    .padding(.horizontal, 16)
-
                 if let weekAdj = vm.weekAdjustment {
                     weekAdjBanner(weekAdj)
                         .padding(.horizontal, 16)
@@ -302,14 +307,6 @@ struct TrainingPlanView: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 4)
                 }
-
-                if !day.isSkipped {
-                    ForgePrimaryButton(icon: "bolt.fill", title: L10n.tr("Review & Start")) {
-                        vm.prepareWorkoutHandoff(day: day)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 6)
-                }
             }
             .padding(.top, 20)
         }
@@ -318,39 +315,28 @@ struct TrainingPlanView: View {
     // MARK: - Mission Card
 
     private func missionCard(day: WorkoutDay, briefing: SessionBriefing) -> some View {
-        ZStack(alignment: .topLeading) {
-            Canvas { context, size in
-                for i in 0..<3 {
-                    let xF: [CGFloat] = [0.15, 0.7, 0.9]
-                    let yF: [CGFloat] = [0.3, 0.7, 0.2]
-                    let radius = CGFloat(70 + i * 25)
-                    let circle = Path(ellipseIn: CGRect(
-                        x: xF[i] * size.width - radius,
-                        y: yF[i] * size.height - radius,
-                        width: radius * 2, height: radius * 2
-                    ))
-                    context.fill(circle, with: .color(.white.opacity(0.025)))
-                }
-            }
-            .allowsHitTesting(false)
-
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 6) {
-                    Text(vm.currentPhase.displayName.uppercased())
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 8) {
+                Text(L10n.tr("WORKOUT"))
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(1.2)
+                    .foregroundStyle(STRQBrand.steel)
+                Text(vm.currentPhase.displayName.uppercased())
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.42))
+                Spacer()
+                if let wd = day.scheduledWeekday {
+                    Text(vm.fullWeekdayName(wd).uppercased())
                         .font(.system(size: 9, weight: .black))
                         .tracking(1.2)
-                        .foregroundStyle(STRQBrand.steel)
-                    Spacer()
-                    if let wd = day.scheduledWeekday {
-                        Text(vm.fullWeekdayName(wd).uppercased())
-                            .font(.system(size: 9, weight: .black))
-                            .tracking(1.2)
-                            .foregroundStyle(.white.opacity(0.4))
-                    }
+                        .foregroundStyle(.white.opacity(0.46))
                 }
+            }
 
+            VStack(alignment: .leading, spacing: 6) {
                 Text(day.name)
-                    .font(.system(size: 22, weight: .heavy, design: .rounded))
+                    .font(.system(size: 24, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -361,37 +347,60 @@ struct TrainingPlanView: View {
                         .foregroundStyle(.white.opacity(0.55))
                         .lineLimit(2)
                 }
-
-                HStack(spacing: 0) {
-                    ForgeStatCell(value: "\(briefing.exerciseCount)", label: L10n.tr("Exercises"))
-                    ForgeStatCell(value: "\(briefing.totalSets)", label: L10n.tr("Sets"))
-                    ForgeStatCell(value: "~\(briefing.estimatedMinutes)m", label: L10n.tr("Time"))
-                    ForgeStatCell(value: briefing.intensityLabel, label: L10n.tr("Effort"), valueColor: STRQBrand.steel)
-                }
-                .padding(.top, 2)
             }
-            .padding(14)
+
+            HStack(spacing: 8) {
+                workoutMetricChip(value: "\(briefing.exerciseCount)", label: L10n.tr("Exercises"))
+                workoutMetricChip(value: "\(briefing.totalSets)", label: L10n.tr("Sets"))
+                workoutMetricChip(value: "~\(briefing.estimatedMinutes)m", label: L10n.tr("Time"))
+                workoutMetricChip(value: briefing.intensityLabel, label: L10n.tr("Effort"), valueColor: STRQBrand.steel)
+            }
+
+            scheduleControlRow(day: day)
         }
+        .padding(16)
         .background(
             LinearGradient(
-                colors: [Color(white: 0.17), Color(white: 0.09)],
+                colors: [Color(white: 0.115), Color(white: 0.055)],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             ),
-            in: .rect(cornerRadius: 22)
+            in: .rect(cornerRadius: 18)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 22)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
         )
         .overlay(alignment: .top) {
             STRQBrand.accentGradient
                 .frame(height: 3)
-                .clipShape(.rect(cornerRadii: .init(topLeading: 22, bottomLeading: 0, bottomTrailing: 0, topTrailing: 22)))
+                .clipShape(.rect(cornerRadii: .init(topLeading: 18, bottomLeading: 0, bottomTrailing: 0, topTrailing: 18)))
         }
         .shadow(color: .black.opacity(0.25), radius: 18, y: 6)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(.easeOut(duration: 0.5).delay(0.05), value: appeared)
+    }
+
+    private func workoutMetricChip(value: String, label: String, valueColor: Color = .white) -> some View {
+        VStack(spacing: 3) {
+            Text(value)
+                .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
+                .foregroundStyle(valueColor)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+            Text(label)
+                .font(.system(size: 8, weight: .black))
+                .tracking(0.5)
+                .foregroundStyle(.white.opacity(0.46))
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 9)
+        .background(Color.white.opacity(0.055), in: .rect(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+        )
     }
 
     // MARK: - Exercise Stack
@@ -663,7 +672,7 @@ struct TrainingPlanView: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
-                .background(STRQBrand.steel.opacity(0.08), in: Capsule())
+                .background(Color.white.opacity(0.055), in: Capsule())
             }
 
             Spacer()
@@ -677,10 +686,10 @@ struct TrainingPlanView: View {
                     Text(L10n.tr(day.isSkipped ? "Unskip" : "Skip"))
                         .font(.caption2.weight(.semibold))
                 }
-                .foregroundStyle(day.isSkipped ? STRQPalette.success : .secondary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color(.tertiarySystemGroupedBackground), in: Capsule())
+                    .foregroundStyle(day.isSkipped ? STRQPalette.success : .white.opacity(0.56))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.white.opacity(0.055), in: Capsule())
             }
 
             if day.scheduledWeekday != nil {
@@ -693,16 +702,45 @@ struct TrainingPlanView: View {
                         Text(L10n.tr("Move"))
                             .font(.caption2.weight(.semibold))
                     }
-                    .foregroundStyle(STRQBrand.steel)
+                    .foregroundStyle(STRQBrand.steel.opacity(0.9))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .background(Color(.tertiarySystemGroupedBackground), in: Capsule())
+                    .background(Color.white.opacity(0.055), in: Capsule())
                 }
             }
         }
     }
 
     // MARK: - Helpers
+
+    private var selectedDay: WorkoutDay? {
+        guard let plan = vm.currentPlan, selectedDayIndex < plan.days.count else { return nil }
+        return plan.days[selectedDayIndex]
+    }
+
+    private func usesWeekRail(for plan: WorkoutPlan) -> Bool {
+        let activeDays = plan.days.filter { !$0.isSkipped }
+        return !activeDays.isEmpty && activeDays.allSatisfy { $0.scheduledWeekday != nil }
+    }
+
+    private func trainStartBar(_ day: WorkoutDay) -> some View {
+        VStack(spacing: 0) {
+            LinearGradient(
+                colors: [Color(.systemBackground).opacity(0), Color(.systemBackground)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 22)
+
+            ForgePrimaryButton(icon: "bolt.fill", title: L10n.tr("Review & Start")) {
+                vm.prepareWorkoutHandoff(day: day)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 6)
+            .padding(.bottom, 12)
+            .background(Color(.systemBackground))
+        }
+    }
 
     private func autoSelectToday(_ plan: WorkoutPlan) {
         let todayWeekday = Calendar.current.component(.weekday, from: Date())

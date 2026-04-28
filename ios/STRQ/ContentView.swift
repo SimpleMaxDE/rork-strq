@@ -49,39 +49,38 @@ struct ContentView: View {
                     onCancel: { vm.cancelHandoff() }
                 )
             } else {
-                ZStack(alignment: .bottom) {
-                    TabView(selection: $selectedTab) {
-                        Tab(value: 0) {
-                            NavigationStack {
-                                DashboardView(vm: vm)
-                            }
-                        }
-                        Tab(value: 1) {
-                            NavigationStack {
-                                CoachTabView(vm: vm)
-                            }
-                        }
-                        Tab(value: 2) {
-                            NavigationStack {
-                                TrainingPlanView(vm: vm)
-                            }
-                        }
-                        Tab(value: 3) {
-                            NavigationStack {
-                                ProgressAnalyticsView(vm: vm)
-                            }
-                        }
-                        Tab(value: 4) {
-                            NavigationStack {
-                                ProfileView(vm: vm, store: store)
-                            }
+                TabView(selection: $selectedTab) {
+                    Tab(value: 0) {
+                        NavigationStack {
+                            DashboardView(vm: vm)
                         }
                     }
-                    .tabViewStyle(.sidebarAdaptable)
-                    .tint(.white)
-                    .preferredColorScheme(.dark)
-                    .toolbar(.hidden, for: .tabBar)
-
+                    Tab(value: 1) {
+                        NavigationStack {
+                            CoachTabView(vm: vm)
+                        }
+                    }
+                    Tab(value: 2) {
+                        NavigationStack {
+                            TrainingPlanView(vm: vm)
+                        }
+                    }
+                    Tab(value: 3) {
+                        NavigationStack {
+                            ProgressAnalyticsView(vm: vm)
+                        }
+                    }
+                    Tab(value: 4) {
+                        NavigationStack {
+                            ProfileView(vm: vm, store: store)
+                        }
+                    }
+                }
+                .tabViewStyle(.sidebarAdaptable)
+                .tint(.white)
+                .preferredColorScheme(.dark)
+                .toolbar(.hidden, for: .tabBar)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
                     STRQTabBar(selectedTab: $selectedTab, hasWorkoutToday: vm.todaysWorkout != nil)
                 }
             }

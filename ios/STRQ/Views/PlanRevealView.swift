@@ -40,17 +40,14 @@ struct PlanRevealView: View {
                         qualitySection(quality)
                     }
                     explanationSection
-                    Color.clear.frame(height: 90)
+                    Color.clear.frame(height: 24)
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
             }
-
-            VStack(spacing: 0) {
-                Spacer()
-                stickyStartBar
-            }
-            .ignoresSafeArea(edges: .bottom)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            stickyStartBar
         }
         .preferredColorScheme(.dark)
         .onAppear {
@@ -62,14 +59,12 @@ struct PlanRevealView: View {
     }
 
     private var heroSection: some View {
-        VStack(spacing: 22) {
-            Spacer().frame(height: 24)
+        VStack(spacing: 20) {
+            Spacer().frame(height: 18)
 
-            STRQPulseMark(size: 72, tint: STRQBrand.steel, line: .horizontal) {
-                Text("STRQ")
-                    .font(.system(size: 13, weight: .black, design: .default))
-                    .tracking(1.6)
-                    .foregroundStyle(.white)
+            STRQPulseMark(size: 84, tint: STRQBrand.steel.opacity(0.78), line: reduceMotion ? .none : .horizontal) {
+                STRQLogoView(size: 48, animated: false)
+                    .opacity(0.96)
             }
             .scaleEffect(appeared ? 1 : 0.82)
             .opacity(appeared ? 1 : 0)

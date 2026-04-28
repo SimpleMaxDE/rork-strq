@@ -221,7 +221,7 @@ struct CoachActionMapper {
         return [
             CoachAction(
                 type: .lighterSession,
-                label: "Lighter Next Session",
+                label: "Lighter Next Workout",
                 icon: "arrow.down.circle",
                 explanation: "Reduce intensity on your next workout. Focus on technique and controlled reps.",
                 whyItMatters: "Managing fatigue proactively prevents burnout and keeps you training consistently.",
@@ -246,10 +246,10 @@ struct CoachActionMapper {
         return [
             CoachAction(
                 type: .increaseFrequency,
-                label: "Schedule Sessions",
+                label: "Schedule Workouts",
                 icon: "calendar.badge.plus",
                 explanation: "Block out specific times in your week for training to build the habit.",
-                whyItMatters: "Scheduled sessions are far more likely to happen than 'whenever I feel like it'.",
+                whyItMatters: "Scheduled workouts are far more likely to happen than 'whenever I feel like it'.",
                 previewText: "Set reminders for your planned training days"
             )
         ]
@@ -297,11 +297,11 @@ struct CoachActionMapper {
         [
             CoachAction(
                 type: .lighterSession,
-                label: "Adjust Next Session",
+                label: "Adjust Next Workout",
                 icon: "slider.horizontal.3",
-                explanation: "Make a small adjustment to your next session based on how you're feeling.",
+                explanation: "Make a small adjustment to your next workout based on how you're feeling.",
                 whyItMatters: "Autoregulation — adjusting training to your daily readiness — is key to sustainable progress.",
-                previewText: "Next session: listen to your body and adjust intensity"
+                previewText: "Next workout: listen to your body and adjust intensity"
             )
         ]
     }

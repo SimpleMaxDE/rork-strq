@@ -108,7 +108,7 @@ struct NotificationSettingsView: View {
             VStack(spacing: 1) {
                 toggleRow(
                     "Workout Planned Today",
-                    subtitle: "Get reminded when you have a session scheduled",
+            subtitle: "Get reminded when you have a workout scheduled",
                     isOn: $vm.notificationSettings.workoutRemindersEnabled
                 )
 

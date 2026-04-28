@@ -69,7 +69,7 @@ struct ActiveWorkoutView: View {
                                 }
                             }
                             .frame(width: proxy.size.width, alignment: .top)
-                            .padding(.bottom, 100)
+                            .padding(.bottom, 140)
                         }
                     }
                 }
@@ -1387,7 +1387,7 @@ struct ActiveWorkoutView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.bottom, 16)
+            .padding(.bottom, 28)
             .background(Color.black)
         }
     }

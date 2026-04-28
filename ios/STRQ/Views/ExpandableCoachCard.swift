@@ -228,7 +228,7 @@ struct ExpandableInsightCard: View {
         let isRegen = action.type == .regenerateWeek
         let color: Color = isRegen ? STRQBrand.steel : STRQBrand.slate
         let icon = isRegen ? "calendar.badge.clock" : "arrow.down.to.line"
-        let label = isRegen ? "Full week adjustment" : "Deload all sessions"
+        let label = isRegen ? "Full week adjustment" : "Deload all workouts"
 
         return HStack(spacing: 8) {
             Image(systemName: icon)
@@ -722,7 +722,7 @@ struct ExpandableRecommendationCard: View {
         let isRegen = action.type == .regenerateWeek
         let color: Color = isRegen ? STRQBrand.steel : STRQBrand.slate
         let icon = isRegen ? "calendar.badge.clock" : "arrow.down.to.line"
-        let label = isRegen ? "Full week adjustment" : "Deload all sessions"
+        let label = isRegen ? "Full week adjustment" : "Deload all workouts"
 
         return HStack(spacing: 8) {
             Image(systemName: icon)

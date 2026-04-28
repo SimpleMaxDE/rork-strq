@@ -319,7 +319,7 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "moon.fill",
                 color: "yellow",
-                title: "3 Sessions in 3 Days",
+                    title: "3 Workouts in 3 Days",
                 message: "Training daily is fine occasionally, but sustained high frequency may impair recovery. Listen to your body.",
                 severity: .medium,
                 category: .recovery
