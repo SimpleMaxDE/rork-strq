@@ -151,19 +151,19 @@ struct STRQSurface<Content: View>: View {
         switch variant {
         case .standard:
             return LinearGradient(
-                colors: [STRQPalette.surfaceCarbon, STRQPalette.backgroundDeep],
+                colors: [STRQPalette.surfaceCommand, STRQPalette.backgroundDeep],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         case .elevated:
             return LinearGradient(
-                colors: [STRQPalette.surfaceRaised, STRQPalette.surfaceCarbon],
+                colors: [STRQPalette.surfaceCommandRaised, STRQPalette.surfaceCommand],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         case .hero:
             return LinearGradient(
-                colors: [STRQPalette.surfaceHero, STRQPalette.surfaceCarbon, STRQPalette.backgroundDeep],
+                colors: [STRQPalette.surfaceCommandRaised, STRQPalette.surfaceHero, STRQPalette.backgroundDeep],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -386,6 +386,274 @@ struct STRQSectionTitle: View {
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(STRQPalette.textMuted)
                     .lineLimit(1)
+            }
+        }
+    }
+}
+
+struct STRQMiniProgressRing<Content: View>: View {
+    var progress: Double
+    var tint: Color = STRQPalette.signalIce
+    var size: CGFloat = 92
+    var lineWidth: CGFloat = 8
+    let content: Content
+
+    init(
+        progress: Double,
+        tint: Color = STRQPalette.signalIce,
+        size: CGFloat = 92,
+        lineWidth: CGFloat = 8,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.progress = progress
+        self.tint = tint
+        self.size = size
+        self.lineWidth = lineWidth
+        self.content = content()
+    }
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(Color.white.opacity(0.075), lineWidth: lineWidth)
+
+            Circle()
+                .trim(from: 0, to: min(max(progress, 0), 1))
+                .stroke(
+                    AngularGradient(
+                        colors: [
+                            tint.opacity(0.36),
+                            tint,
+                            STRQPalette.signalIceBright,
+                            STRQPalette.pulseViolet.opacity(0.78),
+                            tint.opacity(0.36)
+                        ],
+                        center: .center
+                    ),
+                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [tint.opacity(0.20), STRQPalette.surfaceInset.opacity(0.82)],
+                        center: .top,
+                        startRadius: 1,
+                        endRadius: size * 0.62
+                    )
+                )
+                .padding(lineWidth + 7)
+
+            content
+        }
+        .frame(width: size, height: size)
+        .shadow(color: tint.opacity(0.18), radius: 18, y: 8)
+    }
+}
+
+struct STRQDashboardHeroCard: View {
+    struct Metric: Identifiable {
+        let label: String
+        let value: String
+        var icon: String?
+        var tint: Color = STRQPalette.signalIce
+
+        var id: String { "\(label)-\(value)" }
+    }
+
+    let title: String
+    let status: String
+    let score: Int
+    let scoreLabel: String
+    let insight: String
+    let accent: Color
+    let metrics: [Metric]
+
+    var body: some View {
+        STRQSurface(variant: .hero, accent: accent, padding: 0) {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .top, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        STRQBadgeChip(label: title, icon: "sparkles", variant: .ice)
+
+                        Text(status)
+                            .font(.system(size: 25, weight: .heavy, design: .rounded))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.72)
+
+                        Text(insight)
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(STRQPalette.textSecondary)
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    STRQMiniProgressRing(progress: Double(score) / 100, tint: accent, size: 104, lineWidth: 8) {
+                        VStack(spacing: 1) {
+                            Text("\(score)")
+                                .font(.system(size: 32, weight: .black, design: .rounded).monospacedDigit())
+                                .foregroundStyle(STRQPalette.textPrimary)
+                                .contentTransition(.numericText())
+                            Text(scoreLabel.uppercased())
+                                .font(.system(size: 8, weight: .black))
+                                .tracking(0.8)
+                                .foregroundStyle(STRQPalette.textMuted)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.62)
+                        }
+                    }
+                }
+
+                HStack(spacing: 8) {
+                    ForEach(metrics.prefix(3)) { metric in
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(spacing: 5) {
+                                if let icon = metric.icon {
+                                    Image(systemName: icon)
+                                        .font(.system(size: 10, weight: .bold))
+                                }
+                                Text(metric.label.uppercased())
+                                    .font(.system(size: 8, weight: .black))
+                                    .tracking(0.7)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                            }
+                            .foregroundStyle(metric.tint)
+
+                            Text(metric.value)
+                                .font(.system(size: 16, weight: .heavy, design: .rounded).monospacedDigit())
+                                .foregroundStyle(STRQPalette.textPrimary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 9)
+                        .background(STRQPalette.surfaceInset.opacity(0.68), in: .rect(cornerRadius: 14))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .strokeBorder(metric.tint.opacity(0.16), lineWidth: 1)
+                        )
+                    }
+                }
+            }
+            .padding(18)
+        }
+    }
+}
+
+struct STRQSignalBar: View {
+    let label: String
+    let value: String
+    var detail: String?
+    var icon: String = "waveform.path.ecg"
+    var progress: Double
+    var tint: Color = STRQPalette.signalIce
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(tint)
+                    .frame(width: 28, height: 28)
+                    .background(tint.opacity(0.14), in: .rect(cornerRadius: 9))
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(label)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(STRQPalette.textPrimary)
+                        .lineLimit(1)
+                    if let detail {
+                        Text(detail)
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(STRQPalette.textMuted)
+                            .lineLimit(1)
+                    }
+                }
+
+                Spacer(minLength: 8)
+
+                Text(value)
+                    .font(.system(size: 13, weight: .black, design: .rounded).monospacedDigit())
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.075))
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [tint, STRQPalette.signalIceBright.opacity(0.58)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: max(6, geo.size.width * min(max(progress, 0), 1)))
+                }
+            }
+            .frame(height: 6)
+        }
+        .padding(12)
+        .background(STRQPalette.surfaceInset.opacity(0.70), in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(tint.opacity(0.13), lineWidth: 1)
+        )
+    }
+}
+
+struct STRQAchievementPreviewCard: View {
+    let eyebrow: String
+    let title: String
+    let detail: String
+    let value: String
+    let icon: String
+    let tint: Color
+    let progress: Double
+
+    var body: some View {
+        STRQSurface(variant: .elevated, accent: tint, padding: 14) {
+            HStack(spacing: 14) {
+                STRQMiniProgressRing(progress: progress, tint: tint, size: 62, lineWidth: 6) {
+                    Image(systemName: icon)
+                        .font(.system(size: 20, weight: .black))
+                        .foregroundStyle(tint)
+                }
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(eyebrow.uppercased())
+                        .font(.system(size: 9, weight: .black))
+                        .tracking(1.1)
+                        .foregroundStyle(tint)
+                    Text(title)
+                        .font(.system(size: 17, weight: .heavy, design: .rounded))
+                        .foregroundStyle(STRQPalette.textPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                    Text(detail)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(STRQPalette.textSecondary)
+                        .lineLimit(2)
+                }
+
+                Spacer(minLength: 6)
+
+                Text(value)
+                    .font(.system(size: 18, weight: .black, design: .rounded).monospacedDigit())
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(tint.opacity(0.14), in: Capsule())
+                    .overlay(Capsule().strokeBorder(tint.opacity(0.25), lineWidth: 0.8))
             }
         }
     }

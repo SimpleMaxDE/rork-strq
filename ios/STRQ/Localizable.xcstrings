@@ -11,6 +11,366 @@
         }
       }
     },
+    "dashboard.status.ready": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ BEREIT"
+          }
+        }
+      }
+    },
+    "dashboard.hero.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heutiges Signal"
+          }
+        }
+      }
+    },
+    "dashboard.hero.scoreLabel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ Score"
+          }
+        }
+      }
+    },
+    "dashboard.hero.status.peak": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top-Bereitschaft"
+          }
+        }
+      }
+    },
+    "dashboard.hero.status.ready": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainingsbereit"
+          }
+        }
+      }
+    },
+    "dashboard.hero.status.controlled": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrollierter Push"
+          }
+        }
+      }
+    },
+    "dashboard.hero.status.protect": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erholung schützen"
+          }
+        }
+      }
+    },
+    "dashboard.hero.insight.active": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout läuft. Beende sauber und halte das Signal nützlich."
+          }
+        }
+      }
+    },
+    "dashboard.hero.insight.todayReady": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erholung, Belastung und Wochenrhythmus stützen das heutige Workout."
+          }
+        }
+      }
+    },
+    "dashboard.hero.insight.todayLow": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halte die Last konservativ und lass Erholung heute führen."
+          }
+        }
+      }
+    },
+    "dashboard.hero.insight.first": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout eins setzt die echte Basis."
+          }
+        }
+      }
+    },
+    "dashboard.hero.insight.rest": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Workout fällig. Erholung stärkt die nächste Einheit."
+          }
+        }
+      }
+    },
+    "dashboard.action.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächster Schritt"
+          }
+        }
+      }
+    },
+    "dashboard.action.nextWorkout": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächstes: %@"
+          }
+        }
+      }
+    },
+    "dashboard.action.previewNext": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächstes Workout ansehen"
+          }
+        }
+      }
+    },
+    "dashboard.action.sleepCta": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlaf eintragen"
+          }
+        }
+      }
+    },
+    "dashboard.analysis.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyse"
+          }
+        }
+      }
+    },
+    "dashboard.analysis.recovery.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereitschaft und jüngste Belastung"
+          }
+        }
+      }
+    },
+    "dashboard.analysis.week.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempo zum Wochenziel"
+          }
+        }
+      }
+    },
+    "dashboard.analysis.consistency.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workouts oder Check-ins"
+          }
+        }
+      }
+    },
+    "dashboard.analysis.sleep.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siebentage-Schnitt"
+          }
+        }
+      }
+    },
+    "dashboard.metric.recovery": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erholung"
+          }
+        }
+      }
+    },
+    "dashboard.metric.load": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belastung"
+          }
+        }
+      }
+    },
+    "dashboard.metric.focus": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fokus"
+          }
+        }
+      }
+    },
+    "dashboard.metric.week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woche"
+          }
+        }
+      }
+    },
+    "dashboard.metric.consistency": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konstanz"
+          }
+        }
+      }
+    },
+    "dashboard.metric.sleep": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlaf"
+          }
+        }
+      }
+    },
+    "dashboard.reward.eyebrow": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belohnung"
+          }
+        }
+      }
+    },
+    "dashboard.reward.streak.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serie"
+          }
+        }
+      }
+    },
+    "dashboard.reward.streak.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konstanzsignal ist aktiv."
+          }
+        }
+      }
+    },
+    "dashboard.reward.streak.value": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d T"
+          }
+        }
+      }
+    },
+    "dashboard.reward.firstWorkout.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basis gesetzt"
+          }
+        }
+      }
+    },
+    "dashboard.reward.firstWorkout.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstes Workout geloggt. STRQ kann aus echten Sätzen kalibrieren."
+          }
+        }
+      }
+    },
+    "dashboard.reward.plan.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plan erstellt"
+          }
+        }
+      }
+    },
+    "dashboard.reward.plan.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das erste STRQ Signal ist bereit."
+          }
+        }
+      }
+    },
+    "dashboard.week.next": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als Nächstes: %@"
+          }
+        }
+      }
+    },
     "Coach": {
       "localizations": {
         "de": {
