@@ -39,13 +39,11 @@ enum ForgeTheme {
 
     static func color(for name: String) -> Color {
         switch name {
-        case "green", "mint": return STRQPalette.success
-        case "yellow": return STRQPalette.warning
-        case "orange": return STRQPalette.warning
-        case "red": return STRQPalette.danger
-        case "blue", "cyan", "teal": return STRQPalette.info
-        case "purple": return STRQBrand.slate
-        case "pink": return STRQPalette.info
+        case "green", "mint": return STRQPalette.signalGreen
+        case "yellow", "orange": return STRQPalette.warningAmber
+        case "red": return STRQPalette.dangerRed
+        case "blue", "cyan", "teal": return STRQPalette.signalIce
+        case "purple", "pink": return STRQPalette.pulseViolet
         case "gold": return STRQPalette.gold
         default: return STRQBrand.steel
         }
@@ -62,6 +60,334 @@ enum ForgeTheme {
     static func formatVolume(_ v: Double) -> String {
         if v >= 1000 { return String(format: "%.1fk", v / 1000) }
         return String(format: "%.0f", v)
+    }
+}
+
+enum STRQSurfaceVariant: Equatable {
+    case standard
+    case elevated
+    case hero
+
+    var cornerRadius: CGFloat {
+        switch self {
+        case .standard: return 16
+        case .elevated: return 18
+        case .hero: return 22
+        }
+    }
+
+    var borderOpacity: Double {
+        switch self {
+        case .standard: return 0.62
+        case .elevated: return 0.78
+        case .hero: return 0.9
+        }
+    }
+}
+
+struct STRQSurface<Content: View>: View {
+    var variant: STRQSurfaceVariant = .standard
+    var accent: Color?
+    var padding: CGFloat = 16
+    let content: Content
+
+    init(
+        variant: STRQSurfaceVariant = .standard,
+        accent: Color? = nil,
+        padding: CGFloat = 16,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.variant = variant
+        self.accent = accent
+        self.padding = padding
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .padding(padding)
+            .background(surfaceBackground)
+            .overlay(surfaceBorder)
+            .shadow(color: shadowColor, radius: shadowRadius, y: shadowY)
+    }
+
+    private var surfaceBackground: some View {
+        RoundedRectangle(cornerRadius: variant.cornerRadius, style: .continuous)
+            .fill(backgroundFill)
+            .overlay {
+                if variant == .hero {
+                    RoundedRectangle(cornerRadius: variant.cornerRadius, style: .continuous)
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    (accent ?? STRQPalette.signalIce).opacity(0.24),
+                                    STRQPalette.pulseViolet.opacity(0.08),
+                                    Color.clear
+                                ],
+                                center: .topLeading,
+                                startRadius: 8,
+                                endRadius: 260
+                            )
+                        )
+                }
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: variant.cornerRadius, style: .continuous)
+                    .stroke(Color.white.opacity(0.045), lineWidth: 1)
+                    .blendMode(.plusLighter)
+            }
+    }
+
+    private var surfaceBorder: some View {
+        RoundedRectangle(cornerRadius: variant.cornerRadius, style: .continuous)
+            .strokeBorder(
+                accent.map { $0.opacity(variant == .hero ? 0.32 : 0.22) }
+                    ?? STRQPalette.borderHairline.opacity(variant.borderOpacity),
+                lineWidth: 1
+            )
+    }
+
+    private var backgroundFill: LinearGradient {
+        switch variant {
+        case .standard:
+            return LinearGradient(
+                colors: [STRQPalette.surfaceCarbon, STRQPalette.backgroundDeep],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .elevated:
+            return LinearGradient(
+                colors: [STRQPalette.surfaceRaised, STRQPalette.surfaceCarbon],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        case .hero:
+            return LinearGradient(
+                colors: [STRQPalette.surfaceHero, STRQPalette.surfaceCarbon, STRQPalette.backgroundDeep],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+    }
+
+    private var shadowColor: Color {
+        switch variant {
+        case .standard:
+            return .black.opacity(0.18)
+        case .elevated:
+            return .black.opacity(0.28)
+        case .hero:
+            return (accent ?? STRQPalette.signalIce).opacity(0.14)
+        }
+    }
+
+    private var shadowRadius: CGFloat {
+        switch variant {
+        case .standard: return 10
+        case .elevated: return 16
+        case .hero: return 24
+        }
+    }
+
+    private var shadowY: CGFloat {
+        switch variant {
+        case .standard: return 5
+        case .elevated: return 8
+        case .hero: return 10
+        }
+    }
+}
+
+struct STRQMetricTile: View {
+    let value: String
+    let label: String
+    var icon: String?
+    var delta: String?
+    var tint: Color = STRQPalette.signalIce
+    var progress: Double?
+    var compact: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 5 : 8) {
+            if icon != nil || delta != nil {
+                HStack(spacing: 6) {
+                    if let icon {
+                        Image(systemName: icon)
+                            .font(.system(size: compact ? 10 : 11, weight: .bold))
+                    }
+                    Spacer(minLength: 0)
+                    if let delta {
+                        Text(delta)
+                            .font(.system(size: 9, weight: .black).monospacedDigit())
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+                    }
+                }
+                .foregroundStyle(tint)
+            }
+
+            Text(value)
+                .font(.system(size: compact ? 18 : 22, weight: .heavy, design: .rounded).monospacedDigit())
+                .foregroundStyle(STRQPalette.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.68)
+
+            Text(label.uppercased())
+                .font(.system(size: compact ? 8 : 9, weight: .black))
+                .tracking(0.8)
+                .foregroundStyle(STRQPalette.textMuted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+
+            if let progress {
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(Color.white.opacity(0.08))
+                        Capsule()
+                            .fill(tint.gradient)
+                            .frame(width: max(0, geo.size.width * min(max(progress, 0), 1)))
+                    }
+                }
+                .frame(height: 4)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: compact ? 58 : 76, alignment: .leading)
+        .padding(.horizontal, compact ? 10 : 12)
+        .padding(.vertical, compact ? 9 : 12)
+        .background(Color.white.opacity(compact ? 0.045 : 0.055), in: .rect(cornerRadius: compact ? 12 : 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: compact ? 12 : 14, style: .continuous)
+                .strokeBorder(tint.opacity(0.16), lineWidth: 1)
+        )
+    }
+}
+
+struct STRQBadgeChip: View {
+    enum Variant {
+        case neutral
+        case ice
+        case violet
+        case success
+        case warning
+
+        var tint: Color {
+            switch self {
+            case .neutral: return STRQPalette.textSecondary
+            case .ice: return STRQPalette.signalIce
+            case .violet: return STRQPalette.pulseViolet
+            case .success: return STRQPalette.signalGreen
+            case .warning: return STRQPalette.warningAmber
+            }
+        }
+
+        var fill: Color {
+            switch self {
+            case .neutral: return Color.white.opacity(0.07)
+            case .ice: return STRQPalette.signalIceSoft
+            case .violet: return STRQPalette.pulseVioletSoft
+            case .success: return STRQPalette.successSoft
+            case .warning: return STRQPalette.warningSoft
+            }
+        }
+    }
+
+    let label: String
+    var icon: String?
+    var variant: Variant = .neutral
+
+    var body: some View {
+        HStack(spacing: 5) {
+            if let icon {
+                Image(systemName: icon)
+                    .font(.system(size: 9, weight: .bold))
+            }
+            Text(label.uppercased())
+                .font(.system(size: 9, weight: .black))
+                .tracking(0.8)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .foregroundStyle(variant.tint)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 5)
+        .background(variant.fill, in: Capsule())
+        .overlay(
+            Capsule()
+                .strokeBorder(variant.tint.opacity(0.24), lineWidth: 0.7)
+        )
+    }
+}
+
+struct STRQPrimaryCTA: View {
+    let icon: String
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 9) {
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .black))
+                Text(title)
+                    .font(.system(size: 16, weight: .black))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+            }
+            .foregroundStyle(STRQPalette.backgroundDeep)
+            .frame(maxWidth: .infinity)
+            .frame(height: 54)
+            .background(
+                LinearGradient(
+                    colors: [
+                        STRQPalette.signalIce,
+                        Color(red: 0.64, green: 0.94, blue: 1.0),
+                        STRQPalette.pulseViolet.opacity(0.88)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: .rect(cornerRadius: 15)
+            )
+            .overlay(alignment: .top) {
+                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    .fill(Color.white.opacity(0.20))
+                    .frame(height: 26)
+                    .allowsHitTesting(false)
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.28), lineWidth: 1)
+            )
+            .shadow(color: STRQPalette.signalIce.opacity(0.22), radius: 18, y: 7)
+            .shadow(color: STRQPalette.pulseViolet.opacity(0.14), radius: 22, y: 9)
+        }
+        .buttonStyle(.strqPressable)
+    }
+}
+
+struct STRQSectionTitle: View {
+    let title: String
+    var trailing: String?
+    var tint: Color = STRQPalette.signalIce
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Capsule()
+                .fill(tint.gradient)
+                .frame(width: 3, height: 16)
+            Text(title.uppercased())
+                .font(.system(size: 11, weight: .black))
+                .tracking(1.0)
+                .foregroundStyle(STRQPalette.textPrimary)
+            Spacer()
+            if let trailing {
+                Text(trailing)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .lineLimit(1)
+            }
+        }
     }
 }
 

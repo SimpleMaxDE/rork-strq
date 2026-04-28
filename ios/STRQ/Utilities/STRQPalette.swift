@@ -10,19 +10,42 @@ import SwiftUI
 /// - steel   → baseline / coach-default / inert numeric
 /// - gold    → earned moments (PRs, milestones, streak highlights)
 enum STRQPalette {
+    // MARK: - STRQ visual foundation
+
+    static let backgroundCarbon = Color(red: 0.02, green: 0.024, blue: 0.031)
+    static let backgroundDeep = Color(red: 0.006, green: 0.008, blue: 0.012)
+    static let surfaceCarbon = Color(red: 0.043, green: 0.055, blue: 0.071)
+    static let surfaceRaised = Color(red: 0.067, green: 0.090, blue: 0.125)
+    static let surfaceHero = Color(red: 0.055, green: 0.083, blue: 0.120)
+
+    static let borderHairline = Color(red: 0.149, green: 0.192, blue: 0.239)
+    static let borderStrong = Color(red: 0.275, green: 0.365, blue: 0.455)
+
+    static let textPrimary = Color.white
+    static let textSecondary = Color.white.opacity(0.72)
+    static let textMuted = Color.white.opacity(0.46)
+
+    static let signalIce = Color(red: 0.471, green: 0.886, blue: 1.0)
+    static let signalIceSoft = Color(red: 0.471, green: 0.886, blue: 1.0).opacity(0.16)
+    static let pulseViolet = Color(red: 0.549, green: 0.361, blue: 1.0)
+    static let pulseVioletSoft = Color(red: 0.549, green: 0.361, blue: 1.0).opacity(0.16)
+    static let signalGreen = Color(red: 0.302, green: 1.0, blue: 0.553)
+    static let warningAmber = Color(red: 1.0, green: 0.78, blue: 0.28)
+    static let dangerRed = Color(red: 1.0, green: 0.36, blue: 0.40)
+
     // MARK: - State
 
-    static let success = Color(red: 0.36, green: 0.80, blue: 0.52)
-    static let successSoft = Color(red: 0.36, green: 0.80, blue: 0.52).opacity(0.18)
+    static let success = signalGreen
+    static let successSoft = signalGreen.opacity(0.16)
 
-    static let warning = Color(red: 0.98, green: 0.78, blue: 0.28)
-    static let warningSoft = Color(red: 0.98, green: 0.78, blue: 0.28).opacity(0.18)
+    static let warning = warningAmber
+    static let warningSoft = warningAmber.opacity(0.16)
 
-    static let danger = Color(red: 0.96, green: 0.36, blue: 0.36)
-    static let dangerSoft = Color(red: 0.96, green: 0.36, blue: 0.36).opacity(0.18)
+    static let danger = dangerRed
+    static let dangerSoft = dangerRed.opacity(0.16)
 
-    static let info = Color(red: 0.50, green: 0.72, blue: 0.98)
-    static let infoSoft = Color(red: 0.50, green: 0.72, blue: 0.98).opacity(0.18)
+    static let info = signalIce
+    static let infoSoft = signalIceSoft
 
     // MARK: - Neutral / Brand
 
