@@ -40,7 +40,7 @@ enum ForgeTheme {
     static func color(for name: String) -> Color {
         switch name {
         case "green", "mint": return STRQPalette.signalGreen
-        case "yellow", "orange": return STRQPalette.warningAmber
+        case "yellow", "orange": return STRQPalette.sandowOrange
         case "red": return STRQPalette.dangerRed
         case "blue", "cyan", "teal": return STRQPalette.signalIce
         case "purple", "pink": return STRQPalette.pulseViolet
@@ -118,15 +118,13 @@ struct STRQSurface<Content: View>: View {
                 if variant == .hero {
                     RoundedRectangle(cornerRadius: variant.cornerRadius, style: .continuous)
                         .fill(
-                            RadialGradient(
+                            LinearGradient(
                                 colors: [
-                                    (accent ?? STRQPalette.signalIce).opacity(0.24),
-                                    STRQPalette.pulseViolet.opacity(0.08),
+                                    (accent ?? STRQPalette.sandowOrange).opacity(0.08),
                                     Color.clear
                                 ],
-                                center: .topLeading,
-                                startRadius: 8,
-                                endRadius: 260
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
                             )
                         )
                 }
@@ -142,7 +140,7 @@ struct STRQSurface<Content: View>: View {
         RoundedRectangle(cornerRadius: variant.cornerRadius, style: .continuous)
             .strokeBorder(
                 accent.map { $0.opacity(variant == .hero ? 0.32 : 0.22) }
-                    ?? STRQPalette.borderHairline.opacity(variant.borderOpacity),
+                    ?? STRQPalette.sandowBorder.opacity(variant.borderOpacity),
                 lineWidth: 1
             )
     }
@@ -151,19 +149,19 @@ struct STRQSurface<Content: View>: View {
         switch variant {
         case .standard:
             return LinearGradient(
-                colors: [STRQPalette.surfaceCommand, STRQPalette.backgroundDeep],
+                colors: [STRQPalette.sandowCard, STRQPalette.sandowInset],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         case .elevated:
             return LinearGradient(
-                colors: [STRQPalette.surfaceCommandRaised, STRQPalette.surfaceCommand],
+                colors: [STRQPalette.sandowCardRaised, STRQPalette.sandowCard],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         case .hero:
             return LinearGradient(
-                colors: [STRQPalette.surfaceCommandRaised, STRQPalette.surfaceHero, STRQPalette.backgroundDeep],
+                colors: [STRQPalette.sandowCardRaised, STRQPalette.sandowCard, STRQPalette.sandowInset],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -177,7 +175,7 @@ struct STRQSurface<Content: View>: View {
         case .elevated:
             return .black.opacity(0.28)
         case .hero:
-            return (accent ?? STRQPalette.signalIce).opacity(0.14)
+            return .black.opacity(0.34)
         }
     }
 
@@ -203,7 +201,7 @@ struct STRQMetricTile: View {
     let label: String
     var icon: String?
     var delta: String?
-    var tint: Color = STRQPalette.signalIce
+    var tint: Color = STRQPalette.sandowOrange
     var progress: Double?
     var compact: Bool = false
 
@@ -245,7 +243,7 @@ struct STRQMetricTile: View {
                         Capsule()
                             .fill(Color.white.opacity(0.08))
                         Capsule()
-                            .fill(tint.gradient)
+                            .fill(tint)
                             .frame(width: max(0, geo.size.width * min(max(progress, 0), 1)))
                     }
                 }
@@ -255,10 +253,10 @@ struct STRQMetricTile: View {
         .frame(maxWidth: .infinity, minHeight: compact ? 58 : 76, alignment: .leading)
         .padding(.horizontal, compact ? 10 : 12)
         .padding(.vertical, compact ? 9 : 12)
-        .background(Color.white.opacity(compact ? 0.045 : 0.055), in: .rect(cornerRadius: compact ? 12 : 14))
+        .background(STRQPalette.sandowInset.opacity(compact ? 0.86 : 0.72), in: .rect(cornerRadius: compact ? 12 : 14))
         .overlay(
             RoundedRectangle(cornerRadius: compact ? 12 : 14, style: .continuous)
-                .strokeBorder(tint.opacity(0.16), lineWidth: 1)
+                .strokeBorder(tint.opacity(0.14), lineWidth: 1)
         )
     }
 }
@@ -266,28 +264,34 @@ struct STRQMetricTile: View {
 struct STRQBadgeChip: View {
     enum Variant {
         case neutral
+        case orange
         case ice
         case violet
         case success
         case warning
+        case danger
 
         var tint: Color {
             switch self {
             case .neutral: return STRQPalette.textSecondary
+            case .orange: return STRQPalette.sandowOrange
             case .ice: return STRQPalette.signalIce
             case .violet: return STRQPalette.pulseViolet
             case .success: return STRQPalette.signalGreen
             case .warning: return STRQPalette.warningAmber
+            case .danger: return STRQPalette.dangerRed
             }
         }
 
         var fill: Color {
             switch self {
             case .neutral: return Color.white.opacity(0.07)
+            case .orange: return STRQPalette.sandowOrangeSoft
             case .ice: return STRQPalette.signalIceSoft
             case .violet: return STRQPalette.pulseVioletSoft
             case .success: return STRQPalette.successSoft
             case .warning: return STRQPalette.warningSoft
+            case .danger: return STRQPalette.dangerSoft
             }
         }
     }
@@ -334,33 +338,21 @@ struct STRQPrimaryCTA: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.78)
             }
-            .foregroundStyle(STRQPalette.backgroundDeep)
+            .foregroundStyle(Color.white)
             .frame(maxWidth: .infinity)
             .frame(height: 54)
-            .background(
-                LinearGradient(
-                    colors: [
-                        STRQPalette.signalIce,
-                        Color(red: 0.64, green: 0.94, blue: 1.0),
-                        STRQPalette.pulseViolet.opacity(0.88)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                in: .rect(cornerRadius: 15)
-            )
+            .background(STRQPalette.sandowOrange, in: .rect(cornerRadius: 15))
             .overlay(alignment: .top) {
                 RoundedRectangle(cornerRadius: 15, style: .continuous)
-                    .fill(Color.white.opacity(0.20))
+                    .fill(Color.white.opacity(0.12))
                     .frame(height: 26)
                     .allowsHitTesting(false)
             }
             .overlay(
                 RoundedRectangle(cornerRadius: 15, style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.28), lineWidth: 1)
+                    .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
             )
-            .shadow(color: STRQPalette.signalIce.opacity(0.22), radius: 18, y: 7)
-            .shadow(color: STRQPalette.pulseViolet.opacity(0.14), radius: 22, y: 9)
+            .shadow(color: Color.black.opacity(0.34), radius: 16, y: 8)
         }
         .buttonStyle(.strqPressable)
     }
@@ -369,7 +361,7 @@ struct STRQPrimaryCTA: View {
 struct STRQSectionTitle: View {
     let title: String
     var trailing: String?
-    var tint: Color = STRQPalette.signalIce
+    var tint: Color = STRQPalette.sandowOrange
 
     var body: some View {
         HStack(spacing: 8) {
@@ -393,14 +385,14 @@ struct STRQSectionTitle: View {
 
 struct STRQMiniProgressRing<Content: View>: View {
     var progress: Double
-    var tint: Color = STRQPalette.signalIce
+    var tint: Color = STRQPalette.sandowOrange
     var size: CGFloat = 92
     var lineWidth: CGFloat = 8
     let content: Content
 
     init(
         progress: Double,
-        tint: Color = STRQPalette.signalIce,
+        tint: Color = STRQPalette.sandowOrange,
         size: CGFloat = 92,
         lineWidth: CGFloat = 8,
         @ViewBuilder content: () -> Content
@@ -419,36 +411,17 @@ struct STRQMiniProgressRing<Content: View>: View {
 
             Circle()
                 .trim(from: 0, to: min(max(progress, 0), 1))
-                .stroke(
-                    AngularGradient(
-                        colors: [
-                            tint.opacity(0.36),
-                            tint,
-                            STRQPalette.signalIceBright,
-                            STRQPalette.pulseViolet.opacity(0.78),
-                            tint.opacity(0.36)
-                        ],
-                        center: .center
-                    ),
-                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
-                )
+                .stroke(tint, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
 
             Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [tint.opacity(0.20), STRQPalette.surfaceInset.opacity(0.82)],
-                        center: .top,
-                        startRadius: 1,
-                        endRadius: size * 0.62
-                    )
-                )
+                .fill(STRQPalette.sandowInset)
                 .padding(lineWidth + 7)
 
             content
         }
         .frame(width: size, height: size)
-        .shadow(color: tint.opacity(0.18), radius: 18, y: 8)
+        .shadow(color: Color.black.opacity(0.22), radius: 12, y: 6)
     }
 }
 
@@ -457,7 +430,7 @@ struct STRQDashboardHeroCard: View {
         let label: String
         let value: String
         var icon: String?
-        var tint: Color = STRQPalette.signalIce
+        var tint: Color = STRQPalette.sandowOrange
 
         var id: String { "\(label)-\(value)" }
     }
@@ -472,13 +445,36 @@ struct STRQDashboardHeroCard: View {
 
     var body: some View {
         STRQSurface(variant: .hero, accent: accent, padding: 0) {
-            VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .top, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        STRQBadgeChip(label: title, icon: "sparkles", variant: .ice)
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .center, spacing: 14) {
+                    VStack(spacing: 1) {
+                        Text("\(score)")
+                            .font(.system(size: 34, weight: .black, design: .rounded).monospacedDigit())
+                            .foregroundStyle(accent)
+                            .contentTransition(.numericText())
+                        Text(scoreLabel.uppercased())
+                            .font(.system(size: 8, weight: .black))
+                            .tracking(0.7)
+                            .foregroundStyle(STRQPalette.backgroundDeep.opacity(0.70))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.58)
+                    }
+                    .frame(width: 76, height: 76)
+                    .background(STRQPalette.sandowCream, in: .rect(cornerRadius: 18))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .strokeBorder(accent.opacity(0.88), lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.18), radius: 10, y: 6)
+
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(title.uppercased())
+                            .font(.system(size: 10, weight: .black))
+                            .tracking(1.0)
+                            .foregroundStyle(accent)
 
                         Text(status)
-                            .font(.system(size: 25, weight: .heavy, design: .rounded))
+                            .font(.system(size: 24, weight: .heavy, design: .rounded))
                             .foregroundStyle(STRQPalette.textPrimary)
                             .lineLimit(2)
                             .minimumScaleFactor(0.72)
@@ -486,26 +482,11 @@ struct STRQDashboardHeroCard: View {
                         Text(insight)
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(STRQPalette.textSecondary)
-                            .lineLimit(3)
+                            .lineLimit(2)
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
                     Spacer(minLength: 0)
-
-                    STRQMiniProgressRing(progress: Double(score) / 100, tint: accent, size: 104, lineWidth: 8) {
-                        VStack(spacing: 1) {
-                            Text("\(score)")
-                                .font(.system(size: 32, weight: .black, design: .rounded).monospacedDigit())
-                                .foregroundStyle(STRQPalette.textPrimary)
-                                .contentTransition(.numericText())
-                            Text(scoreLabel.uppercased())
-                                .font(.system(size: 8, weight: .black))
-                                .tracking(0.8)
-                                .foregroundStyle(STRQPalette.textMuted)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.62)
-                        }
-                    }
                 }
 
                 HStack(spacing: 8) {
@@ -533,7 +514,7 @@ struct STRQDashboardHeroCard: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 9)
-                        .background(STRQPalette.surfaceInset.opacity(0.68), in: .rect(cornerRadius: 14))
+                        .background(STRQPalette.sandowInset.opacity(0.78), in: .rect(cornerRadius: 14))
                         .overlay(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .strokeBorder(metric.tint.opacity(0.16), lineWidth: 1)
@@ -552,7 +533,7 @@ struct STRQSignalBar: View {
     var detail: String?
     var icon: String = "waveform.path.ecg"
     var progress: Double
-    var tint: Color = STRQPalette.signalIce
+    var tint: Color = STRQPalette.sandowOrange
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
@@ -592,7 +573,7 @@ struct STRQSignalBar: View {
                     Capsule()
                         .fill(
                             LinearGradient(
-                                colors: [tint, STRQPalette.signalIceBright.opacity(0.58)],
+                                colors: [tint, tint.opacity(0.72)],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
@@ -603,7 +584,7 @@ struct STRQSignalBar: View {
             .frame(height: 6)
         }
         .padding(12)
-        .background(STRQPalette.surfaceInset.opacity(0.70), in: .rect(cornerRadius: 16))
+        .background(STRQPalette.sandowInset.opacity(0.78), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .strokeBorder(tint.opacity(0.13), lineWidth: 1)

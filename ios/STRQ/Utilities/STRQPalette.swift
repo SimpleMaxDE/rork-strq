@@ -21,6 +21,18 @@ enum STRQPalette {
     static let surfaceCommandRaised = Color(red: 0.078, green: 0.108, blue: 0.150)
     static let surfaceInset = Color(red: 0.015, green: 0.020, blue: 0.031)
 
+    // MARK: - Sandow dashboard direction
+
+    static let sandowBackground = Color.black
+    static let sandowCard = Color(red: 0.095, green: 0.095, blue: 0.106)
+    static let sandowCardRaised = Color(red: 0.125, green: 0.125, blue: 0.138)
+    static let sandowInset = Color(red: 0.020, green: 0.020, blue: 0.024)
+    static let sandowBorder = Color.white.opacity(0.10)
+    static let sandowBorderStrong = Color.white.opacity(0.16)
+    static let sandowOrange = Color(red: 0.976, green: 0.451, blue: 0.086)
+    static let sandowOrangeSoft = Color(red: 0.976, green: 0.451, blue: 0.086).opacity(0.16)
+    static let sandowCream = Color(red: 1.000, green: 0.969, blue: 0.929)
+
     static let borderHairline = Color(red: 0.149, green: 0.192, blue: 0.239)
     static let borderStrong = Color(red: 0.275, green: 0.365, blue: 0.455)
 
