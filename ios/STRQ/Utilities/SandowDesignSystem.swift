@@ -9,6 +9,7 @@ enum SandowDesignSystem {
 
 enum SandowColors {
     static let background = Color(sandowHex: 0x000000)
+    static let cloneInk = Color(sandowHex: 0x18181B)
     static let surfacePrimary = Color(sandowHex: 0x18181B)
     static let surfaceSecondary = Color(sandowHex: 0x27272A)
     static let surfaceTertiary = Color(sandowHex: 0x3F3F46)

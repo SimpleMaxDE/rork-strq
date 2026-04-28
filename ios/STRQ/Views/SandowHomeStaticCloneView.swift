@@ -38,20 +38,20 @@ struct SandowHomeStaticCloneView: View {
                     HStack(spacing: 6) {
                         Text("Wed, Jun 25")
                             .font(SandowTypography.bodyRegular)
-                            .foregroundStyle(.sandowCloneInk)
+                            .foregroundStyle(SandowColors.cloneInk)
 
                         SandowChip(label: "1", icon: .train, tone: .brandSoft, size: .compact)
                     }
 
                     Text("Hello, Makise!")
                         .font(SandowTypography.title)
-                        .foregroundStyle(.sandowCloneInk)
+                        .foregroundStyle(SandowColors.cloneInk)
                         .lineLimit(1)
                 }
 
                 Spacer(minLength: 8)
 
-                SandowIconContainer(icon: .search, size: .lg, tint: .sandowCloneInk, background: .white)
+                SandowIconContainer(icon: .search, size: .lg, tint: SandowColors.cloneInk, background: .white)
                     .clipShape(Circle())
 
                 ZStack(alignment: .bottomTrailing) {
@@ -67,7 +67,7 @@ struct SandowHomeStaticCloneView: View {
                         .overlay {
                             Text("M")
                                 .font(SandowTypography.body.weight(.bold))
-                                .foregroundStyle(.sandowCloneInk)
+                                .foregroundStyle(SandowColors.cloneInk)
                         }
 
                     Circle()
@@ -160,7 +160,7 @@ struct SandowHomeStaticCloneView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Wellness Score")
                         .font(SandowTypography.body.weight(.bold))
-                        .foregroundStyle(.sandowCloneInk)
+                        .foregroundStyle(SandowColors.cloneInk)
 
                     HStack(spacing: 8) {
                         scoreMeta(icon: .recovery, text: "Healthy")
@@ -171,7 +171,7 @@ struct SandowHomeStaticCloneView: View {
 
                 Spacer(minLength: 0)
                 ChevronRight()
-                    .stroke(.sandowCloneInk, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                    .stroke(SandowColors.cloneInk, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
                     .frame(width: 24, height: 24)
             }
             .frame(height: 64)
@@ -184,12 +184,12 @@ struct SandowHomeStaticCloneView: View {
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .foregroundStyle(.sandowCloneInk)
+                .foregroundStyle(SandowColors.cloneInk)
                 .frame(width: 20, height: 20)
 
             Text(text)
                 .font(SandowTypography.bodyRegular)
-                .foregroundStyle(.sandowCloneInk)
+                .foregroundStyle(SandowColors.cloneInk)
                 .lineLimit(1)
         }
     }
@@ -705,7 +705,8 @@ struct SandowHomeStaticCloneView: View {
             }
             .frame(width: 128)
         }
-        .frame(width: cardWidth, minHeight: 130)
+        .frame(width: cardWidth)
+        .frame(minHeight: 130)
         .background(.black, in: .rect(cornerRadius: 24))
         .overlay(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
@@ -1160,8 +1161,6 @@ private struct SandowStar: Shape {
 }
 
 private extension Color {
-    static let sandowCloneInk = Color(sandowCloneHex: 0x18181B)
-
     init(sandowCloneHex hex: UInt, opacity: Double = 1) {
         let red = Double((hex >> 16) & 0xFF) / 255
         let green = Double((hex >> 8) & 0xFF) / 255
