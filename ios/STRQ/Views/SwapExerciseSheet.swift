@@ -209,7 +209,6 @@ struct SwapExerciseSheet: View {
 
     private func swapOptionCard(_ option: ExerciseSwapOption) -> some View {
         let isSelected = selectedOption?.id == option.id
-        let accent = intentColor(option.intent)
         let showConfirm = isSelected && !confirmed
         return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 12) {

@@ -370,7 +370,9 @@ final class NotificationScheduler {
         let request = UNNotificationRequest(identifier: id, content: content, trigger: trigger)
         center.add(request) { error in
             if let error {
-                ErrorReporter.shared.report(error)
+                Task { @MainActor in
+                    ErrorReporter.shared.report(error)
+                }
             }
         }
     }

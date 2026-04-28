@@ -84,7 +84,9 @@ struct ExerciseMediaProvider {
             return [Color(red: 0.32, green: 0.28, blue: 0.35), Color(red: 0.16, green: 0.13, blue: 0.20)]
         case (.lunge, _):
             return [Color(white: 0.34), Color(white: 0.17)]
-        case (.plank, _), (.isolation, _) where exercise.primaryMuscle == .abs || exercise.primaryMuscle == .coreStability:
+        case (.plank, _):
+            return [Color(red: 0.30, green: 0.28, blue: 0.38), Color(red: 0.15, green: 0.13, blue: 0.22)]
+        case (.isolation, _) where exercise.primaryMuscle == .abs || exercise.primaryMuscle == .coreStability:
             return [Color(red: 0.30, green: 0.28, blue: 0.38), Color(red: 0.15, green: 0.13, blue: 0.22)]
         case (.stretch, _):
             return [Color(red: 0.25, green: 0.32, blue: 0.32), Color(red: 0.12, green: 0.18, blue: 0.18)]

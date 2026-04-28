@@ -32,7 +32,6 @@ struct SleepLogView: View {
     private var recoveryContextCard: some View {
         let avgSleep = vm.averageSleepHours
         let recoveryScore = vm.effectiveRecoveryScore
-        let sleepColor: Color = avgSleep >= 7.5 ? .green : avgSleep >= 6.5 ? .yellow : .red
         let recoveryColor: Color = recoveryScore >= 80 ? .green : recoveryScore >= 60 ? .yellow : .red
 
         return VStack(spacing: 16) {

@@ -246,7 +246,6 @@ struct NutritionCoachEngine {
 
     func goalPaceStatus(target: NutritionTarget, weeklyChange: Double) -> GoalPaceStatus {
         let targetChange = target.targetWeeklyChangeKg
-        let diff = weeklyChange - targetChange
 
         switch target.nutritionGoal {
         case .leanBulk, .muscleGain:

@@ -173,7 +173,6 @@ struct PlanGenerator {
     /// recovery- / phase-aware. This is what makes plans feel engineered
     /// instead of stamped from a template.
     private func weeklyVolumeBudgets(context: PlanContext, split: SplitConfig) -> [MuscleGroup: Int] {
-        let profile = context.profile
         var budgets: [MuscleGroup: Int] = [:]
 
         let targetedMuscles = Set(split.days.flatMap(\.muscles))

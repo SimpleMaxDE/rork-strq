@@ -121,11 +121,10 @@ final class HealthKitService {
                     continuation.resume(returning: nil); return
                 }
                 let asleepValues: Set<Int> = {
-                    var set: Set<Int> = [HKCategoryValueSleepAnalysis.asleep.rawValue]
+                    var set: Set<Int> = [HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue]
                     set.insert(HKCategoryValueSleepAnalysis.asleepCore.rawValue)
                     set.insert(HKCategoryValueSleepAnalysis.asleepDeep.rawValue)
                     set.insert(HKCategoryValueSleepAnalysis.asleepREM.rawValue)
-                    set.insert(HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue)
                     return set
                 }()
                 let seconds = samples.reduce(0.0) { acc, s in

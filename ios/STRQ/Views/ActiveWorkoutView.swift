@@ -297,7 +297,6 @@ struct ActiveWorkoutView: View {
 
             if let ex = exercise {
                 let gradientColors = mediaProvider.heroGradient(for: ex)
-                let heroSymbol = mediaProvider.heroSymbol(for: ex)
 
                 VStack(spacing: 0) {
                     ZStack {
@@ -1457,41 +1456,11 @@ struct ActiveWorkoutView: View {
                                 }
                             }
 
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(L10n.tr("How did that feel?"))
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(.white.opacity(0.48))
-                                HStack(spacing: 8) {
-                                    ForEach(SetQuality.allCases, id: \.self) { quality in
-                                        let isSelected = currentQuality == quality
-                                        Button {
-                                            setQuality(exerciseIndex: last.exerciseIndex, setIndex: last.setIndex, quality: isSelected ? nil : quality)
-                                        } label: {
-                                            VStack(spacing: 4) {
-                                                Image(systemName: quality.icon)
-                                                    .font(.system(size: 13, weight: .semibold))
-                                                Text(quality.shortLabel)
-                                                    .font(.caption2.weight(.bold))
-                                                    .lineLimit(1)
-                                            }
-                                            .foregroundStyle(isSelected ? .black : .white.opacity(0.74))
-                                            .frame(maxWidth: .infinity)
-                                            .frame(minHeight: 50)
-                                            .background(
-                                                isSelected
-                                                    ? AnyShapeStyle(qualityColor(quality.colorName))
-                                                    : AnyShapeStyle(Color.white.opacity(0.05)),
-                                                in: .rect(cornerRadius: 12)
-                                            )
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 12)
-                                                    .strokeBorder(Color.white.opacity(isSelected ? 0 : 0.06), lineWidth: 1)
-                                            )
-                                        }
-                                        .buttonStyle(.strqPressable)
-                                    }
-                                }
-                            }
+                            restQualityPicker(
+                                currentQuality: currentQuality,
+                                exerciseIndex: last.exerciseIndex,
+                                setIndex: last.setIndex
+                            )
                         }
                         .padding(16)
                         .background(Color.white.opacity(0.05), in: .rect(cornerRadius: 20))
@@ -1505,71 +1474,13 @@ struct ActiveWorkoutView: View {
                         }
                     }
 
-                    VStack(spacing: 10) {
-                        ZStack {
-                            Circle()
-                                .stroke(Color.white.opacity(0.06), lineWidth: 6)
-                                .frame(width: 176, height: 176)
-                            Circle()
-                                .trim(from: 0, to: progress)
-                                .stroke(
-                                    restTimeRemaining <= 10 ? STRQPalette.warning : Color.white,
-                                    style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                                )
-                                .frame(width: 176, height: 176)
-                                .rotationEffect(.degrees(-90))
-                                .animation(reduceMotion ? .easeOut(duration: 0.12) : .linear(duration: 1), value: restTimeRemaining)
-
-                            VStack(spacing: 6) {
-                                Text(L10n.tr("REST"))
-                                    .font(.system(size: 10, weight: .black))
-                                    .tracking(2.0)
-                                    .foregroundStyle(.white.opacity(0.46))
-                                Text(formatTime(restTimeRemaining))
-                                    .font(.system(size: 42, weight: .bold, design: .monospaced))
-                                    .foregroundStyle(restTimeRemaining <= 10 ? STRQPalette.warning : .white)
-                                    .contentTransition(.numericText(countsDown: true))
-                            }
-                        }
-
-                        Text(restCountdownHint())
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.white.opacity(0.58))
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity)
+                    restTimerCircle(progress: progress)
 
                     if let nextRec = nextSetRecommendation(workout) {
                         restNextActionCard(nextRec)
                     }
 
-                    HStack(spacing: 12) {
-                        restTimerAdjustmentButton(title: L10n.tr("-15s")) {
-                            let updatedTime = max(0, restTimeRemaining - 15)
-                            restTimeRemaining = updatedTime
-                            if updatedTime == 0 {
-                                restTimerActive = false
-                            }
-                        }
-
-                        Button {
-                            restTimeRemaining = 0
-                            restTimerActive = false
-                        } label: {
-                            Text(L10n.tr("Continue Now"))
-                                .font(.body.weight(.bold))
-                                .foregroundStyle(.black)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 52)
-                                .background(STRQBrand.accentGradient, in: Capsule())
-                        }
-                        .buttonStyle(.strqPressable)
-                        .accessibilityLabel(L10n.tr("Continue workout now"))
-
-                        restTimerAdjustmentButton(title: L10n.tr("+15s")) {
-                            restTimeRemaining += 15
-                        }
-                    }
+                    restControls()
                 }
                 .padding(20)
                 .frame(maxWidth: 380)
@@ -1596,6 +1507,137 @@ struct ActiveWorkoutView: View {
                 Spacer(minLength: 92)
             }
         }
+    }
+
+    private func restQualityPicker(
+        currentQuality: SetQuality?,
+        exerciseIndex: Int,
+        setIndex: Int
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(L10n.tr("How did that feel?"))
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white.opacity(0.48))
+
+            HStack(spacing: 8) {
+                ForEach(SetQuality.allCases, id: \.self) { quality in
+                    restQualityButton(
+                        quality: quality,
+                        isSelected: currentQuality == quality,
+                        exerciseIndex: exerciseIndex,
+                        setIndex: setIndex
+                    )
+                }
+            }
+        }
+    }
+
+    private func restQualityButton(
+        quality: SetQuality,
+        isSelected: Bool,
+        exerciseIndex: Int,
+        setIndex: Int
+    ) -> some View {
+        let foreground = isSelected ? Color.black : Color.white.opacity(0.74)
+        let background = isSelected ? qualityColor(quality.colorName) : Color.white.opacity(0.05)
+        let borderOpacity = isSelected ? 0.0 : 0.06
+
+        return Button {
+            let newQuality: SetQuality? = isSelected ? nil : quality
+            setQuality(exerciseIndex: exerciseIndex, setIndex: setIndex, quality: newQuality)
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: quality.icon)
+                    .font(.system(size: 13, weight: .semibold))
+                Text(quality.shortLabel)
+                    .font(.caption2.weight(.bold))
+                    .lineLimit(1)
+            }
+            .foregroundStyle(foreground)
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: 50)
+            .background(background, in: .rect(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(Color.white.opacity(borderOpacity), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.strqPressable)
+    }
+
+    private func restTimerCircle(progress: CGFloat) -> some View {
+        let isAlmostDone = restTimeRemaining <= 10
+        let progressColor = isAlmostDone ? STRQPalette.warning : Color.white
+        let timerAnimation: Animation = reduceMotion ? .easeOut(duration: 0.12) : .linear(duration: 1)
+
+        return VStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .stroke(Color.white.opacity(0.06), lineWidth: 6)
+                    .frame(width: 176, height: 176)
+
+                Circle()
+                    .trim(from: 0, to: progress)
+                    .stroke(
+                        progressColor,
+                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                    )
+                    .frame(width: 176, height: 176)
+                    .rotationEffect(.degrees(-90))
+                    .animation(timerAnimation, value: restTimeRemaining)
+
+                VStack(spacing: 6) {
+                    Text(L10n.tr("REST"))
+                        .font(.system(size: 10, weight: .black))
+                        .tracking(2.0)
+                        .foregroundStyle(.white.opacity(0.46))
+                    Text(formatTime(restTimeRemaining))
+                        .font(.system(size: 42, weight: .bold, design: .monospaced))
+                        .foregroundStyle(progressColor)
+                        .contentTransition(.numericText(countsDown: true))
+                }
+            }
+
+            Text(restCountdownHint())
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.white.opacity(0.58))
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func restControls() -> some View {
+        HStack(spacing: 12) {
+            restTimerAdjustmentButton(title: L10n.tr("-15s")) {
+                let updatedTime = max(0, restTimeRemaining - 15)
+                restTimeRemaining = updatedTime
+                if updatedTime == 0 {
+                    restTimerActive = false
+                }
+            }
+
+            restContinueButton()
+
+            restTimerAdjustmentButton(title: L10n.tr("+15s")) {
+                restTimeRemaining += 15
+            }
+        }
+    }
+
+    private func restContinueButton() -> some View {
+        Button {
+            restTimeRemaining = 0
+            restTimerActive = false
+        } label: {
+            Text(L10n.tr("Continue Now"))
+                .font(.body.weight(.bold))
+                .foregroundStyle(.black)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(STRQBrand.accentGradient, in: Capsule())
+        }
+        .buttonStyle(.strqPressable)
+        .accessibilityLabel(L10n.tr("Continue workout now"))
     }
 
     private func restTimerAdjustmentButton(title: String, action: @escaping () -> Void) -> some View {
@@ -1702,7 +1744,7 @@ struct ActiveWorkoutView: View {
         let planned = last.exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[last.exerciseIndex] : nil
         let quality = justLogged.quality
         var targetWeight = next.weight > 0 ? next.weight : justLogged.weight
-        var targetReps = next.reps > 0 ? next.reps : justLogged.reps
+        let targetReps = next.reps > 0 ? next.reps : justLogged.reps
         var guidance = "Repeat the last set cleanly."
         var icon = "figure.strengthtraining.traditional"
         var tint: Color = STRQBrand.steel
@@ -1754,7 +1796,6 @@ struct ActiveWorkoutView: View {
             if setIndex < log.sets.count {
                 vm.updateSetLoad(exerciseIndex: last.exerciseIndex, setIndex: setIndex, weight: targetWeight, reps: targetReps)
             }
-            _ = targetReps
         }
 
         return NextSetRec(
