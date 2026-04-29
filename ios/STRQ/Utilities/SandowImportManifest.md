@@ -39,8 +39,8 @@ Foundation completion recheck completed on 2026-04-29:
 - Component nodes were inspected in bounded form only: Button `9128:103928`, Badge & Chip `9126:59240`, Progress `9129:207997`, Tab `9131:172586`, Navigation `11614:57585`, Tab Bar `9131:291579`, List Item `9134:89206`, Schedule `9132:170645`, Card - General `9131:326493`, and Card - App Specific `9160:324200`.
 - No full Figma file scan was performed.
 - No new assets or font files were imported.
-- No Work Sans `.ttf`, `.otf`, `.woff`, or `.woff2` files currently exist in the repo.
-- The STRQ app target uses generated Info.plist settings; no app `ios/STRQ/Info.plist` or `UIAppFonts` registration exists for Work Sans.
+- No Work Sans `.ttf`, `.otf`, `.woff`, or `.woff2` files currently exist in the visible repo checkout. Required `WorkSans-Regular`, `WorkSans-Medium`, `WorkSans-SemiBold`, and `WorkSans-Bold` are missing; optional `WorkSans-ExtraBold` and `WorkSans-Black` are also missing.
+- The STRQ app target uses generated Info.plist settings; no app `ios/STRQ/Info.plist` or `UIAppFonts` registration exists for Work Sans. `STRQFontRegistrar` now provides safe runtime CoreText registration for bundled Work Sans `.ttf`/`.otf` files when they are present.
 - Runtime Swift names remain STRQ-owned; Sandow remains source/provenance documentation only.
 
 This manifest is no longer blocked for the body/anatomy/muscle conclusion. It is still not a full file-wide inventory of every Sandow page, component, token, icon, and screen group.
@@ -175,7 +175,7 @@ Required Figma follow-up keywords for the broader, file-wide audit:
 |---|---|---|---|---|
 | Colors | Known node `5359:9002`; public v3 source indicates semantic tokens and variables | `SandowColors` includes black/white, gray 50-950, orange 50-950, accent blue/purple/lime/amber/rose, dark surfaces, text, borders, brand, success/warning/danger aliases | Missing exact Figma variable names, modes, full semantic taxonomy, light-mode aliases, accessibility/contrast modes if present. Extra STRQ aliases preserve earlier pass compatibility | Partial |
 | Gradients | Known node `5442:13546`; exact count not verified | `SandowGradients` includes orange CTA, orange glow, dark card, inset card, subtle overlay, progress orange/success/warning/danger | Missing full Figma gradient inventory, mesh/dashboard/media gradients, real component usage map | Partial |
-| Typography | Node `9119:6481` inspected directly; Work Sans source scale includes display, heading, text, paragraph, and label families using Regular, Medium, SemiBold, and Bold | `STRQTypography` now includes complete display/heading/text/paragraph/label roles, STRQ role aliases, line-height constants, tracking constants, explicit font helpers, registered Work Sans probing, and a stronger system fallback when Work Sans is not bundled | Work Sans files are not bundled (`workSansFontFilesBundled = false`), no Work Sans font resources exist, and no app `UIAppFonts` registration exists, so exact font fidelity remains pending until licensed files are provided and registered | Mostly complete foundation; font bundling pending |
+| Typography | Node `9119:6481` inspected directly; Work Sans source scale includes display, heading, text, paragraph, and label families using Regular, Medium, SemiBold, and Bold | `STRQTypography` now includes complete display/heading/text/paragraph/label roles, STRQ role aliases, line-height constants, tracking constants, explicit font helpers, registered Work Sans probing for Regular/Medium/SemiBold/Bold plus optional ExtraBold/Black, runtime `STRQFontRegistrar` registration, and a stronger system fallback when Work Sans is not bundled | Work Sans files are not present in this checkout, so `workSansFontFilesBundled` remains false at runtime and exact font fidelity remains pending until licensed files exist under the STRQ app bundle | Mostly complete foundation; font binaries missing |
 | Effects | Known node `9120:58753`; exact style inventory not verified | `SandowEffects` includes hairline, selected border, focus ring width, card/divider borders, soft/card/subtle/orange shadows, background blurs, dark glass background/stroke | Missing exact Figma effects, glows, blur styles, selected/focus/error state effects, style names | Partial |
 | Size & Spacing | Known node `9122:6944`; exact tokens not verified | `SandowSpacing` includes 0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 32, 40, 48, 56, 64, 80, 96, 128 plus card/list/chip/button/icon/tab/nav sizes. `SandowRadii` includes 0, 2, 4, 8, 12, 16, 20, 24, 32, full plus component radii | Missing exact Figma token names, responsive frame sizes, all component dimensions, modal/bottom sheet/input/chart heights if present | Partial |
 
@@ -345,7 +345,7 @@ Foundation:
 
 - Exact Figma variable collections, modes, token names, values, scopes, and aliases.
 - Full color/gradient/effect/grid style inventory.
-- Work Sans font file bundling and Info.plist registration remain pending; the repo currently contains no Work Sans `.ttf`, `.otf`, `.woff`, or `.woff2` files.
+- Work Sans font binaries remain missing in this checkout. Runtime CoreText registration is implemented, but exact Work Sans rendering still requires real `.ttf` or `.otf` files in the app bundle.
 - Exact light/dark mode mapping and accessibility/contrast modes.
 
 Components:

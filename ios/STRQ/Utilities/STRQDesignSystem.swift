@@ -30,11 +30,28 @@ import UIKit
 enum STRQDesignSystem {
     static let sourceFontFamily = "Work Sans"
     static let fontFamily = sourceFontFamily
-    static let workSansFontFilesBundled = false
+    static var workSansFontFilesBundled: Bool {
+        STRQFontRegistrar.hasBundledFontFiles()
+    }
+
+    static let workSansFontResourceSubdirectory = "Resources/Fonts"
     static let workSansRegularFontName = "WorkSans-Regular"
     static let workSansMediumFontName = "WorkSans-Medium"
     static let workSansSemiBoldFontName = "WorkSans-SemiBold"
     static let workSansBoldFontName = "WorkSans-Bold"
+    static let workSansExtraBoldFontName = "WorkSans-ExtraBold"
+    static let workSansBlackFontName = "WorkSans-Black"
+    static let workSansRequiredFontResourceNames = [
+        workSansRegularFontName,
+        workSansMediumFontName,
+        workSansSemiBoldFontName,
+        workSansBoldFontName
+    ]
+    static let workSansOptionalFontResourceNames = [
+        workSansExtraBoldFontName,
+        workSansBlackFontName
+    ]
+    static let workSansFontResourceNames = workSansRequiredFontResourceNames + workSansOptionalFontResourceNames
     static let iconAssetPrefix = "STRQIcon"
 }
 
@@ -268,6 +285,14 @@ enum STRQTypography {
         workSansFontName(for: .regular) != nil
     }
 
+    static var isWorkSansExtraBoldActive: Bool {
+        registeredFontName(from: workSansExtraBoldFontNameCandidates) != nil
+    }
+
+    static var isWorkSansBlackActive: Bool {
+        registeredFontName(from: workSansBlackFontNameCandidates) != nil
+    }
+
     static var fontStatusText: String {
         isWorkSansActive ? "Work Sans active" : "Work Sans not bundled — using system fallback"
     }
@@ -441,36 +466,63 @@ enum STRQTypography {
     }
 
     private static func workSansFontNameCandidates(for weight: Font.Weight) -> [String] {
-        let preferredName: String
-
         if weight == .medium {
-            preferredName = STRQDesignSystem.workSansMediumFontName
+            return workSansMediumFontNameCandidates
         } else if weight == .semibold {
-            preferredName = STRQDesignSystem.workSansSemiBoldFontName
-        } else if weight == .bold || weight == .heavy || weight == .black {
-            preferredName = STRQDesignSystem.workSansBoldFontName
+            return workSansSemiBoldFontNameCandidates
+        } else if weight == .black {
+            return workSansBlackFontNameCandidates + workSansExtraBoldFontNameCandidates + workSansBoldFontNameCandidates
+        } else if weight == .heavy {
+            return workSansExtraBoldFontNameCandidates + workSansBoldFontNameCandidates
+        } else if weight == .bold {
+            return workSansBoldFontNameCandidates
         } else {
-            preferredName = STRQDesignSystem.workSansRegularFontName
-        }
-
-        return [
-            preferredName,
-            STRQDesignSystem.fontFamily,
-            "\(STRQDesignSystem.fontFamily) \(workSansStyleName(for: weight))"
-        ]
-    }
-
-    private static func workSansStyleName(for weight: Font.Weight) -> String {
-        if weight == .medium {
-            return "Medium"
-        } else if weight == .semibold {
-            return "SemiBold"
-        } else if weight == .bold || weight == .heavy || weight == .black {
-            return "Bold"
-        } else {
-            return "Regular"
+            return workSansRegularFontNameCandidates
         }
     }
+
+    private static let workSansRegularFontNameCandidates = [
+        STRQDesignSystem.workSansRegularFontName,
+        "WorkSans",
+        STRQDesignSystem.fontFamily,
+        "\(STRQDesignSystem.fontFamily) Regular"
+    ]
+
+    private static let workSansMediumFontNameCandidates = [
+        STRQDesignSystem.workSansMediumFontName,
+        "WorkSans Medium",
+        "\(STRQDesignSystem.fontFamily) Medium"
+    ]
+
+    private static let workSansSemiBoldFontNameCandidates = [
+        STRQDesignSystem.workSansSemiBoldFontName,
+        "WorkSans-Semibold",
+        "WorkSans SemiBold",
+        "WorkSans Semibold",
+        "\(STRQDesignSystem.fontFamily) SemiBold",
+        "\(STRQDesignSystem.fontFamily) Semibold"
+    ]
+
+    private static let workSansBoldFontNameCandidates = [
+        STRQDesignSystem.workSansBoldFontName,
+        "WorkSans Bold",
+        "\(STRQDesignSystem.fontFamily) Bold"
+    ]
+
+    private static let workSansExtraBoldFontNameCandidates = [
+        STRQDesignSystem.workSansExtraBoldFontName,
+        "WorkSans-Extrabold",
+        "WorkSans ExtraBold",
+        "WorkSans Extrabold",
+        "\(STRQDesignSystem.fontFamily) ExtraBold",
+        "\(STRQDesignSystem.fontFamily) Extrabold"
+    ]
+
+    private static let workSansBlackFontNameCandidates = [
+        STRQDesignSystem.workSansBlackFontName,
+        "WorkSans Black",
+        "\(STRQDesignSystem.fontFamily) Black"
+    ]
 
     private static func safeFallbackWeight(_ weight: Font.Weight) -> Font.Weight {
         if weight == .ultraLight || weight == .thin || weight == .light {

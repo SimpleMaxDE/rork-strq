@@ -92,12 +92,14 @@ Typography completion:
 Font strategy:
 
 - Figma Typography node `9119:6481` uses Work Sans with Regular, Medium, SemiBold, and Bold styles.
-- No Work Sans `.ttf`, `.otf`, `.woff`, or `.woff2` files were found anywhere in the repo during the typography fidelity pass.
+- The 2026-04-29 activation pass found no Work Sans `.ttf`, `.otf`, `.woff`, or `.woff2` files anywhere in this checkout. The expected `ios/STRQ/Resources/Fonts/` path is not present in the visible workspace.
+- Required bundled weights are `WorkSans-Regular`, `WorkSans-Medium`, `WorkSans-SemiBold`, and `WorkSans-Bold`; all are missing in this checkout. Optional `WorkSans-ExtraBold` and `WorkSans-Black` are also missing.
 - No app `ios/STRQ/Info.plist` exists; the STRQ app target uses generated Info.plist build settings.
-- No `UIAppFonts` registration was found in `ios/STRQ.xcodeproj/project.pbxproj`, and there are no Work Sans resources to include in the app target.
+- The Xcode project uses `PBXFileSystemSynchronizedRootGroup` for the `STRQ` app target, so resources placed under `ios/STRQ` are included through filesystem sync; no explicit `project.pbxproj` resource entries were added for missing font files.
+- No `UIAppFonts` registration was added. `STRQFontRegistrar` now registers bundled Work Sans files at startup with `CTFontManagerRegisterFontsForURL`, which avoids forcing a new generated-Info.plist override.
 - No fonts were downloaded or added.
-- Runtime typography now probes for registered Work Sans font names first, then falls back to a stronger role-based system strategy with rounded emphasis for heading, label, and metric roles.
-- Work Sans fidelity remains pending.
+- Runtime typography now probes for registered Work Sans PostScript candidates first, including Regular, Medium, SemiBold, Bold, and optional ExtraBold/Black, then falls back to a stronger role-based system strategy with rounded emphasis for heading, label, and metric roles.
+- Work Sans fidelity remains pending in this checkout until real font binaries are present in the app bundle.
 
 Component primitives added or completed:
 
@@ -108,7 +110,7 @@ Component primitives added or completed:
 
 Debug lab update:
 
-- `STRQDesignSystemPreviewView` now shows typography families, font weight differences, Work Sans active/fallback status, STRQ default roles, button variants, icon buttons, chips/badges, cards, metric cards, progress bars/rings, list items, schedule rows/cards, search/input/toggle/navigation/modal/bottom sheet/avatar/rating/empty-state primitives, and all icons through `STRQIcon.allCases`.
+- `STRQDesignSystemPreviewView` now shows typography families, Regular/Medium/SemiBold/Bold weight differences, optional ExtraBold/Black weights when registered, Work Sans active/fallback status, STRQ default roles, button variants, icon buttons, chips/badges, cards, metric cards, progress bars/rings, list items, schedule rows/cards, search/input/toggle/navigation/modal/bottom sheet/avatar/rating/empty-state primitives, and all icons through `STRQIcon.allCases`.
 
 ## Foundation Roadmap
 
@@ -195,22 +197,24 @@ Current status:
 
 - Figma Typography node `9119:6481` was inspected directly.
 - `STRQTypography` now covers the full observed display, heading, text, paragraph, and label scale.
-- Work Sans font files are not bundled, so runtime uses a safe, stronger system fallback while retaining Work Sans as the source-family note.
+- Work Sans font files are not present in this checkout, so runtime uses a safe, stronger system fallback while retaining Work Sans as the source-family note.
+- `STRQFontRegistrar.registerBundledFonts()` is called once from `STRQApp.init()`. It looks for `WorkSans-Regular`, `WorkSans-Medium`, `WorkSans-SemiBold`, `WorkSans-Bold`, and optional `WorkSans-ExtraBold`/`WorkSans-Black` as `.ttf` or `.otf` resources in `Resources/Fonts`, `Fonts`, or the bundle root.
 - STRQ-owned role aliases are complete enough for future component and module work without leaking source-kit naming into runtime Swift.
 - The typography fidelity pass added explicit helpers: `STRQTypography.font(...)`, `headingFont(...)`, `textFont(...)`, `labelFont(...)`, and `metricFont(...)`.
 
 Font family issue:
 
 - The purchased UI kit uses Work Sans.
-- The current app does not bundle Work Sans.
-- Exact Work Sans rendering requires app-bundled font files, target resource inclusion, Info.plist `UIAppFonts` registration, and verified runtime PostScript/font names.
-- The current app has no `ios/STRQ/Info.plist`; generated Info.plist settings are used and no `UIAppFonts` build setting is present.
+- The current visible checkout does not contain Work Sans font files.
+- Exact Work Sans rendering requires app-bundled font files, target resource inclusion, runtime CoreText registration, and verified runtime PostScript/font names.
+- The current app has no `ios/STRQ/Info.plist`; generated Info.plist settings are used, so runtime registration is preferred over adding `UIAppFonts`.
 
 Fallback strategy:
 
 - Short term: keep system-backed STRQ typography active in the isolated foundation.
 - Use role helpers so display/heading/label/metric roles are intentionally stronger than plain defaults while Work Sans is missing.
-- If licensed Work Sans font files are provided later, add only those font files to the STRQ app target resources, register them through `UIAppFonts`, verify the PostScript/font names on-device or in simulator, and then let the runtime probe activate Work Sans.
+- If licensed Work Sans font files are provided later, add only those font files under `ios/STRQ/Resources/Fonts/`. The STRQ filesystem-synchronized app target should include them without manual `project.pbxproj` entries, and `STRQFontRegistrar` will register them safely at process startup.
+- Verify the PostScript/font names on-device or in simulator; `STRQTypography` already probes likely Work Sans names before falling back.
 - Until then, exact Figma typography remains pending and the DEBUG design-system lab reports `Work Sans not bundled — using system fallback`.
 
 STRQ ownership direction:

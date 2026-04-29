@@ -10,6 +10,8 @@ struct STRQApp: App {
     @State private var store = StoreViewModel()
 
     init() {
+        STRQFontRegistrar.registerBundledFonts()
+
         let apiKey: String
         #if DEBUG
         apiKey = Config.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY.isEmpty

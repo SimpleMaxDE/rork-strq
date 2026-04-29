@@ -176,6 +176,12 @@ private struct TypographySection: View {
                             WeightPill(title: "Medium", font: STRQTypography.textFont(size: 18, weight: .medium))
                             WeightPill(title: "SemiBold", font: STRQTypography.labelFont(size: 18, weight: .semibold))
                             WeightPill(title: "Bold", font: STRQTypography.headingFont(size: 18, weight: .bold))
+                            if STRQTypography.isWorkSansExtraBoldActive {
+                                WeightPill(title: "ExtraBold", font: STRQTypography.metricFont(size: 18, weight: .heavy))
+                            }
+                            if STRQTypography.isWorkSansBlackActive {
+                                WeightPill(title: "Black", font: STRQTypography.metricFont(size: 18, weight: .black))
+                            }
                         }
                     }
                 }
