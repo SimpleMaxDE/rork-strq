@@ -8,7 +8,8 @@ This document prepares STRQ's core icon system for future STRQ UI modules and
 tracks isolated icon import batches.
 
 Batch 1 imported Core UI Actions + Settings as template SVG assets. Batch 2
-imported Training / Workout control icons as template SVG assets. No production
+imported Training / Workout control icons as template SVG assets. Batch 3
+imported Progress / Analytics icons as template SVG assets. No production
 views, app logic, workout logic, persistence, analytics, product IDs,
 localization, navigation behavior, data models, paywall, onboarding, dashboard,
 active workout, workout completion, profile, content, or progress analytics
@@ -43,9 +44,15 @@ Observed icon system structure:
 | Styles per row | Light, Regular, Bold, Fill, Duotone, Duoline |
 | Recommended import style | Use the `Style=Regular` symbol as the base template candidate unless a later visual QA pass chooses another base style |
 
+Batch 3 bounded Figma export confirmed all eight target nodes as 24x24
+`Style=Regular` components. `ActivityRing` uses the recorded closest-match
+donut chart icon because no direct activity ring row was found in the icon set.
+`Medal` is distinct from the existing Trophy icon and was imported from its own
+regular component.
+
 ## Current STRQ Icon Inventory
 
-Current `STRQIcon` exposes 41 enum cases. Every enum raw value has a matching
+Current `STRQIcon` exposes 49 enum cases. Every enum raw value has a matching
 `STRQIcon*.imageset` folder. Every image set has valid `Contents.json`, an
 existing referenced SVG, `preserves-vector-representation: true`, and
 `template-rendering-intent: "template"`.
@@ -88,7 +95,15 @@ existing referenced SVG, `preserves-vector-representation: true`, and
 | `reps` | `STRQIconReps` | `STRQIconReps.svg` | Yes | Yes | Yes |
 | `sets` | `STRQIconSets` | `STRQIconSets.svg` | Yes | Yes | Yes |
 | `target` | `STRQIconTarget` | `STRQIconTarget.svg` | Yes | Yes | Yes |
+| `chartLine` | `STRQIconChartLine` | `STRQIconChartLine.svg` | Yes | Yes | Yes |
+| `chartBar` | `STRQIconChartBar` | `STRQIconChartBar.svg` | Yes | Yes | Yes |
+| `trendUp` | `STRQIconTrendUp` | `STRQIconTrendUp.svg` | Yes | Yes | Yes |
+| `trendDown` | `STRQIconTrendDown` | `STRQIconTrendDown.svg` | Yes | Yes | Yes |
 | `trophy` | `STRQIconTrophy` | `STRQIconTrophy.svg` | Yes | Yes | Yes |
+| `medal` | `STRQIconMedal` | `STRQIconMedal.svg` | Yes | Yes | Yes |
+| `fire` | `STRQIconFire` | `STRQIconFire.svg` | Yes | Yes | Yes |
+| `percentage` | `STRQIconPercentage` | `STRQIconPercentage.svg` | Yes | Yes | Yes |
+| `activityRing` | `STRQIconActivityRing` | `STRQIconActivityRing.svg` | Yes | Yes | Yes |
 | `barbell` | `STRQIconBarbell` | `STRQIconBarbell.svg` | Yes | Yes | Yes |
 | `weightScale` | `STRQIconWeightScale` | `STRQIconWeightScale.svg` | Yes | Yes | Yes |
 | `bell` | `STRQIconBell` | `STRQIconBell.svg` | Yes | Yes | Yes |
@@ -96,11 +111,14 @@ existing referenced SVG, `preserves-vector-representation: true`, and
 
 Current `STRQIcon*.imageset` folders:
 
+- `STRQIconActivityRing.imageset`
 - `STRQIconArrowLeft.imageset`
 - `STRQIconArrowRight.imageset`
 - `STRQIconBarbell.imageset`
 - `STRQIconBell.imageset`
 - `STRQIconCalendar.imageset`
+- `STRQIconChartBar.imageset`
+- `STRQIconChartLine.imageset`
 - `STRQIconCheck.imageset`
 - `STRQIconCheckCircle.imageset`
 - `STRQIconChecklist.imageset`
@@ -110,11 +128,14 @@ Current `STRQIcon*.imageset` folders:
 - `STRQIconClose.imageset`
 - `STRQIconCoach.imageset`
 - `STRQIconEdit.imageset`
+- `STRQIconFire.imageset`
 - `STRQIconHome.imageset`
 - `STRQIconInfo.imageset`
 - `STRQIconLock.imageset`
+- `STRQIconMedal.imageset`
 - `STRQIconMore.imageset`
 - `STRQIconPause.imageset`
+- `STRQIconPercentage.imageset`
 - `STRQIconPlay.imageset`
 - `STRQIconPlus.imageset`
 - `STRQIconProfile.imageset`
@@ -134,6 +155,8 @@ Current `STRQIcon*.imageset` folders:
 - `STRQIconTarget.imageset`
 - `STRQIconTrain.imageset`
 - `STRQIconTrash.imageset`
+- `STRQIconTrendDown.imageset`
+- `STRQIconTrendUp.imageset`
 - `STRQIconTrophy.imageset`
 - `STRQIconWarning.imageset`
 - `STRQIconWeightScale.imageset`
@@ -292,15 +315,15 @@ current asset was exported from the exact same listed Figma row.
 | Training / Workout | `STRQIconSets` | `list-three-check` | `8997:10756` | Yes | `STRQIconSets` | Medium | Imported in Batch 2 as a distinct set-list/checklist variant, not a reused Checklist asset. |
 | Training / Workout | `STRQIconCalendar` | `calendar-1` | `8997:8083` | Yes | `STRQIconCalendar` | High | Already imported. |
 | Training / Workout | `STRQIconChecklist` | `list-two-check` | `8997:10711` | Yes | `STRQIconChecklist` | High | Imported in Batch 2; useful for plan/session completion UI. |
-| Progress / Analytics | `STRQIconChartLine` | `chart-trend-up` | `8997:15175` | No | `STRQIconChartLine` | High | No plain `chart-line` row found. |
-| Progress / Analytics | `STRQIconChartBar` | `chart-bar-1` | `8997:14737` | No | `STRQIconChartBar` | High | Import before analytics cards migrate. |
-| Progress / Analytics | `STRQIconTrendUp` | `arrow-trend-up` | `8997:13776` | No | `STRQIconTrendUp` | High | Use arrow trend for compact deltas. |
-| Progress / Analytics | `STRQIconTrendDown` | `arrow-trend-down` | `8997:13791` | No | `STRQIconTrendDown` | High | Use arrow trend for compact deltas. |
+| Progress / Analytics | `STRQIconChartLine` | `chart-trend-up` | `8997:15175` | Yes | `STRQIconChartLine` | High | Imported in Batch 3; no plain `chart-line` row found, so the recorded chart trend row is used. |
+| Progress / Analytics | `STRQIconChartBar` | `chart-bar-1` | `8997:14737` | Yes | `STRQIconChartBar` | High | Imported in Batch 3 for analytics cards. |
+| Progress / Analytics | `STRQIconTrendUp` | `arrow-trend-up` | `8997:13776` | Yes | `STRQIconTrendUp` | High | Imported in Batch 3; use arrow trend for compact deltas. |
+| Progress / Analytics | `STRQIconTrendDown` | `arrow-trend-down` | `8997:13791` | Yes | `STRQIconTrendDown` | High | Imported in Batch 3; use arrow trend for compact deltas. |
 | Progress / Analytics | `STRQIconTrophy` | `trophy-1` | `8997:12250` | Yes | `STRQIconTrophy` | High | Already imported. |
-| Progress / Analytics | `STRQIconMedal` | `medal` | `8997:15781` | No | `STRQIconMedal` | Medium | Reward/achievement support. |
-| Progress / Analytics | `STRQIconFire` | `fire-1` | `8997:5926` | No | `STRQIconFire` | Medium | Streak support. |
-| Progress / Analytics | `STRQIconPercentage` | `percentage` | `8997:7166` | No | `STRQIconPercentage` | Medium | Useful for score deltas and adherence. |
-| Progress / Analytics | `STRQIconActivityRing` | `chart-donut-1` | `8997:14897` | No | `STRQIconActivityRing` | Medium | No direct activity ring row found; donut chart is the best icon-set fit. |
+| Progress / Analytics | `STRQIconMedal` | `medal` | `8997:15781` | Yes | `STRQIconMedal` | Medium | Imported in Batch 3 as a distinct reward/achievement icon, not a Trophy reuse. |
+| Progress / Analytics | `STRQIconFire` | `fire-1` | `8997:5926` | Yes | `STRQIconFire` | Medium | Imported in Batch 3 for streak support. |
+| Progress / Analytics | `STRQIconPercentage` | `percentage` | `8997:7166` | Yes | `STRQIconPercentage` | Medium | Imported in Batch 3 for score deltas and adherence. |
+| Progress / Analytics | `STRQIconActivityRing` | `chart-donut-1` | `8997:14897` | Yes | `STRQIconActivityRing` | Medium | Imported in Batch 3; no direct activity ring row found, donut chart is the documented closest icon-set fit. |
 | Health / Recovery | `STRQIconHeart` | `heart` | `8997:1201` | No | `STRQIconHeart` | High | Clean health/recovery base icon. |
 | Health / Recovery | `STRQIconHeartbeat` | `heart-ecg` | `8997:1230` | No | `STRQIconHeartbeat` | Medium | Good readiness/vitals candidate. |
 | Health / Recovery | `STRQIconMoon` | `moon` | `8997:5785` | No | `STRQIconMoon` | High | Current `STRQIconSleep` exists, but moon is a cleaner general sleep icon. |
@@ -374,14 +397,29 @@ replacement assets were used.
 | `reps` | `STRQIconReps` | `hash-tag-1`, `Style=Regular` | `8997:8440` | SVG template vector | imported | Closest recorded rep-count match; no direct `reps` row found. |
 | `sets` | `STRQIconSets` | `list-three-check`, `Style=Regular` | `8997:10756` | SVG template vector | imported | Closest recorded set-list match; distinct from `Checklist`. |
 
+## Batch 3 Import Results
+
+Batch 3 imported only Progress / Analytics icons from the recorded
+regular-style Figma nodes. All assets use SVG format with template rendering
+intent and vector preservation enabled. `ActivityRing` uses the closest source
+match already recorded in the matching plan; no SF Symbol replacement assets
+were used.
+
+| STRQ enum case | Asset name | Figma/source match | Figma node id | Imported format | Status | Notes |
+|---|---|---|---:|---|---|---|
+| `chartLine` | `STRQIconChartLine` | `chart-trend-up`, `Style=Regular` | `8997:15175` | SVG template vector | imported | Closest recorded chart-line match; no plain `chart-line` row found. |
+| `chartBar` | `STRQIconChartBar` | `chart-bar-1`, `Style=Regular` | `8997:14737` | SVG template vector | imported | No fallback used. |
+| `trendUp` | `STRQIconTrendUp` | `arrow-trend-up`, `Style=Regular` | `8997:13776` | SVG template vector | imported | No fallback used. |
+| `trendDown` | `STRQIconTrendDown` | `arrow-trend-down`, `Style=Regular` | `8997:13791` | SVG template vector | imported | No fallback used. |
+| `medal` | `STRQIconMedal` | `medal`, `Style=Regular` | `8997:15781` | SVG template vector | imported | Distinct regular medal icon; not a Trophy reuse. |
+| `fire` | `STRQIconFire` | `fire-1`, `Style=Regular` | `8997:5926` | SVG template vector | imported | No fallback used. |
+| `percentage` | `STRQIconPercentage` | `percentage`, `Style=Regular` | `8997:7166` | SVG template vector | imported | No fallback used. |
+| `activityRing` | `STRQIconActivityRing` | `chart-donut-1`, `Style=Regular` | `8997:14897` | SVG template vector | imported | Closest recorded activity-ring match; no direct activity ring row found. |
+
 ## Missing Icons By Priority
 
 High priority:
 
-- `STRQIconChartLine`
-- `STRQIconChartBar`
-- `STRQIconTrendUp`
-- `STRQIconTrendDown`
 - `STRQIconHeart`
 - `STRQIconMoon`
 - `STRQIconBolt`
@@ -390,10 +428,6 @@ Medium priority:
 
 - `STRQIconUnlock`
 - `STRQIconWeightPlate`
-- `STRQIconMedal`
-- `STRQIconFire`
-- `STRQIconPercentage`
-- `STRQIconActivityRing`
 - `STRQIconHeartbeat`
 - `STRQIconSoreness`
 - `STRQIconStress`
@@ -481,7 +515,7 @@ Batch 2 completed:
 - `STRQIconReps`
 - `STRQIconSets`
 
-Recommended next import batch:
+Batch 3 completed:
 
 - `STRQIconChartLine`
 - `STRQIconChartBar`
@@ -492,7 +526,18 @@ Recommended next import batch:
 - `STRQIconPercentage`
 - `STRQIconActivityRing`
 
-This next batch would extend reusable STRQ progress and analytics foundations
+Recommended next import batch:
+
+- `STRQIconHeart`
+- `STRQIconHeartbeat`
+- `STRQIconMoon`
+- `STRQIconBolt`
+- `STRQIconSoreness`
+- `STRQIconStress`
+- `STRQIconWater`
+- `STRQIconNutrition`
+
+This next batch would extend reusable STRQ health and recovery foundations
 without touching production screens.
 
 ## Naming Rules
