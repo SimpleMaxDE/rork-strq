@@ -16,17 +16,23 @@ Public product references used only as non-node-level corroboration:
 
 ## Audit Status
 
-The local STRQ implementation was inspected. The Figma plugin was invoked for the purchased file, but all Figma app calls failed before file access with:
+Previous audit conclusion was blocked by Figma connector failure and is superseded. On 2026-04-29, the Figma connector successfully inspected the requested Sandow Foundations, Media, and Illustration nodes.
 
-`MCP startup failed: handshaking with MCP server failed ... HTTP request failed ... https://chatgpt.com/backend-api/wham/apps`
+The current status remains audit and manifest only. No Sandow assets were imported. No runtime screens, Swift files, asset catalogs, localization, product IDs, workout logic, persistence, analytics, onboarding logic, or data models were modified.
 
-Fallback checks:
+Figma recheck completed:
 
-- Figma REST API without an auth token returned 403.
-- Direct unauthenticated file URL fetch returned 404.
-- Therefore the purchased Figma file could not be enumerated in this pass.
+- Foundations page `5358:6096` exists and contains the expected top-level sections.
+- Media node `9125:50816` exists.
+- Illustration node `9125:148813` exists.
+- Anatomy Muscle node `8673:69673` exists and was inspected with metadata plus screenshot.
+- Body Type node `9025:207456` exists and was inspected with metadata plus screenshot.
+- Organ Anatomy node `9139:70026` exists and was inspected with metadata plus screenshot; its base type set is `_OrganAnatomyBase` at `8860:134805`.
+- Large anatomy/body vector groups parent `9192:5535` exists and was inspected with metadata plus screenshot.
+- Fitness Equipment Image area `11536:90366` exists and was inspected with metadata plus screenshot.
+- Anatomy Muscle import strategy is documented in `SandowAnatomyImportPlan.md`.
 
-This manifest must be treated as a coverage manifest plus blocked-inspection ledger, not as a final complete node-by-node inventory. The next audit pass must rerun the Figma inventory when the Figma connector is available.
+This manifest is no longer blocked for the body/anatomy/muscle conclusion. It is still not a full file-wide inventory of every Sandow page, component, token, icon, and screen group.
 
 ## Inspected STRQ Files
 
@@ -37,7 +43,7 @@ This manifest must be treated as a coverage manifest plus blocked-inspection led
 - `ios/STRQ/Views/MuscleRegionPaths.swift`
 - Runtime view search scope: `ios/STRQ/Views/**/*.swift` and `ios/STRQ/ContentView.swift`
 
-No existing `ios/STRQ/Utilities/SandowImportManifest.md` was found before this pass.
+For this correction pass, only `ios/STRQ/Utilities/SandowImportManifest.md` was edited. Runtime files remain unchanged.
 
 ## Practical Searches Run
 
@@ -70,16 +76,20 @@ Results:
 
 ## Known Figma Nodes To Inspect
 
-These are the currently known nodes from the purchased Sandow file. They are listed here so a follow-up pass can verify them directly when Figma access works.
+These are the currently known nodes from the purchased Sandow file. The Foundations, Media, and Illustration nodes below were rechecked directly through the Figma connector on 2026-04-29.
 
 | Area | Node | Status |
 |---|---:|---|
-| Foundations page | `5358:6096` | Known, not enumerated in this pass |
-| Colors | `5359:9002` | Known, not enumerated in this pass |
-| Gradients | `5442:13546` | Known, not enumerated in this pass |
-| Typography | `9119:6481` | Known, not enumerated in this pass |
-| Effects | `9120:58753` | Known, not enumerated in this pass |
-| Size & Spacing | `9122:6944` | Known, not enumerated in this pass |
+| Foundations page | `5358:6096` | Verified; top-level sections enumerated |
+| Colors | `5359:9002` | Verified as Foundations top-level section |
+| Gradients | `5442:13546` | Verified as Foundations top-level section |
+| Typography | `9119:6481` | Verified as Foundations top-level section |
+| Logo | `9120:37139` | Verified as Foundations top-level section |
+| Effects | `9120:58753` | Verified as Foundations top-level section |
+| Grid | `9122:4683` | Verified as Foundations top-level section |
+| Size & Spacing | `9122:6944` | Verified as Foundations top-level section |
+| Media | `9125:50816` | Verified as Foundations top-level section |
+| Illustration | `9125:148813` | Verified as Foundations top-level section |
 | Icon Set page | `5367:38988` | Known, not enumerated in this pass |
 | Icons | `5454:22014` | Known, not enumerated in this pass |
 | General Components page | `5358:4030` | Known, not enumerated in this pass |
@@ -96,50 +106,55 @@ These are the currently known nodes from the purchased Sandow file. They are lis
 | Card - App Specific | `9160:324200` | Known, not enumerated in this pass |
 | Home & Smart Fitness Metrics | `11604:62728` | Known, not enumerated in this pass |
 | Achievements / Leaderboard | `11613:176014` | Known, not enumerated in this pass |
+| Illustration / Anatomy Muscle | `8673:69673` | Verified; 60-variant component set |
+| Illustration / Body Type | `9025:207456` | Verified; 12-variant component set |
+| Illustration / Organ Anatomy | `9139:70026` | Verified size wrapper; base types at `8860:134805` |
+| Illustration / large anatomy vector groups | `9192:5535` | Verified; 4 generic groups, 225 vectors |
+| Media / Fitness Equipment Image | `11536:90366` | Verified; image/demo asset area |
 
 ## Full Page Inventory
 
-Full page enumeration is blocked until the Figma connector can access the purchased file. Public Sandow product pages indicate the v3 kit contains a large reusable system: 500+ screens, 500+ components, 7 bonus dashboards, dark mode support, accessibility guidance, smart tokens and variables, Sandow icon set, Sandow design system, Work Sans font, and v3 semantic token updates.
+Full page enumeration was not completed in this correction pass. The Figma connector can access the purchased file, but this pass was intentionally limited to the requested Foundations, Media, Illustration, body/anatomy/muscle, and equipment nodes. Public Sandow product pages indicate the v3 kit contains a large reusable system: 500+ screens, 500+ components, 7 bonus dashboards, dark mode support, accessibility guidance, smart tokens and variables, Sandow icon set, Sandow design system, Work Sans font, and v3 semantic token updates.
 
 Known page-level areas from the current STRQ source and provided node list:
 
 | Page / Area | Known Node | Expected Contents | Inventory Status |
 |---|---:|---|---|
-| Foundations | `5358:6096` | Colors, gradients, typography, effects, size and spacing | Partial - node IDs known only |
+| Foundations | `5358:6096` | Colors, gradients, typography, logo, effects, grid, size and spacing, media, illustration | Verified top-level section list |
 | Icon Set | `5367:38988` | Full Sandow icon library | Partial - node IDs known only |
 | General Components | `5358:4030` | Reusable UI primitives | Partial - node IDs known only |
 | App Components | `5643:11300` | Mobile app components and fitness-specific modules | Partial - node IDs known only |
 | Screen groups | Unknown beyond known screen refs | Home, smart metrics, achievements, leaderboard, likely onboarding, coach, nutrition, progress, paywall, settings, profile, workout patterns | Publicly indicated, exact nodes not verified |
-| Asset/media/illustration groups | Unknown | Product imagery, demo photos, avatars, icons, possible illustration/media placeholders | Not verified |
+| Asset/media/illustration groups | `9125:50816`, `9125:148813` | Media component groups, image/demo assets, illustration assets, anatomy/body/muscle component sets | Partial - requested nodes verified |
 
 ## Body / Muscle / Anatomy / Exercise Asset Audit
 
-Critical status: inconclusive for the purchased Figma file because file-level Figma search was blocked.
+Critical correction: the previous body/anatomy conclusion was blocked by Figma connector failure and is superseded. Reusable body/anatomy/muscle assets were found in the Figma Foundations > Illustration section.
 
-No reusable body/anatomy/muscle asset found in inspected areas.
+Direct Figma inspection confirmed:
 
-Inspected areas for this statement:
+- `9125:148813` Illustration contains `8673:69673` Anatomy Muscle, `9025:207456` Body Type, `9139:70026` Organ Anatomy, `9192:5535` large anatomy/body vector groups, `9064:106798` Achievement Badge, `_AchievementBadgeBase` `9063:203904`, `_OrganAnatomyBase` `8860:134805`, and `_IllustrationBase` `8912:62197`.
+- `9125:50816` Media contains `11536:90366` Fitness Equipment Image area, plus Avatar, Flag, Video Player, Image Thumbnail, Gallery, Gallery Row, Credit Card, Credit Card Thumbnail, File Types, and Street Map component groups.
 
-- Current STRQ Sandow implementation
-- Current Sandow asset catalog imports
-- Current STRQ body/muscle views
-- Public Sandow product/listing text available without purchased-file access
+| Area | Node ID | Variants | STRQ relevance | Import priority | Status | Notes |
+|---|---:|---|---|---|---|---|
+| Illustration / Anatomy Muscle | `8673:69673` | 60 variants; Gender: Male, Female; Is Selected: true, false; Body Area: Lower Leg, Upper Leg, Abs, Chest, Shoulder, Bicep, Forearm, Hand, Neck, Tricep, Hamstring, Glute, Calf, Back, Trap | Muscle focus visuals, exercise details, onboarding body selectors, workout analytics | High | Found; metadata and screenshot verified | Reusable for STRQ: yes. Figma names use `Is Selected=true/false`, which maps to selected/not selected state. Prefer base assets plus SwiftUI state styling rather than importing every state blindly. |
+| Illustration / Body Type | `9025:207456` | 12 variants; Gender: Male, Female; Type: Ectomorph, Mesomorph, Endomorph; State: Default, Selected | Onboarding/profile/body goal visuals | Medium | Found; metadata and screenshot verified | Reusable for STRQ: yes, but not first import priority. |
+| Illustration / Organ Anatomy | `9139:70026`; base `8860:134805` | Size wrapper: sm, md, lg, xl, 2xl; base types: Lung, Brain, Kidney, Heart, Stomach, Small Intestine, Large Intestine, Liver, Pancreas, Urinary Bladder, Spine, Knee, Skin, Eye, Gallbladder, Tooth, Breast, Genital Male, Genital Female | Health, recovery, coach, educational visuals | Low/medium | Found; metadata and screenshot verified | Reusable for STRQ: maybe. `9139:70026` controls size; `_OrganAnatomyBase` `8860:134805` holds exact organ/body type variants. |
+| Media / Fitness Equipment Image | `11536:90366` | No component variants; image area contains 20 equipment image rectangles under `11536:90365`, each 128x128 | Equipment visuals, exercise filters, gym setup/onboarding | Medium | Found; metadata and screenshot verified | Reusable for STRQ: maybe. Screenshot shows photo/demo-style equipment imagery, so inspect licensing/export quality before importing. |
+| Illustration / large anatomy vector groups | `9192:5535` | 4 generic `Group` children with 225 vectors total | Possible large body/anatomy visuals for selectors, analytics, or exercise detail | Pending | Found; metadata and screenshot verified; export strategy pending | Reusable for STRQ: likely, pending export feasibility. Screenshot shows large male/female front/back anatomy line-art groups, but metadata labels remain generic `Group`/`Vector`. |
 
-| Asset Type | Found In Figma | Page / Node | Current STRQ Equivalent | Reusable For STRQ | Later Import? | Notes |
-|---|---|---|---|---|---|---|
-| Human body front/back layouts | Not verified | Unknown | Yes, non-Sandow local/remote assets in `MuscleFocusView` and generated body assets | Current STRQ assets are reusable, Sandow status unknown | Decide after Figma search works | Existing STRQ uses generated front/back body images and custom callout overlays |
-| Muscle maps | Not verified | Unknown | Yes, custom `BodyMapView` and `MuscleRegionPaths` | Current STRQ implementation is reusable | Import Sandow only if vector anatomy assets exist | Existing muscle paths are code-native and not Sandow-based |
-| Anatomy visuals | Not verified | Unknown | Partial, current STRQ generated body imagery | Maybe | Pending Figma search | No Sandow anatomy vector was verified |
-| Exercise illustrations | Not verified | Unknown | Exercise media comes from catalog/provider paths, not Sandow | Maybe | Pending Figma search | Do not replace exercise media without separate data/media pass |
-| Exercise media placeholders | Not verified | Unknown | `ExerciseThumbnail`, `RemoteExerciseImage`, `GIFImageView` | Maybe | Pending Figma search | Could later adopt placeholder styling only |
-| Workout visual cards | Publicly likely | Unknown | Existing STRQ workout/card views, non-Sandow | Yes as pattern | High after components | Figma node IDs not verified |
-| Body-part selectors | Not verified | Unknown | `MuscleFocusView` mode/front-back selector | Yes as pattern | High only if found | Existing selector is not Sandow |
-| Muscle focus layouts | Not verified | Unknown | `MuscleFocusView` | Yes | Pending decision | STRQ already has a domain-specific implementation |
-| Fitness/person silhouettes | Not verified | Unknown | Generated local/remote body images | Maybe | Pending search | No Sandow silhouette asset verified |
-| Body scan / health score visuals | Not verified | Unknown | Partial readiness/physique cards | Maybe | Medium if present | Likely relevant to smart metrics but unverified |
-| SVG/vector body assets | Not verified | Unknown | Code-native paths, not imported SVGs | Yes if found | High if present | Requires direct Figma search for `body`, `muscle`, `anatomy`, `human`, `front`, `back` |
+Detailed strategy: see `ios/STRQ/Utilities/SandowAnatomyImportPlan.md`.
 
-Required Figma follow-up keywords:
+Anatomy Muscle strategy summary:
+
+- `8673:69673` is a 60-variant vector-only Figma component set: 2 genders x 15 body areas x selected/unselected state.
+- All direct variants are Figma components; no image paints, gradients, or text nodes were found.
+- Selected/unselected state is represented by separate Figma component variants, but the state difference is primarily color.
+- Recommended future import strategy is base anatomy line art plus per-area masks/overlays, with selected/unselected/focus/reduce styling controlled in SwiftUI.
+- Do not import all 60 state variants unless later export QA proves masks/overlays are not viable.
+
+Required Figma follow-up keywords for the broader, file-wide audit:
 
 `muscle`, `muscles`, `anatomy`, `body`, `body map`, `human`, `front`, `back`, `exercise`, `workout`, `gym`, `fitness`, `illustration`, `media`, `image`, `avatar`, `coach`, `nutrition`, `sleep`, `progress`, `analytics`, `chart`, `score`, `achievement`, `leaderboard`, `paywall`, `subscription`, `onboarding`, `profile`, `settings`, `watch`, `device`, `tab bar`, `navigation`, `modal`, `bottom sheet`, `card`, `list item`, `schedule`, `icon`.
 
@@ -188,7 +203,7 @@ Required Figma follow-up keywords:
 | Settings rows | Likely screen pattern | Unknown | Partial via list item | Partial | Toggles, destructive rows, disclosure groups missing | Medium |
 | Workout cards | Likely screen/app pattern | Unknown | No dedicated Sandow workout card | Missing | Needed for TrainingPlan/Workout migration, not runtime now | High |
 | Exercise cards | Likely screen/app pattern | Unknown | No dedicated Sandow exercise card | Missing | Exercise media/thumbnail variants pending Figma search | High |
-| Muscle/body selectors | Not verified | Unknown | No Sandow primitive; STRQ has non-Sandow `MuscleFocusView` | Missing / Manual decision | Do not import until anatomy audit can verify assets | High if found |
+| Muscle/body selectors | Yes, verified | `8673:69673`, `9025:207456`, `9192:5535` | No Sandow primitive; STRQ has non-Sandow `MuscleFocusView` | Found / import strategy pending | Anatomy Muscle and Body Type component sets verified; large anatomy line-art groups verified but metadata labels are generic | High for Anatomy Muscle; medium for Body Type |
 
 ## Icon Coverage
 
@@ -199,7 +214,7 @@ The provided known icon set nodes are:
 - Icon Set page: `5367:38988`
 - Icons: `5454:22014`
 
-The full Figma icon base count and style/variant count could not be enumerated because Figma access was blocked. Public product/listing sources indicate Sandow includes a large custom icon set, with listings describing 765+ to 1,000+ icons across versions and v3 "revamped UI icons". Exact v3 base icons and style variants must be verified directly in Figma.
+The full Figma icon base count and style/variant count were not enumerated in this correction pass. Public product/listing sources indicate Sandow includes a large custom icon set, with listings describing 765+ to 1,000+ icons across versions and v3 "revamped UI icons". Exact v3 base icons and style variants must be verified directly in Figma.
 
 ### Current STRQ Icons
 
@@ -274,7 +289,7 @@ High-value missing icons for STRQ:
 
 ## Screen / Pattern Inventory
 
-Full screen group enumeration is blocked until the Figma connector can inspect the purchased file. Public Sandow materials and known nodes indicate the following screen/pattern coverage should exist or be searched for:
+Full screen group enumeration was not part of this correction pass. Public Sandow materials and known nodes indicate the following screen/pattern coverage should exist or be searched for:
 
 | Pattern | Page / Node | Useful Patterns | STRQ Needs It | Later Migration Target |
 |---|---:|---|---|---|
@@ -367,7 +382,7 @@ Components:
 - Workout/exercise cards.
 - Achievement/leaderboard components.
 - Empty states and feedback/rating components.
-- Muscle/body selector components if present in Sandow.
+- Muscle/body selector components exist in Figma, but no import/component strategy has been chosen yet.
 
 Icons:
 
@@ -383,8 +398,8 @@ Screens:
 
 Body/anatomy:
 
-- No verified Sandow body/anatomy/muscle SVG/vector asset.
-- Needs direct Figma keyword search before any import decision.
+- Reusable Sandow body/anatomy/muscle assets were verified in Figma.
+- Remaining work is import strategy, export feasibility, and deciding which variants should become base assets versus SwiftUI state styling.
 
 ## Intentionally Excluded Items
 
@@ -404,29 +419,37 @@ Body/anatomy:
 
 ## Recommended Next Import Passes
 
-1. Figma connector recovery and full inventory pass.
+1. Pass 1 - Anatomy Muscle verification and import strategy.
+   - Use `SandowAnatomyImportPlan.md` as the source of truth for the next anatomy pass.
+   - Export sample Anatomy Muscle SVGs/PDFs for one male and one female area in both states, then verify vector-only output before adding assets.
+   - Prefer base anatomy line art plus per-area masks/overlays with SwiftUI state styling.
+   - Do not import every selected/unselected/gender variant blindly.
+
+2. Pass 2 - Secondary reusable assets.
+   - Body Type assets.
+   - Fitness equipment images.
+   - Achievement badges.
+   - Illustration base assets.
+
+3. Pass 3 - Organ anatomy only if product scope needs it.
+   - Import Organ Anatomy assets only if STRQ actually uses health/recovery educational screens.
+
+4. Figma full inventory pass.
    - Enumerate all pages, top-level sections, component sets, variables, styles, screen groups, asset/media groups, and keyword matches.
    - Save exact page/node inventory back into this manifest.
 
-2. Icon base-template import pass.
+5. Icon base-template import pass.
    - Import missing core action, settings, training, analytics, coach, nutrition, and health icons as template SVGs.
    - Keep one base icon per concept unless truly multicolor.
 
-3. Foundation parity pass.
+6. Foundation parity pass.
    - Compare exact Figma variables/styles against `SandowColors`, `SandowGradients`, `SandowTypography`, `SandowEffects`, `SandowSpacing`, and `SandowRadii`.
    - Add missing tokens without changing runtime screens.
 
-4. General primitive parity pass.
-   - Button, chip, badge, card, progress, tabs, inputs, search, modal, sheet, toggles, sliders.
+7. General/app primitive parity pass.
+   - Button, chip, badge, card, progress, tabs, inputs, search, modal, sheet, toggles, sliders, navigation, tab bar, list item, schedule, metric cards, chart cards, workout/exercise cards.
 
-5. App component parity pass.
-   - Navigation, tab bar, list item, schedule, app-specific cards, metric cards, chart cards, workout/exercise cards.
-
-6. Body/anatomy decision pass.
-   - If Sandow includes reusable body/anatomy/muscle assets, import the vector base assets and bind STRQ muscle overlays to them.
-   - If Sandow has only demo/person imagery, keep STRQ's existing body map system and only apply Sandow surface/tokens later.
-
-7. Screen migration planning pass.
+8. Screen migration planning pass.
    - Plan one runtime screen at a time, starting with the least risky contained surfaces.
    - Do not migrate `DashboardView` until component/icon/foundation parity is complete.
 
