@@ -761,6 +761,14 @@ struct ProfileView: View {
                     Analytics.shared.track(.regenerate_plan_dialog_opened, ["surface": "profile"])
                     showPlanRegenerationDialog = true
                 }
+                #if DEBUG
+                NavigationLink {
+                    STRQDesignSystemPreviewView()
+                } label: {
+                    controlRowContent("Design System Lab", icon: "paintpalette.fill", color: STRQBrand.steel)
+                        .background(Color(.secondarySystemGroupedBackground))
+                }
+                #endif
             }
             .clipShape(.rect(cornerRadius: 12))
             .overlay(
