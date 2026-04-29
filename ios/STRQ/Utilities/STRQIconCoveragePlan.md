@@ -7,8 +7,9 @@ Last prepared: 2026-04-29
 This document prepares STRQ's core icon system for future STRQ UI modules and
 tracks isolated icon import batches.
 
-Batch 1 imported Core UI Actions + Settings as template SVG assets. No
-production views, app logic, workout logic, persistence, analytics, product IDs,
+Batch 1 imported Core UI Actions + Settings as template SVG assets. Batch 2
+imported Training / Workout control icons as template SVG assets. No production
+views, app logic, workout logic, persistence, analytics, product IDs,
 localization, navigation behavior, data models, paywall, onboarding, dashboard,
 active workout, workout completion, profile, content, or progress analytics
 screens were modified.
@@ -44,7 +45,7 @@ Observed icon system structure:
 
 ## Current STRQ Icon Inventory
 
-Current `STRQIcon` exposes 31 enum cases. Every enum raw value has a matching
+Current `STRQIcon` exposes 41 enum cases. Every enum raw value has a matching
 `STRQIcon*.imageset` folder. Every image set has valid `Contents.json`, an
 existing referenced SVG, `preserves-vector-representation: true`, and
 `template-rendering-intent: "template"`.
@@ -76,6 +77,16 @@ existing referenced SVG, `preserves-vector-representation: true`, and
 | `lock` | `STRQIconLock` | `STRQIconLock.svg` | Yes | Yes | Yes |
 | `checkCircle` | `STRQIconCheckCircle` | `STRQIconCheckCircle.svg` | Yes | Yes | Yes |
 | `clock` | `STRQIconClock` | `STRQIconClock.svg` | Yes | Yes | Yes |
+| `repeatAction` | `STRQIconRepeat` | `STRQIconRepeat.svg` | Yes | Yes | Yes |
+| `swap` | `STRQIconSwap` | `STRQIconSwap.svg` | Yes | Yes | Yes |
+| `play` | `STRQIconPlay` | `STRQIconPlay.svg` | Yes | Yes | Yes |
+| `pause` | `STRQIconPause` | `STRQIconPause.svg` | Yes | Yes | Yes |
+| `stop` | `STRQIconStop` | `STRQIconStop.svg` | Yes | Yes | Yes |
+| `checklist` | `STRQIconChecklist` | `STRQIconChecklist.svg` | Yes | Yes | Yes |
+| `rest` | `STRQIconRest` | `STRQIconRest.svg` | Yes | Yes | Yes |
+| `skip` | `STRQIconSkip` | `STRQIconSkip.svg` | Yes | Yes | Yes |
+| `reps` | `STRQIconReps` | `STRQIconReps.svg` | Yes | Yes | Yes |
+| `sets` | `STRQIconSets` | `STRQIconSets.svg` | Yes | Yes | Yes |
 | `target` | `STRQIconTarget` | `STRQIconTarget.svg` | Yes | Yes | Yes |
 | `trophy` | `STRQIconTrophy` | `STRQIconTrophy.svg` | Yes | Yes | Yes |
 | `barbell` | `STRQIconBarbell` | `STRQIconBarbell.svg` | Yes | Yes | Yes |
@@ -92,6 +103,7 @@ Current `STRQIcon*.imageset` folders:
 - `STRQIconCalendar.imageset`
 - `STRQIconCheck.imageset`
 - `STRQIconCheckCircle.imageset`
+- `STRQIconChecklist.imageset`
 - `STRQIconChevronLeft.imageset`
 - `STRQIconChevronRight.imageset`
 - `STRQIconClock.imageset`
@@ -102,14 +114,23 @@ Current `STRQIcon*.imageset` folders:
 - `STRQIconInfo.imageset`
 - `STRQIconLock.imageset`
 - `STRQIconMore.imageset`
+- `STRQIconPause.imageset`
+- `STRQIconPlay.imageset`
 - `STRQIconPlus.imageset`
 - `STRQIconProfile.imageset`
 - `STRQIconProgress.imageset`
 - `STRQIconRecovery.imageset`
+- `STRQIconRepeat.imageset`
+- `STRQIconReps.imageset`
+- `STRQIconRest.imageset`
 - `STRQIconSearch.imageset`
+- `STRQIconSets.imageset`
 - `STRQIconSettings.imageset`
+- `STRQIconSkip.imageset`
 - `STRQIconSleep.imageset`
 - `STRQIconStar.imageset`
+- `STRQIconStop.imageset`
+- `STRQIconSwap.imageset`
 - `STRQIconTarget.imageset`
 - `STRQIconTrain.imageset`
 - `STRQIconTrash.imageset`
@@ -259,18 +280,18 @@ current asset was exported from the exact same listed Figma row.
 | Training / Workout | `STRQIconBarbell` | `barbell-horizontal` | `8997:1731` | Yes | `STRQIconBarbell` | High | Already imported. |
 | Training / Workout | `STRQIconWeightPlate` | No direct plate row; nearest `weight` | `8997:2232` | No | `STRQIconWeightPlate` | Medium | Verify visually before import; current `WeightScale` is not a plate. |
 | Training / Workout | `STRQIconClock` | `clock` | `8997:8203` | Yes | `STRQIconClock` | High | Already imported; consider `STRQIconStopwatch` only if distinct timer semantics matter. |
-| Training / Workout | `STRQIconRest` | `sleep-zzz` | `8997:2367` | No | `STRQIconRest` | Medium | Could also use `bed` or `moon` depending on rest-copy context. |
-| Training / Workout | `STRQIconRepeat` | `arrow-repeat-clockwise-1` | `8997:13583` | No | `STRQIconRepeat` | High | Useful for intervals, repeated sets, and cycles. |
-| Training / Workout | `STRQIconSwap` | `arrow-left-right` | `8997:13493` | No | `STRQIconSwap` | High | Use for exercise swaps. |
-| Training / Workout | `STRQIconSkip` | `arrow-skip-forward` | `8997:14124` | No | `STRQIconSkip` | Medium | Import only when workout controls migrate. |
-| Training / Workout | `STRQIconPlay` | `play` | `8997:11220` | No | `STRQIconPlay` | High | Core workout/session control. |
-| Training / Workout | `STRQIconPause` | `pause` | `8997:11234` | No | `STRQIconPause` | High | Core workout/session control. |
-| Training / Workout | `STRQIconStop` | `stop` | `8997:11249` | No | `STRQIconStop` | High | Core workout/session control. |
+| Training / Workout | `STRQIconRest` | `sleep-zzz` | `8997:2367` | Yes | `STRQIconRest` | Medium | Imported in Batch 2 as the recorded closest rest match; no direct `rest` row was available. |
+| Training / Workout | `STRQIconRepeat` | `arrow-repeat-clockwise-1` | `8997:13583` | Yes | `STRQIconRepeat` | High | Imported in Batch 2; useful for intervals, repeated sets, and cycles. |
+| Training / Workout | `STRQIconSwap` | `arrow-left-right` | `8997:13493` | Yes | `STRQIconSwap` | High | Imported in Batch 2; use for exercise swaps. |
+| Training / Workout | `STRQIconSkip` | `arrow-skip-forward` | `8997:14124` | Yes | `STRQIconSkip` | Medium | Imported in Batch 2 for workout control foundations. |
+| Training / Workout | `STRQIconPlay` | `play` | `8997:11220` | Yes | `STRQIconPlay` | High | Imported in Batch 2; core workout/session control. |
+| Training / Workout | `STRQIconPause` | `pause` | `8997:11234` | Yes | `STRQIconPause` | High | Imported in Batch 2; core workout/session control. |
+| Training / Workout | `STRQIconStop` | `stop` | `8997:11249` | Yes | `STRQIconStop` | High | Imported in Batch 2; core workout/session control. |
 | Training / Workout | `STRQIconTarget` | `target-1` | `8997:8561` | Yes | `STRQIconTarget` | High | Already imported. |
-| Training / Workout | `STRQIconReps` | `hash-tag-1` | `8997:8440` | No | `STRQIconReps` | Medium | Better semantic fit than number-circle variants. |
-| Training / Workout | `STRQIconSets` | `list-three-check` | `8997:10756` | No | `STRQIconSets` | Medium | Could share checklist until a stronger sets metaphor is needed. |
+| Training / Workout | `STRQIconReps` | `hash-tag-1` | `8997:8440` | Yes | `STRQIconReps` | Medium | Imported in Batch 2 as the recorded closest repeat-count match; better semantic fit than number-circle variants. |
+| Training / Workout | `STRQIconSets` | `list-three-check` | `8997:10756` | Yes | `STRQIconSets` | Medium | Imported in Batch 2 as a distinct set-list/checklist variant, not a reused Checklist asset. |
 | Training / Workout | `STRQIconCalendar` | `calendar-1` | `8997:8083` | Yes | `STRQIconCalendar` | High | Already imported. |
-| Training / Workout | `STRQIconChecklist` | `list-two-check` | `8997:10711` | No | `STRQIconChecklist` | High | Useful for plan/session completion UI. |
+| Training / Workout | `STRQIconChecklist` | `list-two-check` | `8997:10711` | Yes | `STRQIconChecklist` | High | Imported in Batch 2; useful for plan/session completion UI. |
 | Progress / Analytics | `STRQIconChartLine` | `chart-trend-up` | `8997:15175` | No | `STRQIconChartLine` | High | No plain `chart-line` row found. |
 | Progress / Analytics | `STRQIconChartBar` | `chart-bar-1` | `8997:14737` | No | `STRQIconChartBar` | High | Import before analytics cards migrate. |
 | Progress / Analytics | `STRQIconTrendUp` | `arrow-trend-up` | `8997:13776` | No | `STRQIconTrendUp` | High | Use arrow trend for compact deltas. |
@@ -332,16 +353,31 @@ vector preservation enabled. No fallback icons were used.
 | `warning` | `STRQIconWarning` | `exclamation-mark-triangle`, `Style=Regular` | `8997:7601` | SVG template vector | imported | No fallback used. |
 | `lock` | `STRQIconLock` | `lock-1`, `Style=Regular` | `8997:15495` | SVG template vector | imported | No fallback used. |
 
+## Batch 2 Import Results
+
+Batch 2 imported only Training / Workout controls from the recorded
+regular-style Figma nodes. All assets use SVG format with template rendering
+intent and vector preservation enabled. `Rest`, `Reps`, and `Sets` use the
+closest source matches already recorded in the matching plan; no SF Symbol
+replacement assets were used.
+
+| STRQ enum case | Asset name | Figma/source match | Figma node id | Imported format | Status | Notes |
+|---|---|---|---:|---|---|---|
+| `repeatAction` | `STRQIconRepeat` | `arrow-repeat-clockwise-1`, `Style=Regular` | `8997:13583` | SVG template vector | imported | No fallback used; enum case avoids Swift keyword `repeat`. |
+| `swap` | `STRQIconSwap` | `arrow-left-right`, `Style=Regular` | `8997:13493` | SVG template vector | imported | No fallback used. |
+| `play` | `STRQIconPlay` | `play`, `Style=Regular` | `8997:11220` | SVG template vector | imported | No fallback used. |
+| `pause` | `STRQIconPause` | `pause`, `Style=Regular` | `8997:11234` | SVG template vector | imported | No fallback used. |
+| `stop` | `STRQIconStop` | `stop`, `Style=Regular` | `8997:11249` | SVG template vector | imported | No fallback used. |
+| `checklist` | `STRQIconChecklist` | `list-two-check`, `Style=Regular` | `8997:10711` | SVG template vector | imported | No fallback used. |
+| `rest` | `STRQIconRest` | `sleep-zzz`, `Style=Regular` | `8997:2367` | SVG template vector | imported | Closest recorded rest match; no direct `rest` row found. |
+| `skip` | `STRQIconSkip` | `arrow-skip-forward`, `Style=Regular` | `8997:14124` | SVG template vector | imported | No fallback used. |
+| `reps` | `STRQIconReps` | `hash-tag-1`, `Style=Regular` | `8997:8440` | SVG template vector | imported | Closest recorded rep-count match; no direct `reps` row found. |
+| `sets` | `STRQIconSets` | `list-three-check`, `Style=Regular` | `8997:10756` | SVG template vector | imported | Closest recorded set-list match; distinct from `Checklist`. |
+
 ## Missing Icons By Priority
 
 High priority:
 
-- `STRQIconRepeat`
-- `STRQIconSwap`
-- `STRQIconPlay`
-- `STRQIconPause`
-- `STRQIconStop`
-- `STRQIconChecklist`
 - `STRQIconChartLine`
 - `STRQIconChartBar`
 - `STRQIconTrendUp`
@@ -354,10 +390,6 @@ Medium priority:
 
 - `STRQIconUnlock`
 - `STRQIconWeightPlate`
-- `STRQIconRest`
-- `STRQIconSkip`
-- `STRQIconReps`
-- `STRQIconSets`
 - `STRQIconMedal`
 - `STRQIconFire`
 - `STRQIconPercentage`
@@ -436,7 +468,7 @@ Batch 1 completed:
 - `STRQIconWarning`
 - `STRQIconLock`
 
-Recommended next import batch:
+Batch 2 completed:
 
 - `STRQIconRepeat`
 - `STRQIconSwap`
@@ -449,8 +481,19 @@ Recommended next import batch:
 - `STRQIconReps`
 - `STRQIconSets`
 
-This next batch would unlock reusable STRQ workout controls and plan/session
-UI foundations without touching production screens.
+Recommended next import batch:
+
+- `STRQIconChartLine`
+- `STRQIconChartBar`
+- `STRQIconTrendUp`
+- `STRQIconTrendDown`
+- `STRQIconMedal`
+- `STRQIconFire`
+- `STRQIconPercentage`
+- `STRQIconActivityRing`
+
+This next batch would extend reusable STRQ progress and analytics foundations
+without touching production screens.
 
 ## Naming Rules
 
