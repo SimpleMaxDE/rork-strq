@@ -9,11 +9,14 @@ tracks isolated icon import batches.
 
 Batch 1 imported Core UI Actions + Settings as template SVG assets. Batch 2
 imported Training / Workout control icons as template SVG assets. Batch 3
-imported Progress / Analytics icons as template SVG assets. No production
-views, app logic, workout logic, persistence, analytics, product IDs,
-localization, navigation behavior, data models, paywall, onboarding, dashboard,
-active workout, workout completion, profile, content, or progress analytics
-screens were modified.
+imported Progress / Analytics icons as template SVG assets. Batch 4 imported
+Health / Recovery icons as template SVG assets. Batch 5 imported only clear
+Exercise / Body small-icon matches as template SVG assets. No Anatomy Muscle
+assets, full-body vector groups, Body Type assets, image/media assets,
+production views, app logic, workout logic, persistence, analytics, product
+IDs, localization, navigation behavior, data models, paywall, onboarding,
+dashboard, active workout, workout completion, profile, content, or progress
+analytics screens were modified.
 
 Source/reference:
 
@@ -50,9 +53,22 @@ donut chart icon because no direct activity ring row was found in the icon set.
 `Medal` is distinct from the existing Trophy icon and was imported from its own
 regular component.
 
+Batch 4 bounded Figma export confirmed all eight target nodes as 24x24
+`Style=Regular` components. The existing `STRQIconSleep` asset was audited
+before importing Moon; it is the `sleep-zzz` icon and remains useful for rest,
+but it is not the cleaner moon/sleep symbol recorded for `STRQIconMoon`.
+
+Batch 5 bounded Figma inspection searched only recorded Exercise / Body node
+IDs and targeted names under the Icons node. It confirmed `bicep`,
+`person-arms-spread`, and `kettlebell` as 24x24 `Style=Regular` components.
+It also confirmed that body-region candidates such as `spine`, `foot-step`,
+and `stomach` are approximations rather than clear chest/back/leg/core icons,
+and that there is no distinct small `body`, `equipment`, `chest`, `shoulder`,
+`abs`, or `core` row suitable for this isolated icon pass.
+
 ## Current STRQ Icon Inventory
 
-Current `STRQIcon` exposes 49 enum cases. Every enum raw value has a matching
+Current `STRQIcon` exposes 60 enum cases. Every enum raw value has a matching
 `STRQIcon*.imageset` folder. Every image set has valid `Contents.json`, an
 existing referenced SVG, `preserves-vector-representation: true`, and
 `template-rendering-intent: "template"`.
@@ -68,6 +84,17 @@ existing referenced SVG, `preserves-vector-representation: true`, and
 | `recovery` | `STRQIconRecovery` | `STRQIconRecovery.svg` | Yes | Yes | Yes |
 | `calendar` | `STRQIconCalendar` | `STRQIconCalendar.svg` | Yes | Yes | Yes |
 | `sleep` | `STRQIconSleep` | `STRQIconSleep.svg` | Yes | Yes | Yes |
+| `heart` | `STRQIconHeart` | `STRQIconHeart.svg` | Yes | Yes | Yes |
+| `heartbeat` | `STRQIconHeartbeat` | `STRQIconHeartbeat.svg` | Yes | Yes | Yes |
+| `moon` | `STRQIconMoon` | `STRQIconMoon.svg` | Yes | Yes | Yes |
+| `bolt` | `STRQIconBolt` | `STRQIconBolt.svg` | Yes | Yes | Yes |
+| `soreness` | `STRQIconSoreness` | `STRQIconSoreness.svg` | Yes | Yes | Yes |
+| `stress` | `STRQIconStress` | `STRQIconStress.svg` | Yes | Yes | Yes |
+| `water` | `STRQIconWater` | `STRQIconWater.svg` | Yes | Yes | Yes |
+| `nutrition` | `STRQIconNutrition` | `STRQIconNutrition.svg` | Yes | Yes | Yes |
+| `muscle` | `STRQIconMuscle` | `STRQIconMuscle.svg` | Yes | Yes | Yes |
+| `fullBody` | `STRQIconFullBody` | `STRQIconFullBody.svg` | Yes | Yes | Yes |
+| `gym` | `STRQIconGym` | `STRQIconGym.svg` | Yes | Yes | Yes |
 | `check` | `STRQIconCheck` | `STRQIconCheck.svg` | Yes | Yes | Yes |
 | `search` | `STRQIconSearch` | `STRQIconSearch.svg` | Yes | Yes | Yes |
 | `plus` | `STRQIconPlus` | `STRQIconPlus.svg` | Yes | Yes | Yes |
@@ -116,6 +143,7 @@ Current `STRQIcon*.imageset` folders:
 - `STRQIconArrowRight.imageset`
 - `STRQIconBarbell.imageset`
 - `STRQIconBell.imageset`
+- `STRQIconBolt.imageset`
 - `STRQIconCalendar.imageset`
 - `STRQIconChartBar.imageset`
 - `STRQIconChartLine.imageset`
@@ -129,11 +157,18 @@ Current `STRQIcon*.imageset` folders:
 - `STRQIconCoach.imageset`
 - `STRQIconEdit.imageset`
 - `STRQIconFire.imageset`
+- `STRQIconFullBody.imageset`
+- `STRQIconGym.imageset`
 - `STRQIconHome.imageset`
+- `STRQIconHeart.imageset`
+- `STRQIconHeartbeat.imageset`
 - `STRQIconInfo.imageset`
 - `STRQIconLock.imageset`
 - `STRQIconMedal.imageset`
 - `STRQIconMore.imageset`
+- `STRQIconMuscle.imageset`
+- `STRQIconMoon.imageset`
+- `STRQIconNutrition.imageset`
 - `STRQIconPause.imageset`
 - `STRQIconPercentage.imageset`
 - `STRQIconPlay.imageset`
@@ -149,8 +184,10 @@ Current `STRQIcon*.imageset` folders:
 - `STRQIconSettings.imageset`
 - `STRQIconSkip.imageset`
 - `STRQIconSleep.imageset`
+- `STRQIconSoreness.imageset`
 - `STRQIconStar.imageset`
 - `STRQIconStop.imageset`
+- `STRQIconStress.imageset`
 - `STRQIconSwap.imageset`
 - `STRQIconTarget.imageset`
 - `STRQIconTrain.imageset`
@@ -159,6 +196,7 @@ Current `STRQIcon*.imageset` folders:
 - `STRQIconTrendUp.imageset`
 - `STRQIconTrophy.imageset`
 - `STRQIconWarning.imageset`
+- `STRQIconWater.imageset`
 - `STRQIconWeightScale.imageset`
 
 Sandow icon status:
@@ -242,6 +280,7 @@ Sandow icon status:
 ### Exercise / Body
 
 - `STRQIconMuscle`
+- `STRQIconBody`
 - `STRQIconChest`
 - `STRQIconBack`
 - `STRQIconLegs`
@@ -250,6 +289,7 @@ Sandow icon status:
 - `STRQIconCore`
 - `STRQIconFullBody`
 - `STRQIconGym`
+- `STRQIconEquipment`
 
 ### Paywall / Commerce
 
@@ -324,24 +364,26 @@ current asset was exported from the exact same listed Figma row.
 | Progress / Analytics | `STRQIconFire` | `fire-1` | `8997:5926` | Yes | `STRQIconFire` | Medium | Imported in Batch 3 for streak support. |
 | Progress / Analytics | `STRQIconPercentage` | `percentage` | `8997:7166` | Yes | `STRQIconPercentage` | Medium | Imported in Batch 3 for score deltas and adherence. |
 | Progress / Analytics | `STRQIconActivityRing` | `chart-donut-1` | `8997:14897` | Yes | `STRQIconActivityRing` | Medium | Imported in Batch 3; no direct activity ring row found, donut chart is the documented closest icon-set fit. |
-| Health / Recovery | `STRQIconHeart` | `heart` | `8997:1201` | No | `STRQIconHeart` | High | Clean health/recovery base icon. |
-| Health / Recovery | `STRQIconHeartbeat` | `heart-ecg` | `8997:1230` | No | `STRQIconHeartbeat` | Medium | Good readiness/vitals candidate. |
-| Health / Recovery | `STRQIconMoon` | `moon` | `8997:5785` | No | `STRQIconMoon` | High | Current `STRQIconSleep` exists, but moon is a cleaner general sleep icon. |
+| Health / Recovery | `STRQIconHeart` | `heart` | `8997:1201` | Yes | `STRQIconHeart` | High | Imported in Batch 4 as a clean health/recovery base icon. |
+| Health / Recovery | `STRQIconHeartbeat` | `heart-ecg` | `8997:1230` | Yes | `STRQIconHeartbeat` | Medium | Imported in Batch 4 for readiness/vitals. |
+| Health / Recovery | `STRQIconMoon` | `moon` | `8997:5785` | Yes | `STRQIconMoon` | High | Imported in Batch 4 after auditing existing `STRQIconSleep` as `sleep-zzz`, not a moon silhouette. |
 | Health / Recovery | `STRQIconRecovery` | `heart-ecg` | `8997:1230` | Yes | `STRQIconRecovery` | High | Already imported; keep as semantic recovery asset. |
-| Health / Recovery | `STRQIconBolt` | `lightning-bolt-1` | `8997:7756` | No | `STRQIconBolt` | High | Energy/intensity/status utility. |
-| Health / Recovery | `STRQIconSoreness` | `person-injured` | `8997:2065` | No | `STRQIconSoreness` | Medium | Better than a generic body icon for soreness. |
-| Health / Recovery | `STRQIconStress` | `brain-1` | `8997:2666` | No | `STRQIconStress` | Medium | Could pair with stress copy; avoid medical overreach. |
-| Health / Recovery | `STRQIconWater` | `water-drop` | `8997:1157` | No | `STRQIconWater` | Medium | Hydration candidate. |
-| Health / Recovery | `STRQIconNutrition` | `fork-knife` | `8997:5880` | No | `STRQIconNutrition` | Medium | Use only if nutrition surfaces remain in scope. |
-| Exercise / Body | `STRQIconMuscle` | `bicep` | `8997:5475` | No | `STRQIconMuscle` | Medium | Good general muscle icon. |
-| Exercise / Body | `STRQIconChest` | No direct row found | N/A | No | `STRQIconChest` | Low | Use anatomy illustration assets rather than forcing a generic icon. |
-| Exercise / Body | `STRQIconBack` | `spine` | `8997:3000` | No | `STRQIconBack` | Low | Spine is only an approximation; anatomy assets are better for body areas. |
-| Exercise / Body | `STRQIconLegs` | `foot-step` | `8997:3260` | No | `STRQIconLegs` | Low | No direct leg row found. |
-| Exercise / Body | `STRQIconArms` | `bicep` | `8997:5475` | No | `STRQIconArms` | Medium | Could reuse muscle/bicep if body-area icons are needed. |
-| Exercise / Body | `STRQIconShoulders` | No direct row found | N/A | No | `STRQIconShoulders` | Low | Prefer anatomy illustration strategy. |
-| Exercise / Body | `STRQIconCore` | `stomach` | `8997:2761` | No | `STRQIconCore` | Low | Stomach is not an abs icon; verify product fit first. |
-| Exercise / Body | `STRQIconFullBody` | `person-arms-spread` | `8997:1928` | No | `STRQIconFullBody` | Medium | Better as a high-level body selector icon. |
-| Exercise / Body | `STRQIconGym` | `kettlebell` | `8997:4224` | No | `STRQIconGym` | Medium | Use barbell if avoiding an additional equipment icon. |
+| Health / Recovery | `STRQIconBolt` | `lightning-bolt-1` | `8997:7756` | Yes | `STRQIconBolt` | High | Imported in Batch 4 for energy/intensity/status utility. |
+| Health / Recovery | `STRQIconSoreness` | `person-injured` | `8997:2065` | Yes | `STRQIconSoreness` | Medium | Imported in Batch 4 as the recorded soreness match; better than a generic body icon. |
+| Health / Recovery | `STRQIconStress` | `brain-1` | `8997:2666` | Yes | `STRQIconStress` | Medium | Imported in Batch 4 as the recorded stress/mind match; avoid medical overreach in copy. |
+| Health / Recovery | `STRQIconWater` | `water-drop` | `8997:1157` | Yes | `STRQIconWater` | Medium | Imported in Batch 4 for hydration. |
+| Health / Recovery | `STRQIconNutrition` | `fork-knife` | `8997:5880` | Yes | `STRQIconNutrition` | Medium | Imported in Batch 4 for nutrition/meal surfaces. |
+| Exercise / Body | `STRQIconMuscle` | `bicep` | `8997:5475` | Yes | `STRQIconMuscle` | Medium | Imported in Batch 5 as the clear reusable general muscle icon. |
+| Exercise / Body | `STRQIconBody` | No distinct direct row found | N/A | No | `STRQIconBody` | Low | Do not duplicate `FullBody`; `body-fat` is not an exercise/body base icon. |
+| Exercise / Body | `STRQIconChest` | No direct row found | N/A | No | `STRQIconChest` | Low | Use Anatomy Muscle assets rather than forcing a generic icon. |
+| Exercise / Body | `STRQIconBack` | `spine` | `8997:3000` | No | `STRQIconBack` | Low | Spine is only an approximation; defer back-area imagery to anatomy assets. |
+| Exercise / Body | `STRQIconLegs` | `foot-step` | `8997:3260` | No | `STRQIconLegs` | Low | Foot-step is not a clear reusable legs icon; defer lower-body region imagery to anatomy assets. |
+| Exercise / Body | `STRQIconArms` | `bicep` | `8997:5475` | No | `STRQIconArms` | Medium | Covered by imported `STRQIconMuscle`; no duplicate bicep asset was added. |
+| Exercise / Body | `STRQIconShoulders` | No direct row found | N/A | No | `STRQIconShoulders` | Low | Prefer Anatomy Muscle strategy. |
+| Exercise / Body | `STRQIconCore` | `stomach` | `8997:2761` | No | `STRQIconCore` | Low | Stomach is not an abs/core icon; defer abs/core imagery to anatomy assets. |
+| Exercise / Body | `STRQIconFullBody` | `person-arms-spread` | `8997:1928` | Yes | `STRQIconFullBody` | Medium | Imported in Batch 5 as a small full-body selector icon, not a full-body vector group. |
+| Exercise / Body | `STRQIconGym` | `kettlebell` | `8997:4224` | Yes | `STRQIconGym` | Medium | Imported in Batch 5 as a distinct gym/equipment-context icon; existing Barbell remains for workout/training. |
+| Exercise / Body | `STRQIconEquipment` | No distinct generic equipment row found | N/A | No | `STRQIconEquipment` | Low | Existing `STRQIconBarbell` and imported `STRQIconGym` cover gym equipment contexts; no duplicate generic equipment asset was added. |
 | Paywall / Commerce | `STRQIconCrown` | `crown-1` | `9064:208861` | No | `STRQIconCrown` | Medium | Paywall/pro candidate; import only when a STRQ screen needs it. |
 | Paywall / Commerce | `STRQIconStar` | `star` | Existing asset | Yes | `STRQIconStar` | Medium | Already imported. |
 | Paywall / Commerce | `STRQIconShield` | `shield` | `8997:7512` | No | `STRQIconShield` | Medium | Also useful for trust/privacy/security. |
@@ -416,27 +458,71 @@ were used.
 | `percentage` | `STRQIconPercentage` | `percentage`, `Style=Regular` | `8997:7166` | SVG template vector | imported | No fallback used. |
 | `activityRing` | `STRQIconActivityRing` | `chart-donut-1`, `Style=Regular` | `8997:14897` | SVG template vector | imported | Closest recorded activity-ring match; no direct activity ring row found. |
 
+## Batch 4 Import Results
+
+Batch 4 imported only Health / Recovery icons from the recorded regular-style
+Figma nodes. All assets use SVG format with template rendering intent and
+vector preservation enabled. `Moon` was imported because the existing
+`STRQIconSleep` raw asset is `sleep-zzz`, not the regular moon icon. No SF
+Symbol replacement assets were used.
+
+| STRQ enum case | Asset name | Figma/source match | Figma node id | Imported format | Status | Notes |
+|---|---|---|---:|---|---|---|
+| `heart` | `STRQIconHeart` | `heart`, `Style=Regular` | `8997:1201` | SVG template vector | imported | No fallback used. |
+| `heartbeat` | `STRQIconHeartbeat` | `heart-ecg`, `Style=Regular` | `8997:1230` | SVG template vector | imported | No fallback used. |
+| `moon` | `STRQIconMoon` | `moon`, `Style=Regular` | `8997:5785` | SVG template vector | imported | Imported after `STRQIconSleep` audit found a `sleep-zzz` asset rather than a moon silhouette. |
+| `bolt` | `STRQIconBolt` | `lightning-bolt-1`, `Style=Regular` | `8997:7756` | SVG template vector | imported | No fallback used. |
+| `soreness` | `STRQIconSoreness` | `person-injured`, `Style=Regular` | `8997:2065` | SVG template vector | imported | Recorded closest soreness match; not a generic body icon. |
+| `stress` | `STRQIconStress` | `brain-1`, `Style=Regular` | `8997:2666` | SVG template vector | imported | Recorded stress/mind match; avoid medical overreach in product copy. |
+| `water` | `STRQIconWater` | `water-drop`, `Style=Regular` | `8997:1157` | SVG template vector | imported | No fallback used. |
+| `nutrition` | `STRQIconNutrition` | `fork-knife`, `Style=Regular` | `8997:5880` | SVG template vector | imported | Recorded nutrition/meal match. |
+
+## Batch 5 Import Results
+
+Batch 5 imported only Exercise / Body concepts with clear, reusable,
+regular/base small-icon matches. All imported assets use SVG format with
+template rendering intent and vector preservation enabled. No Anatomy Muscle
+assets, full-body vector groups, Body Type assets, media assets, SF Symbol
+replacement assets, or production views were touched.
+
+Imported icons:
+
+| STRQ enum case | Asset name | Figma/source match | Figma node id | Imported format | Status | Notes |
+|---|---|---|---:|---|---|---|
+| `muscle` | `STRQIconMuscle` | `bicep`, `Style=Regular` | `8997:5475` | SVG template vector | imported | Clear general muscle icon. Also covers high-level arms use where a bicep metaphor is acceptable. |
+| `fullBody` | `STRQIconFullBody` | `person-arms-spread`, `Style=Regular` | `8997:1928` | SVG template vector | imported | Small full-body selector icon; distinct from future full-body vector group assets at `9192:5535`. |
+| `gym` | `STRQIconGym` | `kettlebell`, `Style=Regular` | `8997:4224` | SVG template vector | imported | Distinct gym/equipment-context icon. Existing `STRQIconBarbell` still covers barbell/training affordances. |
+
+Batch 5 target decisions:
+
+| Concept | Decision | Existing/imported coverage | Figma match inspected | Notes |
+|---|---|---|---|---|
+| Muscle | imported | `muscle` / `STRQIconMuscle` | `bicep` regular `8997:5475` | Clear reusable small icon. |
+| Body | missing distinct small icon | Use `fullBody` when a generic full-body selector works | No distinct direct row; `body-fat` rejected | No `STRQIconBody` case was added to avoid duplicating `FullBody` or importing a body-fat/body-type concept. |
+| FullBody | imported | `fullBody` / `STRQIconFullBody` | `person-arms-spread` regular `8997:1928` | Imported as a small icon only; full-body vector groups remain deferred to the anatomy asset pass. |
+| Gym | imported | `gym` / `STRQIconGym`; existing `barbell` remains useful | `kettlebell` regular `8997:4224` | Clear reusable gym icon, not a color or illustration variant. |
+| Equipment | already covered | Existing `barbell` and imported `gym`; `weightScale` remains bodyweight/measurement | `weight` regular `8997:2232` inspected but not imported | No distinct generic equipment asset was added. |
+| Arms | already covered / no duplicate | Imported `muscle` uses the same bicep match | `bicep` regular `8997:5475` | No duplicate `STRQIconArms` asset or enum case was added. Dedicated arm-region anatomy remains future anatomy work. |
+| Legs | deferred to anatomy asset pass | None as small icon | `foot-step` regular `8997:3260` rejected | Foot-step is not a clear legs/body-region icon. See `SandowAnatomyImportPlan.md`, Anatomy Muscle `8673:69673`. |
+| Chest | deferred to anatomy asset pass | None as small icon | No direct row found | Use Anatomy Muscle `8673:69673`; do not force a generic icon. |
+| Back | deferred to anatomy asset pass | None as small icon | `spine` regular `8997:3000` rejected | Spine is medical/anatomical approximation, not a reusable exercise back icon. Use Anatomy Muscle `8673:69673`. |
+| Shoulders | deferred to anatomy asset pass | None as small icon | No direct row found | Use Anatomy Muscle `8673:69673`. |
+| Core / Abs | deferred to anatomy asset pass | None as small icon | `stomach` regular `8997:2761` rejected | Stomach is not an abs/core icon. Use Anatomy Muscle `8673:69673`. |
+
+Future anatomy/full-body asset work remains tracked in
+`SandowAnatomyImportPlan.md`, especially Anatomy Muscle node `8673:69673` and
+full-body vector groups node `9192:5535`.
+
 ## Missing Icons By Priority
 
 High priority:
 
-- `STRQIconHeart`
-- `STRQIconMoon`
-- `STRQIconBolt`
+- None after Batch 5.
 
 Medium priority:
 
 - `STRQIconUnlock`
 - `STRQIconWeightPlate`
-- `STRQIconHeartbeat`
-- `STRQIconSoreness`
-- `STRQIconStress`
-- `STRQIconWater`
-- `STRQIconNutrition`
-- `STRQIconMuscle`
-- `STRQIconArms`
-- `STRQIconFullBody`
-- `STRQIconGym`
 - `STRQIconCrown`
 - `STRQIconShield`
 - `STRQIconSpark`
@@ -448,6 +534,9 @@ Medium priority:
 
 Low priority:
 
+- `STRQIconBody`
+- `STRQIconEquipment`
+- `STRQIconArms` as a dedicated arm-region icon, only if `STRQIconMuscle` is not enough
 - `STRQIconChest`
 - `STRQIconBack`
 - `STRQIconLegs`
@@ -526,7 +615,7 @@ Batch 3 completed:
 - `STRQIconPercentage`
 - `STRQIconActivityRing`
 
-Recommended next import batch:
+Batch 4 completed:
 
 - `STRQIconHeart`
 - `STRQIconHeartbeat`
@@ -537,8 +626,23 @@ Recommended next import batch:
 - `STRQIconWater`
 - `STRQIconNutrition`
 
-This next batch would extend reusable STRQ health and recovery foundations
-without touching production screens.
+Batch 5 completed:
+
+- `STRQIconMuscle`
+- `STRQIconFullBody`
+- `STRQIconGym`
+
+Recommended next icon import batch:
+
+- Paywall/Profile optional icons only if a concrete screen/component pass needs
+  them, such as `STRQIconCrown`, `STRQIconShield`, `STRQIconSpark`,
+  `STRQIconUser`, `STRQIconWatch`, `STRQIconHelp`, or `STRQIconLogout`.
+
+Recommended next non-icon pass:
+
+- Anatomy asset export QA from `SandowAnatomyImportPlan.md`, starting with a
+  tiny sample from Anatomy Muscle node `8673:69673` and full-body vector groups
+  node `9192:5535`, without production screen migration.
 
 ## Naming Rules
 
