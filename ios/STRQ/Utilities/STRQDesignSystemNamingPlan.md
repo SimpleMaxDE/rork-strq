@@ -4,35 +4,35 @@ Last prepared: 2026-04-29
 
 ## Scope
 
-This is a naming and ownership cleanup plan only. No runtime screens, workout logic, progression logic, persistence, analytics, product IDs, exercise data, active workout, rest timer, onboarding, localization, UI behavior, source files, or asset image sets are renamed in this pass.
+This is a naming and ownership cleanup plan. On 2026-04-29, the isolated foundation file, runtime-facing design-system symbols, and current icon image sets were migrated to STRQ-owned names. No runtime screens, workout logic, progression logic, persistence, analytics, product IDs, exercise data, active workout, rest timer, onboarding, localization, UI behavior, or app-facing behavior were changed.
 
 STRQ uses the purchased Sandow UI Kit as a design source, but production/runtime code should use STRQ-owned design-system names over time. Sandow provenance should remain in import, audit, attribution, and roadmap documentation rather than leaking through reusable production APIs.
 
 Files read for this pass:
 
-- `ios/STRQ/Utilities/SandowDesignSystem.swift`
+- `ios/STRQ/Utilities/SandowDesignSystem.swift` -> `ios/STRQ/Utilities/STRQDesignSystem.swift`
 - `ios/STRQ/Utilities/SandowImportManifest.md`
 - `ios/STRQ/Utilities/SandowAnatomyImportPlan.md`
 - `ios/STRQ/Utilities/SandowImportRoadmap.md` was checked and does not currently exist.
-- `ios/STRQ/Assets.xcassets/SandowIcon*.imageset`
+- `ios/STRQ/Assets.xcassets/SandowIcon*.imageset` -> `ios/STRQ/Assets.xcassets/STRQIcon*.imageset`
 
-## Current Sandow Naming Audit
+## Pre-Rename Sandow Naming Audit
 
-The requested Sandow identifiers are currently isolated to documentation, one foundation utility file, and Sandow-named icon assets. No requested Sandow identifiers were found in runtime production views, `ContentView.swift`, localization, or the iOS test targets.
+Before the rename, the requested Sandow identifiers were isolated to documentation, one foundation utility file, and Sandow-named icon assets. No requested Sandow identifiers were found in runtime production views, `ContentView.swift`, localization, or the iOS test targets.
 
 | Area | Result |
 |---|---|
 | Documentation only | `ios/STRQ/Utilities/SandowImportManifest.md` and `ios/STRQ/Utilities/SandowAnatomyImportPlan.md` intentionally mention Sandow as source/import/audit documentation. This naming plan also intentionally mentions Sandow as an audit doc. |
-| Isolated foundation file | `ios/STRQ/Utilities/SandowDesignSystem.swift` defines the current Sandow tokens, primitives, components, icon registry, and debug previews. |
-| Assets | `ios/STRQ/Assets.xcassets/SandowIcon*.imageset` contains the current Sandow-named icon assets and matching `Contents.json` filename references. |
+| Isolated foundation file | `ios/STRQ/Utilities/SandowDesignSystem.swift` defined the pre-rename Sandow tokens, primitives, components, icon registry, and debug previews. It is now `ios/STRQ/Utilities/STRQDesignSystem.swift`. |
+| Assets | `ios/STRQ/Assets.xcassets/SandowIcon*.imageset` contained the pre-rename icon assets and matching `Contents.json` filename references. They are now `STRQIcon*.imageset`. |
 | Runtime production views | No matches found in `ios/STRQ/Views/**/*.swift` or `ios/STRQ/ContentView.swift` for the requested Sandow identifiers. |
-| Tests/previews | No matches found in `ios/STRQTests` or `ios/STRQUITests`. The only preview usage is inside `#if DEBUG` preview structs in `SandowDesignSystem.swift`. |
+| Tests/previews | No matches found in `ios/STRQTests` or `ios/STRQUITests`. Preview usage is isolated inside `#if DEBUG` preview structs in `STRQDesignSystem.swift`. |
 | Localization/user-facing strings | No `Sandow` matches found in `ios/STRQ/Localizable.xcstrings` or `ios/STRQ/Localization`. |
 | Analytics/product identifiers | No `Sandow` matches found outside the utility docs/foundation file and asset catalog, so there is no evidence of Sandow in analytics events or product identifiers. |
 
-Requested identifier locations:
+Requested identifier locations before the rename:
 
-| Identifier | Current location |
+| Identifier | Pre-rename location |
 |---|---|
 | `SandowDesignSystem` | `SandowDesignSystem.swift`, `SandowImportManifest.md` |
 | `SandowColors` | `SandowDesignSystem.swift`, `SandowImportManifest.md` |
@@ -55,7 +55,7 @@ Requested identifier locations:
 | `SandowAnatomy` | `SandowAnatomyImportPlan.md`, `SandowImportManifest.md` |
 | `SandowIcon*.imageset` | `ios/STRQ/Assets.xcassets` |
 
-Current Sandow icon image sets:
+Pre-rename Sandow icon image sets, now renamed to matching `STRQIcon*` image sets:
 
 - `SandowIconArrowRight.imageset`
 - `SandowIconBarbell.imageset`
@@ -87,7 +87,7 @@ Canonical direction:
 
 - Use `STRQ` prefixes for reusable design-system tokens, icon registries, view primitives, and production component names.
 - Keep vendor/source provenance in docs and manifest comments, not in names consumed by runtime screens.
-- Prefer `STRQDesignSystem.swift` as the eventual source filename. `STRQFoundation.swift` is acceptable only if the team deliberately wants this file to own broader non-visual foundation primitives.
+- Use `STRQDesignSystem.swift` as the source filename. `STRQFoundation.swift` remains only a possible future rename if the team deliberately wants this file to own broader non-visual foundation primitives.
 - Use `STRQIcon<Name>` as the asset prefix for imported reusable icons.
 - Keep user-facing strings, analytics events, product identifiers, localization keys, and app-facing copy Sandow-free.
 
@@ -181,7 +181,7 @@ Sandow naming should not appear in:
 
 ## Safe Staged Migration Plan
 
-Do not execute this rename as part of this planning pass.
+Execution status: the controlled rename is complete for the isolated foundation and current icon assets. Stage 1 aliases were skipped because no runtime Swift references required them. Stage 2 and Stage 3 were executed directly. Stage 4 remains a standing cleanup rule for future work if any temporary aliases are ever introduced.
 
 ### Stage 1 - Add STRQ aliases
 
@@ -221,10 +221,8 @@ typealias STRQTabBar<Content: View> = SandowTabBar<Content>
 
 Stage 1 validation:
 
-- Build the app.
-- Confirm no production screen behavior changes.
-- Confirm no asset catalog changes.
-- Start new design-system usages with STRQ aliases only.
+- Skipped in this pass because no runtime Swift references required compatibility aliases.
+- New design-system usages should use STRQ names directly.
 
 ### Stage 2 - Rename source file and type names
 
@@ -232,11 +230,11 @@ In one controlled compile pass, rename the foundation source file and types from
 
 Actions:
 
-- Rename `SandowDesignSystem.swift` to `STRQDesignSystem.swift`.
-- Rename token/component declarations from `Sandow*` to `STRQ*`.
-- Update references inside the foundation file first.
-- Update any production references that adopted Stage 1 aliases.
-- Keep temporary backwards-compatible `Sandow*` aliases only if needed to keep the compile green during the pass.
+- Completed: `SandowDesignSystem.swift` was renamed to `STRQDesignSystem.swift`.
+- Completed: token/component declarations were renamed from `Sandow*` to `STRQ*`.
+- Completed: references inside the foundation file were updated.
+- Not needed: no production references had adopted Stage 1 aliases.
+- Not needed: no temporary backwards-compatible `Sandow*` aliases were added.
 
 Guardrails:
 
@@ -249,11 +247,11 @@ Rename asset image sets from `SandowIcon*` to `STRQIcon*` and update enum/raw-va
 
 Actions:
 
-- Rename each `SandowIcon*.imageset` folder to the matching `STRQIcon*.imageset`.
-- Rename image/PDF/SVG filenames inside each image set if needed.
-- Update each `Contents.json` filename reference.
-- Update `STRQDesignSystem.iconAssetPrefix` to `STRQIcon`.
-- Update `STRQIcon` raw values to the new asset names.
+- Completed: each `SandowIcon*.imageset` folder was renamed to the matching `STRQIcon*.imageset`.
+- Completed: SVG filenames inside each image set were renamed.
+- Completed: each `Contents.json` filename reference was updated.
+- Completed: `STRQDesignSystem.iconAssetPrefix` is `STRQIcon`.
+- Completed: `STRQIcon` raw values use the new asset names.
 
 Guardrails:
 
@@ -335,5 +333,10 @@ Get-ChildItem -LiteralPath "ios/STRQ/Assets.xcassets" -Recurse -File | Select-St
 Files changed in this pass:
 
 - `ios/STRQ/Utilities/STRQDesignSystemNamingPlan.md`
+- `ios/STRQ/Utilities/STRQDesignSystemRoadmap.md`
+- `ios/STRQ/Utilities/SandowImportManifest.md`
+- `ios/STRQ/Utilities/SandowAnatomyImportPlan.md`
+- `ios/STRQ/Utilities/SandowDesignSystem.swift` -> `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Assets.xcassets/SandowIcon*.imageset` -> `ios/STRQ/Assets.xcassets/STRQIcon*.imageset`
 
-No runtime code, source filenames, asset image sets, localization, tests, analytics, product IDs, or app behavior were changed.
+No production screens, localization, tests, analytics, product IDs, workout logic, persistence, navigation behavior, onboarding behavior, active workout behavior, rest timer behavior, paywall behavior, or app-facing behavior were changed.

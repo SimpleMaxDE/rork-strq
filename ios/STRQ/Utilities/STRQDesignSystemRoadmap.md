@@ -4,17 +4,18 @@ Last prepared: 2026-04-29
 
 ## Scope
 
-This roadmap is a planning and documentation pass only.
+This roadmap began as a planning document and now also records the controlled
+foundation ownership rename completed on 2026-04-29.
 
-No assets were imported. No runtime screens, Swift production views, existing assets, source filenames, type names, localization, analytics, product IDs, exercise data, persistence, navigation, workout logic, progression logic, onboarding logic, active workout behavior, rest timer behavior, or paywall behavior were changed.
+No new assets were imported. No runtime screens, Swift production views, localization, analytics, product IDs, exercise data, persistence, navigation, workout logic, progression logic, onboarding logic, active workout behavior, rest timer behavior, or paywall behavior were changed.
 
 Source documents:
 
 - `SandowImportManifest.md`
 - `SandowAnatomyImportPlan.md`
 - `STRQDesignSystemNamingPlan.md`
-- `SandowDesignSystem.swift`
-- `Assets.xcassets/SandowIcon*.imageset`
+- `STRQDesignSystem.swift`
+- `Assets.xcassets/STRQIcon*.imageset`
 
 The purchased Figma/Sandow UI Kit is an internal source/reference. STRQ should own future runtime names, production assets, and reusable design-system APIs.
 
@@ -54,7 +55,7 @@ Runtime-facing future names should be STRQ-owned, including:
 - The failed direct Home clone/takeover was rolled back.
 - The imported foundation currently exists as isolated internal files/assets.
 - Production screens should not use the imported foundation until a controlled migration pass.
-- Current foundation/assets/docs still contain Sandow naming, but `STRQDesignSystemNamingPlan.md` defines a staged path to migrate runtime-facing names to STRQ-owned names.
+- Runtime foundation code and icon assets now use STRQ-owned names. Sandow remains only in approved source/provenance documentation.
 - Anatomy, muscle, body type, full-body vector, achievement, equipment, illustration, and organ anatomy asset groups were found and documented.
 - No full UI import should happen blindly.
 - No runtime production screens currently depend on the imported foundation, based on the prior manifest audit and validation searches in this pass.
@@ -65,7 +66,7 @@ Runtime-facing future names should be STRQ-owned, including:
 
 Current status:
 
-- `SandowDesignSystem.swift` contains an isolated color foundation.
+- `STRQDesignSystem.swift` contains an isolated color foundation.
 - Current tokens cover primitive neutral scales, orange/brand scale, several accent/status colors, dark-mode surfaces, text colors, borders/dividers, and compatibility aliases.
 - The implementation is partial relative to the purchased Figma file because exact Figma variable collections, modes, aliases, scopes, and accessibility variants have not been fully enumerated.
 
@@ -276,15 +277,15 @@ Foundation primitive roadmap:
 
 Current status:
 
-- Current imported icons are still named `SandowIcon*`.
+- Current imported icon image sets are named `STRQIcon*`.
 - Current icon assets are isolated in `Assets.xcassets`.
-- Current foundation exposes an icon registry and icon rendering helper, but future app-facing names should become STRQ-owned.
+- Current foundation exposes `STRQIcon` and `STRQIconView`.
 
 Ownership strategy:
 
-- Future app-facing icon assets should be renamed or mapped to `STRQIcon*`.
-- Future runtime icon registry should be `STRQIcon`.
-- Future runtime icon renderer should be `STRQIconView`.
+- Future app-facing icon assets should continue to use `STRQIcon*`.
+- Runtime icon registry is `STRQIcon`.
+- Runtime icon renderer is `STRQIconView`.
 - Keep source/provenance notes in docs, not production-facing names.
 
 Import strategy:
@@ -524,8 +525,8 @@ Important:
 
 ### Priority 1: Foundation Completion And Ownership
 
-- Verify current `SandowDesignSystem.swift` coverage against exact Figma token/style inventories.
-- Plan STRQ naming migration.
+- Verify current `STRQDesignSystem.swift` coverage against exact Figma token/style inventories.
+- STRQ naming migration is complete for the isolated foundation and current icon assets.
 - Complete core tokens/components.
 - Do not change production screens.
 - Do not import more assets in this priority unless a token/component preview requires a tiny internal fixture.
@@ -533,8 +534,8 @@ Important:
 ### Priority 2: Core Icon System
 
 - Decide import coverage.
-- Migrate naming or mapping to `STRQIcon*`.
-- Create `STRQIcon` enum/view.
+- Keep naming and mapping on `STRQIcon*`.
+- Maintain `STRQIcon` enum/view.
 - Keep template/tint strategy.
 - Import only icons needed by near-term STRQ modules.
 
@@ -612,7 +613,7 @@ Results from this pass:
 |---|---|
 | `SandowImportRoadmap` | Existing mention only in `STRQDesignSystemNamingPlan.md` noting that file does not exist, plus this roadmap's validation checklist. |
 | `STRQDesignSystemRoadmap` | Found in this new roadmap only. |
-| `SandowDesignSystem` | Found in `SandowDesignSystem.swift`, `SandowImportManifest.md`, `STRQDesignSystemNamingPlan.md`, and this roadmap. This is expected docs/foundation usage. |
+| `SandowDesignSystem` | Historical/provenance references remain in docs only. The runtime file is now `STRQDesignSystem.swift`. |
 | `STRQDesignSystemNamingPlan` | Found in the naming plan and this roadmap. |
 | `SandowAnatomyImportPlan` | Found in import/naming/roadmap docs. |
 | `DashboardView` + `Sandow` | No matches. |
@@ -637,4 +638,4 @@ Files changed:
 
 - `ios/STRQ/Utilities/STRQDesignSystemRoadmap.md`
 
-No other files should be changed in this pass.
+This roadmap now reflects the completed runtime ownership rename. See the naming plan for the full file, type, and asset mapping.

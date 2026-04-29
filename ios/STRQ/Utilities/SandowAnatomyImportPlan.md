@@ -149,42 +149,44 @@ If alignment between `9192:5535` full-body groups and `8673:69673` mini silhouet
 
 ## Naming Plan
 
+Runtime-facing anatomy assets and components should use STRQ-owned names. Sandow remains the source/reference label in this import plan and manifest documentation.
+
 Preferred base anatomy assets:
 
-- `SandowAnatomyMaleFrontBase`
-- `SandowAnatomyMaleBackBase`
-- `SandowAnatomyFemaleFrontBase`
-- `SandowAnatomyFemaleBackBase`
+- `STRQAnatomyMaleFrontBase`
+- `STRQAnatomyMaleBackBase`
+- `STRQAnatomyFemaleFrontBase`
+- `STRQAnatomyFemaleBackBase`
 
 Preferred body-area mask assets:
 
 | Body Area | Male asset | Female asset |
 |---|---|---|
-| Lower Leg | `SandowAnatomyMaleLowerLegMask` | `SandowAnatomyFemaleLowerLegMask` |
-| Upper Leg | `SandowAnatomyMaleUpperLegMask` | `SandowAnatomyFemaleUpperLegMask` |
-| Abs | `SandowAnatomyMaleAbsMask` | `SandowAnatomyFemaleAbsMask` |
-| Chest | `SandowAnatomyMaleChestMask` | `SandowAnatomyFemaleChestMask` |
-| Shoulder | `SandowAnatomyMaleShoulderMask` | `SandowAnatomyFemaleShoulderMask` |
-| Bicep | `SandowAnatomyMaleBicepMask` | `SandowAnatomyFemaleBicepMask` |
-| Forearm | `SandowAnatomyMaleForearmMask` | `SandowAnatomyFemaleForearmMask` |
-| Hand | `SandowAnatomyMaleHandMask` | `SandowAnatomyFemaleHandMask` |
-| Neck | `SandowAnatomyMaleNeckMask` | `SandowAnatomyFemaleNeckMask` |
-| Tricep | `SandowAnatomyMaleTricepMask` | `SandowAnatomyFemaleTricepMask` |
-| Hamstring | `SandowAnatomyMaleHamstringMask` | `SandowAnatomyFemaleHamstringMask` |
-| Glute | `SandowAnatomyMaleGluteMask` | `SandowAnatomyFemaleGluteMask` |
-| Calf | `SandowAnatomyMaleCalfMask` | `SandowAnatomyFemaleCalfMask` |
-| Back | `SandowAnatomyMaleBackMask` | `SandowAnatomyFemaleBackMask` |
-| Trap | `SandowAnatomyMaleTrapMask` | `SandowAnatomyFemaleTrapMask` |
+| Lower Leg | `STRQAnatomyMaleLowerLegMask` | `STRQAnatomyFemaleLowerLegMask` |
+| Upper Leg | `STRQAnatomyMaleUpperLegMask` | `STRQAnatomyFemaleUpperLegMask` |
+| Abs | `STRQAnatomyMaleAbsMask` | `STRQAnatomyFemaleAbsMask` |
+| Chest | `STRQAnatomyMaleChestMask` | `STRQAnatomyFemaleChestMask` |
+| Shoulder | `STRQAnatomyMaleShoulderMask` | `STRQAnatomyFemaleShoulderMask` |
+| Bicep | `STRQAnatomyMaleBicepMask` | `STRQAnatomyFemaleBicepMask` |
+| Forearm | `STRQAnatomyMaleForearmMask` | `STRQAnatomyFemaleForearmMask` |
+| Hand | `STRQAnatomyMaleHandMask` | `STRQAnatomyFemaleHandMask` |
+| Neck | `STRQAnatomyMaleNeckMask` | `STRQAnatomyFemaleNeckMask` |
+| Tricep | `STRQAnatomyMaleTricepMask` | `STRQAnatomyFemaleTricepMask` |
+| Hamstring | `STRQAnatomyMaleHamstringMask` | `STRQAnatomyFemaleHamstringMask` |
+| Glute | `STRQAnatomyMaleGluteMask` | `STRQAnatomyFemaleGluteMask` |
+| Calf | `STRQAnatomyMaleCalfMask` | `STRQAnatomyFemaleCalfMask` |
+| Back | `STRQAnatomyMaleBackMask` | `STRQAnatomyFemaleBackMask` |
+| Trap | `STRQAnatomyMaleTrapMask` | `STRQAnatomyFemaleTrapMask` |
 
 If the later import uses composite body-area assets instead of masks, drop the `Mask` suffix:
 
-- `SandowAnatomyMaleChest`
-- `SandowAnatomyFemaleChest`
+- `STRQAnatomyMaleChest`
+- `STRQAnatomyFemaleChest`
 
 Do not create selected-state asset names unless Option A is deliberately chosen later. Avoid:
 
-- `SandowAnatomyMaleChestSelected`
-- `SandowAnatomyFemaleChestSelected`
+- `STRQAnatomyMaleChestSelected`
+- `STRQAnatomyFemaleChestSelected`
 
 The selected state should normally be SwiftUI styling.
 
@@ -192,29 +194,29 @@ The selected state should normally be SwiftUI styling.
 
 Future enum names, not implemented in this pass:
 
-- `SandowAnatomyGender`
-- `SandowAnatomyBodyArea`
-- `SandowAnatomyState`
-- `SandowAnatomyViewOrientation`
-- `SandowAnatomyAsset`
+- `STRQAnatomyGender`
+- `STRQAnatomyBodyArea`
+- `STRQAnatomyState`
+- `STRQAnatomyViewOrientation`
+- `STRQAnatomyAsset`
 
 Suggested enum case shapes:
 
-- `SandowAnatomyGender`: `male`, `female`
-- `SandowAnatomyBodyArea`: `lowerLeg`, `upperLeg`, `abs`, `chest`, `shoulder`, `bicep`, `forearm`, `hand`, `neck`, `tricep`, `hamstring`, `glute`, `calf`, `back`, `trap`
-- `SandowAnatomyState`: `inactive`, `selected`, `primary`, `secondary`, `focus`, `reduce`
-- `SandowAnatomyViewOrientation`: `front`, `back`
-- `SandowAnatomyAsset`: model a base anatomy asset or a body-area mask asset by gender, orientation, and area.
+- `STRQAnatomyGender`: `male`, `female`
+- `STRQAnatomyBodyArea`: `lowerLeg`, `upperLeg`, `abs`, `chest`, `shoulder`, `bicep`, `forearm`, `hand`, `neck`, `tricep`, `hamstring`, `glute`, `calf`, `back`, `trap`
+- `STRQAnatomyState`: `inactive`, `selected`, `primary`, `secondary`, `focus`, `reduce`
+- `STRQAnatomyViewOrientation`: `front`, `back`
+- `STRQAnatomyAsset`: model a base anatomy asset or a body-area mask asset by gender, orientation, and area.
 
 ## Proposed Future SwiftUI Components
 
 Future component names, not implemented in this pass:
 
-- `SandowAnatomyMuscleView`
-- `SandowMuscleFocusCard`
-- `SandowBodyAreaSelector`
+- `STRQAnatomyMuscleView`
+- `STRQMuscleFocusCard`
+- `STRQBodyAreaSelector`
 - `STRQMuscleMapView`
-- `SandowAnatomyLegend`
+- `STRQAnatomyLegend`
 
 Intended use:
 
@@ -228,11 +230,11 @@ Component responsibilities:
 
 | Component | Intended role |
 |---|---|
-| `SandowAnatomyMuscleView` | Low-level renderer for one gender/orientation with selected body areas and state styling. |
-| `SandowBodyAreaSelector` | Interactive body-area selection UI built on `SandowAnatomyBodyArea`; should not mutate STRQ models directly. |
-| `SandowMuscleFocusCard` | Read-only or selectable card for top muscle groups in exercise detail, onboarding, or plan review contexts. |
+| `STRQAnatomyMuscleView` | Low-level renderer for one gender/orientation with selected body areas and state styling. |
+| `STRQBodyAreaSelector` | Interactive body-area selection UI built on `STRQAnatomyBodyArea`; should not mutate STRQ models directly. |
+| `STRQMuscleFocusCard` | Read-only or selectable card for top muscle groups in exercise detail, onboarding, or plan review contexts. |
 | `STRQMuscleMapView` | Adapter view that maps `[MuscleGroup]` to Sandow anatomy areas for existing STRQ domain data. |
-| `SandowAnatomyLegend` | Optional compact legend for primary/secondary/focus/reduce/intensity colors. |
+| `STRQAnatomyLegend` | Optional compact legend for primary/secondary/focus/reduce/intensity colors. |
 
 ## Risks And Open Questions
 

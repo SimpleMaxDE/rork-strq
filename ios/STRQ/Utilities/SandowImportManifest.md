@@ -4,7 +4,7 @@ Last audit: 2026-04-29
 
 ## Scope
 
-This pass is audit and manifest only. No runtime screens, workout logic, progression logic, persistence, analytics keys, product IDs, exercise data, active workout, rest timer, plan generation, onboarding logic, or paywall logic were modified.
+This manifest tracks the purchased Sandow source UI kit and STRQ's controlled imports. The 2026-04-29 ownership pass renamed the isolated runtime foundation and current icon assets to STRQ-owned names. No runtime screens, workout logic, progression logic, persistence, analytics keys, product IDs, exercise data, active workout, rest timer, plan generation, onboarding logic, or paywall logic were modified.
 
 Figma source file: [SH Sandow UI Kit v3.0](https://www.figma.com/design/LBvxljax0ixoTvbvvUeWVC/SH-sandow-UI-Kit--v3.0-?m=auto&t=Cm2KJRPJnU51BdTq-6)
 
@@ -18,7 +18,7 @@ Public product references used only as non-node-level corroboration:
 
 Previous audit conclusion was blocked by Figma connector failure and is superseded. On 2026-04-29, the Figma connector successfully inspected the requested Sandow Foundations, Media, and Illustration nodes.
 
-The current status remains audit and manifest only. No Sandow assets were imported. No runtime screens, Swift files, asset catalogs, localization, product IDs, workout logic, persistence, analytics, onboarding logic, or data models were modified.
+The Figma audit status remains manifest-only. No new Sandow assets were imported. The isolated runtime foundation and existing imported icon assets were renamed to STRQ-owned names; runtime screens, localization, product IDs, workout logic, persistence, analytics, onboarding logic, and data models were not modified.
 
 Figma recheck completed:
 
@@ -36,14 +36,14 @@ This manifest is no longer blocked for the body/anatomy/muscle conclusion. It is
 
 ## Inspected STRQ Files
 
-- `ios/STRQ/Utilities/SandowDesignSystem.swift`
-- `ios/STRQ/Assets.xcassets/SandowIcon*.imageset`
+- `ios/STRQ/Utilities/SandowDesignSystem.swift` -> `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Assets.xcassets/SandowIcon*.imageset` -> `ios/STRQ/Assets.xcassets/STRQIcon*.imageset`
 - `ios/STRQ/Views/BodyMapView.swift`
 - `ios/STRQ/Views/MuscleFocusView.swift`
 - `ios/STRQ/Views/MuscleRegionPaths.swift`
 - Runtime view search scope: `ios/STRQ/Views/**/*.swift` and `ios/STRQ/ContentView.swift`
 
-For this correction pass, only `ios/STRQ/Utilities/SandowImportManifest.md` was edited. Runtime files remain unchanged.
+For the ownership rename pass, runtime screens remain unchanged. The isolated foundation file and current icon image sets were renamed only to move app-facing names under STRQ ownership.
 
 ## Practical Searches Run
 
@@ -69,9 +69,9 @@ For this correction pass, only `ios/STRQ/Utilities/SandowImportManifest.md` was 
 
 Results:
 
-- Sandow implementation is isolated in `SandowDesignSystem.swift`.
+- The imported foundation implementation is isolated in `STRQDesignSystem.swift`.
 - No Sandow runtime usage was found in `ios/STRQ/Views` or `ios/STRQ/ContentView.swift`.
-- No `Image(systemName:)` usage was found inside `SandowDesignSystem.swift`.
+- No `Image(systemName:)` usage was found inside the isolated design-system foundation.
 - No raw localization key usage for `exercise.singular` or `set.plural` was found; one unrelated comment contained the phrase "per session".
 
 ## Known Figma Nodes To Inspect
@@ -218,7 +218,7 @@ The full Figma icon base count and style/variant count were not enumerated in th
 
 ### Current STRQ Icons
 
-Current `SandowIcon` enum and matching `.imageset` assets include 21 icons:
+Current `STRQIcon` enum and matching `STRQIcon*.imageset` assets include 21 icons:
 
 - `home`
 - `coach`
@@ -256,12 +256,12 @@ High-value missing icons for STRQ:
 ### Import Strategy
 
 - Import each base icon once as a template SVG or vector PDF.
-- Name assets `SandowIcon<Name>.imageset`.
+- Name assets `STRQIcon<Name>.imageset`.
 - Preserve vector representation and template rendering intent.
-- Tint via `SandowIconView` in SwiftUI.
+- Tint via `STRQIconView` in SwiftUI.
 - Do not import duplicate color variants or state variants unless the icon is truly multicolor or custom-rendered.
 - Use color/state in SwiftUI components instead of duplicating Figma icon styles.
-- Keep `SandowIcon` as the single enum registry.
+- Keep `STRQIcon` as the single runtime enum registry.
 
 ### Next Icons To Import First
 
@@ -315,39 +315,39 @@ Full screen group enumeration was not part of this correction pass. Public Sando
 
 ### Imported Foundation
 
-Current `SandowDesignSystem.swift` includes:
+Current `STRQDesignSystem.swift` includes:
 
 - Source metadata and known node IDs.
-- Isolated Sandow colors, gradients, typography, spacing, radii, effects.
+- Isolated STRQ-owned colors, gradients, typography, spacing, radii, effects sourced from the purchased kit.
 - Component style helpers for surfaces, borders, radii, tones.
-- Icon registry and `SandowIconView`.
-- Sandow primitives: icon container, surface, card, button, chip, badge, metric card, progress bar, progress ring, progress row, list item, section header/action, tab bar primitives, schedule row/card, preview-only samples.
+- Icon registry and `STRQIconView`.
+- STRQ primitives: icon container, surface, card, button, chip, badge, metric card, progress bar, progress ring, progress row, list item, section header/action, tab bar primitives, schedule row/card, preview-only samples.
 
 ### Imported Assets
 
-Current Sandow icon assets:
+Current STRQ-owned icon assets, renamed from the Sandow source imports:
 
-- `SandowIconArrowRight.imageset`
-- `SandowIconBarbell.imageset`
-- `SandowIconBell.imageset`
-- `SandowIconCalendar.imageset`
-- `SandowIconCheck.imageset`
-- `SandowIconCheckCircle.imageset`
-- `SandowIconChevronRight.imageset`
-- `SandowIconClock.imageset`
-- `SandowIconCoach.imageset`
-- `SandowIconHome.imageset`
-- `SandowIconPlus.imageset`
-- `SandowIconProfile.imageset`
-- `SandowIconProgress.imageset`
-- `SandowIconRecovery.imageset`
-- `SandowIconSearch.imageset`
-- `SandowIconSleep.imageset`
-- `SandowIconStar.imageset`
-- `SandowIconTarget.imageset`
-- `SandowIconTrain.imageset`
-- `SandowIconTrophy.imageset`
-- `SandowIconWeightScale.imageset`
+- `STRQIconArrowRight.imageset`
+- `STRQIconBarbell.imageset`
+- `STRQIconBell.imageset`
+- `STRQIconCalendar.imageset`
+- `STRQIconCheck.imageset`
+- `STRQIconCheckCircle.imageset`
+- `STRQIconChevronRight.imageset`
+- `STRQIconClock.imageset`
+- `STRQIconCoach.imageset`
+- `STRQIconHome.imageset`
+- `STRQIconPlus.imageset`
+- `STRQIconProfile.imageset`
+- `STRQIconProgress.imageset`
+- `STRQIconRecovery.imageset`
+- `STRQIconSearch.imageset`
+- `STRQIconSleep.imageset`
+- `STRQIconStar.imageset`
+- `STRQIconTarget.imageset`
+- `STRQIconTrain.imageset`
+- `STRQIconTrophy.imageset`
+- `STRQIconWeightScale.imageset`
 
 Other body assets exist in `Assets.xcassets`, but they are not Sandow imports:
 
@@ -453,11 +453,11 @@ Body/anatomy:
    - Plan one runtime screen at a time, starting with the least risky contained surfaces.
    - Do not migrate `DashboardView` until component/icon/foundation parity is complete.
 
-## Rules For Using Sandow Foundation In STRQ
+## Rules For Using Source Foundation In STRQ
 
-- Sandow remains an optional visual layer until a dedicated migration pass.
+- The purchased Sandow kit remains an internal source/reference. Runtime code and app-facing assets should use STRQ-owned names.
 - Do not override `STRQPalette` or existing brand systems globally.
-- Use Sandow components explicitly and locally.
+- Use STRQ design-system components explicitly and locally.
 - Replace one contained surface at a time.
 - Never mix a runtime logic change with a visual migration.
 - Use `L10n.tr` for user-facing copy; do not introduce raw localization keys.
