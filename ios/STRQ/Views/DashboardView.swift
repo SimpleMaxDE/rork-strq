@@ -162,7 +162,7 @@ struct DashboardView: View {
     private var todayHero: some View {
         let accent = vm.todaysReadiness.map { ForgeTheme.recoveryColor(for: $0.readinessScore) } ?? STRQPalette.borderStrong
 
-        return STRQSurface(variant: .hero, accent: accent, padding: 18) {
+        return ForgeSurface(variant: .hero, accent: accent, padding: 18) {
             HStack(alignment: .center, spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(greeting)
@@ -228,7 +228,7 @@ struct DashboardView: View {
 
     private func briefingCard(_ primary: DailyBriefing.Primary, briefing: DailyBriefing) -> some View {
         let tint = ForgeTheme.color(for: primary.colorName)
-        return STRQSurface(variant: .elevated, accent: tint, padding: 16) {
+        return ForgeSurface(variant: .elevated, accent: tint, padding: 16) {
             VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 6) {
                 Capsule()
@@ -396,7 +396,7 @@ struct DashboardView: View {
     }
 
     private func postWorkoutBridgeCard(_ bridge: PostWorkoutBridge) -> some View {
-        STRQSurface(variant: .elevated, accent: bridge.accent, padding: 15) {
+        ForgeSurface(variant: .elevated, accent: bridge.accent, padding: 15) {
             VStack(alignment: .leading, spacing: 13) {
             HStack(spacing: 12) {
                 STRQPulseMark(size: 38, tint: bridge.accent) {
@@ -569,7 +569,7 @@ struct DashboardView: View {
     private func sinceLastCard(_ since: DailyBriefing.SinceLast) -> some View {
         let isSupporting = isPostFirstSessionState
 
-        return STRQSurface(
+        return ForgeSurface(
             variant: isSupporting ? .standard : .elevated,
             accent: STRQPalette.signalGreen,
             padding: 12
@@ -621,7 +621,7 @@ struct DashboardView: View {
 
     private func earlyStageHint(_ guidance: EarlyStateGuidance) -> some View {
         let tierIndex = max(0, min(3, guidance.tier.rawValue))
-        return STRQSurface(variant: .standard, accent: STRQPalette.energyAccent, padding: 12) {
+        return ForgeSurface(variant: .standard, accent: STRQPalette.energyAccent, padding: 12) {
             VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: guidance.icon)
@@ -669,7 +669,7 @@ struct DashboardView: View {
         let tint = ForgeTheme.color(for: primary.colorName)
         let isRecovery = primary.kind == .recoverToday
         let isFirstSession = primary.kind == .startFirstSession
-        return STRQSurface(variant: .hero, accent: tint, padding: 0) {
+        return ForgeSurface(variant: .hero, accent: tint, padding: 0) {
             VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 6) {
@@ -811,7 +811,7 @@ struct DashboardView: View {
     @ViewBuilder
     private var scheduleTimeline: some View {
         if let plan = vm.currentPlan, plan.days.contains(where: { $0.scheduledWeekday != nil }) {
-            STRQSurface(variant: .standard, padding: 14) {
+            ForgeSurface(variant: .standard, padding: 14) {
                 VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     STRQSectionTitle(title: L10n.tr("Training Week"))
@@ -992,7 +992,7 @@ struct DashboardView: View {
     // MARK: - Week Pulse
 
     private var weekPulse: some View {
-        STRQSurface(variant: .standard, padding: 16) {
+        ForgeSurface(variant: .standard, padding: 16) {
             VStack(spacing: 14) {
             Button {
                 withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.22)) {

@@ -68,7 +68,7 @@ enum ForgeTheme {
     }
 }
 
-enum STRQSurfaceVariant: Equatable {
+enum ForgeSurfaceVariant: Equatable {
     case standard
     case elevated
     case hero
@@ -90,14 +90,14 @@ enum STRQSurfaceVariant: Equatable {
     }
 }
 
-struct STRQSurface<Content: View>: View {
-    var variant: STRQSurfaceVariant = .standard
+struct ForgeSurface<Content: View>: View {
+    var variant: ForgeSurfaceVariant = .standard
     var accent: Color?
     var padding: CGFloat = 16
     let content: Content
 
     init(
-        variant: STRQSurfaceVariant = .standard,
+        variant: ForgeSurfaceVariant = .standard,
         accent: Color? = nil,
         padding: CGFloat = 16,
         @ViewBuilder content: () -> Content
