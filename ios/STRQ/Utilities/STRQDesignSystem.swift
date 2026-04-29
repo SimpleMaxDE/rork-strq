@@ -83,7 +83,19 @@ enum STRQColors {
     static let elevatedCardSurface = gray800
     static let insetSurface = gray950
     static let controlSurface = gray800
-    static let selectedSurface = orange950
+    static let selectedSurface = gray800
+
+    // STRQ-owned monochrome accent roles.
+    static let primaryAccent = white
+    static let primaryAccentText = black
+    static let secondaryAccent = gray300
+    static let subtleAccent = gray500
+    static let actionSurface = white
+    static let actionText = black
+    static let focusGlow = white.opacity(0.22)
+    static let iconPrimary = white
+    static let iconSecondary = gray400
+    static let iconMuted = gray600
 
     // Dark-mode text foundation.
     static let primaryText = white
@@ -91,8 +103,8 @@ enum STRQColors {
     static let mutedText = gray500
     static let disabledText = gray700
     static let subtleText = gray600
-    static let textOnBrand = gray800
-    static let textOnInverse = gray800
+    static let textOnBrand = primaryAccentText
+    static let textOnInverse = black
 
     // Dark-mode borders and dividers.
     static let borderPrimary = gray400
@@ -100,18 +112,29 @@ enum STRQColors {
     static let borderTertiary = gray600
     static let borderMuted = gray700
     static let divider = gray700
-    static let selectedBorder = orange500
+    static let selectedBorder = gray300
 
-    // Brand semantics.
-    static let orangePrimary = orange500
-    static let orangeHover = orange400
-    static let orangePressed = orange600
-    static let orangeSoft = orange800
-    static let orangeSofter = orange900
-    static let orangeDim = orange950
-    static let brandTextPrimary = orange200
-    static let brandTextSecondary = orange500
-    static let brandTextTertiary = orange700
+    // Legacy warm/source-kit scale. Keep explicit; do not use as default STRQ brand.
+    static let warmAccent = orange500
+    static let warmAccentHover = orange400
+    static let warmAccentPressed = orange600
+    static let warmAccentSoft = orange800
+    static let warmAccentSofter = orange900
+    static let warmAccentDim = orange950
+    static let warmAccentTextPrimary = orange200
+    static let warmAccentTextSecondary = orange500
+    static let warmAccentTextTertiary = orange700
+
+    // Backwards-compatible orange aliases from the first foundation pass.
+    static let orangePrimary = warmAccent
+    static let orangeHover = warmAccentHover
+    static let orangePressed = warmAccentPressed
+    static let orangeSoft = warmAccentSoft
+    static let orangeSofter = warmAccentSofter
+    static let orangeDim = warmAccentDim
+    static let brandTextPrimary = warmAccentTextPrimary
+    static let brandTextSecondary = warmAccentTextSecondary
+    static let brandTextTertiary = warmAccentTextTertiary
 
     // Status semantics.
     static let successGreen = lime500
@@ -159,6 +182,18 @@ enum STRQColors {
 // MARK: - Gradient Tokens
 
 enum STRQGradients {
+    static let primaryAction = LinearGradient(
+        colors: [STRQColors.white, STRQColors.gray100, STRQColors.gray300],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+
+    static let progressNeutral = LinearGradient(
+        colors: [STRQColors.gray300, STRQColors.white],
+        startPoint: .leading,
+        endPoint: .trailing
+    )
+
     static let orangeCTA = LinearGradient(
         colors: [STRQColors.orange400, STRQColors.orange500, STRQColors.orange600],
         startPoint: .topLeading,
@@ -220,21 +255,21 @@ enum STRQGradients {
 enum STRQTypography {
     static let fontFamily = STRQDesignSystem.fontFamily
 
-    static let displayLarge = strqFont(size: 180, weight: .semibold)
-    static let displayMedium = strqFont(size: 128, weight: .semibold)
-    static let displaySmall = strqFont(size: 96, weight: .semibold)
+    static let displayLarge = strqFont(size: 180, weight: .bold)
+    static let displayMedium = strqFont(size: 128, weight: .bold)
+    static let displaySmall = strqFont(size: 96, weight: .bold)
 
-    static let heading2XL = strqFont(size: 72, weight: .semibold)
-    static let headingXL = strqFont(size: 60, weight: .semibold)
-    static let headingLarge = strqFont(size: 48, weight: .semibold)
-    static let headingMedium = strqFont(size: 36, weight: .semibold)
-    static let headingSmall = strqFont(size: 30, weight: .semibold)
-    static let headingXS = strqFont(size: 24, weight: .semibold)
+    static let heading2XL = strqFont(size: 72, weight: .bold)
+    static let headingXL = strqFont(size: 60, weight: .bold)
+    static let headingLarge = strqFont(size: 48, weight: .bold)
+    static let headingMedium = strqFont(size: 36, weight: .bold)
+    static let headingSmall = strqFont(size: 30, weight: .bold)
+    static let headingXS = strqFont(size: 24, weight: .bold)
 
-    static let title = strqFont(size: 24, weight: .semibold)
-    static let cardTitle = strqFont(size: 18, weight: .semibold)
-    static let metricLarge = strqFont(size: 40, weight: .semibold).monospacedDigit()
-    static let metricMedium = strqFont(size: 30, weight: .semibold).monospacedDigit()
+    static let title = strqFont(size: 24, weight: .bold)
+    static let cardTitle = strqFont(size: 18, weight: .bold)
+    static let metricLarge = strqFont(size: 40, weight: .heavy).monospacedDigit()
+    static let metricMedium = strqFont(size: 30, weight: .bold).monospacedDigit()
     static let metricSmall = strqFont(size: 20, weight: .bold).monospacedDigit()
 
     static let bodyXLarge = strqFont(size: 20, weight: .regular)
@@ -251,11 +286,11 @@ enum STRQTypography {
     static let label = strqFont(size: 14, weight: .bold)
     static let labelLarge = strqFont(size: 18, weight: .bold)
     static let labelSmall = strqFont(size: 12, weight: .bold)
-    static let chip = strqFont(size: 14, weight: .medium)
-    static let chipSmall = strqFont(size: 12, weight: .medium)
-    static let button = strqFont(size: 18, weight: .semibold)
-    static let buttonCompact = strqFont(size: 14, weight: .semibold)
-    static let tabLabel = strqFont(size: 12, weight: .medium)
+    static let chip = strqFont(size: 14, weight: .semibold)
+    static let chipSmall = strqFont(size: 12, weight: .semibold)
+    static let button = strqFont(size: 18, weight: .bold)
+    static let buttonCompact = strqFont(size: 14, weight: .bold)
+    static let tabLabel = strqFont(size: 12, weight: .semibold)
 
     // Backwards-compatible aliases from the first STRQ foundation pass.
     static let heading = cardTitle
@@ -274,10 +309,10 @@ enum STRQTypography {
     static let bodySmallLineHeight: CGFloat = 22
     static let captionLineHeight: CGFloat = 16
 
-    static let displayLargeTracking: CGFloat = -8
-    static let displayMediumTracking: CGFloat = -4
-    static let headingTracking: CGFloat = -0.5
-    static let labelTracking: CGFloat = 1
+    static let displayLargeTracking: CGFloat = 0
+    static let displayMediumTracking: CGFloat = 0
+    static let headingTracking: CGFloat = 0
+    static let labelTracking: CGFloat = 0
 
     private static func strqFont(size: CGFloat, weight: Font.Weight) -> Font {
         Font.custom(fontFamily, size: size).weight(weight)
@@ -416,6 +451,13 @@ enum STRQEffects {
         y: 4
     )
 
+    static let selectionGlow = STRQShadowToken(
+        color: STRQColors.white.opacity(0.12),
+        radius: 14,
+        x: 0,
+        y: 6
+    )
+
     static let orangeGlow = STRQShadowToken(
         color: STRQColors.orangePrimary.opacity(0.30),
         radius: 18,
@@ -440,7 +482,7 @@ enum STRQEffects {
     static let subtleShadowColor = subtleShadow.color
     static let subtleShadowRadius = subtleShadow.radius
     static let subtleShadowYOffset = subtleShadow.y
-    static let focusGlowColor = STRQColors.orangePrimary.opacity(0.30)
+    static let focusGlowColor = STRQColors.focusGlow
 }
 
 enum STRQComponentStyle {
@@ -483,7 +525,7 @@ enum STRQComponentStyle {
             case .selected:
                 return STRQEffects.selectedCardBorder
             case .brand:
-                return STRQBorderToken(color: STRQColors.orangePrimary, width: STRQEffects.hairline)
+                return STRQBorderToken(color: STRQColors.primaryAccent, width: STRQEffects.hairline)
             case .danger:
                 return STRQBorderToken(color: STRQColors.dangerRed, width: STRQEffects.hairline)
             }
@@ -539,8 +581,10 @@ enum STRQComponentStyle {
             switch self {
             case .neutral:
                 return STRQColors.secondaryText
-            case .selected, .orange:
-                return STRQColors.brandTextPrimary
+            case .selected:
+                return STRQColors.primaryAccentText
+            case .orange:
+                return STRQColors.warmAccentTextPrimary
             case .success:
                 return STRQColors.successTextPrimary
             case .warning:
@@ -559,9 +603,9 @@ enum STRQComponentStyle {
             case .neutral:
                 return STRQColors.surfaceSecondary
             case .selected:
-                return STRQColors.selectedSurface
+                return STRQColors.primaryAccent
             case .orange:
-                return STRQColors.orangeDim
+                return STRQColors.warmAccentDim
             case .success:
                 return STRQColors.successDim
             case .warning:
@@ -579,8 +623,10 @@ enum STRQComponentStyle {
             switch self {
             case .neutral:
                 return STRQColors.borderMuted
-            case .selected, .orange:
-                return STRQColors.orangeSoft
+            case .selected:
+                return STRQColors.primaryAccent
+            case .orange:
+                return STRQColors.warmAccentSoft
             case .success:
                 return STRQColors.successSoft
             case .warning:
@@ -755,13 +801,17 @@ struct STRQIconContainer: View {
 
     let icon: STRQIcon
     var size: Size = .lg
-    var tint: Color = STRQColors.orangePrimary
+    var tint: Color = STRQColors.iconSecondary
     var background: Color? = nil
 
     var body: some View {
         STRQIconView(icon, size: size.icon, tint: tint)
             .frame(width: size.frame, height: size.frame)
-            .background(background ?? tint.opacity(0.14), in: .rect(cornerRadius: STRQRadii.iconContainer))
+            .background(background ?? STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
     }
 }
 
@@ -825,10 +875,10 @@ struct STRQSurface<Content: View>: View {
                     .strokeBorder(strokeColor, lineWidth: strokeWidth)
             )
             .shadow(
-                color: selected ? STRQEffects.orangeGlow.color : STRQEffects.subtleShadow.color,
-                radius: selected ? STRQEffects.orangeGlow.radius : STRQEffects.subtleShadow.radius,
+                color: selected ? STRQEffects.selectionGlow.color : STRQEffects.subtleShadow.color,
+                radius: selected ? STRQEffects.selectionGlow.radius : STRQEffects.subtleShadow.radius,
                 x: 0,
-                y: selected ? STRQEffects.orangeGlow.y : STRQEffects.subtleShadow.y
+                y: selected ? STRQEffects.selectionGlow.y : STRQEffects.subtleShadow.y
             )
     }
 }
@@ -1005,7 +1055,7 @@ struct STRQButton: View {
                     .strokeBorder(borderColor, lineWidth: borderWidth)
             )
             .shadow(
-                color: variant == .primary ? STRQColors.orangePrimary.opacity(0.20) : STRQEffects.subtleShadow.color,
+                color: variant == .primary ? STRQColors.white.opacity(0.12) : STRQEffects.subtleShadow.color,
                 radius: variant == .primary ? 12 : 4,
                 x: 0,
                 y: variant == .primary ? 6 : 2
@@ -1036,9 +1086,9 @@ struct STRQButton: View {
     private var foregroundColor: Color {
         switch variant {
         case .primary, .compact:
-            return STRQColors.textOnBrand
+            return STRQColors.actionText
         case .secondary:
-            return STRQColors.brandTextPrimary
+            return STRQColors.primaryText
         case .ghost, .icon:
             return STRQColors.textPrimary
         case .destructive:
@@ -1049,11 +1099,13 @@ struct STRQButton: View {
     private var backgroundColor: Color {
         switch variant {
         case .primary, .compact:
-            return STRQColors.orangePrimary
+            return STRQColors.actionSurface
         case .secondary:
-            return STRQColors.orangeDim
-        case .ghost, .icon:
-            return STRQColors.surfaceSecondary
+            return STRQColors.controlSurface
+        case .ghost:
+            return .clear
+        case .icon:
+            return STRQColors.controlSurface
         case .destructive:
             return STRQColors.dangerRed
         }
@@ -1064,7 +1116,7 @@ struct STRQButton: View {
         case .primary, .compact, .destructive:
             return .clear
         case .secondary:
-            return STRQColors.orangeSoft
+            return STRQColors.borderTertiary
         case .ghost, .icon:
             return STRQColors.borderMuted
         }
@@ -1145,10 +1197,12 @@ struct STRQChip: View {
             switch self {
             case .neutral:
                 return .neutral
-            case .selected:
+            case .selected, .brand:
                 return .selected
-            case .orange, .brand, .brandSoft:
+            case .orange:
                 return .orange
+            case .brandSoft:
+                return .neutral
             case .success:
                 return .success
             case .warning:
@@ -1327,7 +1381,7 @@ struct STRQMetricCard: View {
     var progress: Double?
     var selected: Bool = false
     var active: Bool = false
-    var tint: Color = STRQColors.orangePrimary
+    var tint: Color = STRQColors.iconPrimary
     var valueFont: Font = STRQTypography.metricMedium
     var iconBackground: Color? = nil
     var minHeight: CGFloat = STRQSpacing.metricCardMinHeight
@@ -1388,7 +1442,7 @@ struct STRQMetricCard: View {
 struct STRQProgressBar: View {
     var value: Double
     var height: CGFloat = 8
-    var tint: Color = STRQColors.orangePrimary
+    var tint: Color = STRQColors.primaryAccent
     var label: String? = nil
     var valueText: String? = nil
     var compact: Bool = false
@@ -1449,7 +1503,7 @@ struct STRQProgressRing: View {
     var variant: Variant = .compact
     var size: CGFloat? = nil
     var lineWidth: CGFloat? = nil
-    var tint: Color = STRQColors.orangePrimary
+    var tint: Color = STRQColors.primaryAccent
     var label: String? = nil
     var valueText: String? = nil
 
@@ -1532,7 +1586,7 @@ struct STRQProgressRow: View {
     var detail: String?
     var icon: STRQIcon? = .recovery
     var progress: Double
-    var tint: Color = STRQColors.orangePrimary
+    var tint: Color = STRQColors.primaryAccent
     var boxed: Bool = true
 
     var body: some View {
@@ -1588,7 +1642,7 @@ struct STRQListItem: View {
     var trailingValue: String?
     var showsChevron: Bool = false
     var showsDivider: Bool = true
-    var tint: Color = STRQColors.orangePrimary
+    var tint: Color = STRQColors.iconSecondary
 
     var body: some View {
         VStack(spacing: 0) {
@@ -1694,9 +1748,9 @@ struct STRQSectionAction: View {
             HStack(spacing: STRQSpacing.xxs) {
                 Text(title)
                     .font(STRQTypography.labelSmall)
-                STRQIconView(.arrowRight, size: STRQSpacing.iconXS, tint: STRQColors.orangePrimary)
+                STRQIconView(.arrowRight, size: STRQSpacing.iconXS, tint: STRQColors.primaryAccent)
             }
-            .foregroundStyle(STRQColors.orangePrimary)
+            .foregroundStyle(STRQColors.primaryAccent)
         }
         .buttonStyle(.strqPressable)
     }
@@ -1714,7 +1768,7 @@ struct STRQTabBarItem: View {
             STRQIconView(
                 icon,
                 size: STRQSpacing.iconMD,
-                tint: isSelected ? STRQColors.orangePrimary : STRQColors.mutedText
+                tint: isSelected ? STRQColors.primaryAccent : STRQColors.iconMuted
             )
 
             Text(title)
@@ -1722,12 +1776,12 @@ struct STRQTabBarItem: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
         }
-        .foregroundStyle(isSelected ? STRQColors.orangePrimary : STRQColors.mutedText)
+        .foregroundStyle(isSelected ? STRQColors.primaryAccent : STRQColors.iconMuted)
         .frame(maxWidth: .infinity)
         .frame(minHeight: 56)
         .padding(.vertical, STRQSpacing.xxs)
         .background(
-            isSelected ? STRQColors.orangeDim.opacity(0.38) : Color.clear,
+            isSelected ? STRQColors.selectedSurface : Color.clear,
             in: .rect(cornerRadius: STRQRadii.tabItem)
         )
     }
@@ -1739,14 +1793,14 @@ struct STRQTabBarCenterAction: View {
 
     var body: some View {
         Button(action: action) {
-            STRQIconView(icon, size: STRQSpacing.iconMD, tint: STRQColors.textOnBrand)
+            STRQIconView(icon, size: STRQSpacing.iconMD, tint: STRQColors.actionText)
                 .frame(width: 56, height: 56)
-                .background(STRQGradients.orangeCTA, in: Circle())
+                .background(STRQGradients.primaryAction, in: Circle())
                 .shadow(
-                    color: STRQEffects.orangeGlow.color,
-                    radius: STRQEffects.orangeGlow.radius,
+                    color: STRQEffects.selectionGlow.color,
+                    radius: STRQEffects.selectionGlow.radius,
                     x: 0,
-                    y: STRQEffects.orangeGlow.y
+                    y: STRQEffects.selectionGlow.y
                 )
         }
         .buttonStyle(.strqPressable)
@@ -1816,21 +1870,21 @@ struct STRQScheduleRow: View {
             VStack(spacing: 2) {
                 Text(dateTitle)
                     .font(STRQTypography.label)
-                    .foregroundStyle(isSelected ? STRQColors.textOnBrand : STRQColors.primaryText)
+                    .foregroundStyle(isSelected ? STRQColors.actionText : STRQColors.primaryText)
                     .lineLimit(1)
 
                 if let dateSubtitle {
                     Text(dateSubtitle)
                         .font(STRQTypography.micro)
-                        .foregroundStyle(isSelected ? STRQColors.textOnBrand.opacity(0.74) : STRQColors.mutedText)
+                        .foregroundStyle(isSelected ? STRQColors.actionText.opacity(0.74) : STRQColors.mutedText)
                         .lineLimit(1)
                 }
             }
             .frame(width: 48, height: 48)
-            .background(isSelected ? STRQColors.orangePrimary : STRQColors.surfaceSecondary, in: .rect(cornerRadius: STRQRadii.md))
+            .background(isSelected ? STRQColors.actionSurface : STRQColors.surfaceSecondary, in: .rect(cornerRadius: STRQRadii.md))
 
             if let icon {
-                STRQIconContainer(icon: icon, size: .md, tint: isSelected ? STRQColors.orangePrimary : STRQColors.mutedText)
+                STRQIconContainer(icon: icon, size: .md, tint: isSelected ? STRQColors.primaryAccent : STRQColors.iconMuted)
             }
 
             VStack(alignment: .leading, spacing: 2) {
@@ -1943,14 +1997,14 @@ struct STRQComponentsPreview: View {
         VStack(alignment: .leading, spacing: STRQSpacing.sectionGap) {
             HStack(spacing: STRQSpacing.xs) {
                 STRQChip(label: "Neutral")
-                STRQChip(label: "Active", icon: .check, tone: .orange)
+                STRQChip(label: "Active", icon: .check, tone: .selected)
                 STRQBadge(text: "7", variant: .count, tone: .warning)
             }
 
             STRQProgressRing(
                 value: 0.82,
                 variant: .score,
-                tint: STRQColors.orangePrimary,
+                tint: STRQColors.primaryAccent,
                 label: "Score",
                 valueText: "82"
             )

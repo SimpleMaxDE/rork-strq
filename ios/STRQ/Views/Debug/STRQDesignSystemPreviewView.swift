@@ -73,6 +73,12 @@ private struct ColorSurfacesSection: View {
                     borderColor: STRQColors.selectedBorder
                 )
                 TokenSwatch(
+                    title: "Primary action",
+                    value: "STRQColors.actionSurface",
+                    color: STRQColors.actionSurface,
+                    borderColor: STRQColors.secondaryAccent
+                )
+                TokenSwatch(
                     title: "Inset surface",
                     value: "STRQColors.insetSurface",
                     color: STRQColors.insetSurface
@@ -246,7 +252,7 @@ private struct ChipsBadgesSection: View {
                 HStack(spacing: STRQSpacing.xs) {
                     STRQBadge(text: "12", variant: .count, tone: .warning)
                     STRQBadge(text: "Ready", icon: .checkCircle, variant: .status, tone: .success)
-                    STRQBadge(text: "Milestone", icon: .trophy, variant: .achievement, tone: .orange)
+                    STRQBadge(text: "Warm", icon: .fire, variant: .achievement, tone: .orange)
                 }
             }
         }
@@ -287,8 +293,7 @@ private struct CardsMetricSection: View {
                         label: "Sessions",
                         icon: .calendar,
                         detail: "This week",
-                        progress: 0.8,
-                        tint: STRQColors.orangePrimary
+                        progress: 0.8
                     )
                 }
             }
@@ -323,7 +328,6 @@ private struct ProgressSection: View {
                 VStack(alignment: .leading, spacing: STRQSpacing.md) {
                     STRQProgressBar(
                         value: 0.72,
-                        tint: STRQColors.orangePrimary,
                         label: "Progress bar",
                         valueText: "72%"
                     )
@@ -353,7 +357,6 @@ private struct ProgressSection: View {
                         STRQProgressRing(
                             value: 0.72,
                             variant: .score,
-                            tint: STRQColors.orangePrimary,
                             label: "Score",
                             valueText: "72"
                         )
@@ -481,7 +484,7 @@ private struct IconGridCell: View {
             STRQIconView(
                 icon,
                 size: STRQSpacing.iconLG,
-                tint: STRQColors.orangePrimary,
+                tint: STRQColors.iconPrimary,
                 templateRendering: true
             )
 
