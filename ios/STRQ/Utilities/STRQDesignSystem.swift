@@ -7,17 +7,14 @@ import UIKit
 /*
  STRQ Design System Foundation
 
- This file is STRQ's isolated design-system foundation layer. It mirrors the
- purchased source UI kit tokens and primitive components without overriding
- STRQPalette or changing existing production screens.
+ Use this file for STRQ UI primitives, previews, and future screen-by-screen
+ migrations. It is STRQ's isolated design-system foundation layer and should
+ not override STRQPalette or change existing production screens.
 
- Use this file for new STRQ-based UI primitives, previews, and future
- screen-by-screen migrations. Do not import source demo photos, coach/person
- imagery, marketing mockups, huge mesh backgrounds, the full source Figma file,
- or the full ZIP into the app repository.
+ Do not import large demo/media assets into the app repository.
 
  Adding icons:
- 1. Export a source regular-style icon as template SVG or vector PDF.
+ 1. Export a STRQ regular-style icon as template SVG or vector PDF.
  2. Add it as ios/STRQ/Assets.xcassets/STRQIcon<Name>.imageset.
  3. Set preserves-vector-representation and template-rendering-intent.
  4. Add a matching STRQIcon case whose raw value is the asset name.
@@ -31,23 +28,6 @@ import UIKit
 // MARK: - STRQ Design System
 
 enum STRQDesignSystem {
-    static let sourceFileKey = "LBvxljax0ixoTvbvvUeWVC"
-    static let sourceFileURL = "https://www.figma.com/design/" + sourceFileKey
-
-    static let foundationsPageNodeId = "5358:6096"
-    static let colorsNodeId = "5359:9002"
-    static let gradientsNodeId = "5442:13546"
-    static let typographyNodeId = "9119:6481"
-    static let effectsNodeId = "9120:58753"
-    static let sizeSpacingNodeId = "9122:6944"
-
-    static let iconSetPageNodeId = "5367:38988"
-    static let iconsNodeId = "5454:22014"
-
-    static let generalComponentsPageNodeId = "5358:4030"
-    static let appComponentsPageNodeId = "5643:11300"
-    static let sourceHomeNodeId = "11604:62728"
-
     static let fontFamily = "Work Sans"
     static let workSansFontFilesBundled = false
     static let iconAssetPrefix = "STRQIcon"
@@ -1734,7 +1714,7 @@ struct STRQTabBarCenterAction: View {
     }
 }
 
-struct STRQTabBar<Content: View>: View {
+struct STRQTabBarContainer<Content: View>: View {
     let content: Content
 
     init(@ViewBuilder content: () -> Content) {
@@ -1954,7 +1934,7 @@ struct STRQComponentsPreview: View {
                 isSelected: true
             )
 
-            STRQTabBar {
+            STRQTabBarContainer {
                 STRQTabBarItem(title: "Home", icon: .home, isSelected: true)
                 STRQTabBarItem(title: "Train", icon: .train, isSelected: false)
                 STRQTabBarCenterAction {}
