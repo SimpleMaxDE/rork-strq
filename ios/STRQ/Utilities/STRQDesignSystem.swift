@@ -28,8 +28,13 @@ import UIKit
 // MARK: - STRQ Design System
 
 enum STRQDesignSystem {
-    static let fontFamily = "Work Sans"
+    static let sourceFontFamily = "Work Sans"
+    static let fontFamily = sourceFontFamily
     static let workSansFontFilesBundled = false
+    static let workSansRegularFontName = "WorkSans-Regular"
+    static let workSansMediumFontName = "WorkSans-Medium"
+    static let workSansSemiBoldFontName = "WorkSans-SemiBold"
+    static let workSansBoldFontName = "WorkSans-Bold"
     static let iconAssetPrefix = "STRQIcon"
 }
 
@@ -254,43 +259,79 @@ enum STRQGradients {
 
 enum STRQTypography {
     static let fontFamily = STRQDesignSystem.fontFamily
+    static let sourceFontFamily = STRQDesignSystem.sourceFontFamily
+    static var runtimeFontFamily: String? {
+        isWorkSansActive ? fontFamily : nil
+    }
 
-    static let displayLarge = strqFont(size: 180, weight: .bold)
-    static let displayMedium = strqFont(size: 128, weight: .bold)
-    static let displaySmall = strqFont(size: 96, weight: .bold)
+    static var isWorkSansActive: Bool {
+        workSansFontName(for: .regular) != nil
+    }
 
-    static let heading2XL = strqFont(size: 72, weight: .bold)
-    static let headingXL = strqFont(size: 60, weight: .bold)
-    static let headingLarge = strqFont(size: 48, weight: .bold)
-    static let headingMedium = strqFont(size: 36, weight: .bold)
-    static let headingSmall = strqFont(size: 30, weight: .bold)
-    static let headingXS = strqFont(size: 24, weight: .bold)
+    static var fontStatusText: String {
+        isWorkSansActive ? "Work Sans active" : "Work Sans not bundled — using system fallback"
+    }
 
-    static let title = strqFont(size: 24, weight: .bold)
-    static let cardTitle = strqFont(size: 18, weight: .bold)
-    static let metricLarge = strqFont(size: 40, weight: .heavy).monospacedDigit()
-    static let metricMedium = strqFont(size: 30, weight: .bold).monospacedDigit()
-    static let metricSmall = strqFont(size: 20, weight: .bold).monospacedDigit()
+    static let displayLarge = headingFont(size: 180, weight: .bold)
+    static let displayMedium = headingFont(size: 128, weight: .bold)
+    static let displaySmall = headingFont(size: 96, weight: .bold)
 
-    static let bodyXLarge = strqFont(size: 20, weight: .regular)
-    static let bodyLarge = strqFont(size: 18, weight: .regular)
-    static let body = strqFont(size: 16, weight: .regular)
-    static let bodyMedium = strqFont(size: 16, weight: .medium)
-    static let bodySmall = strqFont(size: 14, weight: .regular)
-    static let bodySmallMedium = strqFont(size: 14, weight: .medium)
+    static let heading2XL = headingFont(size: 72, weight: .bold)
+    static let headingXL = headingFont(size: 60, weight: .bold)
+    static let headingLarge = headingFont(size: 48, weight: .bold)
+    static let headingMedium = headingFont(size: 36, weight: .bold)
+    static let headingSmall = headingFont(size: 30, weight: .bold)
+    static let headingXS = headingFont(size: 24, weight: .bold)
 
-    static let caption = strqFont(size: 12, weight: .medium)
-    static let captionRegular = strqFont(size: 12, weight: .regular)
-    static let micro = strqFont(size: 10, weight: .medium)
+    static let text2XL = textFont(size: 24, weight: .medium)
+    static let textXL = textFont(size: 20, weight: .medium)
+    static let textLarge = textFont(size: 18, weight: .medium)
+    static let textMedium = textFont(size: 16, weight: .medium)
+    static let textSmall = textFont(size: 14, weight: .medium)
+    static let textXS = textFont(size: 12, weight: .medium)
+    static let text2XS = textFont(size: 10, weight: .medium)
 
-    static let label = strqFont(size: 14, weight: .bold)
-    static let labelLarge = strqFont(size: 18, weight: .bold)
-    static let labelSmall = strqFont(size: 12, weight: .bold)
-    static let chip = strqFont(size: 14, weight: .semibold)
-    static let chipSmall = strqFont(size: 12, weight: .semibold)
-    static let button = strqFont(size: 18, weight: .bold)
-    static let buttonCompact = strqFont(size: 14, weight: .bold)
-    static let tabLabel = strqFont(size: 12, weight: .semibold)
+    static let paragraph2XL = textFont(size: 24, weight: .regular)
+    static let paragraphXL = textFont(size: 20, weight: .regular)
+    static let paragraphLarge = textFont(size: 18, weight: .regular)
+    static let paragraphMedium = textFont(size: 16, weight: .regular)
+    static let paragraphSmall = textFont(size: 14, weight: .regular)
+    static let paragraphXS = textFont(size: 12, weight: .regular)
+
+    static let label2XL = labelFont(size: 20, weight: .bold)
+    static let labelXL = labelFont(size: 18, weight: .bold)
+    static let labelLarge = labelFont(size: 16, weight: .bold)
+    static let labelMedium = labelFont(size: 14, weight: .bold)
+    static let labelSmall = labelFont(size: 12, weight: .bold)
+    static let labelXS = labelFont(size: 10, weight: .bold)
+
+    // STRQ-owned role preset: stronger hierarchy without inflating UI scale.
+    static let appTitle = headingSmall
+    static let screenTitle = headingXS
+    static let sectionTitle = headingFont(size: 18, weight: .bold)
+    static let cardTitle = headingFont(size: 18, weight: .bold)
+    static let metricLarge = metricFont(size: 40, weight: .heavy)
+    static let metricMedium = metricFont(size: 30, weight: .bold)
+    static let metricSmall = metricFont(size: 20, weight: .bold)
+
+    static let title = screenTitle
+    static let bodyXLarge = paragraphXL
+    static let bodyLarge = paragraphLarge
+    static let body = paragraphMedium
+    static let bodyMedium = textMedium
+    static let bodySmall = paragraphSmall
+    static let bodySmallMedium = textSmall
+
+    static let button = labelFont(size: 18, weight: .bold)
+    static let buttonCompact = labelFont(size: 14, weight: .bold)
+    static let chip = labelFont(size: 14, weight: .semibold)
+    static let chipSmall = labelFont(size: 12, weight: .semibold)
+    static let tabLabel = labelFont(size: 12, weight: .semibold)
+    static let caption = textXS
+    static let captionRegular = paragraphXS
+    static let micro = text2XS
+
+    static let label = labelMedium
 
     // Backwards-compatible aliases from the first STRQ foundation pass.
     static let heading = cardTitle
@@ -301,21 +342,162 @@ enum STRQTypography {
 
     static let displayLargeLineHeight: CGFloat = 188
     static let displayMediumLineHeight: CGFloat = 136
+    static let displaySmallLineHeight: CGFloat = 104
+    static let heading2XLLineHeight: CGFloat = 80
+    static let headingXLLineHeight: CGFloat = 68
     static let headingLargeLineHeight: CGFloat = 56
     static let headingMediumLineHeight: CGFloat = 44
     static let headingSmallLineHeight: CGFloat = 38
-    static let titleLineHeight: CGFloat = 32
+    static let headingXSLineHeight: CGFloat = 32
+
+    static let text2XLLineHeight: CGFloat = 32
+    static let textXLLineHeight: CGFloat = 28
+    static let textLargeLineHeight: CGFloat = 24
+    static let textMediumLineHeight: CGFloat = 22
+    static let textSmallLineHeight: CGFloat = 20
+    static let textXSLineHeight: CGFloat = 16
+    static let text2XSLineHeight: CGFloat = 14
+
+    static let paragraph2XLLineHeight: CGFloat = 38
+    static let paragraphXLLineHeight: CGFloat = 32
+    static let paragraphLargeLineHeight: CGFloat = 28
+    static let paragraphMediumLineHeight: CGFloat = 26
+    static let paragraphSmallLineHeight: CGFloat = 22
+    static let paragraphXSLineHeight: CGFloat = 20
+
+    static let label2XLLineHeight: CGFloat = 28
+    static let labelXLLineHeight: CGFloat = 24
+    static let labelLargeLineHeight: CGFloat = 22
+    static let labelMediumLineHeight: CGFloat = 20
+    static let labelSmallLineHeight: CGFloat = 16
+    static let labelXSLineHeight: CGFloat = 14
+
+    static let titleLineHeight: CGFloat = headingXSLineHeight
     static let bodyLineHeight: CGFloat = 26
     static let bodySmallLineHeight: CGFloat = 22
     static let captionLineHeight: CGFloat = 16
 
-    static let displayLargeTracking: CGFloat = 0
-    static let displayMediumTracking: CGFloat = 0
-    static let headingTracking: CGFloat = 0
-    static let labelTracking: CGFloat = 0
+    static let displayLargeTracking: CGFloat = -8
+    static let displayMediumTracking: CGFloat = -4
+    static let displaySmallTracking: CGFloat = -2
+    static let heading2XLTracking: CGFloat = -1.5
+    static let headingXLTracking: CGFloat = -1
+    static let headingLargeTracking: CGFloat = -0.75
+    static let headingMediumTracking: CGFloat = -0.5
+    static let headingSmallTracking: CGFloat = -0.25
+    static let headingXSTracking: CGFloat = -0.25
+    static let text2XLTracking: CGFloat = -0.25
+    static let textXLTracking: CGFloat = -0.25
+    static let bodyTracking: CGFloat = 0
+    static let label2XLTracking: CGFloat = 2
+    static let labelXLTracking: CGFloat = 2
+    static let labelLargeTracking: CGFloat = 1.5
+    static let labelMediumTracking: CGFloat = 1.5
+    static let labelSmallTracking: CGFloat = 1
+    static let labelXSTracking: CGFloat = 1
+    static let headingTracking: CGFloat = headingMediumTracking
+    static let labelTracking: CGFloat = 0.8
+    static let labelUppercaseTracking: CGFloat = labelMediumTracking
+    static let buttonTracking: CGFloat = 0
+    static let chipTracking: CGFloat = 0.1
+    static let tabTracking: CGFloat = 0
 
-    private static func strqFont(size: CGFloat, weight: Font.Weight) -> Font {
-        Font.custom(fontFamily, size: size).weight(weight)
+    static func font(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        configuredFont(size: size, weight: weight, fallbackDesign: .default, fallbackWeight: safeFallbackWeight(weight))
+    }
+
+    static func headingFont(size: CGFloat, weight: Font.Weight = .bold) -> Font {
+        configuredFont(size: size, weight: weight, fallbackDesign: .rounded, fallbackWeight: emphasizedFallbackWeight(weight))
+    }
+
+    static func textFont(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        configuredFont(size: size, weight: weight, fallbackDesign: .default, fallbackWeight: safeFallbackWeight(weight))
+    }
+
+    static func labelFont(size: CGFloat, weight: Font.Weight = .semibold) -> Font {
+        configuredFont(size: size, weight: weight, fallbackDesign: .rounded, fallbackWeight: emphasizedFallbackWeight(weight))
+    }
+
+    static func metricFont(size: CGFloat, weight: Font.Weight = .bold) -> Font {
+        configuredFont(size: size, weight: weight, fallbackDesign: .rounded, fallbackWeight: emphasizedFallbackWeight(weight))
+            .monospacedDigit()
+    }
+
+    private static func configuredFont(
+        size: CGFloat,
+        weight: Font.Weight,
+        fallbackDesign: Font.Design,
+        fallbackWeight: Font.Weight
+    ) -> Font {
+        if let workSansFontName = workSansFontName(for: weight) {
+            return Font.custom(workSansFontName, size: size)
+        }
+
+        return Font.system(size: size, weight: fallbackWeight, design: fallbackDesign)
+    }
+
+    private static func workSansFontName(for weight: Font.Weight) -> String? {
+        registeredFontName(from: workSansFontNameCandidates(for: weight))
+    }
+
+    private static func workSansFontNameCandidates(for weight: Font.Weight) -> [String] {
+        let preferredName: String
+
+        if weight == .medium {
+            preferredName = STRQDesignSystem.workSansMediumFontName
+        } else if weight == .semibold {
+            preferredName = STRQDesignSystem.workSansSemiBoldFontName
+        } else if weight == .bold || weight == .heavy || weight == .black {
+            preferredName = STRQDesignSystem.workSansBoldFontName
+        } else {
+            preferredName = STRQDesignSystem.workSansRegularFontName
+        }
+
+        return [
+            preferredName,
+            STRQDesignSystem.fontFamily,
+            "\(STRQDesignSystem.fontFamily) \(workSansStyleName(for: weight))"
+        ]
+    }
+
+    private static func workSansStyleName(for weight: Font.Weight) -> String {
+        if weight == .medium {
+            return "Medium"
+        } else if weight == .semibold {
+            return "SemiBold"
+        } else if weight == .bold || weight == .heavy || weight == .black {
+            return "Bold"
+        } else {
+            return "Regular"
+        }
+    }
+
+    private static func safeFallbackWeight(_ weight: Font.Weight) -> Font.Weight {
+        if weight == .ultraLight || weight == .thin || weight == .light {
+            return .regular
+        }
+
+        return weight
+    }
+
+    private static func emphasizedFallbackWeight(_ weight: Font.Weight) -> Font.Weight {
+        if weight == .ultraLight || weight == .thin || weight == .light || weight == .regular {
+            return .medium
+        }
+
+        return weight
+    }
+
+    private static func registeredFontName(from candidates: [String]) -> String? {
+        #if canImport(UIKit)
+        for candidate in candidates where UIFont(name: candidate, size: 12) != nil {
+            return candidate
+        }
+
+        return nil
+        #else
+        return STRQDesignSystem.workSansFontFilesBundled ? candidates.first : nil
+        #endif
     }
 }
 
@@ -368,6 +550,12 @@ enum STRQSpacing {
     static let buttonCompactHeight: CGFloat = 40
     static let buttonMiniHeight: CGFloat = 32
     static let iconButtonSize: CGFloat = 44
+    static let inputHeight: CGFloat = 52
+    static let searchHeight: CGFloat = 48
+    static let toggleRowMinHeight: CGFloat = 56
+    static let avatarSM: CGFloat = 32
+    static let avatarMD: CGFloat = 40
+    static let avatarLG: CGFloat = 56
     static let tabBarHeight: CGFloat = 72
     static let navBarHeight: CGFloat = 56
 
@@ -407,6 +595,8 @@ enum STRQRadii {
     static let tabContainer = lg
     static let tabItem = md
     static let nav = xl
+    static let modal = xxl
+    static let bottomSheet = xxl
 }
 
 struct STRQBorderToken {
@@ -1041,6 +1231,7 @@ struct STRQButton: View {
                 if let title {
                     Text(title)
                         .font(font)
+                        .tracking(STRQTypography.buttonTracking)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
                 }
@@ -1181,6 +1372,78 @@ struct STRQButton: View {
     }
 }
 
+struct STRQIconButton: View {
+    enum Variant: Equatable {
+        case primary
+        case secondary
+        case ghost
+        case destructive
+    }
+
+    var icon: STRQIcon
+    var variant: Variant = .secondary
+    var size: CGFloat = STRQSpacing.iconButtonSize
+    var iconSize: CGFloat = STRQSpacing.iconSM
+    var isDisabled: Bool = false
+    var accessibilityLabel: String?
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            STRQIconView(icon, size: iconSize, tint: foregroundColor)
+                .frame(width: size, height: size)
+                .background(backgroundColor, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                .overlay(
+                    RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                        .strokeBorder(borderColor, lineWidth: borderWidth)
+                )
+                .opacity(isDisabled ? 0.44 : 1)
+        }
+        .buttonStyle(.strqPressable)
+        .disabled(isDisabled)
+        .accessibilityLabel(accessibilityLabel ?? String(describing: icon))
+    }
+
+    private var foregroundColor: Color {
+        switch variant {
+        case .primary:
+            return STRQColors.actionText
+        case .secondary, .ghost:
+            return STRQColors.iconPrimary
+        case .destructive:
+            return STRQColors.dangerTextPrimary
+        }
+    }
+
+    private var backgroundColor: Color {
+        switch variant {
+        case .primary:
+            return STRQColors.actionSurface
+        case .secondary:
+            return STRQColors.controlSurface
+        case .ghost:
+            return .clear
+        case .destructive:
+            return STRQColors.dangerDim
+        }
+    }
+
+    private var borderColor: Color {
+        switch variant {
+        case .primary:
+            return .clear
+        case .secondary, .ghost:
+            return STRQColors.borderMuted
+        case .destructive:
+            return STRQColors.dangerSoft
+        }
+    }
+
+    private var borderWidth: CGFloat {
+        variant == .primary ? 0 : 1
+    }
+}
+
 struct STRQChip: View {
     enum Tone: Equatable {
         case neutral
@@ -1234,6 +1497,7 @@ struct STRQChip: View {
 
             Text(label)
                 .font(font)
+                .tracking(STRQTypography.chipTracking)
                 .lineLimit(1)
                 .minimumScaleFactor(0.78)
         }
@@ -1328,6 +1592,7 @@ struct STRQBadge: View {
 
             Text(text)
                 .font(font)
+                .tracking(variant == .count ? 0 : STRQTypography.labelTracking)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
         }
@@ -1753,6 +2018,391 @@ struct STRQSectionAction: View {
             .foregroundStyle(STRQColors.primaryAccent)
         }
         .buttonStyle(.strqPressable)
+    }
+}
+
+// MARK: - Inputs, Navigation & Feedback
+
+struct STRQSearchField: View {
+    @Binding var text: String
+    var placeholder: String = "Search"
+    var onSubmit: () -> Void = {}
+
+    var body: some View {
+        HStack(spacing: STRQSpacing.sm) {
+            STRQIconView(.search, size: STRQSpacing.iconSM, tint: STRQColors.iconMuted)
+
+            TextField(placeholder, text: $text)
+                .font(STRQTypography.textMedium)
+                .foregroundStyle(STRQColors.primaryText)
+                .submitLabel(.search)
+                .onSubmit(onSubmit)
+
+            if !text.isEmpty {
+                Button {
+                    text = ""
+                } label: {
+                    STRQIconView(.close, size: STRQSpacing.iconXS, tint: STRQColors.iconMuted)
+                }
+                .buttonStyle(.strqPressable)
+                .accessibilityLabel("Clear search")
+            }
+        }
+        .padding(.horizontal, STRQSpacing.md)
+        .frame(minHeight: STRQSpacing.searchHeight)
+        .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.lg))
+        .overlay(
+            RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+        )
+    }
+}
+
+struct STRQInputField: View {
+    var title: String?
+    @Binding var text: String
+    var placeholder: String
+    var icon: STRQIcon?
+    var helper: String?
+    var isSecure: Bool = false
+
+    init(
+        _ title: String? = nil,
+        text: Binding<String>,
+        placeholder: String,
+        icon: STRQIcon? = nil,
+        helper: String? = nil,
+        isSecure: Bool = false
+    ) {
+        self.title = title
+        self._text = text
+        self.placeholder = placeholder
+        self.icon = icon
+        self.helper = helper
+        self.isSecure = isSecure
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+            if let title {
+                Text(title.uppercased())
+                    .font(STRQTypography.labelSmall)
+                    .tracking(STRQTypography.labelSmallTracking)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .lineLimit(1)
+            }
+
+            HStack(spacing: STRQSpacing.sm) {
+                if let icon {
+                    STRQIconView(icon, size: STRQSpacing.iconSM, tint: STRQColors.iconMuted)
+                }
+
+                Group {
+                    if isSecure {
+                        SecureField(placeholder, text: $text)
+                    } else {
+                        TextField(placeholder, text: $text)
+                    }
+                }
+                .font(STRQTypography.textMedium)
+                .foregroundStyle(STRQColors.primaryText)
+            }
+            .padding(.horizontal, STRQSpacing.md)
+            .frame(minHeight: STRQSpacing.inputHeight)
+            .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.lg))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
+
+            if let helper {
+                Text(helper)
+                    .font(STRQTypography.caption)
+                    .foregroundStyle(STRQColors.mutedText)
+                    .lineLimit(2)
+            }
+        }
+    }
+}
+
+struct STRQToggleRow: View {
+    var title: String
+    var subtitle: String?
+    var icon: STRQIcon?
+    @Binding var isOn: Bool
+
+    var body: some View {
+        HStack(spacing: STRQSpacing.sm) {
+            if let icon {
+                STRQIconContainer(icon: icon, size: .md, tint: isOn ? STRQColors.iconPrimary : STRQColors.iconSecondary)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(STRQTypography.textMedium)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+
+                if let subtitle {
+                    Text(subtitle)
+                        .font(STRQTypography.caption)
+                        .foregroundStyle(STRQColors.mutedText)
+                        .lineLimit(2)
+                }
+            }
+
+            Spacer(minLength: STRQSpacing.sm)
+
+            Toggle("", isOn: $isOn)
+                .labelsHidden()
+                .tint(STRQColors.primaryAccent)
+        }
+        .padding(.horizontal, STRQSpacing.listItemPadding)
+        .padding(.vertical, STRQSpacing.sm)
+        .frame(minHeight: STRQSpacing.toggleRowMinHeight)
+        .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.lg))
+        .overlay(
+            RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+        )
+    }
+}
+
+struct STRQModalSurface<Content: View>: View {
+    var title: String?
+    var content: Content
+
+    init(title: String? = nil, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+
+    var body: some View {
+        STRQSurface(
+            variant: .elevated,
+            border: .subtle,
+            radius: .custom(STRQRadii.modal),
+            padding: STRQSpacing.xl
+        ) {
+            VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                if let title {
+                    Text(title)
+                        .font(STRQTypography.cardTitle)
+                        .foregroundStyle(STRQColors.primaryText)
+                        .lineLimit(2)
+                }
+
+                content
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+struct STRQBottomSheetSurface<Content: View>: View {
+    var title: String?
+    var content: Content
+
+    init(title: String? = nil, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: STRQSpacing.md) {
+            Capsule()
+                .fill(STRQColors.borderSecondary)
+                .frame(width: 44, height: 4)
+                .frame(maxWidth: .infinity)
+
+            if let title {
+                Text(title)
+                    .font(STRQTypography.sectionTitle)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(2)
+            }
+
+            content
+        }
+        .padding(.horizontal, STRQSpacing.lg)
+        .padding(.top, STRQSpacing.md)
+        .padding(.bottom, STRQSpacing.xl)
+        .background(STRQEffects.darkGlassBackground, in: .rect(cornerRadius: STRQRadii.bottomSheet))
+        .overlay(
+            RoundedRectangle(cornerRadius: STRQRadii.bottomSheet, style: .continuous)
+                .strokeBorder(STRQEffects.darkGlassStroke, lineWidth: 1)
+        )
+        .shadow(
+            color: STRQEffects.cardShadow.color,
+            radius: STRQEffects.cardShadow.radius,
+            x: STRQEffects.cardShadow.x,
+            y: -STRQEffects.cardShadow.y
+        )
+    }
+}
+
+struct STRQNavigationBar<Leading: View, Trailing: View>: View {
+    var title: String
+    var subtitle: String?
+    var leading: Leading
+    var trailing: Trailing
+
+    init(
+        title: String,
+        subtitle: String? = nil,
+        @ViewBuilder leading: () -> Leading,
+        @ViewBuilder trailing: () -> Trailing
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.leading = leading()
+        self.trailing = trailing()
+    }
+
+    var body: some View {
+        HStack(spacing: STRQSpacing.sm) {
+            leading
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(STRQTypography.screenTitle)
+                    .tracking(STRQTypography.headingXSTracking)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+
+                if let subtitle {
+                    Text(subtitle)
+                        .font(STRQTypography.caption)
+                        .foregroundStyle(STRQColors.mutedText)
+                        .lineLimit(1)
+                }
+            }
+
+            Spacer(minLength: STRQSpacing.sm)
+
+            trailing
+        }
+        .frame(minHeight: STRQSpacing.navBarHeight)
+    }
+}
+
+extension STRQNavigationBar where Leading == EmptyView {
+    init(title: String, subtitle: String? = nil, @ViewBuilder trailing: () -> Trailing) {
+        self.init(title: title, subtitle: subtitle, leading: { EmptyView() }, trailing: trailing)
+    }
+}
+
+extension STRQNavigationBar where Leading == EmptyView, Trailing == EmptyView {
+    init(title: String, subtitle: String? = nil) {
+        self.init(title: title, subtitle: subtitle, leading: { EmptyView() }, trailing: { EmptyView() })
+    }
+}
+
+struct STRQAvatar: View {
+    enum Size {
+        case sm
+        case md
+        case lg
+
+        var frame: CGFloat {
+            switch self {
+            case .sm: return STRQSpacing.avatarSM
+            case .md: return STRQSpacing.avatarMD
+            case .lg: return STRQSpacing.avatarLG
+            }
+        }
+
+        var font: Font {
+            switch self {
+            case .sm: return STRQTypography.labelXS
+            case .md: return STRQTypography.labelSmall
+            case .lg: return STRQTypography.labelMedium
+            }
+        }
+    }
+
+    var initials: String
+    var size: Size = .md
+    var imageName: String?
+    var tint: Color = STRQColors.controlSurface
+
+    var body: some View {
+        Group {
+            if let imageName {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Text(initials.prefix(2).uppercased())
+                    .font(size.font)
+                    .tracking(STRQTypography.labelXSTracking)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(tint)
+            }
+        }
+        .frame(width: size.frame, height: size.frame)
+        .clipShape(Circle())
+        .overlay(
+            Circle()
+                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+        )
+    }
+}
+
+struct STRQRatingStars: View {
+    var rating: Double
+    var maxRating: Int = 5
+    var size: CGFloat = STRQSpacing.iconXS
+    var filledTint: Color = STRQColors.primaryAccent
+    var emptyTint: Color = STRQColors.iconMuted
+
+    var body: some View {
+        HStack(spacing: STRQSpacing.xxs) {
+            ForEach(0..<maxRating, id: \.self) { index in
+                STRQIconView(
+                    .star,
+                    size: size,
+                    tint: rating >= Double(index + 1) ? filledTint : emptyTint
+                )
+            }
+        }
+        .accessibilityLabel(Text("\(rating, specifier: "%.1f") out of \(maxRating) stars"))
+    }
+}
+
+struct STRQEmptyStateCard: View {
+    var icon: STRQIcon = .info
+    var title: String
+    var message: String
+    var actionTitle: String?
+    var action: (() -> Void)?
+
+    var body: some View {
+        STRQCard {
+            VStack(alignment: .center, spacing: STRQSpacing.md) {
+                STRQIconContainer(icon: icon, size: .xl, tint: STRQColors.iconSecondary)
+
+                VStack(spacing: STRQSpacing.xs) {
+                    Text(title)
+                        .font(STRQTypography.cardTitle)
+                        .foregroundStyle(STRQColors.primaryText)
+                        .multilineTextAlignment(.center)
+
+                    Text(message)
+                        .font(STRQTypography.paragraphSmall)
+                        .foregroundStyle(STRQColors.secondaryText)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(3)
+                }
+
+                if let actionTitle, let action {
+                    STRQButton(actionTitle, icon: .plus, variant: .compact, action: action)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
     }
 }
 

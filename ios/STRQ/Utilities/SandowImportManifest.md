@@ -32,6 +32,17 @@ Figma recheck completed:
 - Fitness Equipment Image area `11536:90366` exists and was inspected with metadata plus screenshot.
 - Anatomy Muscle import strategy is documented in `SandowAnatomyImportPlan.md`.
 
+Foundation completion recheck completed on 2026-04-29:
+
+- Typography node `9119:6481` was inspected directly. It includes Display lg/md/sm, Heading 2xl/xl/lg/md/sm/xs, Text 2xl/xl/lg/md/sm/xs/2xs, Paragraph 2xl/xl/lg/md/sm/xs, and Label 2xl/xl/lg/md/sm/xs families using Work Sans.
+- The typography fidelity pass rechecked the same node and confirmed the source font styles are Work Sans Regular, Medium, SemiBold, and Bold.
+- Component nodes were inspected in bounded form only: Button `9128:103928`, Badge & Chip `9126:59240`, Progress `9129:207997`, Tab `9131:172586`, Navigation `11614:57585`, Tab Bar `9131:291579`, List Item `9134:89206`, Schedule `9132:170645`, Card - General `9131:326493`, and Card - App Specific `9160:324200`.
+- No full Figma file scan was performed.
+- No new assets or font files were imported.
+- No Work Sans `.ttf`, `.otf`, `.woff`, or `.woff2` files currently exist in the repo.
+- The STRQ app target uses generated Info.plist settings; no app `ios/STRQ/Info.plist` or `UIAppFonts` registration exists for Work Sans.
+- Runtime Swift names remain STRQ-owned; Sandow remains source/provenance documentation only.
+
 This manifest is no longer blocked for the body/anatomy/muscle conclusion. It is still not a full file-wide inventory of every Sandow page, component, token, icon, and screen group.
 
 ## Inspected STRQ Files
@@ -164,7 +175,7 @@ Required Figma follow-up keywords for the broader, file-wide audit:
 |---|---|---|---|---|
 | Colors | Known node `5359:9002`; public v3 source indicates semantic tokens and variables | `SandowColors` includes black/white, gray 50-950, orange 50-950, accent blue/purple/lime/amber/rose, dark surfaces, text, borders, brand, success/warning/danger aliases | Missing exact Figma variable names, modes, full semantic taxonomy, light-mode aliases, accessibility/contrast modes if present. Extra STRQ aliases preserve earlier pass compatibility | Partial |
 | Gradients | Known node `5442:13546`; exact count not verified | `SandowGradients` includes orange CTA, orange glow, dark card, inset card, subtle overlay, progress orange/success/warning/danger | Missing full Figma gradient inventory, mesh/dashboard/media gradients, real component usage map | Partial |
-| Typography | Known node `9119:6481`; public source confirms Work Sans font included | `SandowTypography` uses Work Sans, display/heading/title/metric/body/caption/label/chip/button/tab roles, selected line heights and tracking | Work Sans files are not bundled (`workSansFontFilesBundled = false`). Missing exact Figma text style list, all roles, font fallback policy, complete line-height/tracking mapping | Partial |
+| Typography | Node `9119:6481` inspected directly; Work Sans source scale includes display, heading, text, paragraph, and label families using Regular, Medium, SemiBold, and Bold | `STRQTypography` now includes complete display/heading/text/paragraph/label roles, STRQ role aliases, line-height constants, tracking constants, explicit font helpers, registered Work Sans probing, and a stronger system fallback when Work Sans is not bundled | Work Sans files are not bundled (`workSansFontFilesBundled = false`), no Work Sans font resources exist, and no app `UIAppFonts` registration exists, so exact font fidelity remains pending until licensed files are provided and registered | Mostly complete foundation; font bundling pending |
 | Effects | Known node `9120:58753`; exact style inventory not verified | `SandowEffects` includes hairline, selected border, focus ring width, card/divider borders, soft/card/subtle/orange shadows, background blurs, dark glass background/stroke | Missing exact Figma effects, glows, blur styles, selected/focus/error state effects, style names | Partial |
 | Size & Spacing | Known node `9122:6944`; exact tokens not verified | `SandowSpacing` includes 0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 32, 40, 48, 56, 64, 80, 96, 128 plus card/list/chip/button/icon/tab/nav sizes. `SandowRadii` includes 0, 2, 4, 8, 12, 16, 20, 24, 32, full plus component radii | Missing exact Figma token names, responsive frame sizes, all component dimensions, modal/bottom sheet/input/chart heights if present | Partial |
 
@@ -218,40 +229,16 @@ The full Figma icon base count and style/variant count were not enumerated in th
 
 ### Current STRQ Icons
 
-Current `STRQIcon` enum and matching `STRQIcon*.imageset` assets include 21 icons:
+Current `STRQIcon` enum and matching `STRQIcon*.imageset` assets include 60 icons. The foundation completion pass revalidated that every enum raw value has a matching image set, every image set has valid `Contents.json`, every referenced SVG exists, vector preservation is enabled, and template rendering intent is set.
 
-- `home`
-- `coach`
-- `train`
-- `progress`
-- `profile`
-- `recovery`
-- `calendar`
-- `sleep`
-- `check`
-- `search`
-- `plus`
-- `chevronRight`
-- `arrowRight`
-- `checkCircle`
-- `clock`
-- `target`
-- `trophy`
-- `barbell`
-- `weightScale`
-- `bell`
-- `star`
+See `STRQIconCoveragePlan.md` for the full icon inventory table.
 
 ### Missing Core App Icons
 
 High-value missing icons for STRQ:
 
-- Navigation/actions: back, close, menu, more, edit, trash, share, filter, sort, info, alert, lock, crown, premium, settings
-- Training: dumbbell, workout, exercise, sets, reps, timer, rest, swap, history, calendar-day, intensity, volume
-- Progress/analytics: chart, line-chart, activity, trend-up, trend-down, score, gauge, target variants
-- Coach/chat: chat, send, sparkle/AI, microphone, attachment, insight
-- Health/body: body, muscle, heart, recovery, sleep detail, nutrition, water, weight, watch/device
-- Account/settings: profile variants, notification, privacy, support, feedback, logout
+- Optional profile/paywall/settings icons remain, such as unlock, weight plate, crown, shield, spark, user, watch, help, and logout.
+- Low-priority body-region icons should continue to defer to the anatomy/body asset strategy rather than forcing generic small icons.
 
 ### Import Strategy
 
@@ -265,27 +252,17 @@ High-value missing icons for STRQ:
 
 ### Next Icons To Import First
 
-1. `settings`
-2. `close`
-3. `back`
-4. `more`
-5. `edit`
-6. `trash`
-7. `filter`
-8. `chart`
-9. `activity`
-10. `dumbbell`
-11. `timer`
-12. `swap`
-13. `chat`
-14. `send`
-15. `sparkle`
-16. `nutrition`
-17. `water`
-18. `heart`
-19. `watch`
-20. `lock`
-21. `crown`
+No high-priority core icon batch is currently pending after the 60-icon inventory. Recommended next icon work should be tied to a concrete screen/component pass and may include:
+
+1. `unlock`
+2. `weightPlate`
+3. `crown`
+4. `shield`
+5. `spark`
+6. `user`
+7. `watch`
+8. `help`
+9. `logout`
 
 ## Screen / Pattern Inventory
 
@@ -321,7 +298,7 @@ Current `STRQDesignSystem.swift` includes:
 - Isolated STRQ-owned colors, gradients, typography, spacing, radii, effects sourced from the purchased kit.
 - Component style helpers for surfaces, borders, radii, tones.
 - Icon registry and `STRQIconView`.
-- STRQ primitives: icon container, surface, card, button, chip, badge, metric card, progress bar, progress ring, progress row, list item, section header/action, tab bar primitives, schedule row/card, preview-only samples.
+- STRQ primitives: icon container, surface, card, button, icon button, chip, badge, metric card, progress bar, progress ring, progress row, list item, section header/action, search field, input field, toggle row, modal surface, bottom sheet surface, navigation bar, avatar, rating stars, empty state card, tab bar primitives, schedule row/card, preview-only samples.
 
 ### Imported Assets
 
@@ -367,21 +344,20 @@ No Sandow references were found in runtime views or `ContentView.swift`. Sandow 
 Foundation:
 
 - Exact Figma variable collections, modes, token names, values, scopes, and aliases.
-- Full color/gradient/text/effect/grid style inventory.
-- Work Sans font file bundling decision.
+- Full color/gradient/effect/grid style inventory.
+- Work Sans font file bundling and Info.plist registration remain pending; the repo currently contains no Work Sans `.ttf`, `.otf`, `.woff`, or `.woff2` files.
 - Exact light/dark mode mapping and accessibility/contrast modes.
 
 Components:
 
-- Navigation/app bar.
-- Inputs, search, toggles, sliders, number inputs, radio controls.
-- Bottom sheet and modal primitives.
+- Navigation/search/input/toggle/modal/bottom-sheet/avatar/rating/empty-state primitives now exist in isolated STRQ form, but exact deep Figma parity remains pending.
+- Sliders, number inputs, radio controls, and checkbox controls.
 - Chart primitives and analytics cards.
 - Coach/chat components.
 - Paywall plan cards.
 - Workout/exercise cards.
 - Achievement/leaderboard components.
-- Empty states and feedback/rating components.
+- Feedback/rating prompt cards beyond the primitive rating-star component.
 - Muscle/body selector components exist in Figma, but no import/component strategy has been chosen yet.
 
 Icons:

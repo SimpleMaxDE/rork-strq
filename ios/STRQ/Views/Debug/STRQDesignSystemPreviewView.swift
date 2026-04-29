@@ -8,7 +8,7 @@ struct STRQDesignSystemPreviewView: View {
                 ColorSurfacesSection()
                 TypographySection()
                 ButtonsSection()
-                ChipsBadgesSection()
+                ComponentsSection()
                 CardsMetricSection()
                 ProgressSection()
                 ListScheduleSection()
@@ -41,7 +41,8 @@ private struct PreviewSection<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: STRQSpacing.md) {
             Text(title)
-                .font(STRQTypography.headingXS)
+                .font(STRQTypography.sectionTitle)
+                .tracking(STRQTypography.headingXSTracking)
                 .foregroundStyle(STRQColors.primaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -55,36 +56,17 @@ private struct ColorSurfacesSection: View {
     var body: some View {
         PreviewSection("Colors / Surfaces") {
             VStack(alignment: .leading, spacing: STRQSpacing.sm) {
-                TokenSwatch(
-                    title: "Base background",
-                    value: "STRQColors.baseBackground",
-                    color: STRQColors.baseBackground,
-                    borderColor: STRQColors.borderMuted
-                )
-                TokenSwatch(
-                    title: "Elevated card",
-                    value: "STRQColors.elevatedCardSurface",
-                    color: STRQColors.elevatedCardSurface
-                )
-                TokenSwatch(
-                    title: "Selected card",
-                    value: "STRQColors.selectedSurface",
-                    color: STRQColors.selectedSurface,
-                    borderColor: STRQColors.selectedBorder
-                )
-                TokenSwatch(
-                    title: "Primary action",
-                    value: "STRQColors.actionSurface",
-                    color: STRQColors.actionSurface,
-                    borderColor: STRQColors.secondaryAccent
-                )
-                TokenSwatch(
-                    title: "Inset surface",
-                    value: "STRQColors.insetSurface",
-                    color: STRQColors.insetSurface
-                )
+                TokenSwatch(title: "Base background", value: "baseBackground", color: STRQColors.baseBackground)
+                TokenSwatch(title: "Card surface", value: "cardSurface", color: STRQColors.cardSurface)
+                TokenSwatch(title: "Elevated surface", value: "elevatedCardSurface", color: STRQColors.elevatedCardSurface)
+                TokenSwatch(title: "Selected surface", value: "selectedSurface", color: STRQColors.selectedSurface, borderColor: STRQColors.selectedBorder)
+                TokenSwatch(title: "Primary action", value: "actionSurface", color: STRQColors.actionSurface, borderColor: STRQColors.secondaryAccent)
 
-                BorderExamples()
+                HStack(spacing: STRQSpacing.sm) {
+                    BorderSample(title: "Subtle", color: STRQColors.borderMuted, width: 1)
+                    BorderSample(title: "Selected", color: STRQColors.selectedBorder, width: 1.5)
+                    BorderSample(title: "Danger", color: STRQColors.dangerRed, width: 1)
+                }
             }
         }
     }
@@ -108,11 +90,11 @@ private struct TokenSwatch: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(STRQTypography.bodyMedium)
+                    .font(STRQTypography.textMedium)
                     .foregroundStyle(STRQColors.primaryText)
 
                 Text(value)
-                    .font(STRQTypography.captionRegular)
+                    .font(STRQTypography.caption)
                     .foregroundStyle(STRQColors.mutedText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
@@ -126,24 +108,6 @@ private struct TokenSwatch: View {
             RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
                 .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
         )
-    }
-}
-
-private struct BorderExamples: View {
-    var body: some View {
-        STRQCard(.compact) {
-            VStack(alignment: .leading, spacing: STRQSpacing.sm) {
-                Text("Border examples")
-                    .font(STRQTypography.cardTitle)
-                    .foregroundStyle(STRQColors.primaryText)
-
-                HStack(spacing: STRQSpacing.sm) {
-                    BorderSample(title: "Subtle", color: STRQColors.borderMuted, width: 1)
-                    BorderSample(title: "Selected", color: STRQColors.selectedBorder, width: 1.5)
-                    BorderSample(title: "Danger", color: STRQColors.dangerRed, width: 1)
-                }
-            }
-        }
     }
 }
 
@@ -173,16 +137,66 @@ private struct BorderSample: View {
 }
 
 private struct TypographySection: View {
+    private let weightColumns = [
+        GridItem(.adaptive(minimum: 116), spacing: STRQSpacing.xs)
+    ]
+
     var body: some View {
         PreviewSection("Typography") {
-            STRQCard {
-                VStack(alignment: .leading, spacing: STRQSpacing.md) {
-                    TypographySample(label: "Title", text: "Train with intent", font: STRQTypography.title)
-                    TypographySample(label: "Heading", text: "Today overview", font: STRQTypography.headingMedium)
-                    TypographySample(label: "Card title", text: "Recovery snapshot", font: STRQTypography.cardTitle)
-                    TypographySample(label: "Body", text: "Preview copy stays local to this debug gallery.", font: STRQTypography.body)
-                    TypographySample(label: "Caption", text: "Updated just for QA", font: STRQTypography.caption)
-                    TypographySample(label: "Metric numbers", text: "87%", font: STRQTypography.metricLarge)
+            VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                Text(STRQTypography.fontStatusText)
+                    .font(STRQTypography.caption)
+                    .foregroundStyle(STRQTypography.isWorkSansActive ? STRQColors.successGreen : STRQColors.warningAmber)
+                    .padding(.horizontal, STRQSpacing.sm)
+                    .padding(.vertical, STRQSpacing.xs)
+                    .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.md))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                            .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                    )
+
+                STRQCard {
+                    VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                        TypographySample(label: "Display / Bold", text: "Display", font: STRQTypography.displaySmall, tracking: STRQTypography.displaySmallTracking)
+                        TypographySample(label: "Heading / Bold", text: "Stronger hierarchy", font: STRQTypography.headingMedium, tracking: STRQTypography.headingMediumTracking)
+                        TypographySample(label: "Text / Medium", text: "Primary interface copy", font: STRQTypography.textLarge)
+                        TypographySample(label: "Paragraph / Regular", text: "Readable body copy uses neutral tracking and a relaxed line-height token.", font: STRQTypography.paragraphMedium)
+                        TypographySample(label: "Label / Bold", text: "TRAINING LOAD", font: STRQTypography.labelMedium, tracking: STRQTypography.labelMediumTracking)
+                    }
+                }
+
+                STRQCard(.compact) {
+                    VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+                        Text("Weights")
+                            .font(STRQTypography.cardTitle)
+                            .foregroundStyle(STRQColors.primaryText)
+
+                        LazyVGrid(columns: weightColumns, alignment: .leading, spacing: STRQSpacing.xs) {
+                            WeightPill(title: "Regular", font: STRQTypography.font(size: 18, weight: .regular))
+                            WeightPill(title: "Medium", font: STRQTypography.textFont(size: 18, weight: .medium))
+                            WeightPill(title: "SemiBold", font: STRQTypography.labelFont(size: 18, weight: .semibold))
+                            WeightPill(title: "Bold", font: STRQTypography.headingFont(size: 18, weight: .bold))
+                        }
+                    }
+                }
+
+                STRQCard(.compact) {
+                    VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+                        TypographySample(label: "screenTitle", text: "Today", font: STRQTypography.screenTitle, tracking: STRQTypography.headingXSTracking)
+                        TypographySample(label: "sectionTitle", text: "Training plan", font: STRQTypography.sectionTitle)
+                        TypographySample(label: "cardTitle", text: "Recovery snapshot", font: STRQTypography.cardTitle)
+                        TypographySample(label: "body", text: "Plan details, cues, and supporting interface copy.", font: STRQTypography.body)
+                        TypographySample(label: "caption", text: "Updated just now", font: STRQTypography.caption)
+                    }
+                }
+
+                STRQCard(.compact) {
+                    VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+                        TypographySample(label: "metric", text: "87%", font: STRQTypography.metricLarge)
+                        TypographySample(label: "button", text: "START NOW", font: STRQTypography.button)
+                        TypographySample(label: "chip", text: "Ready", font: STRQTypography.chip)
+                        TypographySample(label: "label", text: "SESSION QUALITY", font: STRQTypography.label, tracking: STRQTypography.labelMediumTracking)
+                    }
                 }
             }
         }
@@ -193,6 +207,7 @@ private struct TypographySample: View {
     let label: String
     let text: String
     let font: Font
+    var tracking: CGFloat = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: STRQSpacing.xxs) {
@@ -202,10 +217,32 @@ private struct TypographySample: View {
 
             Text(text)
                 .font(font)
+                .tracking(tracking)
                 .foregroundStyle(STRQColors.primaryText)
                 .lineLimit(2)
-                .minimumScaleFactor(0.72)
+                .minimumScaleFactor(0.42)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct WeightPill: View {
+    let title: String
+    let font: Font
+
+    var body: some View {
+        Text(title)
+            .font(font)
+            .foregroundStyle(STRQColors.primaryText)
+            .lineLimit(1)
+            .minimumScaleFactor(0.74)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, STRQSpacing.sm)
+            .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
     }
 }
 
@@ -223,24 +260,44 @@ private struct ButtonsSection: View {
                 }
 
                 HStack(spacing: STRQSpacing.sm) {
-                    STRQButton(icon: .settings) {}
-                    STRQButton(icon: .search, variant: .icon) {}
-                    STRQButton("Disabled", icon: .lock, variant: .secondary, isDisabled: true) {}
+                    STRQIconButton(icon: .settings, variant: .primary) {}
+                    STRQIconButton(icon: .search) {}
+                    STRQIconButton(icon: .more, variant: .ghost) {}
+                    STRQIconButton(icon: .trash, variant: .destructive) {}
+                    STRQIconButton(icon: .lock, isDisabled: true) {}
                 }
             }
         }
     }
 }
 
-private struct ChipsBadgesSection: View {
-    private let columns = [
+private struct ComponentsSection: View {
+    @State private var searchText = "upper"
+    @State private var inputText = "Strength block"
+    @State private var toggleOn = true
+
+    private let chipColumns = [
         GridItem(.adaptive(minimum: 104), spacing: STRQSpacing.xs)
     ]
 
     var body: some View {
-        PreviewSection("Chips / Badges") {
+        PreviewSection("Components") {
             VStack(alignment: .leading, spacing: STRQSpacing.md) {
-                LazyVGrid(columns: columns, alignment: .leading, spacing: STRQSpacing.xs) {
+                STRQNavigationBar(
+                    title: "Foundation Lab",
+                    subtitle: "Debug route",
+                    leading: {
+                        STRQIconButton(icon: .chevronLeft, variant: .ghost) {}
+                    },
+                    trailing: {
+                        HStack(spacing: STRQSpacing.xs) {
+                            STRQIconButton(icon: .bell) {}
+                            STRQAvatar(initials: "SQ", size: .sm)
+                        }
+                    }
+                )
+
+                LazyVGrid(columns: chipColumns, alignment: .leading, spacing: STRQSpacing.xs) {
                     STRQChip(label: "Neutral")
                     STRQChip(label: "Selected", icon: .check, tone: .selected)
                     STRQChip(label: "Success", icon: .checkCircle, tone: .success)
@@ -250,10 +307,44 @@ private struct ChipsBadgesSection: View {
                 }
 
                 HStack(spacing: STRQSpacing.xs) {
-                    STRQBadge(text: "12", variant: .count, tone: .warning)
+                    STRQBadge(text: "12", variant: .count, tone: .neutral)
                     STRQBadge(text: "Ready", icon: .checkCircle, variant: .status, tone: .success)
-                    STRQBadge(text: "Warm", icon: .fire, variant: .achievement, tone: .orange)
+                    STRQBadge(text: "Caution", icon: .warning, variant: .status, tone: .warning)
                 }
+
+                STRQSearchField(text: $searchText, placeholder: "Search exercises")
+                STRQInputField("Plan name", text: $inputText, placeholder: "Enter plan name", icon: .edit, helper: STRQTypography.fontStatusText)
+                STRQToggleRow(title: "Neutral selected state", subtitle: "Toggle row from list-item control patterns", icon: .checkCircle, isOn: $toggleOn)
+
+                HStack(spacing: STRQSpacing.sm) {
+                    STRQAvatar(initials: "AL", size: .md)
+                    STRQAvatar(initials: "MW", size: .lg, tint: STRQColors.selectedSurface)
+
+                    VStack(alignment: .leading, spacing: STRQSpacing.xxs) {
+                        STRQRatingStars(rating: 4)
+                        STRQRatingStars(rating: 3, size: STRQSpacing.iconSM, filledTint: STRQColors.warningAmber)
+                    }
+                }
+
+                STRQModalSurface(title: "Modal surface") {
+                    Text("Reusable elevated shell with STRQ-owned naming.")
+                        .font(STRQTypography.paragraphSmall)
+                        .foregroundStyle(STRQColors.secondaryText)
+                }
+
+                STRQBottomSheetSurface(title: "Bottom sheet surface") {
+                    HStack(spacing: STRQSpacing.xs) {
+                        STRQChip(label: "Handle")
+                        STRQChip(label: "Glass", icon: .check)
+                    }
+                }
+
+                STRQEmptyStateCard(
+                    icon: .calendar,
+                    title: "No sessions scheduled",
+                    message: "Empty states stay reusable and data-free in the foundation lab.",
+                    actionTitle: "Add"
+                ) {}
             }
         }
     }
@@ -276,25 +367,13 @@ private struct CardsMetricSection: View {
                 }
 
                 STRQCard(.selected) {
-                    CardPreviewContent(title: "Selected card", detail: "Selected surface and border for active states.")
+                    CardPreviewContent(title: "Selected card", detail: "Neutral selected surface and border.")
                 }
 
                 LazyVGrid(columns: columns, spacing: STRQSpacing.sm) {
-                    STRQMetricCard(
-                        value: "87",
-                        label: "Readiness",
-                        icon: .recovery,
-                        unit: "%",
-                        tint: STRQColors.successGreen
-                    )
-
-                    STRQMetricCard(
-                        value: "4",
-                        label: "Sessions",
-                        icon: .calendar,
-                        detail: "This week",
-                        progress: 0.8
-                    )
+                    STRQMetricCard(value: "87", label: "Readiness", icon: .recovery, unit: "%", tint: STRQColors.successGreen)
+                    STRQMetricCard(value: "4", label: "Sessions", icon: .calendar, detail: "This week", progress: 0.8)
+                    STRQMetricCard(value: "42", label: "Load", icon: .activityRing, detail: "Neutral progress", progress: 0.42)
                 }
             }
         }
@@ -312,7 +391,7 @@ private struct CardPreviewContent: View {
                 .foregroundStyle(STRQColors.primaryText)
 
             Text(detail)
-                .font(STRQTypography.bodySmall)
+                .font(STRQTypography.paragraphSmall)
                 .foregroundStyle(STRQColors.secondaryText)
                 .lineLimit(2)
                 .minimumScaleFactor(0.78)
@@ -326,64 +405,16 @@ private struct ProgressSection: View {
         PreviewSection("Progress") {
             STRQCard {
                 VStack(alignment: .leading, spacing: STRQSpacing.md) {
-                    STRQProgressBar(
-                        value: 0.72,
-                        label: "Progress bar",
-                        valueText: "72%"
-                    )
-
-                    STRQProgressBar(
-                        value: 0.88,
-                        tint: STRQColors.successGreen,
-                        label: "Success",
-                        valueText: "88%"
-                    )
-
-                    STRQProgressBar(
-                        value: 0.48,
-                        tint: STRQColors.warningAmber,
-                        label: "Warning",
-                        valueText: "48%"
-                    )
-
-                    STRQProgressBar(
-                        value: 0.24,
-                        tint: STRQColors.dangerRed,
-                        label: "Danger",
-                        valueText: "24%"
-                    )
+                    STRQProgressBar(value: 0.72, label: "Neutral progress", valueText: "72%")
+                    STRQProgressBar(value: 0.88, tint: STRQColors.successGreen, label: "Success", valueText: "88%")
+                    STRQProgressBar(value: 0.48, tint: STRQColors.warningAmber, label: "Warning", valueText: "48%")
+                    STRQProgressBar(value: 0.24, tint: STRQColors.dangerRed, label: "Danger", valueText: "24%")
 
                     HStack(alignment: .center, spacing: STRQSpacing.lg) {
-                        STRQProgressRing(
-                            value: 0.72,
-                            variant: .score,
-                            label: "Score",
-                            valueText: "72"
-                        )
-
-                        STRQProgressRing(
-                            value: 0.88,
-                            variant: .compact,
-                            tint: STRQColors.successGreen,
-                            label: "OK",
-                            valueText: "88"
-                        )
-
-                        STRQProgressRing(
-                            value: 0.48,
-                            variant: .compact,
-                            tint: STRQColors.warningAmber,
-                            label: "Med",
-                            valueText: "48"
-                        )
-
-                        STRQProgressRing(
-                            value: 0.34,
-                            variant: .compact,
-                            tint: STRQColors.dangerRed,
-                            label: "Low",
-                            valueText: "34"
-                        )
+                        STRQProgressRing(value: 0.72, variant: .score, label: "Score", valueText: "72")
+                        STRQProgressRing(value: 0.88, variant: .compact, tint: STRQColors.successGreen, label: "OK", valueText: "88")
+                        STRQProgressRing(value: 0.48, variant: .compact, tint: STRQColors.warningAmber, label: "Med", valueText: "48")
+                        STRQProgressRing(value: 0.34, variant: .compact, tint: STRQColors.dangerRed, label: "Low", valueText: "34")
                     }
                 }
             }
@@ -397,58 +428,30 @@ private struct ListScheduleSection: View {
             VStack(alignment: .leading, spacing: STRQSpacing.md) {
                 STRQCard(.compact) {
                     VStack(spacing: 0) {
-                        STRQListItem(
-                            leadingIcon: .barbell,
-                            title: "Strength focus",
-                            subtitle: "Heavy upper work",
-                            trailingValue: "45m",
-                            showsChevron: true
-                        )
-
-                        STRQListItem(
-                            leadingIcon: .recovery,
-                            title: "Recovery check",
-                            subtitle: "Sleep, soreness, and readiness",
-                            trailingValue: "87%",
-                            showsChevron: true,
-                            showsDivider: false,
-                            tint: STRQColors.successGreen
-                        )
+                        STRQListItem(leadingIcon: .barbell, title: "Strength focus", subtitle: "Heavy upper work", trailingValue: "45m", showsChevron: true)
+                        STRQListItem(avatarText: "Q1", title: "Quarter target", subtitle: "Volume and consistency", trailingValue: "68%", showsChevron: true, tint: STRQColors.gray700)
+                        STRQListItem(leadingIcon: .recovery, title: "Recovery check", subtitle: "Sleep, soreness, and readiness", trailingValue: "87%", showsChevron: true, showsDivider: false, tint: STRQColors.successGreen)
                     }
                 }
 
-                STRQScheduleRow(
-                    dateTitle: "29",
-                    dateSubtitle: "WED",
-                    title: "Upper Strength",
-                    subtitle: "Push and pull",
-                    duration: "45m",
-                    icon: .barbell,
-                    isSelected: true
-                )
+                STRQScheduleRow(dateTitle: "29", dateSubtitle: "WED", title: "Upper Strength", subtitle: "Push and pull", duration: "45m", icon: .barbell, isSelected: true)
 
                 STRQScheduleCard(
                     title: "Schedule card",
                     subtitle: "Preview",
                     rows: [
-                        STRQScheduleRow(
-                            dateTitle: "30",
-                            dateSubtitle: "THU",
-                            title: "Lower Power",
-                            subtitle: "Hinge and squat",
-                            duration: "50m",
-                            icon: .train
-                        ),
-                        STRQScheduleRow(
-                            dateTitle: "01",
-                            dateSubtitle: "FRI",
-                            title: "Recovery",
-                            subtitle: "Mobility and walk",
-                            duration: "25m",
-                            icon: .recovery
-                        )
+                        STRQScheduleRow(dateTitle: "30", dateSubtitle: "THU", title: "Lower Power", subtitle: "Hinge and squat", duration: "50m", icon: .train),
+                        STRQScheduleRow(dateTitle: "01", dateSubtitle: "FRI", title: "Recovery", subtitle: "Mobility and walk", duration: "25m", icon: .recovery)
                     ]
                 )
+
+                STRQTabBarContainer {
+                    STRQTabBarItem(title: "Home", icon: .home, isSelected: true)
+                    STRQTabBarItem(title: "Train", icon: .train, isSelected: false)
+                    STRQTabBarCenterAction {}
+                    STRQTabBarItem(title: "Progress", icon: .progress, isSelected: false)
+                    STRQTabBarItem(title: "Profile", icon: .profile, isSelected: false)
+                }
             }
         }
     }
@@ -457,8 +460,41 @@ private struct ListScheduleSection: View {
 private struct IconsSection: View {
     var body: some View {
         PreviewSection("Icons") {
-            IconGrid()
+            VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                STRQCard(.compact) {
+                    HStack(spacing: STRQSpacing.sm) {
+                        IconSemanticSample(icon: .checkCircle, title: "Success", tint: STRQColors.successGreen)
+                        IconSemanticSample(icon: .warning, title: "Warning", tint: STRQColors.warningAmber)
+                        IconSemanticSample(icon: .trash, title: "Danger", tint: STRQColors.dangerRed)
+                    }
+                }
+
+                Text("\(STRQIcon.allCases.count) assets")
+                    .font(STRQTypography.caption)
+                    .foregroundStyle(STRQColors.mutedText)
+
+                IconGrid()
+            }
         }
+    }
+}
+
+private struct IconSemanticSample: View {
+    let icon: STRQIcon
+    let title: String
+    let tint: Color
+
+    var body: some View {
+        VStack(spacing: STRQSpacing.xs) {
+            STRQIconContainer(icon: icon, size: .lg, tint: tint)
+
+            Text(title)
+                .font(STRQTypography.caption)
+                .foregroundStyle(STRQColors.secondaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -481,12 +517,7 @@ private struct IconGridCell: View {
 
     var body: some View {
         VStack(spacing: STRQSpacing.xs) {
-            STRQIconView(
-                icon,
-                size: STRQSpacing.iconLG,
-                tint: STRQColors.iconPrimary,
-                templateRendering: true
-            )
+            STRQIconView(icon, size: STRQSpacing.iconLG, tint: STRQColors.iconPrimary, templateRendering: true)
 
             Text(caseLabel)
                 .font(STRQTypography.micro)

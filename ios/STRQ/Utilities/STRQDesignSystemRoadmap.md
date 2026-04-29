@@ -59,6 +59,56 @@ Runtime-facing future names should be STRQ-owned, including:
 - Anatomy, muscle, body type, full-body vector, achievement, equipment, illustration, and organ anatomy asset groups were found and documented.
 - No full UI import should happen blindly.
 - No runtime production screens currently depend on the imported foundation, based on the prior manifest audit and validation searches in this pass.
+- The 2026-04-29 foundation completion pass expanded isolated STRQ typography and reusable primitives without migrating production screens.
+- The default foundation style remains black, white, carbon, graphite, muted gray, and semantic success/warning/danger colors. Warm/orange tokens remain source-kit aliases only.
+
+## Foundation Completion Pass - 2026-04-29
+
+Figma nodes inspected in bounded form:
+
+- Typography `9119:6481`
+- Colors `5359:9002`
+- Gradients `5442:13546`
+- Effects `9120:58753`
+- Size & Spacing `9122:6944`
+- Button `9128:103928`
+- Badge & Chip `9126:59240`
+- Progress `9129:207997`
+- Tab `9131:172586`
+- Navigation `11614:57585`
+- Tab Bar `9131:291579`
+- List Item `9134:89206`
+- Schedule `9132:170645`
+- Card - General `9131:326493`
+- Card - App Specific `9160:324200`
+
+Typography completion:
+
+- `STRQTypography` now includes complete display, heading, text, paragraph, and label roles matching the Figma categories.
+- STRQ-owned aliases now include `appTitle`, `screenTitle`, `sectionTitle`, `cardTitle`, metric roles, button roles, chip roles, tab labels, captions, and micro text.
+- Line-height constants and tracking constants were added for display, heading, text, paragraph, and label families.
+- STRQ's default preset favors bold/heavy screen, card, metric, and action roles, medium/regular body text, medium captions, and modest uppercase label tracking.
+
+Font strategy:
+
+- Figma Typography node `9119:6481` uses Work Sans with Regular, Medium, SemiBold, and Bold styles.
+- No Work Sans `.ttf`, `.otf`, `.woff`, or `.woff2` files were found anywhere in the repo during the typography fidelity pass.
+- No app `ios/STRQ/Info.plist` exists; the STRQ app target uses generated Info.plist build settings.
+- No `UIAppFonts` registration was found in `ios/STRQ.xcodeproj/project.pbxproj`, and there are no Work Sans resources to include in the app target.
+- No fonts were downloaded or added.
+- Runtime typography now probes for registered Work Sans font names first, then falls back to a stronger role-based system strategy with rounded emphasis for heading, label, and metric roles.
+- Work Sans fidelity remains pending.
+
+Component primitives added or completed:
+
+- Existing primitives remain: `STRQSurface`, `STRQCard`, `STRQButton`, `STRQChip`, `STRQBadge`, `STRQMetricCard`, `STRQProgressBar`, `STRQProgressRing`, `STRQListItem`, `STRQSectionHeader`, tab bar primitives, schedule rows/cards, and icon containers.
+- Added isolated primitives: `STRQIconButton`, `STRQSearchField`, `STRQInputField`, `STRQToggleRow`, `STRQModalSurface`, `STRQBottomSheetSurface`, `STRQNavigationBar`, `STRQAvatar`, `STRQRatingStars`, and `STRQEmptyStateCard`.
+- Figma evidence was explicit for icon buttons, chips/badges, progress, tabs, tab bar, list slots with avatar/toggle/rating, schedule empty/event states, general/app cards, and navigation.
+- Dedicated modal, bottom-sheet, and input component sets were not found in the exact inspected nodes; STRQ now has simple token-based shells for future use, with deeper parity still pending.
+
+Debug lab update:
+
+- `STRQDesignSystemPreviewView` now shows typography families, font weight differences, Work Sans active/fallback status, STRQ default roles, button variants, icon buttons, chips/badges, cards, metric cards, progress bars/rings, list items, schedule rows/cards, search/input/toggle/navigation/modal/bottom sheet/avatar/rating/empty-state primitives, and all icons through `STRQIcon.allCases`.
 
 ## Foundation Roadmap
 
@@ -143,34 +193,48 @@ STRQ ownership direction:
 
 Current status:
 
-- Current typography is based on Work Sans, with display, heading, title, metric, body, caption, label, chip, button, and tab roles.
-- Work Sans font files are not bundled.
-- The exact Figma text style inventory has not been fully verified.
+- Figma Typography node `9119:6481` was inspected directly.
+- `STRQTypography` now covers the full observed display, heading, text, paragraph, and label scale.
+- Work Sans font files are not bundled, so runtime uses a safe, stronger system fallback while retaining Work Sans as the source-family note.
+- STRQ-owned role aliases are complete enough for future component and module work without leaking source-kit naming into runtime Swift.
+- The typography fidelity pass added explicit helpers: `STRQTypography.font(...)`, `headingFont(...)`, `textFont(...)`, `labelFont(...)`, and `metricFont(...)`.
 
 Font family issue:
 
 - The purchased UI kit uses Work Sans.
 - The current app does not bundle Work Sans.
-- `Font.custom("Work Sans", size:)` only works correctly if the font is available at runtime.
+- Exact Work Sans rendering requires app-bundled font files, target resource inclusion, Info.plist `UIAppFonts` registration, and verified runtime PostScript/font names.
+- The current app has no `ios/STRQ/Info.plist`; generated Info.plist settings are used and no `UIAppFonts` build setting is present.
 
 Fallback strategy:
 
-- Short term: keep current STRQ typography active in production screens.
-- Foundation stage: decide whether to bundle Work Sans or remap the imported type scale to the app's existing font strategy.
-- If Work Sans is bundled later, do it in a dedicated typography pass with Info.plist/font registration validation.
-- If Work Sans is not bundled, define STRQ typography roles against the current app font family or system font.
+- Short term: keep system-backed STRQ typography active in the isolated foundation.
+- Use role helpers so display/heading/label/metric roles are intentionally stronger than plain defaults while Work Sans is missing.
+- If licensed Work Sans font files are provided later, add only those font files to the STRQ app target resources, register them through `UIAppFonts`, verify the PostScript/font names on-device or in simulator, and then let the runtime probe activate Work Sans.
+- Until then, exact Figma typography remains pending and the DEBUG design-system lab reports `Work Sans not bundled — using system fallback`.
 
 STRQ ownership direction:
 
 - Future runtime typography should live under `STRQTypography`.
 - Recommended role names:
-  - `display`
+  - `displayLarge`
+  - `displayMedium`
+  - `displaySmall`
+  - `heading2XL`
+  - `headingXL`
   - `headingLarge`
-  - `heading`
-  - `title`
+  - `headingMedium`
+  - `headingSmall`
+  - `headingXS`
+  - `text2XL` through `text2XS`
+  - `paragraph2XL` through `paragraphXS`
+  - `label2XL` through `labelXS`
+  - `screenTitle`
+  - `sectionTitle`
   - `cardTitle`
   - `metricLarge`
-  - `metric`
+  - `metricMedium`
+  - `metricSmall`
   - `body`
   - `bodySmall`
   - `caption`
@@ -249,9 +313,9 @@ STRQ ownership direction:
 
 Current status:
 
-- The isolated foundation currently covers surfaces, cards, buttons, chips, badges, metric cards, progress bars/rings, progress rows, list items, section headers/actions, tab bar primitives, and schedule rows/cards.
+- The isolated foundation currently covers surfaces, cards, buttons, icon buttons, chips, badges, metric cards, progress bars/rings, progress rows, list items, section headers/actions, search/input fields, toggle rows, modal/sheet surfaces, navigation bars, avatars, rating stars, empty states, tab bar primitives, and schedule rows/cards.
 - These are not production screen dependencies yet.
-- Several app-relevant primitive groups are missing or only partial.
+- Several app-relevant primitive groups remain partial, especially charts, sliders, workout/exercise cards, achievement cards, and deeper modal/input parity.
 
 Foundation primitive roadmap:
 
@@ -259,7 +323,7 @@ Foundation primitive roadmap:
 |---|---|---|---|
 | Surfaces | Partial | Base/elevated/inset/selected/background behavior, light/dark mapping | `STRQSurface` |
 | Cards | Partial | General card shell, selected card, media card, action card, compact card | `STRQCard` |
-| Buttons | Partial | Primary, secondary, ghost, destructive, icon, loading, disabled, compact | `STRQButton` |
+| Buttons | Partial | Primary, secondary, ghost, destructive, icon button, loading, disabled, compact | `STRQButton`, `STRQIconButton` |
 | Chips | Partial | Neutral, selected, removable, icon-leading, filter state | `STRQChip` |
 | Badges | Partial | Count, status, achievement, premium, warning/error | `STRQBadge` |
 | Metric Cards | Partial | KPI, trend, score, compact dashboard, comparison state | `STRQMetricCard` |
@@ -268,9 +332,9 @@ Foundation primitive roadmap:
 | List Rows | Partial | Icon, avatar, chevron, toggle, destructive, settings rows | `STRQListItem` |
 | Schedule Rows | Partial | Calendar/session variants, selected state, rest day, completed state | `STRQScheduleRow` |
 | Tab Bar | Partial | Safe area, selected state, center action, badges | `STRQTabBar` |
-| Inputs/Search | Missing | Text input, search field, filters, validation states | `STRQTextField`, `STRQSearchField` |
-| Bottom Sheets/Modals | Needs audit | Sheet container, drag handle, modal header/actions | `STRQBottomSheet`, `STRQModal` |
-| Toggles/Sliders | Needs audit | Settings controls, numeric preference controls | `STRQToggleRow`, `STRQSliderRow` |
+| Inputs/Search | Partial | Text input, search field, filters, validation states | `STRQInputField`, `STRQSearchField` |
+| Bottom Sheets/Modals | Partial | Sheet container, drag handle, modal header/actions | `STRQBottomSheetSurface`, `STRQModalSurface` |
+| Toggles/Sliders | Partial | Settings controls, numeric preference controls | `STRQToggleRow`, `STRQSliderRow` |
 | Charts | Missing | Trend, bar, ring, score, weekly volume, muscle coverage | `STRQChartCard` |
 
 ## Icon Roadmap
@@ -622,9 +686,9 @@ Results from this pass:
 | `exercise.singular` | Matches only import/roadmap docs. No runtime raw key usage found. |
 | `set.plural` | Matches only import/roadmap docs. No runtime raw key usage found. |
 | `Start Session` | Matches only import/roadmap docs. No runtime production screen hit from this pass. |
-| `Per Session` | Matches import/roadmap docs and one unrelated lowercase code comment in `ExerciseResponseEngine.swift`; no production screen migration evidence. |
+| `Per Session` | Matches import/roadmap docs only in the final foundation validation search. No production screen migration evidence. |
 
-Validation note: `rg` was blocked in this local shell, so this pass used PowerShell `Select-String` fallbacks.
+Validation note: `rg` succeeded in this pass and reported ripgrep 15.1.0.
 
 ## Naming / Ownership Rule
 
@@ -636,6 +700,9 @@ Future production-facing names should use STRQ prefixes and STRQ product languag
 
 Files changed:
 
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
 - `ios/STRQ/Utilities/STRQDesignSystemRoadmap.md`
+- `ios/STRQ/Utilities/SandowImportManifest.md`
 
-This roadmap now reflects the completed runtime ownership rename. See the naming plan for the full file, type, and asset mapping.
+This roadmap now reflects the completed runtime ownership rename and the larger isolated foundation completion pass. See the naming plan for the full file, type, and asset mapping.
