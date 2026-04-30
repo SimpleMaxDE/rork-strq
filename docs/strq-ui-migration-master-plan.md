@@ -4,7 +4,7 @@ Last updated: 2026-04-30
 
 ## Purpose
 
-This is the master control document for the STRQ frontend migration. It organizes the work needed to rebuild the STRQ visual and component foundation using the purchased Figma/Sandow UI Kit as an internal source reference while preserving STRQ product identity, runtime behavior, app logic, data, copy, training intelligence, and business contracts.
+This is the master control document for the STRQ frontend migration. It organizes the work needed to rebuild the STRQ visual and component foundation using the Purchased Figma UI Kit as an internal source reference while preserving STRQ product identity, runtime behavior, app logic, data, copy, training intelligence, and business contracts.
 
 This pass is documentation only. It does not authorize production UI changes, asset imports, business logic changes, workout/training logic changes, navigation changes, localization changes, analytics changes, paywall changes, persistence changes, or workout behavior changes.
 
@@ -13,18 +13,31 @@ This pass is documentation only. It does not authorize production UI changes, as
 | Area | Rule |
 |---|---|
 | Purchased Figma UI Kit | Internal visual/component source and provenance only |
-| STRQ runtime code | STRQ-owned names, components, assets, copy, and product behavior |
-| Source naming | Sandow/Figma may appear in docs, manifests, audits, and source maps |
-| Runtime naming | Use `STRQColors`, `STRQTypography`, `STRQSpacing`, `STRQIcon`, `STRQButton`, `STRQCard`, and related STRQ-owned names |
+| STRQ runtime code | STRQ-owned runtime naming, components, assets, copy, and product behavior |
+| Source/provenance docs | Sandow/Figma may appear in docs, manifests, audits, and source maps |
+| Runtime naming | Use STRQ-owned runtime naming such as `STRQColors`, `STRQTypography`, `STRQSpacing`, `STRQIcon`, `STRQButton`, `STRQCard`, and related STRQ names |
 | Screen strategy | Use UI kit patterns as building blocks, not full-screen copies |
 
 Related existing STRQ planning docs remain authoritative inputs:
 
-- `ios/STRQ/Utilities/STRQDesignSystemRoadmap.md`
-- `ios/STRQ/Utilities/STRQDesignSystemNamingPlan.md`
-- `ios/STRQ/Utilities/STRQIconCoveragePlan.md`
-- `ios/STRQ/Utilities/SandowImportManifest.md`
-- `ios/STRQ/Utilities/SandowAnatomyImportPlan.md`
+- [STRQ Design System Roadmap](../ios/STRQ/Utilities/STRQDesignSystemRoadmap.md)
+- [STRQ Design System Naming Plan](../ios/STRQ/Utilities/STRQDesignSystemNamingPlan.md)
+- [STRQ Icon Coverage Plan](../ios/STRQ/Utilities/STRQIconCoveragePlan.md)
+- [Sandow Import Manifest](../ios/STRQ/Utilities/SandowImportManifest.md)
+- [Sandow Anatomy Import Plan](../ios/STRQ/Utilities/SandowAnatomyImportPlan.md)
+
+## Project Control Docs
+
+- [Docs README](README.md)
+- [Project UI Audit](project-ui-audit.md)
+- [Figma Source Map](figma-source-map.md)
+- [Design System Import Plan](design-system-import-plan.md)
+- [Asset Import Plan](asset-import-plan.md)
+- [Component Migration Plan](component-migration-plan.md)
+- [Protected Logic Map](protected-logic-map.md)
+- [UI Direction Options](ui-direction-options.md)
+- [Migration Progress Log](migration-progress-log.md)
+- [QA Validation Plan](qa-validation-plan.md)
 
 ## Current Repository State
 
@@ -35,17 +48,18 @@ Related existing STRQ planning docs remain authoritative inputs:
 | Git availability | Available |
 | `rg` availability | Available at `C:\Users\maxwa\AppData\Local\OpenAI\Codex\bin\rg.exe` |
 | `rg` version | `ripgrep 15.1.0 (rev af60c2de9d)` |
-| Initial working tree | Dirty before this pass, with untracked docs under `docs/` |
+| Initial working tree for docs QA pass | Clean at the start of the 2026-04-30 docs QA pass |
+| Project-control docs in checkout | 10 tracked docs under `docs/`; `docs/README.md` added by the docs QA pass |
 | Build status | Not run on Windows. `xcodebuild` is not expected here |
 
-Initial uncommitted files observed before this documentation pass:
+Historical note from the previous master-control documentation pass: the earlier pass recorded these docs as initially untracked:
 
 - `docs/component-migration-plan.md`
 - `docs/figma-source-map.md`
 - `docs/project-ui-audit.md`
 - `docs/protected-logic-map.md`
 
-Because these were documentation files in the requested documentation area, this pass safely continued with docs-only edits.
+In the current docs QA checkout, those files are tracked and remain in the documentation scope.
 
 ## Architecture Summary
 
@@ -159,7 +173,7 @@ Current asset state:
 - `STRQSigil.imageset` exists.
 - No new assets were imported in this pass.
 
-Future imports must be controlled by `docs/asset-import-plan.md`. Do not import the full source ZIP, demo photos, unused media, redundant state variants, social/payment/brand logos, coach/person photos, or large marketing mockups without explicit approval.
+Future imports must be controlled by the [Asset Import Plan](asset-import-plan.md). Do not import the full source ZIP, demo photos, unused media, redundant state variants, social/payment/brand logos, coach/person photos, or large marketing mockups without explicit approval.
 
 ## Protected Logic Summary
 
@@ -184,7 +198,7 @@ The following areas are protected during UI migration:
 - widget/app group behavior
 - test and QA harnesses
 
-See `docs/protected-logic-map.md` for file-level guardrails.
+See the [Protected Logic Map](protected-logic-map.md) for file-level guardrails.
 
 ## Migration Strategy
 
@@ -205,8 +219,8 @@ Recommended sequencing:
 | Phase | Name | Scope | Exit criteria |
 |---:|---|---|---|
 | 0 | Project control docs | Create master docs, audit maps, QA plan, progress log | All docs exist and are internally linked |
-| 1 | Codebase audit | Confirm architecture, screens, components, assets, protected systems | `docs/project-ui-audit.md` and `docs/protected-logic-map.md` stay current |
-| 2 | Figma source map | Inspect pages, known nodes, adjacent groups, variables/styles, pending queues | `docs/figma-source-map.md` has verified sources and pending items |
+| 1 | Codebase audit | Confirm architecture, screens, components, assets, protected systems | [Project UI Audit](project-ui-audit.md) and [Protected Logic Map](protected-logic-map.md) stay current |
+| 2 | Figma source map | Inspect pages, known nodes, adjacent groups, variables/styles, pending queues | [Figma Source Map](figma-source-map.md) has verified sources and pending items |
 | 3 | Figma-to-code mapping | Map source nodes to STRQ-owned files/components/assets | Mapping table exists and uses STRQ names |
 | 4 | Asset/icon foundation | Validate icon sync, choose controlled import batches, plan anatomy assets | No random assets; import only approved categories |
 | 5 | Design tokens/theme | Align Figma variables/styles to STRQ tokens | Tokens documented and tested in isolated previews |
@@ -237,7 +251,7 @@ Each screen migration must preserve actions, state reads, analytics, localizatio
 
 ## QA Strategy
 
-QA is defined in `docs/qa-validation-plan.md`. At minimum every future implementation pass should include:
+QA is defined in the [QA Validation Plan](qa-validation-plan.md). At minimum every future implementation pass should include:
 
 - `rg` checks for forbidden source/runtime references
 - `rg` checks for protected logic files
@@ -272,11 +286,10 @@ QA is defined in `docs/qa-validation-plan.md`. At minimum every future implement
 
 ## Next Recommended Implementation Passes
 
-1. Token parity pass: compare Figma variables/styles against `STRQDesignSystem.swift`, update docs and isolated tokens only.
-2. Component primitive pass: verify and refine STRQ-owned `STRQButton`, `STRQChip`, `STRQBadge`, `STRQListItem`, `STRQCard`, and progress primitives in the DEBUG lab only.
-3. First production micro-migration pass: apply one approved primitive to a low-risk settings/profile row cluster, preserving all state and actions.
+1. Figma token parity pass: map Figma variables/styles to `STRQColors`, `STRQTypography`, `STRQSpacing`, `STRQRadii`, and `STRQEffects`; update docs/foundation only; do not modify production screens.
+2. Component primitive QA pass: verify `STRQButton`, chips, badges, cards, rows, and progress primitives in the Design System Lab.
+3. First production micro-migration pass: only after foundation QA; choose one low-risk area such as a Profile/settings row cluster or one Dashboard metric group, preserving all state and actions.
 
 ## Acceptance Status For This Pass
 
 This pass is complete only as a control and planning pass. Implementation is not complete. No production UI migration is claimed.
-

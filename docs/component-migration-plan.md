@@ -4,7 +4,18 @@ Last updated: 2026-04-30
 
 ## Purpose
 
-This plan inventories current STRQ production screens and major UI components, then maps them to possible Figma/Sandow source patterns for later implementation. It is not an implementation pass. No screen should be redesigned from this document alone.
+This plan inventories current STRQ production screens and major UI components, then maps them to possible Purchased Figma UI Kit source patterns for later implementation. It is not an implementation pass. No screen should be redesigned from this document alone.
+
+Related control docs:
+
+- [Docs README](README.md)
+- [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
+- [Project UI Audit](project-ui-audit.md)
+- [Protected Logic Map](protected-logic-map.md)
+- [Figma Source Map](figma-source-map.md)
+- [Design System Import Plan](design-system-import-plan.md)
+- [Asset Import Plan](asset-import-plan.md)
+- [QA Validation Plan](qa-validation-plan.md)
 
 ## Migration Principles
 
@@ -12,7 +23,8 @@ This plan inventories current STRQ production screens and major UI components, t
 - Prove each primitive in DEBUG or isolated previews before production use.
 - Migrate one contained module at a time.
 - Preserve all state, actions, analytics, localization, navigation, and training behavior.
-- Do not copy whole Figma screens into STRQ. Use the purchased UI Kit as a visual/component source, not as STRQ product identity.
+- Treat protected app logic as off-limits unless explicitly approved.
+- Do not copy whole Figma screens into STRQ. Use the Purchased Figma UI Kit as a visual/component source, not as STRQ product identity.
 
 ## Figma Component Inventory Notes
 

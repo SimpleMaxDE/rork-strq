@@ -4,14 +4,26 @@ Last updated: 2026-04-30
 
 ## Purpose
 
-This plan maps the purchased Figma/Sandow UI Kit foundations and reusable components into a STRQ-owned runtime design system. It is an import and implementation plan only. It does not authorize production screen migration.
+This plan maps the Purchased Figma UI Kit foundations and reusable components into a STRQ-owned runtime design system. It is an import and implementation plan only. It does not authorize production screen migration.
+
+Related control docs:
+
+- [Docs README](README.md)
+- [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
+- [Figma Source Map](figma-source-map.md)
+- [Asset Import Plan](asset-import-plan.md)
+- [Component Migration Plan](component-migration-plan.md)
+- [QA Validation Plan](qa-validation-plan.md)
+- [STRQ Design System Roadmap](../ios/STRQ/Utilities/STRQDesignSystemRoadmap.md)
+- [STRQ Design System Naming Plan](../ios/STRQ/Utilities/STRQDesignSystemNamingPlan.md)
+- [STRQ Icon Coverage Plan](../ios/STRQ/Utilities/STRQIconCoveragePlan.md)
 
 ## Ownership Rules
 
 | Rule | Direction |
 |---|---|
-| Source provenance | May mention Sandow/Figma in docs, manifests, source maps, and planning files |
-| Runtime APIs | Must use STRQ-owned names |
+| Source/provenance docs | May mention source file names, Figma, Sandow, and inspection details in docs, manifests, source maps, and planning files |
+| Runtime APIs | Must use STRQ-owned runtime naming |
 | Screen code | Must not depend on Sandow names |
 | Visual direction | Must remain ownable to STRQ |
 | Product logic | Must stay unchanged |
@@ -87,7 +99,13 @@ Existing isolated runtime foundation:
 | Effects | `STRQEffects` exists, partial |
 | Icons | `STRQIcon` and `STRQIconView` exist |
 | Components | Many isolated primitives exist |
-| Debug lab | DEBUG-only preview exists in Profile route |
+| Design System Lab | DEBUG-only preview exists in Profile route |
+
+## Runtime Versus Source Provenance
+
+Source/provenance docs may describe the Purchased Figma UI Kit, source node names, and historical Sandow source labels. Runtime Swift symbols, asset names, localization keys, analytics events, product identifiers, and user-facing strings must use STRQ-owned runtime naming.
+
+The Design System Lab is the only current place to verify future STRQ primitives before production adoption. It is not proof that production screens have migrated.
 
 Current production screens mostly still use `STRQPalette`, `STRQBrand`, Forge components, local SwiftUI structs, and SF Symbols. This is expected until controlled migration starts.
 
@@ -213,7 +231,7 @@ Current STRQ icon state:
 - 60 `STRQIcon*.imageset` assets
 - `STRQIcon` enum exists
 - `STRQIconView` exists
-- Assets are documented in `STRQIconCoveragePlan.md`
+- Assets are documented in the [STRQ Icon Coverage Plan](../ios/STRQ/Utilities/STRQIconCoveragePlan.md)
 
 Import rules:
 
@@ -245,13 +263,13 @@ Each primitive must be verified in isolation before production screens use it.
 
 ## Naming Rules
 
-| Figma/source concept | STRQ runtime name |
+| Purchased Figma UI Kit source concept | STRQ runtime name |
 |---|---|
-| Sandow Colors | `STRQColors` |
-| Sandow Typography | `STRQTypography` |
-| Sandow Spacing | `STRQSpacing` |
-| Sandow Effects | `STRQEffects` |
-| Sandow Icon | `STRQIcon` |
+| Colors | `STRQColors` |
+| Typography | `STRQTypography` |
+| Spacing | `STRQSpacing` |
+| Effects | `STRQEffects` |
+| Icon | `STRQIcon` |
 | Button | `STRQButton` |
 | Card | `STRQCard` |
 | Schedule | `STRQScheduleRow` / `STRQScheduleCard` |
@@ -296,4 +314,3 @@ No production view should import or depend on a new STRQ primitive until:
 3. The target screen is approved.
 4. Protected logic checks are run before and after.
 5. Localization and analytics are preserved.
-

@@ -6,13 +6,21 @@ Last updated: 2026-04-30
 
 This audit documents the current STRQ frontend and app architecture before any production UI migration. It is a control document for future design-system work. It does not authorize screen redesigns, production component swaps, asset imports, or business-logic changes.
 
-Existing related docs that remain source material:
+Existing related Source/provenance docs that remain source material:
 
-- `ios/STRQ/Utilities/STRQDesignSystemRoadmap.md`
-- `ios/STRQ/Utilities/STRQDesignSystemNamingPlan.md`
-- `ios/STRQ/Utilities/STRQIconCoveragePlan.md`
-- `ios/STRQ/Utilities/SandowImportManifest.md`
-- `ios/STRQ/Utilities/SandowAnatomyImportPlan.md`
+- [STRQ Design System Roadmap](../ios/STRQ/Utilities/STRQDesignSystemRoadmap.md)
+- [STRQ Design System Naming Plan](../ios/STRQ/Utilities/STRQDesignSystemNamingPlan.md)
+- [STRQ Icon Coverage Plan](../ios/STRQ/Utilities/STRQIconCoveragePlan.md)
+- [Sandow Import Manifest](../ios/STRQ/Utilities/SandowImportManifest.md)
+- [Sandow Anatomy Import Plan](../ios/STRQ/Utilities/SandowAnatomyImportPlan.md)
+
+Related control docs:
+
+- [Docs README](README.md)
+- [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
+- [Protected Logic Map](protected-logic-map.md)
+- [Component Migration Plan](component-migration-plan.md)
+- [QA Validation Plan](qa-validation-plan.md)
 
 ## Repository State At Audit
 
@@ -21,19 +29,19 @@ Existing related docs that remain source material:
 | Working directory | `C:\Users\maxwa\Documents\GitHub\rork-strq` |
 | Current branch | `main` |
 | Git available | Yes |
-| Initial `git status --short` | Dirty before this pass: untracked docs under `docs/` |
+| Initial `git status --short` for docs QA pass | Clean; the 10 project-control docs were tracked in this checkout |
 | `rg` available | Yes, `C:\Users\maxwa\AppData\Local\OpenAI\Codex\bin\rg.exe` |
 | `rg --version` | `ripgrep 15.1.0 (rev af60c2de9d)` |
 | Windows build note | `xcodebuild` was not run and is not expected on Windows |
 
-Initial untracked files observed before this documentation pass:
+Historical note from the previous master-control documentation pass: that earlier pass observed these initially untracked docs:
 
 - `docs/component-migration-plan.md`
 - `docs/figma-source-map.md`
 - `docs/project-ui-audit.md`
 - `docs/protected-logic-map.md`
 
-These files were in the requested documentation scope, so this pass continued with docs-only updates.
+In the current docs QA checkout, those files are tracked and remain in the documentation scope.
 
 ## Tech Stack
 
@@ -74,7 +82,7 @@ Important generated Info.plist keys include HealthKit usage strings, Live Activi
 | `ios/STRQ/STRQApp.swift` | App entry, RevenueCat setup, app lifecycle analytics, watch activation, scene-phase persistence |
 | `ios/STRQ/ContentView.swift` | Main routing shell, onboarding/active workout/handoff/main tabs, custom current tab bar |
 | `ios/STRQ/Views` | Production SwiftUI screens and sheets |
-| `ios/STRQ/Views/Debug` | DEBUG-only design-system lab |
+| `ios/STRQ/Views/Debug` | DEBUG-only Design System Lab |
 | `ios/STRQ/Views/Components` | Small reusable production effects/components |
 | `ios/STRQ/ViewModels` | `AppViewModel` and `StoreViewModel` |
 | `ios/STRQ/Services` | Domain services, engines, persistence, integrations |
@@ -108,7 +116,7 @@ Main app tabs:
 | Coach | `CoachTabView` | Coaching, readiness, weekly review, history |
 | Train | `TrainingPlanView` | Plan, session editor, exercise detail, schedule editor |
 | Progress | `ProgressAnalyticsView` | Analytics routes through `ProgressRoute` |
-| Profile | `ProfileView` | Settings, subscription, debug lab route, diagnostics |
+| Profile | `ProfileView` | Settings, subscription, Design System Lab route, diagnostics |
 
 The main `TabView` hides the system tab bar and uses a custom `STRQTabBar` defined inside `ContentView.swift`. That current production tab bar still uses SF Symbols and `STRQPalette`, not the isolated `STRQDesignSystem` tab primitives.
 
@@ -147,7 +155,7 @@ The UI migration must treat `AppViewModel` as state contract, not a visual targe
 | `ios/STRQ/Utilities/ForgeTheme.swift` | Current production surfaces, cards, metric tiles, CTAs, chips |
 | `ios/STRQ/Utilities/STRQDesignSystem.swift` | Isolated purchased-kit-derived STRQ-owned token/component foundation |
 | `ios/STRQ/Utilities/STRQFontRegistrar.swift` | Runtime Work Sans registration hook |
-| `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift` | DEBUG-only design-system lab |
+| `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift` | DEBUG-only Design System Lab |
 
 Current production screens largely use `STRQPalette`, `STRQBrand`, `ForgeSurface`, `ForgeCard`, `STRQMetricTile`, SF Symbols, and local per-screen view structs. The isolated `STRQDesignSystem.swift` contains the future foundation but is not broadly applied to production screens.
 
@@ -188,7 +196,7 @@ Do not blindly replace all SF Symbols. Some runtime/system concepts may remain b
 
 ## Font Usage
 
-`STRQDesignSystem.swift` expects Work Sans as the purchased UI kit source font. `STRQFontRegistrar.registerBundledFonts()` runs in `STRQApp.init()`, but this checkout currently has no `.ttf`, `.otf`, `.woff`, or `.woff2` font files under `ios/STRQ`. The runtime design-system layer falls back to system fonts when Work Sans is absent.
+`STRQDesignSystem.swift` expects Work Sans as the Purchased Figma UI Kit source font. `STRQFontRegistrar.registerBundledFonts()` runs in `STRQApp.init()`, but this checkout currently has no `.ttf`, `.otf`, `.woff`, or `.woff2` font files under `ios/STRQ`. The runtime design-system layer falls back to system fonts when Work Sans is absent.
 
 Current implication: typography strategy can be documented and tokenized, but exact Work Sans fidelity is pending licensed font files and app-bundle verification.
 
@@ -205,7 +213,7 @@ UI migration must not introduce raw localization keys in runtime text or alter l
 
 ## Debug-Only Tools
 
-`ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift` is the isolated design-system lab. It is reachable from the profile/debug path and should remain DEBUG-only. Production screens must not depend on the lab, and this pass did not touch the existing debug route.
+`ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift` is the isolated Design System Lab. It is reachable from the profile/debug path and should remain DEBUG-only. Production screens must not depend on the lab, and this pass did not touch the existing debug route.
 
 ## Current Production Screens
 

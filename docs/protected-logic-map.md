@@ -8,6 +8,14 @@ This document defines app logic that must not be changed during the STRQ fronten
 
 Current pass note: this is a documentation-only control pass. No protected Swift files, production screens, assets, localization catalogs, or runtime behavior should be changed as part of this pass.
 
+Related control docs:
+
+- [Docs README](README.md)
+- [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
+- [Project UI Audit](project-ui-audit.md)
+- [Component Migration Plan](component-migration-plan.md)
+- [QA Validation Plan](qa-validation-plan.md)
+
 ## Global Migration Rule
 
 Allowed UI migration changes:

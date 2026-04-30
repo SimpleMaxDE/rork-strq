@@ -2,6 +2,12 @@
 
 This log is append-only. Add a new entry after every future Codex pass that touches planning, Figma inspection, assets, design-system code, or production UI.
 
+Related control docs:
+
+- [Docs README](README.md)
+- [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
+- [QA Validation Plan](qa-validation-plan.md)
+
 ## 2026-04-30 - Master Control Documentation Pass
 
 ### Scope
@@ -126,6 +132,65 @@ Run a token parity documentation pass:
 - Work Sans binaries are still missing from the visible checkout.
 - Production screens still contain many SF Symbol references by design at this stage.
 
+## 2026-04-30 - Docs QA Gate
+
+### Scope
+
+Documentation quality gate after the master project-control documentation pass.
+
+### Reviewed
+
+- Git state, branch, tracked/untracked docs status, and `rg` availability.
+- All 10 project-control docs under `docs/`.
+- Cross-link coverage between master plan, audit, Figma source map, design-system import plan, asset import plan, component migration plan, protected logic map, UI direction options, QA validation plan, and progress log.
+- Required project/codebase, protected logic, Figma, asset, design-system, and QA coverage areas.
+- Terminology around STRQ, STRQ-owned runtime naming, Purchased Figma UI Kit, Source/provenance docs, Design System Lab, protected app logic, screen migration, component migration, asset import, and Figma source map.
+
+### Fixed
+
+- Added `docs/README.md` as the entry point for the STRQ UI migration documentation.
+- Added relative markdown links across the project-control docs.
+- Normalized source/provenance wording so runtime naming remains STRQ-owned.
+- Clarified that Work Sans, anatomy assets, asset import, and full Figma inspection remain pending.
+- Updated the master plan and docs README with the recommended next pass order: Figma token parity, component primitive QA in the Design System Lab, then a low-risk production micro-migration only after foundation QA.
+
+### Verification Run
+
+- `where.exe rg`
+- `rg --version`
+- `git status --short`
+- `git branch --show-current`
+- `git diff --name-only`
+- `git diff --name-only -- ios`
+- Documentation and runtime `rg` searches listed in the docs QA request.
+
+### Intentionally Not Changed
+
+- no Swift files
+- no production screens
+- no runtime app logic
+- no workout/training logic
+- no persistence or data models
+- no analytics, RevenueCat/product IDs, onboarding, navigation, active workout, rest timer, watch/widget, HealthKit, or localization behavior
+- no assets or fonts imported
+- no Figma assets imported
+- no commits or staging
+
+### Pending Work
+
+- Figma token parity pass for colors, typography, spacing, radii, and effects.
+- Work Sans font file decision and app-bundle verification.
+- Component primitive QA in the Design System Lab.
+- Anatomy export feasibility and any future asset import remain pending.
+- First production micro-migration target selection after foundation QA.
+- macOS or GitHub Actions build/test verification for implementation passes.
+
+### Warnings
+
+- This docs QA pass ran on Windows; no `xcodebuild` verification was run.
+- The Purchased Figma UI Kit remains source/provenance only.
+- Production screen migration is still blocked until foundation and primitive QA are complete.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
@@ -161,4 +226,3 @@ Pending work:
 Warnings:
 
 - 
-

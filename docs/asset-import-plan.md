@@ -4,9 +4,19 @@ Last updated: 2026-04-30
 
 ## Purpose
 
-This plan controls future visual asset imports from the purchased Figma/Sandow UI Kit into STRQ-owned runtime assets. It prevents random ZIP dumps, redundant variants, source-name leakage, and assets that do not map to actual STRQ product needs.
+This plan controls future visual asset imports from the Purchased Figma UI Kit into STRQ-owned runtime assets. It prevents random ZIP dumps, redundant variants, source-name leakage, and assets that do not map to actual STRQ product needs.
 
 No assets were imported in this pass.
+
+Related control docs:
+
+- [Docs README](README.md)
+- [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
+- [Figma Source Map](figma-source-map.md)
+- [Design System Import Plan](design-system-import-plan.md)
+- [Component Migration Plan](component-migration-plan.md)
+- [STRQ Icon Coverage Plan](../ios/STRQ/Utilities/STRQIconCoveragePlan.md)
+- [Sandow Anatomy Import Plan](../ios/STRQ/Utilities/SandowAnatomyImportPlan.md)
 
 ## Global Rules
 
@@ -16,8 +26,8 @@ No assets were imported in this pass.
 - Do not import huge marketing mockups.
 - Do not import social, payment, press, or brand logos unless a STRQ feature needs them.
 - Do not import redundant state/color variants when SwiftUI tinting/state can handle them.
-- Do not use Sandow names in runtime asset names.
-- Keep source/provenance only in docs and manifests.
+- Use STRQ-owned runtime naming for runtime asset names.
+- Keep source/provenance names only in docs and manifests.
 - Prefer the smallest useful asset set tied to a real STRQ screen, component, or product moment.
 
 ## Current Repo Asset State
@@ -49,7 +59,7 @@ No assets were imported in this pass.
 
 ## Icon Import Policy
 
-Use `STRQIconCoveragePlan.md` as the source of truth for current icon status.
+Use the [STRQ Icon Coverage Plan](../ios/STRQ/Utilities/STRQIconCoveragePlan.md) as the source of truth for current icon status.
 
 Next icon imports should be tied to a concrete implementation need. Candidate medium-priority gaps:
 
@@ -73,6 +83,8 @@ Rules:
 - Do not import hover, selected, disabled, filled, bold, duotone, or color variants unless a real STRQ use case requires them.
 
 ## Anatomy Import Strategy
+
+Use the [Sandow Anatomy Import Plan](../ios/STRQ/Utilities/SandowAnatomyImportPlan.md) as source/provenance context, but do not carry source naming into runtime assets.
 
 Preferred strategy:
 
@@ -180,4 +192,3 @@ Expected:
 - New assets use STRQ names.
 - Icon enum and assets are synced.
 - Production screens are unchanged unless the pass explicitly scopes a migration.
-

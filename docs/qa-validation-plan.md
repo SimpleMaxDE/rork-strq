@@ -8,6 +8,15 @@ This plan defines validation checks for future STRQ UI migration passes. It prot
 
 This current pass did not run an iOS build because it ran on Windows. Do not claim a build unless one is actually run on macOS or CI.
 
+Related control docs:
+
+- [Docs README](README.md)
+- [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
+- [Protected Logic Map](protected-logic-map.md)
+- [Migration Progress Log](migration-progress-log.md)
+- [Asset Import Plan](asset-import-plan.md)
+- [Component Migration Plan](component-migration-plan.md)
+
 ## QA Principles
 
 - Validate source references before implementation.
@@ -112,6 +121,7 @@ git diff -- ios/STRQ/Views ios/STRQ/ContentView.swift ios/STRQ/ViewModels ios/ST
 Expected:
 
 - no runtime code diff
+- `git diff --name-only -- ios` is empty
 
 For future implementation passes:
 
@@ -222,4 +232,3 @@ If a change fails QA:
 2. Keep docs unless they are inaccurate.
 3. Record the failure and reason in `docs/migration-progress-log.md`.
 4. Rescope the next pass smaller.
-

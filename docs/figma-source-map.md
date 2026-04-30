@@ -4,13 +4,22 @@ Last updated: 2026-04-30
 
 ## Purpose
 
-This document maps the purchased Sandow UI Kit Figma file to future STRQ-owned runtime targets. It records what was actually inspected in Figma during this pass, what was discovered adjacent to known nodes, and what remains pending.
+This document maps the Purchased Figma UI Kit file to future STRQ-owned runtime targets. It records what was actually inspected in Figma during this pass, what was discovered adjacent to known nodes, and what remains pending.
 
 Figma source:
 
 - File: `SH-sandow-UI-Kit--v3.0-`
 - URL: `https://www.figma.com/design/LBvxljax0ixoTvbvvUeWVC/SH-sandow-UI-Kit--v3.0-?m=auto&t=Cm2KJRPJnU51BdTq-6`
 - File key: `LBvxljax0ixoTvbvvUeWVC`
+
+Related control docs:
+
+- [Docs README](README.md)
+- [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
+- [Design System Import Plan](design-system-import-plan.md)
+- [Asset Import Plan](asset-import-plan.md)
+- [Component Migration Plan](component-migration-plan.md)
+- [UI Direction Options](ui-direction-options.md)
 
 ## Inspection Method
 
@@ -195,7 +204,7 @@ Keyword discovery also found app component matches for Anatomy Organ, Anatomy Mu
 | Icon Featured | `5546:2332` | Featured icon component source | Medium |
 | Icons | `5454:22014` | Large icon frame; bounded scan saw hundreds of component sets with Light/Regular/Bold/Fill/Duotone/Duoline styles | High |
 
-Current STRQ has 60 `STRQIcon*.imageset` assets and `STRQIcon` enum coverage documented in `ios/STRQ/Utilities/STRQIconCoveragePlan.md`. Future icon imports should stay one base template icon per concept unless multicolor artwork is truly required.
+Current STRQ has 60 `STRQIcon*.imageset` assets and `STRQIcon` enum coverage documented in the [STRQ Icon Coverage Plan](../ios/STRQ/Utilities/STRQIconCoveragePlan.md). Future icon imports should stay one base template icon per concept unless multicolor artwork is truly required.
 
 ## Visual And Asset Source Map
 
@@ -274,6 +283,8 @@ Not found by exact keyword:
 | Pricing Card | `8751:102794` | component | future `STRQPaywallPlanCard` | SwiftUI component | Missing | Medium | Preserve RevenueCat logic |
 
 ## Pending Figma Inspection Queue
+
+This queue is intentionally pending. It prevents docs from implying that all Figma inspection is complete.
 
 | Item | Why pending | Suggested next bounded node/search |
 |---|---|---|

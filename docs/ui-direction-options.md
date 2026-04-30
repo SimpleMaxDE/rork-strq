@@ -6,7 +6,15 @@ Last updated: 2026-04-30
 
 This document presents possible STRQ visual directions before production UI migration begins. It does not select a final direction and does not authorize copying a Figma screen.
 
-The purchased UI kit should provide foundations, components, and patterns. STRQ should remain an ownable training product with its own identity, intelligence, copy, data, and runtime behavior.
+The Purchased Figma UI Kit should provide foundations, components, and patterns. STRQ should remain an ownable training product with its own identity, intelligence, copy, data, and runtime behavior.
+
+Related control docs:
+
+- [Docs README](README.md)
+- [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
+- [Figma Source Map](figma-source-map.md)
+- [Design System Import Plan](design-system-import-plan.md)
+- [Component Migration Plan](component-migration-plan.md)
 
 ## Current STRQ Direction
 
@@ -114,7 +122,7 @@ User decisions needed:
 
 Visual description:
 
-Dark STRQ base with controlled warm orange/amber action accents, progress highlights, selected states, and reward moments. This borrows more from the Sandow source palette while keeping STRQ names and layouts.
+Dark STRQ base with controlled warm orange/amber action accents, progress highlights, selected states, and reward moments. This borrows more from the Purchased Figma UI Kit source palette while keeping STRQ-owned runtime naming and STRQ layouts.
 
 Pros:
 
@@ -219,4 +227,3 @@ The safest starting point is a hybrid of:
 - limited Direction 3 warmth for CTAs, selected states, and reward moments
 
 This keeps STRQ ownable while still benefiting from the UI kit foundations.
-
