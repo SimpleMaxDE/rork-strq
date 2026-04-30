@@ -191,6 +191,111 @@ Documentation quality gate after the master project-control documentation pass.
 - The Purchased Figma UI Kit remains source/provenance only.
 - Production screen migration is still blocked until foundation and primitive QA are complete.
 
+## 2026-04-30 - Figma Token Parity Pass
+
+### Scope
+
+Foundation and documentation token parity pass only. No production screens, app logic, assets, fonts, localization, workout/training behavior, analytics, RevenueCat/product IDs, persistence, watch/widget code, or navigation behavior were changed.
+
+### Files Changed
+
+- `docs/figma-token-parity-report.md`
+- `docs/design-system-import-plan.md`
+- `docs/figma-source-map.md`
+- `docs/strq-ui-migration-master-plan.md`
+- `docs/migration-progress-log.md`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+
+### Figma Inspected
+
+Exact foundation nodes:
+
+- Colors `5359:9002`
+- Gradients `5442:13546`
+- Typography `9119:6481`
+- Effects `9120:58753`
+- Grid `9122:4683`
+- Size & Spacing `9122:6944`
+
+Exact component-state nodes:
+
+- Button `9128:103928`
+- Badge & Chip `9126:59240`
+- Progress `9129:207997`
+- Tab `9131:172586`
+- Navigation `11614:57585`
+- Tab Bar `9131:291579`
+- List Item `9134:89206`
+- Schedule `9132:170645`
+- Card - General `9131:326493`
+- Card - App Specific `9160:324200`
+
+Large component nodes were inspected with explicit descendant caps. No Figma timeout occurred in this pass.
+
+### Code Inspected
+
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `ios/STRQ/Utilities/STRQDesignSystemRoadmap.md`
+- `ios/STRQ/Utilities/SandowImportManifest.md`
+
+### Fixed
+
+- Added the token parity report with color, gradient, typography, spacing/grid, radius, effects, and component-state parity tables.
+- Updated the design-system plan, source map, and master plan with token parity status and the next recommended pass.
+- Added a DEBUG-only Token Parity section to the Design System Lab for neutral surfaces, text colors, borders, spacing, radii, shadows, semantic colors, optional warm accent, and typography role samples.
+
+### Verification Run
+
+- `where.exe rg`
+- `rg --version`
+- `git diff --name-only -- ios/STRQ/Views ios/STRQ/ContentView.swift`
+- `rg -n "Sandow" ios/STRQ/Views ios/STRQ/ContentView.swift`
+- `rg -n -g "*.swift" "Sandow" ios/STRQ/Utilities`
+- `rg -n "STRQColors|STRQTypography|STRQSpacing|STRQRadii|STRQEffects|STRQGradients|STRQComponentStyle" ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `rg -n "orangePrimary|warmAccent|primaryAccent|iconPrimary|selectedSurface|selectedBorder|focusGlow" ios/STRQ/Utilities/STRQDesignSystem.swift ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `rg -n "WorkSans|Work Sans|STRQFontRegistrar|UIAppFonts" ios/STRQ docs`
+- `rg -n "Image\\(systemName:" ios/STRQ/Views/Debug ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `rg -n "exercise\\.singular|set\\.plural|Start Session|Per Session" ios/STRQ`
+- `rg -n "resetAllData|generatePlan|activeWorkout" ios/STRQ`
+- `rg -n "RevenueCat|product|analytics|Analytics" ios/STRQ`
+- `git diff --name-only`
+- `git diff --name-only -- ios`
+- `git diff --name-only -- ios/STRQ/ViewModels ios/STRQ/Services ios/STRQ/Models ios/STRQ/STRQApp.swift ios/STRQ/Localizable.xcstrings ios/STRQ/ContentView.swift ios/STRQ/Views/DashboardView.swift ios/STRQ/Views/ActiveWorkoutView.swift ios/STRQ/Views/ExerciseDetailView.swift ios/STRQ/Views/ExerciseLibraryView.swift ios/STRQ/Views/ProgressAnalyticsView.swift ios/STRQ/Views/STRQPaywallView.swift ios/STRQ/Views/ProfileView.swift ios/STRQ/Views/WorkoutCompletionView.swift`
+- Icon enum/assets sync check: 60 enum cases, 60 image sets, 0 missing, 0 extra.
+- Icon image-set validation: 60 checked, 0 errors.
+- Font file search for `.ttf`, `.otf`, `.woff`, `.woff2`: no files found.
+
+### Intentionally Not Changed
+
+- no production screens
+- no production UI migration
+- no app/business logic
+- no workout/training logic
+- no active workout behavior
+- no rest timer behavior
+- no persistence/schema/data models
+- no analytics keys/events
+- no RevenueCat/product IDs
+- no onboarding behavior
+- no watch/widget code
+- no localization catalogs
+- no assets or fonts imported
+
+### Pending Work
+
+- Component primitive QA pass in the DEBUG Design System Lab.
+- Work Sans font files and runtime fidelity verification.
+- Exact two-layer shadow modeling only if a component needs it.
+- Per-component deep variant inspection before any implementation.
+- First production micro-migration only after foundation and primitive QA.
+
+### Warnings
+
+- This pass ran on Windows; `xcodebuild` was not run and is not expected here.
+- STRQ intentionally keeps black/white/carbon/graphite as the default runtime direction; Figma orange remains optional/source-compatible.
+- Large Figma component nodes should continue to be inspected one family at a time.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

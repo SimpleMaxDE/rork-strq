@@ -5,6 +5,7 @@ struct STRQDesignSystemPreviewView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: STRQSpacing.sectionGap) {
+                TokenParitySection()
                 ColorSurfacesSection()
                 TypographySection()
                 ButtonsSection()
@@ -52,6 +53,66 @@ private struct PreviewSection<Content: View>: View {
     }
 }
 
+private struct TokenParitySection: View {
+    private let columns = [
+        GridItem(.adaptive(minimum: 132), spacing: STRQSpacing.xs)
+    ]
+
+    var body: some View {
+        PreviewSection("Token Parity") {
+            VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                LazyVGrid(columns: columns, alignment: .leading, spacing: STRQSpacing.xs) {
+                    TokenMiniSwatch(title: "Base", value: "black", color: STRQColors.baseBackground)
+                    TokenMiniSwatch(title: "Card", value: "gray900", color: STRQColors.cardSurface)
+                    TokenMiniSwatch(title: "Elevated", value: "gray800", color: STRQColors.elevatedCardSurface)
+                    TokenMiniSwatch(title: "Inset", value: "gray950", color: STRQColors.insetSurface)
+                    TokenMiniSwatch(title: "Primary Text", value: "white", color: STRQColors.primaryText)
+                    TokenMiniSwatch(title: "Secondary Text", value: "gray300", color: STRQColors.secondaryText)
+                    TokenMiniSwatch(title: "Muted Text", value: "gray500", color: STRQColors.mutedText)
+                    TokenMiniSwatch(title: "Border", value: "gray700", color: STRQColors.borderMuted)
+                    TokenMiniSwatch(title: "Success", value: "lime500", color: STRQColors.success)
+                    TokenMiniSwatch(title: "Warning", value: "amber500", color: STRQColors.warning)
+                    TokenMiniSwatch(title: "Danger", value: "rose500", color: STRQColors.danger)
+                    TokenMiniSwatch(title: "Warm Accent", value: "optional", color: STRQColors.warmAccent)
+                }
+
+                VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+                    Text("Spacing / Radii")
+                        .font(STRQTypography.labelSmall)
+                        .tracking(STRQTypography.labelSmallTracking)
+                        .foregroundStyle(STRQColors.secondaryText)
+
+                    HStack(alignment: .bottom, spacing: STRQSpacing.md) {
+                        TokenBlock(label: "8", size: STRQSpacing.xs, radius: STRQRadii.xs)
+                        TokenBlock(label: "12", size: STRQSpacing.sm, radius: STRQRadii.sm)
+                        TokenBlock(label: "16", size: STRQSpacing.md, radius: STRQRadii.md)
+                        TokenBlock(label: "24", size: STRQSpacing.xl, radius: STRQRadii.card)
+                        TokenBlock(label: "32", size: STRQSpacing.xxl, radius: STRQRadii.largeCard)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                LazyVGrid(columns: columns, alignment: .leading, spacing: STRQSpacing.xs) {
+                    ShadowTokenSample(title: "Subtle", token: STRQEffects.subtleShadow)
+                    ShadowTokenSample(title: "Card", token: STRQEffects.cardShadow)
+                    ShadowTokenSample(title: "Soft", token: STRQEffects.softShadow)
+                    ShadowTokenSample(title: "Selected", token: STRQEffects.selectionGlow)
+                }
+
+                STRQCard(.compact) {
+                    VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+                        TypographyRoleSample(name: "screenTitle", text: "Today", font: STRQTypography.screenTitle)
+                        TypographyRoleSample(name: "sectionTitle", text: "Training", font: STRQTypography.sectionTitle)
+                        TypographyRoleSample(name: "body", text: "Readable interface copy", font: STRQTypography.body)
+                        TypographyRoleSample(name: "metric", text: "87%", font: STRQTypography.metricMedium)
+                        TypographyRoleSample(name: "button", text: "START", font: STRQTypography.button)
+                    }
+                }
+            }
+        }
+    }
+}
+
 private struct ColorSurfacesSection: View {
     var body: some View {
         PreviewSection("Colors / Surfaces") {
@@ -68,6 +129,108 @@ private struct ColorSurfacesSection: View {
                     BorderSample(title: "Danger", color: STRQColors.dangerRed, width: 1)
                 }
             }
+        }
+    }
+}
+
+private struct TokenMiniSwatch: View {
+    let title: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+            RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                .fill(color)
+                .frame(height: 40)
+                .overlay(
+                    RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                        .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                )
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(STRQTypography.caption)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+
+                Text(value)
+                    .font(STRQTypography.micro)
+                    .foregroundStyle(STRQColors.mutedText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+        }
+        .padding(STRQSpacing.xs)
+        .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.lg))
+        .overlay(
+            RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+        )
+    }
+}
+
+private struct TokenBlock: View {
+    let label: String
+    let size: CGFloat
+    let radius: CGFloat
+
+    var body: some View {
+        VStack(spacing: STRQSpacing.xs) {
+            RoundedRectangle(cornerRadius: radius, style: .continuous)
+                .fill(STRQColors.controlSurface)
+                .frame(width: max(32, size * 2), height: max(32, size * 2))
+                .overlay(
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .strokeBorder(STRQColors.selectedBorder, lineWidth: 1)
+                )
+
+            Text(label)
+                .font(STRQTypography.micro)
+                .foregroundStyle(STRQColors.secondaryText)
+                .lineLimit(1)
+        }
+    }
+}
+
+private struct ShadowTokenSample: View {
+    let title: String
+    let token: STRQShadowToken
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+            RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                .fill(STRQColors.elevatedCardSurface)
+                .frame(height: 44)
+                .shadow(color: token.color, radius: token.radius, x: token.x, y: token.y)
+
+            Text(title)
+                .font(STRQTypography.caption)
+                .foregroundStyle(STRQColors.secondaryText)
+                .lineLimit(1)
+        }
+        .padding(STRQSpacing.xs)
+    }
+}
+
+private struct TypographyRoleSample: View {
+    let name: String
+    let text: String
+    let font: Font
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: STRQSpacing.sm) {
+            Text(name)
+                .font(STRQTypography.micro)
+                .foregroundStyle(STRQColors.mutedText)
+                .frame(width: 76, alignment: .leading)
+
+            Text(text)
+                .font(font)
+                .foregroundStyle(STRQColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
         }
     }
 }

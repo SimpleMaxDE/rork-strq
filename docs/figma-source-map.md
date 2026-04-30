@@ -17,6 +17,7 @@ Related control docs:
 - [Docs README](README.md)
 - [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
 - [Design System Import Plan](design-system-import-plan.md)
+- [Figma Token Parity Report](figma-token-parity-report.md)
 - [Asset Import Plan](asset-import-plan.md)
 - [Component Migration Plan](component-migration-plan.md)
 - [UI Direction Options](ui-direction-options.md)
@@ -78,6 +79,17 @@ Sample effect styles include focus rings, shadows from `xs` through `2xl`, and b
 
 Grid styles include `Desktop Grid`, `Tablet Grid`, and `Mobile Grid`.
 
+## Token Parity Pass Result - 2026-04-30
+
+The token parity pass inspected the exact foundation nodes and the STRQ-relevant component-state nodes listed in this source map. The full parity tables live in [Figma Token Parity Report](figma-token-parity-report.md).
+
+Key result:
+
+- Colors, typography, spacing, radius, effects, grid, gradient, and component-state token categories are now mapped to current STRQ-owned runtime tokens.
+- STRQ's neutral dark runtime direction remains intentionally different from the Figma source brand-orange default.
+- Work Sans remains pending because font binaries are not present in the checkout.
+- Large component nodes were inspected with explicit descendant caps; deep per-variant implementation details remain pending for later primitive-specific passes.
+
 ## Page Inventory
 
 | Page name | Page ID | Top-level contents | STRQ relevance |
@@ -124,13 +136,13 @@ The light and dark main pages share a similar top-level screen taxonomy:
 | Source | Node ID | Type | STRQ relevance | Priority | Notes |
 |---|---:|---|---|---|---|
 | Foundations page | `5358:6096` | page | Token source | High | Contains colors, gradients, typography, logo, effects, grid, spacing, media, illustration |
-| Colors | `5359:9002` | foundation | `STRQColors`, semantic surfaces | High | Exact variable taxonomy still needs dedicated token pass |
+| Colors | `5359:9002` | foundation | `STRQColors`, semantic surfaces | High | Token parity pass mapped key primitive and semantic light/dark values |
 | Gradients | `5442:13546` | foundation | `STRQGradients`/effects | Medium | Use sparingly for action/progress/reward only |
 | Typography | `9119:6481` | foundation | `STRQTypography` | High | Work Sans source; local font binaries absent in current repo |
 | Logo | `9120:37139` | foundation/brand | Reference only | Low | STRQ identity should not adopt Sandow logo |
-| Effects | `9120:58753` | foundation | `STRQEffects` | High | Shadows, blur, focus/selected effects need exact parity pass |
+| Effects | `9120:58753` | foundation | `STRQEffects` | High | Token parity pass mapped focus rings, shadow stacks, and blur styles; runtime remains partial |
 | Grid | `9122:4683` | foundation | Layout spacing guidance | Medium | Useful for margins/grid decisions |
-| Size & Spacing | `9122:6944` | foundation | `STRQSpacing`, dimensions | High | Needs exact mobile dimensions pass |
+| Size & Spacing | `9122:6944` | foundation | `STRQSpacing`, dimensions | High | Token parity pass mapped spacing, radius, size, border, and mobile grid values |
 | Media | `9125:50816` | asset/system | Avatar/media/gallery/equipment | Medium | Import only approved categories |
 | Illustration | `9125:148813` | asset/system | Anatomy/body/badge/illustration source | High | Key source for STRQ anatomy/reward assets |
 
@@ -288,13 +300,13 @@ This queue is intentionally pending. It prevents docs from implying that all Fig
 
 | Item | Why pending | Suggested next bounded node/search |
 |---|---|---|
-| Exact color variable collections and modes | Current inspection verified sections, not full variable taxonomy | Use Figma variables API on `5359:9002`/local collections |
-| Exact spacing/radius/effect token names | Needed before token parity | Dedicated pass for `9122:6944` and `9120:58753` |
+| Full color variable taxonomy beyond key STRQ roles | Token parity mapped key primitive and semantic roles; all 608 color variables were not individually documented | Inspect a single semantic family when implementation needs it |
+| Exact per-component shadow/radius choices | Token parity mapped foundation values; component-specific adoption still needs visual QA | Dedicated primitive QA pass in the DEBUG Design System Lab |
 | Profile Settings & Help Center details | Top-level groups verified, deep frames not mapped | Inspect `11589:83741` and `11613:167073` |
 | Error & Utility details | Top-level groups verified, keyword search missed exact `error` nodes | Inspect `11589:58128` and `11612:154006` |
 | Full pricing/paywall pattern source | Search found Pricing Card, no paywall/subscription named node | Inspect `8751:102794` and pricing instances |
 | Chart component variants | Chart section verified but not enumerated | Inspect `9129:26029` |
-| App-specific cards variants | Important for workout/exercise/achievement | Inspect `9160:324200` |
+| App-specific card implementation breakdown | High-level variants were inspected; STRQ wrappers still need product-specific decomposition | Inspect one card family at a time before implementation |
 | Workout/exercise screen details | Top-level groups verified only | Inspect `11582:103188`, `11608:96542` |
 | Coach/chat details | Top-level and Chat component verified | Inspect `9128:164508`, `11581:101616`, `11605:86057` |
 | Anatomy export feasibility | Metadata confirms vectors but not export fit | Export sample only in a future approved asset pass |

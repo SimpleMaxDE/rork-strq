@@ -158,6 +158,8 @@ Current isolated STRQ design-system coverage includes:
 
 The design-system layer is not yet the production UI foundation. Future work should first reconcile exact Figma variables/styles with STRQ token names, then apply primitives one controlled component or screen module at a time.
 
+The 2026-04-30 token parity pass is documented in [Figma Token Parity Report](figma-token-parity-report.md). It confirms the isolated STRQ foundation is broadly aligned for dark neutral surfaces, typography categories, core spacing, icon sizes, semantic success/warning/danger, blur values, and primitive shells, while component-state breadth and Work Sans fidelity remain pending.
+
 Work Sans status:
 
 - `STRQFontRegistrar.registerBundledFonts()` is called from `STRQApp.init()`.
@@ -286,9 +288,9 @@ QA is defined in the [QA Validation Plan](qa-validation-plan.md). At minimum eve
 
 ## Next Recommended Implementation Passes
 
-1. Figma token parity pass: map Figma variables/styles to `STRQColors`, `STRQTypography`, `STRQSpacing`, `STRQRadii`, and `STRQEffects`; update docs/foundation only; do not modify production screens.
-2. Component primitive QA pass: verify `STRQButton`, chips, badges, cards, rows, and progress primitives in the Design System Lab.
-3. First production micro-migration pass: only after foundation QA; choose one low-risk area such as a Profile/settings row cluster or one Dashboard metric group, preserving all state and actions.
+1. Component primitive QA pass: verify `STRQButton`, chips, badges, cards, rows, progress primitives, schedule rows, and tab bar primitives in the DEBUG Design System Lab.
+2. Add only STRQ-owned missing primitive states that are proven necessary in isolation; keep production screens untouched.
+3. First production micro-migration pass: only after foundation and primitive QA; choose one low-risk area such as a Profile/settings row cluster or one Dashboard metric group, preserving all state and actions.
 
 ## Acceptance Status For This Pass
 

@@ -11,6 +11,7 @@ Related control docs:
 - [Docs README](README.md)
 - [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
 - [Figma Source Map](figma-source-map.md)
+- [Figma Token Parity Report](figma-token-parity-report.md)
 - [Asset Import Plan](asset-import-plan.md)
 - [Component Migration Plan](component-migration-plan.md)
 - [QA Validation Plan](qa-validation-plan.md)
@@ -101,6 +102,18 @@ Existing isolated runtime foundation:
 | Components | Many isolated primitives exist |
 | Design System Lab | DEBUG-only preview exists in Profile route |
 
+## Token Parity Pass - 2026-04-30
+
+The Figma token parity pass is recorded in [Figma Token Parity Report](figma-token-parity-report.md).
+
+Result:
+
+- Exact foundation nodes were inspected for colors, gradients, typography, effects, grid, and size/spacing.
+- Exact component-state nodes were inspected for Button, Badge & Chip, Progress, Tab, Navigation, Tab Bar, List Item, Schedule, Card - General, and Card - App Specific.
+- The current STRQ-owned foundation is broadly aligned for dark neutral surfaces, primitive gray/orange scales, typography categories, core spacing, icon sizes, semantic success/warning/danger colors, blur values, and core primitive shells.
+- The largest gaps are component-state breadth, exact two-layer Figma shadow stacks, focus-ring tone variants, a few uncommon radius values, light-theme semantic aliases, and Work Sans font binaries.
+- No production screen migration is authorized by this result.
+
 ## Runtime Versus Source Provenance
 
 Source/provenance docs may describe the Purchased Figma UI Kit, source node names, and historical Sandow source labels. Runtime Swift symbols, asset names, localization keys, analytics events, product identifiers, and user-facing strings must use STRQ-owned runtime naming.
@@ -146,9 +159,9 @@ Primitive Figma scales may remain implementation details. Production screens sho
 
 Recommended next color pass:
 
-1. Export or inspect variable names and values for `Semantics` and `Primitives`.
-2. Map each Figma semantic role to a STRQ role.
-3. Decide whether warm/orange is the primary STRQ action color or only a supporting accent.
+1. Use the token parity report as the color source map.
+2. Keep STRQ's black/white/carbon/graphite runtime default.
+3. Keep warm/orange as an optional accent/source-compatible alias, not the default action direction.
 4. Validate contrast for dark mode first.
 5. Keep `STRQPalette` untouched until a dedicated migration pass.
 
@@ -314,3 +327,7 @@ No production view should import or depend on a new STRQ primitive until:
 3. The target screen is approved.
 4. Protected logic checks are run before and after.
 5. Localization and analytics are preserved.
+
+## Recommended Next Pass
+
+Run a component primitive QA pass in the DEBUG Design System Lab. Focus on buttons, icon buttons, chips, badges, cards, progress, list rows, schedule rows, and tab bar primitives. Add only STRQ-owned missing state APIs that are proven useful in isolation. Do not modify production screens.
