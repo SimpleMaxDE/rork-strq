@@ -176,3 +176,10 @@ Do not migrate `DashboardView`, `ContentView`, active workout, paywall, onboardi
 - Some Figma nodes were intentionally capped; deep inspection should continue per component family when a production target needs exact detail.
 - Hover/focus/source-brand states are intentionally not copied into iOS runtime defaults.
 - New Swift component APIs need macOS build validation before production adoption.
+
+## Next Recommended Pass
+
+1. Build and visually inspect the DEBUG Design System Lab in the iOS simulator on macOS.
+2. Confirm the primitive states render correctly across the lab: buttons, icon buttons, chips, badges, cards, surfaces, metrics, progress, lists, schedule rows/cards, inputs, modal surfaces, avatars, ratings, empty state, and all 60 STRQ icons.
+3. If build and visual QA are clean, run the first production micro-migration on a small Profile/settings row cluster using row, toggle, section header, badge, and icon-container primitives.
+4. Keep workout/training logic, persistence, analytics, product IDs, localization, onboarding, navigation, active workout behavior, rest timer, watch/widget code, and data models out of scope.
