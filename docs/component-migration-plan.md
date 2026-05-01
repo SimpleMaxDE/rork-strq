@@ -1,6 +1,6 @@
 # STRQ Component Migration Plan
 
-Last updated: 2026-04-30
+Last updated: 2026-05-01
 
 ## Purpose
 
@@ -14,6 +14,7 @@ Related control docs:
 - [Protected Logic Map](protected-logic-map.md)
 - [Figma Source Map](figma-source-map.md)
 - [Design System Import Plan](design-system-import-plan.md)
+- [Component Primitive QA Report](component-primitive-qa-report.md)
 - [Asset Import Plan](asset-import-plan.md)
 - [QA Validation Plan](qa-validation-plan.md)
 
@@ -96,13 +97,51 @@ Current pass verified these adjacent reusable Figma component sets beyond the or
 | 7 | Anatomy/reward assets and components | High visual value; requires asset strategy first |
 | 8 | Screen module migration | Only after primitives are verified |
 
+## Component Primitive QA Status - 2026-05-01
+
+The isolated component primitive QA pass is complete and recorded in [Component Primitive QA Report](component-primitive-qa-report.md).
+
+Ready for first production micro-migration, pending macOS build validation:
+
+- `STRQListItem`
+- `STRQToggleRow`
+- `STRQSectionHeader`
+- `STRQBadge`
+- `STRQChip`
+- `STRQIconContainer`
+
+Potentially ready for a slightly later display-only micro-migration:
+
+- `STRQButton`
+- `STRQIconButton`
+- `STRQCard`
+- `STRQSurface`
+- `STRQMetricCard`
+- `STRQProgressBar`
+- `STRQProgressRing`
+- `STRQAvatar`
+- `STRQEmptyStateCard`
+
+Still partial or intentionally isolated:
+
+- `STRQSearchField` and `STRQInputField` need target search/form behavior audits.
+- `STRQScheduleRow` and `STRQScheduleCard` need schedule/session behavior review.
+- `STRQTabBarContainer`, `STRQTabBarItem`, and `STRQTabBarBackground` remain blocked from production until a protected navigation pass.
+- Dedicated workout, coach, nutrition, paywall, anatomy, chart, media, and reward wrappers are not part of this primitive pass.
+
+First recommended production micro-migration target:
+
+- A small Profile/settings row cluster using row, toggle, section-header, badge, and icon-container primitives.
+- Keep the existing DEBUG lab route in `ProfileView` untouched.
+- Preserve all actions, subscription links, settings behavior, localization, analytics, and navigation.
+
 ## Screen Migration Sequencing
 
 Recommended first production modules, after component foundations are stable:
 
 | Sequence | Candidate | Reason | Guardrail |
 |---:|---|---|---|
-| 1 | Small settings/list rows inside Profile or Notifications | Lower domain risk, exercises list-row primitives | Do not change toggles, HealthKit calls, notification settings |
+| 1 | Small settings/list rows inside Profile or Notifications | Lower domain risk; row, toggle, badge, and section-header primitives are now proven in DEBUG | Do not change toggles, HealthKit calls, notification settings, subscription actions, or the DEBUG lab route |
 | 2 | Isolated metric card in Dashboard | Visible value with limited action surface | Do not change dashboard logic or Today routing |
 | 3 | Exercise Library cards/search/filter shell | Good component reuse test | Do not change exercise catalog/filter semantics |
 | 4 | Progress metric cards/chart shells | Good visual payoff | Do not alter calculations or history |

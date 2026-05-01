@@ -597,17 +597,20 @@ enum STRQSpacing {
     static let chipGap = px150
 
     static let metricCardMinHeight: CGFloat = 108
+    static let metricCardCompactMinHeight: CGFloat = 84
     static let metricCardMinWidth: CGFloat = 148
     static let buttonHeight: CGFloat = 56
     static let buttonCompactHeight: CGFloat = 40
     static let buttonMiniHeight: CGFloat = 32
     static let iconButtonSize: CGFloat = 44
+    static let iconButtonCompactSize: CGFloat = 36
     static let inputHeight: CGFloat = 52
     static let searchHeight: CGFloat = 48
     static let toggleRowMinHeight: CGFloat = 56
     static let avatarSM: CGFloat = 32
     static let avatarMD: CGFloat = 40
     static let avatarLG: CGFloat = 56
+    static let avatarXL: CGFloat = 72
     static let tabBarHeight: CGFloat = 72
     static let navBarHeight: CGFloat = 56
 
@@ -1222,41 +1225,57 @@ struct STRQButton: View {
     enum Size: Equatable {
         case regular
         case compact
+        case iconOnly
         case text
     }
 
     var title: String?
-    var icon: STRQIcon?
+    var leadingIcon: STRQIcon?
+    var trailingIcon: STRQIcon?
     var variant: Variant = .primary
     var isDisabled: Bool = false
+    var isLoading: Bool = false
+    var accessibilityLabel: String?
     let action: () -> Void
 
     init(
         _ title: String,
         icon: STRQIcon? = nil,
+        trailingIcon: STRQIcon? = nil,
         variant: Variant = .primary,
         isDisabled: Bool = false,
+        isLoading: Bool = false,
+        accessibilityLabel: String? = nil,
         action: @escaping () -> Void
     ) {
         self.title = title
-        self.icon = icon
+        self.leadingIcon = icon
+        self.trailingIcon = trailingIcon
         self.variant = variant
         self.isDisabled = isDisabled
+        self.isLoading = isLoading
+        self.accessibilityLabel = accessibilityLabel
         self.action = action
     }
 
     init(
         title: String,
         icon: STRQIcon? = nil,
+        trailingIcon: STRQIcon? = nil,
         hierarchy: Hierarchy = .primary,
         size: Size = .regular,
         isDisabled: Bool = false,
+        isLoading: Bool = false,
+        accessibilityLabel: String? = nil,
         action: @escaping () -> Void
     ) {
         self.title = title
-        self.icon = icon
+        self.leadingIcon = icon
+        self.trailingIcon = trailingIcon
         self.variant = Self.variant(hierarchy: hierarchy, size: size)
         self.isDisabled = isDisabled
+        self.isLoading = isLoading
+        self.accessibilityLabel = accessibilityLabel
         self.action = action
     }
 
@@ -1264,28 +1283,44 @@ struct STRQButton: View {
         icon: STRQIcon,
         variant: Variant = .icon,
         isDisabled: Bool = false,
+        isLoading: Bool = false,
+        accessibilityLabel: String? = nil,
         action: @escaping () -> Void
     ) {
         self.title = nil
-        self.icon = icon
+        self.leadingIcon = icon
+        self.trailingIcon = nil
         self.variant = variant
         self.isDisabled = isDisabled
+        self.isLoading = isLoading
+        self.accessibilityLabel = accessibilityLabel
         self.action = action
     }
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: title == nil ? 0 : STRQSpacing.sm) {
-                if let icon {
-                    STRQIconView(icon, size: iconSize, tint: foregroundColor)
-                }
+                if isLoading {
+                    Capsule()
+                        .fill(foregroundColor.opacity(0.34))
+                        .frame(width: loadingPlaceholderWidth, height: 8)
+                        .accessibilityHidden(true)
+                } else {
+                    if let leadingIcon {
+                        STRQIconView(leadingIcon, size: iconSize, tint: foregroundColor)
+                    }
 
-                if let title {
-                    Text(title)
-                        .font(font)
-                        .tracking(STRQTypography.buttonTracking)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.78)
+                    if let title {
+                        Text(title)
+                            .font(font)
+                            .tracking(STRQTypography.buttonTracking)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.78)
+                    }
+
+                    if let trailingIcon {
+                        STRQIconView(trailingIcon, size: iconSize, tint: foregroundColor)
+                    }
                 }
             }
             .foregroundStyle(foregroundColor)
@@ -1298,20 +1333,23 @@ struct STRQButton: View {
                     .strokeBorder(borderColor, lineWidth: borderWidth)
             )
             .shadow(
-                color: variant == .primary ? STRQColors.white.opacity(0.12) : STRQEffects.subtleShadow.color,
-                radius: variant == .primary ? 12 : 4,
+                color: shadowColor,
+                radius: shadowRadius,
                 x: 0,
-                y: variant == .primary ? 6 : 2
+                y: shadowYOffset
             )
             .opacity(isDisabled ? 0.44 : 1)
         }
         .buttonStyle(.strqPressable)
-        .disabled(isDisabled)
+        .disabled(isDisabled || isLoading)
+        .accessibilityLabel(accessibilityLabel ?? resolvedAccessibilityLabel)
     }
 
     private static func variant(hierarchy: Hierarchy, size: Size) -> Variant {
         if size == .compact {
             return .compact
+        } else if size == .iconOnly {
+            return .icon
         }
 
         switch hierarchy {
@@ -1416,11 +1454,40 @@ struct STRQButton: View {
     }
 
     private var iconSize: CGFloat {
-        variant == .icon ? STRQSpacing.iconSM : STRQSpacing.iconMD
+        variant == .icon || variant == .compact ? STRQSpacing.iconSM : STRQSpacing.iconMD
     }
 
     private var font: Font {
         variant == .compact ? STRQTypography.buttonCompact : STRQTypography.button
+    }
+
+    private var loadingPlaceholderWidth: CGFloat {
+        title == nil ? STRQSpacing.iconSM : 78
+    }
+
+    private var shadowColor: Color {
+        guard !isDisabled, !isLoading else { return .clear }
+        return (variant == .primary || variant == .compact) ? STRQColors.white.opacity(0.12) : STRQEffects.subtleShadow.color
+    }
+
+    private var shadowRadius: CGFloat {
+        (variant == .primary || variant == .compact) ? 12 : 4
+    }
+
+    private var shadowYOffset: CGFloat {
+        (variant == .primary || variant == .compact) ? 6 : 2
+    }
+
+    private var resolvedAccessibilityLabel: String {
+        if let title {
+            return title
+        }
+
+        if let leadingIcon {
+            return String(describing: leadingIcon)
+        }
+
+        return "Button"
     }
 }
 
@@ -1428,22 +1495,44 @@ struct STRQIconButton: View {
     enum Variant: Equatable {
         case primary
         case secondary
+        case neutral
+        case selected
         case ghost
         case destructive
     }
 
+    enum Size: Equatable {
+        case regular
+        case compact
+    }
+
     var icon: STRQIcon
     var variant: Variant = .secondary
-    var size: CGFloat = STRQSpacing.iconButtonSize
-    var iconSize: CGFloat = STRQSpacing.iconSM
+    var size: Size = .regular
     var isDisabled: Bool = false
     var accessibilityLabel: String?
     let action: () -> Void
 
+    init(
+        icon: STRQIcon,
+        variant: Variant = .secondary,
+        size: Size = .regular,
+        isDisabled: Bool = false,
+        accessibilityLabel: String? = nil,
+        action: @escaping () -> Void
+    ) {
+        self.icon = icon
+        self.variant = variant
+        self.size = size
+        self.isDisabled = isDisabled
+        self.accessibilityLabel = accessibilityLabel
+        self.action = action
+    }
+
     var body: some View {
         Button(action: action) {
             STRQIconView(icon, size: iconSize, tint: foregroundColor)
-                .frame(width: size, height: size)
+                .frame(width: frameSize, height: frameSize)
                 .background(backgroundColor, in: .rect(cornerRadius: STRQRadii.iconContainer))
                 .overlay(
                     RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
@@ -1460,7 +1549,7 @@ struct STRQIconButton: View {
         switch variant {
         case .primary:
             return STRQColors.actionText
-        case .secondary, .ghost:
+        case .secondary, .neutral, .ghost, .selected:
             return STRQColors.iconPrimary
         case .destructive:
             return STRQColors.dangerTextPrimary
@@ -1471,8 +1560,10 @@ struct STRQIconButton: View {
         switch variant {
         case .primary:
             return STRQColors.actionSurface
-        case .secondary:
+        case .secondary, .neutral:
             return STRQColors.controlSurface
+        case .selected:
+            return STRQColors.selectedSurface
         case .ghost:
             return .clear
         case .destructive:
@@ -1484,8 +1575,10 @@ struct STRQIconButton: View {
         switch variant {
         case .primary:
             return .clear
-        case .secondary, .ghost:
+        case .secondary, .neutral, .ghost:
             return STRQColors.borderMuted
+        case .selected:
+            return STRQColors.selectedBorder
         case .destructive:
             return STRQColors.dangerSoft
         }
@@ -1493,6 +1586,24 @@ struct STRQIconButton: View {
 
     private var borderWidth: CGFloat {
         variant == .primary ? 0 : 1
+    }
+
+    private var frameSize: CGFloat {
+        switch size {
+        case .regular:
+            return STRQSpacing.iconButtonSize
+        case .compact:
+            return STRQSpacing.iconButtonCompactSize
+        }
+    }
+
+    private var iconSize: CGFloat {
+        switch size {
+        case .regular:
+            return STRQSpacing.iconSM
+        case .compact:
+            return STRQSpacing.iconXS
+        }
     }
 }
 
@@ -1538,8 +1649,11 @@ struct STRQChip: View {
 
     let label: String
     var icon: STRQIcon?
+    var trailingIcon: STRQIcon?
     var tone: Tone = .neutral
     var size: Size = .regular
+    var isDisabled: Bool = false
+    var accessibilityLabel: String?
 
     var body: some View {
         HStack(spacing: STRQSpacing.chipGap) {
@@ -1552,6 +1666,10 @@ struct STRQChip: View {
                 .tracking(STRQTypography.chipTracking)
                 .lineLimit(1)
                 .minimumScaleFactor(0.78)
+
+            if let trailingIcon {
+                STRQIconView(trailingIcon, size: iconSize, tint: foregroundColor)
+            }
         }
         .foregroundStyle(foregroundColor)
         .padding(.horizontal, horizontalPadding)
@@ -1562,12 +1680,17 @@ struct STRQChip: View {
             RoundedRectangle(cornerRadius: STRQRadii.chip, style: .continuous)
                 .strokeBorder(borderColor, lineWidth: 1)
         )
-        .opacity(tone == .disabled ? 0.58 : 1)
+        .opacity(isDisabled || tone == .disabled ? 0.58 : 1)
+        .accessibilityLabel(accessibilityLabel ?? label)
     }
 
-    private var foregroundColor: Color { tone.componentTone.foreground }
-    private var backgroundColor: Color { tone.componentTone.background }
-    private var borderColor: Color { tone.componentTone.border }
+    private var componentTone: STRQComponentStyle.Tone {
+        isDisabled ? .disabled : tone.componentTone
+    }
+
+    private var foregroundColor: Color { componentTone.foreground }
+    private var backgroundColor: Color { componentTone.background }
+    private var borderColor: Color { componentTone.border }
 
     private var font: Font {
         switch size {
@@ -1635,6 +1758,7 @@ struct STRQBadge: View {
     var icon: STRQIcon?
     var variant: Variant = .small
     var tone: STRQChip.Tone = .neutral
+    var accessibilityLabel: String?
 
     var body: some View {
         HStack(spacing: STRQSpacing.chipGap) {
@@ -1656,6 +1780,7 @@ struct STRQBadge: View {
             Capsule()
                 .strokeBorder(tone.componentTone.border, lineWidth: 1)
         )
+        .accessibilityLabel(accessibilityLabel ?? text)
     }
 
     private var font: Font {
@@ -1690,14 +1815,21 @@ struct STRQBadge: View {
 // MARK: - Metrics & Progress
 
 struct STRQMetricCard: View {
+    enum Size: Equatable {
+        case standard
+        case compact
+    }
+
     let value: String
     let label: String
     var icon: STRQIcon?
     var unit: String?
     var detail: String?
+    var delta: String?
     var progress: Double?
     var selected: Bool = false
     var active: Bool = false
+    var size: Size = .standard
     var tint: Color = STRQColors.iconPrimary
     var valueFont: Font = STRQTypography.metricMedium
     var iconBackground: Color? = nil
@@ -1706,19 +1838,29 @@ struct STRQMetricCard: View {
     var body: some View {
         STRQSurface(
             selected: selected || active,
-            padding: STRQSpacing.md,
+            padding: size == .compact ? STRQSpacing.sm : STRQSpacing.md,
             radius: STRQRadii.metricCard,
             background: active ? STRQColors.selectedSurface : STRQColors.cardSurface
         ) {
-            VStack(alignment: .leading, spacing: STRQSpacing.sm) {
-                if let icon {
-                    STRQIconContainer(icon: icon, size: .lg, tint: tint, background: iconBackground)
+            VStack(alignment: .leading, spacing: size == .compact ? STRQSpacing.xs : STRQSpacing.sm) {
+                if icon != nil || delta != nil {
+                    HStack(alignment: .center, spacing: STRQSpacing.xs) {
+                        if let icon {
+                            STRQIconContainer(icon: icon, size: iconContainerSize, tint: tint, background: iconBackground)
+                        }
+
+                        Spacer(minLength: STRQSpacing.xs)
+
+                        if let delta {
+                            STRQBadge(text: delta, icon: deltaIcon, variant: .small, tone: deltaTone)
+                        }
+                    }
                 }
 
                 VStack(alignment: .leading, spacing: STRQSpacing.xxs) {
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
                         Text(value)
-                            .font(valueFont)
+                            .font(resolvedValueFont)
                             .foregroundStyle(STRQColors.primaryText)
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
@@ -1748,18 +1890,61 @@ struct STRQMetricCard: View {
                 }
 
                 if let progress {
-                    STRQProgressBar(value: progress, height: 6, tint: tint, compact: true)
+                    STRQProgressBar(value: progress, height: size == .compact ? 4 : 6, tint: tint, compact: true)
                 }
             }
-            .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: resolvedMinHeight, alignment: .leading)
         }
+    }
+
+    private var iconContainerSize: STRQIconContainer.Size {
+        size == .compact ? .md : .lg
+    }
+
+    private var resolvedValueFont: Font {
+        size == .compact ? STRQTypography.metricSmall : valueFont
+    }
+
+    private var resolvedMinHeight: CGFloat {
+        size == .compact ? min(minHeight, STRQSpacing.metricCardCompactMinHeight) : minHeight
+    }
+
+    private var deltaTone: STRQChip.Tone {
+        guard let delta else { return .neutral }
+        return delta.trimmingCharacters(in: .whitespaces).hasPrefix("-") ? .danger : .success
+    }
+
+    private var deltaIcon: STRQIcon? {
+        guard let delta else { return nil }
+        return delta.trimmingCharacters(in: .whitespaces).hasPrefix("-") ? .trendDown : .trendUp
     }
 }
 
 struct STRQProgressBar: View {
+    enum Tone: Equatable {
+        case neutral
+        case success
+        case warning
+        case danger
+
+        var tint: Color {
+            switch self {
+            case .neutral:
+                return STRQColors.primaryAccent
+            case .success:
+                return STRQColors.successGreen
+            case .warning:
+                return STRQColors.warningAmber
+            case .danger:
+                return STRQColors.dangerRed
+            }
+        }
+    }
+
     var value: Double
     var height: CGFloat = 8
-    var tint: Color = STRQColors.primaryAccent
+    var tint: Color? = nil
+    var tone: Tone = .neutral
     var label: String? = nil
     var valueText: String? = nil
     var compact: Bool = false
@@ -1797,7 +1982,7 @@ struct STRQProgressBar: View {
 
                     if clamped > 0 {
                         Capsule()
-                            .fill(tint)
+                            .fill(resolvedTint)
                             .overlay(STRQGradients.subtleOverlay.clipShape(Capsule()))
                             .frame(width: width)
                     }
@@ -1806,6 +1991,23 @@ struct STRQProgressBar: View {
             .frame(height: compact ? max(4, height) : height)
             .clipShape(Capsule())
         }
+        .accessibilityLabel(accessibilityText)
+    }
+
+    private var resolvedTint: Color {
+        tint ?? tone.tint
+    }
+
+    private var accessibilityText: String {
+        if let label, let valueText {
+            return "\(label), \(valueText)"
+        } else if let label {
+            return label
+        } else if let valueText {
+            return valueText
+        }
+
+        return "\(Int(min(max(value, 0), 1) * 100)) percent"
     }
 }
 
@@ -1820,7 +2022,8 @@ struct STRQProgressRing: View {
     var variant: Variant = .compact
     var size: CGFloat? = nil
     var lineWidth: CGFloat? = nil
-    var tint: Color = STRQColors.primaryAccent
+    var tint: Color? = nil
+    var tone: STRQProgressBar.Tone = .neutral
     var label: String? = nil
     var valueText: String? = nil
 
@@ -1832,7 +2035,7 @@ struct STRQProgressRing: View {
             Circle()
                 .trim(from: 0, to: min(max(value, 0), 1))
                 .stroke(
-                    tint,
+                    resolvedTint,
                     style: StrokeStyle(lineWidth: resolvedLineWidth, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
@@ -1860,6 +2063,7 @@ struct STRQProgressRing: View {
             }
         }
         .frame(width: resolvedSize, height: resolvedSize)
+        .accessibilityLabel(accessibilityText)
     }
 
     private var resolvedSize: CGFloat {
@@ -1894,6 +2098,22 @@ struct STRQProgressRing: View {
 
     private var valueFont: Font {
         variant == .compact ? STRQTypography.labelSmall : STRQTypography.metricSmall
+    }
+
+    private var resolvedTint: Color {
+        tint ?? tone.tint
+    }
+
+    private var accessibilityText: String {
+        if let label, let valueText {
+            return "\(label), \(valueText)"
+        } else if let label {
+            return label
+        } else if let valueText {
+            return valueText
+        }
+
+        return "\(Int(min(max(value, 0), 1) * 100)) percent"
     }
 }
 
@@ -1957,8 +2177,12 @@ struct STRQListItem: View {
     var title: String
     var subtitle: String?
     var trailingValue: String?
+    var trailingIcon: STRQIcon?
     var showsChevron: Bool = false
     var showsDivider: Bool = true
+    var isSelected: Bool = false
+    var isDisabled: Bool = false
+    var isCompact: Bool = false
     var tint: Color = STRQColors.iconSecondary
 
     var body: some View {
@@ -1969,14 +2193,14 @@ struct STRQListItem: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(STRQTypography.bodyMedium)
-                        .foregroundStyle(STRQColors.primaryText)
+                        .foregroundStyle(primaryTextColor)
                         .lineLimit(1)
                         .minimumScaleFactor(0.82)
 
                     if let subtitle {
                         Text(subtitle)
                             .font(STRQTypography.captionRegular)
-                            .foregroundStyle(STRQColors.mutedText)
+                            .foregroundStyle(secondaryTextColor)
                             .lineLimit(2)
                     }
                 }
@@ -1986,17 +2210,24 @@ struct STRQListItem: View {
                 if let trailingValue {
                     Text(trailingValue)
                         .font(STRQTypography.label)
-                        .foregroundStyle(STRQColors.secondaryText)
+                        .foregroundStyle(secondaryTextColor)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
                 }
 
+                if let trailingIcon {
+                    STRQIconView(trailingIcon, size: STRQSpacing.iconSM, tint: iconTint)
+                }
+
                 if showsChevron {
-                    STRQIconView(.chevronRight, size: STRQSpacing.iconSM, tint: STRQColors.mutedText)
+                    STRQIconView(.chevronRight, size: STRQSpacing.iconSM, tint: secondaryTextColor)
                 }
             }
-            .padding(.vertical, STRQSpacing.sm)
+            .padding(.vertical, isCompact ? STRQSpacing.xs : STRQSpacing.sm)
             .padding(.horizontal, STRQSpacing.listItemPadding)
+            .background(isSelected ? STRQColors.selectedSurface : Color.clear, in: .rect(cornerRadius: STRQRadii.md))
+            .opacity(isDisabled ? 0.52 : 1)
+            .accessibilityLabel(accessibilityText)
 
             if showsDivider {
                 Rectangle()
@@ -2010,18 +2241,34 @@ struct STRQListItem: View {
     @ViewBuilder
     private var leadingView: some View {
         if let leadingIcon {
-            STRQIconContainer(icon: leadingIcon, size: .md, tint: tint)
+            STRQIconContainer(icon: leadingIcon, size: isCompact ? .sm : .md, tint: iconTint)
         } else if let avatarText {
             Text(avatarText.prefix(2).uppercased())
                 .font(STRQTypography.labelSmall)
-                .foregroundStyle(STRQColors.textOnBrand)
-                .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
-                .background(tint, in: Circle())
+                .foregroundStyle(isDisabled ? STRQColors.disabledText : STRQColors.textOnBrand)
+                .frame(width: isCompact ? STRQSpacing.iconContainerSM : STRQSpacing.iconContainerMD, height: isCompact ? STRQSpacing.iconContainerSM : STRQSpacing.iconContainerMD)
+                .background(isDisabled ? STRQColors.gray800 : tint, in: Circle())
         }
     }
 
     private var leadingIndent: CGFloat {
         (leadingIcon == nil && avatarText == nil) ? STRQSpacing.listItemPadding : 68
+    }
+
+    private var iconTint: Color {
+        isDisabled ? STRQColors.iconMuted : (isSelected ? STRQColors.iconPrimary : tint)
+    }
+
+    private var primaryTextColor: Color {
+        isDisabled ? STRQColors.disabledText : STRQColors.primaryText
+    }
+
+    private var secondaryTextColor: Color {
+        isDisabled ? STRQColors.disabledText : STRQColors.mutedText
+    }
+
+    private var accessibilityText: String {
+        [title, subtitle, trailingValue].compactMap { $0 }.joined(separator: ", ")
     }
 }
 
@@ -2078,35 +2325,48 @@ struct STRQSectionAction: View {
 struct STRQSearchField: View {
     @Binding var text: String
     var placeholder: String = "Search"
+    var isDisabled: Bool = false
+    var errorMessage: String?
     var onSubmit: () -> Void = {}
 
     var body: some View {
-        HStack(spacing: STRQSpacing.sm) {
-            STRQIconView(.search, size: STRQSpacing.iconSM, tint: STRQColors.iconMuted)
+        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+            HStack(spacing: STRQSpacing.sm) {
+                STRQIconView(.search, size: STRQSpacing.iconSM, tint: isDisabled ? STRQColors.disabledText : STRQColors.iconMuted)
 
-            TextField(placeholder, text: $text)
-                .font(STRQTypography.textMedium)
-                .foregroundStyle(STRQColors.primaryText)
-                .submitLabel(.search)
-                .onSubmit(onSubmit)
+                TextField(placeholder, text: $text)
+                    .font(STRQTypography.textMedium)
+                    .foregroundStyle(isDisabled ? STRQColors.disabledText : STRQColors.primaryText)
+                    .submitLabel(.search)
+                    .onSubmit(onSubmit)
 
-            if !text.isEmpty {
-                Button {
-                    text = ""
-                } label: {
-                    STRQIconView(.close, size: STRQSpacing.iconXS, tint: STRQColors.iconMuted)
+                if !text.isEmpty && !isDisabled {
+                    Button {
+                        text = ""
+                    } label: {
+                        STRQIconView(.close, size: STRQSpacing.iconXS, tint: STRQColors.iconMuted)
+                    }
+                    .buttonStyle(.strqPressable)
+                    .accessibilityLabel("Clear search")
                 }
-                .buttonStyle(.strqPressable)
-                .accessibilityLabel("Clear search")
+            }
+            .padding(.horizontal, STRQSpacing.md)
+            .frame(minHeight: STRQSpacing.searchHeight)
+            .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.lg))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
+                    .strokeBorder(errorMessage == nil ? STRQColors.borderMuted : STRQColors.dangerRed, lineWidth: 1)
+            )
+            .opacity(isDisabled ? 0.56 : 1)
+            .disabled(isDisabled)
+
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(STRQTypography.caption)
+                    .foregroundStyle(STRQColors.dangerTextPrimary)
+                    .lineLimit(2)
             }
         }
-        .padding(.horizontal, STRQSpacing.md)
-        .frame(minHeight: STRQSpacing.searchHeight)
-        .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.lg))
-        .overlay(
-            RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
-                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
-        )
     }
 }
 
@@ -2117,6 +2377,8 @@ struct STRQInputField: View {
     var icon: STRQIcon?
     var helper: String?
     var isSecure: Bool = false
+    var isDisabled: Bool = false
+    var errorMessage: String?
 
     init(
         _ title: String? = nil,
@@ -2124,7 +2386,9 @@ struct STRQInputField: View {
         placeholder: String,
         icon: STRQIcon? = nil,
         helper: String? = nil,
-        isSecure: Bool = false
+        isSecure: Bool = false,
+        isDisabled: Bool = false,
+        errorMessage: String? = nil
     ) {
         self.title = title
         self._text = text
@@ -2132,6 +2396,8 @@ struct STRQInputField: View {
         self.icon = icon
         self.helper = helper
         self.isSecure = isSecure
+        self.isDisabled = isDisabled
+        self.errorMessage = errorMessage
     }
 
     var body: some View {
@@ -2146,7 +2412,7 @@ struct STRQInputField: View {
 
             HStack(spacing: STRQSpacing.sm) {
                 if let icon {
-                    STRQIconView(icon, size: STRQSpacing.iconSM, tint: STRQColors.iconMuted)
+                    STRQIconView(icon, size: STRQSpacing.iconSM, tint: isDisabled ? STRQColors.disabledText : STRQColors.iconMuted)
                 }
 
                 Group {
@@ -2157,23 +2423,29 @@ struct STRQInputField: View {
                     }
                 }
                 .font(STRQTypography.textMedium)
-                .foregroundStyle(STRQColors.primaryText)
+                .foregroundStyle(isDisabled ? STRQColors.disabledText : STRQColors.primaryText)
             }
             .padding(.horizontal, STRQSpacing.md)
             .frame(minHeight: STRQSpacing.inputHeight)
             .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.lg))
             .overlay(
                 RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
-                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                    .strokeBorder(errorMessage == nil ? STRQColors.borderMuted : STRQColors.dangerRed, lineWidth: 1)
             )
+            .opacity(isDisabled ? 0.56 : 1)
+            .disabled(isDisabled)
 
-            if let helper {
-                Text(helper)
+            if let supportText {
+                Text(supportText)
                     .font(STRQTypography.caption)
-                    .foregroundStyle(STRQColors.mutedText)
+                    .foregroundStyle(errorMessage == nil ? STRQColors.mutedText : STRQColors.dangerTextPrimary)
                     .lineLimit(2)
             }
         }
+    }
+
+    private var supportText: String? {
+        errorMessage ?? helper
     }
 }
 
@@ -2181,24 +2453,26 @@ struct STRQToggleRow: View {
     var title: String
     var subtitle: String?
     var icon: STRQIcon?
+    var isDisabled: Bool = false
+    var isCompact: Bool = false
     @Binding var isOn: Bool
 
     var body: some View {
         HStack(spacing: STRQSpacing.sm) {
             if let icon {
-                STRQIconContainer(icon: icon, size: .md, tint: isOn ? STRQColors.iconPrimary : STRQColors.iconSecondary)
+                STRQIconContainer(icon: icon, size: isCompact ? .sm : .md, tint: iconTint)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(STRQTypography.textMedium)
-                    .foregroundStyle(STRQColors.primaryText)
+                    .foregroundStyle(isDisabled ? STRQColors.disabledText : STRQColors.primaryText)
                     .lineLimit(1)
 
                 if let subtitle {
                     Text(subtitle)
                         .font(STRQTypography.caption)
-                        .foregroundStyle(STRQColors.mutedText)
+                        .foregroundStyle(isDisabled ? STRQColors.disabledText : STRQColors.mutedText)
                         .lineLimit(2)
                 }
             }
@@ -2208,15 +2482,25 @@ struct STRQToggleRow: View {
             Toggle("", isOn: $isOn)
                 .labelsHidden()
                 .tint(STRQColors.primaryAccent)
+                .disabled(isDisabled)
         }
         .padding(.horizontal, STRQSpacing.listItemPadding)
-        .padding(.vertical, STRQSpacing.sm)
+        .padding(.vertical, isCompact ? STRQSpacing.xs : STRQSpacing.sm)
         .frame(minHeight: STRQSpacing.toggleRowMinHeight)
         .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.lg))
         .overlay(
             RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
                 .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
         )
+        .opacity(isDisabled ? 0.56 : 1)
+    }
+
+    private var iconTint: Color {
+        if isDisabled {
+            return STRQColors.iconMuted
+        }
+
+        return isOn ? STRQColors.iconPrimary : STRQColors.iconSecondary
     }
 }
 
@@ -2356,12 +2640,14 @@ struct STRQAvatar: View {
         case sm
         case md
         case lg
+        case xl
 
         var frame: CGFloat {
             switch self {
             case .sm: return STRQSpacing.avatarSM
             case .md: return STRQSpacing.avatarMD
             case .lg: return STRQSpacing.avatarLG
+            case .xl: return STRQSpacing.avatarXL
             }
         }
 
@@ -2370,13 +2656,24 @@ struct STRQAvatar: View {
             case .sm: return STRQTypography.labelXS
             case .md: return STRQTypography.labelSmall
             case .lg: return STRQTypography.labelMedium
+            case .xl: return STRQTypography.labelLarge
+            }
+        }
+
+        var iconSize: CGFloat {
+            switch self {
+            case .sm: return STRQSpacing.iconXS
+            case .md: return STRQSpacing.iconSM
+            case .lg: return STRQSpacing.iconMD
+            case .xl: return STRQSpacing.iconLG
             }
         }
     }
 
-    var initials: String
+    var initials: String = ""
     var size: Size = .md
     var imageName: String?
+    var icon: STRQIcon?
     var tint: Color = STRQColors.controlSurface
 
     var body: some View {
@@ -2385,8 +2682,12 @@ struct STRQAvatar: View {
                 Image(imageName)
                     .resizable()
                     .scaledToFill()
+            } else if let icon {
+                STRQIconView(icon, size: size.iconSize, tint: STRQColors.iconPrimary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(tint)
             } else {
-                Text(initials.prefix(2).uppercased())
+                Text(displayInitials)
                     .font(size.font)
                     .tracking(STRQTypography.labelXSTracking)
                     .foregroundStyle(STRQColors.primaryText)
@@ -2400,6 +2701,11 @@ struct STRQAvatar: View {
             Circle()
                 .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
         )
+        .accessibilityLabel(displayInitials.isEmpty ? "Avatar" : displayInitials)
+    }
+
+    private var displayInitials: String {
+        String(initials.prefix(2)).uppercased()
     }
 }
 
@@ -2429,6 +2735,7 @@ struct STRQEmptyStateCard: View {
     var title: String
     var message: String
     var actionTitle: String?
+    var actionIcon: STRQIcon = .plus
     var action: (() -> Void)?
 
     var body: some View {
@@ -2450,7 +2757,7 @@ struct STRQEmptyStateCard: View {
                 }
 
                 if let actionTitle, let action {
-                    STRQButton(actionTitle, icon: .plus, variant: .compact, action: action)
+                    STRQButton(actionTitle, icon: actionIcon, variant: .compact, action: action)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -2564,29 +2871,32 @@ struct STRQScheduleRow: View {
     var title: String
     var subtitle: String?
     var duration: String?
+    var status: String?
     var icon: STRQIcon? = .calendar
     var isSelected: Bool = false
+    var isCompleted: Bool = false
+    var isCompact: Bool = false
 
     var body: some View {
         HStack(spacing: STRQSpacing.sm) {
             VStack(spacing: 2) {
                 Text(dateTitle)
                     .font(STRQTypography.label)
-                    .foregroundStyle(isSelected ? STRQColors.actionText : STRQColors.primaryText)
+                    .foregroundStyle(dateTextColor)
                     .lineLimit(1)
 
                 if let dateSubtitle {
                     Text(dateSubtitle)
                         .font(STRQTypography.micro)
-                        .foregroundStyle(isSelected ? STRQColors.actionText.opacity(0.74) : STRQColors.mutedText)
+                        .foregroundStyle(dateSubtitleColor)
                         .lineLimit(1)
                 }
             }
-            .frame(width: 48, height: 48)
-            .background(isSelected ? STRQColors.actionSurface : STRQColors.surfaceSecondary, in: .rect(cornerRadius: STRQRadii.md))
+            .frame(width: dateTileSize, height: dateTileSize)
+            .background(dateTileBackground, in: .rect(cornerRadius: STRQRadii.md))
 
             if let icon {
-                STRQIconContainer(icon: icon, size: .md, tint: isSelected ? STRQColors.primaryAccent : STRQColors.iconMuted)
+                STRQIconContainer(icon: isCompleted ? .checkCircle : icon, size: isCompact ? .sm : .md, tint: rowIconTint)
             }
 
             VStack(alignment: .leading, spacing: 2) {
@@ -2606,19 +2916,70 @@ struct STRQScheduleRow: View {
 
             Spacer(minLength: STRQSpacing.sm)
 
-            if let duration {
-                Text(duration)
-                    .font(STRQTypography.labelSmall)
-                    .foregroundStyle(STRQColors.secondaryText)
-                    .lineLimit(1)
+            VStack(alignment: .trailing, spacing: STRQSpacing.xxs) {
+                if let duration {
+                    Text(duration)
+                        .font(STRQTypography.labelSmall)
+                        .foregroundStyle(STRQColors.secondaryText)
+                        .lineLimit(1)
+                }
+
+                if let status {
+                    STRQBadge(text: status, variant: .small, tone: statusTone)
+                }
             }
         }
-        .padding(STRQSpacing.sm)
-        .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.lg))
+        .padding(isCompact ? STRQSpacing.xs : STRQSpacing.sm)
+        .background(rowBackground, in: .rect(cornerRadius: STRQRadii.lg))
         .overlay(
             RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
-                .strokeBorder(isSelected ? STRQColors.selectedBorder : STRQColors.borderMuted, lineWidth: 1)
+                .strokeBorder(rowBorder, lineWidth: isSelected ? STRQEffects.selectedBorderWidth : 1)
         )
+        .accessibilityLabel([dateTitle, dateSubtitle, title, subtitle, duration, status].compactMap { $0 }.joined(separator: ", "))
+    }
+
+    private var dateTileSize: CGFloat {
+        isCompact ? 40 : 48
+    }
+
+    private var dateTextColor: Color {
+        isSelected ? STRQColors.actionText : STRQColors.primaryText
+    }
+
+    private var dateSubtitleColor: Color {
+        isSelected ? STRQColors.actionText.opacity(0.74) : STRQColors.mutedText
+    }
+
+    private var dateTileBackground: Color {
+        if isSelected {
+            return STRQColors.actionSurface
+        }
+
+        return isCompleted ? STRQColors.successDim : STRQColors.surfaceSecondary
+    }
+
+    private var rowBackground: Color {
+        isSelected ? STRQColors.selectedSurface : STRQColors.cardSurface
+    }
+
+    private var rowBorder: Color {
+        if isSelected {
+            return STRQColors.selectedBorder
+        }
+
+        return isCompleted ? STRQColors.successSoft : STRQColors.borderMuted
+    }
+
+    private var rowIconTint: Color {
+        if isCompleted {
+            return STRQColors.successGreen
+        }
+
+        return isSelected ? STRQColors.iconPrimary : STRQColors.iconMuted
+    }
+
+    private var statusTone: STRQChip.Tone {
+        isCompleted ? .success : .neutral
     }
 }
 

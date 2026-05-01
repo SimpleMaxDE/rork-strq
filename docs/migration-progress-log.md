@@ -296,6 +296,114 @@ Large component nodes were inspected with explicit descendant caps. No Figma tim
 - STRQ intentionally keeps black/white/carbon/graphite as the default runtime direction; Figma orange remains optional/source-compatible.
 - Large Figma component nodes should continue to be inspected one family at a time.
 
+## 2026-05-01 - Component Primitive QA Pass
+
+### Scope
+
+Component primitive QA in the isolated STRQ design-system foundation and DEBUG Design System Lab. No production screens, app logic, assets, fonts, localization catalogs, workout/training behavior, analytics, RevenueCat/product IDs, persistence, watch/widget code, navigation behavior, or protected flows were changed.
+
+### Files Changed
+
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `docs/component-primitive-qa-report.md`
+- `docs/component-migration-plan.md`
+- `docs/design-system-import-plan.md`
+- `docs/migration-progress-log.md`
+
+### Figma Inspected
+
+Exact component nodes:
+
+- Button `9128:103928`
+- Badge & Chip `9126:59240`
+- Progress `9129:207997`
+- Tab `9131:172586`
+- Navigation `11614:57585`
+- Tab Bar `9131:291579`
+- List Item `9134:89206`
+- Schedule `9132:170645`
+- Card - General `9131:326493`
+- Card - App Specific `9160:324200`
+
+Button, Badge & Chip, Progress, Tab, Tab Bar, List Item, Card - General, and Card - App Specific were inspected with explicit descendant caps. Navigation and Schedule completed within bounded reads.
+
+### Code Inspected
+
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `ios/STRQ/Utilities/STRQIconCoveragePlan.md`
+- docs listed in the component primitive QA request
+
+### Fixed
+
+- Added `docs/component-primitive-qa-report.md` with component coverage, visual QA, and production-readiness tables.
+- Added safe STRQ-owned component states in `STRQDesignSystem.swift`:
+  - button trailing icons, icon-only sizing, simple loading placeholder, accessibility label support
+  - icon button compact and selected states
+  - chip trailing icon, explicit disabled flag, accessibility label support
+  - badge accessibility label support
+  - metric card compact size and delta badge
+  - semantic progress tones for bars and rings
+  - list item trailing icon, selected, disabled, and compact states
+  - search/input disabled and error states
+  - toggle row disabled and compact states
+  - avatar icon placeholder and xl size
+  - empty-state action icon
+  - schedule row status, completed, and compact states
+- Expanded the DEBUG Design System Lab to show every requested primitive and key state while keeping the all-60 icon grid through `STRQIcon.allCases`.
+- Updated component migration and design-system docs with readiness status and first micro-migration recommendation.
+
+### Verification Run
+
+- `git branch --show-current`
+- `git status --short`
+- `git diff --name-only`
+- `where.exe rg`
+- `rg --version`
+- Figma exact-node inspection through the Figma Plugin API
+- Static source reads of modified Swift component ranges
+- Final validation searches are recorded in the final task summary for this pass
+
+### Intentionally Not Changed
+
+- no production screens
+- no `DashboardView`
+- no `ContentView`
+- no `ActiveWorkoutView`
+- no `ExerciseDetailView`
+- no `ExerciseLibraryView`
+- no `ProgressAnalyticsView`
+- no `STRQPaywallView`
+- no `ProfileView`
+- no onboarding views
+- no `WorkoutCompletionView`
+- no coach, sleep, readiness, watch, or widget targets
+- no `Localizable.xcstrings`
+- no app/business logic
+- no workout/training logic
+- no active workout behavior
+- no rest timer behavior
+- no persistence/schema/data models
+- no analytics keys/events
+- no RevenueCat/product IDs
+- no assets or fonts imported
+- no Figma file keys, URLs, or node IDs added to runtime Swift code
+
+### Pending Work
+
+- macOS build validation for the primitive QA Swift diff.
+- Simulator screenshot QA of the DEBUG Design System Lab.
+- First production micro-migration: small Profile/settings row cluster using `STRQListItem`, `STRQToggleRow`, `STRQSectionHeader`, `STRQBadge`, and `STRQIconContainer`.
+- Work Sans font files and runtime fidelity verification remain pending.
+- Dedicated workout, coach, paywall, nutrition, anatomy, chart, media, tab/navigation, and schedule behavior passes remain future work.
+
+### Warnings
+
+- This pass ran on Windows; `xcodebuild` was not run and is not expected here.
+- Figma component nodes are large; several were intentionally capped rather than full-scanned.
+- New Swift component APIs need macOS build validation before any production adoption.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

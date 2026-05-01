@@ -419,18 +419,23 @@ private struct ButtonsSection: View {
     var body: some View {
         PreviewSection("Buttons") {
             VStack(alignment: .leading, spacing: STRQSpacing.sm) {
-                STRQButton("Primary", icon: .play, variant: .primary) {}
+                STRQButton("Primary", icon: .play, trailingIcon: .arrowRight, variant: .primary) {}
                 STRQButton("Secondary", icon: .star, variant: .secondary) {}
                 STRQButton("Destructive", icon: .trash, variant: .destructive) {}
+                STRQButton("Disabled", icon: .lock, variant: .primary, isDisabled: true) {}
+                STRQButton("Loading", variant: .secondary, isLoading: true) {}
 
                 HStack(spacing: STRQSpacing.sm) {
                     STRQButton("Ghost", icon: .more, variant: .ghost) {}
                     STRQButton("Compact", icon: .check, variant: .compact) {}
+                    STRQButton(icon: .plus, accessibilityLabel: "Icon only") {}
                 }
 
-                HStack(spacing: STRQSpacing.sm) {
-                    STRQIconButton(icon: .settings, variant: .primary) {}
-                    STRQIconButton(icon: .search) {}
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 44), spacing: STRQSpacing.xs)], alignment: .leading, spacing: STRQSpacing.xs) {
+                    STRQIconButton(icon: .settings, variant: .primary, accessibilityLabel: "Primary icon button") {}
+                    STRQIconButton(icon: .search, variant: .neutral, accessibilityLabel: "Neutral icon button") {}
+                    STRQIconButton(icon: .check, variant: .selected, accessibilityLabel: "Selected icon button") {}
+                    STRQIconButton(icon: .more, variant: .ghost, size: .compact, accessibilityLabel: "Compact ghost icon button") {}
                     STRQIconButton(icon: .more, variant: .ghost) {}
                     STRQIconButton(icon: .trash, variant: .destructive) {}
                     STRQIconButton(icon: .lock, isDisabled: true) {}
@@ -468,26 +473,33 @@ private struct ComponentsSection: View {
 
                 LazyVGrid(columns: chipColumns, alignment: .leading, spacing: STRQSpacing.xs) {
                     STRQChip(label: "Neutral")
-                    STRQChip(label: "Selected", icon: .check, tone: .selected)
+                    STRQChip(label: "Selected", icon: .check, trailingIcon: .chevronRight, tone: .selected)
                     STRQChip(label: "Success", icon: .checkCircle, tone: .success)
                     STRQChip(label: "Warning", icon: .warning, tone: .warning)
                     STRQChip(label: "Danger", icon: .warning, tone: .danger)
                     STRQChip(label: "Disabled", icon: .lock, tone: .disabled)
+                    STRQChip(label: "Compact", icon: .bolt, size: .compact)
                 }
 
-                HStack(spacing: STRQSpacing.xs) {
+                LazyVGrid(columns: chipColumns, alignment: .leading, spacing: STRQSpacing.xs) {
                     STRQBadge(text: "12", variant: .count, tone: .neutral)
                     STRQBadge(text: "Ready", icon: .checkCircle, variant: .status, tone: .success)
                     STRQBadge(text: "Caution", icon: .warning, variant: .status, tone: .warning)
+                    STRQBadge(text: "Risk", icon: .warning, variant: .status, tone: .danger)
+                    STRQBadge(text: "PR", icon: .trophy, variant: .achievement, tone: .selected)
                 }
 
                 STRQSearchField(text: $searchText, placeholder: "Search exercises")
+                STRQSearchField(text: .constant(""), placeholder: "Disabled search", isDisabled: true)
                 STRQInputField("Plan name", text: $inputText, placeholder: "Enter plan name", icon: .edit, helper: STRQTypography.fontStatusText)
+                STRQInputField("Error state", text: .constant(""), placeholder: "Required field", icon: .warning, errorMessage: "This field needs attention.")
                 STRQToggleRow(title: "Neutral selected state", subtitle: "Toggle row from list-item control patterns", icon: .checkCircle, isOn: $toggleOn)
+                STRQToggleRow(title: "Disabled toggle", subtitle: "Component-level disabled state", icon: .lock, isDisabled: true, isCompact: true, isOn: .constant(false))
 
                 HStack(spacing: STRQSpacing.sm) {
                     STRQAvatar(initials: "AL", size: .md)
                     STRQAvatar(initials: "MW", size: .lg, tint: STRQColors.selectedSurface)
+                    STRQAvatar(size: .xl, icon: .profile, tint: STRQColors.controlSurface)
 
                     VStack(alignment: .leading, spacing: STRQSpacing.xxs) {
                         STRQRatingStars(rating: 4)
@@ -539,10 +551,23 @@ private struct CardsMetricSection: View {
                     CardPreviewContent(title: "Selected card", detail: "Neutral selected surface and border.")
                 }
 
+                STRQCard(.compact) {
+                    CardPreviewContent(title: "Compact card", detail: "Reduced padding for dense rows.")
+                }
+
+                STRQCard(.hero) {
+                    CardPreviewContent(title: "Hero card", detail: "Large card radius and elevated surface for rare feature modules.")
+                }
+
+                STRQSurface(variant: .inset, border: .subtle, radius: .card, padding: STRQSpacing.md) {
+                    CardPreviewContent(title: "Inset surface", detail: "Primitive surface shell, separate from card semantics.")
+                }
+
                 LazyVGrid(columns: columns, spacing: STRQSpacing.sm) {
-                    STRQMetricCard(value: "87", label: "Readiness", icon: .recovery, unit: "%", tint: STRQColors.successGreen)
+                    STRQMetricCard(value: "87", label: "Readiness", icon: .recovery, unit: "%", delta: "+4%", tint: STRQColors.successGreen)
                     STRQMetricCard(value: "4", label: "Sessions", icon: .calendar, detail: "This week", progress: 0.8)
                     STRQMetricCard(value: "42", label: "Load", icon: .activityRing, detail: "Neutral progress", progress: 0.42)
+                    STRQMetricCard(value: "12", label: "Compact", icon: .bolt, unit: "pts", delta: "-2%", progress: 0.32, size: .compact, tint: STRQColors.warningAmber)
                 }
             }
         }
@@ -574,16 +599,17 @@ private struct ProgressSection: View {
         PreviewSection("Progress") {
             STRQCard {
                 VStack(alignment: .leading, spacing: STRQSpacing.md) {
-                    STRQProgressBar(value: 0.72, label: "Neutral progress", valueText: "72%")
-                    STRQProgressBar(value: 0.88, tint: STRQColors.successGreen, label: "Success", valueText: "88%")
-                    STRQProgressBar(value: 0.48, tint: STRQColors.warningAmber, label: "Warning", valueText: "48%")
-                    STRQProgressBar(value: 0.24, tint: STRQColors.dangerRed, label: "Danger", valueText: "24%")
+                    STRQProgressBar(value: 0.72, tone: .neutral, label: "Neutral progress", valueText: "72%")
+                    STRQProgressBar(value: 0.88, tone: .success, label: "Success", valueText: "88%")
+                    STRQProgressBar(value: 0.48, tone: .warning, label: "Warning", valueText: "48%")
+                    STRQProgressBar(value: 0.24, tone: .danger, label: "Danger", valueText: "24%")
+                    STRQProgressBar(value: 0.36, height: 4, tone: .neutral, compact: true)
 
                     HStack(alignment: .center, spacing: STRQSpacing.lg) {
-                        STRQProgressRing(value: 0.72, variant: .score, label: "Score", valueText: "72")
-                        STRQProgressRing(value: 0.88, variant: .compact, tint: STRQColors.successGreen, label: "OK", valueText: "88")
-                        STRQProgressRing(value: 0.48, variant: .compact, tint: STRQColors.warningAmber, label: "Med", valueText: "48")
-                        STRQProgressRing(value: 0.34, variant: .compact, tint: STRQColors.dangerRed, label: "Low", valueText: "34")
+                        STRQProgressRing(value: 0.72, variant: .score, tone: .neutral, label: "Score", valueText: "72")
+                        STRQProgressRing(value: 0.88, variant: .compact, tone: .success, label: "OK", valueText: "88")
+                        STRQProgressRing(value: 0.48, variant: .compact, tone: .warning, label: "Med", valueText: "48")
+                        STRQProgressRing(value: 0.34, variant: .compact, tone: .danger, label: "Low", valueText: "34")
                     }
                 }
             }
@@ -595,22 +621,28 @@ private struct ListScheduleSection: View {
     var body: some View {
         PreviewSection("List / Schedule") {
             VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                STRQSectionHeader("Section header") {
+                    STRQSectionAction(title: "Action") {}
+                }
+
                 STRQCard(.compact) {
                     VStack(spacing: 0) {
-                        STRQListItem(leadingIcon: .barbell, title: "Strength focus", subtitle: "Heavy upper work", trailingValue: "45m", showsChevron: true)
+                        STRQListItem(leadingIcon: .barbell, title: "Strength focus", subtitle: "Heavy upper work", trailingValue: "45m", showsChevron: true, isSelected: true)
                         STRQListItem(avatarText: "Q1", title: "Quarter target", subtitle: "Volume and consistency", trailingValue: "68%", showsChevron: true, tint: STRQColors.gray700)
-                        STRQListItem(leadingIcon: .recovery, title: "Recovery check", subtitle: "Sleep, soreness, and readiness", trailingValue: "87%", showsChevron: true, showsDivider: false, tint: STRQColors.successGreen)
+                        STRQListItem(leadingIcon: .recovery, title: "Recovery check", subtitle: "Sleep, soreness, and readiness", trailingValue: "87%", trailingIcon: .checkCircle, showsDivider: true, tint: STRQColors.successGreen)
+                        STRQListItem(leadingIcon: .lock, title: "Disabled row", subtitle: "Protected setting", trailingValue: "Off", showsChevron: true, showsDivider: false, isDisabled: true, isCompact: true)
                     }
                 }
 
-                STRQScheduleRow(dateTitle: "29", dateSubtitle: "WED", title: "Upper Strength", subtitle: "Push and pull", duration: "45m", icon: .barbell, isSelected: true)
+                STRQScheduleRow(dateTitle: "29", dateSubtitle: "WED", title: "Upper Strength", subtitle: "Push and pull", duration: "45m", status: "Active", icon: .barbell, isSelected: true)
+                STRQScheduleRow(dateTitle: "30", dateSubtitle: "THU", title: "Lower Power", subtitle: "Hinge and squat", duration: "50m", status: "Done", icon: .train, isCompleted: true, isCompact: true)
 
                 STRQScheduleCard(
                     title: "Schedule card",
                     subtitle: "Preview",
                     rows: [
-                        STRQScheduleRow(dateTitle: "30", dateSubtitle: "THU", title: "Lower Power", subtitle: "Hinge and squat", duration: "50m", icon: .train),
-                        STRQScheduleRow(dateTitle: "01", dateSubtitle: "FRI", title: "Recovery", subtitle: "Mobility and walk", duration: "25m", icon: .recovery)
+                        STRQScheduleRow(dateTitle: "01", dateSubtitle: "FRI", title: "Recovery", subtitle: "Mobility and walk", duration: "25m", status: "Ready", icon: .recovery),
+                        STRQScheduleRow(dateTitle: "02", dateSubtitle: "SAT", title: "Conditioning", subtitle: "Intervals", duration: "30m", status: "Done", icon: .activityRing, isCompleted: true)
                     ]
                 )
 
@@ -621,6 +653,13 @@ private struct ListScheduleSection: View {
                     STRQTabBarItem(title: "Progress", icon: .progress, isSelected: false)
                     STRQTabBarItem(title: "Profile", icon: .profile, isSelected: false)
                 }
+
+                Text("Tab bar background modifier")
+                    .font(STRQTypography.caption)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, STRQSpacing.sm)
+                    .strqTabBarBackground()
             }
         }
     }

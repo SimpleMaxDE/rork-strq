@@ -1,6 +1,6 @@
 # STRQ Design System Import Plan
 
-Last updated: 2026-04-30
+Last updated: 2026-05-01
 
 ## Purpose
 
@@ -12,6 +12,7 @@ Related control docs:
 - [STRQ UI Migration Master Plan](strq-ui-migration-master-plan.md)
 - [Figma Source Map](figma-source-map.md)
 - [Figma Token Parity Report](figma-token-parity-report.md)
+- [Component Primitive QA Report](component-primitive-qa-report.md)
 - [Asset Import Plan](asset-import-plan.md)
 - [Component Migration Plan](component-migration-plan.md)
 - [QA Validation Plan](qa-validation-plan.md)
@@ -113,6 +114,34 @@ Result:
 - The current STRQ-owned foundation is broadly aligned for dark neutral surfaces, primitive gray/orange scales, typography categories, core spacing, icon sizes, semantic success/warning/danger colors, blur values, and core primitive shells.
 - The largest gaps are component-state breadth, exact two-layer Figma shadow stacks, focus-ring tone variants, a few uncommon radius values, light-theme semantic aliases, and Work Sans font binaries.
 - No production screen migration is authorized by this result.
+
+## Component Primitive QA Pass - 2026-05-01
+
+The component primitive QA pass is recorded in [Component Primitive QA Report](component-primitive-qa-report.md).
+
+Result:
+
+- Exact component nodes were inspected for Button, Badge & Chip, Progress, Tab, Navigation, Tab Bar, List Item, Schedule, Card - General, and Card - App Specific.
+- `STRQDesignSystem.swift` remains STRQ-owned and contains all requested primitives.
+- The DEBUG Design System Lab now shows key primitive states for buttons, icon buttons, chips, badges, cards/surfaces, metric cards, progress bars/rings, list items, schedule rows/cards, navigation, search/input/toggle, modal/sheet surfaces, avatar, rating stars, empty state, tab bar primitives, and the full icon grid.
+- Safe API additions were made for component-level states: trailing icons/loading placeholder for buttons, compact/selected icon buttons, chip trailing icon/disabled flag, metric delta/compact, semantic progress tones, list item selected/disabled/compact/trailing icon, search/input disabled/error states, toggle disabled/compact, avatar icon/xl support, empty-state action icon, and schedule status/completed/compact.
+- No production screens, app logic, workout/training logic, assets, fonts, localization catalogs, analytics, RevenueCat/product IDs, persistence, watch/widget targets, or protected flows were changed.
+
+Components now ready for a first production micro-migration, after macOS build validation:
+
+- `STRQListItem`
+- `STRQToggleRow`
+- `STRQSectionHeader`
+- `STRQBadge`
+- `STRQChip`
+- `STRQIconContainer`
+
+Components still partial or intentionally isolated:
+
+- `STRQSearchField` and `STRQInputField` need target behavior audits before production form/search usage.
+- `STRQTabBarContainer`, `STRQTabBarItem`, and `STRQTabBarBackground` must wait for a protected navigation pass.
+- `STRQScheduleRow` and `STRQScheduleCard` need schedule behavior review before training-plan usage.
+- Dedicated workout, coach, nutrition, paywall, anatomy, chart, media, and reward wrappers remain future passes.
 
 ## Runtime Versus Source Provenance
 
@@ -330,4 +359,4 @@ No production view should import or depend on a new STRQ primitive until:
 
 ## Recommended Next Pass
 
-Run a component primitive QA pass in the DEBUG Design System Lab. Focus on buttons, icon buttons, chips, badges, cards, progress, list rows, schedule rows, and tab bar primitives. Add only STRQ-owned missing state APIs that are proven useful in isolation. Do not modify production screens.
+Run the first production micro-migration only after macOS build validation of the primitive QA diff. Recommended target: a small Profile/settings row cluster using `STRQListItem`, `STRQToggleRow`, `STRQSectionHeader`, `STRQBadge`, and `STRQIconContainer`, while preserving all existing navigation, actions, localization, analytics, subscription behavior, and debug route access.
