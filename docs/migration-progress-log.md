@@ -490,6 +490,44 @@ Warnings:
 - The Figma file is very large; the handoff captures the actionable nodes and rules, not a full dump of every canvas object.
 - The handoff prompt is intentionally detailed and should be treated as living project context, not as permission to change protected logic broadly.
 
+## 2026-05-02 - Technical UI Baseline Report Pass
+
+Scope:
+
+- Created a code-only technical UI baseline for future STRQ UI migration prompts.
+- Documented current root navigation, production screens, styling systems, STRQDesignSystem adoption, visual risk areas, protected flows, owner approval gates, Rork screenshot intake, and ranked next work packages.
+
+Files changed:
+
+- `docs/strq-ui-technical-baseline-report.md`
+- `docs/migration-progress-log.md`
+
+Code inspected:
+
+- Required STRQ UI migration docs, `ContentView.swift`, `STRQDesignSystem.swift`, `STRQPalette.swift`, `ForgeTheme.swift`, and targeted production screen files under `ios/STRQ/Views`.
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- Targeted `rg` searches for navigation, Forge/Palette styling, STRQDesignSystem adoption, RevenueCat/paywall, active workout/progression/protected flows, Sandow references, and orange/accent usage.
+
+Intentionally not changed:
+
+- no Swift files
+- no production screens
+- no assets, fonts, localization catalogs, tests, project files, view models, services, models, watch/widget files, `STRQApp.swift`, or `ContentView.swift`
+
+Pending work:
+
+- Owner/Rork screenshot QA after the next actual UI implementation pass.
+- Next recommended implementation remains a narrow Profile/settings row-cluster continuation.
+
+Warnings:
+
+- This was documentation-only on Windows; no `xcodebuild` or simulator run was performed.
+- Active Workout, onboarding, paywall, plan generation/progression, persistence, HealthKit, watch/widget/live activity, localization, and RevenueCat remain protected.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
