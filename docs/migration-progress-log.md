@@ -528,6 +528,53 @@ Warnings:
 - This was documentation-only on Windows; no `xcodebuild` or simulator run was performed.
 - Active Workout, onboarding, paywall, plan generation/progression, persistence, HealthKit, watch/widget/live activity, localization, and RevenueCat remain protected.
 
+## 2026-05-02 - Premium Visual Direction Report Pass
+
+Scope:
+
+- Created a docs-only premium visual/product direction control report to restore owner screenshot findings, block orange as the default CTA identity, define protected areas, and make future Codex prompts stricter.
+
+Files changed:
+
+- `docs/strq-premium-visual-direction-report.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None in this pass. The report used existing STRQ project docs and the owner-provided Rork screenshot findings as source input.
+
+Code inspected:
+
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Utilities/STRQPalette.swift`
+- `ios/STRQ/Utilities/ForgeTheme.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/ContentView.swift`
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- docs/strq-premium-visual-direction-report.md docs/migration-progress-log.md`
+- protected-path and report-content `rg` checks recorded in the final task summary
+
+Intentionally not changed:
+
+- no Swift files
+- no production screens
+- no assets, fonts, localization catalogs, tests, project files, view models, services, models, watch/widget files, `STRQApp.swift`, or `ContentView.swift`
+
+Pending work:
+
+- Foundation hardening for CTA/accent/surface/list policy.
+- Design System Lab QA and primitive readiness confirmation.
+- Continued Profile migration only after foundation guardrails are stable.
+
+Warnings:
+
+- This was documentation-only on Windows; no `xcodebuild`, Rork simulator run, or screenshot QA was performed.
+- Active Workout, Paywall, Onboarding, plan generation/progression, persistence, HealthKit, watch/widget/live activity, localization, RevenueCat, analytics, account/restore, and reset flows remain protected.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
