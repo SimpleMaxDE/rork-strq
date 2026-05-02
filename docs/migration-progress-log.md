@@ -404,6 +404,92 @@ Button, Badge & Chip, Progress, Tab, Tab Bar, List Item, Card - General, and Car
 - Figma component nodes are large; several were intentionally capped rather than full-scanned.
 - New Swift component APIs need macOS build validation before any production adoption.
 
+## 2026-05-02 - ChatGPT Project Handoff Prompt Pass
+
+Scope:
+
+- Created a detailed master handoff prompt for restarting ChatGPT from zero.
+- Consolidated repo architecture, protected logic, product scope, Figma source mapping, design system status, migration strategy, QA expectations, and ChatGPT-to-Codex operating rules.
+- Defined the working model requested by the user: ChatGPT speaks German with the user, writes Codex prompts in English, acts like a project/product/engineering lead, and asks the user mainly for meaningful yes/no decisions.
+- Added ready-to-send English Codex prompt templates sized for bounded implementation passes instead of overly broad tasks.
+
+Files changed:
+
+- `docs/chatgpt-strq-master-handoff.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- File: `SH-sandow-UI-Kit--v3.0-`
+- File key: `LBvxljax0ixoTvbvvUeWVC`
+- URL: `https://www.figma.com/design/LBvxljax0ixoTvbvvUeWVC/SH-sandow-UI-Kit--v3.0-?m=auto&t=Cm2KJRPJnU51BdTq-6`
+- Direct file inventory: 11 pages, 1082 local variables, 184 paint styles, 73 text styles, 25 effect styles, 3 grid styles.
+- Variable collections confirmed: `Semantics` with Light/Dark modes and `Primitives` with Light mode.
+- Key source pages and nodes recorded: Foundations, Icon Set, Design System General Components, App Components, Main Light, Main Dark, Bonus Dashboard, Bonus Mobile Patterns.
+- Key component/source nodes recorded in the handoff: Profile Settings, dark Home, Badge & Chip, Button, Chart, Form Control, Input, Progress, Tab, App Bar, Bottom Sheet, Card, List Item, Navigation, Schedule, Section Header, Tab Bar, pricing, anatomy, equipment, illustration, and achievement assets.
+- Figma search behavior recorded: prefer short exact searches and known node IDs; long compound searches returned weak/no results.
+
+Code inspected:
+
+- `rork.json`
+- `.github/workflows/ios-build.yml`
+- `.gitignore`
+- `PLAN.md`
+- `docs/README.md`
+- `docs/strq-ui-migration-master-plan.md`
+- `docs/migration-progress-log.md`
+- `docs/figma-source-map.md`
+- `docs/protected-logic-map.md`
+- `docs/project-ui-audit.md`
+- `docs/design-system-import-plan.md`
+- `docs/component-migration-plan.md`
+- `docs/component-primitive-qa-report.md`
+- `docs/figma-token-parity-report.md`
+- `docs/asset-import-plan.md`
+- `docs/qa-validation-plan.md`
+- `docs/ui-direction-options.md`
+- `docs/localization-guidelines.md`
+- `ios/STRQ/STRQApp.swift`
+- `ios/STRQ/ContentView.swift`
+- `ios/STRQ/ViewModels/AppViewModel.swift`
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQTests/STRQTests.swift`
+- app entitlements and Xcode project identifiers
+
+Verification run:
+
+- Static repo inspection with `rg`, `git status`, and targeted `Get-Content` reads.
+- Figma exact-node inspection through the Figma Plugin API.
+- No Swift build was run in this pass.
+
+Intentionally not changed:
+
+- no Swift production code
+- no Figma canvas writes
+- no runtime app behavior
+- no business logic
+- no tests
+- no assets
+- no fonts
+- no localization files
+- no RevenueCat, bundle, app group, or iCloud identifiers
+
+Pending work:
+
+- User can use `docs/chatgpt-strq-master-handoff.md` as the new ChatGPT system/project prompt.
+- ChatGPT should start by choosing the next bounded implementation prompt, preferably the debug design system lab build/QA or first Profile row-cluster micro-migration.
+- macOS/Xcode build validation remains pending for Swift implementation tasks.
+- Work Sans font import and visual parity remain pending.
+- Figma-driven migrations should continue node-by-node with small Codex prompts.
+
+Warnings:
+
+- This pass is documentation and project orchestration only.
+- The Figma file is very large; the handoff captures the actionable nodes and rules, not a full dump of every canvas object.
+- The handoff prompt is intentionally detailed and should be treated as living project context, not as permission to change protected logic broadly.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

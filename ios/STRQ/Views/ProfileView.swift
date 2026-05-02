@@ -737,16 +737,16 @@ struct ProfileView: View {
 
     private var controlsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: L10n.tr("Notifications & Tools"))
+            STRQSectionHeader(L10n.tr("Notifications & Tools"))
+                .textCase(.uppercase)
 
-            VStack(spacing: 1) {
+            VStack(spacing: 0) {
                 NavigationLink {
                     NotificationSettingsView(vm: vm)
                 } label: {
-                    controlRowContent(L10n.tr("Notifications"), icon: "bell.fill", color: STRQBrand.steel)
-                        .background(Color(.secondarySystemGroupedBackground))
+                    controlsListRowContent(L10n.tr("Notifications"), icon: .bell)
                 }
-                controlRow(L10n.tr("Restore Purchases"), icon: "arrow.clockwise", color: STRQBrand.steel) {
+                controlsListButtonRow(L10n.tr("Restore Purchases"), icon: .repeatAction) {
                     guard store.isConfigured else {
                         store.restoreMessage = L10n.tr("Subscriptions are not available in this environment.")
                         showRestoreMessage = true
@@ -757,7 +757,11 @@ struct ProfileView: View {
                         showRestoreMessage = true
                     }
                 }
-                controlRow(L10n.tr("profile.regeneratePlan", fallback: "Regenerate Plan"), icon: "arrow.triangle.2.circlepath", color: STRQBrand.steel) {
+                controlsListButtonRow(
+                    L10n.tr("profile.regeneratePlan", fallback: "Regenerate Plan"),
+                    icon: .repeatAction,
+                    showsDivider: controlsSectionShowsDesignSystemLab
+                ) {
                     Analytics.shared.track(.regenerate_plan_dialog_opened, ["surface": "profile"])
                     showPlanRegenerationDialog = true
                 }
@@ -770,10 +774,11 @@ struct ProfileView: View {
                 }
                 #endif
             }
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: 12))
             .clipShape(.rect(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
             )
         }
     }
@@ -852,6 +857,36 @@ struct ProfileView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 11)
         .background(Color(.secondarySystemGroupedBackground))
+    }
+
+    private var controlsSectionShowsDesignSystemLab: Bool {
+        #if DEBUG
+        true
+        #else
+        false
+        #endif
+    }
+
+    private func controlsListButtonRow(
+        _ label: String,
+        icon: STRQIcon,
+        showsDivider: Bool = true,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            controlsListRowContent(label, icon: icon, showsDivider: showsDivider)
+        }
+    }
+
+    private func controlsListRowContent(_ label: String, icon: STRQIcon, showsDivider: Bool = true) -> some View {
+        STRQListItem(
+            leadingIcon: icon,
+            title: label,
+            showsChevron: true,
+            showsDivider: showsDivider,
+            tint: STRQColors.iconSecondary
+        )
+        .background(STRQColors.cardSurface)
     }
 
     private func controlRow(_ label: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
