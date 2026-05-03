@@ -879,34 +879,27 @@ struct ProfileView: View {
     }
 
     private func controlsListRowContent(_ label: String, icon: STRQIcon, showsDivider: Bool = true) -> some View {
-        STRQListItem(
-            leadingIcon: icon,
-            title: label,
-            showsChevron: true,
-            showsDivider: showsDivider,
-            tint: STRQColors.iconSecondary
-        )
-        .background(STRQColors.cardSurface)
+        controlsListRowContent(label, showsDivider: showsDivider) {
+            STRQIconContainer(icon: icon, size: .md, tint: STRQColors.iconSecondary)
+        }
     }
 
     private func controlsListSymbolRowContent(_ label: String, systemIcon: String, showsDivider: Bool = true) -> some View {
+        controlsListRowContent(label, showsDivider: showsDivider) {
+            controlsListSystemIcon(systemIcon)
+        }
+    }
+
+    private func controlsListRowContent<LeadingIcon: View>(
+        _ label: String,
+        showsDivider: Bool = true,
+        @ViewBuilder leadingIcon: () -> LeadingIcon
+    ) -> some View {
         VStack(spacing: 0) {
             HStack(spacing: STRQSpacing.sm) {
-                Image(systemName: systemIcon)
-                    .font(.system(size: STRQSpacing.iconSM, weight: .semibold))
-                    .foregroundStyle(STRQColors.iconSecondary)
-                    .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
-                    .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
-                            .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
-                    )
+                leadingIcon()
 
-                Text(label)
-                    .font(STRQTypography.bodyMedium)
-                    .foregroundStyle(STRQColors.primaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.82)
+                controlsListRowTitle(label)
 
                 Spacer(minLength: STRQSpacing.sm)
 
@@ -923,6 +916,27 @@ struct ProfileView: View {
             }
         }
         .background(STRQColors.cardSurface)
+        .accessibilityLabel(label)
+    }
+
+    private func controlsListRowTitle(_ label: String) -> some View {
+        Text(label)
+            .font(STRQTypography.labelLarge)
+            .foregroundStyle(STRQColors.primaryText)
+            .lineLimit(1)
+            .minimumScaleFactor(0.82)
+    }
+
+    private func controlsListSystemIcon(_ systemIcon: String) -> some View {
+        Image(systemName: systemIcon)
+            .font(.system(size: STRQSpacing.iconSM, weight: .semibold))
+            .foregroundStyle(STRQColors.iconSecondary)
+            .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+            .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
     }
 
     private func controlRow(_ label: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
