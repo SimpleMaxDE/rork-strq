@@ -769,8 +769,7 @@ struct ProfileView: View {
                 NavigationLink {
                     STRQDesignSystemPreviewView()
                 } label: {
-                    controlRowContent("Design System Lab", icon: "paintpalette.fill", color: STRQBrand.steel)
-                        .background(Color(.secondarySystemGroupedBackground))
+                    controlsListSymbolRowContent("Design System Lab", systemIcon: "paintpalette.fill", showsDivider: false)
                 }
                 #endif
             }
@@ -886,6 +885,42 @@ struct ProfileView: View {
             showsDivider: showsDivider,
             tint: STRQColors.iconSecondary
         )
+        .background(STRQColors.cardSurface)
+    }
+
+    private func controlsListSymbolRowContent(_ label: String, systemIcon: String, showsDivider: Bool = true) -> some View {
+        VStack(spacing: 0) {
+            HStack(spacing: STRQSpacing.sm) {
+                Image(systemName: systemIcon)
+                    .font(.system(size: STRQSpacing.iconSM, weight: .semibold))
+                    .foregroundStyle(STRQColors.iconSecondary)
+                    .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                    .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                            .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                    )
+
+                Text(label)
+                    .font(STRQTypography.bodyMedium)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
+
+                Spacer(minLength: STRQSpacing.sm)
+
+                STRQIconView(.chevronRight, size: STRQSpacing.iconSM, tint: STRQColors.mutedText)
+            }
+            .padding(.vertical, STRQSpacing.sm)
+            .padding(.horizontal, STRQSpacing.listItemPadding)
+
+            if showsDivider {
+                Rectangle()
+                    .fill(STRQColors.divider)
+                    .frame(height: 1)
+                    .padding(.leading, 68)
+            }
+        }
         .background(STRQColors.cardSurface)
     }
 

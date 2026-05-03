@@ -703,6 +703,47 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-03 - Profile Controls Section Completion / Icon Consistency
+
+Scope:
+
+- Completed a narrow Profile `controlsSection` completion/icon-consistency pass by aligning the DEBUG Design System Lab row with the migrated controls list shell while preserving existing behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Local docs and code remained the source of truth.
+
+Code inspected:
+
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+
+Verification run:
+
+- Profile controls diff, DEBUG route, restore flow, regenerate-plan analytics/dialog, protected-path, and Sandow-reference static checks.
+
+Intentionally not changed:
+
+- no `STRQDesignSystem.swift`
+- no `STRQDesignSystemPreviewView.swift`
+- no production screens outside the scoped Profile controls row
+- no assets, fonts, localization catalogs, RevenueCat/store files, tests, project files, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, or `ContentView.swift`
+
+Pending work:
+
+- Rork simulator QA for the Profile controls section and DEBUG Design System Lab route.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
