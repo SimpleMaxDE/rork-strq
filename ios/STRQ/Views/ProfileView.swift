@@ -590,21 +590,27 @@ struct ProfileView: View {
 
     private var bodyNutrition: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: L10n.tr("Body & Nutrition"))
+            STRQSectionHeader(L10n.tr("Body & Nutrition"))
+                .textCase(.uppercase)
 
             trackingToggleCard
 
-            VStack(spacing: 1) {
-                profileRow(L10n.tr("Height"), value: L10n.format("%d cm", Int(vm.profile.heightCm)))
-                profileRow(L10n.tr("Weight"), value: L10n.format("%.1f kg", vm.profile.weightKg))
-                profileRow(L10n.tr("Age"), value: "\(vm.profile.age)")
+            VStack(spacing: 0) {
+                bodyNutritionInfoRow(L10n.tr("Height"), value: L10n.format("%d cm", Int(vm.profile.heightCm)))
+                bodyNutritionInfoRow(L10n.tr("Weight"), value: L10n.format("%.1f kg", vm.profile.weightKg))
+                bodyNutritionInfoRow(L10n.tr("Age"), value: "\(vm.profile.age)", showsDivider: vm.profile.nutritionTrackingEnabled)
                 if vm.profile.nutritionTrackingEnabled {
-                    profileRow(L10n.tr("Calories"), value: L10n.format("%d kcal", vm.nutritionTarget.calories))
-                    profileRow(L10n.tr("Protein"), value: L10n.format("%dg", vm.nutritionTarget.proteinGrams))
-                    profileRow(L10n.tr("Goal"), value: vm.nutritionTarget.nutritionGoal.displayName)
+                    bodyNutritionInfoRow(L10n.tr("Calories"), value: L10n.format("%d kcal", vm.nutritionTarget.calories))
+                    bodyNutritionInfoRow(L10n.tr("Protein"), value: L10n.format("%dg", vm.nutritionTarget.proteinGrams))
+                    bodyNutritionInfoRow(L10n.tr("Goal"), value: vm.nutritionTarget.nutritionGoal.displayName, showsDivider: false)
                 }
             }
-            .clipShape(.rect(cornerRadius: 12))
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
 
             HStack(spacing: 10) {
                 if vm.profile.nutritionTrackingEnabled {
@@ -851,18 +857,36 @@ struct ProfileView: View {
 
     // MARK: - Components
 
-    private func profileRow(_ label: String, value: String) -> some View {
-        HStack {
-            Text(label)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Text(value)
-                .font(.subheadline.weight(.medium))
+    private func bodyNutritionInfoRow(_ title: String, value: String, showsDivider: Bool = true) -> some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .firstTextBaseline, spacing: STRQSpacing.sm) {
+                Text(title)
+                    .font(STRQTypography.paragraphSmall)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
+
+                Spacer(minLength: STRQSpacing.sm)
+
+                Text(value)
+                    .font(STRQTypography.labelMedium)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .multilineTextAlignment(.trailing)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+            }
+            .padding(.horizontal, STRQSpacing.listItemPadding)
+            .padding(.vertical, STRQSpacing.sm)
+
+            if showsDivider {
+                Rectangle()
+                    .fill(STRQColors.divider)
+                    .frame(height: 1)
+                    .padding(.horizontal, STRQSpacing.listItemPadding)
+            }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 11)
-        .background(Color(.secondarySystemGroupedBackground))
+        .background(STRQColors.cardSurface)
+        .accessibilityLabel([title, value].joined(separator: ", "))
     }
 
     private func trainingSetupInfoRow(_ title: String, value: String, showsDivider: Bool = true) -> some View {
