@@ -983,6 +983,52 @@ Warnings:
 - This pass was documentation-only on Windows; no `xcodebuild`, Rork simulator run, GitHub remote verification, or screenshot QA was performed.
 - Subscription, account/iCloud, danger/reset, tracking toggle side effects, paywall, RevenueCat, analytics, localization, and protected app logic remain blocked without explicit owner approval.
 
+## 2026-05-03 - Profile Coaching Style Row Shell Migration
+
+Scope:
+
+- Applied a narrow Profile `coachingStyleRow` visual shell migration to the accepted calm dark/carbon Profile style while preserving the coaching preferences navigation and displayed values.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `docs/README.md`
+- `docs/profile-remaining-sections-risk-audit.md`
+- `docs/strq-premium-visual-direction-report.md`
+- `docs/strq-foundation-hardening-pass-1.md`
+- `docs/strq-foundation-hardening-pass-2-design-lab-readiness.md`
+- `docs/component-primitive-qa-report.md`
+- `docs/qa-validation-plan.md`
+- `docs/migration-progress-log.md`
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+
+Verification run:
+
+- Targeted Profile coaching row, accepted-section, protected-reference, protected-path, and Sandow-reference static checks.
+
+Intentionally not changed:
+
+- no accepted `controlsSection`, Training Setup static rows, Body & Nutrition static info rows, `trackingToggleCard`, subscription/account/danger/paywall/iCloud/reset/toggle/sheet behavior, assets, fonts, localization catalogs, RevenueCat/store files, project files, tests, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, `ContentView.swift`, `STRQDesignSystem.swift`, or `STRQDesignSystemPreviewView.swift`
+
+Pending work:
+
+- Rork simulator QA for the Profile Coaching Style row on small and large iPhone viewports.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

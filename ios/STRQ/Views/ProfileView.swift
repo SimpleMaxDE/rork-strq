@@ -693,58 +693,72 @@ struct ProfileView: View {
         return NavigationLink {
             CoachingPreferencesView(vm: vm)
         } label: {
-            HStack(alignment: .center, spacing: 12) {
+            HStack(alignment: .center, spacing: STRQSpacing.sm) {
                 Image(systemName: "person.bust.fill")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(STRQColors.iconSecondary)
+                    .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                    .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                            .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                    )
 
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 6) {
+                VStack(alignment: .leading, spacing: STRQSpacing.px150) {
+                    HStack(spacing: STRQSpacing.px150) {
                         Text(L10n.tr("Coaching Style"))
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.primary)
+                            .font(STRQTypography.labelMedium)
+                            .foregroundStyle(STRQColors.primaryText)
                         Text(L10n.tr("PERSONAL"))
-                            .font(.system(size: 9, weight: .black))
-                            .tracking(0.8)
-                            .foregroundStyle(STRQBrand.steel)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+                            .font(STRQTypography.labelXS)
+                            .tracking(STRQTypography.labelXSTracking)
+                            .foregroundStyle(STRQColors.secondaryText)
+                            .padding(.horizontal, STRQSpacing.px150)
+                            .padding(.vertical, STRQSpacing.px50)
+                            .background(STRQColors.controlSurface, in: Capsule())
+                            .overlay(
+                                Capsule()
+                                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                            )
                     }
-                    HStack(spacing: 5) {
+                    HStack(spacing: STRQSpacing.px150) {
                         styleChip(icon: prefs.tone.symbolName, label: prefs.tone.displayName)
                         styleChip(icon: prefs.emphasis.symbolName, label: prefs.emphasis.displayName)
                         styleChip(icon: prefs.density.symbolName, label: prefs.density.displayName)
                     }
                 }
                 Spacer(minLength: 0)
-                Image(systemName: "chevron.right")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.tertiary)
+                STRQIconView(.chevronRight, size: STRQSpacing.iconXS, tint: STRQColors.iconMuted)
             }
-            .padding(14)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+            .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+            .padding(.vertical, STRQSpacing.sm)
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
     }
 
     private func styleChip(icon: String, label: String) -> some View {
-        HStack(spacing: 3) {
+        HStack(spacing: STRQSpacing.px50) {
             Image(systemName: icon)
-                .font(.system(size: 8, weight: .bold))
+                .font(.system(size: 10, weight: .semibold))
             Text(label)
-                .font(.system(size: 9, weight: .bold))
+                .font(STRQTypography.labelXS)
+                .tracking(STRQTypography.chipTracking)
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
         }
-        .foregroundStyle(STRQBrand.steel)
-        .padding(.horizontal, 6)
-        .padding(.vertical, 3)
-        .background(STRQBrand.steel.opacity(0.10), in: Capsule())
+        .foregroundStyle(STRQColors.secondaryText)
+        .padding(.horizontal, STRQSpacing.px150)
+        .padding(.vertical, STRQSpacing.px100)
+        .background(STRQColors.controlSurface, in: Capsule())
+        .overlay(
+            Capsule()
+                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+        )
     }
 
     private var controlsSection: some View {
