@@ -857,6 +857,44 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-03 - Profile Training Setup Static Row Shell Migration
+
+Scope:
+
+- Applied a narrow Profile `trainingSetup` static row-shell migration to the STRQ design-system visual language while preserving displayed values and leaving focus muscle chips unchanged.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+
+Verification run:
+
+- Targeted Profile training setup, row-helper reuse, controls section, protected-path, and Sandow-reference static checks.
+
+Intentionally not changed:
+
+- no focus muscle chips, Body & Nutrition, controlsSection, account, subscription, danger, paywall, assets, fonts, localization catalogs, RevenueCat/store files, project files, tests, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, `ContentView.swift`, or design-system utility/debug files
+
+Pending work:
+
+- Rork simulator QA for the Profile Training Setup section.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

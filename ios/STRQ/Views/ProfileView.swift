@@ -553,15 +553,21 @@ struct ProfileView: View {
 
     private var trainingSetup: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: L10n.tr("Training Setup"))
+            STRQSectionHeader(L10n.tr("Training Setup"))
+                .textCase(.uppercase)
 
-            VStack(spacing: 1) {
-                profileRow(L10n.tr("Days / Week"), value: "\(vm.profile.daysPerWeek)")
-                profileRow(L10n.tr("Workout Length"), value: L10n.format("%d min", vm.profile.minutesPerSession))
-                profileRow(L10n.tr("Split"), value: vm.profile.splitPreference.displayName)
-                profileRow(L10n.tr("Location"), value: vm.profile.trainingLocation.displayName)
+            VStack(spacing: 0) {
+                trainingSetupInfoRow(L10n.tr("Days / Week"), value: "\(vm.profile.daysPerWeek)")
+                trainingSetupInfoRow(L10n.tr("Workout Length"), value: L10n.format("%d min", vm.profile.minutesPerSession))
+                trainingSetupInfoRow(L10n.tr("Split"), value: vm.profile.splitPreference.displayName)
+                trainingSetupInfoRow(L10n.tr("Location"), value: vm.profile.trainingLocation.displayName, showsDivider: false)
             }
-            .clipShape(.rect(cornerRadius: 12))
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
 
             if !vm.profile.focusMuscles.isEmpty {
                 ScrollView(.horizontal) {
@@ -857,6 +863,38 @@ struct ProfileView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 11)
         .background(Color(.secondarySystemGroupedBackground))
+    }
+
+    private func trainingSetupInfoRow(_ title: String, value: String, showsDivider: Bool = true) -> some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .firstTextBaseline, spacing: STRQSpacing.sm) {
+                Text(title)
+                    .font(STRQTypography.paragraphSmall)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
+
+                Spacer(minLength: STRQSpacing.sm)
+
+                Text(value)
+                    .font(STRQTypography.labelMedium)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .multilineTextAlignment(.trailing)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+            }
+            .padding(.horizontal, STRQSpacing.listItemPadding)
+            .padding(.vertical, STRQSpacing.sm)
+
+            if showsDivider {
+                Rectangle()
+                    .fill(STRQColors.divider)
+                    .frame(height: 1)
+                    .padding(.horizontal, STRQSpacing.listItemPadding)
+            }
+        }
+        .background(STRQColors.cardSurface)
+        .accessibilityLabel([title, value].joined(separator: ", "))
     }
 
     private var controlsSectionShowsDesignSystemLab: Bool {
