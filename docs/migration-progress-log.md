@@ -1029,6 +1029,49 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-03 - Coaching Style Experience Redesign Plan
+
+Scope:
+
+- Created a docs-only Coaching Style experience redesign plan after Rork screenshot observations showed the current row and detail screen are functional but not premium enough.
+
+Files changed:
+
+- `docs/coaching-style-experience-redesign-plan.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Read-only bounded Figma inspection only.
+- Dark AI Fitness Coach node `11605:86057`.
+- Dark AI Fitness Coach subnodes `11605:86093` and `11605:87046`.
+- Dark Profile Settings & Help Center node `11613:167073`.
+- Dark Profile Settings & Help Center subnodes `11613:167244` and `11613:167256`.
+- Design System App Components / List Item node `9134:89206`.
+- Design System General Components / Badge & Chip node `9126:59240`.
+- Design System General Components / Button node `9128:103928`.
+
+Code inspected:
+
+- Requested migration docs, source map, progress log, `ProfileView.swift`, `CoachingPreferencesView.swift`, and `STRQDesignSystem.swift`.
+
+Verification run:
+
+- Docs-only diff, protected iOS path diff, exact plan-content search, and worktree checks.
+
+Intentionally not changed:
+
+- no Swift files, no ProfileView, no CoachingPreferencesView, no STRQDesignSystem, no ContentView, no STRQApp, no assets, fonts, localization catalogs, RevenueCat/store files, project files, tests, view models, services, models, watch/widget/live activity files, analytics, persistence, account, reset, paywall, onboarding, active workout, plan generation, progression, HealthKit, or Figma canvas writes
+
+Pending work:
+
+- Future implementation should start with exactly one scoped pass: Profile `coachingStyleRow` redesign only.
+- Rork simulator QA is required after any future Swift UI implementation.
+
+Warnings:
+
+- This pass was documentation-only on Windows; no `xcodebuild`, Rork simulator run, GitHub remote verification, or screenshot QA was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
