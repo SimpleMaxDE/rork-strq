@@ -933,6 +933,56 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-03 - Profile Remaining Sections Risk Audit
+
+Scope:
+
+- Created a docs-only risk audit for remaining unmigrated Profile sections and selected exactly one next candidate prompt.
+
+Files changed:
+
+- `docs/profile-remaining-sections-risk-audit.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `docs/README.md`
+- `docs/strq-premium-visual-direction-report.md`
+- `docs/strq-foundation-hardening-pass-1.md`
+- `docs/strq-foundation-hardening-pass-2-design-lab-readiness.md`
+- `docs/component-primitive-qa-report.md`
+- `docs/qa-validation-plan.md`
+- `docs/migration-progress-log.md`
+- `docs/protected-logic-map.md`
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+
+Verification run:
+
+- Static Profile helper, visual debt, protected behavior, STRQ primitive, Sandow-reference, protected-path, and docs diff checks.
+
+Intentionally not changed:
+
+- no Swift files
+- no production screens
+- no accepted Profile sections
+- no assets, fonts, localization catalogs, RevenueCat/store files, project files, tests, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, `ContentView.swift`, `STRQDesignSystem.swift`, or `STRQDesignSystemPreviewView.swift`
+
+Pending work:
+
+- Recommended next implementation prompt is `coachingStyleRow` visual shell migration only.
+- Rork simulator QA is required after any future Profile UI implementation pass.
+
+Warnings:
+
+- This pass was documentation-only on Windows; no `xcodebuild`, Rork simulator run, GitHub remote verification, or screenshot QA was performed.
+- Subscription, account/iCloud, danger/reset, tracking toggle side effects, paywall, RevenueCat, analytics, localization, and protected app logic remain blocked without explicit owner approval.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
