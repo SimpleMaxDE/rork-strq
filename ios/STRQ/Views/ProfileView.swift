@@ -773,6 +773,7 @@ struct ProfileView: View {
                 }
                 #endif
             }
+            .buttonStyle(.plain)
             .background(STRQColors.cardSurface, in: .rect(cornerRadius: 12))
             .clipShape(.rect(cornerRadius: 12))
             .overlay(

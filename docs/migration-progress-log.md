@@ -744,6 +744,44 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-03 - Profile Controls Section Typography Consistency Fix
+
+Scope:
+
+- Applied a tiny Profile `controlsSection` typography consistency fix after Rork QA found the Notifications row title visually smaller than the other controls rows.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+
+Verification run:
+
+- Targeted Profile controls, DEBUG route, protected-path, Sandow-reference, and diff checks.
+
+Intentionally not changed:
+
+- no protected Profile sections, design-system utility files, Debug Lab source, assets, fonts, localization catalogs, RevenueCat/store files, project files, tests, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, or `ContentView.swift`
+
+Pending work:
+
+- Rork simulator QA for the Profile controls section typography.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
