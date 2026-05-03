@@ -597,21 +597,40 @@ private struct CardPreviewContent: View {
 private struct ProgressSection: View {
     var body: some View {
         PreviewSection("Progress") {
-            STRQCard {
-                VStack(alignment: .leading, spacing: STRQSpacing.md) {
-                    STRQProgressBar(value: 0.72, tone: .neutral, label: "Neutral progress", valueText: "72%")
-                    STRQProgressBar(value: 0.88, tone: .success, label: "Success", valueText: "88%")
-                    STRQProgressBar(value: 0.48, tone: .warning, label: "Warning", valueText: "48%")
-                    STRQProgressBar(value: 0.24, tone: .danger, label: "Danger", valueText: "24%")
-                    STRQProgressBar(value: 0.36, height: 4, tone: .neutral, compact: true)
+            VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+                STRQCard {
+                    VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                        STRQProgressBar(value: 0.72, tone: .neutral, label: "Neutral progress", valueText: "72%")
+                        STRQProgressBar(value: 0.88, tone: .success, label: "Success", valueText: "88%")
+                        STRQProgressBar(value: 0.48, tone: .warning, label: "Warning", valueText: "48%")
+                        STRQProgressBar(value: 0.24, tone: .danger, label: "Danger", valueText: "24%")
+                        STRQProgressBar(value: 0.36, height: 4, tone: .neutral, compact: true)
 
-                    HStack(alignment: .center, spacing: STRQSpacing.lg) {
-                        STRQProgressRing(value: 0.72, variant: .score, tone: .neutral, label: "Score", valueText: "72")
-                        STRQProgressRing(value: 0.88, variant: .compact, tone: .success, label: "OK", valueText: "88")
-                        STRQProgressRing(value: 0.48, variant: .compact, tone: .warning, label: "Med", valueText: "48")
-                        STRQProgressRing(value: 0.34, variant: .compact, tone: .danger, label: "Low", valueText: "34")
+                        HStack(alignment: .center, spacing: STRQSpacing.lg) {
+                            STRQProgressRing(value: 0.72, variant: .score, tone: .neutral, label: "Score", valueText: "72")
+                            STRQProgressRing(value: 0.88, variant: .compact, tone: .success, label: "OK", valueText: "88")
+                            STRQProgressRing(value: 0.48, variant: .compact, tone: .warning, label: "Med", valueText: "48")
+                            STRQProgressRing(value: 0.34, variant: .compact, tone: .danger, label: "Low", valueText: "34")
+                        }
                     }
                 }
+
+                STRQProgressRow(
+                    label: "Training Load",
+                    value: "72%",
+                    detail: "Weekly target pace",
+                    icon: .train,
+                    progress: 0.72
+                )
+
+                STRQProgressRow(
+                    label: "Volume Target",
+                    value: "88%",
+                    detail: "Four-week strength block",
+                    icon: .activityRing,
+                    progress: 0.88,
+                    tint: STRQColors.successGreen
+                )
             }
         }
     }

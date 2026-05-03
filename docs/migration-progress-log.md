@@ -663,6 +663,46 @@ Warnings:
 - This was documentation-only on Windows; no `xcodebuild`, Rork simulator run, GitHub remote verification, or screenshot QA was performed.
 - `STRQButton` is not ready to replace production CTAs broadly; protected flows still require owner approval.
 
+## 2026-05-03 - DEBUG Design System Lab Progress Row Coverage Patch
+
+Scope:
+
+- Applied a DEBUG-only Design System Lab patch adding visible `STRQProgressRow` coverage in the existing Progress section.
+
+Files changed:
+
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. This pass used local docs and code only.
+
+Code inspected:
+
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+
+Verification run:
+
+- Local static diff, DEBUG route, `STRQProgressRow`, protected-path, and Sandow-reference checks.
+
+Intentionally not changed:
+
+- no production screens
+- no `STRQDesignSystem.swift`
+- no assets, fonts, localization catalogs, RevenueCat/store files, tests, project files, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, or `ContentView.swift`
+
+Pending work:
+
+- Rork simulator screenshot QA for the DEBUG Design System Lab.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
