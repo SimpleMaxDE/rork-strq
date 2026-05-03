@@ -575,6 +575,50 @@ Warnings:
 - This was documentation-only on Windows; no `xcodebuild`, Rork simulator run, or screenshot QA was performed.
 - Active Workout, Paywall, Onboarding, plan generation/progression, persistence, HealthKit, watch/widget/live activity, localization, RevenueCat, analytics, account/restore, and reset flows remain protected.
 
+## 2026-05-03 - Foundation Hardening Pass 1
+
+Scope:
+
+- Created a docs-only CTA, accent, surface/card/list, chip/badge, progress, primitive-readiness, and migration-policy audit before further production UI migration.
+
+Files changed:
+
+- `docs/strq-foundation-hardening-pass-1.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None in this pass. The audit used existing STRQ control docs and targeted repository inspection.
+
+Code inspected:
+
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Utilities/STRQPalette.swift`
+- `ios/STRQ/Utilities/ForgeTheme.swift`
+- `ios/STRQ/Utilities/STRQInteraction.swift`
+- targeted production SwiftUI views for CTA, accent, surface/list/card, chip/badge, and progress usage
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- targeted `rg` searches for CTA/button systems, orange/accent usage, surfaces/lists/cards, chips/badges/progress, primitives, protected references, source-name references, and report content
+
+Intentionally not changed:
+
+- no Swift source files
+- no assets, fonts, localization catalogs, RevenueCat/store files, tests, project files, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, or `ContentView.swift`
+
+Pending work:
+
+- Foundation Hardening Pass 2: Design System Lab primitive readiness QA.
+- Profile controlsSection completion only after lab readiness is confirmed.
+
+Warnings:
+
+- This was documentation-only on Windows; no `xcodebuild`, Rork simulator run, or screenshot QA was performed.
+- Active Workout, Paywall, Onboarding, Plan Reveal, Train broad migration, Coach action cards, HealthKit, RevenueCat, Watch/Widget/Live Activity, persistence, progression, and plan generation remain explicitly not ready.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
