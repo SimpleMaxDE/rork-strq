@@ -619,6 +619,50 @@ Warnings:
 - This was documentation-only on Windows; no `xcodebuild`, Rork simulator run, or screenshot QA was performed.
 - Active Workout, Paywall, Onboarding, Plan Reveal, Train broad migration, Coach action cards, HealthKit, RevenueCat, Watch/Widget/Live Activity, persistence, progression, and plan generation remain explicitly not ready.
 
+## 2026-05-03 - Foundation Hardening Pass 2 Design Lab Readiness
+
+Scope:
+
+- Created a docs-only Design System Lab primitive readiness QA report for `STRQDesignSystem` adoption decisions.
+
+Files changed:
+
+- `docs/strq-foundation-hardening-pass-2-design-lab-readiness.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None in this pass. Local docs and repository code remained the source of truth.
+
+Code inspected:
+
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- targeted production usage references under `ios/STRQ/Views`
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- targeted `rg` searches for DEBUG route status, primitive definitions/usages, CTA/button state coverage, accent/semantic state coverage, typography/font status, production adoption, protected references, source-name references, and report content
+
+Intentionally not changed:
+
+- no Swift source files
+- no assets, fonts, localization catalogs, RevenueCat/store files, tests, project files, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, or `ContentView.swift`
+
+Pending work:
+
+- Small DEBUG-only Design System Lab patch for missing `STRQProgressRow` sample and any explicitly scoped primitive state samples.
+- Rork simulator screenshot QA after any future Lab visual edit or production UI implementation.
+- Profile controlsSection completion / icon consistency after Lab coverage and Rork QA are clean.
+
+Warnings:
+
+- This was documentation-only on Windows; no `xcodebuild`, Rork simulator run, GitHub remote verification, or screenshot QA was performed.
+- `STRQButton` is not ready to replace production CTAs broadly; protected flows still require owner approval.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
