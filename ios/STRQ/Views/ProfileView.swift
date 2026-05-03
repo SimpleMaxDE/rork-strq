@@ -744,7 +744,7 @@ struct ProfileView: View {
                 NavigationLink {
                     NotificationSettingsView(vm: vm)
                 } label: {
-                    controlsListRowContent(L10n.tr("Notifications"), icon: .bell)
+                    controlsListRowContent(L10n.tr("Notifications"), icon: .bell, opticalEmphasis: .notifications)
                 }
                 controlsListButtonRow(L10n.tr("Restore Purchases"), icon: .repeatAction) {
                     guard store.isConfigured else {
@@ -867,25 +867,51 @@ struct ProfileView: View {
         #endif
     }
 
+    // Controls-only optical balance for the short Notifications label; not a global typography rule.
+    private enum ControlsRowOpticalEmphasis {
+        case standard
+        case notifications
+
+        var titleFont: Font {
+            switch self {
+            case .standard:
+                return STRQTypography.labelLarge
+            case .notifications:
+                return STRQTypography.labelFont(size: 16, weight: .heavy)
+            }
+        }
+    }
+
     private func controlsListButtonRow(
         _ label: String,
         icon: STRQIcon,
         showsDivider: Bool = true,
+        opticalEmphasis: ControlsRowOpticalEmphasis = .standard,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            controlsListRowContent(label, icon: icon, showsDivider: showsDivider)
+            controlsListRowContent(label, icon: icon, showsDivider: showsDivider, opticalEmphasis: opticalEmphasis)
         }
     }
 
-    private func controlsListRowContent(_ label: String, icon: STRQIcon, showsDivider: Bool = true) -> some View {
-        controlsListRowContent(label, showsDivider: showsDivider) {
+    private func controlsListRowContent(
+        _ label: String,
+        icon: STRQIcon,
+        showsDivider: Bool = true,
+        opticalEmphasis: ControlsRowOpticalEmphasis = .standard
+    ) -> some View {
+        controlsListRowContent(label, showsDivider: showsDivider, opticalEmphasis: opticalEmphasis) {
             STRQIconContainer(icon: icon, size: .md, tint: STRQColors.iconSecondary)
         }
     }
 
-    private func controlsListSymbolRowContent(_ label: String, systemIcon: String, showsDivider: Bool = true) -> some View {
-        controlsListRowContent(label, showsDivider: showsDivider) {
+    private func controlsListSymbolRowContent(
+        _ label: String,
+        systemIcon: String,
+        showsDivider: Bool = true,
+        opticalEmphasis: ControlsRowOpticalEmphasis = .standard
+    ) -> some View {
+        controlsListRowContent(label, showsDivider: showsDivider, opticalEmphasis: opticalEmphasis) {
             controlsListSystemIcon(systemIcon)
         }
     }
@@ -893,13 +919,14 @@ struct ProfileView: View {
     private func controlsListRowContent<LeadingIcon: View>(
         _ label: String,
         showsDivider: Bool = true,
+        opticalEmphasis: ControlsRowOpticalEmphasis = .standard,
         @ViewBuilder leadingIcon: () -> LeadingIcon
     ) -> some View {
         VStack(spacing: 0) {
             HStack(spacing: STRQSpacing.sm) {
                 leadingIcon()
 
-                controlsListRowTitle(label)
+                controlsListRowTitle(label, opticalEmphasis: opticalEmphasis)
 
                 Spacer(minLength: STRQSpacing.sm)
 
@@ -919,9 +946,9 @@ struct ProfileView: View {
         .accessibilityLabel(label)
     }
 
-    private func controlsListRowTitle(_ label: String) -> some View {
+    private func controlsListRowTitle(_ label: String, opticalEmphasis: ControlsRowOpticalEmphasis = .standard) -> some View {
         Text(label)
-            .font(STRQTypography.labelLarge)
+            .font(opticalEmphasis.titleFont)
             .foregroundStyle(STRQColors.primaryText)
             .lineLimit(1)
             .minimumScaleFactor(0.82)
