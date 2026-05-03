@@ -233,7 +233,7 @@ struct CoachingPreferencesView: View {
         let iconForeground = isSelected ? STRQColors.iconPrimary : STRQColors.iconSecondary
         let checkForeground = isSelected ? STRQColors.iconPrimary.opacity(0.78) : STRQColors.iconMuted.opacity(0.62)
 
-        Button(action: action) {
+        return Button(action: action) {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: icon)
                     .font(.system(size: 15, weight: .semibold))
