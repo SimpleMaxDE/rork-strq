@@ -690,6 +690,11 @@ struct ProfileView: View {
 
     private var coachingStyleRow: some View {
         let prefs = vm.profile.coachingPreferences
+        let summaryItems = [
+            (symbol: prefs.tone.symbolName, label: prefs.tone.displayName),
+            (symbol: prefs.emphasis.symbolName, label: prefs.emphasis.displayName),
+            (symbol: prefs.density.symbolName, label: prefs.density.displayName)
+        ]
         return NavigationLink {
             CoachingPreferencesView(vm: vm)
         } label: {
@@ -704,11 +709,12 @@ struct ProfileView: View {
                             .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
                     )
 
-                VStack(alignment: .leading, spacing: STRQSpacing.px150) {
-                    HStack(spacing: STRQSpacing.px150) {
+                VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                    HStack(spacing: STRQSpacing.xs) {
                         Text(L10n.tr("Coaching Style"))
                             .font(STRQTypography.labelMedium)
                             .foregroundStyle(STRQColors.primaryText)
+                            .lineLimit(1)
                         Text(L10n.tr("PERSONAL"))
                             .font(STRQTypography.labelXS)
                             .tracking(STRQTypography.labelXSTracking)
@@ -721,11 +727,11 @@ struct ProfileView: View {
                                     .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
                             )
                     }
-                    HStack(spacing: STRQSpacing.px150) {
-                        styleChip(icon: prefs.tone.symbolName, label: prefs.tone.displayName)
-                        styleChip(icon: prefs.emphasis.symbolName, label: prefs.emphasis.displayName)
-                        styleChip(icon: prefs.density.symbolName, label: prefs.density.displayName)
-                    }
+                    Text(coachingStyleSummary(summaryItems))
+                        .font(STRQTypography.paragraphSmall)
+                        .foregroundStyle(STRQColors.secondaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
                 }
                 Spacer(minLength: 0)
                 STRQIconView(.chevronRight, size: STRQSpacing.iconXS, tint: STRQColors.iconMuted)
@@ -741,24 +747,8 @@ struct ProfileView: View {
         .buttonStyle(.plain)
     }
 
-    private func styleChip(icon: String, label: String) -> some View {
-        HStack(spacing: STRQSpacing.px50) {
-            Image(systemName: icon)
-                .font(.system(size: 10, weight: .semibold))
-            Text(label)
-                .font(STRQTypography.labelXS)
-                .tracking(STRQTypography.chipTracking)
-                .lineLimit(1)
-                .minimumScaleFactor(0.78)
-        }
-        .foregroundStyle(STRQColors.secondaryText)
-        .padding(.horizontal, STRQSpacing.px150)
-        .padding(.vertical, STRQSpacing.px100)
-        .background(STRQColors.controlSurface, in: Capsule())
-        .overlay(
-            Capsule()
-                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
-        )
+    private func coachingStyleSummary(_ items: [(symbol: String, label: String)]) -> String {
+        items.map { $0.label }.joined(separator: " · ")
     }
 
     private var controlsSection: some View {

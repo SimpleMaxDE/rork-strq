@@ -1072,6 +1072,42 @@ Warnings:
 
 - This pass was documentation-only on Windows; no `xcodebuild`, Rork simulator run, GitHub remote verification, or screenshot QA was performed.
 
+## 2026-05-03 - Profile Coaching Style Entry Row Redesign
+
+Scope:
+
+- Redesigned only the Profile `coachingStyleRow` entry based on the Coaching Style Experience Redesign Plan so it reads as premium coach personalization instead of a chip-heavy technical settings summary.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- Requested migration docs, `ios/STRQ/Utilities/STRQDesignSystem.swift`, `ios/STRQ/Views/ProfileView.swift`, and `ios/STRQ/Views/CoachingPreferencesView.swift`.
+
+Verification run:
+
+- Targeted Profile coaching row, accepted-section, protected-reference, protected-path, and Sandow-reference static checks.
+
+Intentionally not changed:
+
+- no `CoachingPreferencesView.swift`, accepted `controlsSection`, Training Setup static rows, Body & Nutrition static info rows, `trackingToggleCard`, subscription/account/danger/paywall/iCloud/reset/toggle/sheet behavior, assets, fonts, localization catalogs, RevenueCat/store files, project files, tests, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, `ContentView.swift`, `STRQDesignSystem.swift`, or `STRQDesignSystemPreviewView.swift`
+
+Pending work:
+
+- Rork simulator QA for the Profile Coaching Style row on small and large iPhone viewports.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
