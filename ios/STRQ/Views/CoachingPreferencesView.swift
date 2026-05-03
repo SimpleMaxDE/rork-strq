@@ -226,42 +226,48 @@ struct CoachingPreferencesView: View {
         detail: String,
         action: @escaping () -> Void
     ) -> some View {
+        let cardBackground = isSelected ? STRQColors.selectedSurface : STRQColors.cardSurface
+        let cardBorder = isSelected ? STRQColors.selectedBorder.opacity(0.58) : STRQColors.borderMuted
+        let iconBackground = isSelected ? STRQColors.insetSurface : STRQColors.controlSurface
+        let iconBorder = isSelected ? STRQColors.selectedBorder.opacity(0.32) : STRQColors.borderMuted
+        let iconForeground = isSelected ? STRQColors.iconPrimary : STRQColors.iconSecondary
+        let checkForeground = isSelected ? STRQColors.iconPrimary.opacity(0.78) : STRQColors.iconMuted.opacity(0.62)
+
         Button(action: action) {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: icon)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(isSelected ? .black : .white)
-                    .frame(width: 36, height: 36)
-                    .background(
-                        isSelected ?
-                        AnyShapeStyle(STRQBrand.accentGradient) :
-                        AnyShapeStyle(STRQBrand.steelGradient),
-                        in: .rect(cornerRadius: 10)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(iconForeground)
+                    .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                    .background(iconBackground, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                            .strokeBorder(iconBorder, lineWidth: 1)
                     )
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
+                        .font(STRQTypography.labelMedium)
+                        .foregroundStyle(STRQColors.primaryText)
                     Text(detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(STRQTypography.paragraphXS)
+                        .foregroundStyle(STRQColors.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: 0)
 
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
-                    .foregroundStyle(isSelected ? STRQPalette.success : Color.white.opacity(0.18))
+                Image(systemName: isSelected ? "checkmark.circle" : "circle")
+                    .font(.system(size: 18, weight: isSelected ? .semibold : .medium))
+                    .foregroundStyle(checkForeground)
             }
-            .padding(14)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+            .padding(STRQSpacing.cardPaddingCompact)
+            .background(cardBackground, in: .rect(cornerRadius: STRQRadii.lg))
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
                     .strokeBorder(
-                        isSelected ? STRQPalette.success.opacity(0.35) : STRQBrand.cardBorder,
-                        lineWidth: isSelected ? 1.2 : 1
+                        cardBorder,
+                        lineWidth: isSelected ? 1.25 : 1
                     )
             )
         }
@@ -271,31 +277,35 @@ struct CoachingPreferencesView: View {
     private func physiqueDisabledRow() -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: CoachingEmphasis.physique.symbolName)
-                .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.45))
-                .frame(width: 36, height: 36)
-                .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 10))
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(STRQColors.iconMuted)
+                .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                .background(STRQColors.controlSurface.opacity(0.56), in: .rect(cornerRadius: STRQRadii.iconContainer))
+                .overlay(
+                    RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                        .strokeBorder(STRQColors.borderMuted.opacity(0.5), lineWidth: 1)
+                )
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(CoachingEmphasis.physique.displayName)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                    .font(STRQTypography.labelMedium)
+                    .foregroundStyle(STRQColors.secondaryText.opacity(0.62))
                 Text(L10n.tr("Turn on physique tracking in Profile to unlock this focus."))
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+                    .font(STRQTypography.paragraphXS)
+                    .foregroundStyle(STRQColors.mutedText)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
 
             Image(systemName: "lock.fill")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(STRQColors.iconMuted)
         }
-        .padding(14)
-        .background(Color(.secondarySystemGroupedBackground).opacity(0.5), in: .rect(cornerRadius: 14))
+        .padding(STRQSpacing.cardPaddingCompact)
+        .background(STRQColors.cardSurface.opacity(0.56), in: .rect(cornerRadius: STRQRadii.lg))
         .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(STRQBrand.cardBorder.opacity(0.5), lineWidth: 1)
+            RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted.opacity(0.52), lineWidth: 1)
         )
     }
 

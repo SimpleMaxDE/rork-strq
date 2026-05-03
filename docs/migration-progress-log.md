@@ -1144,6 +1144,42 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-04 - CoachingPreferencesView Option Card Selected-State Visual Pass
+
+Scope:
+
+- Updated only the `CoachingPreferencesView` option-card shell and selected-state treatment so coaching choices feel calmer, more premium, and aligned with the accepted hero.
+
+Files changed:
+
+- `ios/STRQ/Views/CoachingPreferencesView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- Requested migration docs, `ios/STRQ/Views/CoachingPreferencesView.swift`, `ios/STRQ/Views/ProfileView.swift`, and `ios/STRQ/Utilities/STRQDesignSystem.swift`.
+
+Verification run:
+
+- Scoped CoachingPreferences option-row, Profile reference, protected-path, and Sandow-reference static checks.
+
+Intentionally not changed:
+
+- no hero, section headings/groups, footer, update/commit logic, analytics, navigation, ProfileView, design-system utilities, assets, fonts, localization catalogs, RevenueCat/store files, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, or `ContentView.swift`
+
+Pending work:
+
+- Rork simulator QA for selected/unselected option cards and disabled Physique state.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
