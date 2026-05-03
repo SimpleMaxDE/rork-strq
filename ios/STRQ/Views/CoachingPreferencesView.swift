@@ -106,48 +106,65 @@ struct CoachingPreferencesView: View {
 
     private var heroCard: some View {
         let prefs = vm.profile.coachingPreferences
-        return VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 6) {
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(STRQBrand.accentGradient)
-                    .frame(width: 3, height: 14)
-                Text(L10n.tr("YOUR COACH, YOUR WAY"))
-                    .font(.system(size: 10, weight: .black))
-                    .tracking(1.2)
-                    .foregroundStyle(.primary)
-                Spacer()
-            }
-
-            HStack(alignment: .top, spacing: 14) {
+        return VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .center, spacing: 12) {
                 Image(systemName: "person.bust.fill")
-                    .font(.title3.weight(.medium))
-                    .foregroundStyle(.white)
-                    .frame(width: 46, height: 46)
-                    .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 12))
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(STRQColors.iconSecondary)
+                    .frame(width: 42, height: 42)
+                    .background(STRQColors.controlSurface, in: .rect(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                    )
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(L10n.tr("YOUR COACH, YOUR WAY"))
+                        .font(STRQTypography.labelXS)
+                        .foregroundStyle(STRQColors.secondaryText)
+                        .lineLimit(1)
+
                     Text(summaryTitle)
-                        .font(.title3.weight(.bold))
-                    Text(L10n.tr("STRQ stays one coach — these tune how it speaks, what it emphasizes, and how much it adjusts on its own."))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+                        .font(STRQTypography.cardTitle)
+                        .foregroundStyle(STRQColors.primaryText)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.82)
                 }
+
                 Spacer(minLength: 0)
             }
 
-            HStack(spacing: 6) {
-                summaryChip(icon: prefs.tone.symbolName, label: prefs.tone.displayName)
-                summaryChip(icon: prefs.emphasis.symbolName, label: prefs.emphasis.displayName)
-                summaryChip(icon: prefs.density.symbolName, label: prefs.density.displayName)
-                summaryChip(icon: prefs.automation.symbolName, label: prefs.automation.displayName)
+            Text(L10n.tr("STRQ stays one coach — these tune how it speaks, what it emphasizes, and how much it adjusts on its own."))
+                .font(STRQTypography.paragraphSmall)
+                .foregroundStyle(STRQColors.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack(spacing: 8) {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(STRQColors.iconMuted)
+
+                Text(summaryLine(for: prefs))
+                    .font(STRQTypography.labelSmall)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+
+                Spacer()
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(STRQColors.insetSurface, in: .rect(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
         }
-        .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
+        .padding(STRQSpacing.cardPadding)
+        .background(STRQGradients.insetCard, in: .rect(cornerRadius: STRQRadii.xl))
         .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+            RoundedRectangle(cornerRadius: STRQRadii.xl, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
         )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
@@ -164,18 +181,13 @@ struct CoachingPreferencesView: View {
         }
     }
 
-    private func summaryChip(icon: String, label: String) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.system(size: 9, weight: .bold))
-            Text(label)
-                .font(.system(size: 10, weight: .bold))
-        }
-        .foregroundStyle(STRQBrand.steel)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(STRQBrand.steel.opacity(0.12), in: Capsule())
-        .overlay(Capsule().strokeBorder(STRQBrand.steel.opacity(0.15), lineWidth: 0.5))
+    private func summaryLine(for prefs: CoachingPreferences) -> String {
+        [
+            prefs.tone.displayName,
+            prefs.emphasis.displayName,
+            prefs.density.displayName,
+            prefs.automation.displayName
+        ].joined(separator: " · ")
     }
 
     // MARK: - Sections

@@ -1108,6 +1108,42 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-03 - CoachingPreferencesView Hero-Only Redesign
+
+Scope:
+
+- Redesigned only the `CoachingPreferencesView` hero based on the Coaching Style Experience Redesign Plan so the destination starts as premium coach personalization instead of a dense settings summary.
+
+Files changed:
+
+- `ios/STRQ/Views/CoachingPreferencesView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- Requested migration docs, `ios/STRQ/Utilities/STRQDesignSystem.swift`, `ios/STRQ/Views/ProfileView.swift`, and `ios/STRQ/Views/CoachingPreferencesView.swift`.
+
+Verification run:
+
+- Targeted CoachingPreferences hero, Profile coaching row presence, protected-path, and Sandow-reference static checks.
+
+Intentionally not changed:
+
+- no option rows, disabled rows, section groups, footer, update/commit logic, analytics, navigation, ProfileView, design-system utilities, assets, fonts, localization catalogs, RevenueCat/store files, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, or `ContentView.swift`
+
+Pending work:
+
+- Rork simulator QA for the Coaching Preferences hero on small and large iPhone viewports.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
