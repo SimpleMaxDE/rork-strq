@@ -1446,6 +1446,42 @@ Warnings:
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 - Semantic color refinement remains owner-gated.
 
+## 2026-05-04 - Profile Fitness Identity Metric-Tile Refinement
+
+Scope:
+
+- Refined only the Profile `fitnessIdentity` `statusChip` metric-tile presentation to feel less blocky and more coach-like while preserving all metric values, labels, icons, semantic color sources, and the Nutrition/Streak branch.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProfileView.swift` `fitnessIdentity` metric calls and `statusChip` helper.
+
+Verification run:
+
+- Scoped Profile metric-tile, accepted-section, protected-file, Sandow-reference, and git diff/status checks.
+
+Intentionally not changed:
+
+- no `fitnessIdentity` goal header, outer shell, metric call sites, metric values, labels, icons, semantic color sources, thresholds, Nutrition/Streak branch, accepted Profile sections, protected files, assets, fonts, localization catalogs, view models, services, models, watch/widget/live activity files, project files, or tests
+
+Pending work:
+
+- Rork simulator QA for Profile `fitnessIdentity` metric tiles in Nutrition enabled and disabled states.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

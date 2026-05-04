@@ -540,31 +540,43 @@ struct ProfileView: View {
     }
 
     private func statusChip(icon: String, value: String, label: String, color: Color) -> some View {
-        VStack(spacing: STRQSpacing.px50) {
-            Image(systemName: icon)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(color)
-            Text(value)
-                .font(STRQTypography.labelMedium.monospacedDigit())
-                .foregroundStyle(STRQColors.primaryText)
-                .lineLimit(1)
-                .minimumScaleFactor(0.82)
-            Text(label)
-                .font(STRQTypography.labelXS)
-                .foregroundStyle(STRQColors.mutedText)
-                .textCase(.uppercase)
-                .tracking(STRQTypography.labelXSTracking)
-                .lineLimit(1)
-                .minimumScaleFactor(0.74)
+        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+            HStack(spacing: STRQSpacing.px150) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .semibold))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(color)
+
+                Capsule()
+                    .fill(color.opacity(0.42))
+                    .frame(width: 14, height: 2)
+
+                Spacer(minLength: 0)
+            }
+
+            VStack(alignment: .leading, spacing: STRQSpacing.px50) {
+                Text(value)
+                    .font(STRQTypography.labelLarge.monospacedDigit())
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+                Text(label)
+                    .font(STRQTypography.micro)
+                    .foregroundStyle(STRQColors.mutedText)
+                    .textCase(.uppercase)
+                    .tracking(STRQTypography.bodyTracking)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
         }
-        .frame(maxWidth: .infinity)
-        .frame(minHeight: 66)
-        .padding(.horizontal, STRQSpacing.px150)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(minHeight: 62)
+        .padding(.horizontal, STRQSpacing.xs)
         .padding(.vertical, STRQSpacing.xs)
-        .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.md))
+        .background(STRQColors.insetSurface.opacity(0.52), in: .rect(cornerRadius: STRQRadii.md))
         .overlay(
             RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                .strokeBorder(STRQColors.borderMuted.opacity(0.58), lineWidth: 1)
         )
     }
 
