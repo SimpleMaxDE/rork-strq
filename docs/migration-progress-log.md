@@ -2075,6 +2075,25 @@ Pending work:
 - Rork QA required to verify `Enable` and `Settings` remain compact, secondary, and unwrapped in all permission states.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Stage 1 QA Report
+
+Scope:
+
+- Created a docs-only NotificationSettings Stage 1 QA consolidation report covering completed visual areas, caveats, protected behavior, required Rork QA, visual consistency, release-readiness, and exactly one recommended next screen.
+
+Files changed:
+
+- `docs/notification-settings-stage-1-qa-report.md`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- no Swift files, no `NotificationSettingsView`, no notification services, no HealthKit behavior, no Profile implementation, no app tint, no assets, no localization, no project files, and no tests
+
+Pending work:
+
+- Rork QA remains required before treating NotificationSettings as release-ready; recommended next screen is CoachingPreferences final QA.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
