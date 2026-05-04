@@ -46,6 +46,7 @@ struct NotificationSettingsView: View {
         let permissionAccent = Color(red: 0.58, green: 0.63, blue: 0.70)
         let permissionAccentInk = Color(red: 0.80, green: 0.84, blue: 0.89)
         let permissionAccentDim = Color(red: 0.10, green: 0.11, blue: 0.13)
+        let actionButtonMinWidth: CGFloat = 78
         let showsSettingsButton = authStatus == .denied ||
             authStatus == .authorized ||
             authStatus == .provisional ||
@@ -88,6 +89,9 @@ struct NotificationSettingsView: View {
                     }
                 }
                 .font(STRQTypography.buttonCompact)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .frame(minWidth: actionButtonMinWidth)
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .tint(permissionAccent)
@@ -98,6 +102,9 @@ struct NotificationSettingsView: View {
                     }
                 }
                 .font(STRQTypography.buttonCompact)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .frame(minWidth: actionButtonMinWidth)
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .tint(permissionAccent)

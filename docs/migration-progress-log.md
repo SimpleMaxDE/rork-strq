@@ -2043,6 +2043,38 @@ Pending work:
 - Rork QA required to verify enabled notification states expose the secondary Settings action clearly without reading as a CTA.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Permission Button Wrap Fix
+
+Scope:
+
+- Updated only the trailing `Enable` / `Settings` button styling inside `NotificationSettingsView.permissionBanner` so labels stay on one line using a compact minimum width, one-line limit, and gentle scale factor.
+- Preserved permission status conditions, Enable action, Settings action, banner title/subtitle behavior, and reminder scheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- ios/STRQ/Views/NotificationSettingsView.swift docs/migration-progress-log.md`
+- targeted `rg` checks for permission button layout/action symbols, Sandow references, and protected paths
+
+Intentionally not changed:
+
+- no permission behavior
+- no fake permission toggle
+- no reminder sections
+- no HealthKit section
+- no notification services, models, routes, assets, localization, project files, widget/watch targets, or tests
+
+Pending work:
+
+- Rork QA required to verify `Enable` and `Settings` remain compact, secondary, and unwrapped in all permission states.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
