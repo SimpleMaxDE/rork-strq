@@ -1518,6 +1518,42 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-04 - Profile Fitness Identity Metric Marker Removal
+
+Scope:
+
+- Removed the decorative Profile `fitnessIdentity` `statusChip` metric marker entirely, keeping icon color as the only semantic accent for each metric tile.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProfileView.swift` `statusChip` marker implementation.
+
+Verification run:
+
+- Scoped Profile `statusChip`, metric call-site, protected-file, Sandow-reference, and git diff/status checks.
+
+Intentionally not changed:
+
+- no `fitnessIdentity` outer shell, metric call sites, values, labels, icons, semantic color sources, thresholds, Nutrition/Streak branch, accepted Profile sections, protected files, assets, fonts, localization catalogs, view models, services, models, watch/widget/live activity files, project files, or tests
+
+Pending work:
+
+- Rork simulator QA for Profile `fitnessIdentity` metric tiles in Nutrition enabled and disabled states.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

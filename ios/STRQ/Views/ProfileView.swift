@@ -541,18 +541,10 @@ struct ProfileView: View {
 
     private func statusChip(icon: String, value: String, label: String, color: Color) -> some View {
         VStack(alignment: .leading, spacing: STRQSpacing.xs) {
-            HStack(spacing: STRQSpacing.px150) {
-                Image(systemName: icon)
-                    .font(.system(size: 11, weight: .semibold))
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(color)
-
-                Circle()
-                    .fill(color.opacity(0.82))
-                    .frame(width: 5, height: 5)
-
-                Spacer(minLength: 0)
-            }
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .semibold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(color)
 
             VStack(alignment: .leading, spacing: STRQSpacing.px50) {
                 Text(value)
