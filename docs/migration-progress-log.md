@@ -1671,6 +1671,44 @@ Pending work:
 - Rork QA should verify the active membership card reads as premium and already-Pro while Manage Subscription remains clearly tappable but secondary.
 - macOS or CI build validation remains required before shipping.
 
+## 2026-05-04 - Profile Account Sync Risk Plan
+
+Scope:
+
+- Created a docs-only risk and redesign plan for `ProfileView.accountSection` / Sync & Restore before any account/iCloud Swift implementation.
+
+Files changed:
+
+- `docs/profile-account-sync-risk-plan.md`
+- `docs/migration-progress-log.md`
+
+Code inspected:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/ViewModels/AppViewModel.swift`
+- `ios/STRQ/Services/AccountManager.swift`
+- `ios/STRQ/Services/CloudSyncService.swift`
+- `ios/STRQ/Services/ContinuityCoordinator.swift`
+- `ios/STRQ/Services/SnapshotBuilder.swift`
+
+Verification run:
+
+- Docs-only diff, protected iOS path diff, Profile account/source checks, account/cloud service reference checks, and plan-content search.
+
+Intentionally not changed:
+
+- no Swift files, no Profile implementation, no account/iCloud services or models, no restore/upload/sign-out behavior, no alerts/copy/localization, no assets, fonts, RevenueCat/store files, Watch, Widget, Live Activity, project files, or tests
+
+Pending work:
+
+- Recommended next prompt is exactly one signed-out `accountSection` shell-only pass that preserves the native Apple sign-in button and all post-sign-in restore/upload behavior.
+- Rork simulator QA is required after any future accountSection Swift implementation.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+- Account/iCloud restore behavior remains owner-gated and data-sensitive.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
