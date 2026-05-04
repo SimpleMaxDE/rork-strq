@@ -1749,6 +1749,25 @@ Pending work:
 - Rork QA should verify Danger Zone remains calm, premium, and unmistakably destructive without reading as a primary CTA.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - Global Tint System Accent Audit
+
+Scope:
+
+- Created a read-only audit explaining why the Reset Alert Cancel button inherits the orange app tint, mapping global tint risk, and recommending a broader accent migration plan before any Swift changes.
+
+Files changed:
+
+- `docs/strq-global-tint-system-accent-audit.md`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- no Swift files, no `ContentView`, no alerts, no reset behavior, no app tint, no assets, no localization, no protected flows, and no tests
+
+Pending work:
+
+- Owner should approve a global accent migration plan and Rork QA matrix before changing app tint or local alert tint.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
