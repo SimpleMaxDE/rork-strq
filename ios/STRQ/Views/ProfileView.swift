@@ -170,19 +170,25 @@ struct ProfileView: View {
                         .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
                 )
             } else {
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+                    HStack(alignment: .top, spacing: STRQSpacing.sm) {
                         Image(systemName: "person.crop.circle.badge.checkmark")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.white)
-                            .frame(width: 34, height: 34)
-                            .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
-                        VStack(alignment: .leading, spacing: 2) {
+                            .font(.system(size: 17, weight: .semibold))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(STRQColors.secondaryText)
+                            .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                            .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                            )
+                        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
                             Text(L10n.tr("iCloud Sync"))
-                                .font(.subheadline.weight(.bold))
+                                .font(STRQTypography.labelLarge)
+                                .foregroundStyle(STRQColors.primaryText)
                             Text(L10n.tr("Sign in with Apple to keep your training backed up in iCloud and ready to restore on another device."))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .font(STRQTypography.paragraphSmall)
+                                .foregroundStyle(STRQColors.secondaryText)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         Spacer(minLength: 0)
@@ -205,14 +211,23 @@ struct ProfileView: View {
                     .clipShape(.rect(cornerRadius: 11))
 
                     Text(L10n.tr("Your training stays local on this device until you turn sync on."))
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .font(STRQTypography.captionRegular)
+                        .foregroundStyle(STRQColors.mutedText)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, STRQSpacing.xs)
+                        .padding(.vertical, STRQSpacing.xs)
+                        .background(STRQColors.insetSurface.opacity(0.52), in: .rect(cornerRadius: STRQRadii.sm))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: STRQRadii.sm, style: .continuous)
+                                .strokeBorder(STRQColors.borderMuted.opacity(0.58), lineWidth: 1)
+                        )
                 }
-                .padding(14)
-                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+                .padding(STRQSpacing.cardPaddingCompact)
+                .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+                .clipShape(.rect(cornerRadius: STRQRadii.md))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                        .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
                 )
             }
         }

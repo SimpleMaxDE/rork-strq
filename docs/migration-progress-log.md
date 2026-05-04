@@ -1709,6 +1709,26 @@ Warnings:
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 - Account/iCloud restore behavior remains owner-gated and data-sensitive.
 
+## 2026-05-04 - Profile Signed-Out Sync Shell
+
+Scope:
+
+- Updated only the signed-out `ProfileView.accountSection` Sync & Restore visual shell with a restrained STRQ carbon card, neutral trust icon well, and local-first footer treatment.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- Native Sign in with Apple request/completion handling, post-sign-in iCloud restore/upload behavior, signed-in account branch, account/cloud helpers, alerts, copy/localization, protected services/models/view models, assets, tests, Watch, Widget, project, and store files.
+
+Pending work:
+
+- Rork QA should verify the signed-out Sync & Restore module feels calm, premium, trustworthy, and not like a subscription upsell.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
