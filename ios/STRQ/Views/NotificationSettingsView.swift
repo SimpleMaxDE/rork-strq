@@ -168,35 +168,81 @@ struct NotificationSettingsView: View {
     }
 
     private var weeklyReviewReminders: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Weekly Review", icon: "doc.text.magnifyingglass", color: .blue)
+        let reviewAccent = Color(red: 0.22, green: 0.38, blue: 0.78)
+        let reviewAccentInk = Color(red: 0.55, green: 0.67, blue: 0.96)
+        let reviewAccentDim = Color(red: 0.04, green: 0.07, blue: 0.18)
+        let isEnabled = vm.notificationSettings.weeklyReviewEnabled
 
-            VStack(spacing: 1) {
-                toggleRow(
-                    "Weekly Review Ready",
-                    subtitle: "Get notified when your weekly check-in is available",
-                    isOn: $vm.notificationSettings.weeklyReviewEnabled
-                )
+        return VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+            Text("Weekly Review")
+                .font(STRQTypography.cardTitle)
+                .foregroundStyle(STRQColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
+
+            VStack(spacing: 0) {
+                Toggle(isOn: $vm.notificationSettings.weeklyReviewEnabled) {
+                    HStack(alignment: .center, spacing: STRQSpacing.sm) {
+                        Image(systemName: "doc.text.magnifyingglass")
+                            .font(.system(size: 15, weight: .semibold))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(isEnabled ? reviewAccentInk : reviewAccent.opacity(0.62))
+                            .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                            .background(
+                                reviewAccentDim.opacity(isEnabled ? 0.72 : 0.42),
+                                in: .rect(cornerRadius: STRQRadii.iconContainer)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                                    .strokeBorder(reviewAccent.opacity(isEnabled ? 0.36 : 0.18), lineWidth: 1)
+                            )
+
+                        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                            Text("Weekly Review Ready")
+                                .font(STRQTypography.labelMedium)
+                                .foregroundStyle(STRQColors.primaryText)
+                            Text("Get notified when your weekly check-in is available")
+                                .font(STRQTypography.paragraphSmall)
+                                .foregroundStyle(STRQColors.secondaryText)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                }
+                .tint(isEnabled ? reviewAccent : STRQColors.secondaryAccent)
+                .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+                .padding(.vertical, STRQSpacing.sm)
 
                 if vm.notificationSettings.weeklyReviewEnabled {
+                    Divider()
+                        .overlay(STRQColors.borderMuted)
+                        .padding(.leading, STRQSpacing.cardPaddingCompact + STRQSpacing.iconContainerMD + STRQSpacing.sm)
+
                     HStack {
                         Text(L10n.tr("Review Day"))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(STRQTypography.paragraphSmall)
+                            .foregroundStyle(STRQColors.secondaryText)
                         Spacer()
                         Picker("", selection: $vm.notificationSettings.weeklyReviewDay) {
                             ForEach(0..<7) { idx in
                                 Text(LocalizedStringKey(weekdays[idx])).tag(idx)
                             }
                         }
-                        .tint(STRQBrand.steel)
+                        .tint(reviewAccent)
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 12)
-                    .background(Color(.secondarySystemGroupedBackground))
+                    .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+                    .padding(.vertical, STRQSpacing.sm)
                 }
             }
-            .clipShape(.rect(cornerRadius: 14))
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(
+                        isEnabled ? reviewAccent.opacity(0.22) : STRQColors.borderMuted,
+                        lineWidth: 1
+                    )
+            )
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)

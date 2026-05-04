@@ -1931,6 +1931,22 @@ Pending work:
 - Rork QA should verify Streak Protection stays warm and active without reading as orange CTA, gamified reward, Pro violet, Coach Blue, or green.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Weekly Review Visual Pass
+
+Scope:
+
+- Updated only the `NotificationSettingsView.weeklyReviewReminders` visual shell to a restrained STRQ dark card with a muted Sapphire / Review Blue accent while preserving the Weekly Review Ready toggle, Review Day picker binding/tags, and top-level reminder rescheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Pending work:
+
+- Rork QA should verify Weekly Review feels like calm planning/review and that toggling or changing the review day still reschedules through existing behavior.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
