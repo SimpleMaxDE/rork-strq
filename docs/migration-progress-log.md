@@ -2137,6 +2137,21 @@ Pending work:
 
 - Recommended next prompt is exactly one docs-only CoachTab state/screenshot inventory before selecting any display-only Swift shell candidate.
 
+### 2026-05-04 - CoachTab Calibration Checklist Shell
+
+Scope:
+
+- CoachTab calibrationChecklist shell-only visual pass; preserved checklist labels, icons, order, conditions, early-state gating, and non-interactive logic.
+
+Files changed:
+
+- ios/STRQ/Views/CoachTabView.swift
+- docs/migration-progress-log.md
+
+Intentionally not changed:
+
+- earlyStateCard, shouldShowCalibrationChecklist, CoachTab actions, sheets, analytics, models, services, design tokens, assets, and localization.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

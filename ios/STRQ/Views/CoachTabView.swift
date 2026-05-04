@@ -668,6 +668,10 @@ struct CoachTabView: View {
         let completed = vm.totalCompletedWorkouts
         let weekSessions = vm.weeklyStats.sessions
         let hasRecoveryContext = vm.hasCheckedInToday || vm.todaysReadiness != nil
+        let calibrationAccent = Color(red: 0.50, green: 0.58, blue: 0.66)
+        let calibrationInk = Color(red: 0.72, green: 0.78, blue: 0.84)
+        let calibrationDim = Color(red: 0.08, green: 0.10, blue: 0.12)
+        let completedSignal = STRQColors.successGreen
 
         let items: [(String, String, Bool)] = [
             (L10n.tr("Plan shape captured"), "doc.text.fill", vm.currentPlan != nil),
@@ -675,34 +679,147 @@ struct CoachTabView: View {
             (L10n.tr("Recovery context logged"), "heart.text.clipboard.fill", hasRecoveryContext),
             (L10n.tr("Week rhythm started"), "calendar.badge.clock", weekSessions >= 1)
         ]
+        let completedCount = items.filter { $0.2 }.count
+        let progress = CGFloat(completedCount) / CGFloat(items.count)
 
-        return VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: L10n.tr("What STRQ has picked up"))
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(calibrationAccent.opacity(0.14))
+                    Image(systemName: "waveform.path.ecg")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(calibrationInk)
+                }
+                .frame(width: 30, height: 30)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .strokeBorder(calibrationAccent.opacity(0.22), lineWidth: 1)
+                )
+                .accessibilityHidden(true)
 
-            VStack(spacing: 8) {
-                ForEach(Array(items.enumerated()), id: \.offset) { _, item in
-                    HStack(spacing: 12) {
-                        Image(systemName: item.2 ? "checkmark.circle.fill" : "circle")
-                            .font(.subheadline)
-                            .foregroundStyle(item.2 ? STRQPalette.success : STRQBrand.steel.opacity(0.55))
-                            .frame(width: 22)
-                        Image(systemName: item.1)
-                            .font(.caption)
-                            .foregroundStyle(item.2 ? .primary : .secondary)
-                            .frame(width: 20)
-                        Text(item.0)
-                            .font(.subheadline.weight(item.2 ? .semibold : .medium))
-                            .foregroundStyle(item.2 ? .primary : .secondary)
-                        Spacer()
+                Text(L10n.tr("What STRQ has picked up"))
+                    .font(.system(size: 11, weight: .black))
+                    .tracking(1.1)
+                    .foregroundStyle(calibrationInk)
+                    .textCase(.uppercase)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+
+                Spacer(minLength: 8)
+
+                HStack(spacing: 4) {
+                    ForEach(0..<items.count, id: \.self) { index in
+                        Capsule()
+                            .fill(index < completedCount ? completedSignal : calibrationAccent.opacity(0.24))
+                            .frame(width: index < completedCount ? 12 : 5, height: 5)
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 14) {
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(calibrationAccent.opacity(0.14))
+                        Capsule()
+                            .fill(
+                                LinearGradient(
+                                    colors: [calibrationInk.opacity(0.70), calibrationAccent.opacity(0.90)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(width: progress == 0 ? 0 : max(6, geo.size.width * progress))
+                    }
+                }
+                .frame(height: 4)
+
+                VStack(spacing: 7) {
+                    ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                        HStack(spacing: 11) {
+                            VStack(spacing: 3) {
+                                ZStack {
+                                    Circle()
+                                        .fill(item.2 ? completedSignal.opacity(0.16) : calibrationAccent.opacity(0.09))
+                                        .frame(width: 24, height: 24)
+                                    Circle()
+                                        .strokeBorder(item.2 ? completedSignal.opacity(0.62) : calibrationAccent.opacity(0.28), lineWidth: 1)
+                                        .frame(width: 24, height: 24)
+                                    Image(systemName: item.2 ? "checkmark" : "circle.fill")
+                                        .font(.system(size: item.2 ? 10 : 5, weight: .black))
+                                        .foregroundStyle(item.2 ? completedSignal : calibrationAccent.opacity(0.48))
+                                }
+
+                                if index < items.count - 1 {
+                                    Capsule()
+                                        .fill(item.2 ? completedSignal.opacity(0.42) : calibrationAccent.opacity(0.16))
+                                        .frame(width: 2, height: 13)
+                                }
+                            }
+                            .frame(width: 24)
+
+                            Image(systemName: item.1)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(item.2 ? calibrationInk : calibrationAccent.opacity(0.56))
+                                .frame(width: 28, height: 28)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                        .fill(Color.white.opacity(item.2 ? 0.055 : 0.030))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                        .strokeBorder(Color.white.opacity(item.2 ? 0.090 : 0.045), lineWidth: 1)
+                                )
+
+                            Text(item.0)
+                                .font(.subheadline.weight(item.2 ? .semibold : .medium))
+                                .foregroundStyle(item.2 ? Color.primary : calibrationInk.opacity(0.62))
+                                .lineLimit(2)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 9)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Color.white.opacity(item.2 ? 0.045 : 0.020))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .strokeBorder(Color.white.opacity(item.2 ? 0.080 : 0.045), lineWidth: 1)
+                        )
                     }
                 }
             }
             .padding(14)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
-            .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+            .background(
+                LinearGradient(
+                    colors: [
+                        calibrationDim,
+                        STRQPalette.surfaceBase,
+                        STRQPalette.backgroundCarbon
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: .rect(cornerRadius: 18)
             )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(calibrationAccent.opacity(0.18), lineWidth: 1)
+            )
+            .overlay(alignment: .topLeading) {
+                LinearGradient(
+                    colors: [calibrationInk.opacity(0.28), Color.clear],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(height: 1)
+                .padding(.horizontal, 16)
+            }
+            .shadow(color: .black.opacity(0.18), radius: 12, y: 5)
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
