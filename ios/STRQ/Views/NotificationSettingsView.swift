@@ -262,17 +262,57 @@ struct NotificationSettingsView: View {
     }
 
     private var streakReminders: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Streak Protection", icon: "flame.fill", color: STRQBrand.steel)
+        let streakAccent = Color(red: 0.68, green: 0.42, blue: 0.20)
+        let streakAccentDim = Color(red: 0.16, green: 0.09, blue: 0.04)
+        let isEnabled = vm.notificationSettings.streakReminderEnabled
 
-            VStack(spacing: 1) {
-                toggleRow(
-                    "Streak at Risk",
-                    subtitle: "Reminder when your streak might break tomorrow",
-                    isOn: $vm.notificationSettings.streakReminderEnabled
-                )
+        return VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+            Text("Streak Protection")
+                .font(STRQTypography.cardTitle)
+                .foregroundStyle(STRQColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
+
+            Toggle(isOn: $vm.notificationSettings.streakReminderEnabled) {
+                HStack(alignment: .center, spacing: STRQSpacing.sm) {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(isEnabled ? streakAccent : streakAccent.opacity(0.62))
+                        .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                        .background(
+                            streakAccentDim.opacity(isEnabled ? 0.72 : 0.42),
+                            in: .rect(cornerRadius: STRQRadii.iconContainer)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                                .strokeBorder(streakAccent.opacity(isEnabled ? 0.36 : 0.18), lineWidth: 1)
+                        )
+
+                    VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                        Text("Streak at Risk")
+                            .font(STRQTypography.labelMedium)
+                            .foregroundStyle(STRQColors.primaryText)
+                        Text("Reminder when your streak might break tomorrow")
+                            .font(STRQTypography.paragraphSmall)
+                            .foregroundStyle(STRQColors.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 0)
+                }
             }
-            .clipShape(.rect(cornerRadius: 14))
+            .tint(isEnabled ? streakAccent : STRQColors.secondaryAccent)
+            .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+            .padding(.vertical, STRQSpacing.sm)
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(
+                        isEnabled ? streakAccent.opacity(0.22) : STRQColors.borderMuted,
+                        lineWidth: 1
+                    )
+            )
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)

@@ -1891,6 +1891,26 @@ Pending work:
 - Rork QA should verify Coach Nudges still feels active when enabled without reading as neon, gamified, or subscription-coded.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Streak Protection Visual Pass
+
+Scope:
+
+- Updated only the `NotificationSettingsView.streakReminders` visual shell to a restrained STRQ dark card with a local muted ember/bronze accent while preserving the Streak at Risk toggle binding and top-level reminder rescheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- Shared `sectionHeader` and `toggleRow`, Coach Nudges, permission banner, workout/readiness/weekly/HealthKit sections, notification services/models/routes, scheduling calls, permission requests, HealthKit behavior, assets, localization, project files, and tests were not changed.
+
+Pending work:
+
+- Rork QA should verify Streak Protection reads as calm consistency/risk support, not gamified reward, bright orange CTA, Pro violet, Coach Blue, or green.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
