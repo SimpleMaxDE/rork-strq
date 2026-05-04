@@ -1963,6 +1963,22 @@ Pending work:
 - Rork QA should verify Weekly Review now reads as Sapphire/Navy planning/review rather than a near-match to Coach Blue.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Daily Check-In Visual Pass
+
+Scope:
+
+- Updated only the `NotificationSettingsView.readinessReminders` visual shell to a restrained STRQ dark card with a muted Readiness Teal accent while preserving the Daily Readiness Check-In toggle binding, Check-In Time DatePicker binding/display, and top-level reminder rescheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Pending work:
+
+- Rork QA should verify Daily Check-In reads as calm readiness/self-check support and that toggling or changing the check-in time still reschedules through existing behavior.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

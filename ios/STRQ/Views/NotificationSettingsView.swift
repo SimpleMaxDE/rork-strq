@@ -135,32 +135,78 @@ struct NotificationSettingsView: View {
     }
 
     private var readinessReminders: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Daily Check-In", icon: "heart.text.clipboard", color: .mint)
+        let readinessAccent = Color(red: 0.13, green: 0.55, blue: 0.52)
+        let readinessAccentInk = Color(red: 0.45, green: 0.82, blue: 0.78)
+        let readinessAccentDim = Color(red: 0.03, green: 0.13, blue: 0.13)
+        let isEnabled = vm.notificationSettings.readinessCheckInEnabled
 
-            VStack(spacing: 1) {
-                toggleRow(
-                    "Daily Readiness Check-In",
-                    subtitle: "Morning reminder to log how you're feeling",
-                    isOn: $vm.notificationSettings.readinessCheckInEnabled
-                )
+        return VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+            Text("Daily Check-In")
+                .font(STRQTypography.cardTitle)
+                .foregroundStyle(STRQColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
+
+            VStack(spacing: 0) {
+                Toggle(isOn: $vm.notificationSettings.readinessCheckInEnabled) {
+                    HStack(alignment: .center, spacing: STRQSpacing.sm) {
+                        Image(systemName: "heart.text.clipboard")
+                            .font(.system(size: 15, weight: .semibold))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(isEnabled ? readinessAccentInk : readinessAccent.opacity(0.62))
+                            .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                            .background(
+                                readinessAccentDim.opacity(isEnabled ? 0.72 : 0.42),
+                                in: .rect(cornerRadius: STRQRadii.iconContainer)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                                    .strokeBorder(readinessAccent.opacity(isEnabled ? 0.36 : 0.18), lineWidth: 1)
+                            )
+
+                        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                            Text("Daily Readiness Check-In")
+                                .font(STRQTypography.labelMedium)
+                                .foregroundStyle(STRQColors.primaryText)
+                            Text("Morning reminder to log how you're feeling")
+                                .font(STRQTypography.paragraphSmall)
+                                .foregroundStyle(STRQColors.secondaryText)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                }
+                .tint(isEnabled ? readinessAccent : STRQColors.secondaryAccent)
+                .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+                .padding(.vertical, STRQSpacing.sm)
 
                 if vm.notificationSettings.readinessCheckInEnabled {
+                    Divider()
+                        .overlay(STRQColors.borderMuted)
+                        .padding(.leading, STRQSpacing.cardPaddingCompact + STRQSpacing.iconContainerMD + STRQSpacing.sm)
+
                     HStack {
                         Text(L10n.tr("Check-In Time"))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(STRQTypography.paragraphSmall)
+                            .foregroundStyle(STRQColors.secondaryText)
                         Spacer()
                         DatePicker("", selection: $vm.notificationSettings.readinessCheckInTime, displayedComponents: .hourAndMinute)
                             .labelsHidden()
-                            .tint(STRQBrand.steel)
+                            .tint(readinessAccent)
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 12)
-                    .background(Color(.secondarySystemGroupedBackground))
+                    .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+                    .padding(.vertical, STRQSpacing.sm)
                 }
             }
-            .clipShape(.rect(cornerRadius: 14))
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(
+                        isEnabled ? readinessAccent.opacity(0.22) : STRQColors.borderMuted,
+                        lineWidth: 1
+                    )
+            )
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
