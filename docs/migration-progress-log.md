@@ -1651,6 +1651,26 @@ Pending work:
 - Rork QA should verify tapping the non-Pro STRQ Pro card still opens the paywall and the refined violet/indigo accent reads as recognizable but restrained.
 - macOS or CI build validation remains required before shipping.
 
+## 2026-05-04 - Profile Active Pro Subscription Shell
+
+Scope:
+
+- Migrated only the Pro-active `subscriptionSection` shell to a restrained dark carbon card with local violet/indigo Pro accents while preserving manage-subscription analytics, action, and sheet behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Verification run:
+
+- Profile active Pro subscription shell diff and protected-path checks; Windows environment only, so no `xcodebuild` or simulator validation was performed.
+
+Pending work:
+
+- Rork QA should verify the active membership card reads as premium and already-Pro while Manage Subscription remains clearly tappable but secondary.
+- macOS or CI build validation remains required before shipping.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

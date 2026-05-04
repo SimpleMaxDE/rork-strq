@@ -324,31 +324,45 @@ struct ProfileView: View {
     private var subscriptionSection: some View {
         VStack(spacing: 10) {
             if store.isPro {
+                let proAccent = Color(red: 0.46, green: 0.42, blue: 0.95)
+                let proAccentInk = Color(red: 0.78, green: 0.75, blue: 1.00)
+                let proAccentDim = Color(red: 0.14, green: 0.12, blue: 0.28)
                 VStack(spacing: 0) {
                     HStack(spacing: 12) {
                         Image(systemName: "bolt.fill")
-                            .font(.subheadline)
-                            .foregroundStyle(.white)
-                            .frame(width: 34, height: 34)
-                            .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(proAccentInk)
+                            .frame(width: 36, height: 36)
+                            .background(proAccentDim.opacity(0.74), in: .rect(cornerRadius: 10))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .strokeBorder(proAccent.opacity(0.36), lineWidth: 1)
+                            )
                         VStack(alignment: .leading, spacing: 2) {
                             Text(L10n.tr("STRQ Pro"))
                                 .font(.subheadline.weight(.bold))
+                                .foregroundStyle(.white)
                             Text(store.subscriptionStatusText)
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.white.opacity(0.68))
                         }
                         Spacer()
                         Text(store.subscriptionPlanName)
                             .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(proAccentInk)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(STRQPalette.success.opacity(0.8), in: Capsule())
+                            .background(proAccent.opacity(0.14), in: Capsule())
+                            .overlay(
+                                Capsule()
+                                    .strokeBorder(proAccent.opacity(0.34), lineWidth: 1)
+                            )
                     }
                     .padding(14)
 
-                    Divider().opacity(0.3).padding(.horizontal, 14)
+                    Divider()
+                        .overlay(Color.white.opacity(0.08))
+                        .padding(.horizontal, 14)
 
                     Button {
                         Analytics.shared.track(.manage_subscription_opened)
@@ -357,24 +371,42 @@ struct ProfileView: View {
                         HStack(spacing: 10) {
                             Image(systemName: "creditcard.fill")
                                 .font(.caption)
-                                .foregroundStyle(STRQBrand.steel)
+                                .foregroundStyle(proAccentInk.opacity(0.82))
                                 .frame(width: 24)
                             Text(L10n.tr("Manage Subscription"))
                                 .font(.subheadline.weight(.medium))
+                                .foregroundStyle(Color.white.opacity(0.86))
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(.caption2.weight(.semibold))
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(Color.white.opacity(0.42))
                         }
                         .padding(.horizontal, 14)
                         .padding(.vertical, 11)
                     }
                 }
-                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.076, green: 0.081, blue: 0.090),
+                            Color(red: 0.045, green: 0.050, blue: 0.058)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    in: .rect(cornerRadius: 14)
                 )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                )
+                .overlay(alignment: .topLeading) {
+                    Capsule()
+                        .fill(proAccentInk.opacity(0.74))
+                        .frame(width: 36, height: 2)
+                        .padding(.leading, 16)
+                        .shadow(color: proAccent.opacity(0.24), radius: 4, y: 1)
+                }
             } else {
                 Button {
                     Analytics.shared.track(.paywall_viewed, ["source": "profile"])
