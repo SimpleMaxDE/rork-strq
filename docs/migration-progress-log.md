@@ -1911,6 +1911,26 @@ Pending work:
 - Rork QA should verify Streak Protection reads as calm consistency/risk support, not gamified reward, bright orange CTA, Pro violet, Coach Blue, or green.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Streak Protection Copper Tuning
+
+Scope:
+
+- Refined only the local `NotificationSettingsView.streakReminders` accent values from ember/orange-leaning bronze to a darker premium Copper/Bronze tone while preserving layout, copy, toggle binding, and existing reminder rescheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- Layout, spacing, icon, copy, shared helpers, Coach Nudges, permission banner, other notification sections, notification services/models/routes, scheduling calls, HealthKit behavior, assets, localization, project files, and tests were not changed.
+
+Pending work:
+
+- Rork QA should verify Streak Protection stays warm and active without reading as orange CTA, gamified reward, Pro violet, Coach Blue, or green.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

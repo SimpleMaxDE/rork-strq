@@ -262,8 +262,9 @@ struct NotificationSettingsView: View {
     }
 
     private var streakReminders: some View {
-        let streakAccent = Color(red: 0.68, green: 0.42, blue: 0.20)
-        let streakAccentDim = Color(red: 0.16, green: 0.09, blue: 0.04)
+        let streakAccent = Color(red: 0.52, green: 0.30, blue: 0.18)
+        let streakAccentInk = Color(red: 0.78, green: 0.52, blue: 0.34)
+        let streakAccentDim = Color(red: 0.13, green: 0.07, blue: 0.04)
         let isEnabled = vm.notificationSettings.streakReminderEnabled
 
         return VStack(alignment: .leading, spacing: STRQSpacing.sm) {
@@ -278,7 +279,7 @@ struct NotificationSettingsView: View {
                     Image(systemName: "flame.fill")
                         .font(.system(size: 15, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(isEnabled ? streakAccent : streakAccent.opacity(0.62))
+                        .foregroundStyle(isEnabled ? streakAccentInk : streakAccent.opacity(0.62))
                         .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
                         .background(
                             streakAccentDim.opacity(isEnabled ? 0.72 : 0.42),
