@@ -381,16 +381,17 @@ struct ProfileView: View {
                     showPaywall = true
                 } label: {
                     let proAccent = Color(red: 0.46, green: 0.42, blue: 0.95)
+                    let proAccentInk = Color(red: 0.78, green: 0.75, blue: 1.00)
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 12) {
                             Image(systemName: "bolt.fill")
                                 .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(proAccent)
+                                .foregroundStyle(proAccentInk)
                                 .frame(width: 36, height: 36)
-                                .background(Color.white.opacity(0.065), in: .rect(cornerRadius: 10))
+                                .background(proAccent.opacity(0.11), in: .rect(cornerRadius: 10))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                                        .strokeBorder(proAccent.opacity(0.34), lineWidth: 1)
                                 )
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(L10n.tr("STRQ Pro"))
@@ -439,9 +440,10 @@ struct ProfileView: View {
                     )
                     .overlay(alignment: .topLeading) {
                         Capsule()
-                            .fill(proAccent.opacity(0.62))
+                            .fill(proAccentInk.opacity(0.88))
                             .frame(width: 42, height: 2)
                             .padding(.leading, 16)
+                            .shadow(color: proAccent.opacity(0.28), radius: 4, y: 1)
                     }
                 }
                 .buttonStyle(.plain)
