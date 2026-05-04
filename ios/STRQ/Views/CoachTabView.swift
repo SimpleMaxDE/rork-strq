@@ -499,53 +499,151 @@ struct CoachTabView: View {
     @ViewBuilder
     private var earlyStateCard: some View {
         if let guidance = vm.earlyStateGuidance {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 6) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(STRQBrand.accentGradient)
-                        .frame(width: 3, height: 14)
-                    Text(L10n.tr("COACH"))
-                        .font(.system(size: 10, weight: .black))
-                        .tracking(1.2)
-                        .foregroundStyle(.primary)
-                    Spacer()
-                    Text(guidance.tier.label.uppercased())
-                        .font(.system(size: 9, weight: .bold))
-                        .tracking(0.4)
-                        .foregroundStyle(STRQBrand.steel)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(STRQBrand.steel.opacity(0.12), in: Capsule())
-                }
+            let tierIndex = max(0, min(3, guidance.tier.rawValue))
+            let completedStages = tierIndex + 1
 
+            VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top, spacing: 14) {
-                    Image(systemName: guidance.icon)
-                        .font(.title3.weight(.medium))
-                        .foregroundStyle(.white)
-                        .frame(width: 46, height: 46)
-                        .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 12))
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 8) {
+                            Text(L10n.tr("COACH CALIBRATION"))
+                                .font(.system(size: 10, weight: .black))
+                                .tracking(1.2)
+                                .foregroundStyle(STRQBrand.steel)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.82)
 
-                    VStack(alignment: .leading, spacing: 4) {
+                            Text(guidance.tier.label.uppercased())
+                                .font(.system(size: 9, weight: .black))
+                                .foregroundStyle(.white.opacity(0.9))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.65)
+                                .padding(.horizontal, 7)
+                                .padding(.vertical, 3)
+                                .background(Color.white.opacity(0.08), in: Capsule())
+                                .overlay(
+                                    Capsule()
+                                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 0.5)
+                                )
+                        }
+
                         Text(guidance.headline)
-                            .font(.subheadline.weight(.semibold))
+                            .font(.system(.title3, design: .rounded, weight: .bold))
                             .foregroundStyle(.primary)
-                        Text(coachEarlyStateMessage)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+
                     Spacer(minLength: 0)
+
+                    earlyStateSignalMark(icon: guidance.icon, completedStages: completedStages)
                 }
+
+                Text(coachEarlyStateMessage)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if let unlocksNext = guidance.unlocksNext {
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(L10n.tr("NEXT"))
+                            .font(.system(size: 9, weight: .black))
+                            .tracking(1.1)
+                            .foregroundStyle(STRQBrand.steel)
+                        Text(unlocksNext)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.primary.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.white.opacity(0.045), in: .rect(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                    )
+                }
+
+                earlyStateProgressTrack(completedStages: completedStages)
             }
             .padding(16)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+            .background(
+                LinearGradient(
+                    colors: [
+                        STRQPalette.surfaceHero,
+                        STRQPalette.surfaceBase,
+                        STRQPalette.backgroundPrimary
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: .rect(cornerRadius: 22)
             )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22)
+                    .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+            )
+            .overlay(alignment: .topLeading) {
+                LinearGradient(
+                    colors: [STRQBrand.steel.opacity(0.22), Color.clear],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(height: 1)
+                .padding(.horizontal, 18)
+            }
+            .shadow(color: .black.opacity(0.22), radius: 16, y: 6)
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
             .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.05), value: appeared)
+        }
+    }
+
+    private func earlyStateSignalMark(icon: String, completedStages: Int) -> some View {
+        ZStack(alignment: .bottomTrailing) {
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Color.white.opacity(0.045))
+                .frame(width: 72, height: 78)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
+                )
+
+            Image(systemName: icon)
+                .font(.system(size: 24, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 54, height: 54)
+                .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.20), lineWidth: 1)
+                )
+                .offset(x: -10, y: -12)
+
+            HStack(spacing: 3) {
+                ForEach(0..<4, id: \.self) { index in
+                    Circle()
+                        .fill(index < completedStages ? STRQBrand.steel : Color.white.opacity(0.16))
+                        .frame(width: 4, height: 4)
+                }
+            }
+            .padding(.horizontal, 7)
+            .padding(.vertical, 5)
+            .background(Color.black.opacity(0.28), in: Capsule())
+            .overlay(
+                Capsule()
+                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
+            )
+        }
+        .frame(width: 78, height: 82)
+    }
+
+    private func earlyStateProgressTrack(completedStages: Int) -> some View {
+        HStack(spacing: 5) {
+            ForEach(0..<4, id: \.self) { index in
+                Capsule()
+                    .fill(index < completedStages ? STRQBrand.steel : Color.white.opacity(0.08))
+                    .frame(maxWidth: .infinity, minHeight: 3, maxHeight: 3)
+            }
         }
     }
 
