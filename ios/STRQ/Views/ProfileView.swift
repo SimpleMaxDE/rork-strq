@@ -547,9 +547,9 @@ struct ProfileView: View {
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(color)
 
-                Capsule()
-                    .fill(color.opacity(0.42))
-                    .frame(width: 14, height: 2)
+                Circle()
+                    .fill(color.opacity(0.82))
+                    .frame(width: 5, height: 5)
 
                 Spacer(minLength: 0)
             }
