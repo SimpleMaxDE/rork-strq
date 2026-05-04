@@ -380,7 +380,7 @@ struct ProfileView: View {
                     Analytics.shared.track(.paywall_viewed, ["source": "profile"])
                     showPaywall = true
                 } label: {
-                    let proAccent = Color(red: 0.98, green: 0.58, blue: 0.22)
+                    let proAccent = Color(red: 0.46, green: 0.42, blue: 0.95)
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 12) {
                             Image(systemName: "bolt.fill")

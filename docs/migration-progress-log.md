@@ -1611,6 +1611,26 @@ Pending work:
 - Rork QA should verify tapping the non-Pro STRQ Pro card still opens the paywall.
 - macOS or CI build validation remains required before shipping.
 
+## 2026-05-04 - Profile Subscription Pro Accent
+
+Scope:
+
+- Changed the local non-Pro `subscriptionSection` STRQ Pro card accent from orange/warm to deep violet/indigo while preserving paywall analytics, Button behavior, sheet presentation, store logic, layout, and copy.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Verification run:
+
+- Profile subscription accent diff and protected-path checks; Windows environment only, so no `xcodebuild` or simulator validation was performed.
+
+Pending work:
+
+- Rork QA should verify tapping the non-Pro STRQ Pro card still opens the paywall and the new accent reads as premium, not neon.
+- macOS or CI build validation remains required before shipping.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
