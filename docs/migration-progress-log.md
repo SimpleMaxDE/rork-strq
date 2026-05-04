@@ -1963,6 +1963,22 @@ Pending work:
 - Rork QA should verify Weekly Review now reads as Sapphire/Navy planning/review rather than a near-match to Coach Blue.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Permission Banner Shell Visual Pass
+
+Scope:
+
+- Updated only the `NotificationSettingsView.permissionBanner` visual shell to a muted Trust Steel STRQ card surface while preserving permission request, Settings fallback, `authStatus` update, and reminder rescheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Pending work:
+
+- Rork QA should verify the permission/status module feels calm and trustworthy, and that Enable and Settings continue to behave as before.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## 2026-05-04 - NotificationSettings Daily Check-In Visual Pass
 
 Scope:

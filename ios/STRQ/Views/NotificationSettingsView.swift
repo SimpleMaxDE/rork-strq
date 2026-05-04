@@ -43,21 +43,38 @@ struct NotificationSettingsView: View {
     }
 
     private var permissionBanner: some View {
-        HStack(spacing: 12) {
-            Image(systemName: authStatus == .authorized ? "bell.badge.fill" : "bell.slash.fill")
-                .font(.body.weight(.medium))
-                .foregroundStyle(.white)
-                .frame(width: 40, height: 40)
-                .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
+        let permissionAccent = Color(red: 0.58, green: 0.63, blue: 0.70)
+        let permissionAccentInk = Color(red: 0.80, green: 0.84, blue: 0.89)
+        let permissionAccentDim = Color(red: 0.10, green: 0.11, blue: 0.13)
 
-            VStack(alignment: .leading, spacing: 2) {
+        return HStack(alignment: .center, spacing: STRQSpacing.sm) {
+            Image(systemName: authStatus == .authorized ? "bell.badge.fill" : "bell.slash.fill")
+                .font(.system(size: 16, weight: .semibold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(authStatus == .authorized ? permissionAccentInk : permissionAccent.opacity(0.72))
+                .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                .background(
+                    permissionAccentDim.opacity(0.72),
+                    in: .rect(cornerRadius: STRQRadii.iconContainer)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                        .strokeBorder(permissionAccent.opacity(0.30), lineWidth: 1)
+                )
+
+            VStack(alignment: .leading, spacing: STRQSpacing.xs) {
                 Text(bannerTitle)
-                    .font(.subheadline.weight(.semibold))
+                    .font(STRQTypography.labelMedium)
+                    .foregroundStyle(STRQColors.primaryText)
                 Text(bannerSubtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(STRQTypography.paragraphSmall)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer()
+            .layoutPriority(1)
+
+            Spacer(minLength: 0)
+
             if authStatus == .notDetermined {
                 Button(L10n.tr("Enable")) {
                     Task {
@@ -66,21 +83,30 @@ struct NotificationSettingsView: View {
                         vm.rescheduleSmartReminders()
                     }
                 }
-                .font(.subheadline.weight(.semibold))
-                .buttonStyle(.borderedProminent)
-                .tint(STRQBrand.steel)
+                .font(STRQTypography.buttonCompact)
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .tint(permissionAccent)
             } else if authStatus == .denied {
                 Button(L10n.tr("Settings")) {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
                     }
                 }
-                .font(.subheadline.weight(.semibold))
+                .font(STRQTypography.buttonCompact)
                 .buttonStyle(.bordered)
+                .controlSize(.small)
+                .tint(permissionAccent)
             }
         }
-        .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+        .padding(.vertical, STRQSpacing.sm)
+        .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+        .clipShape(.rect(cornerRadius: STRQRadii.md))
+        .overlay(
+            RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                .strokeBorder(permissionAccent.opacity(0.20), lineWidth: 1)
+        )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
     }
