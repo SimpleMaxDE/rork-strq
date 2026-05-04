@@ -614,34 +614,14 @@ struct ProfileView: View {
 
             HStack(spacing: 10) {
                 if vm.profile.nutritionTrackingEnabled {
-                    Button { showNutritionSettings = true } label: {
-                        Label(L10n.tr("Edit Targets"), systemImage: "slider.horizontal.3")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(STRQBrand.steel)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 44)
-                            .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 11))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 11)
-                                    .strokeBorder(STRQBrand.steel.opacity(0.1), lineWidth: 1)
-                            )
+                    bodyNutritionActionButton(title: L10n.tr("Edit Targets"), systemIcon: "slider.horizontal.3") {
+                        showNutritionSettings = true
                     }
-                    .buttonStyle(.strqPressable)
                 }
 
-                Button { showSleepLog = true } label: {
-                    Label(L10n.tr("Sleep Log"), systemImage: "moon.zzz.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(STRQBrand.steel)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                        .background(STRQBrand.steel.opacity(0.1), in: .rect(cornerRadius: 11))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 11)
-                                .strokeBorder(STRQBrand.steel.opacity(0.1), lineWidth: 1)
-                        )
+                bodyNutritionActionButton(title: L10n.tr("Sleep Log"), systemIcon: "moon.zzz.fill") {
+                    showSleepLog = true
                 }
-                .buttonStyle(.strqPressable)
             }
         }
     }
@@ -860,6 +840,32 @@ struct ProfileView: View {
     }
 
     // MARK: - Components
+
+    private func bodyNutritionActionButton(title: String, systemIcon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: STRQSpacing.xs) {
+                Image(systemName: systemIcon)
+                    .font(.system(size: 13, weight: .semibold))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(STRQColors.iconSecondary)
+
+                Text(title)
+                    .font(STRQTypography.labelMedium)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
+            }
+            .padding(.horizontal, STRQSpacing.sm)
+            .frame(maxWidth: .infinity)
+            .frame(height: 44)
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.strqPressable)
+    }
 
     private func bodyNutritionInfoRow(_ title: String, value: String, showsDivider: Bool = true) -> some View {
         VStack(spacing: 0) {

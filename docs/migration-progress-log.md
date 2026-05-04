@@ -1180,6 +1180,42 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-04 - Profile Body & Nutrition Action-Button Shell Migration
+
+Scope:
+
+- Narrow Profile Body & Nutrition action-button visual shell migration for `Edit Targets` and `Sleep Log`, preserving sheet behavior and existing conditional visibility.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProfileView.swift` Body & Nutrition, Training Setup, Controls, Coaching Style, protected sheet/state references, and protected path checks.
+
+Verification run:
+
+- Scoped ProfileView `rg` checks, protected-file diff checks, Sandow-reference check, and git diff/status review.
+
+Intentionally not changed:
+
+- `trackingToggleCard`, Body & Nutrition static info rows, Training Setup, controlsSection, coachingStyleRow, sheets/navigation, analytics, subscription/account/danger/paywall/iCloud/reset/toggle logic, protected files, assets, fonts, localization, RevenueCat/store files, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, `ContentView.swift`, project files, or tests.
+
+Pending work:
+
+- Rork simulator QA for the Profile Body & Nutrition action buttons.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
