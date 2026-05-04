@@ -1360,6 +1360,55 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-04 - Profile Fitness Identity Semantic Plan
+
+Scope:
+
+- Created a docs-only semantic and visual planning report for Profile `fitnessIdentity`, separating visual shell work from Recovery, Sleep, Nutrition, and Streak product meaning.
+
+Files changed:
+
+- `docs/profile-fitness-identity-semantic-plan.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. This pass used repo docs and Swift source only.
+
+Code inspected:
+
+- `docs/README.md`
+- `docs/strq-premium-visual-direction-report.md`
+- `docs/profile-remaining-sections-risk-audit.md`
+- `docs/strq-foundation-hardening-pass-1.md`
+- `docs/strq-foundation-hardening-pass-2-design-lab-readiness.md`
+- `docs/qa-validation-plan.md`
+- `docs/migration-progress-log.md`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Utilities/STRQDesignSystem.swift`
+- `ios/STRQ/Utilities/STRQPalette.swift`
+- `ios/STRQ/Utilities/ForgeTheme.swift`
+
+Verification run:
+
+- Docs-only diff, protected iOS path diff, Profile fitness identity source checks, token/color source checks, and plan-content search.
+
+Intentionally not changed:
+
+- no Swift files
+- no Profile implementation
+- no design-system, palette, theme, assets, fonts, localization catalogs, RevenueCat/store files, view models, services, models, watch/widget/live activity files, project files, or tests
+
+Pending work:
+
+- Recommended next prompt is exactly one shell-only `fitnessIdentity` migration that preserves all metric values, thresholds, colors, and the Nutrition/Streak branch.
+- Rork simulator QA is required after any future Swift UI implementation.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+- Semantic color changes remain owner-gated because these metrics communicate coaching meaning.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
