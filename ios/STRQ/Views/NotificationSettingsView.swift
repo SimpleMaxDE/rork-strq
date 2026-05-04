@@ -204,17 +204,47 @@ struct NotificationSettingsView: View {
     }
 
     private var coachNudges: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Coach Nudges", icon: "brain.head.profile.fill", color: .purple)
+        VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+            Text("Coach Nudges")
+                .font(STRQTypography.cardTitle)
+                .foregroundStyle(STRQColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
 
-            VStack(spacing: 1) {
-                toggleRow(
-                    "Coach Recommendations",
-                    subtitle: "When your coach has important adjustments or insights",
-                    isOn: $vm.notificationSettings.coachNudgesEnabled
-                )
+            Toggle(isOn: $vm.notificationSettings.coachNudgesEnabled) {
+                HStack(alignment: .center, spacing: STRQSpacing.sm) {
+                    Image(systemName: "brain.head.profile.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(STRQColors.iconSecondary)
+                        .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                        .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                        )
+
+                    VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                        Text("Coach Recommendations")
+                            .font(STRQTypography.labelMedium)
+                            .foregroundStyle(STRQColors.primaryText)
+                        Text("When your coach has important adjustments or insights")
+                            .font(STRQTypography.paragraphSmall)
+                            .foregroundStyle(STRQColors.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 0)
+                }
             }
-            .clipShape(.rect(cornerRadius: 14))
+            .tint(STRQColors.secondaryAccent)
+            .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+            .padding(.vertical, STRQSpacing.sm)
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)

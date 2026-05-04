@@ -1831,6 +1831,26 @@ Warnings:
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 - Notification scheduling, permission requests, deep links, and HealthKit behavior remain owner-gated and protected.
 
+## 2026-05-04 - NotificationSettings Coach Nudges Visual Pass
+
+Scope:
+
+- Updated only the `NotificationSettingsView.coachNudges` visual shell to a restrained STRQ dark card treatment while preserving the Coach Recommendations toggle binding and top-level reminder rescheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- Shared `sectionHeader` and `toggleRow`, permission banner, workout/readiness/weekly/streak/HealthKit sections, notification services/models/routes, scheduling calls, permission requests, copy/localization catalogs, assets, tests, Watch, Widget, project files, and Profile were not changed.
+
+Pending work:
+
+- Rork QA should verify Coach Nudges remains compact, calm, non-Pro, and that toggling Coach Recommendations still reschedules reminders through existing behavior.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
