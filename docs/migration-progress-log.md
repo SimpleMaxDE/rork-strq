@@ -1851,6 +1851,26 @@ Pending work:
 - Rork QA should verify Coach Nudges remains compact, calm, non-Pro, and that toggling Coach Recommendations still reschedules reminders through existing behavior.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Coach Nudges Accent Refinement
+
+Scope:
+
+- Refined only the `NotificationSettingsView.coachNudges` visual treatment with a restrained local cool-blue Coach/Intelligence accent while preserving the toggle binding, copy, placement, and existing reminder rescheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- Shared `sectionHeader` and `toggleRow`, permission banner, other notification sections, notification services/models/routes, scheduling calls, permission requests, HealthKit behavior, assets, localization, project files, and Profile were not changed.
+
+Pending work:
+
+- Rork QA should verify the accent reads as Coach/Intelligence, not warm, subscription-coded, neon, or gamified.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

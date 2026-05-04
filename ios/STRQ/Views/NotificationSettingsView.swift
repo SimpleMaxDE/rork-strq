@@ -204,7 +204,11 @@ struct NotificationSettingsView: View {
     }
 
     private var coachNudges: some View {
-        VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+        let coachAccent = Color(red: 0.22, green: 0.74, blue: 0.97)
+        let coachAccentDim = Color(red: 0.04, green: 0.16, blue: 0.24)
+        let isEnabled = vm.notificationSettings.coachNudgesEnabled
+
+        return VStack(alignment: .leading, spacing: STRQSpacing.sm) {
             Text("Coach Nudges")
                 .font(STRQTypography.cardTitle)
                 .foregroundStyle(STRQColors.primaryText)
@@ -216,12 +220,15 @@ struct NotificationSettingsView: View {
                     Image(systemName: "brain.head.profile.fill")
                         .font(.system(size: 15, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(STRQColors.iconSecondary)
+                        .foregroundStyle(isEnabled ? coachAccent : coachAccent.opacity(0.62))
                         .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
-                        .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                        .background(
+                            coachAccentDim.opacity(isEnabled ? 0.72 : 0.42),
+                            in: .rect(cornerRadius: STRQRadii.iconContainer)
+                        )
                         .overlay(
                             RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
-                                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                                .strokeBorder(coachAccent.opacity(isEnabled ? 0.36 : 0.18), lineWidth: 1)
                         )
 
                     VStack(alignment: .leading, spacing: STRQSpacing.xs) {
@@ -236,14 +243,17 @@ struct NotificationSettingsView: View {
                     Spacer(minLength: 0)
                 }
             }
-            .tint(STRQColors.secondaryAccent)
+            .tint(isEnabled ? coachAccent : STRQColors.secondaryAccent)
             .padding(.horizontal, STRQSpacing.cardPaddingCompact)
             .padding(.vertical, STRQSpacing.sm)
             .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
             .clipShape(.rect(cornerRadius: STRQRadii.md))
             .overlay(
                 RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                    .strokeBorder(
+                        isEnabled ? coachAccent.opacity(0.22) : STRQColors.borderMuted,
+                        lineWidth: 1
+                    )
             )
         }
         .opacity(appeared ? 1 : 0)
