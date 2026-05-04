@@ -1288,6 +1288,42 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-04 - Profile Tracking Toggle Green Accent Softening
+
+Scope:
+
+- Refined only the active green visual treatment of Profile `trackingToggleCard` so the enabled state stays clear while reducing lime intensity in the icon well and card stroke.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProfileView.swift` `trackingToggleCard` and existing STRQ semantic success color tokens.
+
+Verification run:
+
+- Scoped ProfileView `rg` checks, protected-file diff checks, Sandow-reference check, and git diff/status review.
+
+Intentionally not changed:
+
+- Body & Nutrition rows/buttons, Edit Targets conditional visibility, Sleep Log behavior, Training Setup, controlsSection, coachingStyleRow, other screens, design-system utilities, localization, assets, fonts, RevenueCat/store files, view models, services, models, watch/widget/live activity files, project files, or tests.
+
+Pending work:
+
+- Rork simulator QA for the softened active green state.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

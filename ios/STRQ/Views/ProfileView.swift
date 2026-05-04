@@ -642,12 +642,12 @@ struct ProfileView: View {
                     Image(systemName: on ? "checkmark.seal.fill" : "leaf.fill")
                         .font(.system(size: 15, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(on ? STRQColors.successGreen : STRQColors.iconSecondary)
+                        .foregroundStyle(on ? STRQColors.successGreen.opacity(0.82) : STRQColors.iconSecondary)
                         .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
-                        .background(on ? STRQColors.successDim.opacity(0.72) : STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                        .background(on ? STRQColors.successDim.opacity(0.44) : STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
                         .overlay(
                             RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
-                                .strokeBorder(on ? STRQColors.successSoft.opacity(0.72) : STRQColors.borderMuted, lineWidth: 1)
+                                .strokeBorder(on ? STRQColors.successSoft.opacity(0.38) : STRQColors.borderMuted, lineWidth: 1)
                         )
                     VStack(alignment: .leading, spacing: STRQSpacing.xs) {
                         Text(L10n.tr("Physique & Nutrition Coaching"))
@@ -669,7 +669,7 @@ struct ProfileView: View {
             .clipShape(.rect(cornerRadius: STRQRadii.md))
             .overlay(
                 RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                    .strokeBorder(on ? STRQColors.successSoft.opacity(0.62) : STRQColors.borderMuted, lineWidth: 1)
+                    .strokeBorder(on ? STRQColors.successSoft.opacity(0.24) : STRQColors.borderMuted, lineWidth: 1)
             )
         }
     }
