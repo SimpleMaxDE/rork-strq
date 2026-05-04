@@ -466,30 +466,41 @@ struct ProfileView: View {
     // MARK: - Fitness Identity
 
     private var fitnessIdentity: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 12) {
+        VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+            HStack(alignment: .center, spacing: STRQSpacing.sm) {
                 Image(systemName: vm.profile.goal.symbolName)
-                    .font(.title3)
-                    .foregroundStyle(.white)
-                    .frame(width: 42, height: 42)
-                    .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 11))
+                    .font(.system(size: 17, weight: .semibold))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                    .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                            .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                    )
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: STRQSpacing.px50) {
                     Text(vm.profile.goal.displayName)
-                        .font(.subheadline.weight(.semibold))
+                        .font(STRQTypography.labelLarge)
+                        .foregroundStyle(STRQColors.primaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.82)
                     if !vm.isEarlyStage {
                         Text(goalDescription)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(STRQTypography.captionRegular)
+                            .foregroundStyle(STRQColors.secondaryText)
                             .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
-                Spacer()
+                Spacer(minLength: 0)
             }
 
-            Divider().opacity(0.4)
+            Rectangle()
+                .fill(STRQColors.divider)
+                .frame(height: 1)
 
-            HStack(spacing: 8) {
+            HStack(spacing: STRQSpacing.xs) {
                 statusChip(
                     icon: "heart.fill",
                     value: "\(vm.effectiveRecoveryScore)%",
@@ -519,33 +530,41 @@ struct ProfileView: View {
                 }
             }
         }
-        .padding(14)
-        .background(Color(white: 0.105), in: .rect(cornerRadius: 16))
+        .padding(STRQSpacing.cardPaddingCompact)
+        .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+        .clipShape(.rect(cornerRadius: STRQRadii.md))
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+            RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
         )
     }
 
     private func statusChip(icon: String, value: String, label: String, color: Color) -> some View {
-        VStack(spacing: 4) {
+        VStack(spacing: STRQSpacing.px50) {
             Image(systemName: icon)
-                .font(.system(size: 12))
+                .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(color)
             Text(value)
-                .font(.system(.caption, design: .rounded, weight: .bold).monospacedDigit())
+                .font(STRQTypography.labelMedium.monospacedDigit())
+                .foregroundStyle(STRQColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
             Text(label)
-                .font(.system(size: 9, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .font(STRQTypography.labelXS)
+                .foregroundStyle(STRQColors.mutedText)
                 .textCase(.uppercase)
-                .tracking(0.3)
+                .tracking(STRQTypography.labelXSTracking)
+                .lineLimit(1)
+                .minimumScaleFactor(0.74)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 10)
-        .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 10))
+        .frame(minHeight: 66)
+        .padding(.horizontal, STRQSpacing.px150)
+        .padding(.vertical, STRQSpacing.xs)
+        .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.md))
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(Color.white.opacity(0.06), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
         )
     }
 

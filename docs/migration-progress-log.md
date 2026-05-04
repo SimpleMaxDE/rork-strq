@@ -1409,6 +1409,43 @@ Warnings:
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 - Semantic color changes remain owner-gated because these metrics communicate coaching meaning.
 
+## 2026-05-04 - Profile Fitness Identity Shell Migration
+
+Scope:
+
+- Migrated only the Profile `fitnessIdentity` card shell and local `statusChip` tile presentation to the accepted calm dark/carbon Profile style, preserving all semantic metric colors, displayed data, icons, thresholds, and the Nutrition/Streak branch.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- Requested Profile migration docs, `ios/STRQ/Views/ProfileView.swift`, `ios/STRQ/Utilities/STRQDesignSystem.swift`, `ios/STRQ/Utilities/STRQPalette.swift`, and `ios/STRQ/Utilities/ForgeTheme.swift`.
+
+Verification run:
+
+- Scoped Profile `fitnessIdentity`, `statusChip`, accepted-section, protected-file, Sandow-reference, and git diff/status checks.
+
+Intentionally not changed:
+
+- no metric values, value formats, SF Symbols, semantic color sources, thresholds, Nutrition/Streak branch, `profileHeader`, subscription/account/danger/footer sections, accepted Profile sections, design-system utilities, palette/theme files, assets, fonts, localization catalogs, RevenueCat/store files, view models, services, models, watch/widget/live activity files, project files, or tests
+
+Pending work:
+
+- Rork simulator QA for Profile `fitnessIdentity` on small and large iPhone viewports, including early-stage/established and Nutrition/Streak states.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+- Semantic color refinement remains owner-gated.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
