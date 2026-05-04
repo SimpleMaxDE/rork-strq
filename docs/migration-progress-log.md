@@ -1787,6 +1787,50 @@ Pending work:
 
 - Owner Rork QA remains required before treating Profile as release-ready; recommended next screen is NotificationSettings planning.
 
+## 2026-05-04 - NotificationSettings Risk Plan
+
+Scope:
+
+- Created a docs-only risk and redesign plan for `NotificationSettingsView` before any notification settings Swift implementation.
+
+Files changed:
+
+- `docs/notification-settings-risk-plan.md`
+- `docs/migration-progress-log.md`
+
+Code inspected:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Models/NotificationSettings.swift`
+- `ios/STRQ/Services/NotificationScheduler.swift`
+- `ios/STRQ/Services/ReminderWidgetCoordinator.swift`
+- `ios/STRQ/Models/NotificationDeepLinkRoute.swift`
+- `ios/STRQ/Services/NotificationDeepLinkCenter.swift`
+- `ios/STRQ/AppDelegate.swift`
+- `ios/STRQ/ContentView.swift`
+- `ios/STRQ/STRQApp.swift`
+- `ios/STRQ/ViewModels/AppViewModel.swift`
+- `ios/STRQ/Services/HealthKitService.swift`
+
+Verification run:
+
+- Docs-only diff, protected iOS path diff, NotificationSettings behavior searches, notification scheduler/deep-link searches, and plan-content search.
+
+Intentionally not changed:
+
+- no Swift files, no `NotificationSettingsView` implementation, no Profile implementation, no notification services/managers, no permissions, no scheduling/canceling behavior, no routes/deep links, no HealthKit behavior, no assets, no localization, no project files, and no tests
+
+Pending work:
+
+- Recommended next prompt is exactly one low-risk non-permission `coachNudges` toggle-row visual pass.
+- Rork simulator QA is required after any future NotificationSettings Swift implementation.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+- Notification scheduling, permission requests, deep links, and HealthKit behavior remain owner-gated and protected.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
