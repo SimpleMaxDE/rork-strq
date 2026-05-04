@@ -204,8 +204,8 @@ struct NotificationSettingsView: View {
     }
 
     private var coachNudges: some View {
-        let coachAccent = Color(red: 0.22, green: 0.74, blue: 0.97)
-        let coachAccentDim = Color(red: 0.04, green: 0.16, blue: 0.24)
+        let coachAccent = Color(red: 0.20, green: 0.48, blue: 0.78)
+        let coachAccentDim = Color(red: 0.04, green: 0.10, blue: 0.17)
         let isEnabled = vm.notificationSettings.coachNudgesEnabled
 
         return VStack(alignment: .leading, spacing: STRQSpacing.sm) {

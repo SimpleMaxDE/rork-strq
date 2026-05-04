@@ -1871,6 +1871,26 @@ Pending work:
 - Rork QA should verify the accent reads as Coach/Intelligence, not warm, subscription-coded, neon, or gamified.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Coach Nudges Steel Blue Tuning
+
+Scope:
+
+- Refined only the local `NotificationSettingsView.coachNudges` accent color values from bright cool-blue to muted Coach Blue / Steel Blue while preserving layout, copy, toggle binding, placement, and existing reminder rescheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- Layout, spacing, icon, copy, shared helpers, permission banner, other notification sections, notification services/models/routes, scheduling calls, HealthKit behavior, assets, localization, project files, and Profile were not changed.
+
+Pending work:
+
+- Rork QA should verify Coach Nudges still feels active when enabled without reading as neon, gamified, or subscription-coded.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
