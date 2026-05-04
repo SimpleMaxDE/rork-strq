@@ -2011,6 +2011,38 @@ Pending work:
 - Rork QA should verify Workout Reminders feels practical and training-structured, and that toggling or changing the reminder time still reschedules through existing behavior.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Authorized Permission Settings Action
+
+Scope:
+
+- Updated only `NotificationSettingsView.permissionBanner` trailing action logic so `.authorized`, `.provisional`, and `.ephemeral` states show the same secondary `Settings` button as `.denied`, opening `UIApplication.openSettingsURLString`.
+- Preserved the `.notDetermined` Enable request flow, banner title/subtitle behavior, and reminder scheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- ios/STRQ/Views/NotificationSettingsView.swift docs/migration-progress-log.md`
+- targeted `rg` checks for permission-banner status/action symbols, notification scheduler usage, Sandow references, and protected paths
+
+Intentionally not changed:
+
+- no fake permission toggle
+- no reminder sections
+- no HealthKit section
+- no `bannerTitle` or `bannerSubtitle`
+- no notification services, models, routes, assets, localization, project files, widget/watch targets, or tests
+
+Pending work:
+
+- Rork QA required to verify enabled notification states expose the secondary Settings action clearly without reading as a CTA.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

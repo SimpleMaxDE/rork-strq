@@ -46,6 +46,10 @@ struct NotificationSettingsView: View {
         let permissionAccent = Color(red: 0.58, green: 0.63, blue: 0.70)
         let permissionAccentInk = Color(red: 0.80, green: 0.84, blue: 0.89)
         let permissionAccentDim = Color(red: 0.10, green: 0.11, blue: 0.13)
+        let showsSettingsButton = authStatus == .denied ||
+            authStatus == .authorized ||
+            authStatus == .provisional ||
+            authStatus == .ephemeral
 
         return HStack(alignment: .center, spacing: STRQSpacing.sm) {
             Image(systemName: authStatus == .authorized ? "bell.badge.fill" : "bell.slash.fill")
@@ -87,7 +91,7 @@ struct NotificationSettingsView: View {
                 .buttonStyle(.bordered)
                 .controlSize(.small)
                 .tint(permissionAccent)
-            } else if authStatus == .denied {
+            } else if showsSettingsButton {
                 Button(L10n.tr("Settings")) {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
