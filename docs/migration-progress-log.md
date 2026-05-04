@@ -2094,6 +2094,25 @@ Pending work:
 
 - Rork QA remains required before treating NotificationSettings as release-ready; recommended next screen is CoachingPreferences final QA.
 
+## 2026-05-04 - CoachingPreferences Final QA Report
+
+Scope:
+
+- Created a docs-only CoachingPreferences final QA and remaining-risk report covering implementation inventory, protected behavior, visual diagnosis, required state coverage, release-readiness, and exactly one recommended next action and next screen.
+
+Files changed:
+
+- `docs/coaching-preferences-final-qa-report.md`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- no Swift files, no `CoachingPreferencesView`, no Profile implementation, no models, no services, no analytics files, no design-system utilities, no assets, no localization, no project files, and no tests
+
+Pending work:
+
+- Rork QA should verify all CoachingPreferences option groups, locked/unlocked Physique behavior, Profile summary updates, persistence/refresh behavior, and small/large layouts before freezing the screen.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
