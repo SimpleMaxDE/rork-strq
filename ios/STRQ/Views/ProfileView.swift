@@ -922,17 +922,20 @@ struct ProfileView: View {
 
     private var dangerSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: L10n.tr("Danger Zone"))
+            STRQSectionHeader(L10n.tr("Danger Zone"))
+                .textCase(.uppercase)
 
-            VStack(spacing: 1) {
+            VStack(spacing: 0) {
                 controlRow(L10n.tr("Reset All Data"), icon: "trash.fill", color: .red) {
                     showResetAlert = true
                 }
             }
-            .clipShape(.rect(cornerRadius: 12))
+            .buttonStyle(.plain)
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(Color.red.opacity(0.26), lineWidth: 1)
             )
         }
     }
@@ -1153,27 +1156,33 @@ struct ProfileView: View {
     private func controlRow(_ label: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             controlRowContent(label, icon: icon, color: color)
-                .background(Color(.secondarySystemGroupedBackground))
         }
     }
 
     private func controlRowContent(_ label: String, icon: String, color: Color) -> some View {
-        HStack(spacing: 12) {
+        HStack(spacing: STRQSpacing.sm) {
             Image(systemName: icon)
-                .font(.subheadline)
+                .font(.system(size: 15, weight: .semibold))
+                .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(color)
-                .frame(width: 30, height: 30)
-                .background(color.opacity(0.12), in: .rect(cornerRadius: 8))
+                .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                .background(color.opacity(0.10), in: .rect(cornerRadius: STRQRadii.iconContainer))
+                .overlay(
+                    RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                        .strokeBorder(color.opacity(0.22), lineWidth: 1)
+                )
             Text(label)
-                .font(.subheadline)
-                .foregroundStyle(label.contains(L10n.tr("Reset")) ? .red : .primary)
-            Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.tertiary)
+                .font(STRQTypography.labelMedium)
+                .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
+            Spacer(minLength: STRQSpacing.sm)
+            STRQIconView(.chevronRight, size: STRQSpacing.iconXS, tint: color.opacity(0.58))
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+        .padding(.vertical, STRQSpacing.sm)
+        .background(STRQColors.cardSurface)
+        .accessibilityLabel(label)
     }
 
     private var goalDescription: String {

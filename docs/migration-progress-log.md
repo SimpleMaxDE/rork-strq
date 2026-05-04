@@ -1729,6 +1729,26 @@ Pending work:
 - Rork QA should verify the signed-out Sync & Restore module feels calm, premium, trustworthy, and not like a subscription upsell.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - Profile Danger Zone Shell
+
+Scope:
+
+- Updated only the `ProfileView.dangerSection` visual shell to a restrained STRQ dark card treatment with semantic red danger affordances.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- Reset All Data button behavior, top-level reset alert copy, destructive reset action, cancel action, `showResetAlert`, `vm.resetAllData()`, accepted Profile sections, protected app logic, assets, localization, tests, Watch, Widget, project, and store files.
+
+Pending work:
+
+- Rork QA should verify Danger Zone remains calm, premium, and unmistakably destructive without reading as a primary CTA.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
