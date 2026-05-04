@@ -628,6 +628,9 @@ struct ProfileView: View {
 
     private var trackingToggleCard: some View {
         let on = vm.profile.nutritionTrackingEnabled
+        let activeGreen = Color(red: 0.016, green: 0.471, blue: 0.341)
+        let activeGreenSoft = Color(red: 0.024, green: 0.373, blue: 0.275)
+        let activeGreenDim = Color(red: 0.008, green: 0.173, blue: 0.133)
         return VStack(alignment: .leading, spacing: STRQSpacing.xs) {
             Toggle(isOn: Binding(
                 get: { vm.profile.nutritionTrackingEnabled },
@@ -642,12 +645,12 @@ struct ProfileView: View {
                     Image(systemName: on ? "checkmark.seal.fill" : "leaf.fill")
                         .font(.system(size: 15, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(on ? STRQColors.successGreen.opacity(0.82) : STRQColors.iconSecondary)
+                        .foregroundStyle(on ? activeGreen : STRQColors.iconSecondary)
                         .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
-                        .background(on ? STRQColors.successDim.opacity(0.44) : STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                        .background(on ? activeGreenDim.opacity(0.72) : STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
                         .overlay(
                             RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
-                                .strokeBorder(on ? STRQColors.successSoft.opacity(0.38) : STRQColors.borderMuted, lineWidth: 1)
+                                .strokeBorder(on ? activeGreenSoft.opacity(0.58) : STRQColors.borderMuted, lineWidth: 1)
                         )
                     VStack(alignment: .leading, spacing: STRQSpacing.xs) {
                         Text(L10n.tr("Physique & Nutrition Coaching"))
@@ -662,14 +665,14 @@ struct ProfileView: View {
                     }
                 }
             }
-            .tint(on ? STRQColors.successGreen : STRQColors.secondaryAccent)
+            .tint(on ? activeGreen : STRQColors.secondaryAccent)
             .padding(.horizontal, STRQSpacing.cardPaddingCompact)
             .padding(.vertical, STRQSpacing.sm)
             .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
             .clipShape(.rect(cornerRadius: STRQRadii.md))
             .overlay(
                 RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                    .strokeBorder(on ? STRQColors.successSoft.opacity(0.24) : STRQColors.borderMuted, lineWidth: 1)
+                    .strokeBorder(on ? activeGreenSoft.opacity(0.42) : STRQColors.borderMuted, lineWidth: 1)
             )
         }
     }

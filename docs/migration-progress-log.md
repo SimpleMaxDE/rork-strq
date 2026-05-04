@@ -1324,6 +1324,42 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-04 - Profile Tracking Toggle Dark Green Hue Correction
+
+Scope:
+
+- Applied a local premium dark-green hue correction to Profile `trackingToggleCard` active state after token audit confirmed `STRQColors.successGreen` maps to lime500.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProfileView.swift` `trackingToggleCard`, local active-state color references, and protected toggle binding/refresh side effects.
+
+Verification run:
+
+- Scoped ProfileView color, toggle binding, protected-section, protected-file, Sandow-reference, and git diff/status checks.
+
+Intentionally not changed:
+
+- global STRQ design-system tokens, `STRQPalette`, Body & Nutrition rows/buttons, Edit Targets conditional visibility, Sleep Log behavior, Training Setup, controlsSection, coachingStyleRow, subscription/account/danger sections, other production screens, assets, fonts, localization, RevenueCat/store files, view models, services, models, watch/widget/live activity files, project files, or tests.
+
+Pending work:
+
+- Rork simulator QA for the Profile nutrition tracking toggle active and inactive states.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
