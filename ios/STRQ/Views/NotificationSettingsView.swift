@@ -168,9 +168,9 @@ struct NotificationSettingsView: View {
     }
 
     private var weeklyReviewReminders: some View {
-        let reviewAccent = Color(red: 0.22, green: 0.38, blue: 0.78)
-        let reviewAccentInk = Color(red: 0.55, green: 0.67, blue: 0.96)
-        let reviewAccentDim = Color(red: 0.04, green: 0.07, blue: 0.18)
+        let reviewAccent = Color(red: 0.16, green: 0.25, blue: 0.62)
+        let reviewAccentInk = Color(red: 0.46, green: 0.56, blue: 0.92)
+        let reviewAccentDim = Color(red: 0.03, green: 0.04, blue: 0.14)
         let isEnabled = vm.notificationSettings.weeklyReviewEnabled
 
         return VStack(alignment: .leading, spacing: STRQSpacing.sm) {

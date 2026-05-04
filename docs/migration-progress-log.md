@@ -1947,6 +1947,22 @@ Pending work:
 - Rork QA should verify Weekly Review feels like calm planning/review and that toggling or changing the review day still reschedules through existing behavior.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Weekly Review Sapphire Tuning
+
+Scope:
+
+- Refined only the local `NotificationSettingsView.weeklyReviewReminders` accent color values from brighter Review Blue to darker Sapphire/Navy so Weekly Review reads clearly distinct from Coach Nudges while preserving layout, copy, toggle binding, picker binding/tags, and existing reminder rescheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Pending work:
+
+- Rork QA should verify Weekly Review now reads as Sapphire/Navy planning/review rather than a near-match to Coach Blue.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
