@@ -1554,6 +1554,43 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-04 - Profile Subscription Section Risk Plan
+
+Scope:
+
+- Created a docs-only risk and redesign plan for the Profile `subscriptionSection` / STRQ Pro entry before any Swift implementation.
+
+Files changed:
+
+- `docs/profile-subscription-section-risk-plan.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. This pass used repo docs and Swift source only.
+
+Code inspected:
+
+- Requested migration docs, `ios/STRQ/Views/ProfileView.swift`, `ios/STRQ/Views/STRQPaywallView.swift`, `ios/STRQ/ViewModels/StoreViewModel.swift`, and RevenueCat-facing references found by `rg`.
+
+Verification run:
+
+- Docs-only diff, protected iOS path diff, Profile subscription source checks, RevenueCat/store reference checks, Sandow-reference check, and plan-content search.
+
+Intentionally not changed:
+
+- no Swift files, no Profile implementation, no paywall, no StoreViewModel/RevenueCat logic, no design-system/palette/theme files, no assets, fonts, localization catalogs, view models, services, models, watch/widget/live activity files, project files, or tests
+
+Pending work:
+
+- Recommended next prompt is exactly one shell-only non-Pro `subscriptionSection` card pass that preserves paywall analytics and presentation behavior.
+- Rork simulator QA is required after any future subscriptionSection Swift implementation.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+- Subscription/paywall behavior remains owner-gated and revenue-sensitive.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
