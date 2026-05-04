@@ -2113,6 +2113,30 @@ Pending work:
 
 - Rork QA should verify all CoachingPreferences option groups, locked/unlocked Physique behavior, Profile summary updates, persistence/refresh behavior, and small/large layouts before freezing the screen.
 
+## 2026-05-04 - CoachTab Risk Plan
+
+Scope:
+
+- Created a docs-only CoachTab risk, visual direction, protected behavior, and implementation planning report before any Swift implementation.
+
+Files changed:
+
+- `docs/coach-tab-risk-plan.md`
+- `docs/migration-progress-log.md`
+
+Code inspected:
+
+- `ios/STRQ/Views/CoachTabView.swift`
+- CoachTab-adjacent read-only behavior sources including `AppViewModel`, `DailyStateCoordinator`, `DailyBriefingEngine`, `ComebackEngine`, `ComebackCard`, `PhaseOutlookCard`, `CoachingHistoryView`, `ExpandableCoachCard`, `CoachAction`, `CoachingMemoryService`, `ForgeTheme`, `STRQPalette`, and `Analytics`.
+
+Intentionally not changed:
+
+- no Swift files, no CoachTab implementation, no action logic, no models, no services, no analytics files, no design-system utilities, no assets, no localization, no project files, no tests, no Watch, Widget, or Live Activity files
+
+Pending work:
+
+- Recommended next prompt is exactly one docs-only CoachTab state/screenshot inventory before selecting any display-only Swift shell candidate.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
