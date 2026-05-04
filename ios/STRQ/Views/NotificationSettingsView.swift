@@ -102,32 +102,78 @@ struct NotificationSettingsView: View {
     }
 
     private var workoutReminders: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionHeader("Workout Reminders", icon: "dumbbell.fill", color: STRQBrand.steel)
+        let workoutAccent = Color(red: 0.50, green: 0.58, blue: 0.66)
+        let workoutAccentInk = Color(red: 0.72, green: 0.78, blue: 0.84)
+        let workoutAccentDim = Color(red: 0.08, green: 0.10, blue: 0.12)
+        let isEnabled = vm.notificationSettings.workoutRemindersEnabled
 
-            VStack(spacing: 1) {
-                toggleRow(
-                    "Workout Planned Today",
-            subtitle: "Get reminded when you have a workout scheduled",
-                    isOn: $vm.notificationSettings.workoutRemindersEnabled
-                )
+        return VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+            Text("Workout Reminders")
+                .font(STRQTypography.cardTitle)
+                .foregroundStyle(STRQColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
+
+            VStack(spacing: 0) {
+                Toggle(isOn: $vm.notificationSettings.workoutRemindersEnabled) {
+                    HStack(alignment: .center, spacing: STRQSpacing.sm) {
+                        Image(systemName: "dumbbell.fill")
+                            .font(.system(size: 15, weight: .semibold))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(isEnabled ? workoutAccentInk : workoutAccent.opacity(0.62))
+                            .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                            .background(
+                                workoutAccentDim.opacity(isEnabled ? 0.72 : 0.42),
+                                in: .rect(cornerRadius: STRQRadii.iconContainer)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                                    .strokeBorder(workoutAccent.opacity(isEnabled ? 0.36 : 0.18), lineWidth: 1)
+                            )
+
+                        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                            Text("Workout Planned Today")
+                                .font(STRQTypography.labelMedium)
+                                .foregroundStyle(STRQColors.primaryText)
+                            Text("Get reminded when you have a workout scheduled")
+                                .font(STRQTypography.paragraphSmall)
+                                .foregroundStyle(STRQColors.secondaryText)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                }
+                .tint(isEnabled ? workoutAccent : STRQColors.secondaryAccent)
+                .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+                .padding(.vertical, STRQSpacing.sm)
 
                 if vm.notificationSettings.workoutRemindersEnabled {
+                    Divider()
+                        .overlay(STRQColors.borderMuted)
+                        .padding(.leading, STRQSpacing.cardPaddingCompact + STRQSpacing.iconContainerMD + STRQSpacing.sm)
+
                     HStack {
                         Text(L10n.tr("Reminder Time"))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(STRQTypography.paragraphSmall)
+                            .foregroundStyle(STRQColors.secondaryText)
                         Spacer()
                         DatePicker("", selection: $vm.notificationSettings.workoutReminderTime, displayedComponents: .hourAndMinute)
                             .labelsHidden()
-                            .tint(STRQBrand.steel)
+                            .tint(workoutAccent)
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 12)
-                    .background(Color(.secondarySystemGroupedBackground))
+                    .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+                    .padding(.vertical, STRQSpacing.sm)
                 }
             }
-            .clipShape(.rect(cornerRadius: 14))
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(
+                        isEnabled ? workoutAccent.opacity(0.22) : STRQColors.borderMuted,
+                        lineWidth: 1
+                    )
+            )
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)

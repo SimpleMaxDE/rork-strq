@@ -1979,6 +1979,22 @@ Pending work:
 - Rork QA should verify Daily Check-In reads as calm readiness/self-check support and that toggling or changing the check-in time still reschedules through existing behavior.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-04 - NotificationSettings Workout Reminders Visual Pass
+
+Scope:
+
+- Updated only the `NotificationSettingsView.workoutReminders` visual shell to a restrained STRQ dark card with muted Steel / Graphite Blue-Grey accents while preserving the Workout Planned Today toggle, Reminder Time DatePicker binding/display, and top-level reminder rescheduling behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/NotificationSettingsView.swift`
+- `docs/migration-progress-log.md`
+
+Pending work:
+
+- Rork QA should verify Workout Reminders feels practical and training-structured, and that toggling or changing the reminder time still reschedules through existing behavior.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
