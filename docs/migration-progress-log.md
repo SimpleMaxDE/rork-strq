@@ -1591,6 +1591,26 @@ Warnings:
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 - Subscription/paywall behavior remains owner-gated and revenue-sensitive.
 
+## 2026-05-04 - Profile Subscription Non-Pro Shell
+
+Scope:
+
+- Migrated only the non-Pro `subscriptionSection` STRQ Pro card visual shell to a calmer carbon premium treatment while preserving paywall analytics, Button behavior, sheet presentation, store logic, and copy.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Verification run:
+
+- Profile subscription diff and protected-path checks; Windows environment only, so no `xcodebuild` or simulator validation was performed.
+
+Pending work:
+
+- Rork QA should verify tapping the non-Pro STRQ Pro card still opens the paywall.
+- macOS or CI build validation remains required before shipping.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

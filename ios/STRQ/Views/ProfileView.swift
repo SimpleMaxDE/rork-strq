@@ -222,19 +222,20 @@ struct ProfileView: View {
         HStack(spacing: 4) {
             Image(systemName: icon)
                 .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(Color.white.opacity(0.56))
             Text(label)
                 .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(Color.white.opacity(0.76))
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
         }
-        .foregroundStyle(STRQBrand.steel)
         .padding(.horizontal, 8)
         .padding(.vertical, 5)
         .frame(maxWidth: .infinity)
-        .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+        .background(Color.white.opacity(0.055), in: Capsule())
         .overlay(
             Capsule()
-                .strokeBorder(STRQBrand.steel.opacity(0.15), lineWidth: 0.5)
+                .strokeBorder(Color.white.opacity(0.085), lineWidth: 0.5)
         )
     }
 
@@ -379,29 +380,41 @@ struct ProfileView: View {
                     Analytics.shared.track(.paywall_viewed, ["source": "profile"])
                     showPaywall = true
                 } label: {
+                    let proAccent = Color(red: 0.98, green: 0.58, blue: 0.22)
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(spacing: 12) {
                             Image(systemName: "bolt.fill")
                                 .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.black)
-                                .frame(width: 34, height: 34)
-                                .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 9))
+                                .foregroundStyle(proAccent)
+                                .frame(width: 36, height: 36)
+                                .background(Color.white.opacity(0.065), in: .rect(cornerRadius: 10))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                                )
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(L10n.tr("STRQ Pro"))
                                     .font(.subheadline.weight(.bold))
+                                    .foregroundStyle(.white)
                                 Text(L10n.tr("Deeper coaching, plans that evolve, full ecosystem."))
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.white.opacity(0.68))
                                     .lineLimit(2)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
                             Spacer(minLength: 0)
                             Image(systemName: "chevron.right")
                                 .font(.caption2.weight(.semibold))
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(Color.white.opacity(0.48))
+                                .frame(width: 26, height: 26)
+                                .background(Color.white.opacity(0.055), in: Circle())
+                                .overlay(
+                                    Circle()
+                                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                                )
                         }
 
-                        HStack(spacing: 5) {
+                        HStack(spacing: 6) {
                             proPillarChip(icon: "brain.head.profile.fill", label: L10n.tr("Adaptive"))
                             proPillarChip(icon: "arrow.triangle.2.circlepath", label: L10n.tr("Evolving"))
                             proPillarChip(icon: "icloud.fill", label: L10n.tr("Sync"))
@@ -409,11 +422,27 @@ struct ProfileView: View {
                         }
                     }
                     .padding(14)
-                    .background(Color(white: 0.105), in: .rect(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
+                    .background(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 0.076, green: 0.081, blue: 0.090),
+                                Color(red: 0.045, green: 0.050, blue: 0.058)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        in: .rect(cornerRadius: 14)
                     )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                    )
+                    .overlay(alignment: .topLeading) {
+                        Capsule()
+                            .fill(proAccent.opacity(0.62))
+                            .frame(width: 42, height: 2)
+                            .padding(.leading, 16)
+                    }
                 }
                 .buttonStyle(.plain)
             }
