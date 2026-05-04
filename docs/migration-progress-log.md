@@ -1252,6 +1252,42 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-04 - Profile Tracking Toggle Active-State Accent Refinement
+
+Scope:
+
+- Refined only the active/enabled visual state of Profile `trackingToggleCard` with restrained STRQ semantic green accents while preserving the neutral off state and all nutrition tracking side effects.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProfileView.swift` `trackingToggleCard` and existing STRQ semantic success color tokens.
+
+Verification run:
+
+- Scoped ProfileView `rg` checks, protected-file diff checks, Sandow-reference check, and git diff/status review.
+
+Intentionally not changed:
+
+- Body & Nutrition static info rows, Body & Nutrition action buttons, Training Setup, controlsSection, coachingStyleRow, CoachingPreferencesView, sheets/navigation, analytics, subscription/account/danger/paywall/iCloud/reset behavior, protected files, assets, fonts, localization, RevenueCat/store files, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, `ContentView.swift`, project files, or tests.
+
+Pending work:
+
+- Rork simulator QA for the Profile nutrition tracking toggle active and inactive states.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
