@@ -628,7 +628,7 @@ struct ProfileView: View {
 
     private var trackingToggleCard: some View {
         let on = vm.profile.nutritionTrackingEnabled
-        return VStack(alignment: .leading, spacing: 8) {
+        return VStack(alignment: .leading, spacing: STRQSpacing.xs) {
             Toggle(isOn: Binding(
                 get: { vm.profile.nutritionTrackingEnabled },
                 set: { newValue in
@@ -638,30 +638,38 @@ struct ProfileView: View {
                     vm.refreshDailyState()
                 }
             )) {
-                HStack(spacing: 10) {
+                HStack(alignment: .center, spacing: STRQSpacing.sm) {
                     Image(systemName: on ? "checkmark.seal.fill" : "leaf.fill")
-                        .font(.subheadline)
-                        .foregroundStyle(on ? STRQPalette.success : STRQPalette.info)
-                        .frame(width: 30, height: 30)
-                        .background((on ? STRQPalette.success : STRQPalette.info).opacity(0.12), in: .rect(cornerRadius: 8))
-                    VStack(alignment: .leading, spacing: 2) {
+                        .font(.system(size: 15, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(on ? STRQColors.primaryText : STRQColors.iconSecondary)
+                        .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                        .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                        )
+                    VStack(alignment: .leading, spacing: STRQSpacing.xs) {
                         Text(L10n.tr("Physique & Nutrition Coaching"))
-                            .font(.subheadline.weight(.semibold))
+                            .font(STRQTypography.labelMedium)
+                            .foregroundStyle(STRQColors.primaryText)
                         Text(on
                             ? L10n.tr("STRQ uses weigh-ins and nutrition logs to read body-composition progress.")
                             : L10n.tr("Optional. Training and recovery coaching stay fully active without food or bodyweight logs."))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(STRQTypography.paragraphSmall)
+                            .foregroundStyle(STRQColors.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
             }
-            .tint(STRQPalette.success)
-            .padding(14)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 12))
+            .tint(STRQColors.secondaryAccent)
+            .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+            .padding(.vertical, STRQSpacing.sm)
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
             )
         }
     }

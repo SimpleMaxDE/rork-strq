@@ -1216,6 +1216,42 @@ Warnings:
 
 - This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
 
+## 2026-05-04 - Profile Tracking Toggle Card Visual Shell Migration
+
+Scope:
+
+- Narrow Profile `trackingToggleCard` visual shell migration to the accepted STRQ Profile carbon-card language, preserving the nutrition tracking toggle binding and refresh side effects.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- None. Figma was intentionally not used.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProfileView.swift` Body & Nutrition, protected toggle binding, accepted Profile row/card treatments, and protected path checks.
+
+Verification run:
+
+- Scoped ProfileView `rg` checks, protected-file diff checks, Sandow-reference check, and git diff/status review.
+
+Intentionally not changed:
+
+- Body & Nutrition static info rows, Body & Nutrition action buttons, Training Setup, controlsSection, coachingStyleRow, sheets/navigation, analytics, subscription/account/danger/paywall/iCloud/reset behavior, protected files, assets, fonts, localization, RevenueCat/store files, view models, services, models, watch/widget/live activity files, `STRQApp.swift`, `ContentView.swift`, project files, or tests.
+
+Pending work:
+
+- Rork simulator QA for the Profile nutrition tracking toggle in both off and on states.
+- macOS or CI build validation remains required before shipping.
+
+Warnings:
+
+- This pass ran on Windows; no `xcodebuild` or simulator validation was performed.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
