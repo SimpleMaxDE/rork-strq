@@ -2569,6 +2569,30 @@ Warnings:
 
 - Raw SVG exports are vector-only but include the source rounded component background and border, so they are not transparent as-is.
 
+## 2026-05-05 - STRQ Anatomy Overlay System Plan
+
+Scope:
+
+- Created a docs-only plan for turning licensed Figma Anatomy Muscle sources into a base-body plus transparent overlay/mask runtime system.
+
+Files changed:
+
+- `docs/strq-anatomy-overlay-system-plan.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Inspected Anatomy Muscle `8673:69673` and large anatomy vector groups `9192:5535`.
+
+Intentionally not changed:
+
+- no Swift files, no app assets, no asset catalogs, no localization, no tests, no Watch, Widget, Live Activity, project files, production code, Figma canvas writes, or Figma asset exports
+
+Pending work:
+
+- Run a QA-only normalization pass to derive transparent masks and label base bodies before any app import.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
