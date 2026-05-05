@@ -301,7 +301,7 @@ struct CoachTabView: View {
         case 85...:
             return STRQPalette.success
         case 70..<85:
-            return STRQPalette.success.opacity(0.82)
+            return Color(red: 0.36, green: 0.74, blue: 0.50)
         case 55..<70:
             return STRQPalette.warning
         case 40..<55:

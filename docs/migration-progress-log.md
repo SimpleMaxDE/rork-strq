@@ -2304,6 +2304,34 @@ Warnings:
 
 - Windows environment only; no `xcodebuild` was run. macOS/CI build validation and Rork QA remain required before shipping.
 
+### 2026-05-05 - CoachTab Readiness Green Band Polish
+
+Scope:
+
+- Refined only the CoachTab readiness hero resolver's `70..<85` band so Well Prepared remains green but is visibly more muted than Peak Readiness on the dark hero.
+
+Files changed:
+
+- `ios/STRQ/Views/CoachTabView.swift`
+- `docs/migration-progress-log.md`
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- ios/STRQ/Views/CoachTabView.swift docs/migration-progress-log.md`
+- `rg -n "coachReadinessColor|STRQPalette\\.success|STRQPalette\\.warning|STRQPalette\\.danger|effectiveRecoveryScore|readinessBasedRecoveryStatus|showReadinessCheckIn" ios/STRQ/Views/CoachTabView.swift`
+- `rg -n "Sandow" ios/STRQ/Views ios/STRQ/ContentView.swift`
+- `git diff --name-only -- ios/STRQ/Utilities ios/STRQ/ViewModels ios/STRQ/Services ios/STRQ/Models ios/STRQ/Views/ReadinessCheckInView.swift ios/STRQ/Views/DashboardView.swift ios/STRQ/Views/ProfileView.swift ios/STRQ/Views/ProgressAnalyticsView.swift ios/STRQWidget ios/STRQWatch`
+
+Intentionally not changed:
+
+- Authority hero layout, score/status/phase/headline/week/check-in behavior, sheets/actions/analytics, global color tokens, theme/design-system files, AppViewModel, services, models, assets, localization, other screens, Widget, and Watch.
+
+Warnings:
+
+- Windows environment only; no `xcodebuild` was run. Rork QA remains required.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
