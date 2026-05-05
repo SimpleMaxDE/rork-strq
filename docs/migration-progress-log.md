@@ -2152,6 +2152,36 @@ Intentionally not changed:
 
 - earlyStateCard, shouldShowCalibrationChecklist, CoachTab actions, sheets, analytics, models, services, design tokens, assets, and localization.
 
+## 2026-05-05 - Coach Weekly Check-In Risk Plan
+
+Scope:
+
+- Created a docs-only risk and visual direction plan for `CoachTabView.weeklyCheckInRow` before any Swift implementation.
+
+Files changed:
+
+- `docs/coach-weekly-checkin-risk-plan.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Bounded read-only scan for broad dark dashboard, compact card/list, progress/step, and coach-summary pattern categories only. No assets, layouts, text, or proprietary details were copied.
+
+Code inspected:
+
+- `ios/STRQ/Views/CoachTabView.swift`
+- `ios/STRQ/Views/WeeklyCheckInView.swift`
+- `ios/STRQ/ViewModels/AppViewModel.swift`
+- weekly review and plan-quality behavior references needed for mapping only
+
+Intentionally not changed:
+
+- no Swift files, no CoachTab implementation, no WeeklyCheckInView implementation, no view models, no models, no services, no analytics files, no design-system utilities, no assets, no localization, no project files, no tests, no Watch, Widget, or Live Activity files
+
+Pending work:
+
+- Recommended next prompt is exactly one early-stage passive/not-ready `weeklyCheckInRow` shell-only pass, followed by Rork QA.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
