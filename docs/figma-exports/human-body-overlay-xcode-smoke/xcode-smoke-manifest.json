@@ -1,0 +1,444 @@
+{
+  "smokeTest": "human-body-overlay-xcode-smoke",
+  "mode": "Licensed Source Mode",
+  "createdDate": "2026-05-06",
+  "hostPlatform": "Windows",
+  "xcodeValidationPerformed": false,
+  "xcodeValidationLimitation": "Windows host: Xcode/SwiftUI asset-catalog rendering was not available; this pass performed static SVG checks plus local vector PDF conversion only.",
+  "sourceFolders": [
+    "docs/figma-exports/human-body-overlay-pilot/",
+    "docs/figma-exports/human-body-overlay-visual-qa/"
+  ],
+  "scratchFolder": "docs/figma-exports/human-body-overlay-xcode-smoke",
+  "copiedSvgFolder": "docs/figma-exports/human-body-overlay-xcode-smoke/svg",
+  "normalizedSvgFolder": "docs/figma-exports/human-body-overlay-xcode-smoke/svg-normalized",
+  "pdfFolder": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf",
+  "scratchXcassetsFolder": "docs/figma-exports/human-body-overlay-xcode-smoke/HumanBodyOverlaySmoke.xcassets",
+  "conversionTooling": {
+    "attempts": [
+      {
+        "tool": "CairoSVG",
+        "result": "failed on Windows because the native Cairo library was unavailable",
+        "notes": "cairosvg installed successfully, but import failed with missing cairo/libcairo DLL."
+      },
+      {
+        "tool": "pdfkit + svg-to-pdfkit",
+        "result": "succeeded",
+        "notes": "Generated vector PDF candidates from normalized SVG copies inside the smoke folder."
+      }
+    ]
+  },
+  "runtimeDecision": {
+    "recommendedNextPath": "B. convert to vector PDF first, then import",
+    "recommendedRuntimeFormat": "vector-pdf",
+    "svgDirectImportReadiness": "not recommended without macOS/Xcode proof of currentColor/template tint and percentage-size handling",
+    "pdfImportReadiness": "preferred candidate format for macOS/Xcode scratch import; production import still requires Xcode validation and owner visual QA"
+  },
+  "globalFindings": {
+    "viewBox": "Each overlay shares the exact viewBox of its matching base, preserving same-coordinate alignment.",
+    "widthHeight": "Source SVGs use width=\"100%\" and height=\"100%\"; normalized scratch variants set numeric width/height from the viewBox.",
+    "currentColor": "Overlay SVGs use currentColor for fill and stroke; local conversion resolves the overlay paint into vector PDF, but SwiftUI template tint for direct SVG was not validated on Windows.",
+    "fillStrokeSemantics": "Bases use fixed white/gray fills/strokes, including CSS var() paint attributes in source; overlays are monochrome and suitable for template-style tinting after import validation.",
+    "transparentBackground": "No root canvas/background rectangle or embedded raster image was found in the smoke set.",
+    "unsupportedSvgFeatures": "No image, mask, clipPath, filter, foreignObject, pattern, gradient, use, script, or animation elements were found; attribute-level import risks remain.",
+    "alignmentAfterConversion": "Vector PDFs were generated with the same viewBox-derived output dimensions as their normalized SVG sources, so base/overlay coordinate alignment should be preserved; real Xcode rendering still needs macOS validation."
+  },
+  "assets": [
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleFrontBase",
+      "sourcePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontBase.candidate.svg",
+      "scratchCopyPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg/STRQHumanBodyMaleFrontBase.candidate.svg",
+      "normalizedSvgPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg-normalized/STRQHumanBodyMaleFrontBase.normalized.svg",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleFrontBase.pdf",
+      "scratchXcassetsImageSetPath": "docs/figma-exports/human-body-overlay-xcode-smoke/HumanBodyOverlaySmoke.xcassets/STRQHumanBodyMaleFrontBase.imageset",
+      "type": "base",
+      "gender": "male",
+      "orientation": "front",
+      "muscleGroup": null,
+      "viewBox": "0 0 272.609 496.989",
+      "viewBoxMinX": 0.0,
+      "viewBoxMinY": 0.0,
+      "viewBoxWidth": 272.609,
+      "viewBoxHeight": 496.989,
+      "sourceWidth": "100%",
+      "sourceHeight": "100%",
+      "normalizedWidth": "272.609",
+      "normalizedHeight": "496.989",
+      "currentColorPresent": "no",
+      "rasterPresent": "no",
+      "transparentBackground": "yes",
+      "fillValues": [
+        "none",
+        "var(--fill-0, #FAFAFA)",
+        "var(--fill-0, white)"
+      ],
+      "strokeValues": [
+        "var(--stroke-0, #A1A1AA)"
+      ],
+      "pathCount": 60,
+      "unsupportedSvgFeatureRisk": "percentage width/height; CSS custom-property paint attributes; preserveAspectRatio none requires same-frame base/overlay layout; overflow visible is browser-oriented",
+      "recommendedRuntimeFormat": "vector-pdf",
+      "importReadiness": "qa-ready for macOS/Xcode scratch import; not production-ready",
+      "notes": "Base body keeps fixed source paint and should render as original, not template."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleFrontChestOverlay",
+      "sourcePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontChestOverlay.candidate.svg",
+      "scratchCopyPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg/STRQHumanBodyMaleFrontChestOverlay.candidate.svg",
+      "normalizedSvgPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg-normalized/STRQHumanBodyMaleFrontChestOverlay.normalized.svg",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleFrontChestOverlay.pdf",
+      "scratchXcassetsImageSetPath": "docs/figma-exports/human-body-overlay-xcode-smoke/HumanBodyOverlaySmoke.xcassets/STRQHumanBodyMaleFrontChestOverlay.imageset",
+      "type": "overlay",
+      "gender": "male",
+      "orientation": "front",
+      "muscleGroup": "Chest",
+      "viewBox": "0 0 272.609 496.989",
+      "viewBoxMinX": 0.0,
+      "viewBoxMinY": 0.0,
+      "viewBoxWidth": 272.609,
+      "viewBoxHeight": 496.989,
+      "sourceWidth": "100%",
+      "sourceHeight": "100%",
+      "normalizedWidth": "272.609",
+      "normalizedHeight": "496.989",
+      "currentColorPresent": "yes",
+      "rasterPresent": "no",
+      "transparentBackground": "yes",
+      "fillValues": [
+        "currentColor",
+        "none"
+      ],
+      "strokeValues": [
+        "currentColor"
+      ],
+      "pathCount": 2,
+      "unsupportedSvgFeatureRisk": "percentage width/height; currentColor inheritance requires Xcode template-tint validation; preserveAspectRatio none requires same-frame base/overlay layout; overflow visible is browser-oriented",
+      "recommendedRuntimeFormat": "vector-pdf",
+      "importReadiness": "qa-ready for macOS/Xcode scratch import; not production-ready",
+      "notes": "Overlay source uses currentColor; PDF candidate is intended for asset-catalog template tinting."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleFrontShoulderOverlay",
+      "sourcePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontShoulderOverlay.candidate.svg",
+      "scratchCopyPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg/STRQHumanBodyMaleFrontShoulderOverlay.candidate.svg",
+      "normalizedSvgPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg-normalized/STRQHumanBodyMaleFrontShoulderOverlay.normalized.svg",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleFrontShoulderOverlay.pdf",
+      "scratchXcassetsImageSetPath": "docs/figma-exports/human-body-overlay-xcode-smoke/HumanBodyOverlaySmoke.xcassets/STRQHumanBodyMaleFrontShoulderOverlay.imageset",
+      "type": "overlay",
+      "gender": "male",
+      "orientation": "front",
+      "muscleGroup": "Shoulder",
+      "viewBox": "0 0 272.609 496.989",
+      "viewBoxMinX": 0.0,
+      "viewBoxMinY": 0.0,
+      "viewBoxWidth": 272.609,
+      "viewBoxHeight": 496.989,
+      "sourceWidth": "100%",
+      "sourceHeight": "100%",
+      "normalizedWidth": "272.609",
+      "normalizedHeight": "496.989",
+      "currentColorPresent": "yes",
+      "rasterPresent": "no",
+      "transparentBackground": "yes",
+      "fillValues": [
+        "currentColor",
+        "none"
+      ],
+      "strokeValues": [
+        "currentColor"
+      ],
+      "pathCount": 2,
+      "unsupportedSvgFeatureRisk": "percentage width/height; currentColor inheritance requires Xcode template-tint validation; preserveAspectRatio none requires same-frame base/overlay layout; overflow visible is browser-oriented",
+      "recommendedRuntimeFormat": "vector-pdf",
+      "importReadiness": "qa-ready for macOS/Xcode scratch import; not production-ready",
+      "notes": "Overlay source uses currentColor; PDF candidate is intended for asset-catalog template tinting."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleBackBase",
+      "sourcePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackBase.candidate.svg",
+      "scratchCopyPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg/STRQHumanBodyMaleBackBase.candidate.svg",
+      "normalizedSvgPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg-normalized/STRQHumanBodyMaleBackBase.normalized.svg",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleBackBase.pdf",
+      "scratchXcassetsImageSetPath": "docs/figma-exports/human-body-overlay-xcode-smoke/HumanBodyOverlaySmoke.xcassets/STRQHumanBodyMaleBackBase.imageset",
+      "type": "base",
+      "gender": "male",
+      "orientation": "back",
+      "muscleGroup": null,
+      "viewBox": "0 0 286.668 497",
+      "viewBoxMinX": 0.0,
+      "viewBoxMinY": 0.0,
+      "viewBoxWidth": 286.668,
+      "viewBoxHeight": 497.0,
+      "sourceWidth": "100%",
+      "sourceHeight": "100%",
+      "normalizedWidth": "286.668",
+      "normalizedHeight": "497",
+      "currentColorPresent": "no",
+      "rasterPresent": "no",
+      "transparentBackground": "yes",
+      "fillValues": [
+        "none",
+        "var(--fill-0, #F4F4F5)",
+        "var(--fill-0, #FAFAFA)",
+        "var(--fill-0, white)"
+      ],
+      "strokeValues": [
+        "var(--stroke-0, #A1A1AA)"
+      ],
+      "pathCount": 51,
+      "unsupportedSvgFeatureRisk": "percentage width/height; CSS custom-property paint attributes; preserveAspectRatio none requires same-frame base/overlay layout; overflow visible is browser-oriented",
+      "recommendedRuntimeFormat": "vector-pdf",
+      "importReadiness": "qa-ready for macOS/Xcode scratch import; not production-ready",
+      "notes": "Base body keeps fixed source paint and should render as original, not template."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleBackBackOverlay",
+      "sourcePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackBackOverlay.candidate.svg",
+      "scratchCopyPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg/STRQHumanBodyMaleBackBackOverlay.candidate.svg",
+      "normalizedSvgPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg-normalized/STRQHumanBodyMaleBackBackOverlay.normalized.svg",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleBackBackOverlay.pdf",
+      "scratchXcassetsImageSetPath": "docs/figma-exports/human-body-overlay-xcode-smoke/HumanBodyOverlaySmoke.xcassets/STRQHumanBodyMaleBackBackOverlay.imageset",
+      "type": "overlay",
+      "gender": "male",
+      "orientation": "back",
+      "muscleGroup": "Back",
+      "viewBox": "0 0 286.668 497",
+      "viewBoxMinX": 0.0,
+      "viewBoxMinY": 0.0,
+      "viewBoxWidth": 286.668,
+      "viewBoxHeight": 497.0,
+      "sourceWidth": "100%",
+      "sourceHeight": "100%",
+      "normalizedWidth": "286.668",
+      "normalizedHeight": "497",
+      "currentColorPresent": "yes",
+      "rasterPresent": "no",
+      "transparentBackground": "yes",
+      "fillValues": [
+        "currentColor",
+        "none"
+      ],
+      "strokeValues": [
+        "currentColor"
+      ],
+      "pathCount": 7,
+      "unsupportedSvgFeatureRisk": "percentage width/height; currentColor inheritance requires Xcode template-tint validation; preserveAspectRatio none requires same-frame base/overlay layout; overflow visible is browser-oriented",
+      "recommendedRuntimeFormat": "vector-pdf",
+      "importReadiness": "qa-ready for macOS/Xcode scratch import; not production-ready",
+      "notes": "Overlay source uses currentColor; PDF candidate is intended for asset-catalog template tinting."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleFrontBase",
+      "sourcePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleFrontBase.candidate.svg",
+      "scratchCopyPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg/STRQHumanBodyFemaleFrontBase.candidate.svg",
+      "normalizedSvgPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg-normalized/STRQHumanBodyFemaleFrontBase.normalized.svg",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyFemaleFrontBase.pdf",
+      "scratchXcassetsImageSetPath": "docs/figma-exports/human-body-overlay-xcode-smoke/HumanBodyOverlaySmoke.xcassets/STRQHumanBodyFemaleFrontBase.imageset",
+      "type": "base",
+      "gender": "female",
+      "orientation": "front",
+      "muscleGroup": null,
+      "viewBox": "0 0 233.641 497.381",
+      "viewBoxMinX": 0.0,
+      "viewBoxMinY": 0.0,
+      "viewBoxWidth": 233.641,
+      "viewBoxHeight": 497.381,
+      "sourceWidth": "100%",
+      "sourceHeight": "100%",
+      "normalizedWidth": "233.641",
+      "normalizedHeight": "497.381",
+      "currentColorPresent": "no",
+      "rasterPresent": "no",
+      "transparentBackground": "yes",
+      "fillValues": [
+        "none",
+        "var(--fill-0, #F4F4F5)",
+        "var(--fill-0, #FAFAFA)",
+        "var(--fill-0, white)"
+      ],
+      "strokeValues": [
+        "var(--stroke-0, #A1A1AA)"
+      ],
+      "pathCount": 72,
+      "unsupportedSvgFeatureRisk": "percentage width/height; CSS custom-property paint attributes; preserveAspectRatio none requires same-frame base/overlay layout; overflow visible is browser-oriented",
+      "recommendedRuntimeFormat": "vector-pdf",
+      "importReadiness": "qa-ready for macOS/Xcode scratch import; not production-ready",
+      "notes": "Base body keeps fixed source paint and should render as original, not template."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleFrontChestOverlay",
+      "sourcePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleFrontChestOverlay.candidate.svg",
+      "scratchCopyPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg/STRQHumanBodyFemaleFrontChestOverlay.candidate.svg",
+      "normalizedSvgPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg-normalized/STRQHumanBodyFemaleFrontChestOverlay.normalized.svg",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyFemaleFrontChestOverlay.pdf",
+      "scratchXcassetsImageSetPath": "docs/figma-exports/human-body-overlay-xcode-smoke/HumanBodyOverlaySmoke.xcassets/STRQHumanBodyFemaleFrontChestOverlay.imageset",
+      "type": "overlay",
+      "gender": "female",
+      "orientation": "front",
+      "muscleGroup": "Chest",
+      "viewBox": "0 0 233.641 497.381",
+      "viewBoxMinX": 0.0,
+      "viewBoxMinY": 0.0,
+      "viewBoxWidth": 233.641,
+      "viewBoxHeight": 497.381,
+      "sourceWidth": "100%",
+      "sourceHeight": "100%",
+      "normalizedWidth": "233.641",
+      "normalizedHeight": "497.381",
+      "currentColorPresent": "yes",
+      "rasterPresent": "no",
+      "transparentBackground": "yes",
+      "fillValues": [
+        "currentColor",
+        "none"
+      ],
+      "strokeValues": [
+        "currentColor"
+      ],
+      "pathCount": 2,
+      "unsupportedSvgFeatureRisk": "percentage width/height; currentColor inheritance requires Xcode template-tint validation; preserveAspectRatio none requires same-frame base/overlay layout; overflow visible is browser-oriented",
+      "recommendedRuntimeFormat": "vector-pdf",
+      "importReadiness": "qa-ready for macOS/Xcode scratch import; not production-ready",
+      "notes": "Overlay source uses currentColor; PDF candidate is intended for asset-catalog template tinting."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleBackBase",
+      "sourcePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleBackBase.candidate.svg",
+      "scratchCopyPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg/STRQHumanBodyFemaleBackBase.candidate.svg",
+      "normalizedSvgPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg-normalized/STRQHumanBodyFemaleBackBase.normalized.svg",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyFemaleBackBase.pdf",
+      "scratchXcassetsImageSetPath": "docs/figma-exports/human-body-overlay-xcode-smoke/HumanBodyOverlaySmoke.xcassets/STRQHumanBodyFemaleBackBase.imageset",
+      "type": "base",
+      "gender": "female",
+      "orientation": "back",
+      "muscleGroup": null,
+      "viewBox": "0 0 238.679 497.399",
+      "viewBoxMinX": 0.0,
+      "viewBoxMinY": 0.0,
+      "viewBoxWidth": 238.679,
+      "viewBoxHeight": 497.399,
+      "sourceWidth": "100%",
+      "sourceHeight": "100%",
+      "normalizedWidth": "238.679",
+      "normalizedHeight": "497.399",
+      "currentColorPresent": "no",
+      "rasterPresent": "no",
+      "transparentBackground": "yes",
+      "fillValues": [
+        "none",
+        "var(--fill-0, #F4F4F5)",
+        "var(--fill-0, #FAFAFA)",
+        "var(--fill-0, white)"
+      ],
+      "strokeValues": [
+        "var(--stroke-0, #A1A1AA)"
+      ],
+      "pathCount": 52,
+      "unsupportedSvgFeatureRisk": "percentage width/height; CSS custom-property paint attributes; preserveAspectRatio none requires same-frame base/overlay layout; overflow visible is browser-oriented",
+      "recommendedRuntimeFormat": "vector-pdf",
+      "importReadiness": "qa-ready for macOS/Xcode scratch import; not production-ready",
+      "notes": "Base body keeps fixed source paint and should render as original, not template."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleBackGluteOverlay",
+      "sourcePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleBackGluteOverlay.candidate.svg",
+      "scratchCopyPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg/STRQHumanBodyFemaleBackGluteOverlay.candidate.svg",
+      "normalizedSvgPath": "docs/figma-exports/human-body-overlay-xcode-smoke/svg-normalized/STRQHumanBodyFemaleBackGluteOverlay.normalized.svg",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyFemaleBackGluteOverlay.pdf",
+      "scratchXcassetsImageSetPath": "docs/figma-exports/human-body-overlay-xcode-smoke/HumanBodyOverlaySmoke.xcassets/STRQHumanBodyFemaleBackGluteOverlay.imageset",
+      "type": "overlay",
+      "gender": "female",
+      "orientation": "back",
+      "muscleGroup": "Glute",
+      "viewBox": "0 0 238.679 497.399",
+      "viewBoxMinX": 0.0,
+      "viewBoxMinY": 0.0,
+      "viewBoxWidth": 238.679,
+      "viewBoxHeight": 497.399,
+      "sourceWidth": "100%",
+      "sourceHeight": "100%",
+      "normalizedWidth": "238.679",
+      "normalizedHeight": "497.399",
+      "currentColorPresent": "yes",
+      "rasterPresent": "no",
+      "transparentBackground": "yes",
+      "fillValues": [
+        "currentColor",
+        "none"
+      ],
+      "strokeValues": [
+        "currentColor"
+      ],
+      "pathCount": 2,
+      "unsupportedSvgFeatureRisk": "percentage width/height; currentColor inheritance requires Xcode template-tint validation; preserveAspectRatio none requires same-frame base/overlay layout; overflow visible is browser-oriented",
+      "recommendedRuntimeFormat": "vector-pdf",
+      "importReadiness": "qa-ready for macOS/Xcode scratch import; not production-ready",
+      "notes": "Overlay source uses currentColor; PDF candidate is intended for asset-catalog template tinting."
+    }
+  ],
+  "pdfConversionFindings": [
+    {
+      "asset": "STRQHumanBodyMaleFrontBase",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleFrontBase.pdf",
+      "ok": true,
+      "bytes": 8005,
+      "error": null
+    },
+    {
+      "asset": "STRQHumanBodyMaleFrontChestOverlay",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleFrontChestOverlay.pdf",
+      "ok": true,
+      "bytes": 1700,
+      "error": null
+    },
+    {
+      "asset": "STRQHumanBodyMaleFrontShoulderOverlay",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleFrontShoulderOverlay.pdf",
+      "ok": true,
+      "bytes": 1557,
+      "error": null
+    },
+    {
+      "asset": "STRQHumanBodyMaleBackBase",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleBackBase.pdf",
+      "ok": true,
+      "bytes": 6421,
+      "error": null
+    },
+    {
+      "asset": "STRQHumanBodyMaleBackBackOverlay",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleBackBackOverlay.pdf",
+      "ok": true,
+      "bytes": 2273,
+      "error": null
+    },
+    {
+      "asset": "STRQHumanBodyFemaleFrontBase",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyFemaleFrontBase.pdf",
+      "ok": true,
+      "bytes": 8406,
+      "error": null
+    },
+    {
+      "asset": "STRQHumanBodyFemaleFrontChestOverlay",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyFemaleFrontChestOverlay.pdf",
+      "ok": true,
+      "bytes": 1576,
+      "error": null
+    },
+    {
+      "asset": "STRQHumanBodyFemaleBackBase",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyFemaleBackBase.pdf",
+      "ok": true,
+      "bytes": 6863,
+      "error": null
+    },
+    {
+      "asset": "STRQHumanBodyFemaleBackGluteOverlay",
+      "pdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyFemaleBackGluteOverlay.pdf",
+      "ok": true,
+      "bytes": 1611,
+      "error": null
+    }
+  ]
+}

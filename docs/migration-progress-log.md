@@ -2648,6 +2648,29 @@ Pending work:
 
 - Rork visual QA and Xcode vector/template rendering QA before any app import.
 
+## 2026-05-06 - Human Body Overlay Xcode Smoke
+
+Scope:
+
+- QA-only asset-rendering smoke pass for the licensed Human Body overlay candidates, using static SVG checks plus local vector PDF conversion on Windows.
+
+Files changed:
+
+- Created `docs/figma-exports/human-body-overlay-xcode-smoke/` with copied smoke SVGs, normalized SVG variants, vector PDF candidates, a docs-only scratch `.xcassets` package, `README.md`, and `xcode-smoke-manifest.json`.
+- Updated `docs/migration-progress-log.md`.
+
+Verification run:
+
+- Folder listing, manifest parse, README/manifest keyword search, forbidden production target diff check, and `git diff --check`.
+
+Intentionally not changed:
+
+- No Swift files, production asset catalogs, project files, localization, tests, fonts, Watch, Widget, or app runtime assets.
+
+Pending work:
+
+- macOS/Xcode validation remains required; recommended next path is B, convert to vector PDF first, then import.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
