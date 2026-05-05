@@ -30,21 +30,30 @@ struct WeeklyCheckInView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 0) {
-                    pageIndicator
-                        .padding(.top, 8)
+            VStack(spacing: 0) {
+                pageIndicator
+                    .padding(.top, 8)
 
-                    TabView(selection: $currentPage) {
-                        summaryPage.tag(0)
-                        highlightsPage.tag(1)
-                        coachPage.tag(2)
+                TabView(selection: $currentPage) {
+                    reviewPage {
+                        summaryPage
                     }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .frame(minHeight: 660)
+                    .tag(0)
+
+                    reviewPage {
+                        highlightsPage
+                    }
+                    .tag(1)
+
+                    reviewPage {
+                        coachPage
+                    }
+                    .tag(2)
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .scrollIndicators(.hidden)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(reportBackground)
             .navigationTitle(L10n.tr("Weekly Review"))
             .navigationBarTitleDisplayMode(.inline)
@@ -64,6 +73,15 @@ struct WeeklyCheckInView: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .presentationContentInteraction(.scrolls)
+    }
+
+    private func reviewPage<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        ScrollView(.vertical) {
+            content()
+                .padding(.bottom, 24)
+        }
+        .scrollIndicators(.hidden)
+        .background(reportBackground)
     }
 
     private var pageIndicator: some View {

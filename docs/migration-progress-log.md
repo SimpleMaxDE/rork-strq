@@ -2437,6 +2437,28 @@ Pending work:
 - Rork QA should verify the active CoachTab Weekly Check-In entry, three-page Weekly Review carousel, summary proof hierarchy, highlights observations, Coach's Take conclusion, action row confirmation dialog, small/large iPhone layouts, and no orange CTA dominance.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+### 2026-05-05 - Weekly Review Page Scroll Fix
+
+Scope:
+
+- Fixed the Weekly Review sheet page layout so Summary, Highlights, and Coach pages can scroll vertically inside the paged carousel.
+- Removed the outer vertical `ScrollView` around the `TabView` and wrapped each page in a local vertical scroll helper.
+- Preserved page order, `currentPage`, page tags, page indicator, review data usage, copy/localization, confirmation dialog, `vm.applyReviewAction(selected)`, presentation detents, drag indicator, and visual shells.
+
+Files changed:
+
+- `ios/STRQ/Views/WeeklyCheckInView.swift`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- no `CoachTabView`, view models, models, services, analytics files, design-system utilities, global palette/theme files, assets, localization, Widget, Watch, Live Activity, project files, tests, or fonts
+
+Pending work:
+
+- Rork QA should verify all three Weekly Review pages scroll vertically when content exceeds the viewport, horizontal swiping still works, and the action confirmation dialog remains unchanged.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
