@@ -2536,6 +2536,39 @@ Pending work:
 
 - Recommended next prompt is an export-only QA pilot for the Anatomy Muscle subset before any asset catalog import or Swift implementation.
 
+## 2026-05-05 - Licensed Anatomy Muscle Export QA Pilot
+
+Scope:
+
+- Ran an export-only QA pilot for the licensed Anatomy Muscle subset: Chest, Back, Abs, and Glute across Male/Female and Selected/Unselected variants.
+
+Files changed:
+
+- `docs/figma-exports/anatomy-pilot/`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) in Licensed Source Mode, read-only/export-only.
+- Inspected Anatomy Muscle `8673:69673` and exported 16 clearly labeled SVG variants from nodes `9024:101237`, `9024:97738`, `9025:100270`, `9024:102739`, `9024:101868`, `9024:99348`, `9025:100900`, `9025:98731`, `9024:101162`, `9023:268361`, `9025:100122`, `9024:102664`, `9024:101740`, `9024:99220`, `9025:100770`, and `9025:98471`.
+- Inspected large anatomy vector groups `9192:5535` for context only; no exports were taken from that node.
+
+Verification run:
+
+- Ran export folder listing, manifest JSON parse, README/manifest `rg` checks, `git diff --name-only -- ios/STRQ ios/STRQWidget ios/STRQWatch`, `git diff --check`, and SVG viewBox/raster/background checks.
+
+Intentionally not changed:
+
+- no Swift files, no app assets, no asset catalogs, no localization, no tests, no Watch, Widget, Live Activity, project files, production code, or Figma canvas writes
+
+Pending work:
+
+- Normalize background-free and STRQ-tokenized anatomy candidates before any app asset catalog import.
+
+Warnings:
+
+- Raw SVG exports are vector-only but include the source rounded component background and border, so they are not transparent as-is.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
