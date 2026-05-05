@@ -2400,6 +2400,43 @@ Pending work:
 - Rork QA should verify established-user primary + watch + momentum + More Signals states, focused density hiding, simplicity emphasis hiding momentum, watch details expanded/collapsed, More Signals sheet opening, and small/large iPhone layouts.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+### 2026-05-05 - Weekly Review Experience Visual Batch Pass
+
+Scope:
+
+- Refined the active/ready Weekly Check-In gateway in CoachTab and the Weekly Review sheet summary, highlights, coach conclusion, and action-row visual shells as one premium weekly coach report flow.
+- Preserved review generation call sites, sheet routing, page order, TabView selection behavior, selected action state, confirmation dialog behavior, review data usage, action application behavior, analytics behavior, model/view-model logic, copy/localization, and global design tokens.
+- Left the passive early-stage Weekly Check-In shell and `planQualityRow` unchanged.
+
+Files changed:
+
+- `ios/STRQ/Views/CoachTabView.swift`
+- `ios/STRQ/Views/WeeklyCheckInView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Not used in this pass. The result was guided by STRQ's Product & Design North Star and broad weekly report / dark analytics / coach summary patterns from the existing STRQ planning docs.
+
+Code inspected:
+
+- `docs/strq-product-design-north-star.md`
+- `docs/coach-weekly-checkin-risk-plan.md`
+- `docs/coach-tab-risk-plan.md`
+- `docs/migration-progress-log.md`
+- `ios/STRQ/Views/CoachTabView.swift`
+- `ios/STRQ/Views/WeeklyCheckInView.swift`
+- Weekly review model/action references for behavior confirmation only
+
+Intentionally not changed:
+
+- no `AppViewModel`, review generator, models, services, persistence, analytics files, design-system utilities, global palette/theme files, assets, localization, Readiness, More Signals, Active Workout, training, handoff, RevenueCat/store, Widget, Watch, Live Activity, project files, tests, or fonts
+
+Pending work:
+
+- Rork QA should verify the active CoachTab Weekly Check-In entry, three-page Weekly Review carousel, summary proof hierarchy, highlights observations, Coach's Take conclusion, action row confirmation dialog, small/large iPhone layouts, and no orange CTA dominance.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

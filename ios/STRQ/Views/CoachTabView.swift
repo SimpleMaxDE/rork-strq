@@ -1275,33 +1275,91 @@ struct CoachTabView: View {
     }
 
     private func weeklyReviewLabel(subtitle: String, ready: Bool) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: ready ? "doc.text.magnifyingglass" : "calendar.badge.clock")
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.white)
-                .frame(width: 36, height: 36)
-                .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 10))
+        let reportNavy = Color(red: 0.055, green: 0.090, blue: 0.145)
+        let reportSteel = Color(red: 0.360, green: 0.470, blue: 0.590)
+        let reportInk = Color(red: 0.620, green: 0.730, blue: 0.840)
 
-            VStack(alignment: .leading, spacing: 2) {
+        return HStack(alignment: .center, spacing: 12) {
+            RoundedRectangle(cornerRadius: 2, style: .continuous)
+                .fill(reportInk.opacity(ready ? 0.62 : 0.32))
+                .frame(width: 3, height: 46)
+                .accessibilityHidden(true)
+
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                reportSteel.opacity(0.26),
+                                reportNavy.opacity(0.92)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                Image(systemName: ready ? "doc.text.magnifyingglass" : "calendar.badge.clock")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(reportInk)
+            }
+            .frame(width: 40, height: 40)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(reportInk.opacity(0.18), lineWidth: 1)
+            )
+            .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 3) {
                 Text(L10n.tr("Weekly Check-In"))
                     .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(STRQPalette.textPrimary)
                 Text(subtitle)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(STRQPalette.textSecondary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer()
+
+            Spacer(minLength: 0)
+
             if ready {
                 Image(systemName: "chevron.right")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.quaternary)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(reportInk.opacity(0.82))
+                    .frame(width: 26, height: 26)
+                    .background(Color.white.opacity(0.045), in: Circle())
+                    .overlay(
+                        Circle()
+                            .strokeBorder(reportInk.opacity(0.12), lineWidth: 1)
+                    )
             }
         }
         .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        .background(
+            LinearGradient(
+                colors: [
+                    reportNavy.opacity(0.96),
+                    STRQPalette.surfaceRaised,
+                    STRQPalette.backgroundCarbon
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 16)
         )
+        .overlay(alignment: .topLeading) {
+            LinearGradient(
+                colors: [reportInk.opacity(0.22), Color.clear],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(height: 1)
+            .padding(.horizontal, 16)
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(reportInk.opacity(0.16), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.16), radius: 10, y: 4)
     }
 
     private func planQualityRow(_ quality: PlanQualityScore) -> some View {
