@@ -2271,6 +2271,39 @@ Intentionally not changed:
 
 - Swift files, CoachTab implementation, global palette/theme files, readiness views, Dashboard, Profile, models, services, assets, localization, Widget, Watch, project files, and tests.
 
+### 2026-05-05 - CoachTab Readiness Hero Color Semantics Fix
+
+Scope:
+
+- Added a CoachTab-only readiness hero color resolver for the `authorityHero` ring, status dot, status text, and glow so Moderate readiness reads as amber/warning while preserving the premium dark hero shell.
+
+Files changed:
+
+- `ios/STRQ/Views/CoachTabView.swift`
+- `docs/migration-progress-log.md`
+
+Code inspected:
+
+- `authorityHero` still uses `vm.effectiveRecoveryScore`, `vm.currentPhase`, `vm.readinessBasedRecoveryStatus`, `STRQCountUpText(value: Double(score), duration: 0.75)`, `CGFloat(score) / 100`, existing Check in visibility/action, and Reduce Motion-aware animation.
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- ios/STRQ/Views/CoachTabView.swift docs/migration-progress-log.md`
+- `git diff --name-only -- ios/STRQ/Utilities ios/STRQ/ViewModels ios/STRQ/Services ios/STRQ/Models ios/STRQ/Views/ReadinessCheckInView.swift ios/STRQ/Views/DashboardView.swift ios/STRQ/Views/ProfileView.swift ios/STRQ/Views/ProgressAnalyticsView.swift ios/STRQWidget ios/STRQWatch`
+- `rg -n "private var authorityHero|readinessBasedRecoveryStatus|effectiveRecoveryScore|STRQCountUpText|CGFloat\\(score\\) / 100|hasCheckedInToday|showReadinessCheckIn|ForgeTheme\\.recoveryColor|STRQPalette\\.recovery|STRQPalette\\.warning|STRQPalette\\.danger|STRQPalette\\.success|readinessHeroColor|coachReadinessColor" ios/STRQ/Views/CoachTabView.swift`
+- `rg -n "STRQPalette\\.recovery|static func recovery|recoveryColor\\(for" ios/STRQ/Utilities ios/STRQ/Views`
+- `rg -n "Sandow" ios/STRQ/Views ios/STRQ/ContentView.swift`
+
+Intentionally not changed:
+
+- Global palette/theme/design-system files, status thresholds, score source, status/headline/week/check-in copy, sheets/actions/analytics, models, services, assets, localization, Widget, Watch, project files, and tests.
+
+Warnings:
+
+- Windows environment only; no `xcodebuild` was run. macOS/CI build validation and Rork QA remain required before shipping.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

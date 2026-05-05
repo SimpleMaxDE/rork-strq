@@ -126,7 +126,7 @@ struct CoachTabView: View {
 
     private var authorityHero: some View {
         let score = vm.effectiveRecoveryScore
-        let color = ForgeTheme.recoveryColor(for: score)
+        let color = coachReadinessColor(for: score)
         let phase = vm.currentPhase
         let status = vm.readinessBasedRecoveryStatus
         let readinessTeal = Color(red: 0.300, green: 0.780, blue: 0.740)
@@ -294,6 +294,21 @@ struct CoachTabView: View {
         .shadow(color: .black.opacity(0.26), radius: 18, y: 7)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
+    }
+
+    private func coachReadinessColor(for score: Int) -> Color {
+        switch score {
+        case 85...:
+            return STRQPalette.success
+        case 70..<85:
+            return STRQPalette.success.opacity(0.82)
+        case 55..<70:
+            return STRQPalette.warning
+        case 40..<55:
+            return STRQPalette.danger.opacity(0.84)
+        default:
+            return STRQPalette.danger
+        }
     }
 
     private var headline: String {
