@@ -2671,6 +2671,44 @@ Pending work:
 
 - macOS/Xcode validation remains required; recommended next path is B, convert to vector PDF first, then import.
 
+## 2026-05-06 - Human Body Overlay Runtime Pilot Import
+
+Scope:
+
+- Imported the minimal approved Human Body vector PDF pilot set into the app asset catalog for DEBUG/Rork rendering QA only.
+- Reused the existing DEBUG Design System Lab as the isolated preview surface for base plus overlay composition.
+
+Files changed:
+
+- `ios/STRQ/Assets.xcassets`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `docs/migration-progress-log.md`
+
+Rendering approach:
+
+- Base body PDFs are asset-catalog image sets with vector preservation and original rendering intent.
+- Overlay PDFs are asset-catalog image sets with vector preservation and template rendering intent.
+- The DEBUG lab composes SwiftUI `Image` layers in a shared `ZStack` frame using `.renderingMode(.template)` and `.foregroundStyle(...)` for overlays.
+
+Tint/template findings:
+
+- Static import uses template-rendered overlay assets and SwiftUI template tint calls.
+- This Windows pass cannot prove Xcode asset rendering, SwiftUI template tint behavior, or runtime color output. No `.colorMultiply(...)` fallback was added because template tint failure has not been observed in Rork/macOS runtime QA yet.
+
+Overlay alignment findings:
+
+- Source smoke findings indicate each overlay PDF keeps the same viewBox-derived dimensions as its matching base PDF.
+- The DEBUG lab renders base and overlay images in the same SwiftUI frame for visual alignment inspection. Runtime alignment still requires Rork visual QA.
+
+Intentionally not changed:
+
+- No onboarding, exercise library, exercise detail, progress, coach, model, service, persistence, analytics, localization, RevenueCat/store, Widget, Watch, Live Activity, project file, or test integration.
+
+Pending work:
+
+- Rork runtime visual QA of the DEBUG Design System Lab Human Body Overlay Pilot section.
+- macOS/CI build validation remains required; this Windows pass does not claim `xcodebuild` or Xcode asset-rendering validation.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

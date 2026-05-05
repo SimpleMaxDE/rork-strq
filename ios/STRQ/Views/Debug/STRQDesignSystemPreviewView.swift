@@ -13,6 +13,7 @@ struct STRQDesignSystemPreviewView: View {
                 CardsMetricSection()
                 ProgressSection()
                 ListScheduleSection()
+                HumanBodyOverlayPilotSection()
                 IconsSection()
             }
             .padding(.horizontal, STRQSpacing.screenHorizontalMargin)
@@ -681,6 +682,264 @@ private struct ListScheduleSection: View {
                     .strqTabBarBackground()
             }
         }
+    }
+}
+
+private struct HumanBodyOverlayPilotSection: View {
+    private let samples: [HumanBodyPilotSample] = [
+        .init(
+            title: "Male Front Base",
+            base: .maleFrontBase,
+            overlays: [],
+            aspectRatio: 272.609 / 496.989
+        ),
+        .init(
+            title: "Male Front + Chest",
+            base: .maleFrontBase,
+            overlays: [
+                .init(asset: .maleFrontChestOverlay, tint: HumanBodyPilotTone.selectedTeal)
+            ],
+            aspectRatio: 272.609 / 496.989
+        ),
+        .init(
+            title: "Male Front + Chest + Shoulder",
+            base: .maleFrontBase,
+            overlays: [
+                .init(asset: .maleFrontChestOverlay, tint: HumanBodyPilotTone.selectedTeal),
+                .init(asset: .maleFrontShoulderOverlay, tint: HumanBodyPilotTone.secondaryTeal, opacity: 0.72)
+            ],
+            aspectRatio: 272.609 / 496.989
+        ),
+        .init(
+            title: "Male Back + Back",
+            base: .maleBackBase,
+            overlays: [
+                .init(asset: .maleBackBackOverlay, tint: HumanBodyPilotTone.selectedTeal)
+            ],
+            aspectRatio: 286.668 / 497
+        ),
+        .init(
+            title: "Female Front + Chest",
+            base: .femaleFrontBase,
+            overlays: [
+                .init(asset: .femaleFrontChestOverlay, tint: HumanBodyPilotTone.selectedTeal)
+            ],
+            aspectRatio: 233.641 / 497.381
+        ),
+        .init(
+            title: "Female Back + Glute",
+            base: .femaleBackBase,
+            overlays: [
+                .init(asset: .femaleBackGluteOverlay, tint: HumanBodyPilotTone.selectedTeal)
+            ],
+            aspectRatio: 238.679 / 497.399
+        )
+    ]
+
+    private let columns = [
+        GridItem(.adaptive(minimum: 156), spacing: STRQSpacing.sm)
+    ]
+
+    var body: some View {
+        PreviewSection("Human Body Overlay Pilot") {
+            VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                LazyVGrid(columns: columns, alignment: .leading, spacing: STRQSpacing.sm) {
+                    ForEach(samples, id: \.title) { sample in
+                        HumanBodyPilotTile(sample: sample)
+                    }
+                }
+
+                HumanBodySemanticStateRow()
+            }
+        }
+    }
+}
+
+private struct HumanBodyPilotTile: View {
+    let sample: HumanBodyPilotSample
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+            HumanBodyPilotComposite(
+                base: sample.base,
+                overlays: sample.overlays,
+                aspectRatio: sample.aspectRatio
+            )
+            .frame(height: 220)
+            .frame(maxWidth: .infinity)
+
+            Text(sample.title)
+                .font(STRQTypography.caption)
+                .foregroundStyle(STRQColors.secondaryText)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+                .frame(height: 32, alignment: .topLeading)
+        }
+        .padding(STRQSpacing.sm)
+        .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.lg))
+        .overlay(
+            RoundedRectangle(cornerRadius: STRQRadii.lg, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+        )
+    }
+}
+
+private struct HumanBodySemanticStateRow: View {
+    private let states: [HumanBodyPilotState] = [
+        .init(title: "Selected teal", tint: HumanBodyPilotTone.selectedTeal, opacity: 1),
+        .init(title: "Secondary teal", tint: HumanBodyPilotTone.selectedTeal, opacity: 0.42),
+        .init(title: "Warning amber", tint: STRQColors.warningAmber, opacity: 0.92),
+        .init(title: "Danger pink", tint: STRQColors.dangerRed, opacity: 0.92)
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+            Text("Semantic States")
+                .font(STRQTypography.labelSmall)
+                .tracking(STRQTypography.labelSmallTracking)
+                .foregroundStyle(STRQColors.secondaryText)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: STRQSpacing.sm) {
+                    ForEach(states, id: \.title) { state in
+                        HumanBodyPilotStateCell(state: state)
+                    }
+                }
+                .padding(.bottom, 1)
+            }
+        }
+    }
+}
+
+private struct HumanBodyPilotStateCell: View {
+    let state: HumanBodyPilotState
+
+    var body: some View {
+        VStack(spacing: STRQSpacing.xs) {
+            HumanBodyPilotComposite(
+                base: .maleFrontBase,
+                overlays: [
+                    .init(asset: .maleFrontChestOverlay, tint: state.tint, opacity: state.opacity)
+                ],
+                aspectRatio: 272.609 / 496.989
+            )
+            .frame(width: 72, height: 132)
+
+            Text(state.title)
+                .font(STRQTypography.micro)
+                .foregroundStyle(STRQColors.secondaryText)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.68)
+                .frame(width: 96, height: 28)
+        }
+        .frame(width: 112)
+        .padding(STRQSpacing.xs)
+        .background(STRQColors.insetSurface, in: .rect(cornerRadius: STRQRadii.md))
+        .overlay(
+            RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted.opacity(0.72), lineWidth: 1)
+        )
+    }
+}
+
+private struct HumanBodyPilotComposite: View {
+    let base: HumanBodyPilotAsset
+    let overlays: [HumanBodyPilotLayer]
+    let aspectRatio: CGFloat
+
+    var body: some View {
+        ZStack {
+            HumanBodyPilotBaseImage(asset: base)
+
+            ForEach(overlays) { layer in
+                HumanBodyPilotOverlayImage(layer: layer)
+            }
+        }
+        .aspectRatio(aspectRatio, contentMode: .fit)
+        .padding(STRQSpacing.xs)
+        .background(STRQColors.insetSurface.opacity(0.62), in: .rect(cornerRadius: STRQRadii.md))
+        .overlay(
+            RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted.opacity(0.7), lineWidth: 1)
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Human body overlay pilot sample"))
+    }
+}
+
+private struct HumanBodyPilotBaseImage: View {
+    let asset: HumanBodyPilotAsset
+
+    var body: some View {
+        Image(asset.rawValue)
+            .renderingMode(.original)
+            .resizable()
+            .scaledToFit()
+    }
+}
+
+private struct HumanBodyPilotOverlayImage: View {
+    let layer: HumanBodyPilotLayer
+
+    var body: some View {
+        Image(layer.asset.rawValue)
+            .renderingMode(.template)
+            .resizable()
+            .scaledToFit()
+            .foregroundStyle(layer.tint.opacity(layer.opacity))
+    }
+}
+
+private struct HumanBodyPilotSample {
+    let title: String
+    let base: HumanBodyPilotAsset
+    let overlays: [HumanBodyPilotLayer]
+    let aspectRatio: CGFloat
+}
+
+private struct HumanBodyPilotLayer: Identifiable {
+    let asset: HumanBodyPilotAsset
+    let tint: Color
+    var opacity: Double = 1
+
+    var id: String {
+        "\(asset.rawValue)-\(opacity)"
+    }
+}
+
+private struct HumanBodyPilotState {
+    let title: String
+    let tint: Color
+    let opacity: Double
+}
+
+private enum HumanBodyPilotAsset: String {
+    case maleFrontBase = "STRQHumanBodyMaleFrontBase"
+    case maleFrontChestOverlay = "STRQHumanBodyMaleFrontChestOverlay"
+    case maleFrontShoulderOverlay = "STRQHumanBodyMaleFrontShoulderOverlay"
+    case maleBackBase = "STRQHumanBodyMaleBackBase"
+    case maleBackBackOverlay = "STRQHumanBodyMaleBackBackOverlay"
+    case femaleFrontBase = "STRQHumanBodyFemaleFrontBase"
+    case femaleFrontChestOverlay = "STRQHumanBodyFemaleFrontChestOverlay"
+    case femaleBackBase = "STRQHumanBodyFemaleBackBase"
+    case femaleBackGluteOverlay = "STRQHumanBodyFemaleBackGluteOverlay"
+}
+
+private enum HumanBodyPilotTone {
+    static let selectedTeal = Color(red: 0.11, green: 0.82, blue: 0.78)
+    static let secondaryTeal = selectedTeal.opacity(0.48)
+}
+
+private struct HumanBodyOverlayPilotSection_Previews: PreviewProvider {
+    static var previews: some View {
+        ScrollView {
+            HumanBodyOverlayPilotSection()
+                .padding(STRQSpacing.md)
+        }
+        .background(STRQColors.background)
+        .preferredColorScheme(.dark)
+        .previewDisplayName("Human Body Overlay Pilot")
     }
 }
 
