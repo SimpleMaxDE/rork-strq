@@ -1,0 +1,722 @@
+{
+  "pilot": "licensed-figma-human-body-overlay-pilot",
+  "mode": "Licensed Source Mode",
+  "figmaFileKey": "LBvxljax0ixoTvbvvUeWVC",
+  "createdDate": "2026-05-05",
+  "primarySourceNodes": {
+    "humanBodyLargeVectorGroups": "9192:5535",
+    "anatomyMuscle": "8673:69673"
+  },
+  "figmaUsage": {
+    "usedFigma": true,
+    "tools": [
+      "get_metadata",
+      "get_screenshot",
+      "get_design_context",
+      "use_figma"
+    ],
+    "runtimeNote": "Plugin API reported figma.fileKey as headless while operating on the requested file key.",
+    "canvasWrites": false
+  },
+  "fullBodyGroupsInspected": [
+    {
+      "label": "Male Front",
+      "nodeId": "9192:5245",
+      "sourceName": "Group",
+      "vectors": 58,
+      "sourceSize": {
+        "width": 271.61,
+        "height": 495.99
+      },
+      "labelConfidence": "high"
+    },
+    {
+      "label": "Male Back",
+      "nodeId": "9192:5428",
+      "sourceName": "Group",
+      "vectors": 51,
+      "sourceSize": {
+        "width": 285.67,
+        "height": 496.0
+      },
+      "labelConfidence": "high"
+    },
+    {
+      "label": "Female Front",
+      "nodeId": "9192:5304",
+      "sourceName": "Group",
+      "vectors": 64,
+      "sourceSize": {
+        "width": 232.64,
+        "height": 496.38
+      },
+      "labelConfidence": "high"
+    },
+    {
+      "label": "Female Back",
+      "nodeId": "9192:5480",
+      "sourceName": "Group",
+      "vectors": 52,
+      "sourceSize": {
+        "width": 237.68,
+        "height": 496.4
+      },
+      "labelConfidence": "high"
+    }
+  ],
+  "anatomyMuscleComparison": {
+    "nodeId": "8673:69673",
+    "type": "COMPONENT_SET",
+    "componentCount": 60,
+    "componentSize": {
+      "width": 88,
+      "height": 128
+    },
+    "bodyAreas": [
+      "Abs",
+      "Back",
+      "Bicep",
+      "Calf",
+      "Chest",
+      "Forearm",
+      "Glute",
+      "Hamstring",
+      "Hand",
+      "Lower Leg",
+      "Neck",
+      "Shoulder",
+      "Trap",
+      "Tricep",
+      "Upper Leg"
+    ],
+    "genders": [
+      "Female",
+      "Male"
+    ],
+    "states": [
+      "Is Selected=false",
+      "Is Selected=true"
+    ],
+    "alignmentWithHumanBody9192_5535": "low",
+    "notes": "Anatomy Muscle components are separate 88x128 mini-body components, not the same coordinate system as the full Human Body groups. Use selected/unselected diffs as mask-source evidence only if full-body path isolation is insufficient."
+  },
+  "qaFindings": {
+    "basePlusOverlayFeasible": true,
+    "muscleRegionsSeparateVectorPaths": true,
+    "pathNamesSemantic": false,
+    "overlaysAlignWithBases": true,
+    "runtimeTintFeasible": true,
+    "selectedUnselectedDiffStillNeeded": "Needed for final mask validation and for any muscle group where full-body path selection is uncertain; not needed to prove same-canvas alignment for the exported full-body candidates.",
+    "appImportSuitability": "Not suitable for app import yet. These are QA-only candidates; final app assets need owner/Rork visual QA, Xcode vector/template rendering QA, and possibly path cleanup or vector PDF conversion."
+  },
+  "assets": [
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleFrontBase",
+      "figmaNodeId": "9192:5245",
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Male Front",
+      "gender": "male",
+      "orientation": "front",
+      "muscleGroup": null,
+      "kind": "base",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontBase.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 272.609 496.989",
+        "viewBoxWidth": 272.609,
+        "viewBoxHeight": 496.989
+      },
+      "transparentBackground": true,
+      "runtimeTintable": false,
+      "alignmentConfidence": "high",
+      "isolationConfidence": null,
+      "notes": "Neutral male front full-body base. Visually labeled from the Figma screenshot; source layer name remains generic `Group`."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleBackBase",
+      "figmaNodeId": "9192:5428",
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Male Back",
+      "gender": "male",
+      "orientation": "back",
+      "muscleGroup": null,
+      "kind": "base",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackBase.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 286.668 497",
+        "viewBoxWidth": 286.668,
+        "viewBoxHeight": 497.0
+      },
+      "transparentBackground": true,
+      "runtimeTintable": false,
+      "alignmentConfidence": "high",
+      "isolationConfidence": null,
+      "notes": "Neutral male back full-body base. Visually labeled from the Figma screenshot; source layer name remains generic `Group`."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleFrontBase",
+      "figmaNodeId": "9192:5304",
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Female Front",
+      "gender": "female",
+      "orientation": "front",
+      "muscleGroup": null,
+      "kind": "base",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleFrontBase.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 233.641 497.381",
+        "viewBoxWidth": 233.641,
+        "viewBoxHeight": 497.381
+      },
+      "transparentBackground": true,
+      "runtimeTintable": false,
+      "alignmentConfidence": "high",
+      "isolationConfidence": null,
+      "notes": "Neutral female front full-body base. Visually labeled from the Figma screenshot; source layer name remains generic `Group`."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleBackBase",
+      "figmaNodeId": "9192:5480",
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Female Back",
+      "gender": "female",
+      "orientation": "back",
+      "muscleGroup": null,
+      "kind": "base",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleBackBase.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 238.679 497.399",
+        "viewBoxWidth": 238.679,
+        "viewBoxHeight": 497.399
+      },
+      "transparentBackground": true,
+      "runtimeTintable": false,
+      "alignmentConfidence": "high",
+      "isolationConfidence": null,
+      "notes": "Neutral female back full-body base. Visually labeled from the Figma screenshot; source layer name remains generic `Group`."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleFrontChestOverlay",
+      "figmaNodeId": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5302",
+        "9192:5303"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Male Front",
+      "gender": "male",
+      "orientation": "front",
+      "muscleGroup": "Chest",
+      "strqMuscleGroupMapping": "chest",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontChestOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 272.609 496.989",
+        "viewBoxWidth": 272.609,
+        "viewBoxHeight": 496.989
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "high",
+      "notes": "Directly isolated from the two pectoral vector paths in the male front full-body group."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleFrontShoulderOverlay",
+      "figmaNodeId": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5253",
+        "9192:5299"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Male Front",
+      "gender": "male",
+      "orientation": "front",
+      "muscleGroup": "Shoulder",
+      "strqMuscleGroupMapping": "shoulders",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontShoulderOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 272.609 496.989",
+        "viewBoxWidth": 272.609,
+        "viewBoxHeight": 496.989
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "high",
+      "notes": "Directly isolated from the visible deltoid cap paths in the male front group."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleFrontAbsOverlay",
+      "figmaNodeId": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5290",
+        "9192:5291",
+        "9192:5292",
+        "9192:5293",
+        "9192:5294",
+        "9192:5295",
+        "9192:5296",
+        "9192:5297"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Male Front",
+      "gender": "male",
+      "orientation": "front",
+      "muscleGroup": "Abs",
+      "strqMuscleGroupMapping": "abs",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontAbsOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 272.609 496.989",
+        "viewBoxWidth": 272.609,
+        "viewBoxHeight": 496.989
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "high",
+      "notes": "Directly isolated from the segmented abdominal vector paths in the male front group."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleFrontUpperLegOverlay",
+      "figmaNodeId": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5270",
+        "9192:5271",
+        "9192:5272",
+        "9192:5273",
+        "9192:5274",
+        "9192:5275",
+        "9192:5276",
+        "9192:5277",
+        "9192:5278",
+        "9192:5279"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Male Front",
+      "gender": "male",
+      "orientation": "front",
+      "muscleGroup": "Upper Leg",
+      "strqMuscleGroupMapping": "quads",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontUpperLegOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 272.609 496.989",
+        "viewBoxWidth": 272.609,
+        "viewBoxHeight": 496.989
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "medium",
+      "notes": "Candidate uses the anterior upper-leg path cluster. It appears aligned, but exact STRQ quads versus whole upper leg needs visual QA."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleFrontChestOverlay",
+      "figmaNodeId": "9192:5304",
+      "figmaVectorNodeIds": [
+        "9192:5358",
+        "9192:5359"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Female Front",
+      "gender": "female",
+      "orientation": "front",
+      "muscleGroup": "Chest",
+      "strqMuscleGroupMapping": "chest",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleFrontChestOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 233.641 497.381",
+        "viewBoxWidth": 233.641,
+        "viewBoxHeight": 497.381
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "high",
+      "notes": "Directly isolated from the two chest paths in the female front full-body group."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleFrontShoulderOverlay",
+      "figmaNodeId": "9192:5304",
+      "figmaVectorNodeIds": [
+        "9192:5360",
+        "9192:5361"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Female Front",
+      "gender": "female",
+      "orientation": "front",
+      "muscleGroup": "Shoulder",
+      "strqMuscleGroupMapping": "shoulders",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleFrontShoulderOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 233.641 497.381",
+        "viewBoxWidth": 233.641,
+        "viewBoxHeight": 497.381
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "high",
+      "notes": "Directly isolated from the visible deltoid cap paths in the female front group."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleFrontAbsOverlay",
+      "figmaNodeId": "9192:5304",
+      "figmaVectorNodeIds": [
+        "9192:5339",
+        "9192:5340",
+        "9192:5341",
+        "9192:5342",
+        "9192:5343",
+        "9192:5344",
+        "9192:5345",
+        "9192:5346"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Female Front",
+      "gender": "female",
+      "orientation": "front",
+      "muscleGroup": "Abs",
+      "strqMuscleGroupMapping": "abs",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleFrontAbsOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 233.641 497.381",
+        "viewBoxWidth": 233.641,
+        "viewBoxHeight": 497.381
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "high",
+      "notes": "Directly isolated from the segmented abdominal vector paths in the female front group."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleFrontUpperLegOverlay",
+      "figmaNodeId": "9192:5304",
+      "figmaVectorNodeIds": [
+        "9192:5325",
+        "9192:5326",
+        "9192:5327",
+        "9192:5328",
+        "9192:5329",
+        "9192:5330",
+        "9192:5331",
+        "9192:5332",
+        "9192:5333",
+        "9192:5334"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Female Front",
+      "gender": "female",
+      "orientation": "front",
+      "muscleGroup": "Upper Leg",
+      "strqMuscleGroupMapping": "quads",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleFrontUpperLegOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 233.641 497.381",
+        "viewBoxWidth": 233.641,
+        "viewBoxHeight": 497.381
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "medium",
+      "notes": "Candidate uses the anterior upper-leg path cluster. It appears aligned, but exact STRQ quads versus whole upper leg needs visual QA."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleBackBackOverlay",
+      "figmaNodeId": "9192:5428",
+      "figmaVectorNodeIds": [
+        "9192:5445",
+        "9192:5446",
+        "9192:5452",
+        "9192:5453",
+        "9192:5454",
+        "9192:5455",
+        "9192:5456"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Male Back",
+      "gender": "male",
+      "orientation": "back",
+      "muscleGroup": "Back",
+      "strqMuscleGroupMapping": "back",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackBackOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 286.668 497",
+        "viewBoxWidth": 286.668,
+        "viewBoxHeight": 497.0
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "medium",
+      "notes": "Candidate uses the major upper/mid-back path cluster. Source paths are generic and may include broader torso geometry than a precise back-muscle mask."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleBackShoulderOverlay",
+      "figmaNodeId": "9192:5428",
+      "figmaVectorNodeIds": [
+        "9192:5457",
+        "9192:5469"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Male Back",
+      "gender": "male",
+      "orientation": "back",
+      "muscleGroup": "Shoulder",
+      "strqMuscleGroupMapping": "shoulders",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackShoulderOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 286.668 497",
+        "viewBoxWidth": 286.668,
+        "viewBoxHeight": 497.0
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "medium",
+      "notes": "Back-view shoulder cap paths appear isolatable and aligned; confirm against deltoid intent in visual QA."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleBackGluteOverlay",
+      "figmaNodeId": "9192:5428",
+      "figmaVectorNodeIds": [
+        "9192:5450",
+        "9192:5451"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Male Back",
+      "gender": "male",
+      "orientation": "back",
+      "muscleGroup": "Glute",
+      "strqMuscleGroupMapping": "glutes",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackGluteOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 286.668 497",
+        "viewBoxWidth": 286.668,
+        "viewBoxHeight": 497.0
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "high",
+      "notes": "Directly isolated from the two glute paths in the male back group."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyMaleBackHamstringOverlay",
+      "figmaNodeId": "9192:5428",
+      "figmaVectorNodeIds": [
+        "9192:5437",
+        "9192:5438",
+        "9192:5439",
+        "9192:5440",
+        "9192:5441",
+        "9192:5442",
+        "9192:5443",
+        "9192:5444"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Male Back",
+      "gender": "male",
+      "orientation": "back",
+      "muscleGroup": "Hamstring",
+      "strqMuscleGroupMapping": "hamstrings",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackHamstringOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 286.668 497",
+        "viewBoxWidth": 286.668,
+        "viewBoxHeight": 497.0
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "medium",
+      "notes": "Candidate uses the posterior upper-leg cluster. It aligns to the base but should be checked for thigh-versus-hamstring specificity."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleBackBackOverlay",
+      "figmaNodeId": "9192:5480",
+      "figmaVectorNodeIds": [
+        "9192:5515",
+        "9192:5518",
+        "9192:5519",
+        "9192:5520",
+        "9192:5521",
+        "9192:5522",
+        "9192:5523"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Female Back",
+      "gender": "female",
+      "orientation": "back",
+      "muscleGroup": "Back",
+      "strqMuscleGroupMapping": "back",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleBackBackOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 238.679 497.399",
+        "viewBoxWidth": 238.679,
+        "viewBoxHeight": 497.399
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "medium",
+      "notes": "Candidate uses the major upper/mid-back path cluster. Source paths are generic and may include broader torso geometry than a precise back-muscle mask."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleBackShoulderOverlay",
+      "figmaNodeId": "9192:5480",
+      "figmaVectorNodeIds": [
+        "9192:5525",
+        "9192:5526"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Female Back",
+      "gender": "female",
+      "orientation": "back",
+      "muscleGroup": "Shoulder",
+      "strqMuscleGroupMapping": "shoulders",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleBackShoulderOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 238.679 497.399",
+        "viewBoxWidth": 238.679,
+        "viewBoxHeight": 497.399
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "medium",
+      "notes": "Back-view shoulder cap paths appear isolatable and aligned; confirm against deltoid intent in visual QA."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleBackGluteOverlay",
+      "figmaNodeId": "9192:5480",
+      "figmaVectorNodeIds": [
+        "9192:5527",
+        "9192:5528"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Female Back",
+      "gender": "female",
+      "orientation": "back",
+      "muscleGroup": "Glute",
+      "strqMuscleGroupMapping": "glutes",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleBackGluteOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 238.679 497.399",
+        "viewBoxWidth": 238.679,
+        "viewBoxHeight": 497.399
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "high",
+      "notes": "Directly isolated from the two glute paths in the female back group."
+    },
+    {
+      "proposedSTRQAssetName": "STRQHumanBodyFemaleBackHamstringOverlay",
+      "figmaNodeId": "9192:5480",
+      "figmaVectorNodeIds": [
+        "9192:5491",
+        "9192:5492",
+        "9192:5493",
+        "9192:5494",
+        "9192:5495",
+        "9192:5496",
+        "9192:5497",
+        "9192:5498"
+      ],
+      "sourceGroup": "Human Body / large anatomy vector groups 9192:5535 / Female Back",
+      "gender": "female",
+      "orientation": "back",
+      "muscleGroup": "Hamstring",
+      "strqMuscleGroupMapping": "hamstrings",
+      "kind": "overlay",
+      "filePath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleBackHamstringOverlay.candidate.svg",
+      "format": "svg",
+      "dimensions": {
+        "width": "100%",
+        "height": "100%",
+        "viewBox": "0 0 238.679 497.399",
+        "viewBoxWidth": 238.679,
+        "viewBoxHeight": 497.399
+      },
+      "transparentBackground": true,
+      "runtimeTintable": true,
+      "alignmentConfidence": "high",
+      "isolationConfidence": "medium",
+      "notes": "Candidate uses the posterior upper-leg cluster. It aligns to the base but should be checked for thigh-versus-hamstring specificity."
+    }
+  ],
+  "notExported": [
+    {
+      "muscleGroup": "Back",
+      "reason": "No front-view overlay exported because the pilot Back mapping is back-view only."
+    },
+    {
+      "muscleGroup": "Glute",
+      "reason": "No front-view overlay exported because glutes are back-view only in the full-body source."
+    },
+    {
+      "muscleGroup": "Hamstring",
+      "reason": "No front-view overlay exported because hamstrings are back-view only in the full-body source."
+    },
+    {
+      "muscleGroup": "Upper Leg",
+      "reason": "No back-view Upper Leg overlay exported in this pilot because hamstrings cover the posterior upper-leg use case."
+    }
+  ]
+}

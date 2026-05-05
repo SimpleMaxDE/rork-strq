@@ -2593,6 +2593,34 @@ Pending work:
 
 - Run a QA-only normalization pass to derive transparent masks and label base bodies before any app import.
 
+## 2026-05-05 - Human Body Overlay Pilot
+
+Scope:
+
+- QA-only licensed Figma Human Body base + overlay export feasibility pass.
+
+Files changed:
+
+- Created `docs/figma-exports/human-body-overlay-pilot/` with four base SVG candidates, 16 transparent overlay SVG candidates, `README.md`, and `human-body-overlay-manifest.json`.
+- Updated `docs/migration-progress-log.md`.
+
+Figma inspected:
+
+- Human Body large anatomy groups `9192:5535`.
+- Anatomy Muscle `8673:69673`.
+
+Verification run:
+
+- Manifest parse, README keyword search, QA folder listing, forbidden target diff check, and `git diff --check`.
+
+Intentionally not changed:
+
+- No Swift, asset catalogs, project files, localization, tests, widgets, watch targets, or production runtime assets.
+
+Pending work:
+
+- Rork visual QA and Xcode vector/template rendering QA before any app import.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
