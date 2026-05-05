@@ -2511,6 +2511,31 @@ Pending work:
 
 - Recommended immediate next prompt is a docs-only Licensed Source Mode icon and anatomy adoption map before any asset export or Swift implementation.
 
+## 2026-05-05 - Licensed Figma Icon Anatomy Adoption Map
+
+Scope:
+
+- Created a docs-only STRQ licensed Figma icon and anatomy adoption map before any asset export, Swift change, asset catalog change, or project-file change.
+- Mapped licensed icon categories, current STRQ replacement opportunities, anatomy/body/equipment/achievement/illustration sources, STRQ-owned naming, export/import guardrails, roadmap, risks, exactly one first export pilot, and exactly one immediate next prompt.
+
+Files changed:
+
+- `docs/strq-licensed-figma-icon-anatomy-adoption-map.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Inspected Design System - Icon Set, Icon Container, Icon Featured, Icon library, Anatomy Muscle, large anatomy vector groups, Body Type, Organ Anatomy, Fitness Equipment Image, Achievement Badge, Achievement Badge Base, Illustration Base, Media, and Illustration nodes.
+
+Intentionally not changed:
+
+- no Swift files, no assets, no asset catalogs, no localization, no tests, no Watch, Widget, Live Activity, project files, production code, Figma canvas writes, or Figma asset exports
+
+Pending work:
+
+- Recommended next prompt is an export-only QA pilot for the Anatomy Muscle subset before any asset catalog import or Swift implementation.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
