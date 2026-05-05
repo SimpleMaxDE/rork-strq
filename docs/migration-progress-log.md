@@ -2379,6 +2379,27 @@ Pending work:
 
 - Use this north star as the control document for future Codex prompts, with the next likely CoachTab sprint being a safe Coach Supporting Signals batch rather than one tiny card at a time.
 
+### 2026-05-05 - CoachTab Supporting Signals Shell
+
+Scope:
+
+- Refined only the established-user CoachTab supporting signal layer: `momentumCard`, `watchCard`, and the More Signals row inside `decisionStack`.
+- Preserved decision-stack visibility, density and emphasis gates, watch details expand/collapse behavior, More Signals sheet routing, momentum display-only behavior, primary CTA behavior, workout handoff, readiness routing, sheets, analytics, copy/localization, models, services, design-system tokens, assets, Watch, Widget, project files, and tests.
+
+Files changed:
+
+- `ios/STRQ/Views/CoachTabView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Not used; the pass was guided by the STRQ Product & Design North Star and the CoachTab decision-stack risk plan.
+
+Pending work:
+
+- Rork QA should verify established-user primary + watch + momentum + More Signals states, focused density hiding, simplicity emphasis hiding momentum, watch details expanded/collapsed, More Signals sheet opening, and small/large iPhone layouts.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
