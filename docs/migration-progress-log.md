@@ -2709,6 +2709,26 @@ Pending work:
 - Rork runtime visual QA of the DEBUG Design System Lab Human Body Overlay Pilot section.
 - macOS/CI build validation remains required; this Windows pass does not claim `xcodebuild` or Xcode asset-rendering validation.
 
+## 2026-05-06 - Human Body Overlay Component Plan
+
+Scope:
+
+- Created a docs-only production component plan for turning the licensed Human Body base plus vector PDF overlays into a reusable STRQ component for Onboarding, Exercise Info, Exercise Library, Progress, and Coach explanations.
+- Selected exactly one first production integration target: Exercise Info primary/secondary muscle display.
+
+Files changed:
+
+- `docs/strq-human-body-overlay-component-plan.md`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- No Swift files, app assets, asset catalogs, project files, localization files, tests, fonts, Watch, Widget, or production runtime assets.
+
+Pending work:
+
+- Implement only the Exercise Info production component target in a later scoped pass after Rork QA expectations are ready.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
