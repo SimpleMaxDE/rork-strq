@@ -2485,6 +2485,32 @@ Pending work:
 - Rork QA should verify early-stage and established CoachTab states, readability of the new calibration grid, supporting-signal hierarchy, More Signals doorway, active/passive Weekly Check-In gateways, watch details collapsed/expanded, and small/large iPhone layouts.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-05 - Licensed Figma Foundation Adoption Plan
+
+Scope:
+
+- Created a docs-only STRQ Licensed Figma Foundation Adoption Plan that treats the purchased Figma kit as licensed implementation source, not inspiration only.
+- Converted read-only Figma foundation, component, icon, anatomy, chart, pricing, onboarding, and screen-pattern inspection into a STRQ adoption policy, inventory, screen map, roadmap, prompt rules, and exactly one immediate next prompt recommendation.
+
+Files changed:
+
+- `docs/strq-licensed-figma-foundation-adoption-plan.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only.
+- Inspected the licensed kit pages for Foundations, General Components, App Components, Icon Set, Main Light/Dark mobile screens, Bonus Dashboard, and Bonus Mobile Patterns.
+- Inspected key nodes for colors, typography, effects, grid, size/spacing, media, illustration, icons, buttons, chips, charts, forms, inputs, modals, progress, tabs, tab bar, cards, lists, navigation, schedule, bottom sheets, pricing, anatomy, body type, equipment, achievement badges, and illustrations.
+
+Intentionally not changed:
+
+- no Swift files, no assets, no localization, no tests, no Watch, Widget, Live Activity, project files, production code, or Figma canvas writes
+
+Pending work:
+
+- Recommended immediate next prompt is a docs-only Licensed Source Mode icon and anatomy adoption map before any asset export or Swift implementation.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
