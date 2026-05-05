@@ -2256,6 +2256,21 @@ Intentionally not changed:
 
 - headline priority, decision stack, primary move, primary CTA, Weekly Check-In, early-state card, calibration checklist, sheets, analytics, models, services, persistence, design-system tokens, assets, localization, Watch, Widget, and tests.
 
+### 2026-05-05 - Readiness Color Semantics Audit
+
+Scope:
+
+- Created a docs-only readiness/recovery color semantics audit explaining the `58` Moderate pink/red mismatch and recommending a CoachTab-specific readiness color resolver before any global palette change.
+
+Files changed:
+
+- `docs/readiness-color-semantics-audit.md`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- Swift files, CoachTab implementation, global palette/theme files, readiness views, Dashboard, Profile, models, services, assets, localization, Widget, Watch, project files, and tests.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
