@@ -2197,6 +2197,46 @@ Intentionally not changed:
 
 - Ready and established Weekly Check-In actions, `planQualityRow`, `WeeklyCheckInView`, review generation, sheet routing, analytics, localization, models, services, and persistence.
 
+## 2026-05-05 - Coach Authority Hero Risk Plan
+
+Scope:
+
+- Created a docs-only risk, behavior map, and visual direction plan for `CoachTabView.authorityHero` before any Swift implementation.
+
+Files changed:
+
+- `docs/coach-authority-hero-risk-plan.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Not used in this pass. The plan references broad pattern categories only and does not copy assets, text, layouts, or proprietary details.
+
+Code inspected:
+
+- `ios/STRQ/Views/CoachTabView.swift`
+- `ios/STRQ/Views/ReadinessCheckInView.swift`
+- `ios/STRQ/ViewModels/AppViewModel.swift`
+- `ios/STRQ/Services/DailyStateCoordinator.swift`
+- `ios/STRQ/Services/DailyBriefingEngine.swift`
+- readiness, phase, recovery color, and count-up behavior references needed for mapping only
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- docs/coach-authority-hero-risk-plan.md docs/migration-progress-log.md`
+- `git diff --name-only -- ios/STRQ ios/STRQWidget ios/STRQWatch`
+- `rg -n "Coach Authority Hero Risk Plan|authorityHero|Check in|readiness|effectiveRecoveryScore|recommended next implementation|Rork" docs/coach-authority-hero-risk-plan.md`
+
+Intentionally not changed:
+
+- no Swift files, no CoachTab implementation, no ReadinessCheckInView implementation, no view models, no models, no services, no analytics files, no design-system utilities, no assets, no localization, no project files, no tests, no Watch, Widget, or Live Activity files
+
+Pending work:
+
+- Recommended next prompt is exactly one `authorityHero` shell-only visual pass preserving behavior, followed by Rork QA across high/medium/low readiness and checked-in/not-checked-in states.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
