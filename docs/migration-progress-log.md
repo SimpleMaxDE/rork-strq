@@ -2729,6 +2729,22 @@ Pending work:
 
 - Implement only the Exercise Info production component target in a later scoped pass after Rork QA expectations are ready.
 
+## 2026-05-06 - Human Body Overlay Color Role Clarification
+
+Scope:
+
+- Updated the Human Body Overlay component plan to treat selected, primary, secondary, trained, undertrained, warning, overload, recovery caution, and inactive as semantic roles rather than final color decisions.
+- Clarified that the current debug selected teal, warning amber, and danger pink/red examples are temporary test states and that final colors should be tokenized and visually QA'd later in real screens.
+
+Files changed:
+
+- `docs/strq-human-body-overlay-component-plan.md`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- No Swift files, app assets, asset catalogs, project files, localization files, tests, fonts, Watch, Widget, or production runtime assets.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

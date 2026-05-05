@@ -18,7 +18,7 @@ Validated:
 - The four large body groups are visually labelable as Male Front, Male Back, Female Front, and Female Back.
 - Overlay alignment confidence is high because overlays share the same viewBox as their matching base.
 - Node/sharp preview tinting worked for SVG `currentColor` overlays.
-- Visual QA on carbon backgrounds showed that teal/blue overlays, semantic amber, and red/pink caution states are legible without becoming neon.
+- Visual QA on carbon backgrounds showed that the temporary selected, warning, and overload test states are legible without becoming neon. These debug colors are not final brand decisions.
 - The Xcode smoke pass recommends vector PDF first for runtime import.
 - The runtime import pilot added 9 approved vector PDF assets to the app for DEBUG Design System Lab rendering.
 
@@ -57,15 +57,15 @@ Public component inputs:
 | selected / highlighted muscles | `[STRQMuscleHighlight]` or `Set<STRQMuscle>` | Used mostly by Onboarding and filter-style modes. |
 | primary muscles | `Set<STRQMuscle>` | Strongest normal emphasis for Exercise Info. |
 | secondary muscles | `Set<STRQMuscle>` | Lower-intensity support emphasis for Exercise Info. |
-| warning muscles | `Set<STRQMuscle>` | Amber caution for monitor, low volume, asymmetry, or controlled concern. |
-| danger / overload muscles | `Set<STRQMuscle>` | Red/pink caution for high load, overload, or rest-needed states. |
+| warning muscles | `Set<STRQMuscle>` | Moderate caution role for monitor, low volume, asymmetry, or controlled concern; final color token is intentionally undecided. |
+| danger / overload muscles | `Set<STRQMuscle>` | High-caution role for high load, overload, or rest-needed states; final color token is intentionally undecided. |
 | inactive / neutral state | `Bool` or empty highlight sets | Renders base body only with optional low-opacity neutral overlays. |
 | size | `STRQHumanBodyOverlaySize` | `thumbnail`, `compact`, `standard`, `feature`. Use fixed aspect-ratio frames. |
 | presentation mode | `STRQHumanBodyPresentationMode` | `onboardingSelection`, `exerciseInfo`, `libraryFilter`, `progressCoverage`, `coachExplanation`, `neutral`. |
 
 Rendering priority:
 
-1. Danger / overload
+1. Overload / highest caution
 2. Warning / rest caution
 3. Exercise primary
 4. Onboarding selected or general highlighted
@@ -216,27 +216,30 @@ Runtime asset naming rules:
 
 ## 6. Visual state system
 
-The visual state system should be semantic, calm, and carbon-first. Color should explain training meaning, not decorate the body.
+The visual state system should be semantic, calm, and carbon-first. Color should explain training meaning, not decorate the body. The current debug selected teal, warning amber, and danger pink/red examples are temporary semantic test states only. They are not final STRQ brand decisions, and this plan should not be read as locking final colors.
 
-| State | Treatment |
-|---|---|
-| Onboarding selected | Cool teal/blue overlay, confident but not neon; supports multi-select. |
-| Exercise primary | Strongest normal teal/blue treatment, about 85-100 percent opacity, optional subtle edge emphasis. |
-| Exercise secondary | Same family at about 40-60 percent opacity; never a competing color. |
-| Progress trained | Green used only when real volume or coverage data supports it. |
-| Progress undertrained | Amber used for low coverage or imbalance; should read as "needs attention", not danger. |
-| Coach warning | Amber for monitor/proceed-with-awareness; red/pink only for meaningful overload or rest-needed caution. |
-| Recovery/rest caution | Amber or red/pink based on severity; use training language such as rest, recovery load, or volume management. |
-| Neutral body | Base body only, with quiet graphite/white line work and no bright overlay. |
-| Inactive/disabled | Base body with lower opacity and no semantic accent. |
+| State | Semantic role | Treatment direction |
+|---|---|---|
+| Selected | User-chosen focus or active body area | Confident selected-role overlay with enough contrast for multi-select; final token later. |
+| Primary | Main exercise stimulus | Strongest normal emphasis for the exercise; should feel precise and premium, not loud. |
+| Secondary | Supporting exercise stimulus | Same semantic family as primary with lower intensity, opacity, or hierarchy. |
+| Trained | Real training coverage achieved | Positive coverage role only when backed by actual volume or history data. |
+| Undertrained | Low coverage or imbalance | Attention role for low coverage; should read as "needs attention", not danger. |
+| Warning | Monitor or proceed-with-awareness | Moderate caution role for coach or recovery context. |
+| Overload | Highest training caution | Strong caution role for overload or rest-needed situations; likely a muted premium red/rose token later, not neon pink. |
+| Recovery caution | Recovery or rest-management signal | Recovery-specific caution role that may be distinct from overload after screen QA. |
+| Inactive | Neutral or unavailable | Base body only or low-emphasis neutral overlay with no semantic accent. |
 
 Visual guardrails:
 
+- Final colors should be tokenized in a later implementation/design pass.
+- Final colors must be visually QA'd inside real screens, not decided from the DEBUG Design System Lab alone.
+- Do not hardcode final color values in this component plan unless a future prompt explicitly scopes final token decisions.
 - Do not use the source orange selected state as the default STRQ selection color.
 - Do not make the body look gamified, glowing, or arcade-like.
 - Do not use organ anatomy or medical colors for normal strength training education.
 - Primary versus secondary should be intensity-led, not rainbow-led.
-- Warning and overload must remain clearly distinct from selected and progress-trained states.
+- Warning, overload, and recovery caution must remain clearly distinct from selected and progress-trained states.
 
 ## 7. Screen integration strategy
 
@@ -351,7 +354,7 @@ Asset QA for future implementation:
 Visual QA:
 
 - Neutral body reads on carbon.
-- Onboarding selected, Exercise Info primary/secondary, Progress trained/undertrained, Coach warning, recovery/rest caution, and danger/overload states are visually distinct.
+- Onboarding selected, Exercise Info primary/secondary, Progress trained/undertrained, Coach warning, recovery caution, and overload states are visually distinct.
 - Primary and secondary states remain legible without competing colors.
 - The component does not look medical, neon, or raw-kit.
 - Small, compact, standard, and feature sizes keep stable aspect ratios.
