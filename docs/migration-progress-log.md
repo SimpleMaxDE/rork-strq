@@ -2332,6 +2332,34 @@ Warnings:
 
 - Windows environment only; no `xcodebuild` was run. Rork QA remains required.
 
+## 2026-05-05 - Coach Decision Stack Risk Plan
+
+Scope:
+
+- Created a docs-only risk, behavior map, and visual direction plan for the established-user CoachTab `decisionStack` before any Swift implementation.
+
+Files changed:
+
+- `docs/coach-decision-stack-risk-plan.md`
+- `docs/migration-progress-log.md`
+
+Code inspected:
+
+- `ios/STRQ/Views/CoachTabView.swift`
+- `ios/STRQ/Services/DailyBriefingEngine.swift`
+- `ios/STRQ/Services/DailyStateCoordinator.swift`
+- `ios/STRQ/ViewModels/AppViewModel.swift`
+- `ios/STRQ/Models/UserProfile.swift`
+- `ios/STRQ/Services/CoachingConfidence.swift`
+
+Intentionally not changed:
+
+- no Swift files, no CoachTab implementation, no ReadinessCheckInView or WeeklyCheckInView changes, no view models, no models, no services, no persistence, no analytics files, no design-system utilities, no assets, no localization, no project files, no tests, no Watch, Widget, or Live Activity files
+
+Pending work:
+
+- Recommended next prompt is exactly one `momentumCard` display-only shell pass, followed by Rork QA across density, emphasis, and established-user decision-stack states.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
