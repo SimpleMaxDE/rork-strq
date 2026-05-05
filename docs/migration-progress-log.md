@@ -2237,6 +2237,25 @@ Pending work:
 
 - Recommended next prompt is exactly one `authorityHero` shell-only visual pass preserving behavior, followed by Rork QA across high/medium/low readiness and checked-in/not-checked-in states.
 
+### 2026-05-05 - CoachTab Authority Hero Shell
+
+Scope:
+
+- CoachTab authorityHero shell-only visual pass preserving score, status, phase, Check in, Reduce Motion, and sheet behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/CoachTabView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Not used; broad command-center/readiness composition was applied from STRQ's existing dark carbon foundation.
+
+Intentionally not changed:
+
+- headline priority, decision stack, primary move, primary CTA, Weekly Check-In, early-state card, calibration checklist, sheets, analytics, models, services, persistence, design-system tokens, assets, localization, Watch, Widget, and tests.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
