@@ -2360,6 +2360,25 @@ Pending work:
 
 - Recommended next prompt is exactly one `momentumCard` display-only shell pass, followed by Rork QA across density, emphasis, and established-user decision-stack states.
 
+## 2026-05-05 - STRQ Product Design North Star
+
+Scope:
+
+- Created a docs-only STRQ Product & Design North Star to guide future product/UI prompts, risk modes, screen roles, semantic color rules, prompt requirements, freeze policy, release standard, and the assistant-owner working model.
+
+Files changed:
+
+- `docs/strq-product-design-north-star.md`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- no Swift files, no production code, no assets, no localization, no project files, no tests, no Watch, Widget, or Live Activity files
+
+Pending work:
+
+- Use this north star as the control document for future Codex prompts, with the next likely CoachTab sprint being a safe Coach Supporting Signals batch rather than one tiny card at a time.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
