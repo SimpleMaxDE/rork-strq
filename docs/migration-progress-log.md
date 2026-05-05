@@ -2536,6 +2536,33 @@ Pending work:
 
 - Recommended next prompt is an export-only QA pilot for the Anatomy Muscle subset before any asset catalog import or Swift implementation.
 
+## 2026-05-06 - Human Body Overlay Visual QA
+
+Scope:
+
+- Created a QA-only visual validation pass for licensed Human Body base and transparent `currentColor` overlay candidates, including base contact sheets, overlay contact sheets, multi-select previews, semantic-state examples, README, and manifest.
+
+Files changed:
+
+- `docs/figma-exports/human-body-overlay-visual-qa/`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- No new Figma reads; this pass used the prior Human Body overlay pilot exports from `9192:5535` and its manifest.
+
+Verification run:
+
+- Ran `git status --short --branch`, `git diff --name-only`, QA folder listing, manifest JSON parse, README/manifest keyword search, forbidden app-target diff check, and `git diff --check`.
+
+Intentionally not changed:
+
+- no Swift files, no app assets, no asset catalogs, no localization, no tests, no fonts, no Watch, Widget, project files, production runtime assets, or existing pilot exports
+
+Pending work:
+
+- Xcode SVG/currentColor template-tint smoke test and vector PDF comparison before any app import.
+
 ## 2026-05-05 - Licensed Anatomy Muscle Export QA Pilot
 
 Scope:
