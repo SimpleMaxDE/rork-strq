@@ -2182,6 +2182,21 @@ Pending work:
 
 - Recommended next prompt is exactly one early-stage passive/not-ready `weeklyCheckInRow` shell-only pass, followed by Rork QA.
 
+### 2026-05-05 - CoachTab Passive Weekly Check-In Shell
+
+Scope:
+
+- Refined only the passive early-stage Weekly Check-In shell so the upcoming weekly review reads as calm and noninteractive while preserving review generation and sheet behavior.
+
+Files changed:
+
+- ios/STRQ/Views/CoachTabView.swift
+- docs/migration-progress-log.md
+
+Intentionally not changed:
+
+- Ready and established Weekly Check-In actions, `planQualityRow`, `WeeklyCheckInView`, review generation, sheet routing, analytics, localization, models, services, and persistence.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

@@ -982,8 +982,11 @@ struct CoachTabView: View {
                     weeklyReviewLabel(subtitle: L10n.tr("Review your week and adjust"), ready: true)
                 }
             } else if vm.isEarlyStage {
-                weeklyReviewLabel(subtitle: vm.sessionsUntilReviewReady == 0 ? L10n.tr("Almost there — one more workout rounds out the week") : L10n.format(vm.sessionsUntilReviewReady == 1 ? "%d more workout and your first weekly read will come into focus" : "%d more workouts and your first weekly read will come into focus", vm.sessionsUntilReviewReady), ready: false)
-                    .opacity(0.7)
+                passiveWeeklyCheckInLabel(
+                    subtitle: vm.sessionsUntilReviewReady == 0
+                        ? L10n.tr("Almost there — one more workout rounds out the week")
+                        : L10n.format(vm.sessionsUntilReviewReady == 1 ? "%d more workout and your first weekly read will come into focus" : "%d more workouts and your first weekly read will come into focus", vm.sessionsUntilReviewReady)
+                )
             } else {
                 Button {
                     vm.generateWeeklyReview()
@@ -996,6 +999,100 @@ struct CoachTabView: View {
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.18), value: appeared)
+    }
+
+    private func passiveWeeklyCheckInLabel(subtitle: String) -> some View {
+        let weeklyPassiveAccent = Color(red: 0.16, green: 0.25, blue: 0.62)
+        let weeklyPassiveInk = Color(red: 0.46, green: 0.56, blue: 0.92)
+        let weeklyPassiveDim = Color(red: 0.03, green: 0.04, blue: 0.14)
+
+        return HStack(alignment: .center, spacing: 12) {
+            RoundedRectangle(cornerRadius: 2, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            weeklyPassiveInk.opacity(0.56),
+                            weeklyPassiveAccent.opacity(0.22)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .frame(width: 3, height: 44)
+                .accessibilityHidden(true)
+
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                weeklyPassiveAccent.opacity(0.20),
+                                weeklyPassiveDim.opacity(0.72)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                Image(systemName: "calendar.badge.clock")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(weeklyPassiveInk)
+            }
+            .frame(width: 38, height: 38)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(weeklyPassiveInk.opacity(0.20), lineWidth: 1)
+            )
+            .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(L10n.tr("Weekly Check-In"))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(Color.white.opacity(0.62))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+
+            ZStack {
+                Circle()
+                    .strokeBorder(weeklyPassiveAccent.opacity(0.28), lineWidth: 1)
+                    .frame(width: 20, height: 20)
+                Circle()
+                    .fill(weeklyPassiveInk.opacity(0.38))
+                    .frame(width: 5, height: 5)
+            }
+            .accessibilityHidden(true)
+        }
+        .padding(14)
+        .background(
+            LinearGradient(
+                colors: [
+                    weeklyPassiveDim.opacity(0.92),
+                    STRQPalette.surfaceBase.opacity(0.96),
+                    weeklyPassiveAccent.opacity(0.10)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 14)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(weeklyPassiveAccent.opacity(0.24), lineWidth: 1)
+        )
+        .overlay(alignment: .topLeading) {
+            LinearGradient(
+                colors: [weeklyPassiveInk.opacity(0.22), Color.clear],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(height: 1)
+            .padding(.horizontal, 16)
+        }
     }
 
     private func weeklyReviewLabel(subtitle: String, ready: Bool) -> some View {
