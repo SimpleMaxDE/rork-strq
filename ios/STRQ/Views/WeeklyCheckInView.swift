@@ -539,7 +539,7 @@ struct WeeklyCheckInView: View {
     private func highlightRow(_ item: ReviewHighlight) -> some View {
         let color = highlightColor(item.color)
 
-        HStack(alignment: .top, spacing: 12) {
+        return HStack(alignment: .top, spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(color.opacity(0.13))
