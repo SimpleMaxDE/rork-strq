@@ -2459,6 +2459,32 @@ Pending work:
 - Rork QA should verify all three Weekly Review pages scroll vertically when content exceeds the viewport, horizontal swiping still works, and the action confirmation dialog remains unchanged.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+### 2026-05-05 - CoachTab Main Screen Cohesion Polish
+
+Scope:
+
+- Ran a visual-only cohesion pass on the main CoachTab surface so the screen reads more like STRQ's coach brain: daily command, supporting reasoning, calibration learning, and weekly review gateway.
+- Increased top-level screen rhythm, reduced repeated rail/spine treatments, made established supporting signals quieter and more evidence-like, converted the early calibration checklist into a compact signal board grid, and softened the weekly gateway shells.
+- Preserved all CoachTab actions, sheets, analytics, copy/localization, state sources, model/view-model/service behavior, workout handoff, readiness routes, More Signals routing, watch details toggling, weekly review generation, and protected flows.
+
+Files changed:
+
+- `ios/STRQ/Views/CoachTabView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Not used. The pass was guided by the STRQ Product & Design North Star, CoachTab risk plans, and prior accepted CoachTab module direction.
+
+Intentionally not changed:
+
+- no `WeeklyCheckInView`, `ReadinessCheckInView`, `AppViewModel`, `DailyStateCoordinator`, `DailyBriefingEngine`, models, services, persistence, analytics files, design-system utilities, global palette/theme files, assets, localization, RevenueCat/store files, Watch, Widget, Live Activity, project files, tests, fonts, or other production screens
+
+Pending work:
+
+- Rork QA should verify early-stage and established CoachTab states, readability of the new calibration grid, supporting-signal hierarchy, More Signals doorway, active/passive Weekly Check-In gateways, watch details collapsed/expanded, and small/large iPhone layouts.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

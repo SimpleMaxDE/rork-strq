@@ -16,7 +16,7 @@ struct CoachTabView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 22) {
                 authorityHero
 
                 if vm.isEarlyStage {
@@ -72,7 +72,7 @@ struct CoachTabView: View {
                 weeklyCheckInRow
             }
             .padding(.horizontal, 16)
-            .padding(.top, 4)
+            .padding(.top, 6)
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
@@ -334,7 +334,7 @@ struct CoachTabView: View {
             let emphasis = vm.profile.coachingPreferences.emphasis
             let showWatch = briefing.watch != nil && sideLimit >= 1
             let showMomentum = briefing.momentum != nil && sideLimit >= (showWatch ? 2 : 1) && emphasis != .simplicity
-            VStack(spacing: 14) {
+            VStack(spacing: 12) {
                 primaryMoveCard(briefing.primary)
 
                 if showWatch, let watch = briefing.watch {
@@ -349,20 +349,37 @@ struct CoachTabView: View {
                     Button {
                         showMoreSignals = true
                     } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: "list.bullet.rectangle")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(coachEvidenceTint)
-                                .frame(width: 28, height: 28)
-                                .background(coachEvidenceTint.opacity(0.11), in: .rect(cornerRadius: 8))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .strokeBorder(coachEvidenceTint.opacity(0.15), lineWidth: 1)
-                                )
+                        HStack(spacing: 11) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                    .fill(coachEvidenceTint.opacity(0.10))
+                                Image(systemName: "list.bullet.rectangle")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(coachEvidenceTint)
+                            }
+                            .frame(width: 30, height: 30)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                    .strokeBorder(coachEvidenceTint.opacity(0.14), lineWidth: 1)
+                            )
+
                             Text(moreSignalsLabel(briefing.moreSignalsCount))
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(.primary)
+                                .lineLimit(1)
                             Spacer()
+                            HStack(spacing: 3) {
+                                ForEach(0..<min(3, briefing.moreSignalsCount), id: \.self) { _ in
+                                    Circle()
+                                        .fill(coachEvidenceTint.opacity(0.42))
+                                        .frame(width: 4, height: 4)
+                                }
+                            }
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 5)
+                            .background(Color.white.opacity(0.035), in: Capsule())
+                            .accessibilityHidden(true)
+
                             Image(systemName: "chevron.right")
                                 .font(.caption2.weight(.semibold))
                                 .foregroundStyle(coachEvidenceTint.opacity(0.72))
@@ -372,12 +389,6 @@ struct CoachTabView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
                         .background(coachSupportingSurface, in: .rect(cornerRadius: 13))
-                        .overlay(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 2)
-                                .fill(coachEvidenceTint.opacity(0.62))
-                                .frame(width: 2)
-                                .padding(.vertical, 10)
-                        }
                         .overlay(
                             RoundedRectangle(cornerRadius: 13)
                                 .strokeBorder(coachEvidenceTint.opacity(0.14), lineWidth: 1)
@@ -479,9 +490,9 @@ struct CoachTabView: View {
     private var coachSupportingSurface: LinearGradient {
         LinearGradient(
             colors: [
-                STRQPalette.surfaceRaised.opacity(0.94),
+                STRQPalette.surfaceRaised.opacity(0.90),
                 STRQPalette.surfaceBase.opacity(0.98),
-                STRQPalette.backgroundCarbon.opacity(0.90)
+                STRQPalette.backgroundCarbon.opacity(0.92)
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -543,14 +554,23 @@ struct CoachTabView: View {
     private func watchCard(_ watch: DailyBriefing.Watch) -> some View {
         let tint = coachWatchTint(for: watch.colorName)
         return VStack(alignment: .leading, spacing: showWatchDetails ? 12 : 10) {
-            HStack(spacing: 8) {
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(tint)
-                    .frame(width: 3, height: 13)
-                Text(L10n.tr("WATCH"))
-                    .font(.system(size: 10, weight: .black))
-                    .tracking(1.2)
-                    .foregroundStyle(tint)
+            HStack {
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(tint)
+                        .frame(width: 5, height: 5)
+                    Text(L10n.tr("WATCH"))
+                        .font(.system(size: 10, weight: .black))
+                        .tracking(1.2)
+                }
+                .foregroundStyle(tint)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(tint.opacity(0.08), in: Capsule())
+                .overlay(
+                    Capsule()
+                        .strokeBorder(tint.opacity(0.12), lineWidth: 1)
+                )
                 Spacer()
             }
 
@@ -614,16 +634,12 @@ struct CoachTabView: View {
         .background(coachSupportingSurface, in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(tint.opacity(0.18), lineWidth: 1)
+                .strokeBorder(tint.opacity(0.15), lineWidth: 1)
         )
     }
 
     private func momentumCard(_ momentum: DailyBriefing.Momentum) -> some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 2)
-                .fill(STRQPalette.success.opacity(0.88))
-                .frame(width: 3, height: 38)
-
             Image(systemName: momentum.icon)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(STRQPalette.success)
@@ -646,6 +662,16 @@ struct CoachTabView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
+
+            HStack(spacing: 3) {
+                Circle()
+                    .fill(STRQPalette.success.opacity(0.54))
+                    .frame(width: 5, height: 5)
+                Capsule()
+                    .fill(STRQPalette.success.opacity(0.24))
+                    .frame(width: 15, height: 5)
+            }
+            .accessibilityHidden(true)
         }
         .padding(13)
         .background(coachSupportingSurface, in: .rect(cornerRadius: 14))
@@ -914,10 +940,16 @@ struct CoachTabView: View {
                 }
                 .frame(height: 4)
 
-                VStack(spacing: 7) {
-                    ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                        HStack(spacing: 11) {
-                            VStack(spacing: 3) {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: 8, alignment: .top),
+                        GridItem(.flexible(), spacing: 8, alignment: .top)
+                    ],
+                    spacing: 8
+                ) {
+                    ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack(alignment: .top, spacing: 8) {
                                 ZStack {
                                     Circle()
                                         .fill(item.2 ? completedSignal.opacity(0.16) : calibrationAccent.opacity(0.09))
@@ -930,37 +962,30 @@ struct CoachTabView: View {
                                         .foregroundStyle(item.2 ? completedSignal : calibrationAccent.opacity(0.48))
                                 }
 
-                                if index < items.count - 1 {
-                                    Capsule()
-                                        .fill(item.2 ? completedSignal.opacity(0.42) : calibrationAccent.opacity(0.16))
-                                        .frame(width: 2, height: 13)
-                                }
-                            }
-                            .frame(width: 24)
+                                Spacer(minLength: 0)
 
-                            Image(systemName: item.1)
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(item.2 ? calibrationInk : calibrationAccent.opacity(0.56))
-                                .frame(width: 28, height: 28)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                        .fill(Color.white.opacity(item.2 ? 0.055 : 0.030))
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                        .strokeBorder(Color.white.opacity(item.2 ? 0.090 : 0.045), lineWidth: 1)
-                                )
+                                Image(systemName: item.1)
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(item.2 ? calibrationInk : calibrationAccent.opacity(0.56))
+                                    .frame(width: 28, height: 28)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                            .fill(Color.white.opacity(item.2 ? 0.055 : 0.030))
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                            .strokeBorder(Color.white.opacity(item.2 ? 0.090 : 0.045), lineWidth: 1)
+                                    )
+                            }
 
                             Text(item.0)
-                                .font(.subheadline.weight(item.2 ? .semibold : .medium))
+                                .font(.caption.weight(item.2 ? .semibold : .medium))
                                 .foregroundStyle(item.2 ? Color.primary : calibrationInk.opacity(0.62))
-                                .lineLimit(2)
+                                .lineLimit(3)
                                 .fixedSize(horizontal: false, vertical: true)
-
-                            Spacer(minLength: 0)
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 9)
+                        .frame(maxWidth: .infinity, minHeight: 92, alignment: .topLeading)
+                        .padding(10)
                         .background(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
                                 .fill(Color.white.opacity(item.2 ? 0.045 : 0.020))
@@ -1061,10 +1086,10 @@ struct CoachTabView: View {
             Spacer()
         }
         .padding(12)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .background(coachSupportingSurface, in: .rect(cornerRadius: 14))
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                .strokeBorder(color.opacity(0.12), lineWidth: 1)
         )
     }
 
@@ -1181,25 +1206,11 @@ struct CoachTabView: View {
     }
 
     private func passiveWeeklyCheckInLabel(subtitle: String) -> some View {
-        let weeklyPassiveAccent = Color(red: 0.16, green: 0.25, blue: 0.62)
-        let weeklyPassiveInk = Color(red: 0.46, green: 0.56, blue: 0.92)
-        let weeklyPassiveDim = Color(red: 0.03, green: 0.04, blue: 0.14)
+        let weeklyPassiveAccent = Color(red: 0.18, green: 0.30, blue: 0.40)
+        let weeklyPassiveInk = Color(red: 0.56, green: 0.70, blue: 0.78)
+        let weeklyPassiveDim = Color(red: 0.04, green: 0.07, blue: 0.09)
 
         return HStack(alignment: .center, spacing: 12) {
-            RoundedRectangle(cornerRadius: 2, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            weeklyPassiveInk.opacity(0.56),
-                            weeklyPassiveAccent.opacity(0.22)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .frame(width: 3, height: 44)
-                .accessibilityHidden(true)
-
             ZStack {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(
@@ -1257,10 +1268,10 @@ struct CoachTabView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
-            in: .rect(cornerRadius: 14)
+            in: .rect(cornerRadius: 16)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .strokeBorder(weeklyPassiveAccent.opacity(0.24), lineWidth: 1)
         )
         .overlay(alignment: .topLeading) {
@@ -1280,11 +1291,6 @@ struct CoachTabView: View {
         let reportInk = Color(red: 0.620, green: 0.730, blue: 0.840)
 
         return HStack(alignment: .center, spacing: 12) {
-            RoundedRectangle(cornerRadius: 2, style: .continuous)
-                .fill(reportInk.opacity(ready ? 0.62 : 0.32))
-                .frame(width: 3, height: 46)
-                .accessibilityHidden(true)
-
             ZStack {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(
