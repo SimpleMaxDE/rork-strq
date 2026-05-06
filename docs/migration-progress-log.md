@@ -2791,6 +2791,42 @@ Pending work:
 - Rork QA should inspect Exercise Info with covered primary, covered primary plus covered secondary, and missing-overlay fallback exercises.
 - macOS/CI build validation remains required; this pass ran on Windows.
 
+## 2026-05-06 - Exercise Detail Anatomy Secondary Overlay Semantics
+
+Scope:
+
+- Refined only the Exercise Detail Human Body anatomy overlay selection so secondary support concepts stay in the text list without coloring the body map.
+- Kept the existing Exercise Detail Anatomy V1 coverage assets, colors, legend, navigation, exercise data, and primary/secondary text rows unchanged.
+
+Files changed:
+
+- `ios/STRQ/Views/ExerciseDetailView.swift`
+- `docs/migration-progress-log.md`
+
+Code inspected:
+
+- Confirmed Exercise Detail renders the primary and secondary muscle text directly from `exercise.primaryMuscle` and `exercise.secondaryMuscles`, independently of body overlay coverage.
+- Confirmed the anatomy overlay mapping/filtering is local to `STRQHumanBodyExerciseTargetScene` in `ExerciseDetailView.swift`.
+
+Implementation:
+
+- Added secondary overlay eligibility filtering before layer merging.
+- Filtered support-only secondary concepts including Core Stability/stability/stabilizer/bracing/grip/balance/support terms from visual overlays while preserving text rows.
+- Prevented lower-body primary targets from picking up secondary arm/forearm overlays that are typically holding/support demands, such as Zercher Squat biceps.
+- Stopped mapping Core Stability itself to the Abs overlay; direct core visuals now come from explicit Abs, Obliques, or Rotation targets.
+- Kept existing compatible direct muscle overlays for chest/shoulder, back/lats, glutes, hamstrings, quads, biceps/forearms, and direct abs/oblique/rotation targets.
+
+Intentionally not changed:
+
+- No assets, models, services, view models, persistence, analytics, localization, workout execution, plan generation, onboarding, Coach, Progress, Profile, RevenueCat/store, HealthKit, notification scheduling, tests, Widget, Watch, Live Activity, fonts, or Xcode project files.
+- No exercise data, primary/secondary text content, exercise navigation, favorites, search/filter, add/replace/start workout behavior, colors, legend, or asset names changed.
+- No Sandow references introduced.
+
+Pending work:
+
+- Rork QA should visually inspect Zercher Squat plus Bench Press, Pull-Up/Row, RDL, Glute Kickback, Curl, Squat, and direct core examples.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## 2026-05-06 - Human Body Overlay Exercise Detail V1 Coverage
 
 Scope:

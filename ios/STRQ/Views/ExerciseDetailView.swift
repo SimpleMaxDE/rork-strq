@@ -1225,25 +1225,105 @@ private struct STRQHumanBodyExerciseTargetScene {
     let layers: [STRQHumanBodyExerciseLayer]
 
     init(primaryMuscle: MuscleGroup, secondaryMuscles: [MuscleGroup]) {
-        let resolvedCanvas = STRQHumanBodyExerciseTargetScene.canvas(for: primaryMuscle)
-        let primaryLayers = STRQHumanBodyExerciseTargetScene.layers(
+        let visualPrimaryMuscle = STRQHumanBodyExerciseTargetScene.primaryOverlayMuscle(
             for: primaryMuscle,
-            role: .primary,
-            canvas: resolvedCanvas
+            secondaryMuscles: secondaryMuscles
         )
+        let resolvedCanvas = STRQHumanBodyExerciseTargetScene.canvas(for: visualPrimaryMuscle ?? primaryMuscle)
+        let primaryLayers = visualPrimaryMuscle.map {
+            STRQHumanBodyExerciseTargetScene.layers(
+                for: $0,
+                role: .primary,
+                canvas: resolvedCanvas
+            )
+        } ?? []
 
-        canvas = resolvedCanvas
-        layers = primaryLayers.isEmpty ? [] : STRQHumanBodyExerciseTargetScene.mergedLayers(
-            primary: primaryLayers,
-            secondary: secondaryMuscles.flatMap { muscle in
+        let secondaryLayers = secondaryMuscles
+            .filter {
+                STRQHumanBodyExerciseTargetScene.shouldRenderSecondaryOverlay(
+                    $0,
+                    primaryMuscle: primaryMuscle,
+                    visualPrimaryMuscle: visualPrimaryMuscle
+                )
+            }
+            .flatMap { muscle in
                 STRQHumanBodyExerciseTargetScene.layers(
                     for: muscle,
                     role: .secondary,
                     canvas: resolvedCanvas
                 )
             }
+
+        canvas = resolvedCanvas
+        layers = primaryLayers.isEmpty ? [] : STRQHumanBodyExerciseTargetScene.mergedLayers(
+            primary: primaryLayers,
+            secondary: secondaryLayers
         )
     }
+
+    private static func primaryOverlayMuscle(
+        for primaryMuscle: MuscleGroup,
+        secondaryMuscles: [MuscleGroup]
+    ) -> MuscleGroup? {
+        guard primaryMuscle == .coreStability else { return primaryMuscle }
+        return secondaryMuscles.first { isDirectCoreOverlayMuscle($0) }
+    }
+
+    private static func isDirectCoreOverlayMuscle(_ muscle: MuscleGroup) -> Bool {
+        switch muscle {
+        case .abs, .obliques, .rotationAntiRotation:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private static func shouldRenderSecondaryOverlay(
+        _ muscle: MuscleGroup,
+        primaryMuscle: MuscleGroup,
+        visualPrimaryMuscle: MuscleGroup?
+    ) -> Bool {
+        guard !isSupportOnlySecondary(muscle) else { return false }
+
+        if primaryMuscle == .coreStability {
+            return false
+        }
+
+        if primaryMuscle.region == .lower && isArmSupportSecondary(muscle) {
+            return false
+        }
+
+        if let visualPrimaryMuscle = visualPrimaryMuscle, muscle == visualPrimaryMuscle {
+            return false
+        }
+
+        return true
+    }
+
+    private static func isSupportOnlySecondary(_ muscle: MuscleGroup) -> Bool {
+        let normalizedName = "\(muscle.rawValue) \(muscle.displayName)".lowercased()
+        return supportOnlySecondaryTerms.contains { normalizedName.contains($0) }
+    }
+
+    private static func isArmSupportSecondary(_ muscle: MuscleGroup) -> Bool {
+        switch muscle {
+        case .arms, .biceps, .triceps, .forearms:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private static let supportOnlySecondaryTerms = [
+        "core stability",
+        "stability",
+        "stabilizer",
+        "stabilizers",
+        "bracing",
+        "grip",
+        "balance",
+        "support"
+    ]
 
     private static func mergedLayers(
         primary: [STRQHumanBodyExerciseLayer],
@@ -1286,8 +1366,10 @@ private struct STRQHumanBodyExerciseTargetScene {
                     STRQHumanBodyExerciseLayer(muscle: muscle, canvas: canvas, asset: .maleBackTricepOverlay, role: role)
                 ]
             }
-        case .abs, .obliques, .coreStability, .rotationAntiRotation:
+        case .abs, .obliques, .rotationAntiRotation:
             return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleFront, asset: .maleFrontAbsOverlay, role: role)
+        case .coreStability:
+            return []
         case .quads, .adductors, .abductors, .hipFlexors:
             return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleFront, asset: .maleFrontUpperLegOverlay, role: role)
         case .tibialis:
