@@ -2981,6 +2981,35 @@ Pending work:
 
 - Recommended next prompt is a docs-only current Progress risk/state inventory before any visual shell or chart implementation pass.
 
+## 2026-05-06 - Progress Current State Risk Inventory
+
+Scope:
+
+- Created a docs-only current Progress risk and state inventory before any Progress redesign or Swift implementation.
+- Statically mapped the Progress tab entry, `ProgressAnalyticsView`, `SessionHistoryView`, chart usage, empty states, data sources, routes, protected behavior, low-risk candidates, high-risk areas, and exactly one recommended next prompt.
+
+Files changed:
+
+- `docs/progress-current-state-risk-inventory.md`
+- `docs/migration-progress-log.md`
+
+Code inspected:
+
+- `ios/STRQ/ContentView.swift`
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `ios/STRQ/Views/SessionHistoryView.swift`
+- `ios/STRQ/ViewModels/AppViewModel.swift`
+- `ios/STRQ/Services/WorkoutController.swift`
+- related model/service files referenced by Progress state and data calculations
+
+Intentionally not changed:
+
+- no Swift files, assets, project files, models, services, view models, analytics files, localization, tests, fonts, Watch, Widget, Live Activity, or production runtime behavior
+
+Pending work:
+
+- Recommended next prompt is a docs-only Progress Rork screenshot/state capture checklist before any shell-only Swift pass.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
