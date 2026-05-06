@@ -154,7 +154,7 @@ struct ProgressAnalyticsView: View {
             }
         }
         .padding(20)
-        .background(
+        .background {
             ZStack {
                 LinearGradient(
                     colors: [Color(white: 0.13), Color(white: 0.052)],
@@ -169,9 +169,9 @@ struct ProgressAnalyticsView: View {
                 }
                 .padding(.horizontal, 18)
                 .opacity(0.7)
-            },
-            in: .rect(cornerRadius: 26)
-        )
+            }
+            .clipShape(.rect(cornerRadius: 26))
+        }
         .overlay(
             RoundedRectangle(cornerRadius: 26)
                 .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
