@@ -3166,6 +3166,38 @@ Verification:
 - Static verification only on Windows; no `xcodebuild` was run.
 - macOS/CI build validation and Rork visual QA remain required.
 
+## 2026-05-06 - Progress V3 Source-Locked Concept Lab
+
+Scope:
+
+- Added a DEBUG-only Progress V3 Concept Lab using local prototype/demo data only.
+- Built three source-locked concept directions: Metric Insight Report, Progress Goal / Rhythm System, and Training Distribution / Muscle Proof.
+- Preserved production Progress, production navigation, models, services, persistence, analytics, localization, assets, project files, tests, Widget, Watch, and Live Activity.
+
+Files changed:
+
+- `ios/STRQ/Views/Debug/ProgressV3ConceptLabView.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `docs/progress-v3-figma-source-map.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Inspected all mandatory user-selected nodes: `11604:63074`, `11604:63099`, `11604:63115`, `11604:63236`, `11604:63379`, `11604:63397`, `11604:63410`, `11604:63465`, `11604:63511`, `11604:63616`, `11604:63709`, `11604:63679`, `11604:63724`, `11604:64200`, `11604:64937`, and `11604:66184`.
+- Also inspected helpful chart/progress/dashboard/activity primitives recorded in `docs/progress-v3-figma-source-map.md`.
+
+Implementation:
+
+- Added local concept and data-state switchers for Baseline, Forming, and Established states.
+- Kept all demo data private inside the DEBUG prototype file.
+- Integrated the lab into the existing DEBUG Design System Lab as `Progress V3 Concept Lab`.
+
+Pending work:
+
+- Rork QA should screenshot all three concepts across all three states.
+- macOS/CI build validation remains required; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
