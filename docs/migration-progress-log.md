@@ -2745,6 +2745,52 @@ Intentionally not changed:
 
 - No Swift files, app assets, asset catalogs, project files, localization files, tests, fonts, Watch, Widget, or production runtime assets.
 
+## 2026-05-06 - Exercise Info Human Body Overlay Pilot
+
+Scope:
+
+- Added the first controlled production Human Body Overlay pilot only to the Exercise Detail Target section.
+- Replaced the simple local body-map drawing in that section with a display-only base plus overlay vector PDF composition while preserving the existing primary and secondary muscle text list as the exact source of truth.
+- Kept the pilot local to `ExerciseDetailView` to avoid project-file changes and avoid introducing a global anatomy architecture before full asset coverage exists.
+
+Files changed:
+
+- `ios/STRQ/Views/ExerciseDetailView.swift`
+- `docs/migration-progress-log.md`
+
+Implementation:
+
+- Added a private local `STRQHumanBodyExerciseTargetView` helper plus local canvas, layer, asset, role, and tone helpers.
+- Used a SwiftUI `ZStack` with original-rendered base PDF images and template-tinted overlay PDF images.
+- Primary overlays use a controlled teal/blue treatment at stronger opacity; secondary overlays use the same hue family at lower opacity.
+
+Muscle mapping and fallback:
+
+- Direct pilot coverage: Chest, Shoulders, broad Back/Lats/Lower Back, and Glutes.
+- Current runtime mapping uses `STRQHumanBodyMaleFrontBase`, `STRQHumanBodyMaleFrontChestOverlay`, `STRQHumanBodyMaleFrontShoulderOverlay`, `STRQHumanBodyMaleBackBase`, `STRQHumanBodyMaleBackBackOverlay`, `STRQHumanBodyFemaleBackBase`, and `STRQHumanBodyFemaleBackGluteOverlay`.
+- Female front chest assets remain imported but are not selected in this exercise-info pilot because the male front canvas is the only available front canvas with both Chest and Shoulder overlays.
+- Unsupported muscles fall back to a neutral body canvas and the exact primary/secondary muscle list already shown in the screen.
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- ios/STRQ/Views docs/migration-progress-log.md`
+- `rg -n "HumanBody|STRQHumanBody|Exercise|Muscle|primary|secondary|ZStack|renderingMode|foregroundStyle" ios/STRQ/Views`
+- `rg -n "STRQHumanBodyMaleFrontBase|STRQHumanBodyMaleFrontChestOverlay|STRQHumanBodyMaleFrontShoulderOverlay|STRQHumanBodyMaleBackBase|STRQHumanBodyMaleBackBackOverlay|STRQHumanBodyFemaleFrontBase|STRQHumanBodyFemaleFrontChestOverlay|STRQHumanBodyFemaleBackBase|STRQHumanBodyFemaleBackGluteOverlay" ios/STRQ`
+- `rg -n "Sandow" ios/STRQ/Views ios/STRQ/ContentView.swift`
+- `git diff --name-only -- ios/STRQ/Assets.xcassets ios/STRQ/ViewModels ios/STRQ/Services ios/STRQ/Models ios/STRQ/Localizable.xcstrings ios/STRQWidget ios/STRQWatch ios/STRQ.xcodeproj`
+- `git diff --check`
+
+Intentionally not changed:
+
+- No assets, project files, models, services, view models, persistence, analytics, localization, tests, fonts, Widget, Watch, Live Activity, onboarding, progress, coach, active workout, workout execution, or plan generation files.
+
+Pending work:
+
+- Rork QA should inspect Exercise Info with covered primary, covered primary plus covered secondary, and missing-overlay fallback exercises.
+- macOS/CI build validation remains required; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

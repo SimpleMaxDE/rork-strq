@@ -468,49 +468,69 @@ struct ExerciseDetailView: View {
     }
 
     private var muscleMapSection: some View {
+        let unsupportedMuscles = STRQHumanBodyExerciseTargetView.unsupportedMuscles(
+            primaryMuscle: exercise.primaryMuscle,
+            secondaryMuscles: exercise.secondaryMuscles
+        )
+
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 16) {
-                BodyMapView(
-                    primaryMuscles: [exercise.primaryMuscle],
-                    secondaryMuscles: exercise.secondaryMuscles,
-                    compact: true
-                )
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top, spacing: 14) {
+                    STRQHumanBodyExerciseTargetView(
+                        primaryMuscle: exercise.primaryMuscle,
+                        secondaryMuscles: exercise.secondaryMuscles
+                    )
+                    .frame(width: 128)
 
-                VStack(alignment: .leading, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(L10n.tr("PRIMARY"))
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(STRQBrand.steel)
-                            .tracking(0.5)
-                        HStack(spacing: 6) {
-                            Image(systemName: exercise.primaryMuscle.symbolName)
-                                .font(.caption)
-                                .foregroundStyle(STRQBrand.steel)
-                            Text(exercise.primaryMuscle.displayName)
-                                .font(.subheadline.weight(.semibold))
-                        }
-                    }
-
-                    if !exercise.secondaryMuscles.isEmpty {
+                    VStack(alignment: .leading, spacing: 12) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(L10n.tr("SECONDARY"))
+                            Text(L10n.tr("PRIMARY"))
                                 .font(.system(size: 9, weight: .bold))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(STRQHumanBodyExerciseTargetTone.primary)
                                 .tracking(0.5)
-                            ForEach(exercise.secondaryMuscles) { muscle in
-                                HStack(spacing: 6) {
-                                    Image(systemName: muscle.symbolName)
-                                        .font(.system(size: 10))
-                                        .foregroundStyle(.secondary)
-                                    Text(muscle.displayName)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                            HStack(spacing: 6) {
+                                Image(systemName: exercise.primaryMuscle.symbolName)
+                                    .font(.caption)
+                                    .foregroundStyle(STRQHumanBodyExerciseTargetTone.primary)
+                                Text(exercise.primaryMuscle.displayName)
+                                    .font(.subheadline.weight(.semibold))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.78)
+                            }
+                        }
+
+                        if !exercise.secondaryMuscles.isEmpty {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(L10n.tr("SECONDARY"))
+                                    .font(.system(size: 9, weight: .bold))
+                                    .foregroundStyle(.secondary)
+                                    .tracking(0.5)
+                                ForEach(exercise.secondaryMuscles) { muscle in
+                                    HStack(spacing: 6) {
+                                        Image(systemName: muscle.symbolName)
+                                            .font(.system(size: 10))
+                                            .foregroundStyle(.secondary)
+                                        Text(muscle.displayName)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.78)
+                                    }
                                 }
                             }
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Spacer(minLength: 0)
                 }
-                Spacer()
+
+                if !unsupportedMuscles.isEmpty {
+                    Text("Exact target list stays visible when map coverage is partial.")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             .padding(16)
             .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
@@ -1135,4 +1155,241 @@ enum ExerciseRole {
         case .saferSubstitute: "Safer Sub"
         }
     }
+}
+
+private struct STRQHumanBodyExerciseTargetView: View {
+    let primaryMuscle: MuscleGroup
+    let secondaryMuscles: [MuscleGroup]
+
+    private var scene: STRQHumanBodyExerciseTargetScene {
+        STRQHumanBodyExerciseTargetScene(
+            primaryMuscle: primaryMuscle,
+            secondaryMuscles: secondaryMuscles
+        )
+    }
+
+    var body: some View {
+        VStack(spacing: 8) {
+            ZStack {
+                Image(scene.canvas.baseAsset.rawValue)
+                    .renderingMode(.original)
+                    .resizable()
+                    .scaledToFit()
+
+                ForEach(scene.layers) { layer in
+                    Image(layer.asset.rawValue)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(layer.role.tint.opacity(layer.role.opacity))
+                }
+            }
+            .aspectRatio(scene.canvas.aspectRatio, contentMode: .fit)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 11)
+            .padding(.vertical, 10)
+            .background(STRQHumanBodyExerciseTargetTone.canvasBackground, in: .rect(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(STRQHumanBodyExerciseTargetTone.primary.opacity(scene.layers.isEmpty ? 0.14 : 0.28), lineWidth: 1)
+            )
+
+            HStack(spacing: 8) {
+                STRQHumanBodyExerciseLegendItem(title: "Primary", color: STRQHumanBodyExerciseTargetTone.primary, opacity: 1)
+                STRQHumanBodyExerciseLegendItem(title: "Secondary", color: STRQHumanBodyExerciseTargetTone.primary, opacity: 0.45)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilitySummary)
+    }
+
+    static func unsupportedMuscles(primaryMuscle: MuscleGroup, secondaryMuscles: [MuscleGroup]) -> [MuscleGroup] {
+        let scene = STRQHumanBodyExerciseTargetScene(primaryMuscle: primaryMuscle, secondaryMuscles: secondaryMuscles)
+        let visible = Set(scene.layers.map(\.muscle))
+        return ([primaryMuscle] + secondaryMuscles).filter { !visible.contains($0) }
+    }
+
+    private var accessibilitySummary: Text {
+        let secondarySummary = secondaryMuscles.map(\.displayName).joined(separator: ", ")
+        if secondarySummary.isEmpty {
+            return Text("Primary muscle: \(primaryMuscle.displayName).")
+        }
+        return Text("Primary muscle: \(primaryMuscle.displayName). Secondary muscles: \(secondarySummary).")
+    }
+}
+
+private struct STRQHumanBodyExerciseLegendItem: View {
+    let title: String
+    let color: Color
+    let opacity: Double
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(color.opacity(opacity))
+                .frame(width: 6, height: 6)
+            Text(title)
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct STRQHumanBodyExerciseTargetScene {
+    let canvas: STRQHumanBodyExerciseCanvas
+    let layers: [STRQHumanBodyExerciseLayer]
+
+    init(primaryMuscle: MuscleGroup, secondaryMuscles: [MuscleGroup]) {
+        if let primaryLayer = STRQHumanBodyExerciseTargetScene.layer(for: primaryMuscle, role: .primary) {
+            canvas = primaryLayer.canvas
+            layers = STRQHumanBodyExerciseTargetScene.mergedLayers(
+                primary: primaryLayer,
+                secondary: secondaryMuscles.compactMap { muscle in
+                    STRQHumanBodyExerciseTargetScene.layer(for: muscle, role: .secondary)
+                }
+            )
+        } else {
+            canvas = STRQHumanBodyExerciseTargetScene.fallbackCanvas(for: primaryMuscle)
+            layers = []
+        }
+    }
+
+    private static func mergedLayers(
+        primary: STRQHumanBodyExerciseLayer,
+        secondary: [STRQHumanBodyExerciseLayer]
+    ) -> [STRQHumanBodyExerciseLayer] {
+        var seenAssets: Set<STRQHumanBodyExerciseAsset> = [primary.asset]
+        var output = [primary]
+
+        for layer in secondary where layer.canvas == primary.canvas && !seenAssets.contains(layer.asset) {
+            seenAssets.insert(layer.asset)
+            output.append(layer)
+        }
+
+        return output
+    }
+
+    private static func layer(for muscle: MuscleGroup, role: STRQHumanBodyExerciseRole) -> STRQHumanBodyExerciseLayer? {
+        switch muscle {
+        case .chest:
+            return STRQHumanBodyExerciseLayer(
+                muscle: muscle,
+                canvas: .maleFront,
+                asset: .maleFrontChestOverlay,
+                role: role
+            )
+        case .shoulders:
+            return STRQHumanBodyExerciseLayer(
+                muscle: muscle,
+                canvas: .maleFront,
+                asset: .maleFrontShoulderOverlay,
+                role: role
+            )
+        case .back, .lats, .lowerBack:
+            return STRQHumanBodyExerciseLayer(
+                muscle: muscle,
+                canvas: .maleBack,
+                asset: .maleBackBackOverlay,
+                role: role
+            )
+        case .glutes:
+            return STRQHumanBodyExerciseLayer(
+                muscle: muscle,
+                canvas: .femaleBack,
+                asset: .femaleBackGluteOverlay,
+                role: role
+            )
+        default:
+            return nil
+        }
+    }
+
+    private static func fallbackCanvas(for muscle: MuscleGroup) -> STRQHumanBodyExerciseCanvas {
+        switch muscle {
+        case .back, .lats, .lowerBack, .traps, .triceps, .glutes, .hamstrings, .calves, .neck:
+            return .maleBack
+        default:
+            return .maleFront
+        }
+    }
+}
+
+private struct STRQHumanBodyExerciseLayer: Identifiable {
+    let muscle: MuscleGroup
+    let canvas: STRQHumanBodyExerciseCanvas
+    let asset: STRQHumanBodyExerciseAsset
+    let role: STRQHumanBodyExerciseRole
+
+    var id: String {
+        "\(muscle.rawValue)-\(asset.rawValue)-\(role.id)"
+    }
+}
+
+private enum STRQHumanBodyExerciseRole {
+    case primary
+    case secondary
+
+    var id: String {
+        switch self {
+        case .primary: "primary"
+        case .secondary: "secondary"
+        }
+    }
+
+    var tint: Color {
+        STRQHumanBodyExerciseTargetTone.primary
+    }
+
+    var opacity: Double {
+        switch self {
+        case .primary: 0.94
+        case .secondary: 0.46
+        }
+    }
+}
+
+private enum STRQHumanBodyExerciseCanvas {
+    case maleFront
+    case maleBack
+    case femaleBack
+
+    var baseAsset: STRQHumanBodyExerciseAsset {
+        switch self {
+        case .maleFront: .maleFrontBase
+        case .maleBack: .maleBackBase
+        case .femaleBack: .femaleBackBase
+        }
+    }
+
+    var aspectRatio: CGFloat {
+        switch self {
+        case .maleFront, .maleBack: 0.54
+        case .femaleBack: 0.48
+        }
+    }
+}
+
+private enum STRQHumanBodyExerciseAsset: String, Hashable {
+    case maleFrontBase = "STRQHumanBodyMaleFrontBase"
+    case maleFrontChestOverlay = "STRQHumanBodyMaleFrontChestOverlay"
+    case maleFrontShoulderOverlay = "STRQHumanBodyMaleFrontShoulderOverlay"
+    case maleBackBase = "STRQHumanBodyMaleBackBase"
+    case maleBackBackOverlay = "STRQHumanBodyMaleBackBackOverlay"
+    case femaleBackBase = "STRQHumanBodyFemaleBackBase"
+    case femaleBackGluteOverlay = "STRQHumanBodyFemaleBackGluteOverlay"
+}
+
+private enum STRQHumanBodyExerciseTargetTone {
+    static let primary = Color(red: 0.18, green: 0.66, blue: 0.76)
+    static let canvasBackground = LinearGradient(
+        colors: [
+            STRQBrand.obsidian,
+            STRQPalette.surfaceRaised
+        ],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
 }
