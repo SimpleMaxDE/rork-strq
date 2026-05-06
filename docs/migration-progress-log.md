@@ -2939,6 +2939,25 @@ Pending work:
 - Rork QA should re-check Back/Lats specifically, plus Chest, Quads/Upper Leg, Glutes, Hamstrings, and Abs to confirm the large-region tuning improves definition without making target highlights too faint.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-06 - Exercise Info Anatomy V1 Freeze Report
+
+Scope:
+
+- Created a docs-only freeze report accepting the Exercise Detail Human Body Overlay as a V1 feature candidate with caveats, covering Rork QA examples, support/stabilizer text-only behavior, deferred work, regression guardrails, and release-readiness.
+
+Files changed:
+
+- `docs/exercise-info-anatomy-v1-freeze-report.md`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- No Swift files, assets, models, services, view models, analytics, localization, project files, tests, fonts, Widget, Watch, Live Activity, workout behavior, plan behavior, or runtime behavior.
+
+Pending work:
+
+- macOS/CI build validation and continued Rork QA remain required before final release sign-off.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
