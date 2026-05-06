@@ -60,92 +60,86 @@ struct ProgressAnalyticsView: View {
 
     // MARK: - Headline Hero
 
+    private struct ProofMaturityCopy {
+        let eyebrow: String
+        let title: String
+        let detail: String
+        let meterLabel: String
+        let icon: String
+        let progress: Double
+        let state: STRQPalette.State
+    }
+
+    private struct ProofTrustItem: Identifiable {
+        let title: String
+        let value: String
+        let detail: String
+        let icon: String
+        let state: STRQPalette.State
+
+        var id: String { title }
+    }
+
     private var headlineHero: some View {
-        let progressing = vm.progressingExercises.count
-        let prsThisMonth: Int = {
-            let cal = Calendar.current
-            return vm.personalRecords.filter { cal.isDate($0.date, equalTo: Date(), toGranularity: .month) }.count
-        }()
-        let tier = vm.dataMaturityTier
-        let headline: (String, String) = {
-            switch tier {
-            case .fresh:
-                return ("0", L10n.tr("workouts logged"))
-            case .firstSession:
-                return ("1", L10n.tr("workout logged"))
-            case .earlyWeek:
-                return ("\(vm.totalCompletedWorkouts)", L10n.tr("workouts logged"))
-            case .established:
-                if progressing > 0 {
-                    return ("\(progressing)", L10n.tr("lifts progressing"))
-                } else if prsThisMonth > 0 {
-                    return ("\(prsThisMonth)", L10n.tr("PRs this month"))
-                } else {
-                    return ("\(vm.totalCompletedWorkouts)", L10n.tr("workouts logged"))
-                }
-            }
-        }()
-        let sub: String = {
-            switch tier {
-            case .fresh:
-                return L10n.tr("progress.fresh.subtitle", fallback: "Log one workout, then Progress becomes useful.")
-            case .firstSession:
-                return L10n.tr("Strong start. STRQ is already reading load, recovery, and consistency.")
-            case .earlyWeek:
-                return L10n.tr("First trends form after a few more workouts.")
-            case .established:
-                if progressing > 0 && prsThisMonth > 0 {
-                    let prLabel = prsThisMonth == 1 ? L10n.tr("PR this month") : L10n.tr("PRs this month")
-                    return L10n.format("%d %@ · %d-day streak", prsThisMonth, prLabel, vm.streak)
-                } else if vm.streak > 0 {
-                    return L10n.format("%d-day streak · keep the signal strong", vm.streak)
-                } else {
-                    return L10n.tr("Train to keep the signal sharp")
-                }
-            }
-        }()
+        let headline = proofHeadline
+        let maturity = proofMaturityCopy
+        let tint = STRQPalette.color(for: maturity.state)
 
         return ZStack(alignment: .topLeading) {
-            Canvas { context, size in
-                for i in 0..<3 {
-                    let xF: [CGFloat] = [0.2, 0.75, 0.95]
-                    let yF: [CGFloat] = [0.3, 0.75, 0.2]
-                    let radius = CGFloat(55 + i * 25)
-                    let circle = Path(ellipseIn: CGRect(
-                        x: xF[i] * size.width - radius,
-                        y: yF[i] * size.height - radius,
-                        width: radius * 2, height: radius * 2
-                    ))
-                    context.fill(circle, with: .color(.white.opacity(0.025)))
-                }
-            }
-            .allowsHitTesting(false)
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .top, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 8) {
+                            Text(L10n.tr("PROGRESS PROOF"))
+                                .font(.system(size: 10, weight: .black))
+                                .tracking(1.1)
+                                .foregroundStyle(STRQBrand.steel)
+                            Text(maturity.eyebrow)
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(tint)
+                                .padding(.horizontal, 7)
+                                .padding(.vertical, 3)
+                                .background(tint.opacity(0.14), in: Capsule())
+                        }
 
-            VStack(alignment: .leading, spacing: 10) {
-                Text(L10n.tr("Your Progress"))
-                    .font(.system(size: 10, weight: .black))
-                    .tracking(1.4)
-                    .foregroundStyle(STRQBrand.steel)
+                        HStack(alignment: .lastTextBaseline, spacing: 10) {
+                            if let numeric = Double(headline.0) {
+                                STRQCountUpText(value: numeric, duration: 0.7)
+                                    .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
+                                    .foregroundStyle(.white)
+                            } else {
+                                Text(headline.0)
+                                    .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
+                                    .foregroundStyle(.white)
+                            }
+                            Text(headline.1)
+                                .font(.system(.title3, design: .rounded, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.56))
+                                .padding(.bottom, 6)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
 
-                HStack(alignment: .lastTextBaseline, spacing: 10) {
-                    if let numeric = Double(headline.0) {
-                        STRQCountUpText(value: numeric, duration: 0.7)
-                            .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
-                            .foregroundStyle(.white)
-                    } else {
-                        Text(headline.0)
-                            .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
-                            .foregroundStyle(.white)
+                        Text(maturity.title)
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.88))
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Text(maturity.detail)
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.62))
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    Text(headline.1)
-                        .font(.system(.title3, design: .rounded, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.55))
-                        .padding(.bottom, 6)
+
+                    Spacer(minLength: 0)
+
+                    proofMaturityRing(progress: maturity.progress, tint: tint, icon: maturity.icon, label: maturity.meterLabel)
                 }
 
-                Text(sub)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.6))
+                VStack(spacing: 8) {
+                    ForEach(proofTrustItems) { item in
+                        proofTrustRow(item)
+                    }
+                }
 
                 achievementChips
             }
@@ -153,7 +147,7 @@ struct ProgressAnalyticsView: View {
         }
         .background(
             LinearGradient(
-                colors: [Color(white: 0.14), Color(white: 0.055)],
+                colors: [Color(white: 0.125), Color(white: 0.045)],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             ),
             in: .rect(cornerRadius: 22)
@@ -171,6 +165,171 @@ struct ProgressAnalyticsView: View {
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5), value: appeared)
+    }
+
+    private var proofHeadline: (String, String) {
+        let progressing = vm.progressingExercises.count
+        let prsThisMonth: Int = {
+            let cal = Calendar.current
+            return vm.personalRecords.filter { cal.isDate($0.date, equalTo: Date(), toGranularity: .month) }.count
+        }()
+
+        switch vm.dataMaturityTier {
+        case .fresh:
+            return ("0", L10n.tr("workouts logged"))
+        case .firstSession:
+            return ("1", L10n.tr("workout logged"))
+        case .earlyWeek:
+            return ("\(vm.totalCompletedWorkouts)", L10n.tr("workouts logged"))
+        case .established:
+            if progressing > 0 {
+                return ("\(progressing)", L10n.tr("lifts progressing"))
+            } else if prsThisMonth > 0 {
+                return ("\(prsThisMonth)", L10n.tr("PRs this month"))
+            } else {
+                return ("\(vm.totalCompletedWorkouts)", L10n.tr("workouts logged"))
+            }
+        }
+    }
+
+    private var proofMaturityCopy: ProofMaturityCopy {
+        switch vm.dataMaturityTier {
+        case .fresh:
+            return ProofMaturityCopy(
+                eyebrow: L10n.tr("Baseline"),
+                title: L10n.tr("Baseline forming"),
+                detail: L10n.tr("progress.fresh.subtitle", fallback: "Log one workout, then Progress becomes useful."),
+                meterLabel: L10n.tr("Start"),
+                icon: "circle.dashed",
+                progress: 0.08,
+                state: .info
+            )
+        case .firstSession:
+            return ProofMaturityCopy(
+                eyebrow: L10n.tr("First signal"),
+                title: L10n.tr("First training signal captured"),
+                detail: L10n.tr("One finished workout is real evidence. A few more make strength, body, and volume trends trustworthy."),
+                meterLabel: L10n.tr("Signal"),
+                icon: "waveform.path.ecg",
+                progress: 0.34,
+                state: .info
+            )
+        case .earlyWeek:
+            return ProofMaturityCopy(
+                eyebrow: L10n.tr("Pattern"),
+                title: L10n.tr("Early pattern building"),
+                detail: L10n.tr("STRQ is reading consistency and load. Conclusions stay cautious until the baseline fills in."),
+                meterLabel: L10n.tr("Forming"),
+                icon: "chart.line.uptrend.xyaxis",
+                progress: 0.64,
+                state: .warning
+            )
+        case .established:
+            return ProofMaturityCopy(
+                eyebrow: L10n.tr("Proof"),
+                title: L10n.tr("Proof is becoming meaningful"),
+                detail: vm.streak > 0
+                    ? L10n.format("%d-day streak with strength, recovery, and history now readable.", vm.streak)
+                    : L10n.tr("Strength, recovery, and training history are now readable enough to trust."),
+                meterLabel: L10n.tr("Proof"),
+                icon: "checkmark.seal.fill",
+                progress: 1.0,
+                state: .success
+            )
+        }
+    }
+
+    private var proofTrustItems: [ProofTrustItem] {
+        let target = max(1, min(3, vm.profile.daysPerWeek))
+        let workoutsState: STRQPalette.State = vm.totalCompletedWorkouts >= 4 ? .success : (vm.totalCompletedWorkouts > 0 ? .info : .neutral)
+        let consistencyState: STRQPalette.State = vm.weeklyStats.sessions >= target ? .success : (vm.weeklyStats.sessions > 0 ? .warning : .neutral)
+        let recoveryState: STRQPalette.State = vm.totalCompletedWorkouts == 0 ? .neutral : (vm.effectiveRecoveryScore >= 70 ? .success : (vm.effectiveRecoveryScore >= 55 ? .warning : .danger))
+
+        return [
+            ProofTrustItem(
+                title: L10n.tr("Training data"),
+                value: "\(vm.totalCompletedWorkouts)",
+                detail: vm.totalCompletedWorkouts >= 4 ? L10n.tr("Readable") : (vm.totalCompletedWorkouts == 0 ? L10n.tr("Awaiting first workout") : L10n.tr("Baseline forming")),
+                icon: "figure.strengthtraining.traditional",
+                state: workoutsState
+            ),
+            ProofTrustItem(
+                title: L10n.tr("Consistency"),
+                value: "\(vm.weeklyStats.sessions)/\(target)",
+                detail: vm.weeklyStats.sessions >= target ? L10n.tr("Target met") : L10n.tr("Building pattern"),
+                icon: "calendar.badge.clock",
+                state: consistencyState
+            ),
+            ProofTrustItem(
+                title: L10n.tr("Recovery"),
+                value: "\(vm.effectiveRecoveryScore)%",
+                detail: vm.totalCompletedWorkouts == 0 ? L10n.tr("Context only") : L10n.tr("Training context"),
+                icon: "heart.fill",
+                state: recoveryState
+            )
+        ]
+    }
+
+    private func proofMaturityRing(progress: Double, tint: Color, icon: String, label: String) -> some View {
+        let clamped = max(0, min(progress, 1))
+        return ZStack {
+            Circle()
+                .stroke(Color.white.opacity(0.08), lineWidth: 7)
+            Circle()
+                .trim(from: 0, to: appeared || reduceMotion ? clamped : 0)
+                .stroke(tint.gradient, style: StrokeStyle(lineWidth: 7, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.6), value: appeared)
+
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(tint)
+                Text(label)
+                    .font(.system(size: 9, weight: .black))
+                    .foregroundStyle(.white.opacity(0.74))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+        }
+        .frame(width: 76, height: 76)
+        .padding(4)
+        .background(Color.white.opacity(0.035), in: Circle())
+    }
+
+    private func proofTrustRow(_ item: ProofTrustItem) -> some View {
+        let tint = STRQPalette.color(for: item.state)
+
+        return HStack(spacing: 10) {
+            Image(systemName: item.icon)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 26, height: 26)
+                .background(tint.opacity(0.12), in: .rect(cornerRadius: 7))
+
+            Text(item.title)
+                .font(.system(size: 10, weight: .black))
+                .tracking(0.5)
+                .foregroundStyle(.white.opacity(0.5))
+                .textCase(.uppercase)
+                .frame(width: 104, alignment: .leading)
+
+            Text(item.value)
+                .font(.system(size: 15, weight: .heavy, design: .rounded).monospacedDigit())
+                .foregroundStyle(.white.opacity(0.9))
+                .frame(width: 48, alignment: .trailing)
+
+            Text(item.detail)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.58))
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 11))
     }
 
     private var achievementChips: some View {
@@ -215,34 +374,63 @@ struct ProgressAnalyticsView: View {
         let signal = strongestImprovementSignal
         let tint = STRQPalette.color(for: signal.state)
 
-        return HStack(alignment: .center, spacing: 12) {
-            STRQPulseMark(size: 44, tint: tint) {
-                Image(systemName: signal.icon)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(tint)
-            }
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(L10n.tr("What's improving"))
-                    .font(.system(size: 9, weight: .black))
+        return VStack(alignment: .leading, spacing: 13) {
+            HStack(spacing: 8) {
+                Text(L10n.tr("EVIDENCE SIGNAL"))
+                    .font(.system(size: 10, weight: .black))
                     .tracking(1.1)
+                    .foregroundStyle(STRQBrand.steel)
+                Spacer(minLength: 0)
+                Text(proofMaturityCopy.eyebrow)
+                    .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(tint)
-                Text(signal.title)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                Text(signal.detail)
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.58))
-                    .lineLimit(1)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(tint.opacity(0.12), in: Capsule())
             }
 
-            Spacer(minLength: 0)
+            HStack(alignment: .center, spacing: 12) {
+                STRQPulseMark(size: 44, tint: tint) {
+                    Image(systemName: signal.icon)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(tint)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(signal.title)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(signal.detail)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            Rectangle()
+                .fill(Color.white.opacity(0.06))
+                .frame(height: 1)
+
+            HStack(alignment: .top, spacing: 10) {
+                evidenceMeta(
+                    title: L10n.tr("Trust now"),
+                    detail: evidenceTrustNow,
+                    icon: "checkmark.seal"
+                )
+                evidenceMeta(
+                    title: L10n.tr("Still forming"),
+                    detail: evidenceStillForming,
+                    icon: "circle.dashed"
+                )
+            }
         }
-        .padding(13)
+        .padding(14)
         .background(
             LinearGradient(
-                colors: [Color(white: 0.13), Color(white: 0.075)],
+                colors: [Color(white: 0.13), Color(white: 0.065)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
@@ -256,11 +444,61 @@ struct ProgressAnalyticsView: View {
         .offset(y: appeared ? 0 : 6)
     }
 
+    private var evidenceTrustNow: String {
+        if vm.totalCompletedWorkouts == 0 {
+            return L10n.tr("Nothing yet")
+        }
+        if vm.hasEnoughDataForStrengthChart {
+            return L10n.tr("Strength trend")
+        }
+        if vm.weeklyStats.sessions > 0 {
+            return L10n.tr("Logged sessions")
+        }
+        return L10n.tr("First signal")
+    }
+
+    private var evidenceStillForming: String {
+        if vm.totalCompletedWorkouts < 2 {
+            return L10n.tr("Training baseline")
+        }
+        if !hasTrustworthyMuscleBalance {
+            return L10n.tr("Muscle balance")
+        }
+        if vm.bodyWeightEntries.count < 2 && vm.nutritionLogs.isEmpty && vm.goalPace == nil {
+            return L10n.tr("Body trend")
+        }
+        return L10n.tr("Longer pattern")
+    }
+
+    private func evidenceMeta(title: String, detail: String, icon: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(STRQBrand.steel)
+                .frame(width: 20, height: 20)
+                .background(STRQBrand.steel.opacity(0.1), in: Circle())
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.5)
+                    .foregroundStyle(.white.opacity(0.44))
+                    .textCase(.uppercase)
+                Text(detail)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.72))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
     private var strongestImprovementSignal: ImprovementSignal {
         if vm.totalCompletedWorkouts < 3 {
             let countLabel = vm.totalCompletedWorkouts == 1 ? L10n.tr("workout logged") : L10n.tr("workouts logged")
             return ImprovementSignal(
-                title: L10n.tr("Clear trends appear after a few workouts."),
+                title: vm.totalCompletedWorkouts == 0 ? L10n.tr("Baseline forming") : L10n.tr("First signal forming"),
                 detail: "\(vm.totalCompletedWorkouts) \(countLabel)",
                 icon: "waveform.path.ecg",
                 state: .info
@@ -444,7 +682,7 @@ struct ProgressAnalyticsView: View {
             Spacer(minLength: 0)
         }
         .padding(12)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 14))
         .overlay(
             RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(STRQPalette.color(for: state).opacity(0.18), lineWidth: 1)
@@ -464,9 +702,9 @@ struct ProgressAnalyticsView: View {
 
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                ForgeSectionHeader(title: L10n.tr("Momentum"))
+                ForgeSectionHeader(title: L10n.tr("Proof Runway"))
                 Spacer()
-                Text(L10n.tr("by lift · body · streak"))
+                Text(L10n.tr("strength · body · consistency"))
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.tertiary)
             }
@@ -528,7 +766,8 @@ struct ProgressAnalyticsView: View {
                 Text(detail)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.primary)
-                    .lineLimit(1)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
             Circle()
@@ -549,75 +788,138 @@ struct ProgressAnalyticsView: View {
     // MARK: - Signal Strip
 
     private var signalStrip: some View {
-        HStack(spacing: 8) {
-            if vm.isEarlyStage {
-                signalPill(icon: "figure.strengthtraining.traditional", value: "\(vm.totalCompletedWorkouts)", label: L10n.tr("Logged"), color: STRQBrand.steel)
-                signalPill(icon: "calendar.badge.clock", value: "\(vm.weeklyStats.sessions)/\(max(1, min(3, vm.profile.daysPerWeek)))", label: L10n.tr("Target"), color: STRQBrand.steel)
-                signalPill(icon: "flame.fill", value: "\(vm.streak)", label: L10n.tr("Streak"), color: STRQBrand.steel)
-                signalPill(icon: "heart.fill", value: "\(vm.effectiveRecoveryScore)%", label: L10n.tr("Recovery"), color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
-            } else {
-                signalPill(icon: "arrow.up.right", value: "\(vm.progressingExercises.count)", label: L10n.tr("Progressing"), color: .green)
-                signalPill(icon: "flame.fill", value: "\(vm.streak)", label: L10n.tr("Streak"), color: STRQBrand.steel)
-                signalPill(icon: "figure.strengthtraining.traditional", value: "\(vm.totalCompletedWorkouts)", label: L10n.tr("Workouts"), color: STRQBrand.steel)
-                signalPill(icon: "heart.fill", value: "\(vm.effectiveRecoveryScore)%", label: L10n.tr("Recovery"), color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+        VStack(alignment: .leading, spacing: 11) {
+            HStack(spacing: 8) {
+                Text(L10n.tr("KEY PROOF POINTS"))
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.1)
+                    .foregroundStyle(STRQBrand.steel)
+                Spacer(minLength: 0)
+                Text(vm.isEarlyStage ? L10n.tr("forming") : L10n.tr("active"))
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.white.opacity(0.04), in: Capsule())
+            }
+
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+                metricProofPoint(icon: metricItems[0].icon, value: metricItems[0].value, label: metricItems[0].label, caption: metricItems[0].caption, color: metricItems[0].color)
+                metricProofPoint(icon: metricItems[1].icon, value: metricItems[1].value, label: metricItems[1].label, caption: metricItems[1].caption, color: metricItems[1].color)
+                metricProofPoint(icon: metricItems[2].icon, value: metricItems[2].value, label: metricItems[2].label, caption: metricItems[2].caption, color: metricItems[2].color)
+                metricProofPoint(icon: metricItems[3].icon, value: metricItems[3].value, label: metricItems[3].label, caption: metricItems[3].caption, color: metricItems[3].color)
             }
         }
+        .padding(14)
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 8)
     }
 
-    private func signalPill(icon: String, value: String, label: String, color: Color) -> some View {
-        VStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.system(size: 11))
-                .foregroundStyle(color)
-            Text(value)
-                .font(.system(.subheadline, design: .rounded, weight: .bold).monospacedDigit())
-                .minimumScaleFactor(0.7)
-                .lineLimit(1)
-            Text(label)
-                .font(.system(size: 8, weight: .semibold))
-                .foregroundStyle(.tertiary)
-                .textCase(.uppercase)
-                .tracking(0.2)
-                .lineLimit(1)
+    private var metricItems: [(icon: String, value: String, label: String, caption: String, color: Color)] {
+        if vm.isEarlyStage {
+            return [
+                ("figure.strengthtraining.traditional", "\(vm.totalCompletedWorkouts)", L10n.tr("Logged"), vm.totalCompletedWorkouts == 0 ? L10n.tr("baseline forming") : L10n.tr("first signal"), STRQBrand.steel),
+                ("calendar.badge.clock", "\(vm.weeklyStats.sessions)/\(max(1, min(3, vm.profile.daysPerWeek)))", L10n.tr("Target"), L10n.tr("building pattern"), STRQBrand.steel),
+                ("flame.fill", "\(vm.streak)", L10n.tr("Streak"), vm.streak > 0 ? L10n.tr("active") : L10n.tr("not started"), STRQBrand.steel),
+                ("heart.fill", "\(vm.effectiveRecoveryScore)%", L10n.tr("Recovery"), L10n.tr("context"), ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+            ]
+        } else {
+            return [
+                ("arrow.up.right", "\(vm.progressingExercises.count)", L10n.tr("Progressing"), vm.progressingExercises.isEmpty ? L10n.tr("watching") : L10n.tr("moving"), STRQPalette.success),
+                ("flame.fill", "\(vm.streak)", L10n.tr("Streak"), vm.streak > 0 ? L10n.tr("current run") : L10n.tr("ready"), STRQBrand.steel),
+                ("figure.strengthtraining.traditional", "\(vm.totalCompletedWorkouts)", L10n.tr("Workouts"), L10n.tr("history"), STRQBrand.steel),
+                ("heart.fill", "\(vm.effectiveRecoveryScore)%", L10n.tr("Recovery"), L10n.tr("context"), ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+            ]
         }
-        .frame(maxWidth: .infinity)
+    }
+
+    private func metricProofPoint(icon: String, value: String, label: String, caption: String, color: Color) -> some View {
+        HStack(alignment: .center, spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(color)
+                .frame(width: 28, height: 28)
+                .background(color.opacity(0.1), in: .rect(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(alignment: .lastTextBaseline, spacing: 4) {
+                    Text(value)
+                        .font(.system(.subheadline, design: .rounded, weight: .heavy).monospacedDigit())
+                        .foregroundStyle(.white)
+                        .minimumScaleFactor(0.72)
+                        .lineLimit(1)
+                    Text(label)
+                        .font(.system(size: 9, weight: .bold))
+                        .tracking(0.3)
+                        .foregroundStyle(.white.opacity(0.48))
+                        .textCase(.uppercase)
+                        .lineLimit(1)
+                }
+                Text(caption)
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.44))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 10)
         .padding(.vertical, 10)
-        .background(Color(white: 0.10), in: .rect(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-        )
+        .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 12))
     }
 
     // MARK: - Tab Selector
 
     private var tabSelector: some View {
-        HStack(spacing: 0) {
-            ForEach(Array([L10n.tr("Strength"), L10n.tr("Body"), L10n.tr("Volume")].enumerated()), id: \.offset) { index, tab in
+        HStack(spacing: 6) {
+            ForEach(Array(progressTabs.enumerated()), id: \.offset) { index, tab in
                 Button {
                     withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.25)) { selectedTab = index }
                 } label: {
-                    Text(tab)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(selectedTab == index ? .black : .secondary)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 36)
-                        .background(
-                            selectedTab == index ? AnyShapeStyle(ForgeTheme.accentGradient) : AnyShapeStyle(Color.clear),
-                            in: .rect(cornerRadius: 9)
-                        )
+                    HStack(spacing: 6) {
+                        Image(systemName: tab.icon)
+                            .font(.system(size: 11, weight: .bold))
+                        Text(tab.title)
+                            .font(.system(size: 13, weight: .semibold))
+                    }
+                    .foregroundStyle(selectedTab == index ? .white : .secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 38)
+                    .background(
+                        selectedTab == index
+                            ? AnyShapeStyle(LinearGradient(colors: [STRQBrand.steel.opacity(0.28), STRQBrand.slate.opacity(0.12)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                            : AnyShapeStyle(Color.white.opacity(0.02)),
+                        in: .rect(cornerRadius: 10)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .strokeBorder(selectedTab == index ? STRQBrand.steel.opacity(0.36) : Color.clear, lineWidth: 1)
+                    )
                 }
             }
         }
-        .padding(3)
-        .background(Color(white: 0.10), in: .rect(cornerRadius: 12))
+        .padding(4)
+        .background(Color(white: 0.085), in: .rect(cornerRadius: 14))
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
         )
         .sensoryFeedback(.selection, trigger: selectedTab)
+    }
+
+    private var progressTabs: [(title: String, icon: String)] {
+        [
+            (L10n.tr("Strength"), "chart.line.uptrend.xyaxis"),
+            (L10n.tr("Body"), "heart.text.square"),
+            (L10n.tr("Volume"), "chart.bar.xaxis")
+        ]
     }
 
     // MARK: - Strength Signals
@@ -642,7 +944,7 @@ struct ProgressAnalyticsView: View {
 
     private var strengthBaselineCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: L10n.tr("Estimated 1RM"), trailing: L10n.tr("First Signal"))
+            ForgeSectionHeader(title: L10n.tr("Estimated 1RM"), trailing: L10n.tr("Baseline Forming"))
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 10) {
@@ -652,11 +954,11 @@ struct ProgressAnalyticsView: View {
                         .frame(width: 40, height: 40)
                         .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 10))
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(L10n.tr("Strength trend starts here"))
+                        Text(L10n.tr("Strength baseline is forming"))
                             .font(.subheadline.weight(.semibold))
                         Text(vm.totalCompletedWorkouts == 0
                              ? L10n.tr("Your main lifts create the first real strength read.")
-                             : L10n.tr("Keep logging anchor lifts and STRQ will turn them into a readable strength trend."))
+                             : L10n.tr("Keep logging anchor lifts before treating the trend as a conclusion."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -682,7 +984,7 @@ struct ProgressAnalyticsView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -726,7 +1028,7 @@ struct ProgressAnalyticsView: View {
             .frame(maxWidth: .infinity)
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -780,7 +1082,7 @@ struct ProgressAnalyticsView: View {
             }
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -865,7 +1167,7 @@ struct ProgressAnalyticsView: View {
 
         return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
-                Text(L10n.tr("RECENT IMPROVEMENT"))
+                Text(L10n.tr("RECENT PROOF"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(.secondary)
@@ -907,7 +1209,7 @@ struct ProgressAnalyticsView: View {
             }
         }
         .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 14))
         .overlay(
             RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -990,7 +1292,7 @@ struct ProgressAnalyticsView: View {
             }
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -1086,7 +1388,7 @@ struct ProgressAnalyticsView: View {
             }
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -1100,16 +1402,19 @@ struct ProgressAnalyticsView: View {
         if vm.goalPace == nil && vm.bodyWeightEntries.count < 2 && vm.recoveryTrendData.count < 3 && vm.nutritionLogs.isEmpty {
             signalRunwayCard(
                 title: L10n.tr("Body Signals"),
-                trailing: L10n.tr("Gathering"),
+                trailing: L10n.tr("Baseline Forming"),
                 icon: "heart.text.square.fill",
-                headline: L10n.tr("Body"),
-                detail: L10n.tr("progress.body.runway.detail", fallback: "Sleep, weight, and nutrition sharpen the read."),
+                headline: L10n.tr("Body baseline is forming"),
+                detail: L10n.tr("progress.body.runway.detail", fallback: "Sleep, weight, and nutrition sharpen the read before STRQ turns it into a conclusion."),
                 chips: [("moon.zzz.fill", L10n.tr("Recovery")), ("scalemass.fill", L10n.tr("Weight")), ("fork.knife", L10n.tr("Nutrition"))]
             )
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
         } else {
             VStack(spacing: 14) {
+                if !hasRealBodyBaseline {
+                    bodyBaselineNotice
+                }
                 if let pace = vm.goalPace {
                     goalPaceCard(pace)
                 }
@@ -1120,6 +1425,21 @@ struct ProgressAnalyticsView: View {
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
         }
+    }
+
+    private var hasRealBodyBaseline: Bool {
+        vm.goalPace != nil || vm.bodyWeightEntries.count >= 2 || !vm.nutritionLogs.isEmpty
+    }
+
+    private var bodyBaselineNotice: some View {
+        signalRunwayCard(
+            title: L10n.tr("Body Baseline"),
+            trailing: L10n.tr("Forming"),
+            icon: "heart.text.square.fill",
+            headline: L10n.tr("Body trend is not ready yet"),
+            detail: L10n.tr("Recovery can add context now, but weight, nutrition, or goal data make the body read trustworthy."),
+            chips: [("moon.zzz.fill", L10n.tr("Context")), ("scalemass.fill", L10n.tr("Weight")), ("fork.knife", L10n.tr("Nutrition"))]
+        )
     }
 
     private func signalRunwayCard(title: String, trailing: String, icon: String, headline: String, detail: String, chips: [(String, String)]) -> some View {
@@ -1162,7 +1482,7 @@ struct ProgressAnalyticsView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -1273,7 +1593,7 @@ struct ProgressAnalyticsView: View {
                 }
             }
             .padding(16)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+            .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -1290,7 +1610,7 @@ struct ProgressAnalyticsView: View {
                     ForgeSectionHeader(title: L10n.tr("Recovery Trend"))
                     Spacer()
                     let avgScore = data.map(\.score).reduce(0, +) / max(1, data.count)
-                    let scoreColor: Color = avgScore >= 75 ? .green : avgScore >= 55 ? .yellow : .red
+                    let scoreColor: Color = avgScore >= 75 ? STRQPalette.success : avgScore >= 55 ? STRQPalette.warning : STRQPalette.danger
                     Text(L10n.format("Avg %d", avgScore))
                         .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundStyle(scoreColor)
@@ -1303,14 +1623,14 @@ struct ProgressAnalyticsView: View {
                     ForEach(data, id: \.date) { item in
                         AreaMark(x: .value("Date", item.date), y: .value("Score", item.score))
                             .foregroundStyle(
-                                LinearGradient(colors: [.green.opacity(0.15), .green.opacity(0.02)], startPoint: .top, endPoint: .bottom)
+                                LinearGradient(colors: [STRQPalette.success.opacity(0.15), STRQPalette.success.opacity(0.02)], startPoint: .top, endPoint: .bottom)
                             )
                             .interpolationMethod(.catmullRom)
                         LineMark(x: .value("Date", item.date), y: .value("Score", item.score))
-                            .foregroundStyle(.green).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2))
+                            .foregroundStyle(STRQPalette.success).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2))
                     }
                     RuleMark(y: .value("Good", 70))
-                        .foregroundStyle(.green.opacity(0.25))
+                        .foregroundStyle(STRQPalette.success.opacity(0.25))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
                 }
                 .frame(height: 120)
@@ -1328,7 +1648,7 @@ struct ProgressAnalyticsView: View {
                 }
             }
             .padding(16)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+            .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -1358,7 +1678,7 @@ struct ProgressAnalyticsView: View {
                         let proteinPct = vm.nutritionTarget.proteinGrams > 0 ? min(100, (log.proteinGrams * 100) / vm.nutritionTarget.proteinGrams) : 0
                         let calPct = vm.nutritionTarget.calories > 0 ? min(100, (log.calories * 100) / vm.nutritionTarget.calories) : 0
                         let avgPct = (proteinPct + calPct) / 2
-                        let barColor: Color = avgPct >= 85 ? .green : avgPct >= 65 ? .yellow : .red
+                        let barColor: Color = avgPct >= 85 ? STRQPalette.success : avgPct >= 65 ? STRQPalette.warning : STRQPalette.danger
 
                         VStack(spacing: 4) {
                             RoundedRectangle(cornerRadius: 3)
@@ -1374,7 +1694,7 @@ struct ProgressAnalyticsView: View {
                 .frame(height: 50, alignment: .bottom)
             }
             .padding(16)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+            .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -1389,23 +1709,50 @@ struct ProgressAnalyticsView: View {
         if vm.totalCompletedWorkouts < 2 {
             signalRunwayCard(
                 title: L10n.tr("Volume Signals"),
-                trailing: L10n.tr("First Week"),
+                trailing: L10n.tr("Baseline Forming"),
                 icon: "chart.bar.xaxis",
-                headline: L10n.tr("Volume"),
-                detail: L10n.tr("progress.volume.runway.detail", fallback: "A few workouts reveal rhythm, mix, and workload."),
+                headline: L10n.tr("Volume pattern is forming"),
+                detail: L10n.tr("progress.volume.runway.detail", fallback: "A few workouts reveal rhythm, mix, and workload before balance becomes trustworthy."),
                 chips: [("figure.strengthtraining.traditional", L10n.tr("Workouts")), ("square.stack.3d.up.fill", L10n.tr("Volume")), ("arrow.left.arrow.right", L10n.tr("Balance"))]
             )
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
         } else {
             VStack(spacing: 14) {
-                muscleBalanceChart
                 weeklySessionsChart
-                movementBalanceCard
+                if hasTrustworthyMuscleBalance {
+                    muscleBalanceChart
+                    movementBalanceCard
+                } else {
+                    muscleBalanceBaselineCard
+                }
             }
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
         }
+    }
+
+    private var muscleBalanceBaselineCard: some View {
+        let currentVolume = vm.muscleBalance.reduce(0.0) { $0 + $1.thisWeek }
+        let averageVolume = vm.muscleBalance.reduce(0.0) { $0 + $1.average }
+        let detail: String = {
+            if vm.totalCompletedWorkouts < 4 {
+                return L10n.tr("A few more completed workouts are needed before muscle balance can be trusted.")
+            }
+            if currentVolume <= 0 || averageVolume <= 0 {
+                return L10n.tr("STRQ needs current and comparison volume before showing balance as evidence.")
+            }
+            return L10n.tr("Balance will appear once the comparison window is reliable.")
+        }()
+
+        return signalRunwayCard(
+            title: L10n.tr("Muscle Balance"),
+            trailing: L10n.tr("Baseline Forming"),
+            icon: "arrow.left.arrow.right",
+            headline: L10n.tr("Muscle balance is still forming"),
+            detail: detail,
+            chips: [("square.stack.3d.up.fill", L10n.tr("Current volume")), ("calendar", L10n.tr("4-week average")), ("checkmark.seal", L10n.tr("Trusted read"))]
+        )
     }
 
     private var muscleBalanceChart: some View {
@@ -1440,7 +1787,7 @@ struct ProgressAnalyticsView: View {
             }
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -1464,7 +1811,13 @@ struct ProgressAnalyticsView: View {
             Chart {
                 ForEach(last8Weeks, id: \.0) { week, count in
                     BarMark(x: .value("Week", week), y: .value("Workouts", appeared || reduceMotion ? count : 0))
-                        .foregroundStyle(ForgeTheme.accentGradient)
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [STRQBrand.steel, STRQBrand.slate.opacity(0.82)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
                         .clipShape(.rect(cornerRadius: 3))
                 }
             }
@@ -1481,7 +1834,7 @@ struct ProgressAnalyticsView: View {
             }
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -1497,11 +1850,11 @@ struct ProgressAnalyticsView: View {
                 movementBar(label: "Push", value: data.push, total: data.total, color: Color.white)
                 movementBar(label: "Pull", value: data.pull, total: data.total, color: STRQBrand.steel)
                 movementBar(label: "Legs", value: data.legs, total: data.total, color: STRQBrand.slate)
-                movementBar(label: L10n.tr("Core"), value: data.core, total: data.total, color: STRQBrand.accentSecondary)
+                movementBar(label: L10n.tr("Core"), value: data.core, total: data.total, color: STRQPalette.warning)
             }
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
@@ -1532,10 +1885,17 @@ struct ProgressAnalyticsView: View {
 
     // MARK: - Helpers
 
+    private var hasTrustworthyMuscleBalance: Bool {
+        let currentVolume = vm.muscleBalance.reduce(0.0) { $0 + $1.thisWeek }
+        let averageVolume = vm.muscleBalance.reduce(0.0) { $0 + $1.average }
+        return vm.totalCompletedWorkouts >= 4 && currentVolume > 0 && averageVolume > 0
+    }
+
     private func balanceColor(_ ratio: Double) -> Color {
-        if ratio >= 1.1 { return .green }
+        if ratio >= 1.1 { return STRQPalette.success }
         if ratio >= 0.85 { return STRQBrand.steel }
-        return .red
+        if ratio >= 0.65 { return STRQPalette.warning }
+        return STRQPalette.danger
     }
 
     private func balanceLabel(_ ratio: Double) -> String {

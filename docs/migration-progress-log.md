@@ -3010,6 +3010,67 @@ Pending work:
 
 - Recommended next prompt is a docs-only Progress Rork screenshot/state capture checklist before any shell-only Swift pass.
 
+## 2026-05-06 - Progress Proof Surface Recomposition
+
+Scope:
+
+- Rebuilt `ProgressAnalyticsView` as a premium proof/report surface while staying view-layer-only.
+- Reorganized the top of Progress around proof maturity, evidence signal, supporting proof metrics, an analytical section switcher, and more honest low-data presentation.
+- Preserved Progress data sources, calculations, routes, analytics, persistence, models, services, view models, localization files, assets, project files, and app flows outside Progress.
+
+Files changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Inspected Chart `9129:26029`, Progress `9129:207997`, Bonus Dashboard `5643:11291`, Activity Tracker `11611:134946`, and Dark Home / Smart Fitness Metrics `11604:62728`.
+- Adapted chart/report container anatomy, compact trend-label grammar, progress/ring maturity anatomy, metric proof-point density, activity early-state patterns, and analytical segmented-control structure.
+- Did not copy source branding, source text, health-app assumptions, assets, or orange CTA styling.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `ios/STRQ/ViewModels/AppViewModel.swift` read-only for existing maturity, strength-chart, body, recovery, workout-history, and muscle-balance gates.
+- `ios/STRQ/Utilities/ForgeTheme.swift` and `ios/STRQ/Utilities/STRQPalette.swift` read-only for existing local token behavior.
+
+Implementation:
+
+- Replaced the generic hero with a proof summary showing progress maturity, trustworthy/current context, and existing key values.
+- Reframed "What's improving" into an evidence signal with "Trust now" and "Still forming" language.
+- Rebuilt the metric strip as compact supporting proof points instead of equal-weight dashboard tiles.
+- Replaced the orange selected section treatment with a steel/navy analytical segmented selector.
+- Reworded low-data Strength, Body, and Volume states around baseline forming, first signal, building pattern, and trustworthy evidence.
+- Reordered the Volume section so Weekly Workouts remains visible while Muscle Balance waits for a trustworthy comparison baseline.
+- Added a view-only Muscle Balance confidence gate so insufficient or zero comparison volume shows a baseline-forming state instead of presenting misleading `-100%` labels as a real negative conclusion.
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- ios/STRQ/Views/ProgressAnalyticsView.swift docs/migration-progress-log.md`
+- `rg -n "Progress|Proof|Strength|Body|Volume|selected|workouts logged|What's improving|Estimated 1RM|Recovery Trend|Muscle Balance|Weekly Workouts|Recent Workouts|Consistency|Chart|baseline|signal|foregroundStyle|orange|accentGradient" ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `rg -n "Sandow" ios/STRQ/Views ios/STRQ/ContentView.swift`
+- `git diff --name-only -- ios/STRQ/ViewModels ios/STRQ/Services ios/STRQ/Models ios/STRQ/Assets.xcassets ios/STRQ/Localizable.xcstrings ios/STRQWidget ios/STRQWatch ios/STRQ.xcodeproj ios/STRQTests`
+- `git diff --check`
+
+Intentionally not changed:
+
+- No chart math, workout/session history data, bodyweight/recovery calculations, muscle-volume generation, PR generation, time-range logic, navigation/routes, analytics, persistence, models, services, view models, controllers, HealthKit, localization catalogs, assets, project files, tests, fonts, Widget, Watch, Live Activity, or other screens were changed.
+- No fake values were added.
+- No runtime source-brand references were introduced.
+
+Pending work:
+
+- Rork QA should capture 0, 2, and 3 workout Progress states plus an established state with populated charts.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
+Warnings:
+
+- Muscle Balance confidence is handled view-only in this pass. The underlying incomplete/zero muscle-volume source behavior remains intentionally deferred because fixing it would require model/controller/data-generation changes outside the allowed scope.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
