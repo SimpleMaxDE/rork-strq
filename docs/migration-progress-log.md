@@ -2868,6 +2868,42 @@ Pending work:
 - Rork QA should also inspect DEBUG Design System Lab Human Body Overlay V1 samples.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-06 - Exercise Detail Anatomy Line Preservation
+
+Scope:
+
+- Refined only the Exercise Detail Human Body anatomy rendering so highlighted muscle overlays preserve more of the underlying body and muscle line definition.
+- Kept the local `STRQHumanBodyExerciseTargetView` helper as the implementation boundary and avoided any anatomy asset, mapping, data, or production flow changes.
+
+Files changed:
+
+- `ios/STRQ/Views/ExerciseDetailView.swift`
+- `docs/migration-progress-log.md`
+
+Implementation:
+
+- Kept the neutral base body as the first image layer.
+- Reduced primary and secondary overlay alpha in the local target role helper.
+- Reused the same base body asset as a subtle top line-art pass above colored overlays, using original rendering with a local `.darken` blend treatment so dark anatomical detail can read through large highlighted regions.
+- Kept the line-art pass conditional on visible overlay layers so neutral fallback anatomy remains unchanged.
+
+Opacity tuning:
+
+- Primary overlay opacity changed from `0.94` to `0.84`.
+- Secondary overlay opacity changed from `0.46` to `0.36`.
+- The legend now reads from the same local role opacity values used by the rendered overlays.
+
+Intentionally not changed:
+
+- No muscle mapping, primary/secondary text lists, exercise data, orientation strategy, navigation, favorites, search/filter, workout add/replace/start, plan generation, workout execution, analytics, persistence, localization, or protected production flows were changed.
+- No assets, models, services, view models, revenue/store files, HealthKit, notifications, tests, Widget, Watch, Live Activity, fonts, or Xcode project files were changed.
+- No Sandow references were introduced.
+
+Pending work:
+
+- Rork QA should inspect large highlighted regions such as Back/Lats, Upper Leg/Quads, Abs, and Hamstrings to confirm they no longer read as flat solid areas while primary remains stronger than secondary.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

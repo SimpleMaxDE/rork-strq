@@ -1171,7 +1171,18 @@ private struct STRQHumanBodyExerciseTargetView: View {
                         .scaledToFit()
                         .foregroundStyle(layer.role.tint.opacity(layer.role.opacity))
                 }
+
+                if !scene.layers.isEmpty {
+                    Image(scene.canvas.baseAsset.rawValue)
+                        .renderingMode(.original)
+                        .resizable()
+                        .scaledToFit()
+                        .opacity(STRQHumanBodyExerciseTargetTone.lineArtOpacity)
+                        .blendMode(.darken)
+                        .allowsHitTesting(false)
+                }
             }
+            .compositingGroup()
             .aspectRatio(scene.canvas.aspectRatio, contentMode: .fit)
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 11)
@@ -1183,8 +1194,8 @@ private struct STRQHumanBodyExerciseTargetView: View {
             )
 
             HStack(spacing: 8) {
-                STRQHumanBodyExerciseLegendItem(title: "Primary", color: STRQHumanBodyExerciseTargetTone.primary, opacity: 1)
-                STRQHumanBodyExerciseLegendItem(title: "Secondary", color: STRQHumanBodyExerciseTargetTone.primary, opacity: 0.45)
+                STRQHumanBodyExerciseLegendItem(title: "Primary", color: STRQHumanBodyExerciseTargetTone.primary, opacity: STRQHumanBodyExerciseRole.primary.opacity)
+                STRQHumanBodyExerciseLegendItem(title: "Secondary", color: STRQHumanBodyExerciseTargetTone.primary, opacity: STRQHumanBodyExerciseRole.secondary.opacity)
             }
         }
         .accessibilityElement(children: .ignore)
@@ -1447,8 +1458,8 @@ private enum STRQHumanBodyExerciseRole {
 
     var opacity: Double {
         switch self {
-        case .primary: 0.94
-        case .secondary: 0.46
+        case .primary: 0.84
+        case .secondary: 0.36
         }
     }
 }
@@ -1492,6 +1503,7 @@ private enum STRQHumanBodyExerciseAsset: String, Hashable {
 
 private enum STRQHumanBodyExerciseTargetTone {
     static let primary = Color(red: 0.18, green: 0.66, blue: 0.76)
+    static let lineArtOpacity = 0.38
     static let canvasBackground = LinearGradient(
         colors: [
             STRQBrand.obsidian,
