@@ -1169,7 +1169,7 @@ private struct STRQHumanBodyExerciseTargetView: View {
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundStyle(layer.role.tint.opacity(layer.role.opacity))
+                        .foregroundStyle(layer.role.tint.opacity(layer.opacity))
                 }
 
                 if !scene.layers.isEmpty {
@@ -1439,6 +1439,10 @@ private struct STRQHumanBodyExerciseLayer: Identifiable {
     var id: String {
         "\(muscle.rawValue)-\(asset.rawValue)-\(role.id)"
     }
+
+    var opacity: Double {
+        asset.isLargeRegionOverlay ? role.largeRegionOpacity : role.opacity
+    }
 }
 
 private enum STRQHumanBodyExerciseRole {
@@ -1460,6 +1464,13 @@ private enum STRQHumanBodyExerciseRole {
         switch self {
         case .primary: 0.84
         case .secondary: 0.36
+        }
+    }
+
+    var largeRegionOpacity: Double {
+        switch self {
+        case .primary: 0.78
+        case .secondary: 0.32
         }
     }
 }
@@ -1499,11 +1510,24 @@ private enum STRQHumanBodyExerciseAsset: String, Hashable {
     case maleBackHamstringOverlay = "STRQHumanBodyMaleBackHamstringOverlay"
     case maleBackTrapOverlay = "STRQHumanBodyMaleBackTrapOverlay"
     case maleBackTricepOverlay = "STRQHumanBodyMaleBackTricepOverlay"
+
+    var isLargeRegionOverlay: Bool {
+        switch self {
+        case .maleFrontAbsOverlay,
+             .maleFrontUpperLegOverlay,
+             .maleBackBackOverlay,
+             .maleBackGluteOverlay,
+             .maleBackHamstringOverlay:
+            true
+        default:
+            false
+        }
+    }
 }
 
 private enum STRQHumanBodyExerciseTargetTone {
     static let primary = Color(red: 0.18, green: 0.66, blue: 0.76)
-    static let lineArtOpacity = 0.38
+    static let lineArtOpacity = 0.42
     static let canvasBackground = LinearGradient(
         colors: [
             STRQBrand.obsidian,

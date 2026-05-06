@@ -2904,6 +2904,41 @@ Pending work:
 - Rork QA should inspect large highlighted regions such as Back/Lats, Upper Leg/Quads, Abs, and Hamstrings to confirm they no longer read as flat solid areas while primary remains stronger than secondary.
 - macOS or CI build validation remains required before shipping; this pass ran on Windows.
 
+## 2026-05-06 - Exercise Detail Anatomy Large Overlay Tuning
+
+Scope:
+
+- Refined only the local Exercise Detail Human Body anatomy rendering for large highlighted regions after Rork QA found Back/Lats still slightly too flat.
+- Preserved all anatomy mapping, filtering, text lists, assets, data, layout, and production flows.
+
+Files changed:
+
+- `ios/STRQ/Views/ExerciseDetailView.swift`
+- `docs/migration-progress-log.md`
+
+Implementation:
+
+- Kept the neutral base body, colored overlay layers, and conditional top line-art pass.
+- Added a local render-only `isLargeRegionOverlay` distinction for existing large anatomy mask assets: Abs, Upper Leg, Back, Glute, and Hamstring.
+- Large-region overlays now use slightly lower local opacity than smaller overlays while preserving the existing primary-over-secondary hierarchy.
+- Increased the local top line-art preservation pass from `0.38` to `0.42` using the existing `.darken` treatment.
+
+Opacity tuning:
+
+- Small primary overlays remain `0.84`; large primary overlays use `0.78`.
+- Small secondary overlays remain `0.36`; large secondary overlays use `0.32`.
+
+Intentionally not changed:
+
+- No muscle mapping, secondary filtering rules, primary/secondary text lists, orientation strategy, exercise data, navigation, favorites, search/filter, workout add/replace/start behavior, plan generation, analytics, persistence, localization, or protected production flows were changed.
+- No assets, models, services, view models, revenue/store files, HealthKit, notifications, tests, Widget, Watch, Live Activity, fonts, or Xcode project files were changed.
+- No Sandow references were introduced.
+
+Pending work:
+
+- Rork QA should re-check Back/Lats specifically, plus Chest, Quads/Upper Leg, Glutes, Hamstrings, and Abs to confirm the large-region tuning improves definition without making target highlights too faint.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
