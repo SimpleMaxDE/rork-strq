@@ -2958,6 +2958,29 @@ Pending work:
 
 - macOS/CI build validation and continued Rork QA remain required before final release sign-off.
 
+## 2026-05-06 - Progress Analytics Signature Direction Plan
+
+Scope:
+
+- Created a docs-only Progress / Analytics direction plan defining Progress as STRQ's premium proof surface, mapping current Progress inventory, licensed Figma chart/progress/report primitives, information architecture, visual language, guardrails, phased implementation, and exactly one immediate next prompt.
+
+Files changed:
+
+- `docs/progress-analytics-signature-direction-plan.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode for Chart `9129:26029`, Progress `9129:207997`, Bonus Dashboard `5643:11291`, Activity Tracker `11611:134946`, and Dark Home / Smart Fitness Metrics `11604:62728`.
+
+Intentionally not changed:
+
+- No Swift files, assets, models, services, view models, analytics, localization, project files, tests, fonts, Widget, Watch, Live Activity, or runtime behavior.
+
+Pending work:
+
+- Recommended next prompt is a docs-only current Progress risk/state inventory before any visual shell or chart implementation pass.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
