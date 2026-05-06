@@ -1,0 +1,481 @@
+{
+  "pass": "human-body-overlay-v1-import",
+  "mode": "Licensed Source Mode",
+  "createdDate": "2026-05-06",
+  "hostPlatform": "Windows",
+  "figmaFileKey": "LBvxljax0ixoTvbvvUeWVC",
+  "figmaUsage": {
+    "usedFigma": true,
+    "readOnly": true,
+    "canvasWrites": false,
+    "nodesRead": [
+      "9192:5535"
+    ],
+    "notes": "Figma metadata was re-read for the Human Body source frame to verify V1 path groups. Missing overlays were generated from existing licensed full-body SVG source plus the verified Figma vector node IDs."
+  },
+  "runtimeStrategy": {
+    "bodyVariantForExerciseDetail": "male",
+    "frontPrimaryMuscles": [
+      "Chest",
+      "Shoulder",
+      "Bicep",
+      "Forearm",
+      "Abs",
+      "Upper Leg",
+      "Lower Leg"
+    ],
+    "backPrimaryMuscles": [
+      "Back",
+      "Trap",
+      "Tricep",
+      "Glute",
+      "Hamstring",
+      "Calf"
+    ],
+    "secondaryRule": "Secondary overlays render only when compatible with the primary muscle canvas and available in the male V1 asset set.",
+    "textFallbackRule": "The exact primary and secondary muscle text list remains visible even when an overlay is unsupported or not compatible with the chosen orientation."
+  },
+  "assets": [
+    {
+      "strqAssetName": "STRQHumanBodyMaleFrontBase",
+      "sourceFigmaNodeOrGroup": "9192:5245",
+      "figmaVectorNodeIds": [],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontBase.candidate.svg",
+      "sourcePdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleFrontBase.pdf",
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleFrontBase.imageset",
+      "bodyVariant": "male",
+      "orientation": "front",
+      "muscleGroup": null,
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Existing pilot base kept for the V1 male front canvas.",
+      "confidence": "high"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleBackBase",
+      "sourceFigmaNodeOrGroup": "9192:5428",
+      "figmaVectorNodeIds": [],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackBase.candidate.svg",
+      "sourcePdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleBackBase.pdf",
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleBackBase.imageset",
+      "bodyVariant": "male",
+      "orientation": "back",
+      "muscleGroup": null,
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Existing pilot base kept for the V1 male back canvas.",
+      "confidence": "high"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleFrontChestOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5302",
+        "9192:5303"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontChestOverlay.candidate.svg",
+      "sourcePdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleFrontChestOverlay.pdf",
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleFrontChestOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "front",
+      "muscleGroup": "Chest",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Existing pilot overlay; direct pectoral isolation.",
+      "confidence": "high"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleFrontShoulderOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5253",
+        "9192:5299"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontShoulderOverlay.candidate.svg",
+      "sourcePdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleFrontShoulderOverlay.pdf",
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleFrontShoulderOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "front",
+      "muscleGroup": "Shoulder",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Existing pilot overlay; front deltoid cap isolation.",
+      "confidence": "high"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleFrontBicepOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5249",
+        "9192:5282",
+        "9192:5300",
+        "9192:5301"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontBase.candidate.svg",
+      "sourcePdfPath": null,
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleFrontBicepOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "front",
+      "muscleGroup": "Bicep",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Derived from the male front base SVG using verified upper-arm vector paths.",
+      "confidence": "medium"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleFrontForearmOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5247",
+        "9192:5248",
+        "9192:5250",
+        "9192:5280",
+        "9192:5281",
+        "9192:5283"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontBase.candidate.svg",
+      "sourcePdfPath": null,
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleFrontForearmOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "front",
+      "muscleGroup": "Forearm",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Derived from the male front base SVG using lower-arm paths; hand paths were excluded.",
+      "confidence": "medium"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleFrontAbsOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5290",
+        "9192:5291",
+        "9192:5292",
+        "9192:5293",
+        "9192:5294",
+        "9192:5295",
+        "9192:5296",
+        "9192:5297"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontAbsOverlay.candidate.svg",
+      "sourcePdfPath": null,
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleFrontAbsOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "front",
+      "muscleGroup": "Abs",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Converted from existing pilot overlay candidate.",
+      "confidence": "high"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleFrontUpperLegOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5270",
+        "9192:5271",
+        "9192:5272",
+        "9192:5273",
+        "9192:5274",
+        "9192:5275",
+        "9192:5276",
+        "9192:5277",
+        "9192:5278",
+        "9192:5279"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontUpperLegOverlay.candidate.svg",
+      "sourcePdfPath": null,
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleFrontUpperLegOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "front",
+      "muscleGroup": "Upper Leg",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Converted from existing pilot overlay candidate; mapped to quads and upper-leg-adjacent STRQ groups for V1.",
+      "confidence": "medium"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleFrontLowerLegOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5245",
+      "figmaVectorNodeIds": [
+        "9192:5255",
+        "9192:5256",
+        "9192:5259",
+        "9192:5262",
+        "9192:5263",
+        "9192:5266"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleFrontBase.candidate.svg",
+      "sourcePdfPath": null,
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleFrontLowerLegOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "front",
+      "muscleGroup": "Lower Leg",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Derived from the male front base SVG for tibialis/lower-leg V1 mapping; feet were excluded.",
+      "confidence": "medium"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleBackBackOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5428",
+      "figmaVectorNodeIds": [
+        "9192:5445",
+        "9192:5446",
+        "9192:5452",
+        "9192:5453",
+        "9192:5454",
+        "9192:5455",
+        "9192:5456"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackBackOverlay.candidate.svg",
+      "sourcePdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyMaleBackBackOverlay.pdf",
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleBackBackOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "back",
+      "muscleGroup": "Back",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Existing pilot overlay; broad back/lats/lower-back V1 mapping.",
+      "confidence": "medium"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleBackTrapOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5428",
+      "figmaVectorNodeIds": [
+        "9192:5456"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackBase.candidate.svg",
+      "sourcePdfPath": null,
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleBackTrapOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "back",
+      "muscleGroup": "Trap",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Derived from the upper central male back path. It overlaps conceptually with the broad Back overlay and needs Rork visual QA.",
+      "confidence": "medium"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleBackTricepOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5428",
+      "figmaVectorNodeIds": [
+        "9192:5460",
+        "9192:5462",
+        "9192:5467",
+        "9192:5468",
+        "9192:5471",
+        "9192:5473",
+        "9192:5478",
+        "9192:5479"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackBase.candidate.svg",
+      "sourcePdfPath": null,
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleBackTricepOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "back",
+      "muscleGroup": "Tricep",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Derived from male back upper-arm paths.",
+      "confidence": "medium"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleBackGluteOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5428",
+      "figmaVectorNodeIds": [
+        "9192:5450",
+        "9192:5451"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackGluteOverlay.candidate.svg",
+      "sourcePdfPath": null,
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleBackGluteOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "back",
+      "muscleGroup": "Glute",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Converted from existing pilot overlay candidate to remove the previous Exercise Detail dependency on a female-back glute asset.",
+      "confidence": "high"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleBackHamstringOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5428",
+      "figmaVectorNodeIds": [
+        "9192:5437",
+        "9192:5438",
+        "9192:5439",
+        "9192:5440",
+        "9192:5441",
+        "9192:5442",
+        "9192:5443",
+        "9192:5444"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackHamstringOverlay.candidate.svg",
+      "sourcePdfPath": null,
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleBackHamstringOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "back",
+      "muscleGroup": "Hamstring",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Converted from existing pilot overlay candidate; broad posterior thigh source-backed mapping.",
+      "confidence": "medium"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyMaleBackCalfOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5428",
+      "figmaVectorNodeIds": [
+        "9192:5433",
+        "9192:5434",
+        "9192:5435",
+        "9192:5436"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyMaleBackBase.candidate.svg",
+      "sourcePdfPath": null,
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyMaleBackCalfOverlay.imageset",
+      "bodyVariant": "male",
+      "orientation": "back",
+      "muscleGroup": "Calf",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": true,
+      "notes": "Derived from male back posterior lower-leg paths; feet were excluded.",
+      "confidence": "medium"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyFemaleFrontChestOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5304",
+      "figmaVectorNodeIds": [
+        "9192:5358",
+        "9192:5359"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleFrontChestOverlay.candidate.svg",
+      "sourcePdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyFemaleFrontChestOverlay.pdf",
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyFemaleFrontChestOverlay.imageset",
+      "bodyVariant": "female",
+      "orientation": "front",
+      "muscleGroup": "Chest",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": false,
+      "notes": "Existing pilot asset retained. Exercise Detail V1 does not use female assets to avoid body-variant switching.",
+      "confidence": "high"
+    },
+    {
+      "strqAssetName": "STRQHumanBodyFemaleBackGluteOverlay",
+      "sourceFigmaNodeOrGroup": "9192:5480",
+      "figmaVectorNodeIds": [
+        "9192:5527",
+        "9192:5528"
+      ],
+      "sourceSvgPath": "docs/figma-exports/human-body-overlay-pilot/STRQHumanBodyFemaleBackGluteOverlay.candidate.svg",
+      "sourcePdfPath": "docs/figma-exports/human-body-overlay-xcode-smoke/pdf/STRQHumanBodyFemaleBackGluteOverlay.pdf",
+      "productionImagesetPath": "ios/STRQ/Assets.xcassets/STRQHumanBodyFemaleBackGluteOverlay.imageset",
+      "bodyVariant": "female",
+      "orientation": "back",
+      "muscleGroup": "Glute",
+      "runtimeFormat": "vector-pdf",
+      "imported": true,
+      "usedInExerciseDetailMapping": false,
+      "notes": "Existing pilot asset retained but removed from Exercise Detail mapping in favor of the new male-back glute overlay.",
+      "confidence": "high"
+    }
+  ],
+  "notImported": [
+    {
+      "strqAssetName": "STRQHumanBodyMaleBackShoulderOverlay",
+      "bodyVariant": "male",
+      "orientation": "back",
+      "muscleGroup": "Shoulder",
+      "runtimeFormat": "vector-pdf",
+      "imported": false,
+      "usedInExerciseDetailMapping": false,
+      "notes": "Pilot SVG candidate exists, but V1 Exercise Detail maps shoulders to front orientation only."
+    },
+    {
+      "strqAssetName": "STRQHumanBodyFemaleFrontShoulderOverlay",
+      "bodyVariant": "female",
+      "orientation": "front",
+      "muscleGroup": "Shoulder",
+      "runtimeFormat": "vector-pdf",
+      "imported": false,
+      "usedInExerciseDetailMapping": false,
+      "notes": "Female expansion deferred because Exercise Detail V1 uses a consistent male artwork variant."
+    },
+    {
+      "strqAssetName": "STRQHumanBodyFemaleFrontAbsOverlay",
+      "bodyVariant": "female",
+      "orientation": "front",
+      "muscleGroup": "Abs",
+      "runtimeFormat": "vector-pdf",
+      "imported": false,
+      "usedInExerciseDetailMapping": false,
+      "notes": "Female expansion deferred because Exercise Detail V1 uses a consistent male artwork variant."
+    },
+    {
+      "strqAssetName": "STRQHumanBodyFemaleFrontUpperLegOverlay",
+      "bodyVariant": "female",
+      "orientation": "front",
+      "muscleGroup": "Upper Leg",
+      "runtimeFormat": "vector-pdf",
+      "imported": false,
+      "usedInExerciseDetailMapping": false,
+      "notes": "Female expansion deferred because Exercise Detail V1 uses a consistent male artwork variant."
+    },
+    {
+      "strqAssetName": "STRQHumanBodyFemaleBackBackOverlay",
+      "bodyVariant": "female",
+      "orientation": "back",
+      "muscleGroup": "Back",
+      "runtimeFormat": "vector-pdf",
+      "imported": false,
+      "usedInExerciseDetailMapping": false,
+      "notes": "Female expansion deferred because Exercise Detail V1 uses a consistent male artwork variant."
+    },
+    {
+      "strqAssetName": "STRQHumanBodyFemaleBackHamstringOverlay",
+      "bodyVariant": "female",
+      "orientation": "back",
+      "muscleGroup": "Hamstring",
+      "runtimeFormat": "vector-pdf",
+      "imported": false,
+      "usedInExerciseDetailMapping": false,
+      "notes": "Female expansion deferred because Exercise Detail V1 uses a consistent male artwork variant."
+    },
+    {
+      "strqAssetName": "Hand overlays",
+      "bodyVariant": "all",
+      "orientation": "front/back",
+      "muscleGroup": "Hand",
+      "runtimeFormat": "not-imported",
+      "imported": false,
+      "usedInExerciseDetailMapping": false,
+      "notes": "Explicitly deferred by product direction."
+    },
+    {
+      "strqAssetName": "Neck overlays",
+      "bodyVariant": "all",
+      "orientation": "front/back",
+      "muscleGroup": "Neck",
+      "runtimeFormat": "not-imported",
+      "imported": false,
+      "usedInExerciseDetailMapping": false,
+      "notes": "Explicitly deferred by product direction."
+    }
+  ]
+}

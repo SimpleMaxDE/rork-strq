@@ -2791,6 +2791,47 @@ Pending work:
 - Rork QA should inspect Exercise Info with covered primary, covered primary plus covered secondary, and missing-overlay fallback exercises.
 - macOS/CI build validation remains required; this pass ran on Windows.
 
+## 2026-05-06 - Human Body Overlay Exercise Detail V1 Coverage
+
+Scope:
+
+- Expanded the Exercise Detail Human Body Overlay from the first pilot into a controlled V1 coverage pass for common primary and secondary exercise targets.
+- Imported only male front/back vector PDF overlays needed by the Exercise Detail V1 mapping, while keeping existing female pilot assets unused in Exercise Detail to avoid body-variant switching.
+- Preserved the exact primary and secondary text list as the target source of truth and removed the debug-like partial-coverage helper copy.
+
+Files changed:
+
+- `ios/STRQ/Assets.xcassets`
+- `ios/STRQ/Views/ExerciseDetailView.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `docs/figma-exports/human-body-overlay-v1-import/README.md`
+- `docs/figma-exports/human-body-overlay-v1-import/v1-import-manifest.json`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used Figma read-only in Licensed Source Mode for Human Body source `9192:5535`.
+- Missing V1 overlays were derived from existing licensed full-body SVG source and verified with Figma vector node metadata.
+
+Implementation:
+
+- Exercise Detail now uses a consistent default male anatomy variant.
+- Primary muscles choose orientation: front for chest, shoulders, biceps, forearms, abs/core, upper leg/quads, and lower leg/tibialis; back for back/lats/lower back, traps, triceps, glutes, hamstrings, and calves.
+- Secondary overlays render only when compatible with the primary muscle orientation and available in the V1 male asset set.
+- Local mapping now covers Chest, Back/Lats/Lower Back, Shoulder, Bicep, Tricep, Forearm, Abs/Core/Obliques/Rotation, Glute, Upper Leg/Quads, Hamstring, Calf, Trap, and Lower Leg/Tibialis.
+
+Intentionally not changed:
+
+- No models, services, view models, persistence, analytics, localization, workout execution, plan generation, onboarding, Coach, Progress, Profile, RevenueCat/store, HealthKit, notification scheduling, tests, Widget, Watch, Live Activity, fonts, or Xcode project files.
+- No Hand or Neck overlays were imported.
+- No SVG files were imported into the production asset catalog.
+
+Pending work:
+
+- Rork QA should inspect Exercise Detail examples for chest/shoulder, back/lats, glutes, abs/core, upper leg/quads, hamstrings, biceps/triceps, calves/lower leg, and unsupported/non-compatible secondary text fallback.
+- Rork QA should also inspect DEBUG Design System Lab Human Body Overlay V1 samples.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

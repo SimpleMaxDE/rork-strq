@@ -468,12 +468,7 @@ struct ExerciseDetailView: View {
     }
 
     private var muscleMapSection: some View {
-        let unsupportedMuscles = STRQHumanBodyExerciseTargetView.unsupportedMuscles(
-            primaryMuscle: exercise.primaryMuscle,
-            secondaryMuscles: exercise.secondaryMuscles
-        )
-
-        return VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .top, spacing: 14) {
                     STRQHumanBodyExerciseTargetView(
@@ -523,13 +518,6 @@ struct ExerciseDetailView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                     Spacer(minLength: 0)
-                }
-
-                if !unsupportedMuscles.isEmpty {
-                    Text("Exact target list stays visible when map coverage is partial.")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(.tertiary)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .padding(16)
@@ -1203,12 +1191,6 @@ private struct STRQHumanBodyExerciseTargetView: View {
         .accessibilityLabel(accessibilitySummary)
     }
 
-    static func unsupportedMuscles(primaryMuscle: MuscleGroup, secondaryMuscles: [MuscleGroup]) -> [MuscleGroup] {
-        let scene = STRQHumanBodyExerciseTargetScene(primaryMuscle: primaryMuscle, secondaryMuscles: secondaryMuscles)
-        let visible = Set(scene.layers.map(\.muscle))
-        return ([primaryMuscle] + secondaryMuscles).filter { !visible.contains($0) }
-    }
-
     private var accessibilitySummary: Text {
         let secondarySummary = secondaryMuscles.map(\.displayName).joined(separator: ", ")
         if secondarySummary.isEmpty {
@@ -1243,28 +1225,34 @@ private struct STRQHumanBodyExerciseTargetScene {
     let layers: [STRQHumanBodyExerciseLayer]
 
     init(primaryMuscle: MuscleGroup, secondaryMuscles: [MuscleGroup]) {
-        if let primaryLayer = STRQHumanBodyExerciseTargetScene.layer(for: primaryMuscle, role: .primary) {
-            canvas = primaryLayer.canvas
-            layers = STRQHumanBodyExerciseTargetScene.mergedLayers(
-                primary: primaryLayer,
-                secondary: secondaryMuscles.compactMap { muscle in
-                    STRQHumanBodyExerciseTargetScene.layer(for: muscle, role: .secondary)
-                }
-            )
-        } else {
-            canvas = STRQHumanBodyExerciseTargetScene.fallbackCanvas(for: primaryMuscle)
-            layers = []
-        }
+        let resolvedCanvas = STRQHumanBodyExerciseTargetScene.canvas(for: primaryMuscle)
+        let primaryLayers = STRQHumanBodyExerciseTargetScene.layers(
+            for: primaryMuscle,
+            role: .primary,
+            canvas: resolvedCanvas
+        )
+
+        canvas = resolvedCanvas
+        layers = primaryLayers.isEmpty ? [] : STRQHumanBodyExerciseTargetScene.mergedLayers(
+            primary: primaryLayers,
+            secondary: secondaryMuscles.flatMap { muscle in
+                STRQHumanBodyExerciseTargetScene.layers(
+                    for: muscle,
+                    role: .secondary,
+                    canvas: resolvedCanvas
+                )
+            }
+        )
     }
 
     private static func mergedLayers(
-        primary: STRQHumanBodyExerciseLayer,
+        primary: [STRQHumanBodyExerciseLayer],
         secondary: [STRQHumanBodyExerciseLayer]
     ) -> [STRQHumanBodyExerciseLayer] {
-        var seenAssets: Set<STRQHumanBodyExerciseAsset> = [primary.asset]
-        var output = [primary]
+        var seenAssets: Set<STRQHumanBodyExerciseAsset> = []
+        var output: [STRQHumanBodyExerciseLayer] = []
 
-        for layer in secondary where layer.canvas == primary.canvas && !seenAssets.contains(layer.asset) {
+        for layer in primary + secondary where !seenAssets.contains(layer.asset) {
             seenAssets.insert(layer.asset)
             output.append(layer)
         }
@@ -1272,44 +1260,76 @@ private struct STRQHumanBodyExerciseTargetScene {
         return output
     }
 
-    private static func layer(for muscle: MuscleGroup, role: STRQHumanBodyExerciseRole) -> STRQHumanBodyExerciseLayer? {
+    private static func layers(
+        for muscle: MuscleGroup,
+        role: STRQHumanBodyExerciseRole,
+        canvas: STRQHumanBodyExerciseCanvas
+    ) -> [STRQHumanBodyExerciseLayer] {
         switch muscle {
         case .chest:
-            return STRQHumanBodyExerciseLayer(
-                muscle: muscle,
-                canvas: .maleFront,
-                asset: .maleFrontChestOverlay,
-                role: role
-            )
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleFront, asset: .maleFrontChestOverlay, role: role)
         case .shoulders:
-            return STRQHumanBodyExerciseLayer(
-                muscle: muscle,
-                canvas: .maleFront,
-                asset: .maleFrontShoulderOverlay,
-                role: role
-            )
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleFront, asset: .maleFrontShoulderOverlay, role: role)
+        case .biceps:
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleFront, asset: .maleFrontBicepOverlay, role: role)
+        case .forearms:
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleFront, asset: .maleFrontForearmOverlay, role: role)
+        case .arms:
+            switch canvas {
+            case .maleFront:
+                return [
+                    STRQHumanBodyExerciseLayer(muscle: muscle, canvas: canvas, asset: .maleFrontBicepOverlay, role: role),
+                    STRQHumanBodyExerciseLayer(muscle: muscle, canvas: canvas, asset: .maleFrontForearmOverlay, role: role)
+                ]
+            case .maleBack:
+                return [
+                    STRQHumanBodyExerciseLayer(muscle: muscle, canvas: canvas, asset: .maleBackTricepOverlay, role: role)
+                ]
+            }
+        case .abs, .obliques, .coreStability, .rotationAntiRotation:
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleFront, asset: .maleFrontAbsOverlay, role: role)
+        case .quads, .adductors, .abductors, .hipFlexors:
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleFront, asset: .maleFrontUpperLegOverlay, role: role)
+        case .tibialis:
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleFront, asset: .maleFrontLowerLegOverlay, role: role)
         case .back, .lats, .lowerBack:
-            return STRQHumanBodyExerciseLayer(
-                muscle: muscle,
-                canvas: .maleBack,
-                asset: .maleBackBackOverlay,
-                role: role
-            )
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleBack, asset: .maleBackBackOverlay, role: role)
+        case .traps:
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleBack, asset: .maleBackTrapOverlay, role: role)
+        case .triceps:
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleBack, asset: .maleBackTricepOverlay, role: role)
         case .glutes:
-            return STRQHumanBodyExerciseLayer(
-                muscle: muscle,
-                canvas: .femaleBack,
-                asset: .femaleBackGluteOverlay,
-                role: role
-            )
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleBack, asset: .maleBackGluteOverlay, role: role)
+        case .hamstrings:
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleBack, asset: .maleBackHamstringOverlay, role: role)
+        case .calves:
+            return layer(muscle: muscle, canvas: canvas, targetCanvas: .maleBack, asset: .maleBackCalfOverlay, role: role)
         default:
-            return nil
+            return []
         }
     }
 
-    private static func fallbackCanvas(for muscle: MuscleGroup) -> STRQHumanBodyExerciseCanvas {
+    private static func layer(
+        muscle: MuscleGroup,
+        canvas: STRQHumanBodyExerciseCanvas,
+        targetCanvas: STRQHumanBodyExerciseCanvas,
+        asset: STRQHumanBodyExerciseAsset,
+        role: STRQHumanBodyExerciseRole
+    ) -> [STRQHumanBodyExerciseLayer] {
+        guard canvas == targetCanvas else { return [] }
+        return [
+            STRQHumanBodyExerciseLayer(
+                muscle: muscle,
+                canvas: canvas,
+                asset: asset,
+                role: role
+            )
+        ]
+    }
+
+    private static func canvas(for muscle: MuscleGroup) -> STRQHumanBodyExerciseCanvas {
         switch muscle {
-        case .back, .lats, .lowerBack, .traps, .triceps, .glutes, .hamstrings, .calves, .neck:
+        case .back, .lats, .lowerBack, .traps, .triceps, .glutes, .hamstrings, .calves:
             return .maleBack
         default:
             return .maleFront
@@ -1354,32 +1374,38 @@ private enum STRQHumanBodyExerciseRole {
 private enum STRQHumanBodyExerciseCanvas {
     case maleFront
     case maleBack
-    case femaleBack
 
     var baseAsset: STRQHumanBodyExerciseAsset {
         switch self {
         case .maleFront: .maleFrontBase
         case .maleBack: .maleBackBase
-        case .femaleBack: .femaleBackBase
         }
     }
 
     var aspectRatio: CGFloat {
         switch self {
-        case .maleFront, .maleBack: 0.54
-        case .femaleBack: 0.48
+        case .maleFront: 272.609 / 496.989
+        case .maleBack: 286.668 / 497
         }
     }
 }
 
 private enum STRQHumanBodyExerciseAsset: String, Hashable {
     case maleFrontBase = "STRQHumanBodyMaleFrontBase"
-    case maleFrontChestOverlay = "STRQHumanBodyMaleFrontChestOverlay"
-    case maleFrontShoulderOverlay = "STRQHumanBodyMaleFrontShoulderOverlay"
     case maleBackBase = "STRQHumanBodyMaleBackBase"
+    case maleFrontAbsOverlay = "STRQHumanBodyMaleFrontAbsOverlay"
+    case maleFrontBicepOverlay = "STRQHumanBodyMaleFrontBicepOverlay"
+    case maleFrontChestOverlay = "STRQHumanBodyMaleFrontChestOverlay"
+    case maleFrontForearmOverlay = "STRQHumanBodyMaleFrontForearmOverlay"
+    case maleFrontLowerLegOverlay = "STRQHumanBodyMaleFrontLowerLegOverlay"
+    case maleFrontShoulderOverlay = "STRQHumanBodyMaleFrontShoulderOverlay"
+    case maleFrontUpperLegOverlay = "STRQHumanBodyMaleFrontUpperLegOverlay"
     case maleBackBackOverlay = "STRQHumanBodyMaleBackBackOverlay"
-    case femaleBackBase = "STRQHumanBodyFemaleBackBase"
-    case femaleBackGluteOverlay = "STRQHumanBodyFemaleBackGluteOverlay"
+    case maleBackCalfOverlay = "STRQHumanBodyMaleBackCalfOverlay"
+    case maleBackGluteOverlay = "STRQHumanBodyMaleBackGluteOverlay"
+    case maleBackHamstringOverlay = "STRQHumanBodyMaleBackHamstringOverlay"
+    case maleBackTrapOverlay = "STRQHumanBodyMaleBackTrapOverlay"
+    case maleBackTricepOverlay = "STRQHumanBodyMaleBackTricepOverlay"
 }
 
 private enum STRQHumanBodyExerciseTargetTone {

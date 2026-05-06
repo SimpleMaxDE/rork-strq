@@ -711,6 +711,32 @@ private struct HumanBodyOverlayPilotSection: View {
             aspectRatio: 272.609 / 496.989
         ),
         .init(
+            title: "Male Front + Abs + Upper Leg",
+            base: .maleFrontBase,
+            overlays: [
+                .init(asset: .maleFrontAbsOverlay, tint: HumanBodyPilotTone.selectedTeal),
+                .init(asset: .maleFrontUpperLegOverlay, tint: HumanBodyPilotTone.secondaryTeal, opacity: 0.72)
+            ],
+            aspectRatio: 272.609 / 496.989
+        ),
+        .init(
+            title: "Male Front + Bicep + Forearm",
+            base: .maleFrontBase,
+            overlays: [
+                .init(asset: .maleFrontBicepOverlay, tint: HumanBodyPilotTone.selectedTeal),
+                .init(asset: .maleFrontForearmOverlay, tint: HumanBodyPilotTone.secondaryTeal, opacity: 0.72)
+            ],
+            aspectRatio: 272.609 / 496.989
+        ),
+        .init(
+            title: "Male Front + Lower Leg",
+            base: .maleFrontBase,
+            overlays: [
+                .init(asset: .maleFrontLowerLegOverlay, tint: HumanBodyPilotTone.selectedTeal)
+            ],
+            aspectRatio: 272.609 / 496.989
+        ),
+        .init(
             title: "Male Back + Back",
             base: .maleBackBase,
             overlays: [
@@ -719,20 +745,31 @@ private struct HumanBodyOverlayPilotSection: View {
             aspectRatio: 286.668 / 497
         ),
         .init(
-            title: "Female Front + Chest",
-            base: .femaleFrontBase,
+            title: "Male Back + Back + Trap",
+            base: .maleBackBase,
             overlays: [
-                .init(asset: .femaleFrontChestOverlay, tint: HumanBodyPilotTone.selectedTeal)
+                .init(asset: .maleBackBackOverlay, tint: HumanBodyPilotTone.selectedTeal),
+                .init(asset: .maleBackTrapOverlay, tint: HumanBodyPilotTone.secondaryTeal, opacity: 0.72)
             ],
-            aspectRatio: 233.641 / 497.381
+            aspectRatio: 286.668 / 497
         ),
         .init(
-            title: "Female Back + Glute",
-            base: .femaleBackBase,
+            title: "Male Back + Glute + Hamstring",
+            base: .maleBackBase,
             overlays: [
-                .init(asset: .femaleBackGluteOverlay, tint: HumanBodyPilotTone.selectedTeal)
+                .init(asset: .maleBackGluteOverlay, tint: HumanBodyPilotTone.selectedTeal),
+                .init(asset: .maleBackHamstringOverlay, tint: HumanBodyPilotTone.secondaryTeal, opacity: 0.72)
             ],
-            aspectRatio: 238.679 / 497.399
+            aspectRatio: 286.668 / 497
+        ),
+        .init(
+            title: "Male Back + Tricep + Calf",
+            base: .maleBackBase,
+            overlays: [
+                .init(asset: .maleBackTricepOverlay, tint: HumanBodyPilotTone.selectedTeal),
+                .init(asset: .maleBackCalfOverlay, tint: HumanBodyPilotTone.secondaryTeal, opacity: 0.72)
+            ],
+            aspectRatio: 286.668 / 497
         )
     ]
 
@@ -741,7 +778,7 @@ private struct HumanBodyOverlayPilotSection: View {
     ]
 
     var body: some View {
-        PreviewSection("Human Body Overlay Pilot") {
+        PreviewSection("Human Body Overlay V1") {
             VStack(alignment: .leading, spacing: STRQSpacing.md) {
                 LazyVGrid(columns: columns, alignment: .leading, spacing: STRQSpacing.sm) {
                     ForEach(samples, id: \.title) { sample in
@@ -786,10 +823,9 @@ private struct HumanBodyPilotTile: View {
 
 private struct HumanBodySemanticStateRow: View {
     private let states: [HumanBodyPilotState] = [
-        .init(title: "Selected teal", tint: HumanBodyPilotTone.selectedTeal, opacity: 1),
+        .init(title: "Primary teal", tint: HumanBodyPilotTone.selectedTeal, opacity: 1),
         .init(title: "Secondary teal", tint: HumanBodyPilotTone.selectedTeal, opacity: 0.42),
-        .init(title: "Warning amber", tint: STRQColors.warningAmber, opacity: 0.92),
-        .init(title: "Danger pink", tint: STRQColors.dangerRed, opacity: 0.92)
+        .init(title: "Warning amber", tint: STRQColors.warningAmber, opacity: 0.92)
     ]
 
     var body: some View {
@@ -916,10 +952,20 @@ private struct HumanBodyPilotState {
 
 private enum HumanBodyPilotAsset: String {
     case maleFrontBase = "STRQHumanBodyMaleFrontBase"
+    case maleFrontAbsOverlay = "STRQHumanBodyMaleFrontAbsOverlay"
+    case maleFrontBicepOverlay = "STRQHumanBodyMaleFrontBicepOverlay"
     case maleFrontChestOverlay = "STRQHumanBodyMaleFrontChestOverlay"
+    case maleFrontForearmOverlay = "STRQHumanBodyMaleFrontForearmOverlay"
+    case maleFrontLowerLegOverlay = "STRQHumanBodyMaleFrontLowerLegOverlay"
     case maleFrontShoulderOverlay = "STRQHumanBodyMaleFrontShoulderOverlay"
+    case maleFrontUpperLegOverlay = "STRQHumanBodyMaleFrontUpperLegOverlay"
     case maleBackBase = "STRQHumanBodyMaleBackBase"
     case maleBackBackOverlay = "STRQHumanBodyMaleBackBackOverlay"
+    case maleBackCalfOverlay = "STRQHumanBodyMaleBackCalfOverlay"
+    case maleBackGluteOverlay = "STRQHumanBodyMaleBackGluteOverlay"
+    case maleBackHamstringOverlay = "STRQHumanBodyMaleBackHamstringOverlay"
+    case maleBackTrapOverlay = "STRQHumanBodyMaleBackTrapOverlay"
+    case maleBackTricepOverlay = "STRQHumanBodyMaleBackTricepOverlay"
     case femaleFrontBase = "STRQHumanBodyFemaleFrontBase"
     case femaleFrontChestOverlay = "STRQHumanBodyFemaleFrontChestOverlay"
     case femaleBackBase = "STRQHumanBodyFemaleBackBase"
