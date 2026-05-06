@@ -473,7 +473,7 @@ struct ExerciseDetailView: View {
             secondaryMuscles: exercise.secondaryMuscles
         )
 
-        VStack(alignment: .leading, spacing: 0) {
+        return VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .top, spacing: 14) {
                     STRQHumanBodyExerciseTargetView(
