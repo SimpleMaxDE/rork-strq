@@ -1392,20 +1392,29 @@ private enum ProgressV2EvidenceKind {
 }
 
 private enum ProgressV2Palette {
-    static let background = Color(strqHex: 0x050608)
-    static let surface = Color(strqHex: 0x111317)
-    static let surfaceSecondary = Color(strqHex: 0x171A20)
-    static let control = Color(strqHex: 0x181B21)
-    static let controlSelected = Color(strqHex: 0x252A32)
-    static let heroTop = Color(strqHex: 0x171B21)
-    static let heroBottom = Color(strqHex: 0x080A0E)
-    static let plot = Color(strqHex: 0x0B0E13)
-    static let track = Color(strqHex: 0x313742)
+    static let background = hex(0x050608)
+    static let surface = hex(0x111317)
+    static let surfaceSecondary = hex(0x171A20)
+    static let control = hex(0x181B21)
+    static let controlSelected = hex(0x252A32)
+    static let heroTop = hex(0x171B21)
+    static let heroBottom = hex(0x080A0E)
+    static let plot = hex(0x0B0E13)
+    static let track = hex(0x313742)
     static let border = Color.white.opacity(0.08)
     static let borderStrong = Color.white.opacity(0.14)
-    static let steel = Color(strqHex: 0xAAB7C7)
-    static let accent = Color(strqHex: 0x21D4C8)
+    static let steel = hex(0xAAB7C7)
+    static let accent = hex(0x21D4C8)
     static let amber = STRQColors.warningAmber
+
+    private static func hex(_ value: UInt, opacity: Double = 1) -> Color {
+        Color(
+            red: Double((value >> 16) & 0xFF) / 255,
+            green: Double((value >> 8) & 0xFF) / 255,
+            blue: Double(value & 0xFF) / 255,
+            opacity: opacity
+        )
+    }
 }
 
 private struct ProgressV2PrototypeView_Previews: PreviewProvider {
