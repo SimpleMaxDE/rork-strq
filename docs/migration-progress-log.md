@@ -3071,6 +3071,69 @@ Warnings:
 
 - Muscle Balance confidence is handled view-only in this pass. The underlying incomplete/zero muscle-volume source behavior remains intentionally deferred because fixing it would require model/controller/data-generation changes outside the allowed scope.
 
+## 2026-05-06 - Progress Chart & Section Content Recomposition
+
+Scope:
+
+- Reworked the lower `ProgressAnalyticsView` modules so charts, recent workout proof, consistency, recovery/body context, weekly rhythm, and balance states read as calm evidence modules instead of generic dashboard cards.
+- Kept the prior Proof Summary/top-area direction intact except for local cohesion through shared evidence-module anatomy.
+- Preserved calculations, data sources, selected section state, navigation/routes, analytics, persistence, model/service behavior, localization files, assets, project files, tests, and app flows outside Progress.
+
+Files changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Inspected Chart `9129:26029` and adapted chart base layout, line chart shell, bar chart shell, plot surface, trend label, and legend anatomy.
+- Inspected Progress `9129:207997` and adapted progress/bar confidence structure for baseline-forming modules.
+- Inspected Bonus Dashboard `5643:11291` descendants `11527:73138` and `11527:73069` for dark report-card anatomy, compact metric proof cards, chart headers, badges, and mini bar rhythm.
+- Inspected Activity Tracker `11611:134946` descendants `11611:135087` and `11611:135104` for low-data panel structure and activity/consistency grid anatomy.
+- Inspected Dark Home / Smart Fitness Metrics `11604:62728` descendants `11604:62757` and `11604:62839` for metric card density, context rows, and progress-bar report modules.
+- Did not copy source branding, source text, raw dashboard layouts, health-app assumptions, assets, or orange/pro/violet styling.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift` fully.
+- `ios/STRQ/ViewModels/AppViewModel.swift` read-only for existing strength, body, recovery, workout-history, weekly-session, muscle-balance, and low-data gates.
+- `ios/STRQ/Utilities/STRQPalette.swift` and `ios/STRQ/Utilities/ForgeTheme.swift` read-only for existing color and formatting behavior.
+
+Implementation:
+
+- Added local evidence/report shell helpers inside `ProgressAnalyticsView` for module containers, evidence headers, badges, chips, and plot shells.
+- Rebuilt Estimated 1RM low-data and populated chart presentation around baseline-forming proof while keeping the same strength data and line chart calculations.
+- Rebuilt Recent Workouts as dated training-evidence rows while preserving the completed-session source and `SessionHistoryView` route.
+- Rebuilt 28-Day Consistency as a premium proof grid with neutral open days and no invented streak or negative framing.
+- Rebuilt Body Baseline, Goal Pace, Body Weight, Recovery Trend, and Nutrition shells as context/report modules while preserving displayed values and calculations.
+- Rebuilt Weekly Workouts, Muscle Balance, Muscle Balance baseline, and Movement Balance shells around rhythm proof and trustworthy-balance language while preserving the existing view-only confidence gate and all volume data generation.
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- ios/STRQ/Views/ProgressAnalyticsView.swift docs/migration-progress-log.md`
+- `rg -n "Estimated 1RM|Recent Workouts|28-Day Consistency|Recovery Trend|Body Baseline|Volume Signals|Weekly Workouts|Muscle Balance|Movement Balance|baseline|proof|signal|Chart|selected|SessionHistory|foregroundStyle|orange|accentGradient" ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `rg -n "Sandow" ios/STRQ/Views ios/STRQ/ContentView.swift`
+- `git diff --name-only -- ios/STRQ/ViewModels ios/STRQ/Services ios/STRQ/Models ios/STRQ/Assets.xcassets ios/STRQ/Localizable.xcstrings ios/STRQWidget ios/STRQWatch ios/STRQ.xcodeproj ios/STRQTests`
+- `git diff --check`
+
+Intentionally not changed:
+
+- No chart calculations, workout/session history data, workout count logic, bodyweight/recovery calculations, muscle-volume generation, PR generation, time-range logic, navigation/routes/actions, analytics, persistence, models, services, view models, controllers, HealthKit behavior, localization catalogs, assets, project files, tests, fonts, Widget, Watch, Live Activity, or other screens were changed.
+- No fake values were added.
+- No runtime source-brand references were introduced.
+
+Pending work:
+
+- Rork QA should verify low-data, partial-data, and fully populated Progress states, especially Estimated 1RM baseline, Recovery Trend, Weekly Workouts, and Muscle Balance trust states.
+- macOS or CI build validation remains required before shipping; this pass ran on Windows.
+
+Warnings:
+
+- Any deeper improvement to muscle-volume source fidelity, recovery interpretation, or body-baseline trust rules remains deferred because it would require model/service/calculation changes outside the allowed scope.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

@@ -943,96 +943,116 @@ struct ProgressAnalyticsView: View {
     }
 
     private var strengthBaselineCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: L10n.tr("Estimated 1RM"), trailing: L10n.tr("Baseline Forming"))
+        let anchorWeeks = vm.strengthProgress.count
+        let detail = vm.totalCompletedWorkouts == 0
+            ? L10n.tr("Your first completed workout starts the strength record. STRQ waits for repeated lift evidence before drawing a trend.")
+            : L10n.tr("Logged sets are real proof. The 1RM chart appears once anchor lifts repeat enough to be readable.")
 
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 10) {
-                    Image(systemName: "chart.line.uptrend.xyaxis")
-                        .font(.title3)
-                        .foregroundStyle(STRQBrand.steel)
-                        .frame(width: 40, height: 40)
-                        .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 10))
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(L10n.tr("Strength baseline is forming"))
-                            .font(.subheadline.weight(.semibold))
-                        Text(vm.totalCompletedWorkouts == 0
-                             ? L10n.tr("Your main lifts create the first real strength read.")
-                             : L10n.tr("Keep logging anchor lifts before treating the trend as a conclusion."))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
+        return evidenceModule(border: STRQPalette.warning.opacity(0.18)) {
+            VStack(alignment: .leading, spacing: 14) {
+                evidenceHeader(
+                    title: L10n.tr("Estimated 1RM"),
+                    trailing: L10n.tr("Baseline Forming"),
+                    icon: "chart.line.uptrend.xyaxis",
+                    state: .warning,
+                    subtitle: L10n.tr("Key lifts are becoming readable")
+                )
+
+                ZStack {
+                    VStack(spacing: 0) {
+                        ForEach(0..<4, id: \.self) { _ in
+                            Rectangle()
+                                .fill(Color.white.opacity(0.045))
+                                .frame(height: 1)
+                            Spacer(minLength: 0)
+                        }
                     }
-                    Spacer(minLength: 0)
+                    HStack(alignment: .bottom, spacing: 10) {
+                        ForEach(0..<6, id: \.self) { index in
+                            RoundedRectangle(cornerRadius: 4)
+                                .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                                .foregroundStyle(Color.white.opacity(index < anchorWeeks ? 0.18 : 0.08))
+                                .frame(height: CGFloat(34 + (index % 3) * 14))
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .padding(.top, 14)
+                }
+                .frame(height: 92)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 12)
+                .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+                )
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(L10n.tr("Strength baseline is forming"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.9))
+                    Text(detail)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.58))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 HStack(spacing: 6) {
                     ForEach([L10n.tr("Bench"), L10n.tr("Squat"), L10n.tr("Deadlift")], id: \.self) { lift in
-                        HStack(spacing: 4) {
-                            Image(systemName: "circle.dashed")
-                                .font(.system(size: 9))
-                            Text(lift)
-                                .font(.caption2.weight(.semibold))
-                        }
-                        .foregroundStyle(.tertiary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.white.opacity(0.04), in: Capsule())
+                        evidenceChip(icon: "circle.dashed", text: lift, state: .neutral)
                     }
                 }
             }
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-        )
     }
 
     private var strengthChart: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: L10n.tr("Estimated 1RM"), trailing: L10n.tr("8 Weeks"))
+        let entries = vm.strengthProgress
 
-            Chart {
-                ForEach(vm.strengthProgress) { entry in
-                    LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.bench), series: .value("Lift", "Bench"))
-                        .foregroundStyle(Color.white).interpolationMethod(.catmullRom).symbol(.circle)
-                    LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.squat), series: .value("Lift", "Squat"))
-                        .foregroundStyle(STRQBrand.steel).interpolationMethod(.catmullRom).symbol(.square)
-                    LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.deadlift), series: .value("Lift", "Deadlift"))
-                        .foregroundStyle(STRQBrand.slate).interpolationMethod(.catmullRom).symbol(.triangle)
-                }
-            }
-            .frame(height: 170)
-            .chartYScale(domain: .automatic(includesZero: false))
-            .chartYAxis {
-                AxisMarks(position: .leading) { _ in
-                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3)).foregroundStyle(Color(.separator).opacity(0.3))
-                    AxisValueLabel().foregroundStyle(Color.secondary)
-                }
-            }
-            .chartXAxis {
-                AxisMarks(values: .stride(by: .weekOfYear, count: 2)) { _ in
-                    AxisValueLabel(format: .dateTime.month(.abbreviated).day()).foregroundStyle(Color.secondary)
-                }
-            }
-            .chartForegroundStyleScale(["Bench": Color.white, "Squat": STRQBrand.steel, "Deadlift": STRQBrand.slate])
+        return evidenceModule {
+            VStack(alignment: .leading, spacing: 14) {
+                evidenceHeader(
+                    title: L10n.tr("Estimated 1RM"),
+                    trailing: L10n.tr("8 Weeks"),
+                    icon: "chart.line.uptrend.xyaxis",
+                    state: .info,
+                    subtitle: L10n.tr("Strength proof from logged sets")
+                )
 
-            HStack(spacing: 16) {
-                legendDot(color: .white, label: L10n.tr("Bench"))
-                legendDot(color: STRQBrand.steel, label: L10n.tr("Squat"))
-                legendDot(color: STRQBrand.slate, label: L10n.tr("Deadlift"))
+                plotShell(height: 178) {
+                    Chart {
+                        ForEach(entries) { entry in
+                            LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.bench), series: .value("Lift", "Bench"))
+                                .foregroundStyle(Color.white).interpolationMethod(.catmullRom).symbol(.circle)
+                            LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.squat), series: .value("Lift", "Squat"))
+                                .foregroundStyle(STRQBrand.steel).interpolationMethod(.catmullRom).symbol(.square)
+                            LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.deadlift), series: .value("Lift", "Deadlift"))
+                                .foregroundStyle(STRQBrand.slate).interpolationMethod(.catmullRom).symbol(.triangle)
+                        }
+                    }
+                    .chartYScale(domain: .automatic(includesZero: false))
+                    .chartYAxis {
+                        AxisMarks(position: .leading) { _ in
+                            AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3)).foregroundStyle(Color.white.opacity(0.12))
+                            AxisValueLabel().foregroundStyle(Color.secondary)
+                        }
+                    }
+                    .chartXAxis {
+                        AxisMarks(values: .stride(by: .weekOfYear, count: 2)) { _ in
+                            AxisValueLabel(format: .dateTime.month(.abbreviated).day()).foregroundStyle(Color.secondary)
+                        }
+                    }
+                    .chartForegroundStyleScale(["Bench": Color.white, "Squat": STRQBrand.steel, "Deadlift": STRQBrand.slate])
+                }
+
+                HStack(spacing: 16) {
+                    legendDot(color: .white, label: L10n.tr("Bench"))
+                    legendDot(color: STRQBrand.steel, label: L10n.tr("Squat"))
+                    legendDot(color: STRQBrand.slate, label: L10n.tr("Deadlift"))
+                }
+                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
         }
-        .padding(16)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-        )
     }
 
     private func legendDot(color: Color, label: String) -> some View {
@@ -1040,6 +1060,116 @@ struct ProgressAnalyticsView: View {
             Circle().fill(color).frame(width: 6, height: 6)
             Text(label).font(.caption.weight(.medium)).foregroundStyle(.secondary)
         }
+    }
+
+    private func evidenceModule<Content: View>(
+        cornerRadius: CGFloat = 18,
+        border: Color = STRQBrand.cardBorder,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        content()
+            .padding(16)
+            .background(
+                LinearGradient(
+                    colors: [Color(white: 0.108), Color(white: 0.066)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: .rect(cornerRadius: cornerRadius)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .strokeBorder(border, lineWidth: 1)
+            )
+            .overlay(alignment: .top) {
+                border.opacity(0.62)
+                    .frame(height: 1)
+                    .clipShape(.rect(cornerRadii: .init(topLeading: cornerRadius, bottomLeading: 0, bottomTrailing: 0, topTrailing: cornerRadius)))
+            }
+            .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
+    }
+
+    private func evidenceHeader(
+        title: String,
+        trailing: String? = nil,
+        icon: String,
+        state: STRQPalette.State = .info,
+        subtitle: String? = nil
+    ) -> some View {
+        let tint = STRQPalette.color(for: state)
+
+        return HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 30, height: 30)
+                .background(tint.opacity(0.12), in: .rect(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(0.8)
+                    .foregroundStyle(.white.opacity(0.52))
+                    .textCase(.uppercase)
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.78))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            Spacer(minLength: 0)
+
+            if let trailing {
+                evidenceBadge(trailing, state: state)
+            }
+        }
+    }
+
+    private func evidenceBadge(_ text: String, state: STRQPalette.State = .info) -> some View {
+        let tint = STRQPalette.color(for: state)
+
+        return Text(text)
+            .font(.system(size: 10, weight: .bold, design: .rounded).monospacedDigit())
+            .foregroundStyle(tint)
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(tint.opacity(0.12), in: Capsule())
+    }
+
+    private func evidenceChip(icon: String, text: String, state: STRQPalette.State = .neutral) -> some View {
+        let tint = STRQPalette.color(for: state)
+
+        return HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .semibold))
+            Text(text)
+                .font(.caption2.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .foregroundStyle(tint)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .background(STRQPalette.soft(for: state), in: Capsule())
+    }
+
+    private func plotShell<Content: View>(
+        height: CGFloat,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        content()
+            .frame(height: height)
+            .padding(.horizontal, 4)
+            .padding(.vertical, 10)
+            .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+            )
     }
 
     private var prHighlights: some View {
@@ -1246,57 +1376,88 @@ struct ProgressAnalyticsView: View {
     // MARK: - Recent Sessions
 
     private var recentSessionsCard: some View {
-        let recent = vm.workoutHistory
+        let recent = Array(vm.workoutHistory
             .filter(\.isCompleted)
             .sorted { $0.startTime > $1.startTime }
-            .prefix(3)
+            .prefix(3))
 
-        return VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                ForgeSectionHeader(title: L10n.tr("Recent Workouts"))
-                Spacer()
-                if !recent.isEmpty {
-                    NavigationLink(value: ProgressRoute.history) {
-                        HStack(spacing: 3) {
-                            Text(L10n.tr("All"))
-                                .font(.caption.weight(.semibold))
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 9, weight: .bold))
-                        }
+        return evidenceModule {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "list.bullet.rectangle.portrait.fill")
+                        .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(STRQBrand.steel)
+                        .frame(width: 30, height: 30)
+                        .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 8))
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(L10n.tr("Recent Workouts"))
+                            .font(.system(size: 10, weight: .black))
+                            .tracking(0.8)
+                            .foregroundStyle(.white.opacity(0.52))
+                            .textCase(.uppercase)
+                        Text(recent.isEmpty ? L10n.tr("Training evidence starts here") : L10n.tr("Latest completed training proof"))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.78))
+                    }
+
+                    Spacer(minLength: 0)
+
+                    if !recent.isEmpty {
+                        NavigationLink(value: ProgressRoute.history) {
+                            HStack(spacing: 4) {
+                                Text(L10n.tr("All"))
+                                    .font(.caption.weight(.semibold))
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 9, weight: .bold))
+                            }
+                            .foregroundStyle(STRQBrand.steel)
+                            .padding(.horizontal, 9)
+                            .padding(.vertical, 5)
+                            .background(STRQBrand.steel.opacity(0.11), in: Capsule())
+                        }
                     }
                 }
-            }
 
-            if recent.isEmpty {
-                HStack(spacing: 10) {
-                    Image(systemName: "figure.strengthtraining.traditional")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(L10n.tr("Each finished workout becomes a clean training record here."))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(.vertical, 4)
-            } else {
-                VStack(spacing: 0) {
-                    ForEach(Array(recent.enumerated()), id: \.element.id) { index, session in
-                        sessionLogRow(session)
-                        if index < recent.count - 1 {
-                            Rectangle().fill(Color.white.opacity(0.04)).frame(height: 0.5)
-                                .padding(.leading, 42)
+                if recent.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 10) {
+                            Image(systemName: "figure.strengthtraining.traditional")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(STRQBrand.steel)
+                                .frame(width: 34, height: 34)
+                                .background(STRQBrand.steel.opacity(0.1), in: Circle())
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(L10n.tr("No finished sessions yet"))
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(.white.opacity(0.9))
+                                Text(L10n.tr("Each completed workout becomes a dated proof record with duration, sets, and volume."))
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(.white.opacity(0.58))
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        HStack(spacing: 6) {
+                            evidenceChip(icon: "clock", text: L10n.tr("Duration"), state: .neutral)
+                            evidenceChip(icon: "checkmark.circle", text: L10n.tr("Sets"), state: .neutral)
+                            evidenceChip(icon: "square.stack.3d.up.fill", text: L10n.tr("Volume"), state: .neutral)
+                        }
+                    }
+                    .padding(12)
+                    .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+                    )
+                } else {
+                    VStack(spacing: 8) {
+                        ForEach(Array(recent.enumerated()), id: \.element.id) { index, session in
+                            sessionLogRow(session, isLatest: index == 0)
                         }
                     }
                 }
             }
         }
-        .padding(16)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-        )
         .navigationDestination(for: ProgressRoute.self) { route in
             switch route {
             case .history: SessionHistoryView(vm: vm)
@@ -1304,42 +1465,68 @@ struct ProgressAnalyticsView: View {
         }
     }
 
-    private func sessionLogRow(_ session: WorkoutSession) -> some View {
+    private func sessionLogRow(_ session: WorkoutSession, isLatest: Bool = false) -> some View {
         let duration = session.endTime.map { Int($0.timeIntervalSince(session.startTime) / 60) } ?? 0
         let sets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
-        return HStack(spacing: 12) {
-            VStack(spacing: 1) {
-                Text(session.startTime.formatted(.dateTime.day()))
-                    .font(.system(size: 14, weight: .heavy, design: .rounded).monospacedDigit())
-                    .foregroundStyle(.white)
+        return HStack(alignment: .center, spacing: 12) {
+            VStack(spacing: 2) {
                 Text(session.startTime.formatted(.dateTime.month(.abbreviated)))
-                    .font(.system(size: 8, weight: .bold))
-                    .foregroundStyle(.tertiary)
+                    .font(.system(size: 8, weight: .black))
+                    .tracking(0.6)
+                    .foregroundStyle(.white.opacity(0.52))
                     .textCase(.uppercase)
-                    .tracking(0.3)
+                Text(session.startTime.formatted(.dateTime.day()))
+                    .font(.system(size: 18, weight: .heavy, design: .rounded).monospacedDigit())
+                    .foregroundStyle(.white.opacity(0.92))
             }
-            .frame(width: 30)
-            .padding(.vertical, 4)
+            .frame(width: 42, height: 52)
+            .background(isLatest ? STRQBrand.steel.opacity(0.14) : Color.white.opacity(0.045), in: .rect(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(isLatest ? STRQBrand.steel.opacity(0.22) : Color.white.opacity(0.06), lineWidth: 1)
+            )
 
-            Rectangle().fill(Color.white.opacity(0.06)).frame(width: 0.5, height: 30)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(session.dayName)
-                    .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
-                HStack(spacing: 4) {
-                    Text(L10n.format("%dmin", duration))
-                    Text("·").foregroundStyle(.quaternary)
-                    Text(L10n.format("%d sets", sets))
-                    Text("·").foregroundStyle(.quaternary)
-                    Text(L10n.format("%@kg", ForgeTheme.formatVolume(session.totalVolume)))
+            VStack(alignment: .leading, spacing: 7) {
+                HStack(spacing: 7) {
+                    Text(session.dayName)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.9))
+                        .lineLimit(1)
+                    if isLatest {
+                        evidenceBadge(L10n.tr("Latest"), state: .info)
+                    }
                 }
-                .font(.caption2.monospacedDigit())
-                .foregroundStyle(.tertiary)
+
+                HStack(spacing: 6) {
+                    sessionMetricPill(L10n.format("%dmin", duration), icon: "clock")
+                    sessionMetricPill(L10n.format("%d sets", sets), icon: "checkmark.circle")
+                    sessionMetricPill(L10n.format("%@kg", ForgeTheme.formatVolume(session.totalVolume)), icon: "square.stack.3d.up.fill")
+                }
             }
+
             Spacer(minLength: 0)
         }
-        .padding(.vertical, 8)
+        .padding(10)
+        .background(Color.white.opacity(isLatest ? 0.045 : 0.025), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(isLatest ? 0.10 : 0.06), lineWidth: 1)
+        )
+    }
+
+    private func sessionMetricPill(_ text: String, icon: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 8, weight: .semibold))
+            Text(text)
+                .font(.caption2.weight(.semibold).monospacedDigit())
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .foregroundStyle(.white.opacity(0.58))
+        .padding(.horizontal, 7)
+        .padding(.vertical, 4)
+        .background(Color.white.opacity(0.045), in: Capsule())
     }
 
     @ViewBuilder
@@ -1353,46 +1540,66 @@ struct ProgressAnalyticsView: View {
             return (date, trained)
         }
 
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                ForgeSectionHeader(title: L10n.tr("28-Day Consistency"))
-                Spacer()
-                let count = last28Days.filter(\.1).count
-                Text(L10n.format("%d days", count))
-                    .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
-                    .foregroundStyle(STRQBrand.steel)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(STRQBrand.steel.opacity(0.12), in: Capsule())
-            }
+        let count = last28Days.filter(\.1).count
 
-            if last28Days.contains(where: \.1) {
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 4) {
-                    ForEach(last28Days, id: \.0) { _, trained in
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(trained ? Color.white.gradient : Color(.tertiarySystemGroupedBackground).gradient)
-                            .frame(height: 20)
+        evidenceModule {
+            VStack(alignment: .leading, spacing: 14) {
+                evidenceHeader(
+                    title: L10n.tr("28-Day Consistency"),
+                    trailing: L10n.format("%d days", count),
+                    icon: "calendar.badge.clock",
+                    state: count > 0 ? .info : .neutral,
+                    subtitle: count > 0 ? L10n.tr("Training rhythm is visible") : L10n.tr("Pattern is waiting for workouts")
+                )
+
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(count > 0 ? L10n.tr("Pattern formation") : L10n.tr("Baseline grid ready"))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.9))
+                        Text(count > 0
+                             ? L10n.tr("Filled marks show completed workout days. Empty days stay neutral, not negative.")
+                             : L10n.tr("Completed workouts will fill this 28-day proof grid without inventing a streak."))
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.58))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 0)
+                }
+
+                HStack(spacing: 4) {
+                    ForEach(Array(last28Days.prefix(7)), id: \.0) { item in
+                        Text(item.0.formatted(.dateTime.weekday(.narrow)))
+                            .font(.system(size: 9, weight: .black))
+                            .foregroundStyle(.white.opacity(0.42))
+                            .frame(maxWidth: .infinity)
                     }
                 }
-            } else {
-                HStack(spacing: 10) {
-                    Image(systemName: "calendar.badge.clock")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(L10n.tr("Your consistency pattern will map here once workouts start landing."))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 4) {
+                    ForEach(last28Days, id: \.0) { item in
+                        consistencyCell(trained: item.1)
+                    }
                 }
-                .padding(.vertical, 4)
+
+                HStack(spacing: 10) {
+                    legendDot(color: .white, label: L10n.tr("Completed"))
+                    legendDot(color: STRQBrand.slate.opacity(0.7), label: L10n.tr("Open day"))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(16)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-        )
+    }
+
+    private func consistencyCell(trained: Bool) -> some View {
+        RoundedRectangle(cornerRadius: 5)
+            .fill(trained ? Color.white.gradient : Color.white.opacity(0.055).gradient)
+            .frame(height: 22)
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .strokeBorder(trained ? Color.white.opacity(0.34) : Color.white.opacity(0.06), lineWidth: 1)
+            )
+            .shadow(color: trained ? Color.white.opacity(0.08) : .clear, radius: 6, y: 2)
     }
 
     // MARK: - Body Signals
@@ -1443,93 +1650,84 @@ struct ProgressAnalyticsView: View {
     }
 
     private func signalRunwayCard(title: String, trailing: String, icon: String, headline: String, detail: String, chips: [(String, String)]) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: title, trailing: trailing)
+        evidenceModule(border: STRQPalette.warning.opacity(0.18)) {
+            VStack(alignment: .leading, spacing: 14) {
+                evidenceHeader(
+                    title: title,
+                    trailing: trailing,
+                    icon: icon,
+                    state: .warning,
+                    subtitle: headline
+                )
 
-            HStack(spacing: 10) {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundStyle(STRQBrand.steel)
-                    .frame(width: 40, height: 40)
-                    .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 10))
+                Text(detail)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.58))
+                    .fixedSize(horizontal: false, vertical: true)
 
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(headline)
-                        .font(.subheadline.weight(.semibold))
-                    Text(detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer(minLength: 0)
-            }
-
-            HStack(spacing: 6) {
-                ForEach(chips, id: \.1) { chip in
-                    HStack(spacing: 4) {
-                        Image(systemName: chip.0)
-                            .font(.system(size: 9, weight: .semibold))
-                        Text(chip.1)
-                            .font(.caption2.weight(.semibold))
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 8) {
+                        Text(L10n.tr("EVIDENCE NEEDED"))
+                            .font(.system(size: 9, weight: .black))
+                            .tracking(0.7)
+                            .foregroundStyle(.white.opacity(0.42))
+                        Rectangle()
+                            .fill(Color.white.opacity(0.06))
+                            .frame(height: 1)
                     }
-                    .foregroundStyle(.tertiary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.white.opacity(0.04), in: Capsule())
+
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 92), spacing: 6)], alignment: .leading, spacing: 6) {
+                        ForEach(chips, id: \.1) { chip in
+                            evidenceChip(icon: chip.0, text: chip.1, state: .neutral)
+                        }
+                    }
                 }
+                .padding(12)
+                .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+                )
             }
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-        )
     }
 
     private func goalPaceCard(_ pace: GoalPaceStatus) -> some View {
-        let color = ForgeTheme.color(for: pace.colorName)
-        return HStack(spacing: 14) {
-            Image(systemName: pace.icon)
-                .font(.title3.weight(.medium))
-                .foregroundStyle(.white)
-                .frame(width: 42, height: 42)
-                .background(
-                    LinearGradient(colors: [color, color.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                    in: .rect(cornerRadius: 11)
-                )
+        let state: STRQPalette.State = pace.colorName == "green" ? .success : (pace.colorName == "red" ? .danger : .warning)
+        let color = STRQPalette.color(for: state)
 
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 6) {
-                    Text(L10n.tr("Goal Pace"))
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(color)
-                        .textCase(.uppercase)
-                        .tracking(0.3)
-                    Text(vm.nutritionTarget.nutritionGoal.displayName)
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(color.gradient, in: Capsule())
+        return evidenceModule(border: color.opacity(0.18)) {
+            HStack(spacing: 14) {
+                Image(systemName: pace.icon)
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(color)
+                    .frame(width: 42, height: 42)
+                    .background(color.opacity(0.12), in: .rect(cornerRadius: 11))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 11)
+                            .strokeBorder(color.opacity(0.22), lineWidth: 1)
+                    )
+
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack(spacing: 6) {
+                        Text(L10n.tr("Goal Pace"))
+                            .font(.system(size: 10, weight: .black))
+                            .foregroundStyle(color)
+                            .textCase(.uppercase)
+                            .tracking(0.6)
+                        evidenceBadge(vm.nutritionTarget.nutritionGoal.displayName, state: state)
+                    }
+                    Text(pace.headline)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.9))
+                    Text(pace.detail)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.58))
+                        .lineLimit(2)
                 }
-                Text(pace.headline)
-                    .font(.subheadline.weight(.semibold))
-                Text(pace.detail)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
+                Spacer()
             }
-            Spacer()
         }
-        .padding(14)
-        .background(STRQBrand.cardElevated, in: .rect(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
-        )
     }
 
     @ViewBuilder
@@ -1537,67 +1735,52 @@ struct ProgressAnalyticsView: View {
         let entries = vm.bodyWeightEntries.sorted { $0.date < $1.date }
 
         if entries.count >= 2 {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    ForgeSectionHeader(title: L10n.tr("Body Weight"))
-                    Spacer()
-                    if let latest = entries.last {
-                        Text(L10n.format("%.1f kg", latest.weightKg))
-                            .font(.system(.subheadline, design: .rounded, weight: .bold).monospacedDigit())
-                            .foregroundStyle(STRQBrand.steel)
-                    }
-                }
+            evidenceModule {
+                VStack(alignment: .leading, spacing: 14) {
+                    evidenceHeader(
+                        title: L10n.tr("Body Weight"),
+                        trailing: entries.last.map { L10n.format("%.1f kg", $0.weightKg) },
+                        icon: "scalemass.fill",
+                        state: .info,
+                        subtitle: L10n.tr("Body baseline from logged weight")
+                    )
 
-                Chart {
-                    ForEach(entries) { entry in
-                        AreaMark(x: .value("Date", entry.date), y: .value("Weight", entry.weightKg))
-                            .foregroundStyle(
-                                LinearGradient(colors: [STRQBrand.steel.opacity(0.2), STRQBrand.steel.opacity(0.02)], startPoint: .top, endPoint: .bottom)
-                            )
-                            .interpolationMethod(.catmullRom)
-                        LineMark(x: .value("Date", entry.date), y: .value("Weight", entry.weightKg))
-                            .foregroundStyle(STRQBrand.steel).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2))
+                    plotShell(height: 146) {
+                        Chart {
+                            ForEach(entries) { entry in
+                                AreaMark(x: .value("Date", entry.date), y: .value("Weight", entry.weightKg))
+                                    .foregroundStyle(
+                                        LinearGradient(colors: [STRQBrand.steel.opacity(0.2), STRQBrand.steel.opacity(0.02)], startPoint: .top, endPoint: .bottom)
+                                    )
+                                    .interpolationMethod(.catmullRom)
+                                LineMark(x: .value("Date", entry.date), y: .value("Weight", entry.weightKg))
+                                    .foregroundStyle(STRQBrand.steel).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2))
+                            }
+                        }
+                        .chartYScale(domain: .automatic(includesZero: false))
+                        .chartYAxis {
+                            AxisMarks(position: .leading) { _ in
+                                AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3)).foregroundStyle(Color.white.opacity(0.12))
+                                AxisValueLabel().foregroundStyle(Color.secondary)
+                            }
+                        }
+                        .chartXAxis {
+                            AxisMarks(values: .stride(by: .day, count: 7)) { _ in
+                                AxisValueLabel(format: .dateTime.month(.abbreviated).day()).foregroundStyle(Color.secondary)
+                            }
+                        }
                     }
-                }
-                .frame(height: 140)
-                .chartYScale(domain: .automatic(includesZero: false))
-                .chartYAxis {
-                    AxisMarks(position: .leading) { _ in
-                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3)).foregroundStyle(Color(.separator).opacity(0.3))
-                        AxisValueLabel().foregroundStyle(Color.secondary)
-                    }
-                }
-                .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: 7)) { _ in
-                        AxisValueLabel(format: .dateTime.month(.abbreviated).day()).foregroundStyle(Color.secondary)
-                    }
-                }
 
-                HStack(spacing: 10) {
-                    let trendIcon = vm.weightTrendDescription == "Trending up" ? "arrow.up.right" : vm.weightTrendDescription == "Trending down" ? "arrow.down.right" : "equal"
-                    HStack(spacing: 4) {
-                        Image(systemName: trendIcon)
-                            .font(.system(size: 9))
-                            .foregroundStyle(STRQBrand.steel)
-                        Text(vm.weightTrendDescription)
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(STRQBrand.steel)
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+                    HStack(spacing: 10) {
+                        let trendIcon = vm.weightTrendDescription == "Trending up" ? "arrow.up.right" : vm.weightTrendDescription == "Trending down" ? "arrow.down.right" : "equal"
+                        evidenceChip(icon: trendIcon, text: vm.weightTrendDescription, state: .info)
 
-                    Text(vm.nutritionTarget.weightGoalDirection.displayName)
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(.tertiary)
+                        Text(vm.nutritionTarget.weightGoalDirection.displayName)
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.tertiary)
+                    }
                 }
             }
-            .padding(16)
-            .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-            )
         }
     }
 
@@ -1605,54 +1788,58 @@ struct ProgressAnalyticsView: View {
     private var recoveryTrend: some View {
         let data = vm.recoveryTrendData
         if data.count >= 3 {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    ForgeSectionHeader(title: L10n.tr("Recovery Trend"))
-                    Spacer()
-                    let avgScore = data.map(\.score).reduce(0, +) / max(1, data.count)
-                    let scoreColor: Color = avgScore >= 75 ? STRQPalette.success : avgScore >= 55 ? STRQPalette.warning : STRQPalette.danger
-                    Text(L10n.format("Avg %d", avgScore))
-                        .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
-                        .foregroundStyle(scoreColor)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(scoreColor.opacity(0.1), in: Capsule())
-                }
+            let avgScore = data.map(\.score).reduce(0, +) / max(1, data.count)
+            let scoreState: STRQPalette.State = avgScore >= 75 ? .success : avgScore >= 55 ? .warning : .danger
+            let scoreColor = STRQPalette.color(for: scoreState)
 
-                Chart {
-                    ForEach(data, id: \.date) { item in
-                        AreaMark(x: .value("Date", item.date), y: .value("Score", item.score))
-                            .foregroundStyle(
-                                LinearGradient(colors: [STRQPalette.success.opacity(0.15), STRQPalette.success.opacity(0.02)], startPoint: .top, endPoint: .bottom)
-                            )
-                            .interpolationMethod(.catmullRom)
-                        LineMark(x: .value("Date", item.date), y: .value("Score", item.score))
-                            .foregroundStyle(STRQPalette.success).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2))
+            evidenceModule(border: scoreColor.opacity(0.18)) {
+                VStack(alignment: .leading, spacing: 14) {
+                    evidenceHeader(
+                        title: L10n.tr("Recovery Trend"),
+                        trailing: L10n.format("Avg %d", avgScore),
+                        icon: "waveform.path.ecg",
+                        state: scoreState,
+                        subtitle: L10n.tr("Training context, not a medical read")
+                    )
+
+                    plotShell(height: 132) {
+                        Chart {
+                            ForEach(data, id: \.date) { item in
+                                AreaMark(x: .value("Date", item.date), y: .value("Score", item.score))
+                                    .foregroundStyle(
+                                        LinearGradient(colors: [scoreColor.opacity(0.16), scoreColor.opacity(0.02)], startPoint: .top, endPoint: .bottom)
+                                    )
+                                    .interpolationMethod(.catmullRom)
+                                LineMark(x: .value("Date", item.date), y: .value("Score", item.score))
+                                    .foregroundStyle(scoreColor).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2))
+                            }
+                            RuleMark(y: .value("Good", 70))
+                                .foregroundStyle(STRQPalette.success.opacity(0.25))
+                                .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                        }
+                        .chartYScale(domain: 30...100)
+                        .chartYAxis {
+                            AxisMarks(position: .leading, values: [40, 60, 80, 100]) { _ in
+                                AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3)).foregroundStyle(Color.white.opacity(0.12))
+                                AxisValueLabel().foregroundStyle(Color.secondary)
+                            }
+                        }
+                        .chartXAxis {
+                            AxisMarks(values: .stride(by: .day, count: 3)) { _ in
+                                AxisValueLabel(format: .dateTime.weekday(.narrow)).foregroundStyle(Color.secondary)
+                            }
+                        }
                     }
-                    RuleMark(y: .value("Good", 70))
-                        .foregroundStyle(STRQPalette.success.opacity(0.25))
-                        .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
-                }
-                .frame(height: 120)
-                .chartYScale(domain: 30...100)
-                .chartYAxis {
-                    AxisMarks(position: .leading, values: [40, 60, 80, 100]) { _ in
-                        AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3)).foregroundStyle(Color(.separator).opacity(0.3))
-                        AxisValueLabel().foregroundStyle(Color.secondary)
-                    }
-                }
-                .chartXAxis {
-                    AxisMarks(values: .stride(by: .day, count: 3)) { _ in
-                        AxisValueLabel(format: .dateTime.weekday(.narrow)).foregroundStyle(Color.secondary)
+
+                    HStack(spacing: 10) {
+                        evidenceChip(icon: "line.3.horizontal.decrease", text: L10n.tr("70 reference"), state: .success)
+                        Text(L10n.tr("Use this beside training load and sleep, not as a diagnosis."))
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.tertiary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
             }
-            .padding(16)
-            .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-            )
         }
     }
 
@@ -1660,45 +1847,46 @@ struct ProgressAnalyticsView: View {
     private var nutritionAdherence: some View {
         let logs = vm.nutritionLogs.prefix(7)
         if !logs.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    ForgeSectionHeader(title: L10n.tr("Nutrition"), trailing: L10n.tr("7 Days"))
-                    Spacer()
-                    let avgProtein = logs.map(\.proteinGrams).reduce(0, +) / max(1, logs.count)
-                    Text(L10n.format("Avg %dg", avgProtein))
-                        .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
-                        .foregroundStyle(STRQBrand.steel)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(STRQBrand.steel.opacity(0.1), in: Capsule())
-                }
+            let avgProtein = logs.map(\.proteinGrams).reduce(0, +) / max(1, logs.count)
 
-                HStack(spacing: 0) {
-                    ForEach(Array(logs.reversed())) { log in
-                        let proteinPct = vm.nutritionTarget.proteinGrams > 0 ? min(100, (log.proteinGrams * 100) / vm.nutritionTarget.proteinGrams) : 0
-                        let calPct = vm.nutritionTarget.calories > 0 ? min(100, (log.calories * 100) / vm.nutritionTarget.calories) : 0
-                        let avgPct = (proteinPct + calPct) / 2
-                        let barColor: Color = avgPct >= 85 ? STRQPalette.success : avgPct >= 65 ? STRQPalette.warning : STRQPalette.danger
+            evidenceModule {
+                VStack(alignment: .leading, spacing: 14) {
+                    evidenceHeader(
+                        title: L10n.tr("Nutrition"),
+                        trailing: L10n.format("Avg %dg", avgProtein),
+                        icon: "fork.knife",
+                        state: .info,
+                        subtitle: L10n.tr("7-day adherence context")
+                    )
 
-                        VStack(spacing: 4) {
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(barColor.gradient)
-                                .frame(width: 18, height: max(6, CGFloat(avgPct) / 100.0 * 36))
-                            Text(log.date.formatted(.dateTime.weekday(.narrow)))
-                                .font(.system(size: 8, weight: .semibold))
-                                .foregroundStyle(.tertiary)
+                    HStack(spacing: 0) {
+                        ForEach(Array(logs.reversed())) { log in
+                            let proteinPct = vm.nutritionTarget.proteinGrams > 0 ? min(100, (log.proteinGrams * 100) / vm.nutritionTarget.proteinGrams) : 0
+                            let calPct = vm.nutritionTarget.calories > 0 ? min(100, (log.calories * 100) / vm.nutritionTarget.calories) : 0
+                            let avgPct = (proteinPct + calPct) / 2
+                            let barColor: Color = avgPct >= 85 ? STRQPalette.success : avgPct >= 65 ? STRQPalette.warning : STRQPalette.danger
+
+                            VStack(spacing: 4) {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(barColor.gradient)
+                                    .frame(width: 18, height: max(6, CGFloat(avgPct) / 100.0 * 42))
+                                Text(log.date.formatted(.dateTime.weekday(.narrow)))
+                                    .font(.system(size: 8, weight: .semibold))
+                                    .foregroundStyle(.tertiary)
+                            }
+                            .frame(maxWidth: .infinity)
                         }
-                        .frame(maxWidth: .infinity)
                     }
+                    .frame(height: 58, alignment: .bottom)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 10)
+                    .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+                    )
                 }
-                .frame(height: 50, alignment: .bottom)
             }
-            .padding(16)
-            .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-            )
         }
     }
 
@@ -1756,42 +1944,59 @@ struct ProgressAnalyticsView: View {
     }
 
     private var muscleBalanceChart: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: L10n.tr("Muscle Balance"), trailing: L10n.tr("vs 4-Week Avg"))
+        evidenceModule {
+            VStack(alignment: .leading, spacing: 14) {
+                evidenceHeader(
+                    title: L10n.tr("Muscle Balance"),
+                    trailing: L10n.tr("vs 4-Week Avg"),
+                    icon: "arrow.left.arrow.right",
+                    state: .info,
+                    subtitle: L10n.tr("Trusted read after baseline gate")
+                )
 
-            ForEach(vm.muscleBalance) { entry in
-                HStack(spacing: 8) {
-                    Text(entry.muscle)
-                        .font(.caption.weight(.medium))
-                        .frame(width: 68, alignment: .leading)
+                VStack(spacing: 10) {
+                    ForEach(vm.muscleBalance) { entry in
+                        HStack(spacing: 9) {
+                            Text(entry.muscle)
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(.white.opacity(0.76))
+                                .frame(width: 70, alignment: .leading)
 
-                    GeometryReader { geo in
-                        ZStack(alignment: .leading) {
-                            Capsule().fill(Color(.tertiarySystemGroupedBackground)).frame(height: 6)
-                            Capsule()
-                                .fill(balanceColor(entry.percentOfAverage).gradient)
-                                .frame(
-                                    width: max(0, geo.size.width * (appeared || reduceMotion ? min(CGFloat(entry.percentOfAverage), 1.3) / 1.3 : 0)),
-                                    height: 6
-                                )
-                                .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.45), value: appeared)
+                            GeometryReader { geo in
+                                ZStack(alignment: .leading) {
+                                    Capsule()
+                                        .fill(Color.white.opacity(0.055))
+                                        .frame(height: 8)
+                                    Rectangle()
+                                        .fill(Color.white.opacity(0.18))
+                                        .frame(width: 1, height: 14)
+                                        .offset(x: geo.size.width * (1.0 / 1.3))
+                                    Capsule()
+                                        .fill(balanceColor(entry.percentOfAverage).gradient)
+                                        .frame(
+                                            width: max(0, geo.size.width * (appeared || reduceMotion ? min(CGFloat(entry.percentOfAverage), 1.3) / 1.3 : 0)),
+                                            height: 8
+                                        )
+                                        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.45), value: appeared)
+                                }
+                            }
+                            .frame(height: 14)
+
+                            Text(balanceLabel(entry.percentOfAverage))
+                                .font(.system(size: 10, weight: .bold, design: .rounded).monospacedDigit())
+                                .foregroundStyle(balanceColor(entry.percentOfAverage))
+                                .frame(width: 42, alignment: .trailing)
                         }
                     }
-                    .frame(height: 6)
-
-                    Text(balanceLabel(entry.percentOfAverage))
-                        .font(.system(size: 10, weight: .bold, design: .rounded).monospacedDigit())
-                        .foregroundStyle(balanceColor(entry.percentOfAverage))
-                        .frame(width: 38, alignment: .trailing)
                 }
+
+                HStack(spacing: 10) {
+                    legendDot(color: Color.white.opacity(0.18), label: L10n.tr("100% baseline"))
+                    legendDot(color: STRQBrand.steel, label: L10n.tr("Current week"))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(16)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-        )
     }
 
     @ViewBuilder
@@ -1805,60 +2010,78 @@ struct ProgressAnalyticsView: View {
             return (label, count)
         }
 
-        VStack(alignment: .leading, spacing: 12) {
-            ForgeSectionHeader(title: L10n.tr("Weekly Workouts"), trailing: L10n.tr("8 Weeks"))
+        evidenceModule {
+            VStack(alignment: .leading, spacing: 14) {
+                evidenceHeader(
+                    title: L10n.tr("Weekly Workouts"),
+                    trailing: L10n.tr("8 Weeks"),
+                    icon: "chart.bar.xaxis",
+                    state: .info,
+                    subtitle: L10n.tr("Rhythm proof from completed sessions")
+                )
 
-            Chart {
-                ForEach(last8Weeks, id: \.0) { week, count in
-                    BarMark(x: .value("Week", week), y: .value("Workouts", appeared || reduceMotion ? count : 0))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [STRQBrand.steel, STRQBrand.slate.opacity(0.82)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .clipShape(.rect(cornerRadius: 3))
+                plotShell(height: 132) {
+                    Chart {
+                        ForEach(last8Weeks, id: \.0) { week, count in
+                            BarMark(x: .value("Week", week), y: .value("Workouts", appeared || reduceMotion ? count : 0))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [STRQBrand.steel, STRQBrand.slate.opacity(0.82)],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .clipShape(.rect(cornerRadius: 3))
+                        }
+                    }
+                    .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5), value: appeared)
+                    .chartYAxis {
+                        AxisMarks(position: .leading) { _ in
+                            AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3)).foregroundStyle(Color.white.opacity(0.12))
+                            AxisValueLabel().foregroundStyle(Color.secondary)
+                        }
+                    }
+                    .chartXAxis {
+                        AxisMarks { _ in AxisValueLabel().foregroundStyle(Color.secondary) }
+                    }
                 }
-            }
-            .frame(height: 120)
-            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5), value: appeared)
-            .chartYAxis {
-                AxisMarks(position: .leading) { _ in
-                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3)).foregroundStyle(Color(.separator).opacity(0.3))
-                    AxisValueLabel().foregroundStyle(Color.secondary)
+
+                HStack(spacing: 10) {
+                    evidenceChip(icon: "checkmark.circle", text: L10n.tr("Completed only"), state: .neutral)
+                    Text(L10n.tr("Bars show finished workouts per week; open weeks are neutral."))
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-            }
-            .chartXAxis {
-                AxisMarks { _ in AxisValueLabel().foregroundStyle(Color.secondary) }
             }
         }
-        .padding(16)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-        )
     }
 
     private var movementBalanceCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: L10n.tr("Movement Balance"))
+        evidenceModule {
+            VStack(alignment: .leading, spacing: 14) {
+                evidenceHeader(
+                    title: L10n.tr("Movement Balance"),
+                    icon: "figure.strengthtraining.traditional",
+                    state: .info,
+                    subtitle: L10n.tr("Movement mix from current volume")
+                )
 
-            let data = movementBalanceData
-            HStack(spacing: 8) {
-                movementBar(label: "Push", value: data.push, total: data.total, color: Color.white)
-                movementBar(label: "Pull", value: data.pull, total: data.total, color: STRQBrand.steel)
-                movementBar(label: "Legs", value: data.legs, total: data.total, color: STRQBrand.slate)
-                movementBar(label: L10n.tr("Core"), value: data.core, total: data.total, color: STRQPalette.warning)
+                let data = movementBalanceData
+                HStack(spacing: 8) {
+                    movementBar(label: "Push", value: data.push, total: data.total, color: Color.white)
+                    movementBar(label: "Pull", value: data.pull, total: data.total, color: STRQBrand.steel)
+                    movementBar(label: "Legs", value: data.legs, total: data.total, color: STRQBrand.slate)
+                    movementBar(label: L10n.tr("Core"), value: data.core, total: data.total, color: STRQPalette.warning)
+                }
+                .padding(12)
+                .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+                )
             }
         }
-        .padding(16)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-        )
     }
 
     private func movementBar(label: String, value: Double, total: Double, color: Color) -> some View {
