@@ -80,91 +80,260 @@ struct ProgressAnalyticsView: View {
         var id: String { title }
     }
 
+    private struct ProofAxisItem: Identifiable {
+        let title: String
+        let value: String
+        let detail: String
+        let icon: String
+        let progress: Double
+        let state: STRQPalette.State
+
+        var id: String { title }
+    }
+
     private var headlineHero: some View {
         let headline = proofHeadline
         let maturity = proofMaturityCopy
         let tint = STRQPalette.color(for: maturity.state)
+        let axisItems = proofAxisItems
 
-        return ZStack(alignment: .topLeading) {
-            VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .top, spacing: 14) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack(spacing: 8) {
-                            Text(L10n.tr("PROGRESS PROOF"))
-                                .font(.system(size: 10, weight: .black))
-                                .tracking(1.1)
-                                .foregroundStyle(STRQBrand.steel)
-                            Text(maturity.eyebrow)
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundStyle(tint)
-                                .padding(.horizontal, 7)
-                                .padding(.vertical, 3)
-                                .background(tint.opacity(0.14), in: Capsule())
+        return VStack(alignment: .leading, spacing: 18) {
+            HStack(alignment: .top, spacing: 14) {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 8) {
+                        Text(L10n.tr("STRQ REPORT"))
+                            .font(.system(size: 10, weight: .black))
+                            .tracking(1.2)
+                            .foregroundStyle(STRQBrand.steel)
+                        Text(maturity.eyebrow)
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(tint)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(tint.opacity(0.14), in: Capsule())
+                    }
+
+                    HStack(alignment: .lastTextBaseline, spacing: 9) {
+                        if let numeric = Double(headline.0) {
+                            STRQCountUpText(value: numeric, duration: 0.7)
+                                .font(.system(size: 62, weight: .heavy, design: .rounded).monospacedDigit())
+                                .foregroundStyle(.white)
+                        } else {
+                            Text(headline.0)
+                                .font(.system(size: 62, weight: .heavy, design: .rounded).monospacedDigit())
+                                .foregroundStyle(.white)
                         }
-
-                        HStack(alignment: .lastTextBaseline, spacing: 10) {
-                            if let numeric = Double(headline.0) {
-                                STRQCountUpText(value: numeric, duration: 0.7)
-                                    .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
-                                    .foregroundStyle(.white)
-                            } else {
-                                Text(headline.0)
-                                    .font(.system(size: 56, weight: .heavy, design: .rounded).monospacedDigit())
-                                    .foregroundStyle(.white)
-                            }
-                            Text(headline.1)
-                                .font(.system(.title3, design: .rounded, weight: .semibold))
-                                .foregroundStyle(.white.opacity(0.56))
-                                .padding(.bottom, 6)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-
-                        Text(maturity.title)
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(.white.opacity(0.88))
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Text(maturity.detail)
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(.white.opacity(0.62))
+                        Text(headline.1)
+                            .font(.system(size: 17, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.54))
+                            .padding(.bottom, 8)
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    Spacer(minLength: 0)
-
-                    proofMaturityRing(progress: maturity.progress, tint: tint, icon: maturity.icon, label: maturity.meterLabel)
+                    Text(maturity.title)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.9))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
-                VStack(spacing: 8) {
-                    ForEach(proofTrustItems) { item in
-                        proofTrustRow(item)
-                    }
-                }
+                Spacer(minLength: 0)
 
+                proofMaturityRing(progress: maturity.progress, tint: tint, icon: maturity.icon, label: maturity.meterLabel)
+            }
+
+            heroSignalPlot(items: axisItems, tint: tint)
+
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+                ForEach(axisItems) { item in
+                    heroAxisReadout(item)
+                }
+            }
+
+            if !achievementChipsIsEmpty {
                 achievementChips
             }
-            .padding(20)
         }
+        .padding(20)
         .background(
-            LinearGradient(
-                colors: [Color(white: 0.125), Color(white: 0.045)],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            ),
-            in: .rect(cornerRadius: 22)
+            ZStack {
+                LinearGradient(
+                    colors: [Color(white: 0.13), Color(white: 0.052)],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+                VStack(spacing: 13) {
+                    ForEach(0..<7, id: \.self) { _ in
+                        Rectangle()
+                            .fill(Color.white.opacity(0.026))
+                            .frame(height: 1)
+                    }
+                }
+                .padding(.horizontal, 18)
+                .opacity(0.7)
+            },
+            in: .rect(cornerRadius: 26)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 22)
+            RoundedRectangle(cornerRadius: 26)
                 .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
         )
-        .overlay(alignment: .top) {
-            STRQBrand.steel.opacity(0.34)
-                .frame(height: 1)
-                .clipShape(.rect(cornerRadii: .init(topLeading: 22, bottomLeading: 0, bottomTrailing: 0, topTrailing: 22)))
+        .overlay(alignment: .topLeading) {
+            LinearGradient(colors: [tint.opacity(0.42), .clear], startPoint: .leading, endPoint: .trailing)
+                .frame(height: 2)
+                .clipShape(.rect(cornerRadii: .init(topLeading: 26, bottomLeading: 0, bottomTrailing: 0, topTrailing: 26)))
         }
-        .shadow(color: .black.opacity(0.22), radius: 16, y: 5)
+        .shadow(color: .black.opacity(0.24), radius: 20, y: 7)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5), value: appeared)
+    }
+
+    private var achievementChipsIsEmpty: Bool {
+        let calendar = Calendar.current
+        let now = Date()
+        let weekAgo = calendar.date(byAdding: .day, value: -7, to: now) ?? now
+        let twoWeeksAgo = calendar.date(byAdding: .day, value: -14, to: now) ?? now
+        let prsThisMonth = vm.personalRecords.filter { calendar.isDate($0.date, equalTo: now, toGranularity: .month) }.count
+        let thisWeek = vm.workoutHistory.filter { $0.startTime > weekAgo && $0.isCompleted }
+        let lastWeek = vm.workoutHistory.filter { $0.startTime > twoWeeksAgo && $0.startTime <= weekAgo && $0.isCompleted }
+        let volumeThis = thisWeek.reduce(0.0) { $0 + $1.totalVolume }
+        let volumeLast = lastWeek.reduce(0.0) { $0 + $1.totalVolume }
+        let consistencyTarget = max(1, min(vm.profile.daysPerWeek, 4))
+        return prsThisMonth == 0 && vm.streak <= 1 && !(volumeLast > 0 && volumeThis > volumeLast) && vm.weeklyStats.sessions < consistencyTarget
+    }
+
+    private var proofAxisItems: [ProofAxisItem] {
+        let target = max(1, min(3, vm.profile.daysPerWeek))
+        let workoutProgress = min(Double(vm.totalCompletedWorkouts) / 4.0, 1)
+        let consistencyProgress = min(Double(vm.weeklyStats.sessions) / Double(target), 1)
+        let recoveryProgress = min(Double(vm.effectiveRecoveryScore) / 100.0, 1)
+        let strengthProgress = vm.hasEnoughDataForStrengthChart ? min(Double(vm.strengthProgress.count) / 8.0, 1) : min(Double(vm.strengthProgress.count) / 4.0, 0.72)
+
+        return [
+            ProofAxisItem(
+                title: L10n.tr("Baseline"),
+                value: "\(vm.totalCompletedWorkouts)",
+                detail: vm.totalCompletedWorkouts == 1 ? L10n.tr("session") : L10n.tr("sessions"),
+                icon: "figure.strengthtraining.traditional",
+                progress: workoutProgress,
+                state: vm.totalCompletedWorkouts >= 4 ? .success : (vm.totalCompletedWorkouts > 0 ? .info : .neutral)
+            ),
+            ProofAxisItem(
+                title: L10n.tr("Strength"),
+                value: "\(vm.strengthProgress.count)",
+                detail: vm.hasEnoughDataForStrengthChart ? L10n.tr("anchors") : L10n.tr("forming"),
+                icon: "chart.line.uptrend.xyaxis",
+                progress: strengthProgress,
+                state: vm.hasEnoughDataForStrengthChart ? .info : .warning
+            ),
+            ProofAxisItem(
+                title: L10n.tr("Rhythm"),
+                value: "\(vm.weeklyStats.sessions)/\(target)",
+                detail: L10n.tr("this week"),
+                icon: "calendar.badge.clock",
+                progress: consistencyProgress,
+                state: vm.weeklyStats.sessions >= target ? .success : (vm.weeklyStats.sessions > 0 ? .warning : .neutral)
+            ),
+            ProofAxisItem(
+                title: L10n.tr("Context"),
+                value: "\(vm.effectiveRecoveryScore)%",
+                detail: L10n.tr("recovery"),
+                icon: "heart.fill",
+                progress: recoveryProgress,
+                state: vm.totalCompletedWorkouts == 0 ? .neutral : (vm.effectiveRecoveryScore >= 70 ? .success : (vm.effectiveRecoveryScore >= 55 ? .warning : .danger))
+            )
+        ]
+    }
+
+    private func heroSignalPlot(items: [ProofAxisItem], tint: Color) -> some View {
+        let values = items.map { max(0.04, min($0.progress, 1.0)) }
+
+        return GeometryReader { geo in
+            let width = max(1, geo.size.width)
+            let height = max(1, geo.size.height)
+            let step = width / CGFloat(max(values.count - 1, 1))
+
+            ZStack {
+                VStack(spacing: 0) {
+                    ForEach(0..<4, id: \.self) { _ in
+                        Rectangle()
+                            .fill(Color.white.opacity(0.055))
+                            .frame(height: 1)
+                        Spacer(minLength: 0)
+                    }
+                }
+
+                Path { path in
+                    for index in values.indices {
+                        let x = CGFloat(index) * step
+                        let y = 10 + (1 - CGFloat(values[index])) * (height - 20)
+                        if index == values.startIndex {
+                            path.move(to: CGPoint(x: x, y: y))
+                        } else {
+                            path.addLine(to: CGPoint(x: x, y: y))
+                        }
+                    }
+                }
+                .trim(from: 0, to: appeared || reduceMotion ? 1 : 0)
+                .stroke(tint.gradient, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+                .shadow(color: tint.opacity(0.28), radius: 10, y: 3)
+                .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.65), value: appeared)
+
+                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                    let value = max(0.04, min(item.progress, 1.0))
+                    let x = CGFloat(index) * step
+                    let y = 10 + (1 - CGFloat(value)) * (height - 20)
+                    Circle()
+                        .fill(STRQPalette.color(for: item.state))
+                        .frame(width: 8, height: 8)
+                        .overlay(Circle().strokeBorder(Color.white.opacity(0.5), lineWidth: 1))
+                        .position(x: x, y: y)
+                }
+            }
+            .padding(.horizontal, 4)
+        }
+        .frame(height: 118)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 12)
+        .background(Color.black.opacity(0.2), in: .rect(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+        )
+    }
+
+    private func heroAxisReadout(_ item: ProofAxisItem) -> some View {
+        let tint = STRQPalette.color(for: item.state)
+
+        return HStack(spacing: 9) {
+            Image(systemName: item.icon)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 24, height: 24)
+                .background(tint.opacity(0.12), in: .rect(cornerRadius: 7))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.title)
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.6)
+                    .foregroundStyle(.white.opacity(0.45))
+                    .textCase(.uppercase)
+                HStack(alignment: .lastTextBaseline, spacing: 3) {
+                    Text(item.value)
+                        .font(.system(size: 15, weight: .heavy, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white.opacity(0.92))
+                    Text(item.detail)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.46))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 12))
     }
 
     private var proofHeadline: (String, String) {
