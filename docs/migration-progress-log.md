@@ -3134,6 +3134,38 @@ Warnings:
 
 - Any deeper improvement to muscle-volume source fidelity, recovery interpretation, or body-baseline trust rules remains deferred because it would require model/service/calculation changes outside the allowed scope.
 
+## 2026-05-06 - Progress V2 DEBUG Prototype
+
+Scope:
+
+- Added a DEBUG-only Progress V2 prototype surface for owner/Rork review using local prototype data only.
+- Preserved the production Progress tab, Progress calculations, workout history, models, services, persistence, analytics, localization, assets, project files, tests, Widget, Watch, and Live Activity.
+
+Files changed:
+
+- `ios/STRQ/Views/Debug/ProgressV2PrototypeView.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) in Licensed Source Mode.
+- Inspected Chart `9129:26029`, Progress `9129:207997`, Activity Tracker `11611:134946`, Dark Home / Smart Fitness Metrics `11604:62728`, and Bonus Dashboard page `5643:11291` with targeted subnodes `11527:73138`, `11527:73069`, `11611:135104`, and `11611:135087`.
+- Adapted chart-first report anatomy, line/area/bar chart grammar, progress ring maturity, metric density, calendar rhythm grid, low-data empty-state honesty, and evidence/feed structure.
+- Did not copy source branding, source text, source assets, raw screen layout, orange CTA styling, Pro/violet styling, or production data wiring.
+
+Implementation:
+
+- Created baseline, forming, and established prototype states behind a local DEBUG selector.
+- Added graph-first hero, varied proof area, rhythm grid, strength/volume trend, muscle distribution concept, and recent evidence timeline.
+- Kept all demo/prototype data inside the new DEBUG file.
+- Integrated the prototype into the DEBUG Design System Lab as `Progress V2 Prototype`.
+
+Verification:
+
+- Static verification only on Windows; no `xcodebuild` was run.
+- macOS/CI build validation and Rork visual QA remain required.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
