@@ -3198,6 +3198,38 @@ Pending work:
 - Rork QA should screenshot all three concepts across all three states.
 - macOS/CI build validation remains required; this pass ran on Windows.
 
+## 2026-05-07 - Progress V4 Hybrid Candidate
+
+Scope:
+
+- Added a DEBUG-only Progress V4 Hybrid Candidate using local prototype/demo data only.
+- Combined Concept C muscle coverage and training distribution with Concept B weekly rhythm and a restrained Concept A strength trend detail.
+- Kept production Progress, production navigation, models, services, persistence, analytics, localization, assets, project files, tests, Widget, Watch, and Live Activity unchanged.
+
+Files changed:
+
+- `ios/STRQ/Views/Debug/ProgressV4HybridCandidateView.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `docs/progress-v3-figma-source-map.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Re-inspected strongest V4 source nodes: `11604:64937`, `11604:63724`, `11604:63236`, and `11604:66184`.
+- Used distribution/level, rhythm grid, goal cadence, chart-detail, and history/evidence pacing patterns without importing Figma assets.
+
+Implementation:
+
+- Added Baseline, Forming, and Established local states.
+- Built a front/back muscle coverage hero, weekly rhythm grid, one strength trend chart, training mix distribution, and recent evidence timeline.
+- Integrated the candidate into the DEBUG Design System Lab as `Progress V4 Hybrid Candidate`.
+
+Pending work:
+
+- Rork QA should screenshot all three V4 states.
+- macOS/CI build validation remains required; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

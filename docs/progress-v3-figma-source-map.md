@@ -110,6 +110,16 @@ The final lab uses Figma as licensed source anatomy, not as a pasted screen. The
 
 Concept C is strongest. It is the most STRQ-specific because muscle coverage and training distribution are harder for a generic dashboard to fake, and it connects directly to STRQ's existing anatomy direction.
 
+## V4 Hybrid Candidate Decision
+
+Progress V4 Hybrid Candidate keeps Concept C as the core direction and folds in the strongest support patterns from Concepts B and A:
+
+- Concept C core: training distribution, front/back muscle coverage, coverage bars, and training mix.
+- Concept B rhythm layer: weekly rhythm grid, week-by-week cadence bars, baseline/forming/established state language, and recent session pacing from `11604:63724`, `11604:64937`, and `11604:66184`.
+- Concept A detail layer: one restrained strength trend chart and compact status treatment from `11604:63236`, `11604:63410`, and `11604:63074`.
+
+The V4 pass deliberately avoids promoting any V3 concept directly. It uses the selected Figma nodes as licensed source patterns, not copied screens, and keeps all values local to the DEBUG-only candidate.
+
 ## Weakest Concept
 
 Concept A is weakest. It is useful and visually clearer than the current card stack, but chart-first metric reports are common enough that it needs the strongest STRQ copy and production data model to avoid drifting generic.
