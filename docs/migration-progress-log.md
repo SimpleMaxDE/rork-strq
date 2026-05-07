@@ -3313,6 +3313,57 @@ Pending work:
 
 - Recommended next step is C: fix/build the muscle coverage data contract first as a read-only derivation before any V4 production UI wiring.
 
+## 2026-05-07 - Progress Muscle Coverage Data Contract V1
+
+Scope:
+
+- Implemented the first real Progress muscle coverage data contract by populating existing `ProgressEntry.muscleGroupVolume` during workout completion from completed workout sets and exercise muscle metadata.
+- Added a centralized calculator for per-muscle coverage, broad push/pull/legs/core/posterior category distribution, secondary-muscle weighting, exposure fallback behavior, unresolved exercise reporting, and future confidence-state vocabulary.
+- Preserved Progress V4 as DEBUG/prototype-only and did not wire any V4 production UI.
+
+Files changed:
+
+- `ios/STRQ/Services/ProgressMuscleCoverageCalculator.swift`
+- `ios/STRQ/Services/WorkoutController.swift`
+- `ios/STRQ/ViewModels/AppViewModel.swift`
+- `ios/STRQTests/STRQTests.swift`
+- `docs/progress-muscle-coverage-data-contract-v1.md`
+- `docs/migration-progress-log.md`
+
+Code inspected:
+
+- `ProgressEntry`, `WorkoutSession`, `ExerciseLog`, and `SetLog` in `ios/STRQ/Models/WorkoutSession.swift`
+- `Exercise`, `MovementPattern`, and exercise metadata fields in `ios/STRQ/Models/Exercise.swift`
+- `MuscleGroup` in `ios/STRQ/Models/MuscleGroup.swift`
+- workout completion in `ios/STRQ/Services/WorkoutController.swift`
+- `ExerciseLibrary` resolution and imported exercise fallback
+- `AppViewModel.muscleBalance` and `weeklyVolumeByMuscle`
+- `ProgressAnalyticsView` Muscle Balance gate and movement-balance readers
+- persistence through `PersistedAppState`, `ProgressEntry` decoding, and `SnapshotBuilder`
+- existing Smart Volume and Weekly Review muscle-balance consumers
+
+Implementation:
+
+- Weighted completed sets use existing loaded volume (`weight * reps`) as the contribution value.
+- Completed exercises with zero loaded volume fall back to completed set exposure points.
+- Primary muscles receive `1.0` contribution and secondary muscles receive `0.35`.
+- `ProgressEntry.muscleGroupVolume` stores stable per-muscle `MuscleGroup.rawValue` keys.
+- Existing Progress display buckets aggregate the new exact per-muscle keys while retaining compatibility with older aggregate keys.
+- Missing or unresolved exercise metadata is skipped safely and reported by the calculator result.
+
+Intentionally not changed:
+
+- No Progress V4 production integration.
+- No `ProgressAnalyticsView.swift` edit.
+- No Progress UI redesign, navigation, route, analytics, localization, asset, project, Widget, Watch, Live Activity, HealthKit, plan generation, workout execution, or exercise metadata changes.
+- No demo/mock data and no historical workout backfill.
+
+Pending work:
+
+- macOS or CI build validation is required because this pass ran on Windows.
+- Rork QA should verify Muscle Balance after real completed workouts, especially low-data and four-plus-workout states.
+- Future V4 work should use the documented V1 contract to build read-only weekly and 4-week distribution adapters with module-level confidence gates.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

@@ -653,17 +653,13 @@ class AppViewModel {
         let thisWeek = progressEntries.filter { $0.date > weekAgo }
         let fourWeek = progressEntries.filter { $0.date > fourWeeksAgo }
 
-        let muscles = ["Chest", "Back", "Shoulders", "Quads", "Hamstrings", "Glutes", "Arms", "Abs"]
-        let keyMap: [String: String] = [
-            "Chest": "chest", "Back": "back", "Shoulders": "shoulders",
-            "Quads": "quads", "Hamstrings": "hamstrings", "Glutes": "glutes",
-            "Arms": "arms", "Abs": "abs"
-        ]
-
-        return muscles.map { name in
-            let key = keyMap[name] ?? name.lowercased()
-            let weekVol = thisWeek.reduce(0.0) { $0 + ($1.muscleGroupVolume[key] ?? 0) }
-            let totalVol = fourWeek.reduce(0.0) { $0 + ($1.muscleGroupVolume[key] ?? 0) }
+        return ProgressMuscleCoverageCalculator.progressDisplayMuscleNames.map { name in
+            let weekVol = thisWeek.reduce(0.0) { total, entry in
+                total + ProgressMuscleCoverageCalculator.displayVolume(in: entry.muscleGroupVolume, displayName: name)
+            }
+            let totalVol = fourWeek.reduce(0.0) { total, entry in
+                total + ProgressMuscleCoverageCalculator.displayVolume(in: entry.muscleGroupVolume, displayName: name)
+            }
             let weeks = max(1, min(4, fourWeek.count / 7 + 1))
             let avg = totalVol / Double(weeks)
             return MuscleBalanceEntry(muscle: name, thisWeek: weekVol, average: avg)

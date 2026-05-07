@@ -92,10 +92,12 @@ final class WorkoutController {
         workout.session.totalVolume = workout.session.exerciseLogs.reduce(0.0) { total, log in
             total + log.sets.filter(\.isCompleted).reduce(0.0) { $0 + $1.weight * Double($1.reps) }
         }
+        let muscleCoverage = ProgressMuscleCoverageCalculator.calculate(for: workout.session, library: vm.library)
         vm.workoutHistory.insert(workout.session, at: 0)
 
         let entry = ProgressEntry(
             date: Date(),
+            muscleGroupVolume: muscleCoverage.muscleGroupVolume,
             totalSets: workout.session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count,
             totalReps: workout.session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).reduce(0) { $0 + $1.reps },
             totalVolume: workout.session.totalVolume,

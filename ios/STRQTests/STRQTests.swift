@@ -2,6 +2,73 @@ import Testing
 import Foundation
 @testable import STRQ
 
+// MARK: - ProgressMuscleCoverageCalculator
+
+@Suite("ProgressMuscleCoverageCalculator")
+struct ProgressMuscleCoverageCalculatorTests {
+    private func session(exerciseId: String, sets: [SetLog]) -> WorkoutSession {
+        WorkoutSession(
+            planId: "p",
+            dayId: "d",
+            dayName: "Coverage",
+            exerciseLogs: [ExerciseLog(exerciseId: exerciseId, sets: sets, isCompleted: true)],
+            isCompleted: true
+        )
+    }
+
+    @Test func weightedExerciseUsesLoadedVolumeWithSecondaryWeight() {
+        let sets = [
+            SetLog(setNumber: 1, weight: 50, reps: 10, isCompleted: true),
+            SetLog(setNumber: 2, weight: 50, reps: 10, isCompleted: true)
+        ]
+
+        let result = ProgressMuscleCoverageCalculator.calculate(
+            for: session(exerciseId: "barbell-bench-press", sets: sets)
+        )
+
+        #expect(result.muscleGroupVolume["chest"] == 1000)
+        #expect(result.muscleGroupVolume["triceps"] == 350)
+        #expect(result.muscleGroupVolume["shoulders"] == 350)
+        #expect(result.broadCategoryVolume["push"] == 1700)
+        #expect(result.loadedExerciseCount == 1)
+        #expect(result.exposureFallbackExerciseCount == 0)
+    }
+
+    @Test func unloadedExerciseFallsBackToSetExposure() {
+        let sets = [
+            SetLog(setNumber: 1, weight: 0, reps: 12, isCompleted: true),
+            SetLog(setNumber: 2, weight: 0, reps: 12, isCompleted: true),
+            SetLog(setNumber: 3, weight: 0, reps: 12, isCompleted: true)
+        ]
+
+        let result = ProgressMuscleCoverageCalculator.calculate(
+            for: session(exerciseId: "push-up", sets: sets)
+        )
+
+        #expect(result.muscleGroupVolume["chest"] == 3)
+        #expect(result.muscleGroupVolume["triceps"] == 1.05)
+        #expect(result.muscleGroupVolume["shoulders"] == 1.05)
+        #expect(result.muscleGroupVolume["coreStability"] == 1.05)
+        #expect(result.broadCategoryVolume["push"] == 5.1)
+        #expect(result.broadCategoryVolume["core"] == 1.05)
+        #expect(result.loadedExerciseCount == 0)
+        #expect(result.exposureFallbackExerciseCount == 1)
+    }
+
+    @Test func unresolvedExerciseIsSkippedSafely() {
+        let sets = [SetLog(setNumber: 1, weight: 0, reps: 10, isCompleted: true)]
+
+        let result = ProgressMuscleCoverageCalculator.calculate(
+            for: session(exerciseId: "missing-exercise", sets: sets)
+        )
+
+        #expect(result.muscleGroupVolume.isEmpty)
+        #expect(result.broadCategoryVolume.isEmpty)
+        #expect(result.unresolvedExerciseIds == ["missing-exercise"])
+        #expect(result.completedSetCount == 1)
+    }
+}
+
 // MARK: - PersistenceStore
 
 @Suite("PersistenceStore")
