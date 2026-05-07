@@ -3271,6 +3271,29 @@ Pending work:
 - Rork QA should re-check Baseline, Forming, and Established V4 screenshots, especially Training Distribution title wrapping, the mix rail labels, baseline intentionality, forming warmth, and established readability.
 - macOS or CI build validation remains required before any production planning; this pass ran on Windows.
 
+## 2026-05-07 - Progress V4 Product Innovation Roadmap
+
+Scope:
+
+- Created a docs-only production roadmap for turning the DEBUG-only Progress V4 Hybrid Candidate into a phased STRQ Progress feature set, covering product innovation, Release V1 scope, 2027 differentiators, data contracts, monetization, production phases, risks, guardrails, and exactly one next prompt.
+
+Files changed:
+
+- `docs/progress-v4-product-innovation-production-roadmap.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode for compact metadata inspection of `11604:64937`, `11604:63724`, `11604:63236`, `11604:66184`, `9129:26029`, and `9129:207997`, alongside the existing V3/V4 source-map docs.
+
+Intentionally not changed:
+
+- No Swift files, assets, project files, models, services, view models, analytics files, localization, tests, fonts, Widget, Watch, Live Activity, or runtime behavior.
+
+Pending work:
+
+- Recommended next prompt is a docs-only real data contract audit for Progress V4 modules before any production skeleton or data wiring.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
