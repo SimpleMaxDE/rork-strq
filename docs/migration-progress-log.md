@@ -3294,6 +3294,25 @@ Pending work:
 
 - Recommended next prompt is a docs-only real data contract audit for Progress V4 modules before any production skeleton or data wiring.
 
+## 2026-05-07 - Progress V4 Real Data Contract Audit
+
+Scope:
+
+- Created `docs/progress-v4-real-data-contract-audit.md` to map Progress V4 modules to current STRQ data sources and confirm the production blocker around `ProgressEntry.muscleGroupVolume`.
+
+Files changed:
+
+- `docs/progress-v4-real-data-contract-audit.md`
+- `docs/migration-progress-log.md`
+
+Verification:
+
+- Ran docs-only diff scope, iOS tree no-change check, required audit-term search, and `git diff --check`; no Swift/assets/project/localization/test/runtime changes.
+
+Pending work:
+
+- Recommended next step is C: fix/build the muscle coverage data contract first as a read-only derivation before any V4 production UI wiring.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
