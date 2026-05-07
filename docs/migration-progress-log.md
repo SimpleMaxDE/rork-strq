@@ -3230,6 +3230,47 @@ Pending work:
 - Rork QA should screenshot all three V4 states.
 - macOS/CI build validation remains required; this pass ran on Windows.
 
+## 2026-05-07 - Progress V4 Hybrid Candidate Refinement
+
+Scope:
+
+- Refined only the DEBUG-only Progress V4 Hybrid Candidate toward a cleaner production-candidate direction.
+- Preserved the production Progress tab, production navigation, models, services, persistence, analytics, localization, assets, project files, tests, Widget, Watch, and Live Activity.
+- Kept all V4 data local to the DEBUG prototype and did not wire real data.
+
+Files changed:
+
+- `ios/STRQ/Views/Debug/ProgressV4HybridCandidateView.swift`
+- `docs/progress-v3-figma-source-map.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Re-inspected `11604:63115`, `11604:63236`, `11604:63724`, `11604:64937`, `11604:66184`, `9129:26029`, and `9129:207997`.
+- Adapted report hierarchy, chart skeleton grammar, progress/bar baseline states, rhythm grids, and evidence/history pacing without copying source text, source branding, or assets.
+
+Implementation:
+
+- Changed the in-surface header to product language and separated the Training Distribution title from its status chip to avoid truncation pressure.
+- Replaced unexplained compact `P / U / L / C / H` training-mix labels with understandable Push, Pull, Legs, Core, and Posterior labels.
+- Replaced low/high read semantics with Locked, Baseline forming, Early signal, Readable, and High confidence semantics.
+- Added more intentional baseline visuals through faint body coverage guides, skeleton coverage bars, and locked trend language.
+- Softened forming state color and copy so it reads as a constructive early signal rather than a warning state.
+- Preserved established teal/green coverage, rhythm, and high-confidence trend hierarchy.
+- Refined Recent Evidence from a plain list toward dated proof rows inside the timeline.
+
+Intentionally not changed:
+
+- No `ProgressAnalyticsView.swift`.
+- No production Progress behavior, route, data source, model, service, analytics, persistence, localization, asset, token, project, test, Widget, Watch, or Live Activity change.
+- No Sandow references were introduced.
+
+Pending work:
+
+- Rork QA should re-check Baseline, Forming, and Established V4 screenshots, especially Training Distribution title wrapping, the mix rail labels, baseline intentionality, forming warmth, and established readability.
+- macOS or CI build validation remains required before any production planning; this pass ran on Windows.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

@@ -120,6 +120,19 @@ Progress V4 Hybrid Candidate keeps Concept C as the core direction and folds in 
 
 The V4 pass deliberately avoids promoting any V3 concept directly. It uses the selected Figma nodes as licensed source patterns, not copied screens, and keeps all values local to the DEBUG-only candidate.
 
+## V4 Hybrid Candidate Refinement Decision
+
+The 2026-05-07 refinement keeps V4 as the strongest Progress direction while cleaning up prototype roughness before any production-planning step:
+
+- Training Distribution remains the hero, but the title/status hierarchy is separated so the title does not fight the status chip.
+- Baseline uses intentional skeleton structure, faint coverage guides, and locked/baseline-forming language instead of presenting a dead empty panel.
+- Forming uses muted early-signal language and a softer amber treatment so the state reads as constructive rather than warning-heavy.
+- Established keeps the readable teal/green coverage, weekly rhythm, and high-confidence strength trend as the strongest state.
+- Training Mix keeps full Push, Pull, Legs, Core, and Posterior labels; compact unexplained `P / U / L / C / H` labels are removed.
+- Recent Evidence remains a proof/timeline module, with slightly stronger date/tag hierarchy and less plain-list presentation.
+
+This remains DEBUG-only and local-data-only. No production Progress replacement, production route, analytics, models, services, persistence, localization, assets, or global design tokens are part of the decision.
+
 ## Weakest Concept
 
 Concept A is weakest. It is useful and visually clearer than the current card stack, but chart-first metric reports are common enough that it needs the strongest STRQ copy and production data model to avoid drifting generic.

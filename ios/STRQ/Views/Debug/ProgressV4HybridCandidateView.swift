@@ -32,13 +32,13 @@ struct ProgressV4HybridCandidateView: View {
 private struct ProgressV4Header: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text("Progress V4 Hybrid Candidate")
+            Text("Training Progress")
                 .font(STRQTypography.headingSmall)
                 .foregroundStyle(STRQColors.primaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.68)
 
-            Text("Training distribution, weekly rhythm, and strength trend in one progress surface.")
+            Text("Distribution, rhythm, strength trend, and recent proof in one progress surface.")
                 .font(STRQTypography.caption)
                 .foregroundStyle(STRQColors.secondaryText)
                 .lineLimit(2)
@@ -95,22 +95,23 @@ private struct ProgressV4MuscleProofHero: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: STRQSpacing.md) {
-            HStack(alignment: .top, spacing: STRQSpacing.sm) {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("Training Distribution")
-                        .font(STRQTypography.headingXS)
-                        .foregroundStyle(STRQColors.primaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.68)
+            VStack(alignment: .leading, spacing: 7) {
+                Text("Training Distribution")
+                    .font(STRQTypography.headingXS)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
 
+                HStack(alignment: .top, spacing: STRQSpacing.sm) {
                     Text(data.heroCaption)
                         .font(STRQTypography.caption)
                         .foregroundStyle(STRQColors.secondaryText)
                         .lineLimit(2)
-                }
 
-                Spacer(minLength: STRQSpacing.xs)
-                ProgressV4StatusChip(text: data.maturityLabel, tint: data.tint)
+                    Spacer(minLength: STRQSpacing.xs)
+                    ProgressV4StatusChip(text: data.maturityLabel, tint: data.tint)
+                        .padding(.top, 1)
+                }
             }
 
             HStack(alignment: .center, spacing: STRQSpacing.sm) {
@@ -149,7 +150,7 @@ private struct ProgressV4MuscleProofHero: View {
                 ProgressV4Divider()
                 ProgressV4HeroStat(title: "Window", value: data.windowValue, tint: data.tint)
                 ProgressV4Divider()
-                ProgressV4HeroStat(title: "Read", value: data.readabilityValue, tint: data.tint)
+                ProgressV4HeroStat(title: "Signal", value: data.readabilityValue, tint: data.tint)
             }
             .padding(.vertical, STRQSpacing.sm)
             .background(ProgressV4Style.glassSurface, in: .rect(cornerRadius: 18))
@@ -244,15 +245,45 @@ private struct ProgressV4BodyScanLines: View {
         GeometryReader { proxy in
             let width = max(proxy.size.width, 1)
             let height = max(proxy.size.height, 1)
+            let xPositions: [CGFloat] = [0.38, 0.62, 0.5, 0.43, 0.57]
+            let yPositions: [CGFloat] = [0.25, 0.25, 0.46, 0.7, 0.7]
 
-            Path { path in
-                for index in 0..<7 {
-                    let y = height * CGFloat(index + 1) / 8
-                    path.move(to: CGPoint(x: width * 0.16, y: y))
-                    path.addLine(to: CGPoint(x: width * 0.84, y: y))
+            ZStack {
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .strokeBorder(tint.opacity(0.13), style: StrokeStyle(lineWidth: 1, dash: [6, 8]))
+                    .padding(.horizontal, width * 0.18)
+                    .padding(.vertical, height * 0.08)
+
+                Path { path in
+                    for index in 0..<7 {
+                        let y = height * CGFloat(index + 1) / 8
+                        path.move(to: CGPoint(x: width * 0.16, y: y))
+                        path.addLine(to: CGPoint(x: width * 0.84, y: y))
+                    }
+                }
+                .stroke(tint.opacity(0.34), style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5, 7]))
+
+                Path { path in
+                    path.move(to: CGPoint(x: width * 0.5, y: height * 0.12))
+                    path.addLine(to: CGPoint(x: width * 0.5, y: height * 0.88))
+                    path.move(to: CGPoint(x: width * 0.32, y: height * 0.34))
+                    path.addLine(to: CGPoint(x: width * 0.68, y: height * 0.34))
+                    path.move(to: CGPoint(x: width * 0.36, y: height * 0.66))
+                    path.addLine(to: CGPoint(x: width * 0.64, y: height * 0.66))
+                }
+                .stroke(tint.opacity(0.18), style: StrokeStyle(lineWidth: 1, lineCap: .round))
+
+                ForEach(0..<5, id: \.self) { index in
+                    Circle()
+                        .strokeBorder(tint.opacity(index == 2 ? 0.32 : 0.18), lineWidth: 1)
+                        .background(Circle().fill(ProgressV4Style.plot.opacity(0.42)))
+                        .frame(width: 7, height: 7)
+                        .position(
+                            x: width * xPositions[index],
+                            y: height * yPositions[index]
+                        )
                 }
             }
-            .stroke(tint.opacity(0.45), style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5, 7]))
         }
     }
 }
@@ -280,9 +311,18 @@ private struct ProgressV4CoverageBar: View {
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
                     Capsule().fill(ProgressV4Style.track)
-                    Capsule()
-                        .fill(item.value > 0 ? tint.opacity(item.isPrimary ? 0.94 : 0.6) : ProgressV4Style.steel.opacity(0.14))
-                        .frame(width: max(4, proxy.size.width * CGFloat(item.clampedValue)))
+                    if item.value > 0 {
+                        Capsule()
+                            .fill(tint.opacity(item.isPrimary ? 0.94 : 0.6))
+                            .frame(width: max(4, proxy.size.width * CGFloat(item.clampedValue)))
+                    } else {
+                        Capsule()
+                            .fill(ProgressV4Style.steel.opacity(0.08))
+                            .frame(width: proxy.size.width * 0.34)
+                        Capsule()
+                            .fill(ProgressV4Style.steel.opacity(0.2))
+                            .frame(width: 12)
+                    }
                 }
             }
             .frame(height: 7)
@@ -464,10 +504,12 @@ private struct ProgressV4TrendDetailLayer: View {
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.62)
-                Text(data.trendUnit)
-                    .font(STRQTypography.caption)
-                    .foregroundStyle(STRQColors.secondaryText)
-                    .padding(.bottom, 5)
+                if !data.trendUnit.isEmpty {
+                    Text(data.trendUnit)
+                        .font(STRQTypography.caption)
+                        .foregroundStyle(STRQColors.secondaryText)
+                        .padding(.bottom, 5)
+                }
                 Spacer()
                 Text(data.trendWindow)
                     .font(STRQTypography.micro)
@@ -625,6 +667,7 @@ private struct ProgressV4TrainingMix: View {
                     .font(STRQTypography.micro)
                     .foregroundStyle(data.tint)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.72)
             }
 
             ProgressV4MixRail(segments: data.mixSegments, tint: data.tint, state: data.state)
@@ -663,15 +706,19 @@ private struct ProgressV4MixRail: View {
 
             HStack(spacing: 4) {
                 ForEach(segments) { segment in
+                    let segmentWidth = max(state == .baseline ? 14 : 28, availableWidth * CGFloat(segment.clampedValue))
+
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
                         .fill(segment.color(tint: tint, state: state).opacity(segment.value > 0 ? 0.9 : 0.16))
-                        .frame(width: max(10, availableWidth * CGFloat(segment.clampedValue)))
+                        .frame(width: segmentWidth)
                         .overlay {
-                            Text(segment.short)
-                                .font(STRQTypography.micro)
-                                .foregroundStyle(segment.value > 0.13 ? ProgressV4Style.background : STRQColors.mutedText)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
+                            if segment.value > 0, segmentWidth > 34 {
+                                Text(segment.short)
+                                    .font(STRQTypography.micro)
+                                    .foregroundStyle(segment.value > 0.13 ? ProgressV4Style.background : STRQColors.mutedText)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.48)
+                            }
                         }
                 }
             }
@@ -696,6 +743,7 @@ private struct ProgressV4MixRow: View {
                 .font(STRQTypography.caption)
                 .foregroundStyle(STRQColors.secondaryText)
                 .lineLimit(1)
+                .minimumScaleFactor(0.72)
                 .frame(width: 70, alignment: .leading)
 
             GeometryReader { proxy in
@@ -782,16 +830,19 @@ private struct ProgressV4EvidenceRow: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 HStack(alignment: .firstTextBaseline, spacing: STRQSpacing.xs) {
+                    Text(item.date)
+                        .font(STRQTypography.micro)
+                        .foregroundStyle(item.tone.tagColor(tint: tint))
+                        .lineLimit(1)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(item.tone.tagColor(tint: tint).opacity(0.1), in: Capsule())
+
                     Text(item.title)
                         .font(STRQTypography.bodySmallMedium)
                         .foregroundStyle(STRQColors.primaryText)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
-                    Spacer(minLength: STRQSpacing.xs)
-                    Text(item.date)
-                        .font(STRQTypography.micro)
-                        .foregroundStyle(STRQColors.mutedText)
-                        .lineLimit(1)
                 }
 
                 Text(item.detail)
@@ -813,7 +864,13 @@ private struct ProgressV4EvidenceRow: View {
                     }
                 }
             }
-            .padding(.bottom, isLast ? 0 : STRQSpacing.sm)
+            .padding(STRQSpacing.sm)
+            .background(ProgressV4Style.surfaceSecondary.opacity(0.58), in: .rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(item.tone.markerColor(tint: tint).opacity(0.16), lineWidth: 1)
+            )
+            .padding(.bottom, isLast ? 0 : STRQSpacing.xs)
         }
     }
 }
@@ -825,7 +882,7 @@ private struct ProgressV4StatusChip: View {
     let tint: Color
 
     var body: some View {
-        Text(text.uppercased())
+        Text(text)
             .font(STRQTypography.micro)
             .foregroundStyle(tint)
             .lineLimit(1)
@@ -979,11 +1036,11 @@ private struct ProgressV4DemoData {
     // Prototype-only demo data. It stays local to this DEBUG candidate and does not touch app models.
     static let baseline = ProgressV4DemoData(
         state: .baseline,
-        heroCaption: "No conclusions yet. The map waits for completed sessions before calling a pattern.",
+        heroCaption: "Complete sessions to build the first coverage map. Until then, this stays structured and quiet.",
         maturityLabel: "Baseline forming",
         workoutValue: "0",
         windowValue: "--",
-        readabilityValue: "--",
+        readabilityValue: "Locked",
         frontLayers: [],
         backLayers: [],
         coverageBars: ProgressV4Factory.coverage(push: 0, pull: 0, legs: 0, posterior: 0),
@@ -991,35 +1048,35 @@ private struct ProgressV4DemoData {
         rhythmValue: "0 sessions",
         rhythmDays: ProgressV4Factory.days(trained: [], forming: [8, 15, 22, 29]),
         weekSummaries: ProgressV4Factory.weeks([0, 0, 0, 0, 0, 0], current: 5),
-        trendCaption: "Strength and volume stay blank until a baseline exists.",
+        trendCaption: "Strength stays blank until the first repeatable anchor exists.",
         trendStatus: "Locked",
         trendValue: "--",
-        trendUnit: "trend",
-        trendWindow: "no window",
+        trendUnit: "",
+        trendWindow: "baseline",
         trendValues: [],
         mixCaption: "Push, pull, legs, core, and posterior work start empty.",
-        mixStatus: "Open",
+        mixStatus: "Baseline forming",
         mixSegments: ProgressV4Factory.mix(push: 0, pull: 0, legs: 0, core: 0, posterior: 0),
         evidenceWindow: "now",
         evidence: [
             .init(date: "Now", title: "No completed sessions", detail: "Complete workouts to start the training record.", tags: ["0 workouts"], tone: .neutral),
-            .init(date: "0/3", title: "First anchors pending", detail: "Muscle coverage and trend stay quiet until the first sessions land.", tags: ["baseline"], tone: .neutral)
+            .init(date: "0/3", title: "First anchors pending", detail: "Coverage, rhythm, and trend stay quiet until the first sessions land.", tags: ["Baseline"], tone: .neutral)
         ]
     )
 
     static let forming = ProgressV4DemoData(
         state: .forming,
-        heroCaption: "Three workouts show early push, legs, and back signals without claiming balance.",
-        maturityLabel: "Early pattern",
+        heroCaption: "Three workouts show early push, legs, and pull signals without claiming balance.",
+        maturityLabel: "Early signal",
         workoutValue: "3",
         windowValue: "1 wk",
-        readabilityValue: "Low",
+        readabilityValue: "Early",
         frontLayers: [
-            .init(asset: "STRQHumanBodyMaleFrontChestOverlay", color: ProgressV4Style.amber, opacity: 0.66),
-            .init(asset: "STRQHumanBodyMaleFrontUpperLegOverlay", color: ProgressV4Style.amber, opacity: 0.42)
+            .init(asset: "STRQHumanBodyMaleFrontChestOverlay", color: ProgressV4Style.amber, opacity: 0.54),
+            .init(asset: "STRQHumanBodyMaleFrontUpperLegOverlay", color: ProgressV4Style.amber, opacity: 0.34)
         ],
         backLayers: [
-            .init(asset: "STRQHumanBodyMaleBackBackOverlay", color: ProgressV4Style.amber, opacity: 0.5),
+            .init(asset: "STRQHumanBodyMaleBackBackOverlay", color: ProgressV4Style.amber, opacity: 0.42),
             .init(asset: "STRQHumanBodyMaleBackHamstringOverlay", color: ProgressV4Style.steel, opacity: 0.24)
         ],
         coverageBars: ProgressV4Factory.coverage(push: 0.42, pull: 0.28, legs: 0.34, posterior: 0.18),
@@ -1027,30 +1084,30 @@ private struct ProgressV4DemoData {
         rhythmValue: "3 sessions",
         rhythmDays: ProgressV4Factory.days(trained: [3, 7, 12], forming: [18, 23, 28]),
         weekSummaries: ProgressV4Factory.weeks([0, 1, 0, 2, 0, 3], current: 5),
-        trendCaption: "Volume is moving, but the read stays cautious.",
-        trendStatus: "Early",
+        trendCaption: "Volume is moving; repeats will turn it into a reliable trend.",
+        trendStatus: "Early signal",
         trendValue: "+4",
         trendUnit: "% volume",
         trendWindow: "3 sessions",
         trendValues: [42, 48, 46, 53, 57],
         mixCaption: "The first week leans push and legs, with pull still light.",
-        mixStatus: "Forming",
+        mixStatus: "Early signal",
         mixSegments: ProgressV4Factory.mix(push: 0.32, pull: 0.22, legs: 0.28, core: 0.1, posterior: 0.08),
         evidenceWindow: "this week",
         evidence: [
-            .init(date: "Mon", title: "Upper Strength", detail: "Pressing and rows created the first upper-body anchors.", tags: ["push", "pull"], tone: .forming),
-            .init(date: "Thu", title: "Lower Strength", detail: "Squat work added a clear leg signal.", tags: ["legs"], tone: .forming),
-            .init(date: "Sat", title: "Full Body", detail: "Third workout made weekly rhythm readable, but still early.", tags: ["cadence"], tone: .forming)
+            .init(date: "Mon", title: "Upper Strength", detail: "Pressing and rows created the first upper-body anchors.", tags: ["Push", "Pull"], tone: .forming),
+            .init(date: "Thu", title: "Lower Strength", detail: "Squat work added a clear leg signal.", tags: ["Legs"], tone: .forming),
+            .init(date: "Sat", title: "Full Body", detail: "Third workout made weekly rhythm visible; repeats will confirm it.", tags: ["Rhythm"], tone: .forming)
         ]
     )
 
     static let established = ProgressV4DemoData(
         state: .established,
         heroCaption: "A four-week window shows readable coverage across push, pull, legs, and posterior chain.",
-        maturityLabel: "Readable pattern",
+        maturityLabel: "High confidence",
         workoutValue: "27",
         windowValue: "4 wk",
-        readabilityValue: "High",
+        readabilityValue: "Readable",
         frontLayers: [
             .init(asset: "STRQHumanBodyMaleFrontChestOverlay", color: ProgressV4Style.signal, opacity: 0.64),
             .init(asset: "STRQHumanBodyMaleFrontShoulderOverlay", color: ProgressV4Style.signal, opacity: 0.5),
@@ -1069,7 +1126,7 @@ private struct ProgressV4DemoData {
         rhythmDays: ProgressV4Factory.days(trained: [1, 3, 5, 8, 10, 12, 15, 17, 19, 22, 24, 26, 29, 31, 33], forming: [35]),
         weekSummaries: ProgressV4Factory.weeks([3, 4, 3, 5, 4, 6], current: 5),
         trendCaption: "Strength volume is up while coverage stays balanced.",
-        trendStatus: "Readable",
+        trendStatus: "High confidence",
         trendValue: "+11",
         trendUnit: "% volume",
         trendWindow: "4 weeks",
@@ -1079,10 +1136,10 @@ private struct ProgressV4DemoData {
         mixSegments: ProgressV4Factory.mix(push: 0.25, pull: 0.28, legs: 0.24, core: 0.09, posterior: 0.14),
         evidenceWindow: "latest",
         evidence: [
-            .init(date: "Apr 29", title: "Upper Strength", detail: "Press and row moved together without crowding lower work.", tags: ["push", "pull"], tone: .positive),
-            .init(date: "May 01", title: "Lower Power", detail: "Leg work returned near the four-week average.", tags: ["legs"], tone: .positive),
-            .init(date: "May 04", title: "Pull Focus", detail: "Back volume filled the main coverage gap.", tags: ["pull"], tone: .positive),
-            .init(date: "May 05", title: "Recovery Slot", detail: "Low-load work preserved cadence without changing the trend.", tags: ["rhythm"], tone: .neutral)
+            .init(date: "Apr 29", title: "Upper Strength", detail: "Press and row moved together without crowding lower work.", tags: ["Push", "Pull"], tone: .positive),
+            .init(date: "May 01", title: "Lower Power", detail: "Leg work returned near the four-week average.", tags: ["Legs"], tone: .positive),
+            .init(date: "May 04", title: "Pull Focus", detail: "Back volume filled the main coverage gap.", tags: ["Pull"], tone: .positive),
+            .init(date: "May 05", title: "Recovery Slot", detail: "Low-load work preserved cadence without changing the trend.", tags: ["Rhythm"], tone: .neutral)
         ]
     )
 }
@@ -1130,11 +1187,11 @@ private enum ProgressV4Factory {
 
     static func mix(push: Double, pull: Double, legs: Double, core: Double, posterior: Double) -> [ProgressV4MixSegment] {
         [
-            .init(name: "Push", short: "P", value: push, role: .primary),
-            .init(name: "Pull", short: "U", value: pull, role: .secondary),
-            .init(name: "Legs", short: "L", value: legs, role: .success),
-            .init(name: "Core", short: "C", value: core, role: .neutral),
-            .init(name: "Posterior", short: "H", value: posterior, role: .successSoft)
+            .init(name: "Push", short: "Push", value: push, role: .primary),
+            .init(name: "Pull", short: "Pull", value: pull, role: .secondary),
+            .init(name: "Legs", short: "Legs", value: legs, role: .success),
+            .init(name: "Core", short: "Core", value: core, role: .neutral),
+            .init(name: "Posterior", short: "Posterior", value: posterior, role: .successSoft)
         ]
     }
 }
@@ -1296,7 +1353,7 @@ private enum ProgressV4Style {
     static let steel = hex(0xAAB7C7)
     static let signal = hex(0x69D7CE)
     static let success = STRQColors.successGreen
-    static let amber = STRQColors.warningAmber
+    static let amber = hex(0xD4B86A)
 
     private static func hex(_ value: UInt, opacity: Double = 1) -> Color {
         Color(
