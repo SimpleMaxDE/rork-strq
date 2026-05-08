@@ -3394,6 +3394,44 @@ Pending work:
 - macOS or CI build/test validation remains required.
 - Rork/simulator QA remains required for loaded, bodyweight, mixed, unresolved-metadata, low-data, three-workout, and established Muscle Balance states.
 
+## 2026-05-08 - Progress Muscle Coverage iOS Test Workflow
+
+Scope:
+
+- Added a focused GitHub Actions workflow for Progress Muscle Coverage V1 test validation on macOS/Xcode CI.
+- The workflow selects Xcode 16.4 when available, lists the Xcode project, lists available iOS simulators, prefers `iPhone 16`, and falls back to an available iPhone simulator.
+- The focused test command is:
+
+```sh
+xcodebuild test \
+  -project ios/STRQ.xcodeproj \
+  -scheme STRQ \
+  -configuration Debug \
+  -sdk iphonesimulator \
+  -destination "${destination}" \
+  -only-testing:STRQTests/ProgressMuscleCoverageCalculatorTests \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+Files changed:
+
+- `.github/workflows/ios-tests.yml`
+- `docs/migration-progress-log.md`
+
+Pre-CI inspection:
+
+- `ios/STRQTests/STRQTests.swift` defines `ProgressMuscleCoverageCalculatorTests`.
+- The shared `STRQ` scheme exists, but this Windows-side inspection found no `TestAction` in `ios/STRQ.xcodeproj/xcshareddata/xcschemes/STRQ.xcscheme`; macOS/Xcode CI must confirm whether this blocks `xcodebuild test`.
+
+Intentionally not changed:
+
+- No app runtime behavior, production Progress UI, Progress V4 production wiring, analytics, navigation, assets, localization, Widget, Watch, Live Activity, project file, or test source changes.
+
+Pending work:
+
+- Dispatch or inspect the `iOS Tests` workflow on GitHub Actions and capture the exact Progress Muscle Coverage test result or blocker.
+- If CI reports the shared scheme is not configured for testing, the minimal follow-up is to add the existing `STRQTests` target to the shared `STRQ` scheme test action.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
