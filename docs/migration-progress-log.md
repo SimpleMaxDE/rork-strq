@@ -3432,6 +3432,24 @@ Pending work:
 - Dispatch or inspect the `iOS Tests` workflow on GitHub Actions and capture the exact Progress Muscle Coverage test result or blocker.
 - If CI reports the shared scheme is not configured for testing, the minimal follow-up is to add the existing `STRQTests` target to the shared `STRQ` scheme test action.
 
+## 2026-05-08 - Progress Muscle Coverage Runtime QA Report
+
+Scope:
+
+- Documented Progress Muscle Coverage runtime QA status after green iOS Build and focused iOS Tests on `dcf9ac9`.
+- Confirmed this Windows workspace cannot execute Rork/iOS simulator runtime scenarios because `xcodebuild`, `xcrun`, Swift, and `rork` are unavailable.
+- Captured static findings for weighted, bodyweight, mixed, low-data, 4+ Muscle Balance, per-muscle data shape, broad bucket label risk, copy semantics, and V4 DEBUG-only containment.
+
+Files changed:
+
+- `docs/progress-muscle-coverage-runtime-qa-report.md`
+- `docs/migration-progress-log.md`
+
+Verification status:
+
+- GitHub Actions iOS Build and iOS Tests passed on `dcf9ac94a984a2c97888d9919192cbbf9df05eae`.
+- Real Rork/simulator QA remains blocked pending a macOS runtime environment with disposable simulator data.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
