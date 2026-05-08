@@ -3484,6 +3484,29 @@ Pending work:
 - Complete real Rork/simulator QA from a macOS runtime environment using disposable simulator data.
 - Replace blocked scenario notes with actual runtime observations before classifying Progress Muscle Coverage V1 as pass or pass with caveats.
 
+## 2026-05-08 - Progress V4 Production Integration Plan
+
+Scope:
+
+- Created a docs-only phased integration plan for moving the accepted DEBUG-only Progress V4 Hybrid Candidate into production safely without implementing it yet.
+- Chose exactly one first production slice: Weekly Rhythm from real completed workout dates.
+- Kept Muscle Coverage runtime QA as a separate release gate and documented why repeated Windows-only runtime QA attempts should not continue.
+
+Files changed:
+
+- `docs/progress-v4-production-integration-plan.md`
+- `docs/migration-progress-log.md`
+
+Intentionally not changed:
+
+- No Swift files, assets, project files, models, services, view models, analytics files, localization, tests, fonts, Widget, Watch, Live Activity, or production runtime files.
+- No Progress V4 productionization and no demo data wiring.
+
+Pending work:
+
+- Implement the Weekly Rhythm production slice in a separate scoped pass.
+- Complete real macOS/Rork runtime QA for Muscle Coverage before Training Distribution or V4 replacement release confidence.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
