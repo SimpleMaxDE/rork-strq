@@ -50,36 +50,33 @@ struct ContentView: View {
                 )
             } else {
                 TabView(selection: $selectedTab) {
-                    NavigationStack {
-                        DashboardView(vm: vm)
+                    Tab(value: 0) {
+                        NavigationStack {
+                            DashboardView(vm: vm)
+                        }
                     }
-                    .tabItem { Label("Today", systemImage: "house.fill") }
-                    .tag(0)
-
-                    NavigationStack {
-                        CoachTabView(vm: vm)
+                    Tab(value: 1) {
+                        NavigationStack {
+                            CoachTabView(vm: vm)
+                        }
                     }
-                    .tabItem { Label("Coach", systemImage: "brain.head.profile.fill") }
-                    .tag(1)
-
-                    NavigationStack {
-                        TrainingPlanView(vm: vm)
+                    Tab(value: 2) {
+                        NavigationStack {
+                            TrainingPlanView(vm: vm)
+                        }
                     }
-                    .tabItem { Label("Train", systemImage: "bolt.fill") }
-                    .tag(2)
-
-                    NavigationStack {
-                        ProgressAnalyticsView(vm: vm)
+                    Tab(value: 3) {
+                        NavigationStack {
+                            ProgressAnalyticsView(vm: vm)
+                        }
                     }
-                    .tabItem { Label("Progress", systemImage: "chart.line.uptrend.xyaxis") }
-                    .tag(3)
-
-                    NavigationStack {
-                        ProfileView(vm: vm, store: store)
+                    Tab(value: 4) {
+                        NavigationStack {
+                            ProfileView(vm: vm, store: store)
+                        }
                     }
-                    .tabItem { Label("Profile", systemImage: "person.fill") }
-                    .tag(4)
                 }
+                .tabViewStyle(.sidebarAdaptable)
                 .tint(STRQPalette.energyAccent)
                 .preferredColorScheme(.dark)
                 .toolbar(.hidden, for: .tabBar)

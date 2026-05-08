@@ -3548,27 +3548,28 @@ Pending work:
 Scope:
 
 - Hardened the native iOS app target for Rork preview installation after the cloud preview stayed on the Apple logo / Installing state.
-- Removed iOS 18-only tab-shell APIs so the app can deploy to iOS 17 preview devices.
+- Kept the app on the iOS 26 direction and restored the modern tab shell / onboarding `MeshGradient` assumptions.
 - Stopped the app target from embedding Widget and Watch products during the main STRQ app install, reducing preview signing/provisioning risk while leaving the Widget and Watch source targets in the project.
 - Pruned the main app entitlements file to avoid requiring HealthKit, iCloud, Apple Sign-In, App Groups, or Apple Pay provisioning for the Rork preview app bundle.
 
 Files changed:
 
 - `ios/STRQ/ContentView.swift`
+- `ios/STRQ/Views/OnboardingView.swift`
 - `ios/STRQ/STRQ.entitlements`
 - `ios/STRQ.xcodeproj/project.pbxproj`
 - `docs/migration-progress-log.md`
 
 Verification:
 
-- Confirmed no `Tab(value:)` or `.sidebarAdaptable` usage remains.
-- Confirmed no `IPHONEOS_DEPLOYMENT_TARGET = 18.0` remains.
+- Confirmed `Tab(value:)`, `.sidebarAdaptable`, and onboarding `MeshGradient` remain available for the iOS 26 baseline.
+- Confirmed no iOS or watchOS deployment target below `26.0` remains in the app targets.
 - Confirmed the main app entitlements file no longer contains `com.apple.developer.*` or App Groups entries.
 - Ran `git diff --check`; only existing CRLF normalization warnings were reported.
 
 Pending work:
 
-- GitHub Actions macOS build validation is required after push.
+- GitHub Actions on the current runner may need an Xcode/iOS 26 image before it can validate the iOS 26 deployment target.
 - Rork preview should be refreshed from the new commit and retried.
 - Watch, Widget, HealthKit, iCloud, and Apple Sign-In should be reintroduced only with matching provisioning once the base Rork app install is stable.
 
