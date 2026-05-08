@@ -3543,6 +3543,35 @@ Pending work:
 - Rork QA should capture 0, 1, 3, and 4+ workout states on small and large iPhone sizes.
 - Full Progress V4 production integration remains deferred; Muscle Coverage runtime QA remains a separate release gate.
 
+## 2026-05-09 - Rork Preview Install Hardening
+
+Scope:
+
+- Hardened the native iOS app target for Rork preview installation after the cloud preview stayed on the Apple logo / Installing state.
+- Removed iOS 18-only tab-shell APIs so the app can deploy to iOS 17 preview devices.
+- Stopped the app target from embedding Widget and Watch products during the main STRQ app install, reducing preview signing/provisioning risk while leaving the Widget and Watch source targets in the project.
+- Pruned the main app entitlements file to avoid requiring HealthKit, iCloud, Apple Sign-In, App Groups, or Apple Pay provisioning for the Rork preview app bundle.
+
+Files changed:
+
+- `ios/STRQ/ContentView.swift`
+- `ios/STRQ/STRQ.entitlements`
+- `ios/STRQ.xcodeproj/project.pbxproj`
+- `docs/migration-progress-log.md`
+
+Verification:
+
+- Confirmed no `Tab(value:)` or `.sidebarAdaptable` usage remains.
+- Confirmed no `IPHONEOS_DEPLOYMENT_TARGET = 18.0` remains.
+- Confirmed the main app entitlements file no longer contains `com.apple.developer.*` or App Groups entries.
+- Ran `git diff --check`; only existing CRLF normalization warnings were reported.
+
+Pending work:
+
+- GitHub Actions macOS build validation is required after push.
+- Rork preview should be refreshed from the new commit and retried.
+- Watch, Widget, HealthKit, iCloud, and Apple Sign-In should be reintroduced only with matching provisioning once the base Rork app install is stable.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
