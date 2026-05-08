@@ -721,6 +721,13 @@ struct AddExerciseSheet: View {
     private let library = ExerciseLibrary.shared
     private let catalog = ExerciseCatalog.shared
 
+    private struct ExerciseGroup: Identifiable {
+        let muscle: MuscleGroup
+        let exercises: [Exercise]
+
+        var id: String { muscle.id }
+    }
+
     init(vm: AppViewModel, day: WorkoutDay? = nil, onSelect: @escaping (Exercise) -> Void) {
         self.vm = vm
         self.day = day
@@ -763,11 +770,11 @@ struct AddExerciseSheet: View {
         return Array(matches.sorted { score($0) > score($1) }.prefix(6))
     }
 
-    private var grouped: [(MuscleGroup, [Exercise])] {
+    private var grouped: [ExerciseGroup] {
         let d = Dictionary(grouping: results) { $0.primaryMuscle }
         return MuscleGroup.allCases.compactMap { m in
             guard let arr = d[m], !arr.isEmpty else { return nil }
-            return (m, arr)
+            return ExerciseGroup(muscle: m, exercises: arr)
         }
     }
 
@@ -813,13 +820,13 @@ struct AddExerciseSheet: View {
                         }
                     }
 
-                    SwiftUI.ForEach(grouped, id: \.0) { group in
+                    SwiftUI.ForEach(grouped) { group in
                         SwiftUI.Section {
-                            SwiftUI.ForEach(group.1) { ex in
+                            SwiftUI.ForEach(group.exercises, id: \.id) { ex in
                                 resultRow(ex)
                             }
                         } header: {
-                            Text(group.0.localizedDisplayName)
+                            Text(group.muscle.localizedDisplayName)
                         }
                     }
                 }
