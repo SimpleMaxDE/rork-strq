@@ -3450,6 +3450,40 @@ Verification status:
 - GitHub Actions iOS Build and iOS Tests passed on `dcf9ac94a984a2c97888d9919192cbbf9df05eae`.
 - Real Rork/simulator QA remains blocked pending a macOS runtime environment with disposable simulator data.
 
+## 2026-05-08 - Progress Muscle Coverage Runtime QA Current-Head Attempt
+
+Scope:
+
+- Re-attempted the requested real macOS/Rork simulator QA preflight from the current Codex workspace.
+- Confirmed the working tree was clean before edits and `main` was at `bc2356cc8c0683aad94910b3047dbeab3a3e362a`.
+- Confirmed `main` includes both `dcf9ac9 ci: enable STRQTests scheme action` and `bc2356c docs: validate progress muscle coverage runtime`.
+- Confirmed local runtime QA remains blocked here because Windows PowerShell does not provide `xcodebuild`, `xcrun simctl`, Swift, a Rork CLI, or exposed XcodeBuildMCP simulator tools.
+- Updated the runtime QA report so weighted, bodyweight, mixed, 1-workout, 3-workout, 4+ workout, Progress UI, Muscle Balance, Movement Balance, unresolved metadata, data-shape, and copy-risk sections state the exact blocker instead of implying simulator observations.
+
+Files changed:
+
+- `docs/progress-muscle-coverage-runtime-qa-report.md`
+- `docs/migration-progress-log.md`
+
+Verification status:
+
+- iOS Build passed on current head `bc2356cc8c0683aad94910b3047dbeab3a3e362a`, run `25571693952`.
+- Focused iOS Tests previously passed on `dcf9ac94a984a2c97888d9919192cbbf9df05eae`, run `25570824557`.
+- Focused iOS Tests passed on current head `bc2356cc8c0683aad94910b3047dbeab3a3e362a`, run `25572288082`.
+
+Intentionally not changed:
+
+- No Swift files.
+- No production Progress UI.
+- No Progress V4 production integration.
+- No DEBUG prototype files.
+- No `ContentView.swift`, `CoachTabView.swift`, `ExerciseDetailView.swift`, `WeeklyCheckInView.swift`, assets, localization, project file, analytics, unrelated Services/Models/ViewModels, Widget, Watch, Live Activity, fonts, or destructive simulator data actions.
+
+Pending work:
+
+- Complete real Rork/simulator QA from a macOS runtime environment using disposable simulator data.
+- Replace blocked scenario notes with actual runtime observations before classifying Progress Muscle Coverage V1 as pass or pass with caveats.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

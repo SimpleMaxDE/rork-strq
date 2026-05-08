@@ -4,133 +4,169 @@ Date: 2026-05-08
 
 ## 1. Executive summary
 
-Runtime QA is blocked in this workspace because the local environment is Windows PowerShell and does not provide `xcodebuild`, `xcrun`, Swift, an iOS simulator, or the `rork` CLI. No disposable simulator data state could be prepared locally.
+Release-readiness classification: blocked.
 
-Static review plus GitHub Actions evidence did not find a code bug in the Progress Muscle Coverage Data Contract V1 path. `WorkoutController.completeWorkout()` populates `ProgressEntry.muscleGroupVolume`, the calculator persists per-muscle keys only, and production Muscle Balance remains gated. This is not a runtime pass, so the release-readiness classification is blocked until macOS/Rork simulator QA completes.
+This pass attempted to run real macOS/Rork simulator QA for Progress Muscle Coverage Data Contract V1 from the current Codex workspace. The runtime pass is still blocked here because the workspace is Windows PowerShell and does not expose macOS simulator controls, XcodeBuildMCP tools, `xcodebuild`, `xcrun simctl`, Swift, or a `rork` CLI. No disposable simulator state could be created or inspected, and no non-disposable user data was accessed.
 
-## 2. Environment / build status
+Preflight is otherwise healthy: the working tree was clean before edits, `main` includes `dcf9ac9 ci: enable STRQTests scheme action` and `bc2356c docs: validate progress muscle coverage runtime`, the latest iOS Build passed on `bc2356c`, and the focused iOS Tests workflow also passed on `bc2356c`.
+
+No runtime observations are claimed in this report. Each scenario below records the exact blocker plus the static/CI evidence available. No Swift bug was confirmed, no code fix was made, and Progress V4 remains DEBUG-only.
+
+## 2. Runtime environment
 
 - Local workspace: `C:\Users\maxwa\Documents\GitHub\rork-strq`
 - Local shell: Windows PowerShell
-- Branch: `main`
-- Head: `dcf9ac9 ci: enable STRQTests scheme action`
+- Branch at preflight: `main`
+- Head at preflight: `bc2356cc8c0683aad94910b3047dbeab3a3e362a`
+- Required commits present:
+  - `bc2356c docs: validate progress muscle coverage runtime`
+  - `dcf9ac9 ci: enable STRQTests scheme action`
 - Preflight working tree: clean before docs edits
 - `rork.json`: app `STRQ`, path `ios`, framework `swift`
-- Local runtime tooling: `xcodebuild`, `xcrun`, `swift`, and `rork` were not available
-- iOS Build: success on full SHA `dcf9ac94a984a2c97888d9919192cbbf9df05eae`, run `25570802185`, Xcode 16.4, macOS 15.7.4
-- iOS Tests: success on full SHA `dcf9ac94a984a2c97888d9919192cbbf9df05eae`, run `25570824557`, Xcode 16.4, iPhone 16 simulator
-- Progress V4 remains DEBUG-only: `ProfileView` exposes the Design System Lab under `#if DEBUG`, and V4 candidate files remain under `ios/STRQ/Views/Debug`
+- Local runtime tooling: `xcodebuild`, `xcrun`, `simctl`, Swift, `rork`, and `rork-cli` were not available
+- XcodeBuildMCP simulator tools: not exposed in this tool session
+- Disposable simulator data: not created because no simulator/Rork runtime was available
+- Non-disposable user data: not accessed
+- iOS Build: passed on `bc2356cc8c0683aad94910b3047dbeab3a3e362a`, run `25571693952`
+- iOS Tests: passed on `bc2356cc8c0683aad94910b3047dbeab3a3e362a`, run `25572288082`
+- V4 remains DEBUG-only: Progress V4 candidate files remain under `ios/STRQ/Views/Debug`, and production Progress was not wired to V4
 
-## 3. Test status summary
+## 3. Weighted workout result
 
-The focused CI run passed the required calculator tests:
+Runtime status: blocked, not executed.
 
-- `ProgressMuscleCoverageCalculatorTests/unresolvedExerciseIsSkippedSafely()`
-- `ProgressMuscleCoverageCalculatorTests/unloadedExerciseFallsBackToSetExposure()`
-- `ProgressMuscleCoverageCalculatorTests/weightedExerciseUsesLoadedVolumeWithSecondaryWeight()`
+Exact blocker: the local environment has no macOS simulator, Rork runtime, XcodeBuildMCP simulator tools, `xcodebuild`, or `simctl`, so a disposable Bench Press or loaded workout could not be created or completed.
 
-The app build also passed on the same head commit. Local test execution was not possible because the Windows workspace has no Swift/Xcode toolchain.
+Static/CI evidence only: `ProgressMuscleCoverageCalculatorTests/weightedExerciseUsesLoadedVolumeWithSecondaryWeight()` verifies loaded sets contribute `weight * reps`, with Bench Press style coverage of `chest = 1000`, `triceps = 350`, `shoulders = 350`, and `push = 1700` in the calculator result. `WorkoutController.completeWorkout()` writes only `muscleCoverage.muscleGroupVolume` into `ProgressEntry.muscleGroupVolume`.
 
-## 4. Runtime scenarios tested
+Unverified runtime checks: workout completion, crash-free Progress opening, total volume reasonableness, inspectable muscle coverage population, Muscle Balance labels, and absence of missing-baseline `-100%` rows.
 
-No real Rork/simulator runtime scenarios were executed locally. The following items were reviewed from code and CI evidence only:
+## 4. Bodyweight workout result
 
-- weighted calculator semantics
-- bodyweight / zero-load exposure fallback semantics
-- mixed-workout calculator loop safety
-- `completeWorkout()` population of `ProgressEntry.muscleGroupVolume`
-- low-data and 4+ Muscle Balance gating
-- production Progress labels and DEBUG-only V4 containment
+Runtime status: blocked, not executed.
 
-## 5. Weighted workout result
+Exact blocker: the local environment could not create or complete a disposable Push-up, Pull-up, bodyweight squat, or other zero-load simulator workout.
 
-Runtime status: not executed.
+Static/CI evidence only: `ProgressMuscleCoverageCalculatorTests/unloadedExerciseFallsBackToSetExposure()` verifies zero-load completed sets use exposure points instead of disappearing from coverage. The Push-up style fixture produces `chest = 3`, secondary `triceps = 1.05`, `shoulders = 1.05`, `coreStability = 1.05`, `push = 5.1`, and `core = 1.05`.
 
-Code and CI evidence: weighted completed sets use loaded contribution `weight * reps`. The focused weighted test verifies Bench Press style coverage as `chest = 1000`, secondary `triceps = 350`, secondary `shoulders = 350`, and loaded exercise count `1`.
+Unverified runtime checks: exposure fallback safety in the actual completion flow, Progress opening after a bodyweight-only workout, UI wording clarity, and Muscle Balance low-data gating.
 
-Completion-path evidence: `WorkoutController.completeWorkout()` computes existing `session.totalVolume` unchanged, then calculates coverage and writes the per-muscle dictionary into `ProgressEntry.muscleGroupVolume`.
+## 5. Mixed workout result
 
-## 6. Bodyweight workout result
+Runtime status: blocked, not executed.
 
-Runtime status: not executed.
+Exact blocker: the local environment could not create a disposable workout containing one loaded movement and one zero-load movement.
 
-Code and CI evidence: completed exercises with zero loaded volume use completed-set exposure fallback. The focused bodyweight test verifies Push-up style coverage as primary `chest = 3` and secondary `triceps`, `shoulders`, and `coreStability = 1.05` each for three completed unloaded sets.
+Static evidence only: the calculator evaluates each exercise log independently. A loaded exercise uses loaded volume when its completed sets have positive load, while a zero-load exercise in the same session uses completed-set exposure fallback. This supports coexistence in the same session, but the mixed path has not been runtime-observed in Rork/simulator.
 
-Copy risk: existing total workout volume remains kg-style load and can remain `0` for bodyweight-only work. The coverage field is not directly shown as kg in Muscle Balance rows, but current labels still use "volume" language.
+Unverified runtime checks: no crash after mixed completion, Progress opening, understandable Muscle Balance state, and absence of visible double-counting.
 
-## 7. Mixed workout result
+## 6. 1-workout Progress result
 
-Runtime status: not executed.
+Runtime status: blocked, not executed.
 
-Static result: the calculator loops each exercise log independently, so a loaded exercise can use loaded volume while a zero-load exercise in the same session uses exposure fallback. No dedicated mixed runtime scenario or mixed unit test was run in this pass.
+Exact blocker: no disposable simulator data state could be prepared with exactly one completed workout.
 
-## 8. 1-workout Progress result
+Static evidence only: `ProgressAnalyticsView.volumeSignals` shows the Volume Signals baseline card when `vm.totalCompletedWorkouts < 2`. Muscle Balance is not presented as confident comparison data in that path.
 
-Runtime status: not executed.
+Expected but unverified runtime behavior: no fake conclusions, no missing-baseline `-100%` rows, no crash or blank Progress state, and no production-visible V4 prototype data.
 
-Static result: with one completed workout, `ProgressAnalyticsView.volumeSignals` uses the Volume Signals baseline card because `totalCompletedWorkouts < 2`. Muscle Balance is not shown as confident data.
+## 7. 3-workout Progress result
 
-Expected behavior remains: no missing-baseline `-100%` Muscle Balance rows, no fake conclusions, and no V4 production surface.
+Runtime status: blocked, not executed.
 
-## 9. 3-workout Progress result
+Exact blocker: no disposable simulator data state could be prepared with exactly three completed workouts.
 
-Runtime status: not executed.
+Static evidence only: `hasTrustworthyMuscleBalance` requires `vm.totalCompletedWorkouts >= 4`, current Muscle Balance volume `> 0`, and comparison average volume `> 0`. At three workouts, production Progress should show the Muscle Balance baseline-forming card rather than confident comparison rows.
 
-Static result: with three completed workouts, `hasTrustworthyMuscleBalance` remains false because it requires `totalCompletedWorkouts >= 4`. The view shows the Muscle Balance baseline card rather than the chart.
+Expected but unverified runtime behavior: no fake conclusions and no missing-baseline `-100%` rows.
 
-Expected behavior remains: no confident Muscle Balance read, no missing-baseline `-100%` rows, and no fake conclusions.
+## 8. 4+ workout Progress result
 
-## 10. 4+ workout Progress result
+Runtime status: blocked, not executed.
 
-Runtime status: not executed.
+Exact blocker: no disposable simulator data state could be prepared or inspected with four or more completed workouts.
 
-Static result: with four or more completed workouts, Muscle Balance may appear only when current volume and comparison average are both greater than zero. Chart rows are filtered to `average > 0`.
+Static evidence only: after four or more completed workouts, Muscle Balance may appear only when both current and comparison data exist. The Muscle Balance chart filters rows with `vm.muscleBalance.filter { $0.average > 0 }`, so muscles without a real comparison baseline should not render as misleading `-100%` regressions.
 
-Muscle Balance row labels come from `ProgressMuscleCoverageCalculator.progressDisplayMuscleNames`: Chest, Back, Shoulders, Quads, Hamstrings, Glutes, Arms, and Abs. The persisted data path does not write broad bucket keys. A separate existing `Movement Balance` card can show Push, Pull, Legs, and Core labels when Muscle Balance is trusted; see Data-shape / label findings.
+Expected but unverified runtime behavior: rows should show understandable per-muscle labels only, no broad bucket labels as Muscle Balance rows, no crash, and no blank state.
 
-## 11. Muscle Balance behavior
+## 9. Progress UI result
 
-Production Muscle Balance behavior remains conservative in static review:
+Runtime status: blocked, not executed.
 
-- display gate: `totalCompletedWorkouts >= 4`
-- display gate: current Muscle Balance volume sum `> 0`
-- display gate: comparison average volume sum `> 0`
-- row filter: `vm.muscleBalance.filter { $0.average > 0 }`
-- zero-average rows return `percentOfAverage = 0` and are filtered out of the chart
+Exact blocker: the existing Progress UI could not be opened in Rork/simulator from this workspace.
 
-No concrete Muscle Balance runtime bug was confirmed because runtime QA could not be executed.
+Static evidence only: production `ProgressAnalyticsView` still owns the Strength, Body, Volume, Muscle Balance, Movement Balance, and Recent Workouts sections. The DEBUG Progress V4 candidate remains isolated under `ios/STRQ/Views/Debug` and was not productionized.
 
-## 12. Data-shape / label findings
+Unverified runtime checks: Strength, Body, Volume, Muscle Balance, Movement Balance, and Recent Workouts loading without blank/crash states; no demo/prototype data appearing in production Progress.
 
-Data-shape finding: `ProgressEntry.muscleGroupVolume` stores per-muscle `MuscleGroup.rawValue` keys only. The calculator also returns broad bucket data in `broadCategoryVolume`, but `WorkoutController.completeWorkout()` does not persist those broad buckets.
+## 10. Muscle Balance behavior
 
-Label finding: Muscle Balance rows use understandable display labels: Chest, Back, Shoulders, Quads, Hamstrings, Glutes, Arms, and Abs. Broad bucket labels do not appear as Muscle Balance row labels.
+Runtime status: blocked, not executed.
 
-Potential acceptance caveat: the existing production `Movement Balance` card can display Push, Pull, Legs, and Core labels. Static review indicates those labels are derived from current display muscles, not from persisted broad bucket keys, and `posterior` is not shown. If the acceptance criterion means no broad bucket words anywhere in production UI, this should be treated as a pre-existing production Progress label issue and resolved in a scoped follow-up.
+Static findings:
 
-## 13. Unit semantics / copy risk
+- Display gate: `vm.totalCompletedWorkouts >= 4`
+- Display gate: current Muscle Balance volume sum `> 0`
+- Display gate: comparison average volume sum `> 0`
+- Row filter: `vm.muscleBalance.filter { $0.average > 0 }`
+- Display labels: Chest, Back, Shoulders, Quads, Hamstrings, Glutes, Arms, Abs
 
-The current UI wording around "volume" is acceptable for a blocked runtime report but carries product-copy risk. `muscleGroupVolume` now mixes loaded kg-style contribution for weighted exercises with set-exposure points for bodyweight or unloaded exercises.
+Static review found no broad bucket labels as Muscle Balance row labels. Missing-baseline rows should be filtered before rendering. Runtime confirmation remains required because only the live app can prove the visible state, scroll behavior, and copy hierarchy.
 
-Users could misunderstand coverage/exposure as exact kg muscle volume if future UI makes the value explicit. A future copy pass should clarify this as coverage, exposure, or training contribution rather than precise muscle volume.
+## 11. Movement Balance behavior
 
-## 14. Bugs found and fixes made, if any
+Runtime status: blocked, not executed.
 
-No code bugs were confirmed and no Swift fixes were made.
+Static findings: the existing production Movement Balance card is separate from Muscle Balance, titled `Movement Balance`, and uses the subtitle `Movement mix from current volume`. It displays Push, Pull, Legs, and Core as movement-category labels, not per-muscle labels.
 
-Blocked runtime finding: real weighted, bodyweight, mixed, low-data, 4+ workout, and unresolved-metadata scenarios were not executed in Rork/simulator because the local environment lacks the required iOS runtime tooling.
+Data distinction: `movementBalanceData` derives Push/Pull/Legs/Core from the current `vm.muscleBalance` display muscles. It does not read persisted broad buckets from `ProgressEntry.muscleGroupVolume`, and `WorkoutController.completeWorkout()` does not persist `broadCategoryVolume`.
 
-## 15. Remaining blockers
+Caveat: Push/Pull/Legs/Core labels are acceptable only if runtime presentation makes the card feel movement-category based. If screenshots show users could confuse it with per-muscle Muscle Balance, that should be logged as a copy/UX caveat rather than a data-contract bug.
 
-- Run real Rork/simulator QA on macOS or another environment with Xcode and simulator access.
-- Use a disposable simulator state only; do not reset or corrupt non-disposable user data.
-- Complete weighted, bodyweight, mixed, 1-workout, 3-workout, 4+ workout, Progress UI, and safe unresolved-metadata checks.
-- Decide whether the existing Movement Balance Push/Pull/Legs/Core labels conflict with the no broad bucket labels acceptance criterion.
+## 12. Unresolved metadata scenario
 
-## 16. Release-readiness classification
+Runtime status: blocked, not executed.
 
-blocked: GitHub Actions build/tests are green and static review did not find a data-contract bug, but runtime QA was not executed. This is not ready to call pass or pass with caveats until real Rork/simulator scenarios are completed.
+Exact blocker: safely creating or simulating a missing exercise metadata workout was not possible without a disposable runtime state. No data was corrupted to force this scenario.
 
-## 17. Recommended next step
+Static/CI evidence only: `ProgressMuscleCoverageCalculatorTests/unresolvedExerciseIsSkippedSafely()` verifies unresolved exercise IDs are skipped, produce empty coverage, and are reported in `unresolvedExerciseIds` without crashing the calculator.
 
-Run the same QA prompt from a macOS/Rork simulator-capable environment and record real app observations for weighted, bodyweight, mixed, low-data, and 4+ workout states. Keep Progress V4 DEBUG-only and make no product/UI changes unless that runtime pass finds a concrete bug.
+## 13. Data-shape / label findings
+
+Static data-shape finding: `ProgressEntry.muscleGroupVolume` stores per-muscle `MuscleGroup.rawValue` keys only. The calculator also derives `broadCategoryVolume` for push/pull/legs/core/posterior, but `WorkoutController.completeWorkout()` does not persist those broad buckets to `ProgressEntry`.
+
+Static label finding: Muscle Balance rows use per-muscle display labels. Broad bucket labels do not appear as Muscle Balance row labels. Movement Balance may show Push/Pull/Legs/Core, but those are movement-category labels in a separate card.
+
+Runtime label finding: blocked. Simulator screenshots are still required to verify that the visual distinction between Muscle Balance and Movement Balance is clear.
+
+## 14. Unit semantics / copy risk
+
+The current semantics remain a copy/naming caveat, not a confirmed runtime bug from this pass.
+
+`muscleGroupVolume` is coverage/exposure, not pure kg muscle volume. Weighted exercises contribute kg-style loaded volume. Bodyweight, mobility, and unloaded work contribute exposure points. Existing UI language still uses "volume" in several places, and users could misunderstand future explicit values as exact kg muscle volume.
+
+Current recommendation: acceptable for now behind the existing gated Progress UI, but future Progress V4 production planning should include a copy pass that prefers coverage, exposure, contribution, or training mix language when showing muscle-level values.
+
+## 15. Bugs found and fixes made
+
+No runtime bug was confirmed.
+
+No Swift files were changed. No production Progress UI, Progress V4 DEBUG prototype, assets, localization, analytics, project file, Widget, Watch, or Live Activity files were changed.
+
+## 16. Remaining blockers
+
+- Run real Rork/simulator QA from macOS or another simulator-capable environment.
+- Use disposable simulator data only.
+- Complete weighted, bodyweight, mixed, 1-workout, 3-workout, 4+ workout, Progress UI, Muscle Balance, Movement Balance, and safely reproducible unresolved-metadata checks.
+- Capture whether Movement Balance visually reads as movement-category based and separate from per-muscle Muscle Balance.
+- Update this report with actual simulator observations before reclassifying release readiness.
+
+## 17. Release-readiness classification
+
+blocked: build/test/static evidence is healthy, but this is still not a completed runtime QA pass. The data contract should not be marked pass or pass with caveats until real Rork/simulator observations are recorded with disposable simulator data.
+
+## 18. Recommended next prompt
+
+Run this QA prompt from a macOS/Rork simulator-capable environment with disposable data. Record actual observations for weighted, bodyweight, mixed, 1-workout, 3-workout, 4+ workout, Progress UI, Muscle Balance, and Movement Balance. Make no code changes unless that runtime pass finds a concrete bug, and keep Progress V4 DEBUG-only.
