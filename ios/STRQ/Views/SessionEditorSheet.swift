@@ -827,6 +827,8 @@ struct AddExerciseSheet: View {
                             }
                         } header: {
                             Text(group.muscle.localizedDisplayName)
+                        } footer: {
+                            SwiftUI.EmptyView()
                         }
                     }
                 }
