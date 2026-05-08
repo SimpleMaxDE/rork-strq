@@ -796,8 +796,8 @@ struct AddExerciseSheet: View {
 
                 List {
                     if !contextualPicks.isEmpty {
-                        Section {
-                            ForEach(contextualPicks) { ex in
+                        SwiftUI.Section {
+                            SwiftUI.ForEach(contextualPicks) { ex in
                                 contextualRow(ex)
                             }
                         } header: {
@@ -813,9 +813,9 @@ struct AddExerciseSheet: View {
                         }
                     }
 
-                    ForEach(grouped, id: \.0) { group in
-                        Section {
-                            ForEach(group.1) { ex in
+                    SwiftUI.ForEach(grouped, id: \.0) { group in
+                        SwiftUI.Section {
+                            SwiftUI.ForEach(group.1) { ex in
                                 resultRow(ex)
                             }
                         } header: {
