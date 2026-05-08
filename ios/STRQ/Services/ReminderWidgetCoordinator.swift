@@ -100,26 +100,31 @@ final class ReminderWidgetCoordinator {
         let df = ISO8601DateFormatter()
         df.formatOptions = [.withFullDate]
         let today = df.string(from: Date())
-        return [
-            today,
-            s.workoutRemindersEnabled ? "1" : "0",
-            s.readinessCheckInEnabled ? "1" : "0",
-            s.weeklyReviewEnabled ? "1" : "0",
-            s.coachNudgesEnabled ? "1" : "0",
-            s.streakReminderEnabled ? "1" : "0",
-            String(Int(s.workoutReminderTime.timeIntervalSinceReferenceDate / 60).description.hashValue),
-            String(Int(s.readinessCheckInTime.timeIntervalSinceReferenceDate / 60).description.hashValue),
-            String(s.weeklyReviewDay),
-            input.todaysWorkoutName ?? "-",
-            input.nextScheduledWorkoutName ?? "-",
-            input.nextScheduledDate.map { df.string(from: $0) } ?? "-",
-            input.hasCheckedInToday ? "1" : "0",
-            String(input.streak),
-            String(input.completedWorkoutsTotal),
-            input.isWeeklyReviewReady ? "1" : "0",
-            input.readinessBucket,
-            String(input.missingBodyWeightDays),
-            String(input.missingSleepDays)
-        ].joined(separator: "|")
+        let workoutReminderMinute = Int(s.workoutReminderTime.timeIntervalSinceReferenceDate / 60)
+        let readinessCheckInMinute = Int(s.readinessCheckInTime.timeIntervalSinceReferenceDate / 60)
+        let nextScheduledDate = input.nextScheduledDate.map { df.string(from: $0) } ?? "-"
+
+        var components: [String] = []
+        components.reserveCapacity(19)
+        components.append(today)
+        components.append(s.workoutRemindersEnabled ? "1" : "0")
+        components.append(s.readinessCheckInEnabled ? "1" : "0")
+        components.append(s.weeklyReviewEnabled ? "1" : "0")
+        components.append(s.coachNudgesEnabled ? "1" : "0")
+        components.append(s.streakReminderEnabled ? "1" : "0")
+        components.append(String(workoutReminderMinute.description.hashValue))
+        components.append(String(readinessCheckInMinute.description.hashValue))
+        components.append(String(s.weeklyReviewDay))
+        components.append(input.todaysWorkoutName ?? "-")
+        components.append(input.nextScheduledWorkoutName ?? "-")
+        components.append(nextScheduledDate)
+        components.append(input.hasCheckedInToday ? "1" : "0")
+        components.append(String(input.streak))
+        components.append(String(input.completedWorkoutsTotal))
+        components.append(input.isWeeklyReviewReady ? "1" : "0")
+        components.append(input.readinessBucket)
+        components.append(String(input.missingBodyWeightDays))
+        components.append(String(input.missingSleepDays))
+        return components.joined(separator: "|")
     }
 }
