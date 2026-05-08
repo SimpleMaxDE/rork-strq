@@ -3364,6 +3364,36 @@ Pending work:
 - Rork QA should verify Muscle Balance after real completed workouts, especially low-data and four-plus-workout states.
 - Future V4 work should use the documented V1 contract to build read-only weekly and 4-week distribution adapters with module-level confidence gates.
 
+## 2026-05-08 - Progress Muscle Coverage Contract V1 Validation
+
+Scope:
+
+- Validated the Progress muscle coverage V1 data path after `26dc264 feat: populate progress muscle coverage`.
+- Performed Windows static validation only; no local Swift/Xcode build or simulator run was available.
+- Confirmed workout completion now populates `ProgressEntry.muscleGroupVolume` from completed workout sets and `ExerciseLibrary` metadata without demo/prototype data or Progress V4 production wiring.
+
+Files changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `docs/migration-progress-log.md`
+
+Fix:
+
+- Filtered existing Muscle Balance chart rows to entries with a real comparison baseline so newly populated data cannot display missing-baseline muscles as misleading `-100%` regressions.
+
+Validation findings:
+
+- Persisted `muscleGroupVolume` contains per-muscle `MuscleGroup.rawValue` keys only; broad push/pull/legs/core/posterior buckets remain calculator result data and are not written into `ProgressEntry`.
+- Loaded exercises use `weight * reps`; zero-load exercises fall back to completed-set exposure points, so the field remains coverage/exposure rather than pure kg volume.
+- Unresolved exercise IDs are skipped safely and reported by the calculator result.
+- Existing workout completion ordering, total volume formula, analytics event payloads, HealthKit handoff, plan generation code, navigation, assets, localization, Widget, Watch, and project files were not changed in this validation pass.
+- Progress V4 remains DEBUG-only.
+
+Pending work:
+
+- macOS or CI build/test validation remains required.
+- Rork/simulator QA remains required for loaded, bodyweight, mixed, unresolved-metadata, low-data, three-workout, and established Muscle Balance states.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

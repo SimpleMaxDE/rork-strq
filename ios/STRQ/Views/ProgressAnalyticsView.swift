@@ -2124,7 +2124,7 @@ struct ProgressAnalyticsView: View {
                 )
 
                 VStack(spacing: 10) {
-                    ForEach(vm.muscleBalance) { entry in
+                    ForEach(vm.muscleBalance.filter { $0.average > 0 }) { entry in
                         HStack(spacing: 9) {
                             Text(entry.muscle)
                                 .font(.caption.weight(.medium))
