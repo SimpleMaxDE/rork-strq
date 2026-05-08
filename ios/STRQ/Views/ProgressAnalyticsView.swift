@@ -1105,7 +1105,7 @@ struct ProgressAnalyticsView: View {
                 prHighlights
             }
             recentSessionsCard
-            consistencyHeatmap
+            weeklyRhythmModule
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
@@ -1698,77 +1698,386 @@ struct ProgressAnalyticsView: View {
         .background(Color.white.opacity(0.045), in: Capsule())
     }
 
-    @ViewBuilder
-    private var consistencyHeatmap: some View {
-        let calendar = Calendar.current
-        let last28Days: [(Date, Bool)] = (0..<28).reversed().map { offset in
-            let date = calendar.date(byAdding: .day, value: -offset, to: Date())!
-            let trained = vm.workoutHistory.contains { session in
-                calendar.isDate(session.startTime, inSameDayAs: date) && session.isCompleted
-            }
-            return (date, trained)
-        }
+    private struct WeeklyRhythmDay: Identifiable {
+        let date: Date
+        let sessionCount: Int
+        let isToday: Bool
 
-        let count = last28Days.filter(\.1).count
+        var id: Date { date }
+        var hasSession: Bool { sessionCount > 0 }
+    }
 
-        evidenceModule {
+    private struct WeeklyRhythmWeek: Identifiable {
+        let startDate: Date
+        let label: String
+        let sessions: Int
+        let target: Int
+        let isCurrent: Bool
+
+        var id: Date { startDate }
+        var metTarget: Bool { sessions >= target }
+        var ratio: Double { target > 0 ? min(Double(sessions) / Double(target), 1.0) : 0 }
+    }
+
+    private struct WeeklyRhythmSnapshot {
+        let days: [WeeklyRhythmDay]
+        let weeks: [WeeklyRhythmWeek]
+        let daysWithSessions: Int
+        let sessionsInWindow: Int
+        let currentWeekSessions: Int
+        let target: Int
+        let activeWeeks: Int
+        let targetWeeks: Int
+        let stateLabel: String
+        let detail: String
+        let state: STRQPalette.State
+
+        var currentWeekMetTarget: Bool { currentWeekSessions >= target }
+    }
+
+    private var weeklyRhythmModule: some View {
+        let snapshot = weeklyRhythmSnapshot
+        let stateTint = STRQPalette.color(for: snapshot.state)
+        let completionTint = STRQPalette.success
+
+        return evidenceModule(border: stateTint.opacity(snapshot.daysWithSessions > 0 ? 0.2 : 0.14)) {
             VStack(alignment: .leading, spacing: 14) {
                 evidenceHeader(
-                    title: L10n.tr("28-Day Consistency"),
-                    trailing: L10n.format("%d days", count),
+                    title: L10n.tr("Weekly Rhythm"),
+                    trailing: snapshot.stateLabel,
                     icon: "calendar.badge.clock",
-                    state: count > 0 ? .info : .neutral,
-                    subtitle: count > 0 ? L10n.tr("Training rhythm is visible") : L10n.tr("Pattern is waiting for workouts")
+                    state: snapshot.state,
+                    subtitle: L10n.tr("Completed workout cadence")
                 )
 
-                HStack(spacing: 12) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(count > 0 ? L10n.tr("Pattern formation") : L10n.tr("Baseline grid ready"))
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.white.opacity(0.9))
-                        Text(count > 0
-                             ? L10n.tr("Filled marks show completed workout days. Empty days stay neutral, not negative.")
-                             : L10n.tr("Completed workouts will fill this 28-day proof grid without inventing a streak."))
+                HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(alignment: .lastTextBaseline, spacing: 5) {
+                            Text("\(snapshot.daysWithSessions)")
+                                .font(.system(size: 34, weight: .heavy, design: .rounded).monospacedDigit())
+                                .foregroundStyle(snapshot.daysWithSessions > 0 ? completionTint : STRQBrand.steel)
+                            Text(L10n.tr("/28 days"))
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.white.opacity(0.52))
+                                .padding(.bottom, 4)
+                        }
+
+                        Text(snapshot.detail)
                             .font(.caption.weight(.medium))
-                            .foregroundStyle(.white.opacity(0.58))
+                            .foregroundStyle(.white.opacity(0.6))
                             .fixedSize(horizontal: false, vertical: true)
                     }
+
                     Spacer(minLength: 0)
-                }
 
-                HStack(spacing: 4) {
-                    ForEach(Array(last28Days.prefix(7)), id: \.0) { item in
-                        Text(item.0.formatted(.dateTime.weekday(.narrow)))
+                    VStack(alignment: .trailing, spacing: 5) {
+                        Text(L10n.tr("This week"))
                             .font(.system(size: 9, weight: .black))
+                            .tracking(0.7)
                             .foregroundStyle(.white.opacity(0.42))
-                            .frame(maxWidth: .infinity)
+                            .textCase(.uppercase)
+                        Text("\(snapshot.currentWeekSessions)/\(snapshot.target)")
+                            .font(.system(size: 22, weight: .heavy, design: .rounded).monospacedDigit())
+                            .foregroundStyle(snapshot.currentWeekMetTarget ? completionTint : stateTint)
+                        Text(snapshot.currentWeekMetTarget ? L10n.tr("target reached") : L10n.tr("target forming"))
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.5))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
                     }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 13))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 13)
+                            .strokeBorder((snapshot.currentWeekMetTarget ? completionTint : stateTint).opacity(0.14), lineWidth: 1)
+                    )
                 }
 
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 4) {
-                    ForEach(last28Days, id: \.0) { item in
-                        consistencyCell(trained: item.1)
-                    }
-                }
+                weeklyRhythmMetricGrid(snapshot)
+                weeklyRhythmGrid(days: snapshot.days, completionTint: completionTint)
+                weeklyRhythmWeekRows(snapshot.weeks, completionTint: completionTint, stateTint: stateTint)
 
                 HStack(spacing: 10) {
-                    legendDot(color: .white, label: L10n.tr("Completed"))
-                    legendDot(color: STRQBrand.slate.opacity(0.7), label: L10n.tr("Open day"))
+                    evidenceChip(icon: "checkmark.circle", text: L10n.tr("Completed only"), state: .neutral)
+                    Text(L10n.tr("Open days stay neutral; readiness check-ins do not count here."))
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
 
-    private func consistencyCell(trained: Bool) -> some View {
-        RoundedRectangle(cornerRadius: 5)
-            .fill(trained ? Color.white.gradient : Color.white.opacity(0.055).gradient)
-            .frame(height: 22)
-            .overlay(
-                RoundedRectangle(cornerRadius: 5)
-                    .strokeBorder(trained ? Color.white.opacity(0.34) : Color.white.opacity(0.06), lineWidth: 1)
+    private var weeklyRhythmSnapshot: WeeklyRhythmSnapshot {
+        let calendar = Calendar.current
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) ?? now
+        let windowStart = calendar.date(byAdding: .day, value: -27, to: today) ?? today
+        let target = max(1, min(vm.profile.daysPerWeek, 7))
+        let completedSessions = vm.workoutHistory.filter(\.isCompleted)
+        let sessionsInWindow = completedSessions.filter { $0.startTime >= windowStart && $0.startTime < tomorrow }
+        let sessionsByDay = Dictionary(grouping: sessionsInWindow) { session in
+            calendar.startOfDay(for: session.startTime)
+        }
+
+        let days: [WeeklyRhythmDay] = (0..<28).compactMap { offset in
+            guard let date = calendar.date(byAdding: .day, value: offset, to: windowStart) else { return nil }
+            let day = calendar.startOfDay(for: date)
+            return WeeklyRhythmDay(
+                date: day,
+                sessionCount: sessionsByDay[day]?.count ?? 0,
+                isToday: calendar.isDateInToday(day)
             )
-            .shadow(color: trained ? Color.white.opacity(0.08) : .clear, radius: 6, y: 2)
+        }
+
+        let currentWeekStart = calendar.dateInterval(of: .weekOfYear, for: today)?.start ?? today
+        let weeks: [WeeklyRhythmWeek] = (0..<4).reversed().compactMap { weekOffset in
+            guard
+                let start = calendar.date(byAdding: .weekOfYear, value: -weekOffset, to: currentWeekStart),
+                let end = calendar.date(byAdding: .day, value: 7, to: start)
+            else { return nil }
+
+            let count = completedSessions.filter { session in
+                session.startTime >= start &&
+                session.startTime < end &&
+                session.startTime >= windowStart &&
+                session.startTime < tomorrow
+            }.count
+            let label = weekOffset == 0 ? L10n.tr("Now") : L10n.format("%dw", weekOffset)
+            return WeeklyRhythmWeek(
+                startDate: start,
+                label: label,
+                sessions: count,
+                target: target,
+                isCurrent: weekOffset == 0
+            )
+        }
+
+        let daysWithSessions = days.filter(\.hasSession).count
+        let currentWeekSessions = weeks.first(where: \.isCurrent)?.sessions ?? 0
+        let activeWeeks = weeks.filter { $0.sessions > 0 }.count
+        let targetWeeks = weeks.filter(\.metTarget).count
+        let currentWeekMetTarget = currentWeekSessions >= target
+        let readable = daysWithSessions >= 4 && activeWeeks >= 2
+        let consistentWeek = currentWeekMetTarget && daysWithSessions >= max(4, target)
+
+        let stateLabel: String
+        let detail: String
+        let state: STRQPalette.State
+
+        if daysWithSessions == 0 {
+            stateLabel = L10n.tr("Baseline forming")
+            detail = L10n.tr("Complete workouts to start the cadence map. The baseline stays quiet until real sessions land.")
+            state = .neutral
+        } else if consistentWeek {
+            stateLabel = L10n.tr("Consistent week")
+            detail = L10n.tr("This week has enough completed sessions for your target. Longer rhythm still comes from repeat weeks.")
+            state = .success
+        } else if readable {
+            stateLabel = L10n.tr("Readable rhythm")
+            detail = L10n.tr("Completed sessions now span multiple weeks, enough to read cadence without turning it into a streak game.")
+            state = .info
+        } else {
+            stateLabel = L10n.tr("Early rhythm")
+            detail = L10n.tr("A few training days are visible. Repeated weeks will make the rhythm more stable.")
+            state = .warning
+        }
+
+        return WeeklyRhythmSnapshot(
+            days: days,
+            weeks: weeks,
+            daysWithSessions: daysWithSessions,
+            sessionsInWindow: sessionsInWindow.count,
+            currentWeekSessions: currentWeekSessions,
+            target: target,
+            activeWeeks: activeWeeks,
+            targetWeeks: targetWeeks,
+            stateLabel: stateLabel,
+            detail: detail,
+            state: state
+        )
+    }
+
+    private func weeklyRhythmMetricGrid(_ snapshot: WeeklyRhythmSnapshot) -> some View {
+        LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+            weeklyRhythmMetric(
+                title: L10n.tr("This week"),
+                value: "\(snapshot.currentWeekSessions)/\(snapshot.target)",
+                detail: snapshot.currentWeekMetTarget ? L10n.tr("enough activity") : L10n.tr("still forming"),
+                icon: "target",
+                state: snapshot.currentWeekMetTarget ? .success : (snapshot.currentWeekSessions > 0 ? .warning : .neutral)
+            )
+            weeklyRhythmMetric(
+                title: L10n.tr("Session days"),
+                value: "\(snapshot.daysWithSessions)",
+                detail: L10n.tr("last 28 days"),
+                icon: "calendar",
+                state: snapshot.daysWithSessions >= 4 ? .success : (snapshot.daysWithSessions > 0 ? .warning : .neutral)
+            )
+            weeklyRhythmMetric(
+                title: L10n.tr("Active weeks"),
+                value: "\(snapshot.activeWeeks)/4",
+                detail: L10n.tr("recent weeks"),
+                icon: "rectangle.stack",
+                state: snapshot.activeWeeks >= 2 ? .info : (snapshot.activeWeeks > 0 ? .warning : .neutral)
+            )
+            weeklyRhythmMetric(
+                title: L10n.tr("Target weeks"),
+                value: "\(snapshot.targetWeeks)/4",
+                detail: L10n.tr("met or above"),
+                icon: "checkmark.seal",
+                state: snapshot.targetWeeks > 0 ? .success : .neutral
+            )
+        }
+    }
+
+    private func weeklyRhythmMetric(title: String, value: String, detail: String, icon: String, state: STRQPalette.State) -> some View {
+        let tint = STRQPalette.color(for: state)
+
+        return HStack(spacing: 9) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 25, height: 25)
+                .background(tint.opacity(0.1), in: .rect(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.5)
+                    .foregroundStyle(.white.opacity(0.42))
+                    .textCase(.uppercase)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                HStack(alignment: .lastTextBaseline, spacing: 4) {
+                    Text(value)
+                        .font(.system(size: 15, weight: .heavy, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white.opacity(0.9))
+                    Text(detail)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.48))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.68)
+                }
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(Color.white.opacity(0.065), lineWidth: 1)
+        )
+    }
+
+    private func weeklyRhythmGrid(days: [WeeklyRhythmDay], completionTint: Color) -> some View {
+        VStack(spacing: 7) {
+            HStack(spacing: 4) {
+                ForEach(Array(days.prefix(7)), id: \.id) { day in
+                    Text(day.date.formatted(.dateTime.weekday(.narrow)))
+                        .font(.system(size: 9, weight: .black))
+                        .foregroundStyle(.white.opacity(0.42))
+                        .frame(maxWidth: .infinity)
+                }
+            }
+
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: 4) {
+                ForEach(days) { day in
+                    weeklyRhythmCell(day, completionTint: completionTint)
+                }
+            }
+        }
+        .padding(10)
+        .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+        )
+    }
+
+    private func weeklyRhythmCell(_ day: WeeklyRhythmDay, completionTint: Color) -> some View {
+        let fill = day.hasSession ? completionTint : Color.white.opacity(day.isToday ? 0.085 : 0.045)
+        let stroke = day.hasSession ? completionTint.opacity(0.42) : (day.isToday ? STRQBrand.steel.opacity(0.24) : Color.white.opacity(0.055))
+
+        return RoundedRectangle(cornerRadius: 6)
+            .fill(fill.gradient)
+            .frame(height: 23)
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .strokeBorder(stroke, lineWidth: 1)
+            )
+            .overlay(alignment: .bottom) {
+                if day.hasSession {
+                    Capsule()
+                        .fill(Color.white.opacity(0.68))
+                        .frame(width: day.sessionCount > 1 ? 18 : 12, height: 3)
+                        .padding(.bottom, 4)
+                }
+            }
+            .shadow(color: day.hasSession ? completionTint.opacity(0.1) : .clear, radius: 6, y: 2)
+            .accessibilityLabel(Text(day.hasSession ? L10n.tr("Completed workout day") : L10n.tr("Open training day")))
+    }
+
+    private func weeklyRhythmWeekRows(_ weeks: [WeeklyRhythmWeek], completionTint: Color, stateTint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Text(L10n.tr("4-week cadence"))
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.7)
+                    .foregroundStyle(.white.opacity(0.42))
+                    .textCase(.uppercase)
+                Rectangle()
+                    .fill(Color.white.opacity(0.06))
+                    .frame(height: 1)
+                Text(L10n.format("target %d/wk", weeks.first?.target ?? 1))
+                    .font(.caption2.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(.white.opacity(0.48))
+            }
+
+            HStack(alignment: .bottom, spacing: 7) {
+                ForEach(weeks) { week in
+                    weeklyRhythmWeekColumn(week, completionTint: completionTint, stateTint: stateTint)
+                }
+            }
+            .frame(height: 84)
+        }
+        .padding(12)
+        .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+        )
+    }
+
+    private func weeklyRhythmWeekColumn(_ week: WeeklyRhythmWeek, completionTint: Color, stateTint: Color) -> some View {
+        let barTint = week.metTarget ? completionTint : (week.sessions > 0 ? stateTint : STRQBrand.slate.opacity(0.48))
+
+        return VStack(spacing: 5) {
+            GeometryReader { proxy in
+                ZStack(alignment: .bottom) {
+                    RoundedRectangle(cornerRadius: 7)
+                        .fill(Color.white.opacity(0.045))
+                    RoundedRectangle(cornerRadius: 7)
+                        .fill(barTint.opacity(week.sessions > 0 ? (week.isCurrent ? 0.88 : 0.56) : 0.18).gradient)
+                        .frame(height: max(5, proxy.size.height * CGFloat(week.ratio)))
+                }
+            }
+            .frame(height: 50)
+
+            Text(week.label)
+                .font(.system(size: 9, weight: .black))
+                .foregroundStyle(week.isCurrent ? stateTint : .white.opacity(0.42))
+                .lineLimit(1)
+            Text("\(week.sessions)")
+                .font(.system(size: 10, weight: .heavy, design: .rounded).monospacedDigit())
+                .foregroundStyle(week.sessions > 0 ? .white.opacity(0.78) : .white.opacity(0.34))
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityLabel(Text(L10n.format("%@, %d completed workouts", week.label, week.sessions)))
     }
 
     // MARK: - Body Signals

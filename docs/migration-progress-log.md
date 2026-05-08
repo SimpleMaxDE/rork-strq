@@ -3507,6 +3507,42 @@ Pending work:
 - Implement the Weekly Rhythm production slice in a separate scoped pass.
 - Complete real macOS/Rork runtime QA for Muscle Coverage before Training Distribution or V4 replacement release confidence.
 
+## 2026-05-08 - Progress Weekly Rhythm Production Slice
+
+Scope:
+
+- Replaced the production Progress 28-day consistency card with a real-data Weekly Rhythm module inside `ProgressAnalyticsView`.
+- Kept the production Progress screen, Progress V4 DEBUG candidate, Muscle Coverage, Muscle Balance, Strength/Body/Volume chart calculations, Recent Workouts route, analytics, persistence, models, services, view models, assets, localization, project files, tests, Widget, Watch, and Live Activity behavior unchanged.
+- Used completed workout/session dates from existing `workoutHistory` only, with `profile.daysPerWeek` as target context.
+
+Files changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Inspected Activity Tracker `11611:134946`, user-selected rhythm/goal/calendar nodes `11604:63724`, `11604:64200`, `11604:64937`, `11604:66184`, and chart/progress primitives `9129:26029`, `9129:207997`.
+- Adapted compact calendar rows, target/progress context, neutral inactive day tracks, week-by-week cadence bars, and clear state chips without copying source text, branding, assets, raw layouts, orange CTA styling, Pro violet styling, or demo values.
+
+Implementation:
+
+- Added private view-local Weekly Rhythm snapshot structs and helpers inside `ProgressAnalyticsView.swift`.
+- Shows a 28-day completed-workout grid, current week sessions versus target, last-28-day session days, active weeks, target-met weeks, and a compact four-week cadence row.
+- Uses conservative labels: Baseline forming, Early rhythm, Readable rhythm, and Consistent week.
+- Keeps low-data states honest and treats open days as neutral.
+
+Verification status:
+
+- Static Windows verification only; macOS/Xcode local build validation was not available in this workspace.
+- macOS/CI build validation and Rork visual QA remain required.
+
+Pending work:
+
+- Rork QA should capture 0, 1, 3, and 4+ workout states on small and large iPhone sizes.
+- Full Progress V4 production integration remains deferred; Muscle Coverage runtime QA remains a separate release gate.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
