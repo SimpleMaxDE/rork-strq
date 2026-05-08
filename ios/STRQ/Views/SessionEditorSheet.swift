@@ -813,11 +813,13 @@ struct AddExerciseSheet: View {
                         }
                     }
 
-                    ForEach(grouped, id: \.0) { muscle, exercises in
-                        Section(muscle.localizedDisplayName) {
-                            ForEach(exercises) { ex in
+                    ForEach(grouped, id: \.0) { group in
+                        Section {
+                            ForEach(group.1) { ex in
                                 resultRow(ex)
                             }
+                        } header: {
+                            Text(group.0.localizedDisplayName)
                         }
                     }
                 }
