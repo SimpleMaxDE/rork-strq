@@ -3755,6 +3755,30 @@ Pending work:
 
 - Rork QA should open Profile, tap `Internal Preview: Progress V5 Experience`, and capture Beginner and Athlete states on small and large iPhone sizes.
 
+## 2026-05-09 - Rork Preview Build Target Reset
+
+Scope:
+
+- Reset the native preview build baseline away from iOS/watchOS 26 after Rork reported the preview build timed out.
+- Kept the app on an iOS 18 baseline so existing `MeshGradient`, modern `Tab(value:)`, and `.sidebarAdaptable` usage still compiles.
+- Restored the watch target to watchOS 11 for compatibility with current Xcode 16.x simulator tooling.
+
+Files changed:
+
+- `ios/STRQ.xcodeproj/project.pbxproj`
+- `docs/migration-progress-log.md`
+
+Verification status:
+
+- Static Windows verification only; no local macOS/Xcode build was available.
+- Confirmed all `IPHONEOS_DEPLOYMENT_TARGET` values are now `18.0`.
+- Confirmed all `WATCHOS_DEPLOYMENT_TARGET` values are now `11.0`.
+
+Pending work:
+
+- Push to GitHub and let the iOS Build workflow validate the target reset.
+- Retry the Rork preview build from the new commit.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
