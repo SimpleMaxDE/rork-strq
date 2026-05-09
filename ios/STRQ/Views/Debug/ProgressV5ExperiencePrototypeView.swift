@@ -1,6 +1,5 @@
 import SwiftUI
 
-#if DEBUG
 struct ProgressV5ExperiencePrototypeView: View {
     @State private var selectedState: ProgressV5ExperienceState = .beginner
 
@@ -1261,6 +1260,7 @@ private enum ProgressV5Style {
     }
 }
 
+#if DEBUG
 private struct ProgressV5ExperiencePrototypeView_Previews: PreviewProvider {
     static var previews: some View {
         ProgressV5ExperiencePrototypeView()

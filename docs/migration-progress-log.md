@@ -3720,6 +3720,41 @@ Pending work:
 - Rork visual QA should capture Beginner and Athlete first viewport, full scroll, small iPhone, and large iPhone.
 - macOS/Xcode build validation remains required for Swift compile confidence.
 
+## 2026-05-09 - Progress V5 Rork QA Access
+
+Scope:
+
+- Exposed the Progress V5 Experience surface through a clearly labeled internal Profile entry so Rork can open it without DEBUG mode.
+- Kept the full Design System Lab DEBUG-only and did not replace or modify the production Progress tab.
+- Kept V5 on private local scenario data only.
+
+Files changed:
+
+- `ios/STRQ/Views/Debug/ProgressV5ExperiencePrototypeView.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Implementation:
+
+- Removed the file-level DEBUG guard from `ProgressV5ExperiencePrototypeView` while keeping its SwiftUI preview provider DEBUG-only.
+- Added a temporary Profile controls row labeled `Internal Preview: Progress V5 Experience`.
+- The Profile row opens V5 with an `Internal Preview` navigation title and no analytics, persistence, localization, asset, model, service, or view-model wiring.
+
+Verification status:
+
+- Static Windows verification only; macOS/Xcode local build validation was not available in this workspace.
+- macOS/CI build validation and Rork visual QA remain required.
+
+Intentionally not changed:
+
+- No `ios/STRQ/Views/ProgressAnalyticsView.swift`.
+- No real Progress data wiring.
+- No analytics, persistence, localization catalogs, assets, models, services, view models, project files, tests, Widget, Watch, Live Activity, fonts, or production Progress replacement.
+
+Pending work:
+
+- Rork QA should open Profile, tap `Internal Preview: Progress V5 Experience`, and capture Beginner and Athlete states on small and large iPhone sizes.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

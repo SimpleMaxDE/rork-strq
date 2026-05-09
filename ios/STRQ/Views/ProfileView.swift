@@ -867,11 +867,21 @@ struct ProfileView: View {
                 }
                 controlsListButtonRow(
                     L10n.tr("profile.regeneratePlan", fallback: "Regenerate Plan"),
-                    icon: .repeatAction,
-                    showsDivider: controlsSectionShowsDesignSystemLab
+                    icon: .repeatAction
                 ) {
                     Analytics.shared.track(.regenerate_plan_dialog_opened, ["surface": "profile"])
                     showPlanRegenerationDialog = true
+                }
+                NavigationLink {
+                    ProgressV5ExperiencePrototypeView()
+                        .navigationTitle("Internal Preview")
+                        .navigationBarTitleDisplayMode(.inline)
+                } label: {
+                    controlsListSymbolRowContent(
+                        "Internal Preview: Progress V5 Experience",
+                        systemIcon: "eye.fill",
+                        showsDivider: controlsSectionShowsDesignSystemLab
+                    )
                 }
                 #if DEBUG
                 NavigationLink {
