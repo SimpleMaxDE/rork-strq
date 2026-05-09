@@ -3610,6 +3610,44 @@ Pending work:
 - Rork QA should capture Strength Trend and Volume Trend states across low-data and readable-data users on small and large iPhone sizes.
 - Full Progress V4 integration remains deferred; Muscle Coverage runtime QA remains a separate release gate before Training Distribution or V4 replacement confidence.
 
+## 2026-05-09 - Progress Recent Evidence Slice
+
+Scope:
+
+- Upgraded the production Progress recent workout/history preview into a Recent Evidence timeline.
+- Kept Progress V4 DEBUG-only and did not productionize Training Distribution, Muscle Coverage, Muscle Balance, or a full V4 surface.
+- Preserved the existing SessionHistoryView route/action, selected Strength/Body/Volume tab behavior, Weekly Rhythm logic, Strength/Volume chart calculations, analytics, persistence, models, services, view models, assets, localization files, project files, tests, Widget, Watch, and Live Activity behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Inspected Activity Tracker / history source `11611:134946`, user-selected history/evidence/rhythm nodes `11604:63724`, `11604:64200`, `11604:64937`, `11604:66184`, chart primitives `9129:26029`, and progress primitives `9129:207997`.
+- Drilled into history/evidence sublayers `11604:63838`, `11604:65087`, `11604:66340`, progress-track primitive `1264:9818`, and trend-label primitive `8390:5246`.
+- Adapted compact history row anatomy, section-header plus history action, timeline/list pacing, conservative status chips, and progress/status primitive grammar without copying source branding, assets, orange CTA identity, Pro violet styling, health-specific copy, or demo data.
+
+Implementation:
+
+- Replaced the plain Recent Workouts preview with a Recent Evidence module that uses real completed workout history only.
+- Shows a conservative 28-day evidence summary, active-week count, current-week count against the existing profile target, completed-session source count, and recent 3-5 completed sessions as a timeline.
+- Derives only view-level labels from existing session fields: completed status, start/end date, workout name, duration, completed sets/reps/exercise count, total volume, and completed-date rhythm context.
+- Uses conservative state language: Logged, Recent, Building pattern, Training evidence, and Baseline forming.
+- Keeps `NavigationLink(value: ProgressRoute.history)` and `SessionHistoryView(vm: vm)` intact.
+
+Verification status:
+
+- Static Windows verification only; macOS/Xcode local build validation was not available in this workspace.
+- macOS/CI build validation and Rork visual QA remain required.
+
+Pending work:
+
+- Rork visual QA should capture Recent Evidence empty, low-data, and multi-week states on small and large iPhone sizes.
+- Full Progress V4 integration remains deferred; Muscle Coverage runtime QA remains a separate release gate before Training Distribution or V4 replacement confidence.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

@@ -1686,88 +1686,116 @@ struct ProgressAnalyticsView: View {
         .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 10))
     }
 
-    // MARK: - Recent Sessions
+    // MARK: - Recent Evidence
 
     private var recentSessionsCard: some View {
-        let recent = Array(vm.workoutHistory
-            .filter(\.isCompleted)
-            .sorted { $0.startTime > $1.startTime }
-            .prefix(3))
+        let snapshot = recentEvidenceSnapshot
+        let tint = STRQPalette.color(for: snapshot.state)
 
-        return evidenceModule {
-            VStack(alignment: .leading, spacing: 14) {
+        return evidenceModule(border: tint.opacity(0.18)) {
+            VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top, spacing: 10) {
                     Image(systemName: "list.bullet.rectangle.portrait.fill")
                         .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(STRQBrand.steel)
+                        .foregroundStyle(tint)
                         .frame(width: 30, height: 30)
-                        .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 8))
+                        .background(tint.opacity(0.12), in: .rect(cornerRadius: 8))
 
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(L10n.tr("Recent Workouts"))
+                        Text(L10n.tr("Recent Evidence"))
                             .font(.system(size: 10, weight: .black))
                             .tracking(0.8)
                             .foregroundStyle(.white.opacity(0.52))
                             .textCase(.uppercase)
-                        Text(recent.isEmpty ? L10n.tr("Training evidence starts here") : L10n.tr("Latest completed training proof"))
+                        Text(snapshot.subtitle)
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.white.opacity(0.78))
+                            .fixedSize(horizontal: false, vertical: true)
                     }
 
                     Spacer(minLength: 0)
 
-                    if !recent.isEmpty {
+                    if snapshot.hasEvents {
                         NavigationLink(value: ProgressRoute.history) {
                             HStack(spacing: 4) {
-                                Text(L10n.tr("All"))
+                                Text(L10n.tr("History"))
                                     .font(.caption.weight(.semibold))
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 9, weight: .bold))
                             }
-                            .foregroundStyle(STRQBrand.steel)
+                            .foregroundStyle(tint)
                             .padding(.horizontal, 9)
                             .padding(.vertical, 5)
-                            .background(STRQBrand.steel.opacity(0.11), in: Capsule())
+                            .background(tint.opacity(0.11), in: Capsule())
                         }
                     }
                 }
 
-                if recent.isEmpty {
+                VStack(alignment: .leading, spacing: 11) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(snapshot.countValue)
+                            .font(.system(size: 28, weight: .heavy, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.94))
+                            .lineLimit(1)
+                        Text(snapshot.countDetail)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.56))
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
+                        Spacer(minLength: 0)
+                        evidenceBadge(snapshot.stateLabel, state: snapshot.state)
+                    }
+
+                    Text(snapshot.detail)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.58))
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+                        ForEach(snapshot.metrics) { metric in
+                            recentEvidenceMetric(metric)
+                        }
+                    }
+                }
+                .padding(12)
+                .background(
+                    LinearGradient(
+                        colors: [tint.opacity(0.10), Color.white.opacity(0.022)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    in: .rect(cornerRadius: 14)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(tint.opacity(0.14), lineWidth: 1)
+                )
+
+                if snapshot.hasEvents {
                     VStack(alignment: .leading, spacing: 10) {
-                        HStack(spacing: 10) {
-                            Image(systemName: "figure.strengthtraining.traditional")
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundStyle(STRQBrand.steel)
-                                .frame(width: 34, height: 34)
-                                .background(STRQBrand.steel.opacity(0.1), in: Circle())
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(L10n.tr("No finished sessions yet"))
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(.white.opacity(0.9))
-                                Text(L10n.tr("Each completed workout becomes a dated proof record with duration, sets, and volume."))
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(.white.opacity(0.58))
-                                    .fixedSize(horizontal: false, vertical: true)
+                        HStack(spacing: 7) {
+                            Circle()
+                                .fill(tint)
+                                .frame(width: 6, height: 6)
+                            Text(L10n.tr("Latest sessions"))
+                                .font(.system(size: 9, weight: .black))
+                                .tracking(0.7)
+                                .foregroundStyle(.white.opacity(0.46))
+                                .textCase(.uppercase)
+                            Spacer(minLength: 0)
+                        }
+
+                        VStack(spacing: 0) {
+                            ForEach(Array(snapshot.events.enumerated()), id: \.element.id) { index, event in
+                                recentEvidenceTimelineRow(
+                                    event,
+                                    isLast: index == snapshot.events.count - 1
+                                )
                             }
                         }
-                        HStack(spacing: 6) {
-                            evidenceChip(icon: "clock", text: L10n.tr("Duration"), state: .neutral)
-                            evidenceChip(icon: "checkmark.circle", text: L10n.tr("Sets"), state: .neutral)
-                            evidenceChip(icon: "square.stack.3d.up.fill", text: L10n.tr("Volume"), state: .neutral)
-                        }
                     }
-                    .padding(12)
-                    .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
-                    )
                 } else {
-                    VStack(spacing: 8) {
-                        ForEach(Array(recent.enumerated()), id: \.element.id) { index, session in
-                            sessionLogRow(session, isLatest: index == 0)
-                        }
-                    }
+                    recentEvidenceEmptyState
                 }
             }
         }
@@ -1778,68 +1806,360 @@ struct ProgressAnalyticsView: View {
         }
     }
 
-    private func sessionLogRow(_ session: WorkoutSession, isLatest: Bool = false) -> some View {
-        let duration = session.endTime.map { Int($0.timeIntervalSince(session.startTime) / 60) } ?? 0
-        let sets = session.exerciseLogs.flatMap(\.sets).filter(\.isCompleted).count
-        return HStack(alignment: .center, spacing: 12) {
-            VStack(spacing: 2) {
-                Text(session.startTime.formatted(.dateTime.month(.abbreviated)))
-                    .font(.system(size: 8, weight: .black))
-                    .tracking(0.6)
-                    .foregroundStyle(.white.opacity(0.52))
-                    .textCase(.uppercase)
-                Text(session.startTime.formatted(.dateTime.day()))
-                    .font(.system(size: 18, weight: .heavy, design: .rounded).monospacedDigit())
-                    .foregroundStyle(.white.opacity(0.92))
-            }
-            .frame(width: 42, height: 52)
-            .background(isLatest ? STRQBrand.steel.opacity(0.14) : Color.white.opacity(0.045), in: .rect(cornerRadius: 12))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(isLatest ? STRQBrand.steel.opacity(0.22) : Color.white.opacity(0.06), lineWidth: 1)
+    private var recentEvidenceSnapshot: RecentEvidenceSnapshot {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) ?? Date()
+        let windowStart = calendar.date(byAdding: .day, value: -27, to: today) ?? today
+        let completedSessions = vm.workoutHistory
+            .filter(\.isCompleted)
+            .sorted { $0.startTime > $1.startTime }
+        let sessionsInWindow = completedSessions.filter {
+            $0.startTime >= windowStart && $0.startTime < tomorrow
+        }
+        let activeWeekStarts = Set(sessionsInWindow.map {
+            calendar.dateInterval(of: .weekOfYear, for: $0.startTime)?.start ?? calendar.startOfDay(for: $0.startTime)
+        })
+        let activeWeeks = activeWeekStarts.count
+        let currentWeekStart = calendar.dateInterval(of: .weekOfYear, for: today)?.start ?? today
+        let currentWeekSessions = sessionsInWindow.filter { $0.startTime >= currentWeekStart }.count
+        let target = max(1, min(vm.profile.daysPerWeek, 7))
+        let recentRows = Array(completedSessions.prefix(5))
+        let events = recentRows.enumerated().map { index, session in
+            recentEvidenceEvent(
+                session,
+                previousSession: completedSessions.dropFirst(index + 1).first,
+                isLatest: index == 0,
+                calendar: calendar
             )
+        }
 
-            VStack(alignment: .leading, spacing: 7) {
-                HStack(spacing: 7) {
-                    Text(session.dayName)
-                        .font(.subheadline.weight(.semibold))
+        let state: STRQPalette.State
+        let stateLabel: String
+        let subtitle: String
+        let detail: String
+        switch sessionsInWindow.count {
+        case 0:
+            state = .neutral
+            stateLabel = L10n.tr("Baseline forming")
+            subtitle = L10n.tr("Training evidence starts with completed sessions")
+            detail = L10n.tr("No completed workouts are shown here until real workout history exists.")
+        case 1...2:
+            state = .warning
+            stateLabel = L10n.tr("Baseline forming")
+            subtitle = L10n.tr("Real sessions logged, pattern still forming")
+            detail = L10n.tr("STRQ has dated session evidence, but the recent baseline needs more completed workouts before it can explain a rhythm.")
+        case 3...:
+            if activeWeeks >= 2 {
+                state = .info
+                stateLabel = L10n.tr("Training evidence")
+                subtitle = L10n.tr("Recent sessions shaping Progress")
+                detail = L10n.tr("Completed workouts now span multiple weeks, enough to show which real sessions are shaping the current Progress picture.")
+            } else {
+                state = .warning
+                stateLabel = L10n.tr("Building pattern")
+                subtitle = L10n.tr("Recent sessions logged close together")
+                detail = L10n.tr("STRQ has several completed workouts, but the weekly rhythm is still forming across the current evidence window.")
+            }
+        default:
+            state = .neutral
+            stateLabel = L10n.tr("Baseline forming")
+            subtitle = L10n.tr("Training evidence starts with completed sessions")
+            detail = L10n.tr("No completed workouts are shown here until real workout history exists.")
+        }
+
+        return RecentEvidenceSnapshot(
+            state: state,
+            stateLabel: stateLabel,
+            subtitle: subtitle,
+            detail: detail,
+            countValue: "\(sessionsInWindow.count)",
+            countDetail: L10n.tr("logged in 28d"),
+            metrics: [
+                RecentEvidenceMetric(
+                    title: L10n.tr("Active weeks"),
+                    value: "\(activeWeeks)",
+                    detail: L10n.tr("of 4"),
+                    icon: "calendar.badge.clock",
+                    state: activeWeeks >= 2 ? .info : .neutral
+                ),
+                RecentEvidenceMetric(
+                    title: L10n.tr("This week"),
+                    value: "\(currentWeekSessions)",
+                    detail: L10n.format("of %d", target),
+                    icon: "checkmark.seal",
+                    state: currentWeekSessions >= target ? .success : (currentWeekSessions > 0 ? .warning : .neutral)
+                ),
+                RecentEvidenceMetric(
+                    title: L10n.tr("Source"),
+                    value: "\(completedSessions.count)",
+                    detail: L10n.tr("completed"),
+                    icon: "list.bullet.rectangle.portrait",
+                    state: completedSessions.isEmpty ? .neutral : .info
+                ),
+                RecentEvidenceMetric(
+                    title: L10n.tr("Window"),
+                    value: "28",
+                    detail: L10n.tr("days"),
+                    icon: "clock.arrow.circlepath",
+                    state: .neutral
+                )
+            ],
+            events: events
+        )
+    }
+
+    private func recentEvidenceEvent(
+        _ session: WorkoutSession,
+        previousSession: WorkoutSession?,
+        isLatest: Bool,
+        calendar: Calendar
+    ) -> RecentEvidenceEvent {
+        let title = session.dayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? L10n.tr("Workout")
+            : session.dayName
+        let duration = session.endTime.map { max(0, Int($0.timeIntervalSince(session.startTime) / 60)) } ?? 0
+        let sets = session.completedSetCount
+        let reps = session.completedRepCount
+        let exercises = session.distinctCompletedExerciseCount
+        let volume = session.totalVolume
+        let gapDays = previousSession.map {
+            max(0, calendar.dateComponents([.day], from: calendar.startOfDay(for: $0.startTime), to: calendar.startOfDay(for: session.startTime)).day ?? 0)
+        }
+
+        let detail: String
+        if sets > 0, duration > 0, volume > 0 {
+            detail = L10n.format("Logged %d sets over %dmin with %@kg total volume.", sets, duration, ForgeTheme.formatVolume(volume))
+        } else if sets > 0, volume > 0 {
+            detail = L10n.format("Logged %d completed sets with %@kg total volume.", sets, ForgeTheme.formatVolume(volume))
+        } else if sets > 0, exercises > 0 {
+            detail = L10n.format("Logged %d completed sets across %d exercises.", sets, exercises)
+        } else {
+            detail = L10n.tr("Completed workout recorded from history.")
+        }
+
+        var chips: [RecentEvidenceChip] = [
+            RecentEvidenceChip(icon: "checkmark.circle.fill", text: L10n.tr("Logged"), state: .success)
+        ]
+        if isLatest {
+            chips.append(RecentEvidenceChip(icon: "clock", text: L10n.tr("Recent"), state: .info))
+        }
+        if let gapDays, gapDays <= 3 {
+            chips.append(RecentEvidenceChip(icon: "calendar.badge.clock", text: L10n.tr("Building pattern"), state: .warning))
+        } else if previousSession == nil, !isLatest {
+            chips.append(RecentEvidenceChip(icon: "circle.dashed", text: L10n.tr("Baseline forming"), state: .neutral))
+        }
+        if duration > 0 {
+            chips.append(RecentEvidenceChip(icon: "clock", text: L10n.format("%dmin", duration), state: .neutral))
+        } else if sets > 0 {
+            chips.append(RecentEvidenceChip(icon: "checkmark.seal", text: L10n.format("%d sets", sets), state: .neutral))
+        }
+        if volume > 0, chips.count < 4 {
+            chips.append(RecentEvidenceChip(icon: "square.stack.3d.up.fill", text: L10n.format("%@kg", ForgeTheme.formatVolume(volume)), state: .neutral))
+        } else if reps > 0, chips.count < 4 {
+            chips.append(RecentEvidenceChip(icon: "number", text: L10n.format("%d reps", reps), state: .neutral))
+        }
+
+        return RecentEvidenceEvent(
+            id: session.id,
+            date: session.startTime,
+            title: title,
+            detail: detail,
+            chips: Array(chips.prefix(4)),
+            state: isLatest ? .info : .success
+        )
+    }
+
+    private func recentEvidenceMetric(_ metric: RecentEvidenceMetric) -> some View {
+        let tint = STRQPalette.color(for: metric.state)
+
+        return HStack(spacing: 8) {
+            Image(systemName: metric.icon)
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 22, height: 22)
+                .background(tint.opacity(0.10), in: .rect(cornerRadius: 7))
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(metric.title)
+                    .font(.system(size: 8, weight: .black))
+                    .tracking(0.5)
+                    .foregroundStyle(.white.opacity(0.42))
+                    .textCase(.uppercase)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.68)
+                HStack(alignment: .lastTextBaseline, spacing: 3) {
+                    Text(metric.value)
+                        .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
                         .foregroundStyle(.white.opacity(0.9))
                         .lineLimit(1)
-                    if isLatest {
-                        evidenceBadge(L10n.tr("Latest"), state: .info)
-                    }
-                }
-
-                HStack(spacing: 6) {
-                    sessionMetricPill(L10n.format("%dmin", duration), icon: "clock")
-                    sessionMetricPill(L10n.format("%d sets", sets), icon: "checkmark.circle")
-                    sessionMetricPill(L10n.format("%@kg", ForgeTheme.formatVolume(session.totalVolume)), icon: "square.stack.3d.up.fill")
+                    Text(metric.detail)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.48))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
             }
 
             Spacer(minLength: 0)
         }
-        .padding(10)
-        .background(Color.white.opacity(isLatest ? 0.045 : 0.025), in: .rect(cornerRadius: 14))
+        .padding(.horizontal, 9)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 12))
         .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(Color.white.opacity(isLatest ? 0.10 : 0.06), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
         )
     }
 
-    private func sessionMetricPill(_ text: String, icon: String) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.system(size: 8, weight: .semibold))
-            Text(text)
-                .font(.caption2.weight(.semibold).monospacedDigit())
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
+    private func recentEvidenceTimelineRow(_ event: RecentEvidenceEvent, isLast: Bool) -> some View {
+        let tint = STRQPalette.color(for: event.state)
+
+        return HStack(alignment: .top, spacing: 12) {
+            VStack(spacing: 5) {
+                ZStack {
+                    Circle()
+                        .fill(tint.opacity(0.16))
+                        .frame(width: 18, height: 18)
+                    Circle()
+                        .fill(tint)
+                        .frame(width: 7, height: 7)
+                }
+
+                Rectangle()
+                    .fill(isLast ? Color.clear : Color.white.opacity(0.10))
+                    .frame(width: 1, minHeight: isLast ? 0 : 58)
+            }
+            .frame(width: 20)
+
+            VStack(alignment: .leading, spacing: 9) {
+                HStack(alignment: .center, spacing: 8) {
+                    VStack(spacing: 1) {
+                        Text(event.date.formatted(.dateTime.month(.abbreviated)))
+                            .font(.system(size: 8, weight: .black))
+                            .tracking(0.6)
+                            .foregroundStyle(.white.opacity(0.48))
+                            .textCase(.uppercase)
+                        Text(event.date.formatted(.dateTime.day()))
+                            .font(.system(size: 17, weight: .heavy, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.92))
+                    }
+                    .frame(width: 40, height: 48)
+                    .background(tint.opacity(0.10), in: .rect(cornerRadius: 11))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 11)
+                            .strokeBorder(tint.opacity(0.16), lineWidth: 1)
+                    )
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(event.title)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.92))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.78)
+                        Text(event.date.formatted(.dateTime.weekday(.abbreviated).hour().minute()))
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.44))
+                            .lineLimit(1)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+
+                Text(event.detail)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.62))
+                    .fixedSize(horizontal: false, vertical: true)
+
+                FlowLayout(spacing: 6) {
+                    ForEach(event.chips) { chip in
+                        evidenceChip(icon: chip.icon, text: chip.text, state: chip.state)
+                    }
+                }
+            }
+            .padding(11)
+            .background(Color.white.opacity(0.028), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(Color.white.opacity(0.065), lineWidth: 1)
+            )
+            .padding(.bottom, isLast ? 0 : 10)
         }
-        .foregroundStyle(.white.opacity(0.58))
-        .padding(.horizontal, 7)
-        .padding(.vertical, 4)
-        .background(Color.white.opacity(0.045), in: Capsule())
+    }
+
+    private var recentEvidenceEmptyState: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "circle.dashed")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(STRQBrand.steel)
+                    .frame(width: 34, height: 34)
+                    .background(STRQBrand.steel.opacity(0.10), in: Circle())
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(L10n.tr("Baseline forming"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.9))
+                    Text(L10n.tr("Complete workouts to create dated evidence with duration, sets, and volume when those fields exist in history."))
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.58))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            FlowLayout(spacing: 6) {
+                evidenceChip(icon: "checkmark.circle", text: L10n.tr("Logged"), state: .neutral)
+                evidenceChip(icon: "calendar", text: L10n.tr("Workout date"), state: .neutral)
+                evidenceChip(icon: "clock", text: L10n.tr("Duration"), state: .neutral)
+                evidenceChip(icon: "square.stack.3d.up.fill", text: L10n.tr("Volume"), state: .neutral)
+            }
+        }
+        .padding(12)
+        .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+        )
+    }
+
+    private struct RecentEvidenceSnapshot {
+        let state: STRQPalette.State
+        let stateLabel: String
+        let subtitle: String
+        let detail: String
+        let countValue: String
+        let countDetail: String
+        let metrics: [RecentEvidenceMetric]
+        let events: [RecentEvidenceEvent]
+
+        var hasEvents: Bool { !events.isEmpty }
+    }
+
+    private struct RecentEvidenceMetric: Identifiable {
+        let title: String
+        let value: String
+        let detail: String
+        let icon: String
+        let state: STRQPalette.State
+
+        var id: String { "\(title)-\(value)-\(detail)" }
+    }
+
+    private struct RecentEvidenceEvent: Identifiable {
+        let id: String
+        let date: Date
+        let title: String
+        let detail: String
+        let chips: [RecentEvidenceChip]
+        let state: STRQPalette.State
+    }
+
+    private struct RecentEvidenceChip: Identifiable {
+        let icon: String
+        let text: String
+        let state: STRQPalette.State
+
+        var id: String { "\(icon)-\(text)" }
     }
 
     private struct WeeklyRhythmDay: Identifiable {
