@@ -3675,6 +3675,51 @@ Pending work:
 
 - Next recommended pass is a DEBUG-only Progress V5 Experience Prototype with first-time/beginner and established/athlete demo states.
 
+## 2026-05-09 - Progress V5 Experience Prototype
+
+Scope:
+
+- Added a DEBUG-only Progress V5 Experience surface for owner/Rork review.
+- Implemented two local-data states: Beginner and Athlete.
+- Kept the prototype focused on a simple training story: Training Map, Rhythm Story, Next Unlock, Evidence Timeline, Confidence State, and deeper analytics doorway.
+- Kept production Progress unchanged.
+
+Files changed:
+
+- `ios/STRQ/Views/Debug/ProgressV5ExperiencePrototypeView.swift`
+- `ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode before implementation.
+- Inspected chart primitives `9129:26029`, progress primitives `9129:207997`, Activity Tracker `11611:134946`, Dark Home / Smart Fitness Metrics `11604:62728`, and user-selected Progress / Metrics / Health / Goal / History frames `11604:63074`, `11604:63099`, `11604:63115`, `11604:63236`, `11604:63379`, `11604:63397`, `11604:63410`, `11604:63465`, `11604:63511`, `11604:63616`, `11604:63709`, `11604:63679`, `11604:63724`, `11604:64200`, `11604:64937`, `11604:66184`.
+- Adapted chart/progress primitive grammar, premium dark compact density, circular progress/readiness treatment, calendar/rhythm pacing, compact history/evidence rows, and goal/unlock runway patterns.
+- Deliberately avoided source branding, source copy, source assets, orange/violet source identity, health/medical claims, manual logging, filter sheets, result-confirmation flows, and copied full-screen layouts.
+
+Implementation:
+
+- Added `ProgressV5ExperiencePrototypeView` behind `#if DEBUG` with private local scenario structs only.
+- Built a connected Training Map hero with covered, improving, forming, light, and locked areas instead of a grey card stack or V4 body-overlay-first composition.
+- Added Beginner and Athlete state switching, local rhythm grids, unlock rows, evidence timeline rows, confidence rows, and a display-only deeper analytics doorway.
+- Integrated the surface into the DEBUG Design System Lab as `Progress V5 Experience`.
+
+Verification status:
+
+- Static Windows verification only; macOS/Xcode local build validation was not available in this workspace.
+- The `demo/prototype/mock/sample` string search may report code-only identifiers or comments; UI-visible strings were kept free of those terms.
+
+Intentionally not changed:
+
+- No production Progress UI.
+- No `ios/STRQ/Views/ProgressAnalyticsView.swift`.
+- No assets, models, services, view models, analytics files, localization files, project files, tests, fonts, Widget, Watch, Live Activity, ContentView, navigation routes, app data wiring, or production runtime behavior.
+
+Pending work:
+
+- Rork visual QA should capture Beginner and Athlete first viewport, full scroll, small iPhone, and large iPhone.
+- macOS/Xcode build validation remains required for Swift compile confidence.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

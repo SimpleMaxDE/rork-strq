@@ -15,6 +15,7 @@ struct STRQDesignSystemPreviewView: View {
                 ProgressV2PrototypeSection()
                 ProgressV3ConceptLabSection()
                 ProgressV4HybridCandidateSection()
+                ProgressV5ExperienceSection()
                 ListScheduleSection()
                 HumanBodyOverlayPilotSection()
                 IconsSection()
@@ -673,6 +674,20 @@ private struct ProgressV4HybridCandidateSection: View {
         PreviewSection("Progress V4 Hybrid Candidate") {
             ProgressV4HybridCandidateView()
                 .frame(height: 1440)
+                .clipShape(.rect(cornerRadius: STRQRadii.largeCard))
+                .overlay(
+                    RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
+                        .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+                )
+        }
+    }
+}
+
+private struct ProgressV5ExperienceSection: View {
+    var body: some View {
+        PreviewSection("Progress V5 Experience") {
+            ProgressV5ExperiencePrototypeView()
+                .frame(height: 1560)
                 .clipShape(.rect(cornerRadius: STRQRadii.largeCard))
                 .overlay(
                     RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
