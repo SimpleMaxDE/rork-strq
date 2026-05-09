@@ -1,11 +1,10 @@
 import SwiftUI
-import RevenueCat
 
 struct STRQPaywallView: View {
     var store: StoreViewModel
     var source: String = "profile"
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedPackage: Package?
+    @State private var selectedPackage: SubscriptionPackage?
     @State private var expandedPillars: Set<Int> = []
 
     var body: some View {
@@ -409,8 +408,8 @@ struct STRQPaywallView: View {
     private func savingsBadge() -> String? {
         guard let annual = store.annualPackage,
               let monthly = store.monthlyPackage else { return nil }
-        let annualPrice = annual.storeProduct.price as NSDecimalNumber
-        let monthlyPrice = monthly.storeProduct.price as NSDecimalNumber
+        let annualPrice = annual.storeProduct.price
+        let monthlyPrice = monthly.storeProduct.price
         let monthlyAsYear = monthlyPrice.doubleValue * 12
         guard monthlyAsYear > 0 else { return nil }
         let saved = 1.0 - (annualPrice.doubleValue / monthlyAsYear)
@@ -418,13 +417,13 @@ struct STRQPaywallView: View {
         return L10n.format("Save %d%%", Int(saved * 100))
     }
 
-    private func annualSubtitle(_ package: Package) -> String {
+    private func annualSubtitle(_ package: SubscriptionPackage) -> String {
         let price = package.storeProduct.localizedPriceString
         return L10n.format("%@/year", price)
     }
 
-    private func perMonthLine(for package: Package) -> String? {
-        let priceValue = (package.storeProduct.price as NSDecimalNumber).doubleValue
+    private func perMonthLine(for package: SubscriptionPackage) -> String? {
+        let priceValue = package.storeProduct.price.doubleValue
         guard priceValue > 0 else { return nil }
         let monthly = priceValue / 12.0
         let formatter = NumberFormatter()
@@ -438,7 +437,7 @@ struct STRQPaywallView: View {
         return L10n.format("%@/mo", formatted)
     }
 
-    private func trialBadge(_ package: Package) -> String? {
+    private func trialBadge(_ package: SubscriptionPackage) -> String? {
         guard let intro = package.storeProduct.introductoryDiscount else { return nil }
         let period = intro.subscriptionPeriod
         if period.unit == .day {
@@ -449,7 +448,7 @@ struct STRQPaywallView: View {
         return L10n.tr("Free trial")
     }
 
-    private func packageCard(package: Package, title: String, subtitle: String, trailing: String?, badge: String?, isSelected: Bool) -> some View {
+    private func packageCard(package: SubscriptionPackage, title: String, subtitle: String, trailing: String?, badge: String?, isSelected: Bool) -> some View {
         Button {
             withAnimation(.snappy(duration: 0.2)) {
                 selectedPackage = package

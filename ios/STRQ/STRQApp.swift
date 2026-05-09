@@ -1,5 +1,4 @@
 import SwiftUI
-import RevenueCat
 
 @main
 struct STRQApp: App {
@@ -12,26 +11,14 @@ struct STRQApp: App {
     init() {
         STRQFontRegistrar.registerBundledFonts()
 
-        let apiKey: String
-        #if DEBUG
-        apiKey = Config.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY.isEmpty
-            ? Config.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY
-            : Config.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY
-        #else
-        apiKey = Config.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY
-        #endif
-
-        guard !apiKey.isEmpty else {
+        if StoreViewModel.hasRevenueCatKeys {
+            print("[STRQ] RevenueCat keys are present, but the SDK is omitted from this preview build")
+            ErrorReporter.shared.breadcrumb("RevenueCat SDK omitted from preview build", category: "subscription")
+        } else {
             print("[STRQ] RevenueCat API key not configured — skipping initialization")
             ErrorReporter.shared.breadcrumb("RevenueCat not configured", category: "subscription")
-            return
         }
 
-        #if DEBUG
-        Purchases.logLevel = .debug
-        #endif
-        Purchases.configure(withAPIKey: apiKey)
-        ErrorReporter.shared.breadcrumb("RevenueCat configured", category: "subscription")
         EnvironmentValidator.validateAndLog()
     }
 

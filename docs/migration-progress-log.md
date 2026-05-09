@@ -3779,6 +3779,32 @@ Pending work:
 - Push to GitHub and let the iOS Build workflow validate the target reset.
 - Retry the Rork preview build from the new commit.
 
+## 2026-05-09 - Rork Preview RevenueCat SPM Removal
+
+Scope:
+
+- Removed the RevenueCat Swift Package dependency from the native iOS project after the cloud build log showed package resolution and RevenueCat compilation consuming the preview timeout budget.
+- Kept subscription surfaces on the existing unavailable/fallback path so Profile, Restore Purchases, and the paywall remain reachable without external package setup.
+- Left RevenueCat key validation warnings in place so real subscription configuration debt is still visible.
+
+Files changed:
+
+- `ios/STRQ.xcodeproj/project.pbxproj`
+- `ios/STRQ/STRQApp.swift`
+- `ios/STRQ/ViewModels/StoreViewModel.swift`
+- `ios/STRQ/Views/STRQPaywallView.swift`
+- `docs/migration-progress-log.md`
+
+Verification status:
+
+- Static Windows verification only at patch time; no local macOS/Xcode build was available.
+- Pending GitHub iOS Build validation after push.
+
+Pending work:
+
+- Retry the Rork preview build from the new commit.
+- Reintroduce RevenueCat only when the preview/provisioning path is stable enough for the extra Swift Package build cost.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
