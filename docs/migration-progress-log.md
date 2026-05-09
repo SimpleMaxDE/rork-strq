@@ -3648,6 +3648,33 @@ Pending work:
 - Rork visual QA should capture Recent Evidence empty, low-data, and multi-week states on small and large iPhone sizes.
 - Full Progress V4 integration remains deferred; Muscle Coverage runtime QA remains a separate release gate before Training Distribution or V4 replacement confidence.
 
+## 2026-05-09 - Progress V5 Experience Blueprint
+
+Scope:
+
+- Created a docs-only Progress V5 Experience Blueprint for a stronger flagship Progress direction.
+- Defined Progress as a simple user-facing training story powered by complex confidence, rhythm, coverage, evidence, unlock, and future plan-impact logic.
+- Kept current Progress production slices and V4 direction as useful ingredients, not the final experience.
+
+Files changed:
+
+- `docs/progress-v5-experience-blueprint.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode during planning.
+- Mapped selected Progress / Metrics / Health / Goal / History frames `11604:63074`, `11604:63099`, `11604:63115`, `11604:63236`, `11604:63379`, `11604:63397`, `11604:63410`, `11604:63465`, `11604:63511`, `11604:63616`, `11604:63709`, `11604:63679`, `11604:63724`, `11604:64200`, `11604:64937`, `11604:66184`, chart primitives `9129:26029`, progress primitives `9129:207997`, Activity Tracker `11611:134946`, and Dark Home / Smart Fitness Metrics `11604:62728`.
+- Chose `11604:63724`, `11604:64937`, `11604:66184`, `11611:134946`, and `11604:62728` as the strongest V5 layout anchors.
+
+Intentionally not changed:
+
+- No Swift files, assets, project files, models, services, view models, analytics files, localization files, Widget, Watch, Live Activity, tests, fonts, or production runtime behavior.
+
+Pending work:
+
+- Next recommended pass is a DEBUG-only Progress V5 Experience Prototype with first-time/beginner and established/athlete demo states.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
