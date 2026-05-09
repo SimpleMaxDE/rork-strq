@@ -29,6 +29,10 @@ struct SubscriptionProduct {
 struct SubscriptionPackage: Identifiable {
     let identifier: String
     let storeProduct: SubscriptionProduct
+
+    var id: String {
+        identifier
+    }
 }
 
 struct SubscriptionOffering {
