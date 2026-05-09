@@ -2028,7 +2028,7 @@ struct ProgressAnalyticsView: View {
 
                 Rectangle()
                     .fill(isLast ? Color.clear : Color.white.opacity(0.10))
-                    .frame(width: 1, minHeight: isLast ? 0 : 58)
+                    .frame(width: 1, height: isLast ? 0 : 58)
             }
             .frame(width: 20)
 
