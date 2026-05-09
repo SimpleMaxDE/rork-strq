@@ -3573,6 +3573,43 @@ Pending work:
 - Rork preview should be refreshed from the new commit and retried.
 - Watch, Widget, HealthKit, iCloud, and Apple Sign-In should be reintroduced only with matching provisioning once the base Rork app install is stable.
 
+## 2026-05-09 - Progress Strength Volume Trend Slice
+
+Scope:
+
+- Refined the production Progress Strength Trend and Volume Trend / Weekly Workouts modules as the next safe Progress V4 production slice.
+- Kept Progress V4 DEBUG-only and did not productionize Training Distribution, Muscle Coverage, or a full V4 surface.
+- Preserved existing Strength/Body/Volume tab behavior, Weekly Rhythm, Muscle Balance, Muscle Coverage data behavior, Recent Workouts routing, analytics, persistence, models, services, view models, assets, localization files, project files, tests, Widget, Watch, and Live Activity behavior.
+
+Files changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Inspected chart primitives `9129:26029`, progress primitives `9129:207997`, metric insight/detail nodes `11604:63115`, `11604:63236`, `11604:63379`, `11604:63397`, and `11604:63410`.
+- Adapted chart-first proof containers, conservative status chips, line/bar primitive grammar, muted progress tracks, compact metric rows, and detail/report hierarchy without copying source branding, assets, orange CTA identity, Pro violet styling, or health-specific copy.
+
+Implementation:
+
+- Upgraded the Strength module from a generic Estimated 1RM card into a Strength Trend proof module with Baseline forming, Early signal, and Readable trend states.
+- Preserved the existing strength chart gate, `vm.strengthProgress` data source, and estimated 1RM chart marks while clarifying the visible labels as movement-anchor evidence rather than PR claims.
+- Upgraded the Volume tab's Weekly Workouts card into a Volume Trend / weekly load rhythm module using the same completed-workout 8-week count source.
+- Added local view-only helper snapshots and proof metrics inside `ProgressAnalyticsView.swift`.
+- Improved low-data copy for Strength and Volume without using demo/mock data or new localization keys.
+
+Verification status:
+
+- Static Windows verification only; macOS/Xcode local build validation was not available in this workspace.
+- macOS/CI build validation and Rork visual QA remain required.
+
+Pending work:
+
+- Rork QA should capture Strength Trend and Volume Trend states across low-data and readable-data users on small and large iPhone sizes.
+- Full Progress V4 integration remains deferred; Muscle Coverage runtime QA remains a separate release gate before Training Distribution or V4 replacement confidence.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

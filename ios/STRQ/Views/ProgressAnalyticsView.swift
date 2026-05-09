@@ -1093,6 +1093,46 @@ struct ProgressAnalyticsView: View {
 
     // MARK: - Strength Signals
 
+    private struct StrengthTrendSnapshot {
+        let stateLabel: String
+        let state: STRQPalette.State
+        let anchorWeeks: Int
+        let caption: String
+        let detail: String
+    }
+
+    private var strengthTrendSnapshot: StrengthTrendSnapshot {
+        let anchorWeeks = vm.strengthProgress.count
+
+        if vm.hasEnoughDataForStrengthChart {
+            return StrengthTrendSnapshot(
+                stateLabel: L10n.tr("Readable trend"),
+                state: .info,
+                anchorWeeks: anchorWeeks,
+                caption: L10n.tr("Estimated 1RM movement anchors"),
+                detail: L10n.tr("Repeated logged sets are enough to draw the existing 8-week estimate. Treat this as strength signal, not a PR claim.")
+            )
+        }
+
+        if anchorWeeks > 0 || vm.totalCompletedWorkouts > 0 {
+            return StrengthTrendSnapshot(
+                stateLabel: L10n.tr("Early signal"),
+                state: .warning,
+                anchorWeeks: anchorWeeks,
+                caption: L10n.tr("Anchor evidence is present"),
+                detail: L10n.tr("Logged sets are real proof, but repeated anchor evidence is still thin. The chart stays quiet until the existing gate passes.")
+            )
+        }
+
+        return StrengthTrendSnapshot(
+            stateLabel: L10n.tr("Baseline forming"),
+            state: .warning,
+            anchorWeeks: anchorWeeks,
+            caption: L10n.tr("Strength record is waiting"),
+            detail: L10n.tr("Your first completed workout starts the strength record. STRQ waits for repeated lift evidence before drawing a trend.")
+        )
+    }
+
     @ViewBuilder
     private var strengthSignals: some View {
         VStack(spacing: 14) {
@@ -1112,90 +1152,194 @@ struct ProgressAnalyticsView: View {
     }
 
     private var strengthBaselineCard: some View {
-        let anchorWeeks = vm.strengthProgress.count
-        let detail = vm.totalCompletedWorkouts == 0
-            ? L10n.tr("Your first completed workout starts the strength record. STRQ waits for repeated lift evidence before drawing a trend.")
-            : L10n.tr("Logged sets are real proof. The 1RM chart appears once anchor lifts repeat enough to be readable.")
+        let snapshot = strengthTrendSnapshot
+        let tint = STRQPalette.color(for: snapshot.state)
 
-        return evidenceModule(border: STRQPalette.warning.opacity(0.18)) {
-            VStack(alignment: .leading, spacing: 14) {
+        return evidenceModule(border: tint.opacity(0.2)) {
+            VStack(alignment: .leading, spacing: 16) {
                 evidenceHeader(
-                    title: L10n.tr("Estimated 1RM"),
-                    trailing: L10n.tr("Baseline Forming"),
+                    title: L10n.tr("Strength Trend"),
+                    trailing: snapshot.stateLabel,
                     icon: "chart.line.uptrend.xyaxis",
-                    state: .warning,
-                    subtitle: L10n.tr("Key lifts are becoming readable")
+                    state: snapshot.state,
+                    subtitle: L10n.tr("Estimated 1RM from logged sets")
                 )
 
-                ZStack {
-                    VStack(spacing: 0) {
-                        ForEach(0..<4, id: \.self) { _ in
-                            Rectangle()
-                                .fill(Color.white.opacity(0.045))
-                                .frame(height: 1)
-                            Spacer(minLength: 0)
-                        }
-                    }
-                    HStack(alignment: .bottom, spacing: 10) {
-                        ForEach(0..<6, id: \.self) { index in
-                            RoundedRectangle(cornerRadius: 4)
-                                .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
-                                .foregroundStyle(Color.white.opacity(index < anchorWeeks ? 0.18 : 0.08))
-                                .frame(height: CGFloat(34 + (index % 3) * 14))
-                                .frame(maxWidth: .infinity)
-                        }
-                    }
-                    .padding(.top, 14)
+                HStack(alignment: .lastTextBaseline, spacing: 6) {
+                    Text("\(snapshot.anchorWeeks)")
+                        .font(.system(size: 34, weight: .heavy, design: .rounded).monospacedDigit())
+                        .foregroundStyle(snapshot.anchorWeeks > 0 ? tint : .white.opacity(0.68))
+                    Text(L10n.tr("anchor weeks"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.5))
+                        .padding(.bottom, 6)
+                    Spacer(minLength: 0)
+                    evidenceChip(icon: "circle.dashed", text: L10n.tr("No PR claim"), state: .neutral)
                 }
-                .frame(height: 92)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 12)
-                .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
-                )
+
+                plotShell(height: 118) {
+                    strengthTrendSkeleton(anchorWeeks: snapshot.anchorWeeks, tint: tint)
+                }
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(L10n.tr("Strength baseline is forming"))
+                    Text(snapshot.caption)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.9))
-                    Text(detail)
+                    Text(snapshot.detail)
                         .font(.caption.weight(.medium))
                         .foregroundStyle(.white.opacity(0.58))
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                HStack(spacing: 6) {
-                    ForEach([L10n.tr("Bench"), L10n.tr("Squat"), L10n.tr("Deadlift")], id: \.self) { lift in
-                        evidenceChip(icon: "circle.dashed", text: lift, state: .neutral)
-                    }
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+                    trendProofMetric(
+                        title: L10n.tr("Signal"),
+                        value: snapshot.stateLabel,
+                        detail: L10n.tr("confidence"),
+                        icon: "waveform.path.ecg",
+                        state: snapshot.state
+                    )
+                    trendProofMetric(
+                        title: L10n.tr("Window"),
+                        value: L10n.tr("8 weeks"),
+                        detail: L10n.tr("existing chart"),
+                        icon: "calendar",
+                        state: .neutral
+                    )
                 }
             }
         }
     }
 
+    private func strengthTrendSkeleton(anchorWeeks: Int, tint: Color) -> some View {
+        GeometryReader { proxy in
+            let width = max(proxy.size.width, 1)
+            let height = max(proxy.size.height, 1)
+            let markerInset: CGFloat = 8
+            let markerWidth = max(width - markerInset * 2, 1)
+
+            ZStack {
+                VStack(spacing: 0) {
+                    ForEach(0..<4, id: \.self) { _ in
+                        Rectangle()
+                            .fill(Color.white.opacity(0.05))
+                            .frame(height: 1)
+                        Spacer(minLength: 0)
+                    }
+                }
+
+                Path { path in
+                    path.move(to: CGPoint(x: 0, y: height * 0.62))
+                    path.addLine(to: CGPoint(x: width, y: height * 0.62))
+                }
+                .stroke(tint.opacity(0.34), style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [7, 8]))
+
+                ForEach(0..<6, id: \.self) { index in
+                    Circle()
+                        .strokeBorder(tint.opacity(index < anchorWeeks ? 0.42 : 0.15), lineWidth: 2)
+                        .background(
+                            Circle()
+                                .fill(index < anchorWeeks ? tint.opacity(0.16) : Color.white.opacity(0.025))
+                        )
+                        .frame(width: 12, height: 12)
+                        .position(
+                            x: markerInset + markerWidth * CGFloat(index) / 5,
+                            y: height * (0.36 + CGFloat(index % 3) * 0.12)
+                        )
+                }
+            }
+            .padding(.horizontal, 2)
+        }
+    }
+
+    private func trendProofMetric(title: String, value: String, detail: String, icon: String, state: STRQPalette.State) -> some View {
+        let tint = STRQPalette.color(for: state)
+
+        return HStack(spacing: 9) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 25, height: 25)
+                .background(tint.opacity(0.1), in: .rect(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.5)
+                    .foregroundStyle(.white.opacity(0.42))
+                    .textCase(.uppercase)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                HStack(alignment: .lastTextBaseline, spacing: 4) {
+                    Text(value)
+                        .font(.system(size: 14, weight: .heavy, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white.opacity(0.9))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.62)
+                    Text(detail)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.48))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.68)
+                }
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(Color.white.opacity(0.065), lineWidth: 1)
+        )
+    }
+
     private var strengthChart: some View {
         let entries = vm.strengthProgress
+        let snapshot = strengthTrendSnapshot
+        let tint = STRQPalette.color(for: snapshot.state)
 
-        return evidenceModule {
-            VStack(alignment: .leading, spacing: 14) {
+        return evidenceModule(border: tint.opacity(0.2)) {
+            VStack(alignment: .leading, spacing: 16) {
                 evidenceHeader(
-                    title: L10n.tr("Estimated 1RM"),
-                    trailing: L10n.tr("8 Weeks"),
+                    title: L10n.tr("Strength Trend"),
+                    trailing: snapshot.stateLabel,
                     icon: "chart.line.uptrend.xyaxis",
-                    state: .info,
-                    subtitle: L10n.tr("Strength proof from logged sets")
+                    state: snapshot.state,
+                    subtitle: L10n.tr("Estimated 1RM movement anchors")
                 )
 
-                plotShell(height: 178) {
+                HStack(alignment: .top, spacing: 10) {
+                    trendProofMetric(
+                        title: L10n.tr("Evidence"),
+                        value: "\(snapshot.anchorWeeks)",
+                        detail: L10n.tr("anchor weeks"),
+                        icon: "checkmark.seal",
+                        state: snapshot.state
+                    )
+                    trendProofMetric(
+                        title: L10n.tr("Claim"),
+                        value: L10n.tr("Signal"),
+                        detail: L10n.tr("not PRs"),
+                        icon: "exclamationmark.shield",
+                        state: .neutral
+                    )
+                }
+
+                Text(snapshot.detail)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.58))
+                    .fixedSize(horizontal: false, vertical: true)
+
+                plotShell(height: 186) {
                     Chart {
                         ForEach(entries) { entry in
-                            LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.bench), series: .value("Lift", "Bench"))
+                            LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.bench), series: .value("Anchor", "Push anchor"))
                                 .foregroundStyle(Color.white).interpolationMethod(.catmullRom).symbol(.circle)
-                            LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.squat), series: .value("Lift", "Squat"))
+                            LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.squat), series: .value("Anchor", "Squat pattern"))
                                 .foregroundStyle(STRQBrand.steel).interpolationMethod(.catmullRom).symbol(.square)
-                            LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.deadlift), series: .value("Lift", "Deadlift"))
+                            LineMark(x: .value("Week", entry.date), y: .value("Weight", entry.deadlift), series: .value("Anchor", "Hinge pattern"))
                                 .foregroundStyle(STRQBrand.slate).interpolationMethod(.catmullRom).symbol(.triangle)
                         }
                     }
@@ -1211,13 +1355,13 @@ struct ProgressAnalyticsView: View {
                             AxisValueLabel(format: .dateTime.month(.abbreviated).day()).foregroundStyle(Color.secondary)
                         }
                     }
-                    .chartForegroundStyleScale(["Bench": Color.white, "Squat": STRQBrand.steel, "Deadlift": STRQBrand.slate])
+                    .chartForegroundStyleScale(["Push anchor": Color.white, "Squat pattern": STRQBrand.steel, "Hinge pattern": STRQBrand.slate])
                 }
 
                 HStack(spacing: 16) {
-                    legendDot(color: .white, label: L10n.tr("Bench"))
-                    legendDot(color: STRQBrand.steel, label: L10n.tr("Squat"))
-                    legendDot(color: STRQBrand.slate, label: L10n.tr("Deadlift"))
+                    legendDot(color: .white, label: L10n.tr("Push anchor"))
+                    legendDot(color: STRQBrand.steel, label: L10n.tr("Squat pattern"))
+                    legendDot(color: STRQBrand.slate, label: L10n.tr("Hinge pattern"))
                 }
                 .frame(maxWidth: .infinity)
             }
@@ -2370,16 +2514,75 @@ struct ProgressAnalyticsView: View {
 
     // MARK: - Volume Signals
 
+    private struct WeeklyLoadWeek: Identifiable {
+        let index: Int
+        let label: String
+        let count: Int
+
+        var id: Int { index }
+    }
+
+    private struct VolumeTrendSnapshot {
+        let stateLabel: String
+        let state: STRQPalette.State
+        let activeWeeks: Int
+        let totalSessions: Int
+        let currentWeekSessions: Int
+        let peakWeekSessions: Int
+        let detail: String
+    }
+
+    private func volumeTrendSnapshot(from weeks: [WeeklyLoadWeek]) -> VolumeTrendSnapshot {
+        let activeWeeks = weeks.filter { $0.count > 0 }.count
+        let totalSessions = weeks.reduce(0) { $0 + $1.count }
+        let currentWeekSessions = weeks.last?.count ?? 0
+        let peakWeekSessions = weeks.map(\.count).max() ?? 0
+
+        if totalSessions <= 1 {
+            return VolumeTrendSnapshot(
+                stateLabel: L10n.tr("Baseline forming"),
+                state: .warning,
+                activeWeeks: activeWeeks,
+                totalSessions: totalSessions,
+                currentWeekSessions: currentWeekSessions,
+                peakWeekSessions: peakWeekSessions,
+                detail: L10n.tr("One or two sessions start the workload record. Weekly rhythm becomes useful after the same evidence repeats.")
+            )
+        }
+
+        if activeWeeks >= 2 && totalSessions >= 4 {
+            return VolumeTrendSnapshot(
+                stateLabel: L10n.tr("Readable trend"),
+                state: .info,
+                activeWeeks: activeWeeks,
+                totalSessions: totalSessions,
+                currentWeekSessions: currentWeekSessions,
+                peakWeekSessions: peakWeekSessions,
+                detail: L10n.tr("Completed workouts now span multiple weeks, enough to read load rhythm without guessing at adaptation.")
+            )
+        }
+
+        return VolumeTrendSnapshot(
+            stateLabel: L10n.tr("Early signal"),
+            state: .warning,
+            activeWeeks: activeWeeks,
+            totalSessions: totalSessions,
+            currentWeekSessions: currentWeekSessions,
+            peakWeekSessions: peakWeekSessions,
+            detail: L10n.tr("The workload signal is present, but the weekly pattern is still thin. More completed sessions make the rhythm trustworthy.")
+        )
+    }
+
     @ViewBuilder
     private var volumeSignals: some View {
         if vm.totalCompletedWorkouts < 2 {
             signalRunwayCard(
                 title: L10n.tr("Volume Signals"),
-                trailing: L10n.tr("Baseline Forming"),
+                trailing: L10n.tr("Baseline forming"),
                 icon: "chart.bar.xaxis",
-                headline: L10n.tr("Volume pattern is forming"),
-                detail: L10n.tr("progress.volume.runway.detail", fallback: "A few workouts reveal rhythm, mix, and workload before balance becomes trustworthy."),
-                chips: [("figure.strengthtraining.traditional", L10n.tr("Workouts")), ("square.stack.3d.up.fill", L10n.tr("Volume")), ("arrow.left.arrow.right", L10n.tr("Balance"))]
+                headline: L10n.tr("Training load baseline is forming"),
+                detail: L10n.tr("progress.volume.runway.detail", fallback: "A few completed workouts reveal weekly rhythm and workload before balance becomes trustworthy."),
+                chips: [("figure.strengthtraining.traditional", L10n.tr("Workouts")), ("chart.bar.xaxis", L10n.tr("Weekly rhythm")), ("circle.dashed", L10n.tr("No conclusion"))]
             )
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
@@ -2480,31 +2683,55 @@ struct ProgressAnalyticsView: View {
     @ViewBuilder
     private var weeklySessionsChart: some View {
         let calendar = Calendar.current
-        let last8Weeks: [(String, Int)] = (0..<8).reversed().map { weekOffset in
+        let last8Weeks: [WeeklyLoadWeek] = Array((0..<8).reversed().enumerated()).map { index, weekOffset in
             let weekStart = calendar.date(byAdding: .weekOfYear, value: -weekOffset, to: Date())!
             let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart)!
             let count = vm.workoutHistory.filter { $0.startTime >= weekStart && $0.startTime < weekEnd && $0.isCompleted }.count
             let label = weekOffset == 0 ? L10n.tr("Now") : L10n.format("%dw", weekOffset)
-            return (label, count)
+            return WeeklyLoadWeek(index: index, label: label, count: count)
         }
+        let snapshot = volumeTrendSnapshot(from: last8Weeks)
+        let tint = STRQPalette.color(for: snapshot.state)
 
-        evidenceModule {
-            VStack(alignment: .leading, spacing: 14) {
+        evidenceModule(border: tint.opacity(0.2)) {
+            VStack(alignment: .leading, spacing: 16) {
                 evidenceHeader(
-                    title: L10n.tr("Weekly Workouts"),
-                    trailing: L10n.tr("8 Weeks"),
+                    title: L10n.tr("Volume Trend"),
+                    trailing: snapshot.stateLabel,
                     icon: "chart.bar.xaxis",
-                    state: .info,
-                    subtitle: L10n.tr("Rhythm proof from completed sessions")
+                    state: snapshot.state,
+                    subtitle: L10n.tr("Weekly Workouts from completed sessions")
                 )
 
-                plotShell(height: 132) {
+                HStack(alignment: .top, spacing: 10) {
+                    trendProofMetric(
+                        title: L10n.tr("This week"),
+                        value: "\(snapshot.currentWeekSessions)",
+                        detail: L10n.tr("workouts"),
+                        icon: "calendar.badge.clock",
+                        state: snapshot.currentWeekSessions > 0 ? snapshot.state : .neutral
+                    )
+                    trendProofMetric(
+                        title: L10n.tr("Active weeks"),
+                        value: "\(snapshot.activeWeeks)/8",
+                        detail: L10n.tr("with work"),
+                        icon: "rectangle.stack",
+                        state: snapshot.activeWeeks >= 2 ? .info : (snapshot.activeWeeks > 0 ? .warning : .neutral)
+                    )
+                }
+
+                Text(snapshot.detail)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.58))
+                    .fixedSize(horizontal: false, vertical: true)
+
+                plotShell(height: 140) {
                     Chart {
-                        ForEach(last8Weeks, id: \.0) { week, count in
-                            BarMark(x: .value("Week", week), y: .value("Workouts", appeared || reduceMotion ? count : 0))
+                        ForEach(last8Weeks) { week in
+                            BarMark(x: .value("Week", week.label), y: .value("Workouts", appeared || reduceMotion ? week.count : 0))
                                 .foregroundStyle(
                                     LinearGradient(
-                                        colors: [STRQBrand.steel, STRQBrand.slate.opacity(0.82)],
+                                        colors: [tint, STRQBrand.slate.opacity(0.82)],
                                         startPoint: .top,
                                         endPoint: .bottom
                                     )
@@ -2524,15 +2751,70 @@ struct ProgressAnalyticsView: View {
                     }
                 }
 
+                weeklyWorkloadRail(weeks: last8Weeks, snapshot: snapshot, tint: tint)
+
                 HStack(spacing: 10) {
                     evidenceChip(icon: "checkmark.circle", text: L10n.tr("Completed only"), state: .neutral)
-                    Text(L10n.tr("Bars show finished workouts per week; open weeks are neutral."))
+                    Text(L10n.tr("Bars show finished workouts per week; this is rhythm evidence, not intensity scoring."))
                         .font(.caption2.weight(.medium))
                         .foregroundStyle(.tertiary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
+    }
+
+    private func weeklyWorkloadRail(weeks: [WeeklyLoadWeek], snapshot: VolumeTrendSnapshot, tint: Color) -> some View {
+        let peak = max(snapshot.peakWeekSessions, 1)
+
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Text(L10n.tr("8-week load rhythm"))
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.7)
+                    .foregroundStyle(.white.opacity(0.42))
+                    .textCase(.uppercase)
+                Rectangle()
+                    .fill(Color.white.opacity(0.06))
+                    .frame(height: 1)
+                Text(L10n.format("peak %d/wk", snapshot.peakWeekSessions))
+                    .font(.caption2.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(.white.opacity(0.48))
+            }
+
+            HStack(alignment: .bottom, spacing: 6) {
+                ForEach(weeks) { week in
+                    VStack(spacing: 5) {
+                        GeometryReader { proxy in
+                            ZStack(alignment: .bottom) {
+                                RoundedRectangle(cornerRadius: 7)
+                                    .fill(Color.white.opacity(0.045))
+                                RoundedRectangle(cornerRadius: 7)
+                                    .fill((week.count > 0 ? tint : STRQBrand.slate.opacity(0.44)).opacity(week.count > 0 ? 0.76 : 0.16).gradient)
+                                    .frame(height: max(5, proxy.size.height * CGFloat(Double(week.count) / Double(peak))))
+                            }
+                        }
+                        .frame(height: 46)
+
+                        Text(week.label)
+                            .font(.system(size: 9, weight: .black))
+                            .foregroundStyle(week.index == weeks.count - 1 ? tint : .white.opacity(0.42))
+                            .lineLimit(1)
+                        Text("\(week.count)")
+                            .font(.system(size: 10, weight: .heavy, design: .rounded).monospacedDigit())
+                            .foregroundStyle(week.count > 0 ? .white.opacity(0.72) : .white.opacity(0.3))
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .frame(height: 80)
+        }
+        .padding(12)
+        .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+        )
     }
 
     private var movementBalanceCard: some View {
