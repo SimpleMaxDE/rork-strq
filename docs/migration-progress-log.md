@@ -3805,6 +3805,52 @@ Pending work:
 - Retry the Rork preview build from the new commit.
 - Reintroduce RevenueCat only when the preview/provisioning path is stable enough for the extra Swift Package build cost.
 
+## 2026-05-10 - Progress V5 Simulator QA Capture
+
+Scope:
+
+- Ran the iOS Debug app on a Cloud Mac simulator to validate that the Progress V5 experience prototype is reachable and visible.
+- Captured simulator screenshots for Beginner, Athlete, the state switcher, and the internal entry point.
+- Documented the environment, access path, screenshots, visual caveats, and verification notes in `docs/qa/progress-v5-simulator-qa/README.md`.
+
+Files changed:
+
+- `docs/qa/progress-v5-simulator-qa/README.md`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-entry.png`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-beginner-top.png`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-beginner-bottom.png`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-athlete-top.png`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-athlete-bottom.png`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-switcher.png`
+- `docs/migration-progress-log.md`
+
+Verification run:
+
+- `xcodebuild -version`
+- `xcrun simctl list devices available | head -80`
+- `git status --short --branch`
+- `git pull --ff-only`
+- `git rev-parse --short HEAD`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+- `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' CODE_SIGNING_ALLOWED=NO -only-testing:STRQTests/ProgressMuscleCoverageCalculatorTests`
+- Retried focused test with explicit iPhone 16 simulator id after Xcode could not resolve `name=iPhone 16` as `OS:latest`.
+- `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'id=D0B148E5-33DC-4B9C-8843-CD44A06E869D' CODE_SIGNING_ALLOWED=NO -only-testing:STRQTests/ProgressMuscleCoverageCalculatorTests`
+
+Intentionally not changed:
+
+- No code access patch was needed; V5 was already reachable through `Profile` -> `Internal Preview: Progress V5 Experience`.
+- `ios/STRQ/Views/ProgressAnalyticsView.swift` and the real Progress tab were not changed.
+- No models, services, analytics, persistence, localization, assets, tests, widget/watch/live activity, fonts, workout execution, or plan generation files were changed.
+
+Pending work:
+
+- Evaluate whether the Athlete hero title truncation and lower-scroll chrome proximity need V5-only layout refinement.
+- Re-run the focused test on iPhone 16 specifically if that destination matters; the same test suite passed on the iPhone 17 Pro screenshot simulator.
+
+Warnings:
+
+- The requested iPhone 16 focused-test destination did not complete: `name=iPhone 16` failed destination resolution against `OS:latest`, and the explicit iPhone 16 retry failed to launch the test runner with Mach error `-308`.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
