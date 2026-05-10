@@ -3851,6 +3851,61 @@ Warnings:
 
 - The requested iPhone 16 focused-test destination did not complete: `name=iPhone 16` failed destination resolution against `OS:latest`, and the explicit iPhone 16 retry failed to launch the test runner with Mach error `-308`.
 
+## 2026-05-11 - Progress V5 Experience Polish
+
+Scope:
+
+- Polished the DEBUG/internal-preview Progress V5 surface after simulator screenshot QA.
+- Kept V5 local-scenario-only and did not productionize or connect real Progress data.
+- Preserved the Training Map direction while tightening visible product language, truncation risk, and lower-scroll tab-bar spacing.
+
+Files changed:
+
+- `ios/STRQ/Views/Debug/ProgressV5ExperiencePrototypeView.swift`
+- `docs/qa/progress-v5-simulator-qa/README.md`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-beginner-top.png`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-beginner-bottom.png`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-athlete-top.png`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-athlete-bottom.png`
+- `docs/qa/progress-v5-simulator-qa/progress-v5-switcher.png`
+- `docs/migration-progress-log.md`
+
+Changes:
+
+- Replaced the visible V5 product title with `Training Map`.
+- Shortened the Athlete hero headline to avoid iPhone 17 Pro truncation.
+- Simplified Beginner copy around one logged workout, repeating one lift, and locked detail.
+- Shortened the Training Map helper copy and the Athlete deeper-analytics doorway copy.
+- Added extra bottom scroll padding so lower modules sit above translucent tab chrome.
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- ios/STRQ/Views/Debug/ProgressV5ExperiencePrototypeView.swift ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift docs/migration-progress-log.md`
+- `rg -n "Training Map|Training Progress|Your Training Story|Beginner|Athlete|Next Unlock|Evidence Timeline|Confidence State|Deeper Analytics|Internal Preview" ios/STRQ/Views/Debug/ProgressV5ExperiencePrototypeView.swift ios/STRQ/Views/Debug/STRQDesignSystemPreviewView.swift docs/migration-progress-log.md`
+- `rg -n '"[^"]*(Progress V5|demo|prototype|mock|sample|Sandow)[^"]*"' ios/STRQ/Views/Debug/ProgressV5ExperiencePrototypeView.swift`
+- `rg -n "Sandow" ios/STRQ/Views ios/STRQ/ContentView.swift`
+- `git diff --name-only -- ios/STRQ/Views/ProgressAnalyticsView.swift ios/STRQ/Models ios/STRQ/Services ios/STRQ/ViewModels ios/STRQ/Assets.xcassets ios/STRQ/Localizable.xcstrings ios/STRQ.xcodeproj ios/STRQTests ios/STRQWidget ios/STRQWatch ios/STRQShared`
+- `git diff --check`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+
+Simulator QA:
+
+- Rebuilt, installed, and launched Debug on iPhone 17 Pro iOS 26.2.
+- Captured updated Beginner top, Beginner bottom, Athlete top, Athlete bottom, and switcher screenshots.
+- Confirmed the Athlete hero and lower Deeper Analytics doorway no longer show visible ellipses in the captured states.
+
+Intentionally not changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- production Progress tab wiring
+- models, services, view models, analytics, persistence, localization, assets, tests, widgets, watch targets, fonts, workout execution, plan generation, and HealthKit
+
+Warnings:
+
+- The XcodeBuildMCP build/run helper timed out before booting the simulator, so simulator install/launch and screenshots were completed with `xcrun simctl` after the requested `xcodebuild` succeeded.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

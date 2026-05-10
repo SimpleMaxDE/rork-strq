@@ -23,6 +23,7 @@ struct ProgressV5ExperiencePrototypeView: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal, STRQSpacing.md)
             .padding(.vertical, STRQSpacing.lg)
+            .padding(.bottom, STRQSpacing.tabBarHeight + STRQSpacing.xl)
         }
         .background(ProgressV5Style.background.ignoresSafeArea())
         .preferredColorScheme(.dark)
@@ -32,13 +33,13 @@ struct ProgressV5ExperiencePrototypeView: View {
 private struct ProgressV5Header: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text("Progress V5")
+            Text("Training Map")
                 .font(STRQTypography.headingSmall)
                 .foregroundStyle(STRQColors.primaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
-            Text("A training story surface built around map, rhythm, unlocks, evidence, and confidence.")
+            Text("A clear read on what is covered, what is forming, and what to repeat next.")
                 .font(STRQTypography.caption)
                 .foregroundStyle(STRQColors.secondaryText)
                 .lineLimit(2)
@@ -207,7 +208,7 @@ private struct ProgressV5TrainingMap: View {
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                .frame(width: min(172, width * 0.46), alignment: .leading)
+                .frame(width: min(184, width * 0.52), alignment: .leading)
                 .padding(STRQSpacing.sm)
                 .background(ProgressV5Style.plot.opacity(0.78), in: .rect(cornerRadius: STRQRadii.md))
                 .overlay(
@@ -876,19 +877,19 @@ private struct ProgressV5Scenario {
         state: .beginner,
         heroStatus: "Calibrating",
         heroTitle: "One workout has started the record.",
-        heroMessage: "Repeat one lift to make the map readable. Until then, STRQ keeps the story simple and honest.",
+        heroMessage: "Repeat one lift to unlock the map. No charts yet.",
         workoutCount: "1",
         windowLabel: "7 day",
         confidenceLabel: "Calibrating",
         heroConfidenceValue: 0.24,
         confidenceIcon: .clock,
-        mapCaption: "The first anchors are visible; locked areas stay quiet until training repeats.",
-        rhythmCaption: "One completed session is evidence, not a streak.",
+        mapCaption: "The map fills as you train.\nLocked areas stay quiet.",
+        rhythmCaption: "One workout started the record.",
         rhythmValue: "1/3 this week",
-        unlockCaption: "The next workout should make one comparison possible.",
-        evidenceCaption: "Only the facts that exist are shown.",
-        confidenceCaption: "Claims stay narrow while the baseline forms.",
-        doorwayCopy: "Strength, volume, and coverage detail open once the map has repeat evidence.",
+        unlockCaption: "Repeat one lift to make the map readable.",
+        evidenceCaption: "Only the first facts are shown.",
+        confidenceCaption: "Confidence grows after repeats.",
+        doorwayCopy: "More detail opens after workouts repeat.",
         doorwayState: "Locked",
         doorwayIcon: .lock,
         areas: [
@@ -902,36 +903,36 @@ private struct ProgressV5Scenario {
         rhythmDays: ProgressV5Factory.days(trained: [5], forming: [12, 19, 26], count: 28),
         weeks: ProgressV5Factory.weeks([0, 0, 0, 1], target: 3),
         unlocks: [
-            .init(label: "Next", title: "Repeat one lift", detail: "A second exposure turns one entry into the first comparison.", progress: 0.34, icon: .repeatAction, tone: .primary)
+            .init(label: "Next", title: "Repeat one lift", detail: "A second workout gives the map something to compare.", progress: 0.34, icon: .repeatAction, tone: .primary)
         ],
         evidence: [
-            .init(date: "Today", title: "First workout logged", detail: "Push and leg work created the first visible anchors.", tone: .primary),
-            .init(date: "Next", title: "Map readability pending", detail: "Repeat one lift before STRQ compares direction.", tone: .neutral)
+            .init(date: "Today", title: "First workout logged", detail: "Push and leg work made the first anchors.", tone: .primary),
+            .init(date: "Next", title: "Repeat one lift", detail: "The map gets easier to read after that.", tone: .neutral)
         ],
         confidenceItems: [
-            .init(title: "Training Map", detail: "first anchors only", state: "Calibrating", icon: .progress, tone: .primary),
-            .init(title: "Rhythm Story", detail: "one completed day", state: "Forming", icon: .calendar, tone: .neutral),
-            .init(title: "Deep Trends", detail: "needs repeats", state: "Locked", icon: .lock, tone: .neutral)
+            .init(title: "Training Map", detail: "fills after repeats", state: "Calibrating", icon: .progress, tone: .primary),
+            .init(title: "Rhythm Story", detail: "one day logged", state: "Forming", icon: .calendar, tone: .neutral),
+            .init(title: "Deep Trends", detail: "not yet", state: "Locked", icon: .lock, tone: .neutral)
         ]
     )
 
     static let athlete = ProgressV5Scenario(
         state: .athlete,
         heroStatus: "Confident",
-        heroTitle: "Your four-week map is readable enough to guide the next block.",
+        heroTitle: "Your four-week map can guide the next block.",
         heroMessage: "Coverage, rhythm, and recent evidence point to a stable pattern with one area still light.",
         workoutCount: "32",
         windowLabel: "4 week",
         confidenceLabel: "Confident",
         heroConfidenceValue: 0.92,
         confidenceIcon: .checkCircle,
-        mapCaption: "Covered areas, improving work, and one light pattern stay visible in one read.",
+        mapCaption: "Covered, improving, and light areas stay visible in one read.",
         rhythmCaption: "Cadence is repeatable without turning open days into failure.",
         rhythmValue: "14/16 target",
         unlockCaption: "The next sessions can close a gap without flooding the view with raw tables.",
         evidenceCaption: "Recent sessions explain why the map is saying this.",
         confidenceCaption: "Signals are readable, but plan impact remains a future layer.",
-        doorwayCopy: "Detailed anchors, load rhythm, and movement breakdown can live behind this doorway.",
+        doorwayCopy: "Detailed anchors and movement breakdowns are ready.",
         doorwayState: "Ready",
         doorwayIcon: .chartLine,
         areas: [
@@ -1264,7 +1265,7 @@ private enum ProgressV5Style {
 private struct ProgressV5ExperiencePrototypeView_Previews: PreviewProvider {
     static var previews: some View {
         ProgressV5ExperiencePrototypeView()
-            .previewDisplayName("Progress V5 Experience")
+            .previewDisplayName("Training Map Experience")
     }
 }
 #endif
