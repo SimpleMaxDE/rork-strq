@@ -3906,6 +3906,53 @@ Warnings:
 
 - The XcodeBuildMCP build/run helper timed out before booting the simulator, so simulator install/launch and screenshots were completed with `xcrun simctl` after the requested `xcodebuild` succeeded.
 
+## 2026-05-11 - Progress V5 Production Candidate Visual Polish
+
+Scope:
+
+- Polished the DEBUG-only real-data Training Map production candidate after simulator screenshot review.
+- Kept the candidate internal/Profile-entry only and continued to read from completed workout history only.
+- Moved the candidate closer to the accepted V5 prototype direction with stronger visual hierarchy while keeping claims conservative.
+
+Files changed:
+
+- `ios/STRQ/Views/ProgressV5ProductionCandidateView.swift`
+- `docs/migration-progress-log.md`
+
+Implementation:
+
+- Replaced internal header copy with product-facing completed-workout copy.
+- Strengthened the Training Map stage with darker plot structure, grid/route hierarchy, teal/steel/amber readiness accents, node rings, and quieter locked-state styling.
+- Made 0-workout and low-data copy feel like a starting runway while preserving "No claims yet" language.
+- Replaced repeated readiness labels with module-specific labels such as "Rhythm forming", "Enough sessions", "Opening", and "Available".
+- Reworded Next Unlock around motivating completed-session progress instead of task-list phrasing.
+- Fixed evidence volume text to render values like `5.6k kg total volume` instead of double-appending `kg`.
+- Made zero-volume evidence rows less strong by avoiding volume claims and using a forming state.
+- Reworked Signal Readiness rows away from a table-like trailing-status layout.
+- Increased bottom spacing so lower modules sit more comfortably above translucent tab chrome.
+
+Intentionally not changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `ios/STRQ/Views/Debug/ProgressV5ExperiencePrototypeView.swift`
+- `ProfileView.swift`
+- Models, services, view models, persistence, analytics, HealthKit, plan generation, workout execution, session/exercise/coach/check-in views, assets, localization, project files, tests, widgets, watch targets, Live Activity, and fonts.
+
+Verification run:
+
+- `git diff --check`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+
+Simulator screenshots:
+
+- `docs/qa/progress-v5-production-candidate-polish-2026-05-11/profile-entry-internal-training-map.jpg`
+- `docs/qa/progress-v5-production-candidate-polish-2026-05-11/training-map-0-workout-top.jpg`
+- `docs/qa/progress-v5-production-candidate-polish-2026-05-11/training-map-0-workout-middle.jpg`
+- `docs/qa/progress-v5-production-candidate-polish-2026-05-11/training-map-0-workout-bottom.jpg`
+- `docs/qa/progress-v5-production-candidate-polish-2026-05-11/training-map-8-workout-top.jpg`
+- `docs/qa/progress-v5-production-candidate-polish-2026-05-11/training-map-8-workout-middle.jpg`
+- `docs/qa/progress-v5-production-candidate-polish-2026-05-11/training-map-8-workout-bottom.jpg`
+
 ## 2026-05-11 - Progress V5 Production Candidate Shell
 
 Scope:
