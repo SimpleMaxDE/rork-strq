@@ -3906,6 +3906,51 @@ Warnings:
 
 - The XcodeBuildMCP build/run helper timed out before booting the simulator, so simulator install/launch and screenshots were completed with `xcrun simctl` after the requested `xcodebuild` succeeded.
 
+## 2026-05-11 - Progress V5 Production Candidate Shell
+
+Scope:
+
+- Added a real-data internal Training Map production-candidate shell for Progress V5 direction under Licensed Source Mode.
+- Kept `ProgressAnalyticsView.swift` unchanged and did not replace the real Progress tab.
+- Gated the Profile access row behind `#if DEBUG` so the internal Training Map candidate is not visible in public release builds.
+- Removed the public Profile access path to the older local-scenario V5 preview row by replacing it with the DEBUG-only real-data candidate entry.
+
+Files changed:
+
+- `ios/STRQ/Views/ProgressV5ProductionCandidateView.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Implementation:
+
+- Added `ProgressV5ProductionCandidateView(vm:)` using existing read-only `AppViewModel` data.
+- Built Training Map, Rhythm Story, Next Unlock, Evidence Timeline, Signal Readiness, and Deeper Analytics doorway sections.
+- Powered rhythm from completed workout history only.
+- Powered evidence from completed session date, name, duration, sets, reps, and total volume only.
+- Limited Training Map states to locked, forming, and readable high-level structure while Muscle Coverage runtime QA remains open.
+- Kept exact coverage levels, category percentages, area confidence colors, gap-closed claims, plan-impact claims, and route replacement out of scope.
+
+Intentionally not changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `ios/STRQ/Views/Debug/ProgressV5ExperiencePrototypeView.swift`
+- Models, services, view models, workout completion, persistence, analytics, assets, localization catalogs, project files, tests, widgets, watch targets, Live Activity, fonts, HealthKit, Coach, and plan generation.
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `rg -n "ProgressV5Scenario|ProgressV5Factory|demo|prototype|mock|sample|covered|improving|light|Confident" ios/STRQ/Views/ProgressV5ProductionCandidateView.swift ios/STRQ/Views/ProfileView.swift`
+- `rg -n "ProgressV5ProductionCandidateView|Signal Readiness|Training Map|Rhythm Story|Next Unlock|Evidence Timeline" ios/STRQ/Views/ProgressV5ProductionCandidateView.swift ios/STRQ/Views/ProfileView.swift`
+- `rg -n "ProgressV5ProductionCandidateView|Internal Preview|Training Map Preview|#if DEBUG|DEBUG" ios/STRQ/Views/ProfileView.swift ios/STRQ/Views/ProgressV5ProductionCandidateView.swift`
+- `git diff --name-only -- ios/STRQ/Views/ProgressAnalyticsView.swift ios/STRQ/Models ios/STRQ/Services ios/STRQ/ViewModels ios/STRQ/Assets.xcassets ios/STRQ/Localizable.xcstrings ios/STRQ.xcodeproj ios/STRQTests ios/STRQWidget ios/STRQWatch ios/STRQShared`
+- `git diff --check`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+
+Pending work:
+
+- Capture simulator screenshots for first-time, low-data, regular, and athlete-like states after a disposable state setup path is available for the new internal candidate.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
