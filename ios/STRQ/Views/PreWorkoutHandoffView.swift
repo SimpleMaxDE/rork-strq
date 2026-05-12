@@ -13,20 +13,33 @@ struct PreWorkoutHandoffView: View {
         vm.sessionBriefing(for: day)
     }
 
+    private var backgroundSurface: some View {
+        LinearGradient(
+            colors: [
+                STRQPalette.backgroundPrimary,
+                STRQPalette.backgroundCarbon,
+                STRQPalette.backgroundPrimary
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .ignoresSafeArea()
+    }
+
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            backgroundSurface
 
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 16) {
                     sessionHero
                     readinessRow
-                    sessionStats
+                    prepCueCard
                     exercisePreviewList
                     whyThisSessionCard
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 8)
+                .padding(.top, 10)
                 .padding(.bottom, 120)
             }
 
@@ -61,14 +74,15 @@ struct PreWorkoutHandoffView: View {
     // MARK: - Session Hero
 
     private var sessionHero: some View {
-        VStack(spacing: 20) {
+        VStack(alignment: .leading, spacing: 18) {
             HStack {
                 Button { onCancel() } label: {
                     Image(systemName: "xmark")
-                        .font(.body.weight(.medium))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 36, height: 36)
-                        .background(Color.white.opacity(0.06), in: Circle())
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(STRQPalette.textSecondary)
+                        .frame(width: 38, height: 38)
+                        .background(Color.white.opacity(0.065), in: Circle())
+                        .overlay(Circle().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
                 }
                 Spacer()
                 if briefing.hasCoachAdjustment {
@@ -82,142 +96,251 @@ struct PreWorkoutHandoffView: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+                    .overlay(Capsule().strokeBorder(STRQBrand.steel.opacity(0.18), lineWidth: 1))
                 }
             }
 
-            VStack(spacing: 14) {
-                ZStack {
-                    Circle()
-                        .fill(Color.white.opacity(0.04))
-                        .frame(width: 90, height: 90)
-
-                    HStack(spacing: 4) {
-                        ForEach(briefing.focusMuscles.prefix(2)) { muscle in
-                            Image(systemName: muscle.symbolName)
-                                .font(.system(size: 28, weight: .thin))
-                                .foregroundStyle(.white.opacity(0.8))
-                        }
-                    }
-                }
-                .scaleEffect(appeared ? 1 : 0.7)
-                .opacity(appeared ? 1 : 0)
-                .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1), value: appeared)
-
-                VStack(spacing: 6) {
+            HStack(alignment: .top, spacing: 16) {
+                VStack(alignment: .leading, spacing: 10) {
                     Text(L10n.tr("TODAY'S WORKOUT"))
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 10, weight: .black))
                         .foregroundStyle(STRQBrand.steel)
-                        .tracking(1.5)
+                        .tracking(1.4)
 
                     Text(briefing.dayName)
-                        .font(.system(.title, design: .rounded, weight: .bold))
+                        .font(.system(size: 34, weight: .black, design: .rounded))
+                        .foregroundStyle(STRQPalette.textPrimary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.72)
 
                     Text(briefing.dayExplanation)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 8)
+                        .foregroundStyle(STRQPalette.textSecondary)
+                        .lineSpacing(2)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .opacity(appeared ? 1 : 0)
-                .animation(.easeOut(duration: 0.5).delay(0.15), value: appeared)
+                Spacer(minLength: 0)
 
-                ScrollView(.horizontal) {
-                    HStack(spacing: 6) {
-                        ForEach(briefing.focusMuscles.prefix(5)) { muscle in
-                            Text(muscle.displayName)
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(STRQBrand.steel)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 5)
-                                .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.white.opacity(0.11), STRQBrand.steel.opacity(0.08)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 74, height: 74)
+                        .overlay(Circle().strokeBorder(Color.white.opacity(0.11), lineWidth: 1))
+
+                    VStack(spacing: -2) {
+                        ForEach(briefing.focusMuscles.prefix(2)) { muscle in
+                            Image(systemName: muscle.symbolName)
+                                .font(.system(size: 23, weight: .thin))
+                                .foregroundStyle(STRQPalette.textPrimary.opacity(0.86))
                         }
                     }
                 }
-                .contentMargins(.horizontal, 0)
-                .scrollIndicators(.hidden)
+                .scaleEffect(appeared ? 1 : 0.82)
                 .opacity(appeared ? 1 : 0)
-                .animation(.easeOut(duration: 0.5).delay(0.2), value: appeared)
+                .animation(.spring(response: 0.55, dampingFraction: 0.76).delay(0.1), value: appeared)
             }
+
+            ScrollView(.horizontal) {
+                HStack(spacing: 8) {
+                    ForEach(briefing.focusMuscles.prefix(5)) { muscle in
+                        focusMuscleChip(muscle)
+                    }
+                }
+            }
+            .contentMargins(.horizontal, 0)
+            .scrollIndicators(.hidden)
+
+            sessionStats
         }
-        .padding(.top, 4)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 24)
+                .fill(
+                    LinearGradient(
+                        colors: [STRQPalette.surfaceRaised.opacity(0.96), STRQPalette.backgroundCarbon.opacity(0.96)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
+        .overlay(alignment: .topTrailing) {
+            Circle()
+                .fill(STRQBrand.steel.opacity(0.12))
+                .frame(width: 190, height: 190)
+                .blur(radius: 52)
+                .offset(x: 72, y: -90)
+                .allowsHitTesting(false)
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .strokeBorder(Color.white.opacity(0.09), lineWidth: 1)
+        )
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 12)
+        .animation(.easeOut(duration: 0.5).delay(0.12), value: appeared)
+    }
+
+    private func focusMuscleChip(_ muscle: MuscleGroup) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: muscle.symbolName)
+                .font(.system(size: 11, weight: .medium))
+            Text(muscle.displayName)
+                .font(.caption2.weight(.semibold))
+                .lineLimit(1)
+        }
+        .foregroundStyle(STRQPalette.textPrimary.opacity(0.88))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.white.opacity(0.065), in: Capsule())
+        .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
     }
 
     // MARK: - Readiness
 
     private var readinessRow: some View {
-        HStack(spacing: 8) {
-            readinessItem(
+        HStack(spacing: 6) {
+            readinessPill(
                 icon: recoveryIcon,
                 color: recoveryColor,
-                title: "Recovery",
-                value: "\(briefing.recoveryScore)%"
+                value: "\(briefing.recoveryScore)%",
+                label: "Recovery"
             )
-            readinessItem(
+            readinessPill(
                 icon: briefing.phase.icon,
                 color: phaseColor,
-                title: "Phase",
-                value: briefing.phase.displayName.replacingOccurrences(of: " Phase", with: "")
+                value: briefing.phase.displayName.replacingOccurrences(of: " Phase", with: ""),
+                label: "Phase"
             )
-            readinessItem(
+            readinessPill(
                 icon: intensityIcon,
                 color: intensityColor,
-                title: "Intensity",
-                value: briefing.intensityLabel
+                value: briefing.intensityLabel,
+                label: "Intensity"
             )
         }
+        .padding(4)
+        .background(STRQPalette.surfaceBase.opacity(0.84), in: .rect(cornerRadius: 18))
+        .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(Color.white.opacity(0.07), lineWidth: 1))
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(.easeOut(duration: 0.5).delay(0.25), value: appeared)
     }
 
-    private func readinessItem(icon: String, color: Color, title: String, value: String) -> some View {
-        VStack(spacing: 8) {
+    private func readinessPill(icon: String, color: Color, value: String, label: String) -> some View {
+        HStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.body)
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(color)
-                .frame(width: 34, height: 34)
-                .background(color.opacity(0.12), in: Circle())
-            Text(value)
-                .font(.caption.weight(.bold))
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-            Text(title)
-                .font(.system(size: 10))
-                .foregroundStyle(.tertiary)
+                .frame(width: 28, height: 28)
+                .background(color.opacity(0.13), in: Circle())
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(value)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+                Text(label)
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .lineLimit(1)
+            }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
+        .padding(.vertical, 8)
+        .padding(.horizontal, 7)
     }
 
     // MARK: - Session Stats
 
     private var sessionStats: some View {
         HStack(spacing: 0) {
-            statItem(value: "\(briefing.exerciseCount)", label: "Exercises")
-            Rectangle().fill(Color.white.opacity(0.06)).frame(width: 1, height: 28)
-            statItem(value: "\(briefing.totalSets)", label: "Sets")
-            Rectangle().fill(Color.white.opacity(0.06)).frame(width: 1, height: 28)
-            statItem(value: "~\(briefing.estimatedMinutes)m", label: "Duration")
-            Rectangle().fill(Color.white.opacity(0.06)).frame(width: 1, height: 28)
-            statItem(value: "RPE \(String(format: "%.0f", briefing.avgRPE))", label: "Effort")
+            statItem(icon: "list.bullet.rectangle.portrait", value: "\(briefing.exerciseCount)", label: "Exercises")
+            statDivider
+            statItem(icon: "square.stack.3d.up", value: "\(briefing.totalSets)", label: "Sets")
+            statDivider
+            statItem(icon: "clock", value: "~\(briefing.estimatedMinutes)m", label: "Time")
+            statDivider
+            statItem(icon: intensityIcon, value: "RPE \(String(format: "%.0f", briefing.avgRPE))", label: "Effort")
         }
-        .padding(.vertical, 16)
-        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 16))
+        .padding(.top, 14)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Color.white.opacity(0.07))
+                .frame(height: 1)
+        }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(.easeOut(duration: 0.5).delay(0.3), value: appeared)
     }
 
-    private func statItem(value: String, label: String) -> some View {
-        VStack(spacing: 4) {
+    private var statDivider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.07))
+            .frame(width: 1, height: 34)
+            .padding(.horizontal, 7)
+    }
+
+    private func statItem(icon: String, value: String, label: String) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(STRQBrand.steel)
             Text(value)
                 .font(.subheadline.bold().monospacedDigit())
+                .foregroundStyle(STRQPalette.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             Text(label)
-                .font(.system(size: 10))
-                .foregroundStyle(.tertiary)
+                .font(.system(size: 9, weight: .medium))
+                .foregroundStyle(STRQPalette.textMuted)
+                .lineLimit(1)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Prep
+
+    @ViewBuilder
+    private var prepCueCard: some View {
+        let hint = briefing.warmupHint.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if !hint.isEmpty {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "figure.strengthtraining.traditional")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(STRQBrand.steel)
+                    .frame(width: 34, height: 34)
+                    .background(STRQBrand.steel.opacity(0.12), in: .rect(cornerRadius: 10))
+                    .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(STRQBrand.steel.opacity(0.18), lineWidth: 1))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(L10n.tr("PREP"))
+                        .font(.system(size: 10, weight: .black))
+                        .tracking(1.0)
+                        .foregroundStyle(STRQBrand.steel)
+                    Text(hint)
+                        .font(.footnote)
+                        .foregroundStyle(STRQPalette.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(14)
+            .background(STRQPalette.surfaceBase.opacity(0.78), in: .rect(cornerRadius: 16))
+            .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Color.white.opacity(0.07), lineWidth: 1))
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 10)
+            .animation(.easeOut(duration: 0.5).delay(0.32), value: appeared)
+        }
     }
 
     // MARK: - Exercise Preview
@@ -288,7 +411,11 @@ struct PreWorkoutHandoffView: View {
                     }
                     .padding(.vertical, 10)
                     .padding(.horizontal, 14)
-                    .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 14))
+                    .background(STRQPalette.surfaceBase.opacity(0.72), in: .rect(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(Color.white.opacity(0.055), lineWidth: 1)
+                    )
                 }
                 .buttonStyle(.plain)
             }
@@ -342,10 +469,10 @@ struct PreWorkoutHandoffView: View {
             }
         }
         .padding(14)
-        .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 14))
+        .background(STRQPalette.surfaceBase.opacity(0.68), in: .rect(cornerRadius: 14))
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.055), lineWidth: 1)
         )
         .opacity(appeared ? 1 : 0)
         .animation(.easeOut(duration: 0.5).delay(0.4), value: appeared)
@@ -370,7 +497,7 @@ struct PreWorkoutHandoffView: View {
     private var startButton: some View {
         VStack(spacing: 0) {
             LinearGradient(
-                colors: [Color.black.opacity(0), Color.black],
+                colors: [STRQPalette.backgroundPrimary.opacity(0), STRQPalette.backgroundPrimary],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -386,11 +513,23 @@ struct PreWorkoutHandoffView: View {
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
+                .background(
+                    LinearGradient(
+                        colors: [STRQPalette.textPrimary, STRQBrand.steel.opacity(0.86)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    in: .rect(cornerRadius: 16)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(Color.white.opacity(0.22), lineWidth: 1)
+                )
+                .shadow(color: Color.white.opacity(0.10), radius: 16, y: 5)
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
-            .background(Color.black)
+            .background(STRQPalette.backgroundPrimary)
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 20)
