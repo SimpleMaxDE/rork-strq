@@ -2,7 +2,13 @@ name: iOS Build
 
 on:
   push:
+    paths:
+      - ".github/workflows/ios-build.yml"
+      - "ios/**"
   pull_request:
+    paths:
+      - ".github/workflows/ios-build.yml"
+      - "ios/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,13 +27,20 @@ jobs:
         run: xcodebuild -version
 
       - name: Build app
+        shell: bash
         run: |
-          set -o pipefail
+          set -euo pipefail
+          simulator_arch="$(uname -m)"
+          echo "Building simulator architecture: ${simulator_arch}"
+
           xcodebuild \
             -project ios/STRQ.xcodeproj \
             -scheme STRQ \
             -configuration Debug \
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
+            ARCHS="${simulator_arch}" \
+            ONLY_ACTIVE_ARCH=YES \
+            COMPILER_INDEX_STORE_ENABLE=NO \
             CODE_SIGNING_ALLOWED=NO \
             build
