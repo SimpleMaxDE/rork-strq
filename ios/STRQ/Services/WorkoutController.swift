@@ -78,6 +78,7 @@ final class WorkoutController {
         vm.workoutMinimized = false
         vm.completedWorkoutHandoff = nil
         pendingSetUndo = nil
+        cancelPendingPersistenceTask()
         startLiveActivity()
         vm.persist()
     }
@@ -109,6 +110,7 @@ final class WorkoutController {
         let sessionEnd = workout.session.endTime ?? Date()
         let sessionVolume = workout.session.totalVolume
         pendingSetUndo = nil
+        cancelPendingPersistenceTask()
         endLiveActivity(completed: true)
         vm.workoutMinimized = false
         vm.completedWorkoutHandoff = workout.session
@@ -153,6 +155,7 @@ final class WorkoutController {
 
     func saveDraft() {
         pendingSetUndo = nil
+        cancelPendingPersistenceTask()
         vm.persist()
     }
 
@@ -170,6 +173,7 @@ final class WorkoutController {
     func pauseWorkout() {
         guard vm.activeWorkout != nil else { return }
         pendingSetUndo = nil
+        cancelPendingPersistenceTask()
         Analytics.shared.track(.workout_paused, [:])
         ErrorReporter.shared.breadcrumb("Workout paused", category: "training")
         vm.workoutMinimized = true
@@ -182,6 +186,7 @@ final class WorkoutController {
     func discardWorkout() {
         guard let workout = vm.activeWorkout else { return }
         pendingSetUndo = nil
+        cancelPendingPersistenceTask()
         Analytics.shared.track(.workout_discarded, [
             "day": workout.session.dayName,
             "exercises_touched": String(workout.session.exerciseLogs.filter { $0.sets.contains(where: \.isCompleted) }.count)
@@ -468,18 +473,23 @@ final class WorkoutController {
 
     private func persistActiveWorkoutChange(debounced: Bool = false) {
         guard vm.activeWorkout != nil else { return }
-        pendingPersistenceTask?.cancel()
-        pendingPersistenceTask = nil
+        cancelPendingPersistenceTask()
         guard debounced else {
             vm.persist()
             return
         }
-        pendingPersistenceTask = Task { @MainActor in
+        let vm = vm
+        pendingPersistenceTask = Task { @MainActor [weak self, vm] in
             try? await Task.sleep(nanoseconds: 350_000_000)
             guard !Task.isCancelled else { return }
-            self.vm.persist()
-            self.pendingPersistenceTask = nil
+            vm.persist()
+            self?.pendingPersistenceTask = nil
         }
+    }
+
+    private func cancelPendingPersistenceTask() {
+        pendingPersistenceTask?.cancel()
+        pendingPersistenceTask = nil
     }
 
     private func defaultReps(for planned: PlannedExercise, suggestedRange: String? = nil) -> Int {

@@ -485,8 +485,8 @@ struct StoreViewModelTests {
     @Test func unconfiguredStateIsFree() {
         let store = StoreViewModel()
         if !store.isConfigured {
-            #expect(store.subscriptionStatusText == "Free")
-            #expect(store.subscriptionPlanName == "Free")
+            #expect(store.subscriptionStatusText == L10n.tr("Free"))
+            #expect(store.subscriptionPlanName == L10n.tr("Free"))
             #expect(store.isPro == false)
         }
     }
@@ -495,7 +495,7 @@ struct StoreViewModelTests {
         let store = StoreViewModel()
         if !store.isConfigured {
             await store.restore()
-            #expect(store.restoreMessage == "Subscriptions are not available in this environment.")
+            #expect(store.restoreMessage == L10n.tr("Subscriptions are not available in this environment."))
         }
     }
 }

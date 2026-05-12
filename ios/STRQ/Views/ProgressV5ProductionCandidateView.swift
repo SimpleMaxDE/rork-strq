@@ -541,6 +541,7 @@ struct ProgressV5ProductionCandidateView: View {
     }
 }
 
+@MainActor
 private struct TrainingProgressSnapshot {
     let completedWorkouts: Int
     let sessionsInWindow: Int

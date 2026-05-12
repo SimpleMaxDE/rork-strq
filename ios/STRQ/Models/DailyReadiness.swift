@@ -147,7 +147,7 @@ nonisolated struct DailyReadiness: Codable, Identifiable, Sendable {
         let stressW = Double(6 - stressLevel.rawValue) * 0.2
         let sorenessW = Double(4 - min(soreness.rawValue, 4)) * 0.15
         let motivationW = Double(motivation.rawValue) * 0.1
-        let raw = (sleepW + energyW + stressW + sorenessW + motivationW) / 5.0
+        let raw = sleepW + energyW + stressW + sorenessW + motivationW
         return min(100, max(0, Int(raw * 20)))
     }
 

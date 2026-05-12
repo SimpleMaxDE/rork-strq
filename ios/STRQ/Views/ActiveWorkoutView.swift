@@ -2006,7 +2006,7 @@ struct ActiveWorkoutView: View {
     }
 
     private func taskHeaderDetail(currentSet: SetLog?, totalSets: Int) -> String {
-        if let currentSet {
+        if currentSet != nil {
             return L10n.tr("Rest as needed. Adjust load or reps by feel.")
         }
         return totalSets == 0 ? L10n.tr("This exercise is ready.") : L10n.tr("Use the bottom action to move forward when you're ready.")
