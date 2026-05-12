@@ -23,17 +23,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Show Xcode version
-        run: xcodebuild -version
-
       - name: Build app
         shell: bash
         run: |
           set -euo pipefail
+          xcodebuild -version
+
           simulator_arch="$(uname -m)"
           echo "Building simulator architecture: ${simulator_arch}"
 
-          xcodebuild \
+          xcodebuild -quiet \
             -project ios/STRQ.xcodeproj \
             -scheme STRQ \
             -configuration Debug \
@@ -42,5 +41,11 @@ jobs:
             ARCHS="${simulator_arch}" \
             ONLY_ACTIVE_ARCH=YES \
             COMPILER_INDEX_STORE_ENABLE=NO \
+            ENABLE_CODE_COVERAGE=NO \
+            ENABLE_DEBUG_DYLIB=NO \
+            ENABLE_PREVIEWS=NO \
+            ENABLE_TESTABILITY=NO \
+            SWIFT_SERIALIZE_DEBUGGING_OPTIONS=NO \
+            GCC_GENERATE_DEBUGGING_SYMBOLS=NO \
             CODE_SIGNING_ALLOWED=NO \
             build

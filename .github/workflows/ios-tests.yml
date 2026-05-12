@@ -33,27 +33,16 @@ jobs:
           fi
           xcodebuild -version
 
-      - name: List Xcode project
-        shell: bash
-        run: |
-          set -euo pipefail
-          xcodebuild -list -project ios/STRQ.xcodeproj
-
-      - name: List available simulators
-        shell: bash
-        run: |
-          set -euo pipefail
-          xcrun simctl list devices available
-
       - name: Run Progress Muscle Coverage tests
         shell: bash
         run: |
           set -euo pipefail
 
-          if xcrun simctl list devices available | grep -q "iPhone 16 ("; then
+          available_devices="$(xcrun simctl list devices available)"
+          if grep -q "iPhone 16 (" <<< "${available_devices}"; then
             destination="platform=iOS Simulator,name=iPhone 16"
           else
-            device_name="$(xcrun simctl list devices available | awk -F '[()]' '/iPhone [0-9]+/ { print $1; exit }' | xargs)"
+            device_name="$(awk -F '[()]' '/iPhone [0-9]+/ { print $1; exit }' <<< "${available_devices}" | xargs)"
             if [ -z "$device_name" ]; then
               echo "No available iPhone simulator found."
               exit 1
@@ -65,7 +54,7 @@ jobs:
           simulator_arch="$(uname -m)"
           echo "Building simulator architecture: ${simulator_arch}"
 
-          xcodebuild test \
+          xcodebuild -quiet test \
             -project ios/STRQ.xcodeproj \
             -scheme STRQ \
             -configuration Debug \
@@ -75,4 +64,9 @@ jobs:
             ARCHS="${simulator_arch}" \
             ONLY_ACTIVE_ARCH=YES \
             COMPILER_INDEX_STORE_ENABLE=NO \
+            ENABLE_CODE_COVERAGE=NO \
+            ENABLE_DEBUG_DYLIB=NO \
+            ENABLE_PREVIEWS=NO \
+            SWIFT_SERIALIZE_DEBUGGING_OPTIONS=NO \
+            GCC_GENERATE_DEBUGGING_SYMBOLS=NO \
             CODE_SIGNING_ALLOWED=NO
