@@ -15700,7 +15700,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Noch ein paar Workouts und dein Coach trifft sch?rfere Entscheidungen zu Last, Wiederholungen und Erholung."
+            "value": "Noch ein paar Workouts und dein Coach trifft schärfere Entscheidungen zu Last, Wiederholungen und Erholung."
           }
         }
       }
@@ -15710,7 +15710,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eine kurze Notiz, damit STRQ Erholung und n?chstes Workout abstimmen kann."
+            "value": "Eine kurze Notiz, damit STRQ Erholung und nächstes Workout abstimmen kann."
           }
         }
       }
@@ -15720,7 +15720,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adaptive Pl?ne, tiefere Progressions-Reads und jedes Workout sicher auf all deinen Ger?ten."
+            "value": "Adaptive Pläne, tiefere Progressions-Reads und jedes Workout sicher auf all deinen Geräten."
           }
         }
       }
@@ -15730,7 +15730,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Notiere kurz, wie sich dieses Workout angef?hlt hat."
+            "value": "Notiere kurz, wie sich dieses Workout angefühlt hat."
           }
         }
       }
@@ -15740,7 +15740,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Workout-Notiz hinzuf?gen"
+            "value": "Workout-Notiz hinzufügen"
           }
         }
       }
@@ -15750,7 +15750,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alle geloggten S?tze dieses Workouts gehen verloren. Das kann nicht r?ckg?ngig gemacht werden."
+            "value": "Alle geloggten Sätze dieses Workouts gehen verloren. Das kann nicht rückgängig gemacht werden."
           }
         }
       }
@@ -15760,7 +15760,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alle S?tze sind geloggt. Beende das Workout, um es an Heute zu ?bergeben."
+            "value": "Alle Sätze sind geloggt. Beende das Workout, um es an Heute zu übergeben."
           }
         }
       }
@@ -15780,7 +15780,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Coach kann Last und Volumen jetzt anpassen. Ein weiteres Workout sch?rft die Muster-Reads."
+            "value": "Der Coach kann Last und Volumen jetzt anpassen. Ein weiteres Workout schärft die Muster-Reads."
           }
         }
       }
@@ -15790,7 +15790,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Komm f?r Workout 2 wieder"
+            "value": "Komm für Workout 2 wieder"
           }
         }
       }
@@ -15810,7 +15810,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "N?chstes Workout erleichtern"
+            "value": "Nächstes Workout erleichtern"
           }
         }
       }
@@ -15850,7 +15850,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beende das Workout, wenn du es speichern m?chtest."
+            "value": "Beende das Workout, wenn du es speichern möchtest."
           }
         }
       }
@@ -15860,7 +15860,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abgeschlossene Workouts sammeln sich hier, damit dein Fortschritt sp?ter leicht pr?fbar bleibt."
+            "value": "Abgeschlossene Workouts sammeln sich hier, damit dein Fortschritt später leicht prüfbar bleibt."
           }
         }
       }
@@ -15910,7 +15910,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Guter Schlaf und ein proteinreicher Tag heute = ein st?rkeres Workout."
+            "value": "Guter Schlaf und ein proteinreicher Tag heute = ein stärkeres Workout."
           }
         }
       }
@@ -15920,7 +15920,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wie hat sich dieses Workout angef?hlt?"
+            "value": "Wie hat sich dieses Workout angefühlt?"
           }
         }
       }
@@ -15950,7 +15950,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "L?ngstes Workout"
+            "value": "Längstes Workout"
           }
         }
       }
@@ -15970,7 +15970,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Motivation formt die Absicht. Schmerz ver?ndert das ganze Workout."
+            "value": "Motivation formt die Absicht. Schmerz verändert das ganze Workout."
           }
         }
       }
@@ -15980,7 +15980,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mehrere Systeme sind auff?llig. Training kostet heute mehr, als es bringt. Verschiebe das Workout - STRQ balanciert die Woche neu."
+            "value": "Mehrere Systeme sind auffällig. Training kostet heute mehr, als es bringt. Verschiebe das Workout - STRQ balanciert die Woche neu."
           }
         }
       }
@@ -15990,7 +15990,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "N?CHSTES WORKOUT"
+            "value": "NÄCHSTES WORKOUT"
           }
         }
       }
@@ -16000,7 +16000,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Das n?chste Workout ist %@. Schlaf, Protein und ein kurzer Spaziergang bereiten dich aufs Pushen vor."
+            "value": "Das nächste Workout ist %@. Schlaf, Protein und ein kurzer Spaziergang bereiten dich aufs Pushen vor."
           }
         }
       }
@@ -16010,7 +16010,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kein Workout geplant. Leichte Bewegung, Protein und Schlaf verst?rken alles, was du schon aufgebaut hast."
+            "value": "Kein Workout geplant. Leichte Bewegung, Protein und Schlaf verstärken alles, was du schon aufgebaut hast."
           }
         }
       }
@@ -16020,7 +16020,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein weiteres Workout diese Woche schaltet deinen Wochenr?ckblick frei."
+            "value": "Ein weiteres Workout diese Woche schaltet deinen Wochenrückblick frei."
           }
         }
       }
@@ -16030,7 +16030,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Leichteres Workout ?ffnen"
+            "value": "Leichteres Workout öffnen"
           }
         }
       }
@@ -16100,7 +16100,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Readiness ist niedrig. Ein k?rzeres, leichteres Workout ist besser als ein Grind, den du nicht verarbeitest."
+            "value": "Readiness ist niedrig. Ein kürzeres, leichteres Workout ist besser als ein Grind, den du nicht verarbeitest."
           }
         }
       }
@@ -16160,7 +16160,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Workout 2 ist das n?chste Signal, das z?hlt."
+            "value": "Workout 2 ist das nächste Signal, das zählt."
           }
         }
       }
@@ -16210,7 +16210,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Workout eins fixiert deine Baseline. Jeder Schritt sch?rft den Coach."
+            "value": "Workout eins fixiert deine Baseline. Jeder Schritt schärft den Coach."
           }
         }
       }
@@ -16250,7 +16250,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Workout 2 aktiviert Progression. Du bist n?her dran, als du denkst."
+            "value": "Workout 2 aktiviert Progression. Du bist näher dran, als du denkst."
           }
         }
       }
@@ -16320,7 +16320,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vorschl?ge basierend auf Fokusmuskeln und L?cken dieses Workouts."
+            "value": "Vorschläge basierend auf Fokusmuskeln und Lücken dieses Workouts."
           }
         }
       }
@@ -16350,7 +16350,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heute ?bernimmt den n?chsten Schritt. Der Coach formt Last und Erholung, sobald dein erstes echtes Workout drin ist."
+            "value": "Heute übernimmt den nächsten Schritt. Der Coach formt Last und Erholung, sobald dein erstes echtes Workout drin ist."
           }
         }
       }
@@ -16360,7 +16360,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Das heutige Workout ist bereit%@. W?rm dich gut auf und starte mit den Haupt?bungen."
+            "value": "Das heutige Workout ist bereit%@. Wärm dich gut auf und starte mit den Hauptübungen."
           }
         }
       }
@@ -16380,7 +16380,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "W?chentliche Workouts"
+            "value": "Wöchentliche Workouts"
           }
         }
       }
@@ -16390,7 +16390,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wochenr?ckblick wird nach %d weiteren Workouts diese Woche freigeschaltet"
+            "value": "Wochenrückblick wird nach %d weiteren Workouts diese Woche freigeschaltet"
           }
         }
       }
@@ -16400,7 +16400,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wochenr?ckblick wird nach 1 weiteren Workout diese Woche freigeschaltet"
+            "value": "Wochenrückblick wird nach 1 weiteren Workout diese Woche freigeschaltet"
           }
         }
       }
@@ -16410,7 +16410,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Du gehst direkt ins heutige Workout. Anpassen kannst du sp?ter im Tab ?Train?."
+            "value": "Du gehst direkt ins heutige Workout. Anpassen kannst du später im Train-Tab."
           }
         }
       }
@@ -16430,7 +16430,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dein erstes Workout ist drin. Nach ein paar weiteren erkennt STRQ Progression, Balance und Erm?dungsmuster."
+            "value": "Dein erstes Workout ist drin. Nach ein paar weiteren erkennt STRQ Progression, Balance und Ermüdungsmuster."
           }
         }
       }
@@ -16500,7 +16500,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%d weitere Workouts diese Woche schalten deinen Wochenr?ckblick frei."
+            "value": "%d weitere Workouts diese Woche schalten deinen Wochenrückblick frei."
           }
         }
       }
@@ -16510,7 +16510,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%d von %d S?tzen"
+            "value": "%d von %d Sätzen"
           }
         }
       }
@@ -16580,7 +16580,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abschlie?en"
+            "value": "Abschließen"
           }
         }
       }
@@ -16620,7 +16620,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "?bung %d von %d"
+            "value": "Übung %d von %d"
           }
         }
       }
@@ -16630,7 +16630,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "?bung %d/%d"
+            "value": "Übung %d/%d"
           }
         }
       }
@@ -16710,7 +16710,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "SATZGEF?HL"
+            "value": "SATZGEFÜHL"
           }
         }
       }
@@ -16740,7 +16740,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Satzgef?hl"
+            "value": "Satzgefühl"
           }
         }
       }
@@ -16870,7 +16870,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Letztes Workout geschlagen — n?chstes Mal pushen"
+            "value": "Letztes Workout geschlagen — nächstes Mal pushen"
           }
         }
       }

@@ -119,7 +119,7 @@ struct DashboardView: View {
             .ignoresSafeArea()
         }
         .navigationTitle(L10n.tr("Today"))
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5)) { appeared = true }
             vm.refreshDailyState()
@@ -160,47 +160,107 @@ struct DashboardView: View {
     // MARK: - Today Hero
 
     private var todayHero: some View {
-        let accent = vm.todaysReadiness.map { ForgeTheme.recoveryColor(for: $0.readinessScore) } ?? STRQPalette.borderStrong
+        let primary = vm.dailyBriefing?.primary
+        let accent = todayCommandAccent(for: primary)
+        let name = vm.profile.name.isEmpty ? L10n.tr("Athlete") : vm.profile.name
 
-        return ForgeSurface(variant: .hero, accent: accent, padding: 18) {
-            HStack(alignment: .center, spacing: 16) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(greeting)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(STRQPalette.textSecondary)
-                    Text(vm.profile.name.isEmpty ? L10n.tr("Athlete") : vm.profile.name)
-                        .font(.system(.title2, design: .rounded, weight: .heavy))
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(todayDateLabel.uppercased())
+                        .font(.system(size: 10, weight: .black))
+                        .tracking(1.1)
+                        .foregroundStyle(STRQPalette.textMuted)
+                        .lineLimit(1)
+
+                    Text("\(greeting), \(name)")
+                        .font(.system(size: 24, weight: .heavy, design: .rounded))
                         .foregroundStyle(STRQPalette.textPrimary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.72)
                 }
-                Spacer()
-                readinessBadge
+
+                Spacer(minLength: 8)
+
+                readinessBadge(accent: accent)
+            }
+
+            if let primary {
+                HStack(spacing: 10) {
+                    Image(systemName: primary.icon)
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(accent)
+                        .frame(width: 28, height: 28)
+                        .background(accent.opacity(0.12), in: Circle())
+
+                    Text(primary.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(STRQPalette.textPrimary.opacity(0.92))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
+
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(Color.white.opacity(0.045), in: .rect(cornerRadius: 15))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 15, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                )
             }
         }
+        .padding(.horizontal, 2)
         .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 8)
+        .offset(y: appeared ? 0 : 6)
     }
 
-    private var readinessBadge: some View {
-        Group {
-            if let readiness = vm.todaysReadiness {
-                let score = readiness.readinessScore
-                let color = ForgeTheme.recoveryColor(for: score)
-                STRQMetricTile(
-                    value: "\(score)",
-                    label: L10n.tr("Ready"),
-                    icon: "waveform.path.ecg",
-                    tint: color,
-                    progress: appeared ? Double(score) / 100 : 0,
-                    compact: true
-                )
-                .frame(width: 94)
-                .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.8).delay(0.2), value: appeared)
-            } else if vm.streak > 0 {
-                STRQBadgeChip(label: "\(vm.streak)", icon: "flame.fill", variant: .accent)
+    @ViewBuilder
+    private func readinessBadge(accent: Color) -> some View {
+        if let readiness = vm.todaysReadiness {
+            let score = readiness.readinessScore
+            let color = ForgeTheme.recoveryColor(for: score)
+            HStack(spacing: 8) {
+                ZStack {
+                    Circle()
+                        .stroke(Color.white.opacity(0.08), lineWidth: 3)
+                    Circle()
+                        .trim(from: 0, to: appeared ? Double(score) / 100 : 0)
+                        .stroke(color, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                    Text("\(score)")
+                        .font(.system(size: 11, weight: .black).monospacedDigit())
+                        .foregroundStyle(STRQPalette.textPrimary)
+                }
+                .frame(width: 34, height: 34)
+
+                Text(L10n.tr("Ready"))
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(0.8)
+                    .foregroundStyle(STRQPalette.textSecondary)
             }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(Color.white.opacity(0.055), in: Capsule())
+            .overlay(Capsule().strokeBorder(color.opacity(0.22), lineWidth: 1))
+            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.8).delay(0.2), value: appeared)
+        } else if vm.streak > 0 {
+            HStack(spacing: 6) {
+                Image(systemName: "flame.fill")
+                    .font(.system(size: 11, weight: .bold))
+                Text("\(vm.streak)")
+                    .font(.system(size: 12, weight: .black).monospacedDigit())
+            }
+            .foregroundStyle(accent)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(accent.opacity(0.10), in: Capsule())
+            .overlay(Capsule().strokeBorder(accent.opacity(0.22), lineWidth: 1))
         }
+    }
+
+    private var todayDateLabel: String {
+        Date().formatted(.dateTime.weekday(.wide).month(.abbreviated).day())
     }
 
     // MARK: - Primary Action Card (Daily Briefing)
@@ -334,11 +394,11 @@ struct DashboardView: View {
                 .font(.system(size: 9, weight: .black))
                 .tracking(0.8)
         }
-        .foregroundStyle(.black)
+        .foregroundStyle(STRQPalette.textPrimary)
         .padding(.horizontal, 8)
         .padding(.vertical, 3)
-        .background(STRQPalette.energyAccent, in: Capsule())
-        .overlay(Capsule().strokeBorder(Color.white.opacity(0.28), lineWidth: 0.7))
+        .background(Color.white.opacity(0.09), in: Capsule())
+        .overlay(Capsule().strokeBorder(Color.white.opacity(0.18), lineWidth: 0.7))
     }
 
     private struct PostWorkoutBridge {
@@ -666,127 +726,285 @@ struct DashboardView: View {
 
     private func workoutCard(_ day: WorkoutDay, briefing: DailyBriefing) -> some View {
         let primary = briefing.primary
-        let tint = ForgeTheme.color(for: primary.colorName)
+        let tint = todayCommandAccent(for: primary)
         let isRecovery = primary.kind == .recoverToday
         let isFirstSession = primary.kind == .startFirstSession
         return ForgeSurface(variant: .hero, accent: tint, padding: 0) {
             VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(spacing: 6) {
-                    Image(systemName: vm.currentPhase.icon)
-                        .font(.system(size: 9, weight: .bold))
-                    Text(primary.eyebrow)
-                        .font(.system(size: 9, weight: .black))
-                        .tracking(1.2)
-                    Spacer()
-                    if vm.isEarlyStage {
-                        todayPriorityPill
-                    } else if isRecovery {
-                        STRQBadgeChip(label: L10n.tr("Recovery first"), icon: "heart.circle.fill", variant: .success)
-                    } else if isFirstSession {
-                        STRQBadgeChip(label: L10n.tr("Milestone"), icon: "sparkles", variant: .accent)
-                    } else if let momentum = briefing.momentum {
-                        STRQBadgeChip(label: momentum.title, icon: momentum.icon, variant: .neutral)
-                    } else {
-                        Text(L10n.tr("TODAY"))
-                            .font(.system(size: 9, weight: .black))
-                            .tracking(1.2)
-                            .foregroundStyle(.white.opacity(0.4))
-                    }
-                }
-                .foregroundStyle(tint)
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack(alignment: .center, spacing: 12) {
+                        Image(systemName: primary.icon)
+                            .font(.system(size: 14, weight: .black))
+                            .foregroundStyle(tint)
+                            .frame(width: 40, height: 40)
+                            .background(tint.opacity(0.13), in: .rect(cornerRadius: 13))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                                    .strokeBorder(tint.opacity(0.24), lineWidth: 1)
+                            )
 
-                Text(day.name)
-                    .font(.system(size: isRecovery ? 25 : 29, weight: .heavy, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.7)
-
-                Text(primary.detail)
-                    .font(.footnote)
-                    .foregroundStyle(.white.opacity(0.7))
-                    .fixedSize(horizontal: false, vertical: true)
-
-                if let adj = vm.adjustment(for: day.id) {
-                    coachAdjustmentChip(adj)
-                }
-
-                HStack(spacing: 6) {
-                    ForEach(day.focusMuscles.prefix(3)) { muscle in
-                        STRQBadgeChip(label: muscle.displayName, variant: .neutral)
-                    }
-                }
-
-                Divider().opacity(0.22)
-
-                HStack(spacing: 8) {
-                    STRQMetricTile(
-                        value: "\(day.exercises.count)",
-                        label: L10n.tr("Exercises"),
-                        icon: "figure.strengthtraining.traditional",
-                        tint: tint,
-                        compact: true
-                    )
-                    STRQMetricTile(
-                        value: "~\(day.estimatedMinutes)m",
-                        label: L10n.tr("Duration"),
-                        icon: "clock.fill",
-                        tint: STRQPalette.steel,
-                        compact: true
-                    )
-                    STRQMetricTile(
-                        value: "\(day.exercises.reduce(0) { $0 + $1.sets })",
-                        label: L10n.tr("Total Sets"),
-                        icon: "square.stack.3d.up.fill",
-                        tint: STRQPalette.textSecondary,
-                        compact: true
-                    )
-                }
-            }
-            .padding(20)
-
-            if primary.kind == .checkInBeforeTraining {
-                HStack(spacing: 10) {
-                    STRQPrimaryCTA(icon: "heart.text.clipboard", title: L10n.tr("Check in")) {
-                        showReadinessCheckIn = true
-                    }
-
-                    Button {
-                        vm.prepareWorkoutHandoff(day: day)
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "bolt.fill")
-                            Text(L10n.tr("Start Workout"))
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(primary.eyebrow)
+                                .font(.system(size: 9, weight: .black))
+                                .tracking(1.2)
+                                .foregroundStyle(tint)
+                                .lineLimit(1)
+                            Text(workoutPrimaryTitle(for: primary.kind))
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(STRQPalette.textSecondary)
+                                .lineLimit(1)
                         }
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(STRQPalette.textPrimary.opacity(0.86))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(Color.white.opacity(0.08), in: .rect(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+
+                        Spacer(minLength: 0)
+
+                        workoutStatusBadge(
+                            isRecovery: isRecovery,
+                            isFirstSession: isFirstSession,
+                            briefing: briefing
                         )
                     }
-                    .buttonStyle(.strqPressable)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(day.name)
+                            .font(.system(size: isRecovery ? 25 : 30, weight: .heavy, design: .rounded))
+                            .foregroundStyle(.white)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.68)
+
+                        Text(primary.detail)
+                            .font(.footnote)
+                            .lineSpacing(2)
+                            .foregroundStyle(.white.opacity(0.68))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    if let adj = vm.adjustment(for: day.id) {
+                        coachAdjustmentChip(adj)
+                    }
+
+                    if let watch = briefing.watch {
+                        workoutCoachHint(watch)
+                    }
+
+                    HStack(spacing: 6) {
+                        ForEach(day.focusMuscles.prefix(3)) { muscle in
+                            STRQBadgeChip(label: muscle.displayName, variant: .neutral)
+                        }
+                    }
+
+                    HStack(spacing: 8) {
+                        workoutMetric(
+                            value: "\(day.exercises.count)",
+                            label: L10n.tr("Exercises"),
+                            icon: "figure.strengthtraining.traditional",
+                            tint: tint
+                        )
+                        workoutMetric(
+                            value: "~\(day.estimatedMinutes)m",
+                            label: L10n.tr("Duration"),
+                            icon: "clock.fill",
+                            tint: STRQPalette.steel
+                        )
+                        workoutMetric(
+                            value: "\(day.exercises.reduce(0) { $0 + $1.sets })",
+                            label: L10n.tr("Total Sets"),
+                            icon: "square.stack.3d.up.fill",
+                            tint: STRQPalette.textSecondary
+                        )
+                    }
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
-            } else {
-                STRQPrimaryCTA(
-                    icon: primary.kind == .resumeWorkout ? "play.fill" : "bolt.fill",
-                    title: workoutPrimaryTitle(for: primary.kind)
-                ) {
-                    vm.prepareWorkoutHandoff(day: day)
+                .padding(20)
+
+                if primary.kind == .checkInBeforeTraining {
+                    HStack(spacing: 10) {
+                        todayCommandCTA(icon: "heart.text.clipboard", title: L10n.tr("Check in"), tint: tint) {
+                            showReadinessCheckIn = true
+                        }
+
+                        todaySecondaryCTA(icon: "bolt.fill", title: L10n.tr("Start Workout")) {
+                            vm.prepareWorkoutHandoff(day: day)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+                } else {
+                    todayCommandCTA(
+                        icon: primary.kind == .resumeWorkout ? "play.fill" : "bolt.fill",
+                        title: workoutPrimaryTitle(for: primary.kind),
+                        tint: tint
+                    ) {
+                        vm.prepareWorkoutHandoff(day: day)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
-            }
             }
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.05), value: appeared)
+    }
+
+    private func todayCommandAccent(for primary: DailyBriefing.Primary?) -> Color {
+        guard let primary else {
+            return vm.todaysReadiness.map { ForgeTheme.recoveryColor(for: $0.readinessScore) } ?? STRQPalette.steel
+        }
+
+        switch primary.kind {
+        case .trainToday:
+            return STRQPalette.signalGreen
+        case .checkInBeforeTraining, .resumeWorkout:
+            return STRQPalette.steel
+        case .recoverToday, .recoveryDay:
+            return STRQPalette.warningAmber
+        case .startFirstSession:
+            return STRQPalette.gold
+        case .prepNextSession, .logCompletion, .logBodyWeight:
+            return ForgeTheme.color(for: primary.colorName)
+        }
+    }
+
+    @ViewBuilder
+    private func workoutStatusBadge(
+        isRecovery: Bool,
+        isFirstSession: Bool,
+        briefing: DailyBriefing
+    ) -> some View {
+        if vm.isEarlyStage {
+            todayPriorityPill
+        } else if isRecovery {
+            STRQBadgeChip(label: L10n.tr("Recovery first"), icon: "heart.circle.fill", variant: .warning)
+        } else if isFirstSession {
+            STRQBadgeChip(label: L10n.tr("Milestone"), icon: "sparkles", variant: .success)
+        } else if let momentum = briefing.momentum {
+            STRQBadgeChip(label: momentum.title, icon: momentum.icon, variant: .neutral)
+        } else {
+            Text(L10n.tr("TODAY"))
+                .font(.system(size: 9, weight: .black))
+                .tracking(1.2)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
+    private func workoutCoachHint(_ watch: DailyBriefing.Watch) -> some View {
+        let tint = ForgeTheme.color(for: watch.colorName)
+        return HStack(alignment: .top, spacing: 10) {
+            Image(systemName: watch.icon)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 28, height: 28)
+                .background(tint.opacity(0.12), in: .rect(cornerRadius: 9))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(watch.title)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(STRQPalette.textPrimary.opacity(0.92))
+                    .lineLimit(1)
+                Text(watch.detail)
+                    .font(.caption2)
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(10)
+        .background(Color.white.opacity(0.045), in: .rect(cornerRadius: 13))
+        .overlay(
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+        )
+    }
+
+    private func workoutMetric(value: String, label: String, icon: String, tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(tint)
+
+            Text(value)
+                .font(.system(size: 17, weight: .heavy, design: .rounded).monospacedDigit())
+                .foregroundStyle(STRQPalette.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.68)
+
+            Text(label.uppercased())
+                .font(.system(size: 8, weight: .black))
+                .tracking(0.7)
+                .foregroundStyle(STRQPalette.textMuted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .frame(maxWidth: .infinity, minHeight: 66, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .background(Color.white.opacity(0.045), in: .rect(cornerRadius: 13))
+        .overlay(
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .strokeBorder(tint.opacity(0.15), lineWidth: 1)
+        )
+    }
+
+    private func todayCommandCTA(icon: String, title: String, tint: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 9) {
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .black))
+                Text(title)
+                    .font(.system(size: 16, weight: .black))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.76)
+            }
+            .foregroundStyle(STRQPalette.backgroundDeep)
+            .frame(maxWidth: .infinity)
+            .frame(height: 54)
+            .background(
+                LinearGradient(
+                    colors: [
+                        Color.white,
+                        Color(red: 0.84, green: 0.86, blue: 0.88)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: .rect(cornerRadius: 15)
+            )
+            .overlay(alignment: .top) {
+                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    .fill(Color.white.opacity(0.42))
+                    .frame(height: 24)
+                    .allowsHitTesting(false)
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    .strokeBorder(tint.opacity(0.24), lineWidth: 1)
+            )
+            .shadow(color: tint.opacity(0.12), radius: 16, y: 7)
+            .shadow(color: .black.opacity(0.26), radius: 18, y: 8)
+        }
+        .buttonStyle(.strqPressable)
+    }
+
+    private func todaySecondaryCTA(icon: String, title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                Text(title)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.76)
+            }
+            .font(.subheadline.weight(.bold))
+            .foregroundStyle(STRQPalette.textPrimary.opacity(0.86))
+            .frame(maxWidth: .infinity)
+            .frame(height: 54)
+            .background(Color.white.opacity(0.075), in: .rect(cornerRadius: 15))
+            .overlay(
+                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.strqPressable)
     }
 
     private func workoutPrimaryTitle(for kind: DailyBriefing.PrimaryKind) -> String {
