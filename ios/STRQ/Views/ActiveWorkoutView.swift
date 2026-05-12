@@ -515,12 +515,14 @@ struct ActiveWorkoutView: View {
                 let isBodyweight = exerciseForIncrement?.category == .bodyweight || (exerciseForIncrement?.isBodyweight ?? false)
                 let canLogSet = setLog.reps > 0
 
-                VStack(spacing: 10) {
+                VStack(spacing: 12) {
                     activeTaskHeader(
                         exercise: exerciseForIncrement,
                         currentSet: setLog,
                         totalSets: log.sets.count
                     )
+
+                    currentSetProgressBar(setNumber: setLog.setNumber, totalSets: log.sets.count)
 
                     matchChipsRow(
                         setLog: setLog,
@@ -532,7 +534,7 @@ struct ActiveWorkoutView: View {
                         targetReps: parsePlannedReps(planned?.reps)
                     )
 
-                    HStack(spacing: 14) {
+                    HStack(spacing: 10) {
                         inputColumn(
                             label: isBodyweight ? L10n.tr("ADDED LOAD") : L10n.tr("WEIGHT"),
                             value: isBodyweight && setLog.weight <= 0 ? L10n.tr("BW") : formatWeight(setLog.weight, increment: increment),
@@ -562,10 +564,6 @@ struct ActiveWorkoutView: View {
                             plateMath: plateMathLabel(weight: setLog.weight, exercise: exerciseForIncrement)
                         )
                         .frame(maxWidth: .infinity)
-
-                        Rectangle()
-                            .fill(Color.white.opacity(0.06))
-                            .frame(width: 1, height: 64)
 
                         inputColumn(
                             label: L10n.tr("REPS"),
@@ -601,25 +599,33 @@ struct ActiveWorkoutView: View {
                         completeSet(exerciseIndex: exerciseIndex, setIndex: activeSetIndex)
                     } label: {
                         HStack(spacing: 8) {
-                            Image(systemName: "checkmark")
-                                .font(.subheadline.weight(.bold))
+                            Image(systemName: canLogSet ? "checkmark.circle.fill" : "checkmark.circle")
+                                .font(.system(size: 15, weight: .bold))
+                                .foregroundStyle(canLogSet ? STRQPalette.success : Color.white.opacity(0.28))
                             Text(L10n.format("Log Set %d", setLog.setNumber))
-                                .font(.body.weight(.heavy))
+                                .font(.system(size: 16, weight: .heavy, design: .rounded))
+                                .foregroundStyle(canLogSet ? Color.black.opacity(0.92) : Color.white.opacity(0.38))
                         }
-                        .foregroundStyle(canLogSet ? .black : .white.opacity(0.42))
                         .frame(maxWidth: .infinity)
-                        .frame(height: 46)
+                        .frame(height: 50)
                         .background(
                             canLogSet
-                                ? AnyShapeStyle(STRQBrand.accentGradient)
-                                : AnyShapeStyle(Color.white.opacity(0.07)),
-                            in: .rect(cornerRadius: 12)
+                                ? AnyShapeStyle(
+                                    LinearGradient(
+                                        colors: [Color.white, Color.white.opacity(0.82)],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                : AnyShapeStyle(Color.white.opacity(0.06)),
+                            in: .rect(cornerRadius: 14)
                         )
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .strokeBorder(Color.white.opacity(canLogSet ? 0 : 0.08), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: 14)
+                                .strokeBorder(Color.white.opacity(canLogSet ? 0.32 : 0.08), lineWidth: 1)
                         )
-                        .shadow(color: .white.opacity(canLogSet ? 0.12 : 0), radius: 10, y: 2)
+                        .shadow(color: .white.opacity(canLogSet ? 0.12 : 0), radius: 12, y: 3)
+                        .shadow(color: .black.opacity(canLogSet ? 0.22 : 0), radius: 14, y: 8)
                     }
                     .buttonStyle(.strqPressable)
                     .disabled(!canLogSet)
@@ -632,19 +638,25 @@ struct ActiveWorkoutView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                .padding(.horizontal, 13)
-                .padding(.vertical, 12)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 14)
                 .background(
-                    LinearGradient(
-                        colors: [Color.white.opacity(0.08), Color.white.opacity(0.03)],
-                        startPoint: .topLeading, endPoint: .bottomTrailing
-                    ),
-                    in: .rect(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(STRQPalette.surfaceRaised)
+                        .overlay(
+                            LinearGradient(
+                                colors: [Color.white.opacity(0.08), Color.white.opacity(0.015)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        )
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
                 )
+                .shadow(color: .black.opacity(0.28), radius: 18, y: 12)
                 .id(setLog.id)
                 .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.98)))
                 .animation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.32, dampingFraction: 0.84), value: setLog.id)
@@ -747,6 +759,32 @@ struct ActiveWorkoutView: View {
     // MARK: - Input column
 
     @ViewBuilder
+    private func currentSetProgressBar(setNumber: Int, totalSets: Int) -> some View {
+        let total = max(totalSets, 1)
+        let clampedSet = min(max(setNumber, 1), total)
+        let progress = CGFloat(clampedSet) / CGFloat(total)
+
+        GeometryReader { proxy in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color.white.opacity(0.07))
+
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.white.opacity(0.92), STRQBrand.steel.opacity(0.78)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: max(8, proxy.size.width * progress))
+            }
+        }
+        .frame(height: 4)
+        .accessibilityHidden(true)
+    }
+
+    @ViewBuilder
     private func inputColumn(
         label: String,
         value: String,
@@ -757,17 +795,19 @@ struct ActiveWorkoutView: View {
         onTapValue: @escaping () -> Void,
         plateMath: String?
     ) -> some View {
-        VStack(spacing: 3) {
+        VStack(spacing: 6) {
             Text(label)
                 .font(.system(size: 9, weight: .black))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.45))
+                .foregroundStyle(.white.opacity(0.48))
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             HStack(spacing: 0) {
                 stepperButton(icon: "minus", disabled: disableMinus, onTap: { onMinus(nil) }, onLongStep: { onMinus(5) })
                 Button(action: onTapValue) {
                     Text(value)
                         .font(.system(size: 30, weight: .heavy, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                         .frame(maxWidth: .infinity)
@@ -784,16 +824,38 @@ struct ActiveWorkoutView: View {
                 .foregroundStyle(.white.opacity(plateMath != nil ? 0.55 : 0.4))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.black.opacity(0.16))
+                .overlay(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.065), Color.white.opacity(0.018)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+        )
     }
 
     private func stepperButton(icon: String, disabled: Bool, onTap: @escaping () -> Void, onLongStep: @escaping () -> Void) -> some View {
         Button(action: onTap) {
             Image(systemName: icon)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(.white.opacity(disabled ? 0.25 : 0.55))
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.white.opacity(disabled ? 0.24 : 0.68))
                 .frame(width: 44, height: 44)
-                .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 9))
+                .background(Color.white.opacity(disabled ? 0.025 : 0.055), in: .rect(cornerRadius: 11))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 11)
+                        .strokeBorder(Color.white.opacity(disabled ? 0.035 : 0.085), lineWidth: 1)
+                )
                 .contentShape(.rect)
         }
         .buttonStyle(.strqStepper)
@@ -1970,6 +2032,7 @@ struct ActiveWorkoutView: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
+            .layoutPriority(1)
 
             Spacer(minLength: 0)
 
@@ -1977,22 +2040,18 @@ struct ActiveWorkoutView: View {
                 Button {
                     showExerciseInfo = exercise
                 } label: {
-                    HStack(spacing: 5) {
-                        Image(systemName: "info.circle")
-                            .font(.caption.weight(.semibold))
-                        Text(L10n.tr("Exercise Guide"))
-                            .font(.caption.weight(.semibold))
-                    }
-                    .foregroundStyle(.white.opacity(0.82))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .background(Color.white.opacity(0.06), in: Capsule())
-                    .overlay(
-                        Capsule()
-                            .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
-                    )
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.82))
+                        .frame(width: 44, height: 44)
+                        .background(Color.white.opacity(0.06), in: Circle())
+                        .overlay(
+                            Circle()
+                                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                        )
                 }
                 .buttonStyle(.strqPressable)
+                .accessibilityLabel(L10n.tr("Exercise Guide"))
             }
         }
     }
