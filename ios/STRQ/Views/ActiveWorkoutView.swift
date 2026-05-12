@@ -940,43 +940,78 @@ struct ActiveWorkoutView: View {
             }()
             let lastSessionSets = previousSetsMap(for: log.exerciseId)
             let firstActiveIdx = log.sets.firstIndex(where: { !$0.isCompleted })
+            let completedCount = log.sets.filter(\.isCompleted).count
 
-            VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    tableHeader("#", width: 22, alignment: .leading)
+            VStack(spacing: 10) {
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L10n.tr("Sets"))
+                            .font(.system(size: 14, weight: .heavy, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.94))
+                        Text("\(completedCount)/\(log.sets.count)")
+                            .font(.system(size: 10, weight: .bold).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.46))
+                    }
+
+                    Spacer(minLength: 8)
+
+                    setHistoryStatusRail(
+                        totalSets: log.sets.count,
+                        completedCount: completedCount,
+                        activeIndex: firstActiveIdx
+                    )
+                }
+                .padding(.horizontal, 14)
+                .padding(.top, 13)
+
+                setHistoryProgressBar(completedCount: completedCount, totalSets: log.sets.count)
+                    .padding(.horizontal, 14)
+
+                HStack(spacing: 6) {
+                    tableHeader("#", width: 36, alignment: .leading)
                     tableHeader("KG")
                     tableHeader("REPS")
                     tableHeader("TGT")
                     tableHeader("e1RM")
-                    Color.clear.frame(width: 28)
+                    Color.clear.frame(width: 26)
                 }
                 .padding(.horizontal, 12)
-                .padding(.top, 9)
-                .padding(.bottom, 5)
+                .padding(.top, 1)
 
-                Rectangle().fill(Color.white.opacity(0.05)).frame(height: 0.5)
-
-                ForEach(Array(log.sets.enumerated()), id: \.element.id) { idx, setLog in
-                    let isActive = idx == firstActiveIdx
-                    setLogRow(
-                        setLog: setLog,
-                        idx: idx,
-                        isActive: isActive,
-                        exerciseIndex: exerciseIndex,
-                        targetReps: targetReps,
-                        targetWeight: targetWeight,
-                        previousSet: lastSessionSets[setLog.setNumber]
-                    )
-                    if idx < log.sets.count - 1 {
-                        Rectangle().fill(Color.white.opacity(0.04)).frame(height: 0.5).padding(.leading, 12)
+                VStack(spacing: 6) {
+                    ForEach(Array(log.sets.enumerated()), id: \.element.id) { idx, setLog in
+                        let isActive = idx == firstActiveIdx
+                        setLogRow(
+                            setLog: setLog,
+                            idx: idx,
+                            isActive: isActive,
+                            exerciseIndex: exerciseIndex,
+                            targetReps: targetReps,
+                            targetWeight: targetWeight,
+                            previousSet: lastSessionSets[setLog.setNumber]
+                        )
                     }
                 }
+                .padding(.horizontal, 6)
+                .padding(.bottom, 6)
             }
-            .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 14))
-            .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(STRQPalette.surfaceRaised)
+                    .overlay(
+                        LinearGradient(
+                            colors: [Color.white.opacity(0.065), Color.white.opacity(0.012)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    )
             )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.105), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.20), radius: 14, y: 8)
         }
     }
 
@@ -984,9 +1019,58 @@ struct ActiveWorkoutView: View {
         Text(text)
             .font(.system(size: 9, weight: .black))
             .tracking(1.0)
-            .foregroundStyle(.white.opacity(0.35))
+            .foregroundStyle(.white.opacity(0.38))
             .frame(maxWidth: width == nil ? .infinity : nil, alignment: alignment)
             .frame(width: width)
+    }
+
+    private func setHistoryProgressBar(completedCount: Int, totalSets: Int) -> some View {
+        let progress = totalSets > 0 ? CGFloat(completedCount) / CGFloat(totalSets) : 0
+        return GeometryReader { proxy in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color.white.opacity(0.065))
+
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [STRQPalette.success.opacity(0.95), STRQBrand.steel.opacity(0.78)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: max(completedCount > 0 ? 8 : 0, proxy.size.width * progress))
+            }
+        }
+        .frame(height: 4)
+        .accessibilityHidden(true)
+    }
+
+    private func setHistoryStatusRail(totalSets: Int, completedCount: Int, activeIndex: Int?) -> some View {
+        HStack(spacing: 4) {
+            ForEach(0..<totalSets, id: \.self) { index in
+                let isCompleted = index < completedCount
+                let isActive = activeIndex == index
+                Capsule()
+                    .fill(setHistoryRailColor(completed: isCompleted, active: isActive))
+                    .frame(width: isActive ? 18 : 7, height: 7)
+                    .overlay(
+                        Capsule()
+                            .strokeBorder(Color.white.opacity(isActive ? 0.22 : 0.06), lineWidth: 1)
+                    )
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 7)
+        .background(Color.black.opacity(0.16), in: Capsule())
+        .overlay(Capsule().strokeBorder(Color.white.opacity(0.07), lineWidth: 1))
+        .accessibilityHidden(true)
+    }
+
+    private func setHistoryRailColor(completed: Bool, active: Bool) -> Color {
+        if completed { return STRQPalette.success.opacity(0.92) }
+        if active { return Color.white.opacity(0.86) }
+        return Color.white.opacity(0.20)
     }
 
     @ViewBuilder
@@ -1001,93 +1085,159 @@ struct ActiveWorkoutView: View {
     ) -> some View {
         let completed = setLog.isCompleted
         let e1rm = estimatedOneRM(weight: setLog.weight, reps: setLog.reps)
-        let rowOpacity: Double = completed ? 0.9 : (isActive ? 1.0 : 0.38)
+        let rowOpacity: Double = completed ? 0.82 : (isActive ? 1.0 : 0.38)
         let delta = completed ? deltaChip(current: setLog, previous: previousSet) : nil
+        let weightText = completed || setLog.weight > 0 ? formatWeight(setLog.weight, increment: 0.5) : "—"
+        let repsIsPlaceholder = !(completed || setLog.reps > 0)
+        let repsText = repsIsPlaceholder ? targetReps : "\(setLog.reps)"
+        let e1rmText = e1rm > 0 ? String(format: "%.0f", e1rm) : "—"
 
         Button {
             if !completed && !isActive {
                 jumpToSet(exerciseIndex: exerciseIndex, setIndex: idx)
             }
         } label: {
-            HStack(spacing: 0) {
-                Text("\(setLog.setNumber)")
-                    .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
-                    .foregroundStyle(isActive ? .white : .white.opacity(0.5))
-                    .frame(width: 22, alignment: .leading)
+            HStack(spacing: 6) {
+                setNumberBadge(setNumber: setLog.setNumber, completed: completed, isActive: isActive)
+                    .frame(width: 36, alignment: .leading)
 
-                HStack(spacing: 3) {
-                    Text(completed || setLog.weight > 0 ? formatWeight(setLog.weight, increment: 0.5) : "—")
-                        .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
-                        .foregroundStyle(.white.opacity(rowOpacity))
-                }
-                .frame(maxWidth: .infinity)
+                setPrimaryMetricCell(value: weightText, opacity: rowOpacity, isPlaceholder: weightText == "—")
+                setPrimaryMetricCell(value: repsText, opacity: repsIsPlaceholder ? 0.34 : rowOpacity, isPlaceholder: repsIsPlaceholder)
+                setQuietMetricCell(value: targetWeight, opacity: isActive ? 0.62 : (completed ? 0.46 : 0.28), delta: nil)
+                setQuietMetricCell(value: e1rmText, opacity: completed ? 0.56 : (isActive ? 0.34 : 0.24), delta: delta)
 
-                HStack(spacing: 3) {
-                    if completed || setLog.reps > 0 {
-                        Text("\(setLog.reps)")
-                            .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
-                            .foregroundStyle(.white.opacity(rowOpacity))
-                    } else {
-                        Text(targetReps)
-                            .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
-                            .foregroundStyle(.white.opacity(0.25))
-                    }
-                }
-                .frame(maxWidth: .infinity)
-
-                Text(targetWeight)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded).monospacedDigit())
-                    .foregroundStyle(.white.opacity(isActive ? 0.55 : 0.3))
-                    .frame(maxWidth: .infinity)
-
-                HStack(spacing: 4) {
-                    Text(e1rm > 0 ? String(format: "%.0f", e1rm) : "—")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
-                        .foregroundStyle(.white.opacity(completed ? 0.55 : 0.25))
-                    if let d = delta {
-                        Text(d.text)
-                            .font(.system(size: 9, weight: .heavy).monospacedDigit())
-                            .foregroundStyle(d.color)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 1.5)
-                            .background(d.color.opacity(0.14), in: Capsule())
-                    }
-                }
-                .frame(maxWidth: .infinity)
-
-                ZStack {
-                    if completed {
-                        Circle().fill(STRQPalette.success).frame(width: 20, height: 20)
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(.black)
-                    } else if isActive {
-                        Circle().strokeBorder(Color.white, lineWidth: 1.4).frame(width: 20, height: 20)
-                        Circle().fill(Color.white).frame(width: 6, height: 6)
-                    } else {
-                        Circle()
-                            .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [2, 2]))
-                            .foregroundStyle(Color.white.opacity(0.2))
-                            .frame(width: 20, height: 20)
-                    }
-                }
-                .frame(width: 28)
+                setRowStatusIndicator(completed: completed, isActive: isActive)
+                    .frame(width: 26)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
             .background(
                 ZStack {
+                    RoundedRectangle(cornerRadius: 13, style: .continuous)
+                        .fill(setRowBaseColor(completed: completed, isActive: isActive))
                     if isActive {
-                        RoundedRectangle(cornerRadius: 0)
-                            .fill(Color.white.opacity(0.05))
-                        RoundedRectangle(cornerRadius: 0)
-                            .strokeBorder(Color.white.opacity(0.18), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.white.opacity(0.070), STRQBrand.steel.opacity(0.055)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    }
+                    if completed {
+                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            .fill(STRQPalette.success.opacity(0.035))
                     }
                 }
+            )
+            .overlay(alignment: .leading) {
+                Capsule()
+                    .fill(setRowRailColor(completed: completed, isActive: isActive))
+                    .frame(width: 3)
+                    .padding(.vertical, 10)
+                    .padding(.leading, 1)
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                    .strokeBorder(setRowBorderColor(completed: completed, isActive: isActive), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
         .disabled(completed)
+    }
+
+    private func setNumberBadge(setNumber: Int, completed: Bool, isActive: Bool) -> some View {
+        Text("\(setNumber)")
+            .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
+            .foregroundStyle(isActive ? .black.opacity(0.92) : .white.opacity(completed ? 0.82 : 0.48))
+            .frame(width: 28, height: 28)
+            .background(
+                isActive
+                    ? Color.white.opacity(0.92)
+                    : Color.white.opacity(completed ? 0.075 : 0.035),
+                in: Circle()
+            )
+            .overlay(
+                Circle()
+                    .strokeBorder(Color.white.opacity(completed || isActive ? 0.16 : 0.06), lineWidth: 1)
+            )
+    }
+
+    private func setPrimaryMetricCell(value: String, opacity: Double, isPlaceholder: Bool) -> some View {
+        Text(value)
+            .font(.system(size: isPlaceholder ? 12 : 14, weight: isPlaceholder ? .semibold : .bold, design: .rounded).monospacedDigit())
+            .foregroundStyle(.white.opacity(opacity))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .frame(maxWidth: .infinity)
+            .frame(minHeight: 30)
+            .contentTransition(.numericText())
+    }
+
+    private func setQuietMetricCell(value: String, opacity: Double, delta: DeltaChip?) -> some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.system(size: 11, weight: .semibold, design: .rounded).monospacedDigit())
+                .foregroundStyle(.white.opacity(opacity))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+            if let delta {
+                Text(delta.text)
+                    .font(.system(size: 8, weight: .heavy).monospacedDigit())
+                    .foregroundStyle(delta.color)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 1)
+                    .background(delta.color.opacity(0.14), in: Capsule())
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: 30)
+        .padding(.horizontal, 2)
+        .background(Color.black.opacity(0.12), in: .rect(cornerRadius: 9))
+        .overlay(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.035), lineWidth: 1)
+        )
+    }
+
+    private func setRowStatusIndicator(completed: Bool, isActive: Bool) -> some View {
+        ZStack {
+            if completed {
+                Circle().fill(STRQPalette.success).frame(width: 20, height: 20)
+                Image(systemName: "checkmark")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.black.opacity(0.9))
+            } else if isActive {
+                Circle().strokeBorder(Color.white.opacity(0.88), lineWidth: 1.4).frame(width: 20, height: 20)
+                Circle().fill(Color.white).frame(width: 6, height: 6)
+            } else {
+                Circle()
+                    .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [2.2, 2.2]))
+                    .foregroundStyle(Color.white.opacity(0.22))
+                    .frame(width: 20, height: 20)
+            }
+        }
+    }
+
+    private func setRowBaseColor(completed: Bool, isActive: Bool) -> Color {
+        if isActive { return Color.white.opacity(0.052) }
+        if completed { return Color.white.opacity(0.034) }
+        return Color.white.opacity(0.018)
+    }
+
+    private func setRowBorderColor(completed: Bool, isActive: Bool) -> Color {
+        if isActive { return Color.white.opacity(0.20) }
+        if completed { return STRQPalette.success.opacity(0.12) }
+        return Color.white.opacity(0.045)
+    }
+
+    private func setRowRailColor(completed: Bool, isActive: Bool) -> Color {
+        if completed { return STRQPalette.success.opacity(0.88) }
+        if isActive { return Color.white.opacity(0.86) }
+        return Color.white.opacity(0.16)
     }
 
     private struct DeltaChip {
