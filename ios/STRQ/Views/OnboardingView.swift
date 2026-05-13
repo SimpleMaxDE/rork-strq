@@ -9,6 +9,7 @@ struct OnboardingView: View {
     @State private var editingMetric: MetricEdit?
 
     private let totalSteps = 8  // 0 welcome + 7 chapters
+    private let scrollBottomPadding: CGFloat = 112
 
     var body: some View {
         ZStack {
@@ -33,13 +34,17 @@ struct OnboardingView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .animation(.smooth(duration: 0.4), value: step)
-
-                navigationButtons
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 16)
+                .clipped()
             }
         }
         .preferredColorScheme(.dark)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            navigationButtons
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+                .padding(.bottom, 16)
+                .background(navigationShelfBackground)
+        }
         .onAppear { withAnimation(.easeOut(duration: 0.8)) { appeared = true } }
         .onChange(of: step) { _, newValue in
             if newValue == 1 {
@@ -61,42 +66,91 @@ struct OnboardingView: View {
 
     private var backgroundGradient: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
-            MeshGradient(width: 3, height: 3, points: [
-                [0, 0], [0.5, 0], [1, 0],
-                [0, 0.5], [0.5, 0.5], [1, 0.5],
-                [0, 1], [0.5, 1], [1, 1]
-            ], colors: [
-                .black, .black, .black,
-                .black, Color.white.opacity(0.03), .black,
-                .black, .black, .black
-            ])
+            STRQBrand.obsidian.ignoresSafeArea()
+            LinearGradient(
+                colors: [
+                    Color.white.opacity(0.055),
+                    Color.clear,
+                    STRQBrand.graphite.opacity(0.36),
+                    Color.black.opacity(0.58)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                Color.white.opacity(0.035).frame(height: 1)
+                Spacer()
+                Color.white.opacity(0.025).frame(height: 1)
+            }
             .ignoresSafeArea()
         }
+    }
+
+    private var navigationShelfBackground: some View {
+        LinearGradient(
+            colors: [
+                STRQBrand.obsidian.opacity(0.0),
+                STRQBrand.obsidian.opacity(0.94),
+                STRQBrand.obsidian
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .ignoresSafeArea(edges: .bottom)
     }
 
     // MARK: - Header
 
     private var header: some View {
         VStack(spacing: 12) {
-            HStack(spacing: 10) {
-                Text(String(format: "%02d", step))
-                    .font(.caption2.weight(.bold).monospacedDigit())
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(Color.white.opacity(0.10), in: Capsule())
-                Text(stepCategoryLabel)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.6))
-                    .tracking(0.8)
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                    Image(systemName: stepSymbolName)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(STRQBrand.steel)
+                }
+                .frame(width: 34, height: 34)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(stepCategoryLabel)
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.white.opacity(0.62))
+                        .tracking(0.8)
+                    Text(stepSupportText)
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.36))
+                        .lineLimit(1)
+                }
+
                 Spacer()
+
                 Text("\(step) / \(totalSteps - 1)")
-                    .font(.caption2.weight(.medium).monospacedDigit())
-                    .foregroundStyle(.white.opacity(0.35))
+                    .font(.caption.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(.white.opacity(0.7))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.white.opacity(0.055), in: Capsule())
+                    .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
             }
             progressBar
         }
+        .padding(12)
+        .background(
+            LinearGradient(
+                colors: [Color.white.opacity(0.075), Color.white.opacity(0.028)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 18)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+        )
     }
 
     private var stepCategoryLabel: String {
@@ -112,17 +166,46 @@ struct OnboardingView: View {
         }
     }
 
+    private var stepSymbolName: String {
+        switch step {
+        case 1: return "person.crop.circle"
+        case 2: return "ruler"
+        case 3: return "target"
+        case 4: return "calendar"
+        case 5: return "dumbbell"
+        case 6: return "scope"
+        case 7: return "waveform.path.ecg"
+        default: return "sparkles"
+        }
+    }
+
+    private var stepSupportText: String {
+        switch step {
+        case 1: return L10n.tr("Name and basics")
+        case 2: return L10n.tr("Plan calibration")
+        case 3: return L10n.tr("Training direction")
+        case 4: return L10n.tr("Weekly rhythm")
+        case 5: return L10n.tr("Exercise matching")
+        case 6: return L10n.tr("Muscle priorities")
+        case 7: return L10n.tr("Load readiness")
+        default: return ""
+        }
+    }
+
     private var progressBar: some View {
-        GeometryReader { geo in
-            ZStack(alignment: .leading) {
-                Capsule().fill(Color.white.opacity(0.06))
+        HStack(spacing: 5) {
+            ForEach(1..<totalSteps, id: \.self) { index in
                 Capsule()
-                    .fill(STRQBrand.accentGradient)
-                    .frame(width: max(0, geo.size.width * CGFloat(step) / CGFloat(totalSteps - 1)))
-                    .animation(.spring(response: 0.5, dampingFraction: 0.85), value: step)
+                    .fill(index <= step ? STRQBrand.steel : Color.white.opacity(0.07))
+                    .overlay(
+                        Capsule()
+                            .strokeBorder(index <= step ? Color.white.opacity(0.12) : Color.clear, lineWidth: 0.5)
+                    )
+                    .frame(height: index == step ? 5 : 3)
+                    .animation(.spring(response: 0.42, dampingFraction: 0.86), value: step)
             }
         }
-        .frame(height: 3)
+        .frame(height: 5)
     }
 
     // MARK: - Navigation
@@ -144,17 +227,22 @@ struct OnboardingView: View {
                             .font(.subheadline.weight(.semibold))
                     }
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(canAdvance ? .black : .white.opacity(0.5))
                 .frame(maxWidth: .infinity)
                 .frame(height: 54)
                 .background(
-                    (canAdvance ? AnyShapeStyle(STRQBrand.accentGradient) : AnyShapeStyle(Color.white.opacity(0.14))),
-                    in: .rect(cornerRadius: 14)
+                    (canAdvance ? AnyShapeStyle(STRQBrand.steelGradient) : AnyShapeStyle(Color.white.opacity(0.08))),
+                    in: .rect(cornerRadius: 16)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(canAdvance ? Color.white.opacity(0.18) : Color.white.opacity(0.08), lineWidth: 1)
                 )
                 .opacity(canAdvance ? 1 : 0.55)
             }
             .buttonStyle(.strqPressable)
             .disabled(!canAdvance)
+            .accessibilityIdentifier("strq.onboarding.primary")
             .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.5), trigger: step)
 
             if step > 0 {
@@ -168,6 +256,7 @@ struct OnboardingView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: 32)
                 }
+                .accessibilityIdentifier("strq.onboarding.back")
             }
         }
     }
@@ -201,22 +290,37 @@ struct OnboardingView: View {
     private var welcomeStep: some View {
         VStack(spacing: 0) {
             Spacer()
-            VStack(spacing: 28) {
-                STRQLogoView(size: 80, animated: true)
+            VStack(spacing: 26) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 28)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.white.opacity(0.10), Color.white.opacity(0.025)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 120, height: 120)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 28)
+                                .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
+                        )
+                    STRQLogoView(size: 76, animated: true)
+                }
                     .opacity(appeared ? 1 : 0)
                     .scaleEffect(appeared ? 1 : 0.8)
                     .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.2), value: appeared)
 
-                VStack(spacing: 12) {
+                VStack(spacing: 14) {
                     Text(L10n.tr("STRQ"))
-                        .font(.system(size: 38, weight: .black, design: .default))
+                        .font(.system(size: 40, weight: .black, design: .default))
                         .tracking(4)
                         .opacity(appeared ? 1 : 0)
                         .offset(y: appeared ? 0 : 16)
                         .animation(.easeOut(duration: 0.6).delay(0.35), value: appeared)
 
                     Text(L10n.tr("A training system built around you."))
-                        .font(.title3.weight(.medium))
+                        .font(.title2.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.9))
                         .multilineTextAlignment(.center)
                         .opacity(appeared ? 1 : 0)
@@ -225,7 +329,7 @@ struct OnboardingView: View {
 
                     Text(L10n.tr("Seven quick chapters. Then a plan that actually fits."))
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.58))
                         .multilineTextAlignment(.center)
                         .opacity(appeared ? 1 : 0)
                         .offset(y: appeared ? 0 : 10)
@@ -233,12 +337,14 @@ struct OnboardingView: View {
                 }
             }
             Spacer()
-            VStack(spacing: 14) {
-                welcomeFeatureRow(icon: "slider.horizontal.3", text: L10n.tr("Calibrated to your body, goal, and schedule"))
-                welcomeFeatureRow(icon: "chart.line.uptrend.xyaxis", text: L10n.tr("Progression that adapts after every workout"))
-                welcomeFeatureRow(icon: "waveform.path.ecg", text: L10n.tr("Recovery-aware. No guesswork on load or volume"))
+            VStack(spacing: 12) {
+                profileSignalStrip
+                VStack(spacing: 10) {
+                    welcomeFeatureRow(icon: "slider.horizontal.3", text: L10n.tr("Calibrated to your body, goal, and schedule"))
+                    welcomeFeatureRow(icon: "chart.line.uptrend.xyaxis", text: L10n.tr("Progression that adapts after every workout"))
+                    welcomeFeatureRow(icon: "waveform.path.ecg", text: L10n.tr("Recovery signals help guide load and volume"))
+                }
             }
-            .padding(.horizontal, 24)
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 20)
             .animation(.easeOut(duration: 0.6).delay(0.65), value: appeared)
@@ -247,18 +353,58 @@ struct OnboardingView: View {
         .padding(.horizontal, 20)
     }
 
+    private var profileSignalStrip: some View {
+        HStack(spacing: 8) {
+            welcomeSignal(label: L10n.tr("Goal"), value: L10n.tr("Direction"))
+            welcomeSignal(label: L10n.tr("Week"), value: L10n.tr("Rhythm"))
+            welcomeSignal(label: L10n.tr("Setup"), value: L10n.tr("Equipment"))
+        }
+    }
+
+    private func welcomeSignal(label: String, value: String) -> some View {
+        VStack(spacing: 3) {
+            Text(label.uppercased())
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(.white.opacity(0.36))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            Text(value)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.82))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(Color.white.opacity(0.045), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+        )
+    }
+
     private func welcomeFeatureRow(icon: String, text: String) -> some View {
         HStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.body)
-                .foregroundStyle(.white)
+                .foregroundStyle(STRQBrand.steel)
                 .frame(width: 36, height: 36)
-                .background(Color.white.opacity(0.08), in: .rect(cornerRadius: 10))
+                .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                )
             Text(text)
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.8))
             Spacer()
         }
+        .padding(12)
+        .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(Color.white.opacity(0.065), lineWidth: 1)
+        )
     }
 
     // MARK: - Chapter 1: About
@@ -275,6 +421,7 @@ struct OnboardingView: View {
                 TextField(L10n.tr("Your name"), text: $vm.profile.name)
                     .textFieldStyle(.plain)
                     .font(.title3.weight(.semibold))
+                    .accessibilityIdentifier("strq.onboarding.name")
                     .focused($nameFocused)
                     .submitLabel(.next)
                     .onSubmit { if canAdvance { advance() } }
@@ -292,14 +439,15 @@ struct OnboardingView: View {
                 fieldGroup(L10n.tr("Age")) {
                     tapValueTile(
                         value: "\(vm.profile.age)",
-                        unit: L10n.tr("years")
+                        unit: L10n.tr("years"),
+                        accessibilityIdentifier: "strq.onboarding.metric.age"
                     ) { editingMetric = .age }
                 }
 
                 fieldGroup(L10n.tr("Gender")) {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                         ForEach(Gender.allCases) { gender in
-                            selectionChip(gender.displayName, selected: vm.profile.gender == gender) {
+                            selectionChip(gender.displayName, selected: vm.profile.gender == gender, accessibilityIdentifier: onboardingIdentifier("gender", gender.rawValue)) {
                                 vm.profile.gender = gender
                             }
                         }
@@ -307,7 +455,7 @@ struct OnboardingView: View {
                 }
             }
             .padding(20)
-            .padding(.bottom, 20)
+            .padding(.bottom, scrollBottomPadding)
         }
         .scrollDismissesKeyboard(.interactively)
     }
@@ -328,14 +476,16 @@ struct OnboardingView: View {
                         label: L10n.tr("Height"),
                         value: "\(Int(vm.profile.heightCm))",
                         unit: "cm",
-                        filled: true
+                        filled: true,
+                        accessibilityIdentifier: "strq.onboarding.metric.height"
                     ) { editingMetric = .height }
 
                     metricTile(
                         label: L10n.tr("Weight"),
                         value: String(format: "%.1f", vm.profile.weightKg),
                         unit: "kg",
-                        filled: true
+                        filled: true,
+                        accessibilityIdentifier: "strq.onboarding.metric.weight"
                     ) { editingMetric = .weight }
 
                     metricTile(
@@ -343,6 +493,7 @@ struct OnboardingView: View {
                         value: vm.profile.targetWeightKg.map { String(format: "%.1f", $0) } ?? "—",
                         unit: "kg",
                         filled: vm.profile.targetWeightKg != nil,
+                        accessibilityIdentifier: "strq.onboarding.metric.targetWeight",
                         trailingClear: vm.profile.targetWeightKg != nil ? { vm.profile.targetWeightKg = nil } : nil
                     ) { editingMetric = .targetWeight }
 
@@ -351,6 +502,7 @@ struct OnboardingView: View {
                         value: vm.profile.bodyFatPercentage.map { "\(Int($0))" } ?? "—",
                         unit: "%",
                         filled: vm.profile.bodyFatPercentage != nil,
+                        accessibilityIdentifier: "strq.onboarding.metric.bodyFat",
                         trailingClear: vm.profile.bodyFatPercentage != nil ? { vm.profile.bodyFatPercentage = nil } : nil
                     ) { editingMetric = .bodyFat }
                 }
@@ -377,7 +529,7 @@ struct OnboardingView: View {
                     .foregroundStyle(.white.opacity(0.35))
             }
             .padding(20)
-            .padding(.bottom, 20)
+            .padding(.bottom, scrollBottomPadding)
         }
     }
 
@@ -404,46 +556,47 @@ struct OnboardingView: View {
                             VStack(spacing: 10) {
                                 Image(systemName: goal.symbolName)
                                     .font(.title2)
-                                    .foregroundStyle(isSelected ? .black : .white)
+                                    .foregroundStyle(isSelected ? STRQBrand.steel : .white)
                                     .frame(width: 42, height: 42)
                                     .background(
-                                        isSelected ? Color.black.opacity(0.12) : Color.white.opacity(0.06),
+                                        isSelected ? STRQBrand.steel.opacity(0.14) : Color.white.opacity(0.06),
                                         in: Circle()
                                     )
                                 Text(goal.displayName)
                                     .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(isSelected ? .black : .white)
+                                    .foregroundStyle(.white)
                                     .multilineTextAlignment(.center)
                             }
                             .frame(maxWidth: .infinity)
                             .frame(height: 108)
                             .background(
                                 isSelected
-                                    ? AnyShapeStyle(STRQBrand.accentGradient)
+                                    ? AnyShapeStyle(LinearGradient(colors: [Color.white.opacity(0.105), STRQBrand.steel.opacity(0.085)], startPoint: .topLeading, endPoint: .bottomTrailing))
                                     : AnyShapeStyle(Color.white.opacity(0.04)),
                                 in: .rect(cornerRadius: 16)
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16)
-                                    .strokeBorder(isSelected ? Color.white.opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1)
+                                    .strokeBorder(isSelected ? STRQBrand.steel.opacity(0.44) : Color.white.opacity(0.06), lineWidth: 1)
                             )
                             .overlay(alignment: .topTrailing) {
                                 if isSelected {
                                     Image(systemName: "checkmark")
                                         .font(.system(size: 10, weight: .black))
-                                        .foregroundStyle(.white)
+                                        .foregroundStyle(.black)
                                         .frame(width: 18, height: 18)
-                                        .background(Color.black.opacity(0.85), in: Circle())
+                                        .background(STRQBrand.steelGradient, in: Circle())
                                         .padding(8)
                                 }
                             }
                         }
                         .sensoryFeedback(.selection, trigger: selectionPulse)
+                        .accessibilityIdentifier(onboardingIdentifier("goal", goal.rawValue))
                     }
                 }
             }
             .padding(20)
-            .padding(.bottom, 20)
+            .padding(.bottom, scrollBottomPadding)
         }
     }
 
@@ -469,7 +622,7 @@ struct OnboardingView: View {
                 fieldGroup(L10n.tr("Training days / week")) {
                     HStack(spacing: 6) {
                         ForEach(1...6, id: \.self) { n in
-                            pillNumber(n, selected: vm.profile.daysPerWeek == n) {
+                            pillNumber(n, selected: vm.profile.daysPerWeek == n, accessibilityIdentifier: "strq.onboarding.days.\(n)") {
                                 vm.profile.daysPerWeek = n
                             }
                         }
@@ -497,15 +650,16 @@ struct OnboardingView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
                                 .background(
-                                    isSelected ? AnyShapeStyle(STRQBrand.accentGradient) : AnyShapeStyle(Color.white.opacity(0.04)),
+                                    isSelected ? AnyShapeStyle(STRQBrand.steelGradient) : AnyShapeStyle(Color.white.opacity(0.04)),
                                     in: .rect(cornerRadius: 12)
                                 )
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .strokeBorder(isSelected ? .clear : Color.white.opacity(0.06), lineWidth: 1)
+                                        .strokeBorder(isSelected ? Color.white.opacity(0.16) : Color.white.opacity(0.06), lineWidth: 1)
                                 )
                             }
                             .buttonStyle(.strqPressable)
+                            .accessibilityIdentifier("strq.onboarding.minutes.\(m)")
                         }
                     }
                 }
@@ -513,7 +667,7 @@ struct OnboardingView: View {
                 fieldGroup(L10n.tr("Preferred split")) {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                         ForEach(SplitPreference.allCases) { split in
-                            selectionChip(split.displayName, selected: vm.profile.splitPreference == split) {
+                            selectionChip(split.displayName, selected: vm.profile.splitPreference == split, accessibilityIdentifier: onboardingIdentifier("split", split.rawValue)) {
                                 vm.profile.splitPreference = split
                             }
                         }
@@ -521,7 +675,7 @@ struct OnboardingView: View {
                 }
             }
             .padding(20)
-            .padding(.bottom, 20)
+            .padding(.bottom, scrollBottomPadding)
         }
     }
 
@@ -537,45 +691,46 @@ struct OnboardingView: View {
             HStack(spacing: 14) {
                 Image(systemName: levelIcon(level))
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(isSelected ? .black : .white)
+                    .foregroundStyle(isSelected ? STRQBrand.steel : .white)
                     .frame(width: 36, height: 36)
                     .background(
-                        isSelected ? Color.black.opacity(0.12) : Color.white.opacity(0.08),
+                        isSelected ? STRQBrand.steel.opacity(0.14) : Color.white.opacity(0.08),
                         in: .rect(cornerRadius: 10)
                     )
                 VStack(alignment: .leading, spacing: 2) {
                     Text(level.shortName)
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(isSelected ? .black : .white)
+                        .foregroundStyle(.white)
                     Text(levelSubtitle(level))
                         .font(.caption)
-                        .foregroundStyle(isSelected ? .black.opacity(0.65) : .white.opacity(0.55))
+                        .foregroundStyle(isSelected ? .white.opacity(0.72) : .white.opacity(0.55))
                 }
                 Spacer()
                 if isSelected {
                     Image(systemName: "checkmark")
                         .font(.caption.weight(.black))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.black)
                         .frame(width: 20, height: 20)
-                        .background(Color.black.opacity(0.85), in: Circle())
+                        .background(STRQBrand.steelGradient, in: Circle())
                 }
             }
             .padding(14)
             .background(
-                isSelected ? AnyShapeStyle(STRQBrand.accentGradient) : AnyShapeStyle(Color.white.opacity(0.04)),
+                isSelected ? AnyShapeStyle(LinearGradient(colors: [Color.white.opacity(0.10), STRQBrand.steel.opacity(0.08)], startPoint: .topLeading, endPoint: .bottomTrailing)) : AnyShapeStyle(Color.white.opacity(0.04)),
                 in: .rect(cornerRadius: 14)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(isSelected ? Color.white.opacity(0.25) : Color.white.opacity(0.06), lineWidth: 1)
+                    .strokeBorder(isSelected ? STRQBrand.steel.opacity(0.44) : Color.white.opacity(0.06), lineWidth: 1)
             )
         }
         .buttonStyle(.strqPressable)
         .sensoryFeedback(.selection, trigger: selectionPulse)
+        .accessibilityIdentifier(onboardingIdentifier("trainingLevel", level.rawValue))
     }
 
     @ViewBuilder
-    private func pillNumber(_ n: Int, selected: Bool, action: @escaping () -> Void) -> some View {
+    private func pillNumber(_ n: Int, selected: Bool, accessibilityIdentifier: String? = nil, action: @escaping () -> Void) -> some View {
         Button {
             withAnimation(STRQMotion.tap) { action() }
             selectionPulse.toggle()
@@ -586,16 +741,17 @@ struct OnboardingView: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)
                 .background(
-                    selected ? AnyShapeStyle(STRQBrand.accentGradient) : AnyShapeStyle(Color.white.opacity(0.04)),
+                    selected ? AnyShapeStyle(STRQBrand.steelGradient) : AnyShapeStyle(Color.white.opacity(0.04)),
                     in: .rect(cornerRadius: 12)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(selected ? .clear : Color.white.opacity(0.06), lineWidth: 1)
+                        .strokeBorder(selected ? Color.white.opacity(0.16) : Color.white.opacity(0.06), lineWidth: 1)
                 )
         }
         .buttonStyle(.strqPressable)
         .sensoryFeedback(.selection, trigger: selectionPulse)
+        .strqOptionalAccessibilityIdentifier(accessibilityIdentifier)
     }
 
     private func levelIcon(_ level: TrainingLevel) -> String {
@@ -638,7 +794,7 @@ struct OnboardingView: View {
                         let homeEquipment: [Equipment] = [.dumbbell, .kettlebell, .resistanceBand, .pullUpBar, .bench, .stabilityBall, .foamRoller, .mat, .trx, .rings, .abWheel]
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                             ForEach(homeEquipment) { equip in
-                                selectionChip(equip.displayName, selected: vm.profile.availableEquipment.contains(equip)) {
+                                selectionChip(equip.displayName, selected: vm.profile.availableEquipment.contains(equip), accessibilityIdentifier: onboardingIdentifier("equipment", equip.rawValue)) {
                                     if vm.profile.availableEquipment.contains(equip) {
                                         vm.profile.availableEquipment.removeAll { $0 == equip }
                                     } else {
@@ -651,14 +807,14 @@ struct OnboardingView: View {
                 }
 
                 fieldGroup(L10n.tr("Injuries or restrictions")) {
-                    Text(L10n.tr("Select any areas of concern so exercises can be filtered for safety."))
+                    Text(L10n.tr("Select any areas of concern so STRQ can avoid poor exercise matches."))
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.5))
                         .padding(.bottom, 2)
 
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                         ForEach(InjuryRestriction.allCases) { injury in
-                            selectionChip(injury.localizedDisplayName, selected: vm.profile.injuries.contains(injury.rawValue)) {
+                            selectionChip(injury.localizedDisplayName, selected: vm.profile.injuries.contains(injury.rawValue), accessibilityIdentifier: onboardingIdentifier("injury", injury.rawValue)) {
                                 if vm.profile.injuries.contains(injury.rawValue) {
                                     vm.profile.injuries.removeAll { $0 == injury.rawValue }
                                 } else {
@@ -670,7 +826,7 @@ struct OnboardingView: View {
                 }
             }
             .padding(20)
-            .padding(.bottom, 20)
+            .padding(.bottom, scrollBottomPadding)
         }
     }
 
@@ -686,10 +842,10 @@ struct OnboardingView: View {
             VStack(spacing: 8) {
                 Image(systemName: loc.symbolName)
                     .font(.title3)
-                    .foregroundStyle(isSelected ? .black : .white)
+                    .foregroundStyle(isSelected ? STRQBrand.steel : .white)
                 Text(loc.displayName)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(isSelected ? .black : .white)
+                    .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
@@ -697,26 +853,27 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 92)
             .background(
-                isSelected ? AnyShapeStyle(STRQBrand.accentGradient) : AnyShapeStyle(Color.white.opacity(0.04)),
+                isSelected ? AnyShapeStyle(LinearGradient(colors: [Color.white.opacity(0.10), STRQBrand.steel.opacity(0.08)], startPoint: .topLeading, endPoint: .bottomTrailing)) : AnyShapeStyle(Color.white.opacity(0.04)),
                 in: .rect(cornerRadius: 14)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(isSelected ? Color.white.opacity(0.25) : Color.white.opacity(0.06), lineWidth: 1)
+                    .strokeBorder(isSelected ? STRQBrand.steel.opacity(0.44) : Color.white.opacity(0.06), lineWidth: 1)
             )
             .overlay(alignment: .topTrailing) {
                 if isSelected {
                     Image(systemName: "checkmark")
                         .font(.system(size: 9, weight: .black))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.black)
                         .frame(width: 16, height: 16)
-                        .background(Color.black.opacity(0.85), in: Circle())
+                        .background(STRQBrand.steelGradient, in: Circle())
                         .padding(6)
                 }
             }
         }
         .buttonStyle(.strqPressable)
         .sensoryFeedback(.selection, trigger: selectionPulse)
+        .accessibilityIdentifier(onboardingIdentifier("location", loc.rawValue))
     }
 
     // MARK: - Chapter 6: Muscle focus
@@ -737,7 +894,7 @@ struct OnboardingView: View {
                 )
             }
             .padding(20)
-            .padding(.bottom, 20)
+            .padding(.bottom, scrollBottomPadding)
         }
     }
 
@@ -755,7 +912,7 @@ struct OnboardingView: View {
                 fieldGroup(L10n.tr("Sleep")) {
                     VStack(spacing: 8) {
                         ForEach(SleepQuality.allCases) { sleep in
-                            selectionChip(sleep.displayName, selected: vm.profile.sleepQuality == sleep) {
+                            selectionChip(sleep.displayName, selected: vm.profile.sleepQuality == sleep, accessibilityIdentifier: onboardingIdentifier("sleep", sleep.rawValue)) {
                                 vm.profile.sleepQuality = sleep
                             }
                         }
@@ -765,7 +922,7 @@ struct OnboardingView: View {
                 fieldGroup(L10n.tr("Stress")) {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                         ForEach(StressLevel.allCases) { stress in
-                            selectionChip(stress.displayName, selected: vm.profile.stressLevel == stress) {
+                            selectionChip(stress.displayName, selected: vm.profile.stressLevel == stress, accessibilityIdentifier: onboardingIdentifier("stress", stress.rawValue)) {
                                 vm.profile.stressLevel = stress
                             }
                         }
@@ -775,7 +932,7 @@ struct OnboardingView: View {
                 fieldGroup(L10n.tr("Activity")) {
                     VStack(spacing: 8) {
                         ForEach(ActivityLevel.allCases) { level in
-                            selectionChip(level.displayName, selected: vm.profile.activityLevel == level) {
+                            selectionChip(level.displayName, selected: vm.profile.activityLevel == level, accessibilityIdentifier: onboardingIdentifier("activity", level.rawValue)) {
                                 vm.profile.activityLevel = level
                             }
                         }
@@ -785,7 +942,7 @@ struct OnboardingView: View {
                 fieldGroup(L10n.tr("Recovery")) {
                     HStack(spacing: 8) {
                         ForEach(RecoveryCapacity.allCases) { rec in
-                            selectionChip(rec.displayName, selected: vm.profile.recoveryCapacity == rec) {
+                            selectionChip(rec.displayName, selected: vm.profile.recoveryCapacity == rec, accessibilityIdentifier: onboardingIdentifier("recovery", rec.rawValue)) {
                                 vm.profile.recoveryCapacity = rec
                             }
                         }
@@ -793,7 +950,7 @@ struct OnboardingView: View {
                 }
             }
             .padding(20)
-            .padding(.bottom, 20)
+            .padding(.bottom, scrollBottomPadding)
         }
     }
 
@@ -801,36 +958,79 @@ struct OnboardingView: View {
 
     @ViewBuilder
     private func stepHero(eyebrow: String, title: String, subtitle: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(eyebrow.uppercased())
-                .font(.caption2.weight(.bold))
-                .tracking(1.2)
-                .foregroundStyle(STRQBrand.steel)
-            Text(title)
-                .font(.title.bold())
-                .foregroundStyle(.white)
-                .fixedSize(horizontal: false, vertical: true)
-            Text(subtitle)
-                .font(.callout)
-                .foregroundStyle(.white.opacity(0.58))
-                .fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Image(systemName: stepSymbolName)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(STRQBrand.steel)
+                    .frame(width: 30, height: 30)
+                    .background(Color.white.opacity(0.055), in: .rect(cornerRadius: 10))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                    )
+                Text(eyebrow.uppercased())
+                    .font(.caption2.weight(.bold))
+                    .tracking(1.0)
+                    .foregroundStyle(STRQBrand.steel)
+                Spacer()
+                Text(String(format: "%02d", step))
+                    .font(.caption2.weight(.bold).monospacedDigit())
+                    .foregroundStyle(.white.opacity(0.48))
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title)
+                    .font(.title.bold())
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(subtitle)
+                    .font(.callout)
+                    .foregroundStyle(.white.opacity(0.6))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
-        .padding(.bottom, 2)
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [Color.white.opacity(0.075), Color.white.opacity(0.025)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 22)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 22)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+        )
     }
 
     @ViewBuilder
     private func fieldGroup(_ label: String, @ViewBuilder content: () -> some View) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(label.uppercased())
-                .font(.caption2.weight(.bold))
-                .tracking(0.8)
-                .foregroundStyle(.white.opacity(0.5))
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(STRQBrand.steel.opacity(0.75))
+                    .frame(width: 3, height: 15)
+                Text(label.uppercased())
+                    .font(.caption2.weight(.bold))
+                    .tracking(0.8)
+                    .foregroundStyle(.white.opacity(0.55))
+                Spacer()
+            }
             content()
         }
+        .padding(14)
+        .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color.white.opacity(0.055), lineWidth: 1)
+        )
     }
 
     @ViewBuilder
-    private func tapValueTile(value: String, unit: String, action: @escaping () -> Void) -> some View {
+    private func tapValueTile(value: String, unit: String, accessibilityIdentifier: String? = nil, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text(value)
@@ -855,6 +1055,7 @@ struct OnboardingView: View {
             .contentShape(.rect(cornerRadius: 14))
         }
         .buttonStyle(.strqPressable)
+        .strqOptionalAccessibilityIdentifier(accessibilityIdentifier)
     }
 
     @ViewBuilder
@@ -863,6 +1064,7 @@ struct OnboardingView: View {
         value: String,
         unit: String,
         filled: Bool,
+        accessibilityIdentifier: String? = nil,
         trailingClear: (() -> Void)? = nil,
         action: @escaping () -> Void
     ) -> some View {
@@ -903,7 +1105,14 @@ struct OnboardingView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(14)
-            .background(Color.white.opacity(filled ? 0.06 : 0.03), in: .rect(cornerRadius: 14))
+            .background(
+                LinearGradient(
+                    colors: filled ? [Color.white.opacity(0.07), Color.white.opacity(0.035)] : [Color.white.opacity(0.035), Color.white.opacity(0.02)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: .rect(cornerRadius: 14)
+            )
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
                     .strokeBorder(Color.white.opacity(filled ? 0.10 : 0.06), lineWidth: 1)
@@ -911,10 +1120,11 @@ struct OnboardingView: View {
             .contentShape(.rect(cornerRadius: 14))
         }
         .buttonStyle(.strqPressable)
+        .strqOptionalAccessibilityIdentifier(accessibilityIdentifier)
     }
 
     @ViewBuilder
-    private func selectionChip(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
+    private func selectionChip(_ title: String, selected: Bool, accessibilityIdentifier: String? = nil, action: @escaping () -> Void) -> some View {
         Button {
             withAnimation(STRQMotion.tap) { action() }
             selectionPulse.toggle()
@@ -922,30 +1132,52 @@ struct OnboardingView: View {
             HStack(spacing: 6) {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(selected ? .black : .white)
+                    .foregroundStyle(.white)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
                     .multilineTextAlignment(.center)
                 if selected {
                     Image(systemName: "checkmark")
                         .font(.caption2.weight(.black))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(STRQBrand.steel)
                 }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 13)
             .padding(.horizontal, 10)
             .background(
-                selected ? AnyShapeStyle(STRQBrand.accentGradient) : AnyShapeStyle(Color.white.opacity(0.04)),
+                selected ? AnyShapeStyle(LinearGradient(colors: [Color.white.opacity(0.10), STRQBrand.steel.opacity(0.08)], startPoint: .topLeading, endPoint: .bottomTrailing)) : AnyShapeStyle(Color.white.opacity(0.04)),
                 in: .rect(cornerRadius: 12)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(selected ? Color.white.opacity(0.25) : Color.white.opacity(0.06), lineWidth: 1)
+                    .strokeBorder(selected ? STRQBrand.steel.opacity(0.44) : Color.white.opacity(0.06), lineWidth: 1)
             )
             .contentShape(.rect(cornerRadius: 12))
         }
         .buttonStyle(.strqPressable)
         .sensoryFeedback(.selection, trigger: selectionPulse)
+        .strqOptionalAccessibilityIdentifier(accessibilityIdentifier)
+    }
+
+    private func onboardingIdentifier(_ group: String, _ value: String) -> String {
+        let safeValue = value
+            .lowercased()
+            .replacingOccurrences(of: " ", with: "-")
+            .replacingOccurrences(of: "/", with: "-")
+            .replacingOccurrences(of: "+", with: "plus")
+            .filter { $0.isLetter || $0.isNumber || $0 == "-" || $0 == "." }
+        return "strq.onboarding.\(group).\(safeValue)"
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func strqOptionalAccessibilityIdentifier(_ identifier: String?) -> some View {
+        if let identifier {
+            accessibilityIdentifier(identifier)
+        } else {
+            self
+        }
     }
 }
