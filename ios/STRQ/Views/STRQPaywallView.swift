@@ -7,12 +7,48 @@ struct STRQPaywallView: View {
     @State private var selectedPackage: SubscriptionPackage?
     @State private var expandedPillars: Set<Int> = []
 
+    private var previewBackground: LinearGradient {
+        LinearGradient(
+            colors: [
+                Color(red: 0.030, green: 0.034, blue: 0.040),
+                Color(red: 0.055, green: 0.060, blue: 0.072),
+                Color(red: 0.026, green: 0.029, blue: 0.034)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    private var previewSurface: Color {
+        Color(red: 0.075, green: 0.082, blue: 0.096)
+    }
+
+    private var previewSurfaceRaised: Color {
+        Color(red: 0.100, green: 0.108, blue: 0.126)
+    }
+
+    private var previewBorder: Color {
+        Color.white.opacity(0.105)
+    }
+
+    private var proAccent: Color {
+        Color(red: 0.46, green: 0.42, blue: 0.95)
+    }
+
+    private var proAccentInk: Color {
+        Color(red: 0.78, green: 0.75, blue: 1.00)
+    }
+
+    private var proofTint: Color {
+        Color(red: 0.40, green: 0.78, blue: 0.72)
+    }
+
     var body: some View {
         ZStack {
-            Color(.systemBackground).ignoresSafeArea()
+            previewBackground.ignoresSafeArea()
 
             if store.isPro {
-                alreadySubscribedState
+                activeProState
             } else if store.isLoading {
                 loadingState
             } else if store.currentOffering != nil, !(store.currentOffering?.availablePackages.isEmpty ?? true) {
@@ -100,39 +136,142 @@ struct STRQPaywallView: View {
     // MARK: - Hero
 
     private var heroSection: some View {
-        VStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(STRQBrand.steelGradient)
-                    .frame(width: 68, height: 68)
+        VStack(spacing: 18) {
+            VStack(spacing: 7) {
+                Text(L10n.tr("STRQ PRO PREVIEW"))
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.8)
+                    .foregroundStyle(proAccentInk)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(proAccent.opacity(0.16), in: Capsule())
                     .overlay(
-                        Circle()
-                            .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
+                        Capsule()
+                            .strokeBorder(proAccent.opacity(0.34), lineWidth: 1)
                     )
-                Image(systemName: "bolt.fill")
-                    .font(.system(size: 26, weight: .bold))
-                    .foregroundStyle(.white)
-            }
 
-            VStack(spacing: 6) {
-                Text(L10n.tr("STRQ PRO"))
-                    .font(.system(size: 11, weight: .black))
-                    .tracking(2.4)
-                    .foregroundStyle(STRQBrand.steel)
-
-                Text(L10n.tr("Coaching that keeps learning you"))
+                Text(L10n.tr("Train with a plan that keeps learning."))
                     .font(.system(.title2, design: .rounded, weight: .bold))
+                    .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text(L10n.tr("Adaptive plans, deeper progression reads, and every workout safely carried across your devices."))
+                Text(L10n.tr("Pro is the deeper layer after STRQ has real workouts to learn from: Training Map evidence, plan evolution, weekly review, and advanced history."))
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.white.opacity(0.68))
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 2)
                     .padding(.horizontal, 4)
             }
+
+            trainingMapPreview
+        }
+    }
+
+    private var trainingMapPreview: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .center, spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.tr("TRAINING MAP"))
+                        .font(.system(size: 10, weight: .black))
+                        .tracking(1.2)
+                        .foregroundStyle(Color.white.opacity(0.48))
+                    Text(L10n.tr("Evidence forming"))
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(.white)
+                }
+                Spacer()
+                Text(L10n.tr("Preview"))
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(proAccentInk)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 4)
+                    .background(proAccent.opacity(0.14), in: Capsule())
+                    .overlay(Capsule().strokeBorder(proAccent.opacity(0.28), lineWidth: 1))
+            }
+
+            HStack(spacing: 8) {
+                trainingMapNode(title: L10n.tr("Push"), value: 0.74, tint: proofTint)
+                trainingMapNode(title: L10n.tr("Pull"), value: 0.58, tint: proAccentInk)
+                trainingMapNode(title: L10n.tr("Legs"), value: 0.36, tint: Color(red: 0.88, green: 0.70, blue: 0.38))
+            }
+
+            VStack(spacing: 8) {
+                evidenceLine(icon: "checkmark.circle.fill", title: L10n.tr("First plan stays free"), detail: L10n.tr("Onboarding, plan reveal, first workout, and core logging remain useful."))
+                evidenceLine(icon: "chart.line.uptrend.xyaxis", title: L10n.tr("Pro adds depth later"), detail: L10n.tr("Deeper evidence appears once your training record can support it."))
+            }
+        }
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [
+                    previewSurfaceRaised,
+                    previewSurface
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 22)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .strokeBorder(previewBorder, lineWidth: 1)
+        )
+        .overlay(alignment: .topLeading) {
+            Capsule()
+                .fill(proAccentInk.opacity(0.72))
+                .frame(width: 48, height: 2)
+                .padding(.leading, 18)
+        }
+    }
+
+    private func trainingMapNode(title: String, value: Double, tint: Color) -> some View {
+        let clampedValue = min(max(value, 0), 1)
+
+        return VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white)
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.08))
+                    Capsule()
+                        .fill(tint.opacity(0.74))
+                        .frame(width: max(CGFloat(8), proxy.size.width * CGFloat(clampedValue)))
+                }
+            }
+            .frame(height: 5)
+            Text(L10n.tr(value > 0.65 ? "Covered" : value > 0.45 ? "Forming" : "Light"))
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(Color.white.opacity(0.58))
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.black.opacity(0.16), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
+        )
+    }
+
+    private func evidenceLine(icon: String, title: String, detail: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(proofTint)
+                .frame(width: 20, height: 20)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.white.opacity(0.90))
+                Text(detail)
+                    .font(.caption2)
+                    .foregroundStyle(Color.white.opacity(0.56))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
         }
     }
 
@@ -149,42 +288,42 @@ struct STRQPaywallView: View {
         [
             Pillar(
                 icon: "brain.head.profile.fill",
-                title: L10n.tr("Adaptive coaching"),
-                detail: L10n.tr("Readiness-aware adjustments and weekly reviews that tune your plan as you train."),
+                title: L10n.tr("Adaptive plan evolution"),
+                detail: L10n.tr("Your plan can respond to completed sessions, missed days, fatigue signals, and real progress evidence."),
                 bullets: [
-                    L10n.tr("Smart swaps that preserve the training role"),
-                    L10n.tr("Weekly check-in that reasons about your week"),
-                    L10n.tr("Comeback guidance after missed workouts")
+                    L10n.tr("Adjustments based on what you actually logged"),
+                    L10n.tr("Comeback guidance after disrupted weeks"),
+                    L10n.tr("Clear reasons before meaningful changes")
                 ]
             ),
             Pillar(
                 icon: "chart.line.uptrend.xyaxis",
-                title: L10n.tr("Deeper progression"),
-                detail: L10n.tr("Long-term phase reads, progression memory, and a change log you can trust."),
+                title: L10n.tr("Deeper Training Map"),
+                detail: L10n.tr("See what is covered, what is forming, what is light, and which workouts made the signal stronger."),
                 bullets: [
-                    L10n.tr("Mesocycle outlook — block, phase, and next shift"),
-                    L10n.tr("Per-lift progression signals and plateau reads"),
-                    L10n.tr("Coaching memory: what changed, why, and when")
+                    L10n.tr("Evidence behind each training area"),
+                    L10n.tr("Confidence labels before strong claims"),
+                    L10n.tr("Next unlocks tied to real sessions")
                 ]
             ),
             Pillar(
-                icon: "scalemass.fill",
-                title: L10n.tr("Physique intelligence"),
-                detail: L10n.tr("Bodyweight trend and nutrition coaching tuned to your goal — fully opt-in."),
+                icon: "calendar.badge.clock",
+                title: L10n.tr("Weekly coach review"),
+                detail: L10n.tr("A calmer review of what moved, what stalled, and what STRQ recommends for the next week."),
                 bullets: [
-                    L10n.tr("Regression-based bodyweight trend with 4-week projection"),
-                    L10n.tr("Protein and calorie targets that follow your goal"),
-                    L10n.tr("Nutrition × training bridge, not a calorie tracker")
+                    L10n.tr("Training rhythm and consistency read"),
+                    L10n.tr("Progress signals that are ready to trust"),
+                    L10n.tr("One next step, not a wall of metrics")
                 ]
             ),
             Pillar(
-                icon: "icloud.fill",
-                title: L10n.tr("Ecosystem & continuity"),
-                detail: L10n.tr("Your training carried safely across devices, with premium continuity features."),
+                icon: "clock.arrow.circlepath",
+                title: L10n.tr("Advanced evidence history"),
+                detail: L10n.tr("Longer history, trend context, and evidence timelines for users who want to inspect the why."),
                 bullets: [
-                    L10n.tr("iCloud sync across iPhone, iPad, and Mac"),
-                    L10n.tr("Smart reminders tuned to your week"),
-                    L10n.tr("Priority updates and early-access features")
+                    L10n.tr("Session-to-session evidence trail"),
+                    L10n.tr("Readable trends when data is mature"),
+                    L10n.tr("Comparisons that stay tied to logged workouts")
                 ]
             )
         ]
@@ -215,9 +354,10 @@ struct STRQPaywallView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(p.title)
                     .font(.subheadline.weight(.bold))
+                    .foregroundStyle(.white)
                 Text(p.detail)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.white.opacity(0.62))
                     .fixedSize(horizontal: false, vertical: true)
 
                 Button {
@@ -261,10 +401,10 @@ struct STRQPaywallView: View {
             Spacer(minLength: 0)
         }
         .padding(14)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .background(previewSurface, in: .rect(cornerRadius: 14))
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                .strokeBorder(previewBorder, lineWidth: 1)
         )
     }
 
@@ -285,39 +425,39 @@ struct STRQPaywallView: View {
 
             VStack(spacing: 0) {
                 compareRow(
-                    label: L10n.tr("Plan generation"),
-                    free: L10n.tr("Strong default plans"),
-                    pro: L10n.tr("Adaptive weekly tuning")
+                    label: L10n.tr("Activation"),
+                    free: L10n.tr("Onboarding + first plan"),
+                    pro: L10n.tr("Learns over time")
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: L10n.tr("Exercise library"),
-                    free: L10n.tr("Full curated catalog"),
-                    pro: L10n.tr("Smart swaps & alternatives")
+                    label: L10n.tr("First workout"),
+                    free: L10n.tr("Core logging included"),
+                    pro: L10n.tr("Deeper review")
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: L10n.tr("Progression"),
-                    free: L10n.tr("Per-workout logging"),
-                    pro: L10n.tr("Phase outlook & memory")
+                    label: L10n.tr("Progress"),
+                    free: L10n.tr("Basic Training Map"),
+                    pro: L10n.tr("Evidence depth")
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: L10n.tr("Physique coaching"),
-                    free: L10n.tr("Training-only"),
-                    pro: L10n.tr("Trend · protein · bridge")
+                    label: L10n.tr("Plan changes"),
+                    free: L10n.tr("Safe fixes remain"),
+                    pro: L10n.tr("Adaptive tuning")
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: L10n.tr("Across devices"),
-                    free: L10n.tr("This device"),
-                    pro: L10n.tr("iCloud continuity")
+                    label: L10n.tr("History"),
+                    free: L10n.tr("Recent sessions"),
+                    pro: L10n.tr("Longer evidence")
                 )
             }
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+            .background(previewSurface, in: .rect(cornerRadius: 14))
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                    .strokeBorder(previewBorder, lineWidth: 1)
             )
         }
     }
@@ -326,17 +466,17 @@ struct STRQPaywallView: View {
         HStack(alignment: .center, spacing: 10) {
             Text(label)
                 .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(.primary)
+                .foregroundStyle(.white)
                 .frame(width: 110, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(L10n.tr("FREE"))
                     .font(.system(size: 8, weight: .black))
                     .tracking(0.8)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(Color.white.opacity(0.40))
                 Text(free)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.white.opacity(0.62))
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -350,7 +490,7 @@ struct STRQPaywallView: View {
                         .font(.system(size: 8, weight: .black))
                         .tracking(0.8)
                 }
-                .foregroundStyle(.white)
+                .foregroundStyle(proAccentInk)
                 Text(pro)
                     .font(.system(size: 11, weight: .bold))
                     .foregroundStyle(.white)
@@ -369,9 +509,9 @@ struct STRQPaywallView: View {
     private var trialReassurance: some View {
         if let pkg = selectedPackage, pkg.storeProduct.introductoryDiscount != nil {
             HStack(spacing: 6) {
-                Image(systemName: "lock.open.fill")
+                Image(systemName: "apple.logo")
                     .font(.system(size: 10, weight: .bold))
-                Text(L10n.tr("Try free, cancel anytime before it renews"))
+                Text(L10n.tr("Apple shows offer details before purchase"))
                     .font(.caption2.weight(.semibold))
             }
             .foregroundStyle(.secondary)
@@ -546,9 +686,9 @@ struct STRQPaywallView: View {
     private var purchaseButtonTitle: String {
         guard let pkg = selectedPackage else { return L10n.tr("Continue") }
         if pkg.storeProduct.introductoryDiscount != nil {
-            return L10n.tr("Start Free Trial")
+            return L10n.tr("Continue with STRQ Pro")
         }
-        return L10n.tr("Subscribe")
+        return L10n.tr("Continue with STRQ Pro")
     }
 
     private var trustRow: some View {
@@ -589,7 +729,7 @@ struct STRQPaywallView: View {
     }
 
     private var legalText: some View {
-        Text(L10n.tr("Payment is charged to your Apple ID account. Subscription auto-renews unless cancelled at least 24 hours before the end of the current period."))
+        Text(L10n.tr("Apple shows pricing, renewal, and cancellation details before any purchase is confirmed."))
             .font(.system(size: 9))
             .foregroundStyle(.quaternary)
             .multilineTextAlignment(.center)
@@ -597,7 +737,7 @@ struct STRQPaywallView: View {
 
     // MARK: - States
 
-    private var alreadySubscribedState: some View {
+    private var activeProState: some View {
         VStack(spacing: 0) {
             Spacer()
 
@@ -674,7 +814,11 @@ struct STRQPaywallView: View {
 
                 Spacer().frame(height: 22)
 
-                comingSoonBanner
+                previewBanner
+
+                Spacer().frame(height: 22)
+
+                freeAccessBlock
 
                 Spacer().frame(height: 22)
 
@@ -690,7 +834,7 @@ struct STRQPaywallView: View {
 
                 Spacer().frame(height: 10)
 
-                trustRow
+                previewTrustRow
 
                 Spacer().frame(height: 12)
 
@@ -698,7 +842,7 @@ struct STRQPaywallView: View {
 
                 Spacer().frame(height: 10)
 
-                legalText
+                previewFooterText
 
                 Spacer().frame(height: 28)
             }
@@ -707,57 +851,132 @@ struct STRQPaywallView: View {
         .scrollIndicators(.hidden)
     }
 
-    private var comingSoonBanner: some View {
+    private var previewBanner: some View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
-                Image(systemName: "sparkles")
+                Image(systemName: "eye.fill")
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(STRQBrand.steel)
-                Text(L10n.tr("SUBSCRIPTIONS COMING SOON"))
+                    .foregroundStyle(proAccentInk)
+                Text(L10n.tr("PREVIEW ONLY"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.4)
-                    .foregroundStyle(STRQBrand.steel)
+                    .foregroundStyle(proAccentInk)
             }
-            Text(L10n.tr("Premium plans will become available once App Store setup is complete."))
+            Text(L10n.tr("No purchase is available in this build."))
                 .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(L10n.tr("You can continue exploring STRQ in the meantime."))
+            Text(L10n.tr("This screen previews the kind of depth STRQ Pro may add after a user has seen value."))
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.white.opacity(0.62))
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .background(previewSurface, in: .rect(cornerRadius: 14))
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                .strokeBorder(previewBorder, lineWidth: 1)
         )
+    }
+
+    private var freeAccessBlock: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(proofTint)
+                    .frame(width: 3, height: 14)
+                Text(L10n.tr("FREE ACCESS STAYS USEFUL"))
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.1)
+                    .foregroundStyle(Color.white.opacity(0.62))
+                Spacer()
+            }
+
+            VStack(spacing: 8) {
+                freeAccessItem(icon: "person.crop.circle.badge.checkmark", title: L10n.tr("Free activation"), detail: L10n.tr("Onboarding and setup remain open."))
+                freeAccessItem(icon: "map.fill", title: L10n.tr("First plan free"), detail: L10n.tr("Plan reveal is not blocked."))
+                freeAccessItem(icon: "figure.strengthtraining.traditional", title: L10n.tr("First workout free"), detail: L10n.tr("Core workout logging remains usable."))
+                freeAccessItem(icon: "chart.bar.fill", title: L10n.tr("Basic Progress free"), detail: L10n.tr("The Training Map starts useful before Pro depth."))
+            }
+        }
+        .padding(16)
+        .background(previewSurface, in: .rect(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .strokeBorder(previewBorder, lineWidth: 1)
+        )
+    }
+
+    private func freeAccessItem(icon: String, title: String, detail: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(proofTint)
+                .frame(width: 24, height: 24)
+                .background(proofTint.opacity(0.12), in: .rect(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.white.opacity(0.90))
+                Text(detail)
+                    .font(.caption2)
+                    .foregroundStyle(Color.white.opacity(0.58))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
     }
 
     private var disabledCTA: some View {
         VStack(spacing: 6) {
             HStack(spacing: 8) {
-                Image(systemName: "lock.fill")
+                Image(systemName: "eye.fill")
                     .font(.system(size: 12, weight: .bold))
-                Text(L10n.tr("Subscriptions coming soon"))
+                Text(L10n.tr("Preview only"))
                     .font(.body.weight(.bold))
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Color.white.opacity(0.72))
             .frame(maxWidth: .infinity)
             .frame(height: 54)
-            .background(Color.white.opacity(0.05), in: .rect(cornerRadius: 14))
+            .background(Color.white.opacity(0.055), in: .rect(cornerRadius: 14))
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+                    .strokeBorder(previewBorder, lineWidth: 1)
             )
-            Text(L10n.tr("Premium plans will appear here once App Store setup is complete."))
+            Text(L10n.tr("Purchases stay disabled until a separate purchase implementation is approved."))
                 .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(Color.white.opacity(0.46))
                 .multilineTextAlignment(.center)
         }
+    }
+
+    private var previewTrustRow: some View {
+        HStack(spacing: 10) {
+            previewTrustItem(icon: "checkmark.seal.fill", label: L10n.tr("No purchase today"))
+            trustDivider
+            previewTrustItem(icon: "figure.strengthtraining.traditional", label: L10n.tr("Training stays open"))
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func previewTrustItem(icon: String, label: String) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .semibold))
+            Text(label)
+                .font(.system(size: 10, weight: .semibold))
+        }
+        .foregroundStyle(Color.white.opacity(0.46))
+    }
+
+    private var previewFooterText: some View {
+        Text(L10n.tr("Restore remains available from Profile and this preview. Pricing and Apple billing details are not shown because purchases are not active in this build."))
+            .font(.system(size: 9))
+            .foregroundStyle(Color.white.opacity(0.34))
+            .multilineTextAlignment(.center)
     }
 
     private var emptyState: some View {
@@ -774,7 +993,7 @@ struct STRQPaywallView: View {
             Spacer().frame(height: 28)
 
             VStack(spacing: 14) {
-                Text(L10n.tr("Subscription plans are currently unavailable."))
+                Text(L10n.tr("STRQ Pro Preview is not connected to products in this build."))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -782,12 +1001,13 @@ struct STRQPaywallView: View {
                 Button {
                     Task { await store.fetchOfferings() }
                 } label: {
-                    Text(L10n.tr("Try Again"))
+                    Text(L10n.tr("Refresh Preview"))
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 28)
                         .padding(.vertical, 12)
-                        .background(STRQBrand.accentGradient, in: Capsule())
+                        .background(proAccent.opacity(0.24), in: Capsule())
+                        .overlay(Capsule().strokeBorder(proAccent.opacity(0.36), lineWidth: 1))
                 }
             }
             .padding(.horizontal, 32)

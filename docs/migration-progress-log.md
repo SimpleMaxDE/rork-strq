@@ -4113,6 +4113,108 @@ Warnings:
 
 - No xcodebuild or screenshot QA was run because this was a docs-only planning slice.
 
+## 2026-05-13 - STRQ Pro Preview Visual Prototype
+
+Scope:
+
+- Implemented the first passive STRQ Pro Preview visual prototype in the existing paywall shell.
+- Reframed the no-offering state as a preview-only value surface, not a live purchase screen.
+- Preserved the accepted monetization direction: free activation, first plan, first workout, core logging, and basic Progress remain useful.
+
+Files changed:
+
+- `ios/STRQ/Views/STRQPaywallView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Used [@Figma](plugin://figma@openai-curated) read-only in Licensed Source Mode.
+- Inspected `11604:62728`, `11611:134946`, `9129:207997`, `11603:112700`, `11604:59713`, `11604:63115`, `11604:63236`, `11604:63410`, `11604:63724`, `11604:64200`, `11604:64937`, `11604:66184`, and pricing card `8751:102794`.
+- Adapted dark metric density, progress/ring grammar, setup/readiness pacing, evidence/history rhythm, and selected/default pricing-card restraint.
+- Did not export assets or copy source branding/copy.
+
+Code inspected:
+
+- `ios/STRQ/Views/STRQPaywallView.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/ViewModels/StoreViewModel.swift`
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- ios/STRQ/Views/STRQPaywallView.swift docs/migration-progress-log.md`
+- `rg -n "RevenueCat|Purchases|entitlement|currentOffering|annualPackage|monthlyPackage|purchase\(|restore\(|package_selected|paywall_viewed|STRQPaywallView" ios/STRQ`
+- `rg -n "iCloud continuity|Physique intelligence|Protein and calorie|Subscribe|Start Free Trial|limited time|guaranteed|locked premium|premium feature|unlock premium" ios/STRQ/Views/STRQPaywallView.swift`
+- `git diff --check`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build`
+- Maestro 2.5.1 screenshot QA on iPhone 17 Pro and iPhone 17e:
+  - Profile Pro entry before tap.
+  - Paywall preview top viewport.
+  - Paywall preview lower/footer/restore area.
+  - Smaller iPhone 17e paywall top viewport for text fit.
+  - Dismiss paywall and confirm Profile returns unchanged.
+
+Intentionally not changed:
+
+- `StoreViewModel`, Profile routing, RevenueCat setup, entitlements, purchase/restore behavior, analytics events, onboarding, plan generation, active workout, Progress behavior, assets, localization catalogs, project files, tests, Watch, Widget, and Live Activity code.
+
+Pending work:
+
+- Profile Pro entry copy still mentions ecosystem/sync/Apple Watch and should be handled in a separate Profile-only slice if approved.
+- Future contextual Pro preview placement remains deferred until this passive preview is approved.
+
+Warnings:
+
+- The current store remains a stub with no live products; this slice is visual/copy only.
+- Screenshot artifacts were generated outside the repository under `/tmp/strq-pro-preview-qa`.
+
+## 2026-05-14 - Profile STRQ Pro Preview Copy Cleanup
+
+Scope:
+
+- Cleaned up the non-Pro Profile STRQ Pro entry so it matches the passive Pro Preview strategy.
+- Removed ecosystem/continuity promises from the Profile card copy.
+- Adjusted approved Pro theme chips into a compact 2x2 grid so labels do not truncate.
+- Kept Profile routing, restore behavior, store behavior, and paywall presentation unchanged.
+
+Files changed:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Not needed for this copy-only follow-up. The previous Pro Preview slice already inspected the approved Figma sources in Licensed Source Mode.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Views/STRQPaywallView.swift`
+
+Verification run:
+
+- `git status --short`
+- `git diff -- ios/STRQ/Views/ProfileView.swift ios/STRQ/Views/STRQPaywallView.swift docs/migration-progress-log.md`
+- `rg -n "full ecosystem|Sync|Apple Watch|iCloud|RevenueCat|purchase\(|restore\(|STRQ Pro|Training Map|Evidence|Weekly review|Adaptive" ios/STRQ/Views/ProfileView.swift ios/STRQ/Views/STRQPaywallView.swift`
+- `git diff --check`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -destination 'platform=iOS Simulator,name=iPhone 17 Pro' CODE_SIGNING_ALLOWED=NO build`
+- Maestro screenshot QA for Profile card, paywall top, paywall lower/footer, and dismiss back to Profile.
+
+Intentionally not changed:
+
+- StoreViewModel, RevenueCat/store files, AppViewModel, ContentView, models, services, analytics, persistence, assets, localization catalogs, project files, onboarding, plan, workout, and Progress files.
+- No entitlement gates, live purchase implications, purchase behavior changes, restore behavior changes, or Profile routing changes.
+
+Pending work:
+
+- Future contextual Pro preview placement remains deferred until the passive preview and Profile entry are approved together.
+
+Warnings:
+
+- The current store remains a stub with no live products; this slice is copy-only.
+- New Profile copy strings rely on the existing `L10n.tr` fallback behavior because localization catalog edits were outside scope.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

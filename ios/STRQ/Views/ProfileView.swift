@@ -444,7 +444,7 @@ struct ProfileView: View {
                                 Text(L10n.tr("STRQ Pro"))
                                     .font(.subheadline.weight(.bold))
                                     .foregroundStyle(.white)
-                                Text(L10n.tr("Deeper coaching, plans that evolve, full ecosystem."))
+                                Text(L10n.tr("Deeper coaching, evolving plans, and richer progress evidence."))
                                     .font(.caption)
                                     .foregroundStyle(Color.white.opacity(0.68))
                                     .lineLimit(2)
@@ -462,11 +462,17 @@ struct ProfileView: View {
                                 )
                         }
 
-                        HStack(spacing: 6) {
-                            proPillarChip(icon: "brain.head.profile.fill", label: L10n.tr("Adaptive"))
-                            proPillarChip(icon: "arrow.triangle.2.circlepath", label: L10n.tr("Evolving"))
-                            proPillarChip(icon: "icloud.fill", label: L10n.tr("Sync"))
-                            proPillarChip(icon: "applewatch", label: L10n.tr("Apple Watch"))
+                        LazyVGrid(
+                            columns: [
+                                GridItem(.flexible(), spacing: 6),
+                                GridItem(.flexible(), spacing: 6)
+                            ],
+                            spacing: 6
+                        ) {
+                            proPillarChip(icon: "brain.head.profile.fill", label: L10n.tr("Adaptive plans"))
+                            proPillarChip(icon: "map.fill", label: L10n.tr("Training Map"))
+                            proPillarChip(icon: "calendar.badge.clock", label: L10n.tr("Weekly review"))
+                            proPillarChip(icon: "chart.line.uptrend.xyaxis", label: L10n.tr("Evidence depth"))
                         }
                     }
                     .padding(14)
