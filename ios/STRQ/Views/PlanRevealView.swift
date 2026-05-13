@@ -8,490 +8,842 @@ struct PlanRevealView: View {
     var impacts: [OnboardingImpact] = []
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var appeared: Bool = false
-    @State private var showDays: Bool = false
-    @State private var showQuality: Bool = false
-    @State private var showImpacts: Bool = false
-    @State private var showCoachNote: Bool = false
+
+    @State private var appeared = false
+    @State private var showDays = false
+    @State private var showQuality = false
+    @State private var showImpacts = false
+    @State private var showCoachNote = false
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
+        ZStack(alignment: .bottom) {
+            activationBackground
 
-            MeshGradient(width: 3, height: 3, points: [
-                [0, 0], [0.5, 0], [1, 0],
-                [0, 0.5], [0.5, 0.5], [1, 0.5],
-                [0, 1], [0.5, 1], [1, 1]
-            ], colors: [
-                .black, .black, .black,
-                .black, Color.white.opacity(0.04), .black,
-                .black, .black, .black
-            ])
-            .ignoresSafeArea()
-
-            ScrollView {
-                VStack(spacing: 24) {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 18) {
                     heroSection
-                    planOverviewCard
-                    firstWeekRoadmap
-                    onboardingImpactSection
+                        .padding(.top, 34)
+
+                    planIdentityCard
+
+                    weeklyRhythmSection
+
+                    whyThisFitsSection
+
+                    nextWorkoutBridge
+
                     weekPreview
+
                     if let quality = planQuality {
                         qualitySection(quality)
                     }
+
                     explanationSection
-                    Color.clear.frame(height: 24)
+
+                    Spacer(minLength: 116)
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, 20)
             }
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+
+            topScrollScrim
+
             stickyStartBar
         }
-        .preferredColorScheme(.dark)
         .onAppear {
-            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.7)) { appeared = true }
-            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.5)) { showDays = true }
-            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.6)) { showImpacts = true }
-            withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.8)) { showQuality = true }
+            appeared = true
+            animateSequence()
         }
+    }
+
+    private var activationBackground: some View {
+        ZStack {
+            STRQPalette.backgroundPrimary.ignoresSafeArea()
+
+            LinearGradient(
+                colors: [
+                    STRQPalette.backgroundDeep,
+                    STRQPalette.backgroundCarbon,
+                    STRQPalette.backgroundPrimary
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                Rectangle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(height: 1)
+                LinearGradient(
+                    colors: [Color.white.opacity(0.08), .clear],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 170)
+                Spacer()
+            }
+            .ignoresSafeArea()
+        }
+    }
+
+    private var topScrollScrim: some View {
+        VStack(spacing: 0) {
+            STRQPalette.backgroundPrimary
+                .frame(height: 88)
+
+            LinearGradient(
+                colors: [
+                    STRQPalette.backgroundPrimary,
+                    STRQPalette.backgroundPrimary.opacity(0.72),
+                    STRQPalette.backgroundPrimary.opacity(0)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 44)
+
+            Spacer(minLength: 0)
+        }
+        .ignoresSafeArea(edges: .top)
+        .allowsHitTesting(false)
     }
 
     private var heroSection: some View {
-        VStack(spacing: 20) {
-            Spacer().frame(height: 18)
-
+        VStack(spacing: 16) {
             STRQPulseMark(
-                size: 84,
-                tint: STRQBrand.steel.opacity(0.78),
-                line: reduceMotion ? .none : .horizontal,
-                ringOpacityMultiplier: 0.88,
-                lineOpacityMultiplier: 0.76
-            ) {
-                STRQLogoView(size: 54, animated: false)
-                    .opacity(0.96)
-            }
-            .scaleEffect(appeared ? 1 : 0.82)
-            .opacity(appeared ? 1 : 0)
-            .animation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.5, dampingFraction: 0.7).delay(0.1), value: appeared)
+                size: 82,
+                tint: STRQBrand.steel,
+                line: .horizontal,
+                ringOpacityMultiplier: reduceMotion ? 0.72 : 1,
+                lineOpacityMultiplier: reduceMotion ? 0.45 : 1,
+                trigger: appeared ? 1 : 0
+            )
+            .overlay(
+                Circle()
+                    .strokeBorder(STRQPalette.borderSubtle, lineWidth: 1)
+                    .frame(width: 106, height: 106)
+            )
 
-            VStack(spacing: 6) {
-                Text(L10n.tr("Your Plan is Ready"))
-                    .font(.system(size: 31, weight: .heavy, design: .rounded))
-                    .foregroundStyle(.white)
+            VStack(spacing: 8) {
+                Text(L10n.tr("plan_reveal_eyebrow", fallback: "Your Plan is Ready"))
+                    .font(.caption2.weight(.bold))
+                    .tracking(1.4)
+                    .foregroundStyle(STRQBrand.steel)
+
+                Text(splitName)
+                    .font(.system(.title2, design: .rounded).weight(.bold))
+                    .foregroundStyle(STRQPalette.textPrimary)
                     .multilineTextAlignment(.center)
-                Text(profile.name.isEmpty ? L10n.tr("Start Workout 1 now. STRQ will tune the rest from real training.") : L10n.format("%@, start Workout 1 now. STRQ will tune the rest from real training.", profile.name))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.82)
+
+                Text(revealSubtitle)
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.58))
+                    .foregroundStyle(STRQPalette.textSecondary)
                     .multilineTextAlignment(.center)
+                    .lineSpacing(3)
+                    .padding(.horizontal, 8)
             }
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 12)
-            .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.2), value: appeared)
         }
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 14)
+        .animation(reduceMotion ? nil : .spring(response: 0.58, dampingFraction: 0.86), value: appeared)
     }
 
-    private var planOverviewCard: some View {
-        VStack(spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(SplitDisplayName.localizedDisplayName(for: plan.splitType))
-                        .font(.headline)
-                    Text("\(profile.goal.localizedDisplayName) · \(profile.trainingLevel.localizedShortName)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+    private var planIdentityCard: some View {
+        activationCard {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .top, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(plan.name.isEmpty ? splitName : plan.name)
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.82)
+
+                        Text(planIdentityLine)
+                            .font(.subheadline)
+                            .foregroundStyle(STRQPalette.textSecondary)
+                            .lineSpacing(2)
+                    }
+
+                    Spacer(minLength: 10)
+
+                    VStack(spacing: 2) {
+                        Text("\(plan.durationWeeks)")
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                        Text(L10n.tr("plan_reveal_weeks_short", fallback: "weeks"))
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(STRQPalette.textMuted)
+                            .textCase(.uppercase)
+                    }
+                    .frame(width: 64, height: 64)
+                    .background(STRQPalette.surfaceStrong, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .strokeBorder(STRQPalette.borderSubtle, lineWidth: 1)
+                    )
                 }
-                Spacer()
-                Image(systemName: profile.goal.symbolName)
-                    .font(.title2)
-                    .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
-                    .background(Color.white.opacity(0.08), in: .rect(cornerRadius: 12))
-            }
 
-            Divider().opacity(0.3)
-
-            HStack(spacing: 0) {
-                overviewStat(value: Double(plan.days.count), suffix: "", label: L10n.tr("Days/Week"), icon: "calendar")
-                overviewStat(value: Double(profile.minutesPerSession), suffix: "m", label: L10n.tr("Per Workout"), icon: "clock")
-                overviewStat(value: Double(plan.durationWeeks), suffix: "wk", label: L10n.tr("Duration"), icon: "repeat")
-                overviewStat(value: Double(totalExerciseCount), suffix: "", label: L10n.tr("Exercises"), icon: "figure.strengthtraining.traditional")
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: 10),
+                        GridItem(.flexible(), spacing: 10)
+                    ],
+                    spacing: 10
+                ) {
+                    planMetric(
+                        icon: "calendar",
+                        label: L10n.tr("plan_reveal_metric_rhythm", fallback: "Weekly rhythm"),
+                        value: L10n.format("plan_reveal_metric_days", fallback: "%d days", plan.days.count)
+                    )
+                    planMetric(
+                        icon: "clock",
+                        label: L10n.tr("plan_reveal_metric_duration", fallback: "Session length"),
+                        value: L10n.format("plan_reveal_metric_minutes", fallback: "%d min", averageMinutes)
+                    )
+                    planMetric(
+                        icon: "figure.strengthtraining.traditional",
+                        label: L10n.tr("plan_reveal_metric_exercises", fallback: "Exercises"),
+                        value: "\(totalExerciseCount)"
+                    )
+                    planMetric(
+                        icon: "chart.bar.fill",
+                        label: L10n.tr("plan_reveal_metric_load", fallback: "Load cue"),
+                        value: profile.trainingLevel.localizedShortName
+                    )
+                }
             }
         }
-        .padding(18)
-        .background(Color(white: 0.105), in: .rect(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.14), lineWidth: 1)
-        )
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 16)
-        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.35), value: appeared)
+        .animation(reduceMotion ? nil : .spring(response: 0.58, dampingFraction: 0.88).delay(0.08), value: appeared)
     }
 
-    private func overviewStat(value: Double, suffix: String, label: String, icon: String) -> some View {
-        VStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.caption)
-                .foregroundStyle(STRQBrand.steel)
-            STRQCountUpText(value: value, duration: 0.65) { current in
-                "\(Int(current.rounded()))\(suffix)"
-            }
-                .font(.subheadline.bold().monospacedDigit())
-            Text(label)
-                .font(.system(size: 9, weight: .medium))
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
+    private var weeklyRhythmSection: some View {
+        activationCard {
+            VStack(alignment: .leading, spacing: 15) {
+                sectionLabel(
+                    L10n.tr("plan_reveal_rhythm_title", fallback: "Weekly structure"),
+                    detail: L10n.tr("plan_reveal_rhythm_detail", fallback: "A simple rhythm for the block ahead.")
+                )
 
-    private var totalExerciseCount: Int {
-        Set(plan.days.flatMap { $0.exercises.map(\.exerciseId) }).count
-    }
-
-    private var weekPreview: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text(L10n.tr("YOUR WEEK"))
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(STRQBrand.steel)
-                    .tracking(0.5)
-                Spacer()
-            }
-
-            ForEach(Array(plan.days.enumerated()), id: \.element.id) { index, day in
-                dayRow(day, index: index)
-                    .opacity(showDays ? 1 : 0)
-                    .offset(x: showDays ? 0 : -20)
-                    .animation(
-                        reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.4, dampingFraction: 0.8)
-                            .delay(Double(index) * 0.08),
-                        value: showDays
-                    )
-            }
-        }
-        .padding(18)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
-        )
-    }
-
-    private func dayRow(_ day: WorkoutDay, index: Int) -> some View {
-        HStack(spacing: 14) {
-            Text(L10n.format("Day %d", index + 1))
-                .font(.system(size: 10, weight: .bold).monospacedDigit())
-                .foregroundStyle(STRQBrand.steel)
-                .frame(width: 38)
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(day.name)
-                    .font(.subheadline.weight(.semibold))
-                HStack(spacing: 4) {
-                    Text(day.focusMuscles.prefix(3).map(\.localizedDisplayName).joined(separator: ", "))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text("·")
-                        .foregroundStyle(.secondary)
-                    Text(L10n.format("%d exercises", day.exercises.count))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                HStack(spacing: 8) {
+                    ForEach(Array(plan.days.enumerated()), id: \.element.id) { index, day in
+                        rhythmTile(day: day, index: index)
+                    }
                 }
             }
-
-            Spacer()
-
-            Text(L10n.format("~%dm", day.estimatedMinutes))
-                .font(.caption.weight(.medium).monospacedDigit())
-                .foregroundStyle(.white.opacity(0.4))
         }
-        .padding(.vertical, 2)
+        .opacity(showDays ? 1 : 0)
+        .offset(y: showDays ? 0 : 16)
+        .animation(reduceMotion ? nil : .spring(response: 0.58, dampingFraction: 0.88), value: showDays)
     }
 
-    @ViewBuilder
-    private func qualitySection(_ quality: PlanQualityScore) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Text(L10n.tr("COACH ASSESSMENT"))
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(STRQBrand.steel)
-                    .tracking(0.5)
-                Spacer()
-                Text(quality.localizedOverallLabel)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(qualityColor(quality.overallColor))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(qualityColor(quality.overallColor).opacity(0.12), in: Capsule())
-            }
+    private var whyThisFitsSection: some View {
+        activationCard {
+            VStack(alignment: .leading, spacing: 15) {
+                sectionLabel(
+                    L10n.tr("plan_reveal_why_title", fallback: "Why this fits"),
+                    detail: L10n.tr("plan_reveal_why_detail", fallback: "Visible choices are tied back to your profile.")
+                )
 
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                qualityItem(L10n.tr("Recovery Fit"), rating: quality.recoveryFit)
-                qualityItem(L10n.tr("Time Fit"), rating: quality.timeFit)
-                qualityItem(L10n.tr("Muscle Balance"), rating: quality.muscleBalance)
-                qualityItem(L10n.tr("Equipment Fit"), rating: quality.equipmentFit)
-            }
+                VStack(spacing: 10) {
+                    ForEach(displayImpacts) { impact in
+                        fitRow(
+                            icon: impact.icon,
+                            title: impact.title,
+                            detail: impact.detail,
+                            color: impactColor(impact.color)
+                        )
+                    }
 
-            if !quality.strengths.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    ForEach(quality.strengths.prefix(2), id: \.self) { strength in
-                        HStack(spacing: 8) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 10))
-                                .foregroundStyle(STRQPalette.success)
-                            Text(strength)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                    if let quality = planQuality, !quality.strengths.isEmpty {
+                        Divider()
+                            .background(STRQPalette.borderSubtle)
+                            .padding(.vertical, 2)
+
+                        ForEach(Array(quality.strengths.prefix(2).enumerated()), id: \.offset) { _, strength in
+                            fitRow(
+                                icon: "checkmark.seal.fill",
+                                title: L10n.tr("plan_reveal_strength_label", fallback: "Plan strength"),
+                                detail: strength,
+                                color: STRQPalette.success
+                            )
                         }
                     }
                 }
             }
         }
-        .padding(18)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
-        )
+        .opacity(showImpacts ? 1 : 0)
+        .offset(y: showImpacts ? 0 : 16)
+        .animation(reduceMotion ? nil : .spring(response: 0.58, dampingFraction: 0.88), value: showImpacts)
+    }
+
+    private var nextWorkoutBridge: some View {
+        activationCard {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "arrow.right.circle.fill")
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .frame(width: 44, height: 44)
+                    .background(STRQPalette.surfaceStrong, in: Circle())
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(L10n.tr("plan_reveal_bridge_title", fallback: "Prepare the next workout"))
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(STRQPalette.textPrimary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.84)
+
+                    Text(L10n.tr("plan_reveal_bridge_detail", fallback: "STRQ opens a short handoff first, then you can begin training with the plan loaded."))
+                        .font(.subheadline)
+                        .foregroundStyle(STRQPalette.textSecondary)
+                        .lineSpacing(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+        }
         .opacity(showQuality ? 1 : 0)
         .offset(y: showQuality ? 0 : 16)
+        .animation(reduceMotion ? nil : .spring(response: 0.58, dampingFraction: 0.88), value: showQuality)
     }
 
-    private func qualityItem(_ label: String, rating: QualityRating) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: rating.icon)
-                .font(.caption)
-                .foregroundStyle(qualityColor(rating.colorName))
-            VStack(alignment: .leading, spacing: 1) {
-                Text(label)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(.secondary)
-                Text(rating.localizedLabel)
-                    .font(.caption.weight(.semibold))
-            }
-            Spacer()
-        }
-        .padding(10)
-        .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 10))
-    }
-
-    private var onboardingImpactSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 8) {
-                Image(systemName: "person.fill.viewfinder")
-                    .font(.caption)
-                    .foregroundStyle(STRQBrand.steel)
-                Text(L10n.tr("YOUR INPUTS SHAPED THIS PLAN"))
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(STRQBrand.steel)
-                    .tracking(0.5)
-            }
-
-            ForEach(Array(impacts.enumerated()), id: \.element.id) { index, impact in
-                HStack(spacing: 12) {
-                    Image(systemName: impact.icon)
-                        .font(.caption)
-                        .foregroundStyle(impactColor(impact.color))
-                        .frame(width: 28, height: 28)
-                        .background(impactColor(impact.color).opacity(0.12), in: .rect(cornerRadius: 8))
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(impact.title)
-                            .font(.caption.weight(.bold))
-                        Text(impact.detail)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                    }
-                    Spacer()
-                }
-                .opacity(showImpacts ? 1 : 0)
-                .offset(x: showImpacts ? 0 : -16)
-                .animation(
-                    reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.4, dampingFraction: 0.8)
-                        .delay(Double(index) * 0.06),
-                    value: showImpacts
+    private var weekPreview: some View {
+        activationCard {
+            VStack(alignment: .leading, spacing: 15) {
+                sectionLabel(
+                    L10n.tr("plan_reveal_week_title", fallback: "First week"),
+                    detail: L10n.tr("plan_reveal_week_detail", fallback: "Each session has a clear focus and a realistic time box.")
                 )
+
+                VStack(spacing: 10) {
+                    ForEach(Array(plan.days.enumerated()), id: \.element.id) { index, day in
+                        dayPreviewRow(day: day, index: index)
+                    }
+                }
             }
         }
-        .padding(18)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
-        )
+        .opacity(showDays ? 1 : 0)
+        .offset(y: showDays ? 0 : 16)
+        .animation(reduceMotion ? nil : .spring(response: 0.58, dampingFraction: 0.88).delay(0.06), value: showDays)
     }
 
-    private func impactColor(_ name: String) -> Color {
-        switch name {
-        case "blue": return STRQBrand.steel
-        case "green": return STRQPalette.success
-        case "purple": return STRQBrand.slate
-        case "red": return STRQPalette.danger
-        case "cyan": return STRQBrand.steel
-        case "steel": return STRQBrand.steel
-        default: return STRQBrand.steel
+    private func qualitySection(_ quality: PlanQualityScore) -> some View {
+        activationCard {
+            VStack(alignment: .leading, spacing: 15) {
+                sectionLabel(
+                    L10n.tr("plan_reveal_quality_title", fallback: "Plan check"),
+                    detail: L10n.tr("plan_reveal_quality_detail", fallback: "A quick read on balance, time fit, recovery, and progression.")
+                )
+
+                HStack(spacing: 12) {
+                    Text("\(Int((quality.overall * 100).rounded()))")
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                        .foregroundStyle(STRQPalette.textPrimary)
+                        .frame(width: 78, height: 78)
+                        .background(STRQPalette.surfaceStrong, in: Circle())
+                        .overlay(
+                            Circle()
+                                .strokeBorder(qualityColor(quality.overallColor), lineWidth: 2)
+                        )
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(quality.localizedOverallLabel)
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                        Text(L10n.tr("plan_reveal_quality_copy", fallback: "The structure is ready for a first training block. STRQ will learn more as you log sessions."))
+                            .font(.footnote)
+                            .foregroundStyle(STRQPalette.textSecondary)
+                            .lineSpacing(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: 10),
+                        GridItem(.flexible(), spacing: 10)
+                    ],
+                    spacing: 10
+                ) {
+                    qualityTile(
+                        L10n.tr("plan_reveal_quality_balance", fallback: "Balance"),
+                        quality.muscleBalance.localizedLabel,
+                        quality.muscleBalance.icon,
+                        quality.muscleBalance.colorName
+                    )
+                    qualityTile(
+                        L10n.tr("plan_reveal_quality_time", fallback: "Time fit"),
+                        quality.timeFit.localizedLabel,
+                        quality.timeFit.icon,
+                        quality.timeFit.colorName
+                    )
+                    qualityTile(
+                        L10n.tr("plan_reveal_quality_recovery", fallback: "Recovery"),
+                        quality.recoveryFit.localizedLabel,
+                        quality.recoveryFit.icon,
+                        quality.recoveryFit.colorName
+                    )
+                    qualityTile(
+                        L10n.tr("plan_reveal_quality_progression", fallback: "Progression"),
+                        quality.progressionReadiness.localizedLabel,
+                        quality.progressionReadiness.icon,
+                        quality.progressionReadiness.colorName
+                    )
+                }
+
+                if !quality.watchItems.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(L10n.tr("plan_reveal_watch_items", fallback: "Watch items"))
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(STRQPalette.textMuted)
+                            .textCase(.uppercase)
+
+                        ForEach(Array(quality.watchItems.prefix(2).enumerated()), id: \.offset) { _, item in
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: "info.circle")
+                                    .foregroundStyle(STRQPalette.warning)
+                                Text(item)
+                                    .font(.footnote)
+                                    .foregroundStyle(STRQPalette.textSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                    .padding(12)
+                    .background(STRQPalette.surfaceRaised, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                }
+            }
         }
+        .opacity(showQuality ? 1 : 0)
+        .offset(y: showQuality ? 0 : 18)
+        .animation(reduceMotion ? nil : .spring(response: 0.58, dampingFraction: 0.88), value: showQuality)
     }
 
     private var explanationSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Button {
-                withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.22)) {
-                    showCoachNote.toggle()
+        activationCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Button {
+                    withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.86)) {
+                        showCoachNote.toggle()
+                    }
+                } label: {
+                    HStack {
+                        Label(L10n.tr("plan_reveal_coach_note", fallback: "Coach note"), systemImage: "text.bubble.fill")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                        Spacer()
+                        Image(systemName: showCoachNote ? "chevron.up" : "chevron.down")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(STRQPalette.textMuted)
+                    }
                 }
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "brain.head.profile.fill")
-                        .font(.caption)
-                        .foregroundStyle(STRQBrand.steel)
-                    Text(L10n.tr("coachNote.title", fallback: "Coach note"))
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(STRQBrand.steel)
-                        .tracking(0.5)
-                    Spacer()
-                    Text(L10n.tr("common.details", fallback: "Details"))
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    Image(systemName: showCoachNote ? "chevron.up" : "chevron.down")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .buttonStyle(.plain)
+                .buttonStyle(.plain)
 
-            if showCoachNote {
-                Text(plan.explanation)
-                    .font(.callout)
-                    .foregroundStyle(.white.opacity(0.66))
-                    .lineSpacing(2)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                if showCoachNote {
+                    Text(plan.explanation)
+                        .font(.footnote)
+                        .foregroundStyle(STRQPalette.textSecondary)
+                        .lineSpacing(4)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
             }
         }
-        .padding(18)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
-        )
         .opacity(showQuality ? 1 : 0)
-        .offset(y: showQuality ? 0 : 12)
-        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(1.0), value: showQuality)
+        .offset(y: showQuality ? 0 : 18)
+        .animation(reduceMotion ? nil : .spring(response: 0.58, dampingFraction: 0.88).delay(0.08), value: showQuality)
     }
 
     private var stickyStartBar: some View {
-        VStack(spacing: 0) {
-            LinearGradient(colors: [.black.opacity(0), .black], startPoint: .top, endPoint: .bottom)
-                .frame(height: 36)
-            VStack(spacing: 8) {
-                Button {
-                    onStart()
-                } label: {
-                    HStack(spacing: 10) {
-                        Text(L10n.tr("Start Workout 1"))
-                            .font(.body.weight(.bold))
-                        Image(systemName: "arrow.right")
-                            .font(.subheadline.weight(.bold))
-                    }
-                    .foregroundStyle(.black)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 16))
-                    .shadow(color: .white.opacity(0.16), radius: 16, y: 4)
+        VStack(spacing: 10) {
+            Button {
+                onStart()
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 17, weight: .bold))
+                    Text(L10n.tr("plan_reveal_cta_prepare_workout", fallback: "Prepare Workout"))
+                        .font(.headline.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.84)
                 }
-                .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: showQuality)
-
-                Text(L10n.tr("You'll go straight into today's workout. You can fine-tune the plan later in Train."))
-                    .font(.caption2)
-                    .foregroundStyle(.white.opacity(0.35))
+                .foregroundStyle(STRQPalette.backgroundPrimary)
+                .frame(maxWidth: .infinity)
+                .frame(height: 58)
+                .background(
+                    LinearGradient(
+                        colors: [STRQPalette.textPrimary, STRQBrand.steel.opacity(0.88)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.22), lineWidth: 1)
+                )
+                .shadow(color: Color.white.opacity(0.10), radius: 18, y: 6)
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 28)
-            .background(Color.black)
+            .buttonStyle(.plain)
+
+            Text(L10n.tr("plan_reveal_cta_note", fallback: "STRQ opens the workout handoff before training starts."))
+                .font(.caption)
+                .foregroundStyle(STRQPalette.textMuted)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 14)
+        .padding(.bottom, 14)
+        .background(
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .overlay(STRQPalette.backgroundPrimary.opacity(0.78))
+                .ignoresSafeArea(edges: .bottom)
+        )
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(STRQPalette.borderSubtle)
+                .frame(height: 1)
         }
         .opacity(showQuality ? 1 : 0)
-        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(1.0), value: showQuality)
+        .offset(y: showQuality ? 0 : 22)
+        .animation(reduceMotion ? nil : .spring(response: 0.58, dampingFraction: 0.86), value: showQuality)
     }
 
-    private func qualityColor(_ name: String) -> Color {
-        ForgeTheme.color(for: name)
+    private var splitName: String {
+        SplitDisplayName.localizedDisplayName(for: plan.splitType)
     }
 
-    private var firstWeekRoadmap: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 8) {
-                Image(systemName: "map.fill")
-                    .font(.caption)
-                    .foregroundStyle(STRQBrand.steel)
-                Text(L10n.tr("WHAT TO DO FIRST"))
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(STRQBrand.steel)
-                    .tracking(0.5)
-            }
-
-            VStack(spacing: 0) {
-                roadmapRow(
-                    index: 1,
-                    title: L10n.tr("Start Workout 1"),
-                    detail: L10n.tr("Train normally. STRQ sets your real baseline from this workout."),
-                    isLast: false
-                )
-                roadmapRow(
-                    index: 2,
-                    title: L10n.tr("Come back for Workout 2"),
-                    detail: L10n.tr("Progression starts once STRQ sees your first-workout data."),
-                    isLast: false
-                )
-                roadmapRow(
-                    index: 3,
-                    title: L10n.tr("Complete week one"),
-                    detail: L10n.tr("Recovery, balance, and workload get sharper after your first week."),
-                    isLast: true
-                )
-            }
+    private var revealSubtitle: String {
+        if profile.name.isEmpty {
+            return L10n.tr("plan_reveal_subtitle_generic", fallback: "Your training block is ready. Start with the next workout and let real training sharpen the plan.")
         }
-        .padding(18)
-        .background(Color(white: 0.105), in: .rect(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+        return L10n.format(
+            "plan_reveal_subtitle_named",
+            fallback: "%@, your training block is ready. Start with the next workout and let real training sharpen the plan.",
+            profile.name
         )
-        .opacity(showDays ? 1 : 0)
-        .offset(y: showDays ? 0 : 12)
     }
 
-    private func roadmapRow(index: Int, title: String, detail: String, isLast: Bool) -> some View {
-        HStack(alignment: .top, spacing: 14) {
-            VStack(spacing: 0) {
-                ZStack {
-                    Circle()
-                        .fill(Color.white.opacity(0.08))
-                        .frame(width: 26, height: 26)
-                    Text("\(index)")
-                        .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
-                        .foregroundStyle(.white.opacity(0.85))
-                }
-                if !isLast {
-                    Rectangle()
-                        .fill(Color.white.opacity(0.08))
-                        .frame(width: 1)
-                        .frame(maxHeight: .infinity)
-                }
+    private var planIdentityLine: String {
+        L10n.format(
+            "plan_reveal_identity_line",
+            fallback: "%@ / %@",
+            profile.goal.localizedDisplayName,
+            profile.trainingLevel.localizedShortName
+        )
+    }
+
+    private var averageMinutes: Int {
+        guard !plan.days.isEmpty else { return profile.minutesPerSession }
+        let total = plan.days.reduce(0) { $0 + $1.estimatedMinutes }
+        return max(1, total / plan.days.count)
+    }
+
+    private var totalExerciseCount: Int {
+        plan.days.reduce(0) { $0 + $1.exercises.count }
+    }
+
+    private var displayImpacts: [OnboardingImpact] {
+        if !impacts.isEmpty {
+            return Array(impacts.prefix(4))
+        }
+
+        return [
+            OnboardingImpact(
+                icon: "target",
+                title: L10n.tr("plan_reveal_fallback_goal_title", fallback: "Goal matched"),
+                detail: L10n.format("plan_reveal_fallback_goal_detail", fallback: "%@ goal focus.", profile.goal.localizedDisplayName),
+                color: "blue"
+            ),
+            OnboardingImpact(
+                icon: "calendar",
+                title: L10n.tr("plan_reveal_fallback_schedule_title", fallback: "Schedule respected"),
+                detail: L10n.format("plan_reveal_fallback_schedule_detail", fallback: "%d days / %d min sessions.", profile.daysPerWeek, profile.minutesPerSession),
+                color: "green"
+            ),
+            OnboardingImpact(
+                icon: "chart.line.uptrend.xyaxis",
+                title: L10n.tr("plan_reveal_fallback_level_title", fallback: "Level calibrated"),
+                detail: L10n.format("plan_reveal_fallback_level_detail", fallback: "Set for %@ training.", profile.trainingLevel.localizedShortName),
+                color: "purple"
+            )
+        ]
+    }
+
+    private func activationCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        content()
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(STRQPalette.surfaceBase.opacity(0.94))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.white.opacity(0.07), .clear],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(STRQPalette.borderSubtle, lineWidth: 1)
+            )
+    }
+
+    private func sectionLabel(_ title: String, detail: String) -> some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.caption.weight(.bold))
+                    .tracking(1.0)
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .textCase(.uppercase)
+
+                Text(detail)
+                    .font(.footnote)
+                    .foregroundStyle(STRQPalette.textSecondary)
+                    .lineSpacing(2)
             }
-            .frame(width: 26)
+            Spacer(minLength: 0)
+        }
+    }
+
+    private func planMetric(icon: String, label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(STRQBrand.steel)
+                .frame(width: 28, height: 28)
+                .background(STRQPalette.surfaceStrong, in: Circle())
 
             VStack(alignment: .leading, spacing: 3) {
+                Text(label)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .textCase(.uppercase)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.76)
+
+                Text(value)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 92, alignment: .topLeading)
+        .padding(12)
+        .background(STRQPalette.surfaceRaised, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(STRQPalette.borderSubtle, lineWidth: 1)
+        )
+    }
+
+    private func rhythmTile(day: WorkoutDay, index: Int) -> some View {
+        VStack(spacing: 8) {
+            Text(dayShortLabel(day: day, index: index))
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(STRQPalette.textMuted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+
+            Capsule()
+                .fill(index == 0 ? STRQPalette.textPrimary : STRQPalette.surfaceStrong)
+                .frame(width: 10, height: 36)
+                .overlay(
+                    Capsule()
+                        .strokeBorder(index == 0 ? Color.white.opacity(0.22) : STRQPalette.borderSubtle, lineWidth: 1)
+                )
+
+            Text(day.focusMuscles.first?.localizedDisplayName ?? L10n.tr("plan_reveal_day_focus", fallback: "Full"))
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(index == 0 ? STRQPalette.textPrimary : STRQPalette.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.66)
+        }
+        .frame(maxWidth: .infinity, minHeight: 92)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(index == 0 ? STRQPalette.surfaceStrong : STRQPalette.surfaceRaised)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(index == 0 ? STRQPalette.borderStrong : STRQPalette.borderSubtle, lineWidth: 1)
+        )
+    }
+
+    private func fitRow(icon: String, title: String, detail: String, color: Color) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(color)
+                .frame(width: 30, height: 30)
+                .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.82)
+
                 Text(detail)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(STRQPalette.textSecondary)
+                    .lineSpacing(2)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.bottom, isLast ? 0 : 14)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(STRQPalette.surfaceRaised.opacity(0.82), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private func dayPreviewRow(day: WorkoutDay, index: Int) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(spacing: 2) {
+                Text(dayShortLabel(day: day, index: index))
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(STRQPalette.textMuted)
+                Text("\(index + 1)")
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(STRQPalette.textPrimary)
+            }
+            .frame(width: 44, height: 48)
+            .background(STRQPalette.surfaceStrong, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(day.name)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                Text(dayFocusText(day))
+                    .font(.caption)
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.76)
+            }
+
+            Spacer(minLength: 8)
+
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(L10n.format("plan_reveal_day_exercises", fallback: "%d exercises", day.exercises.count))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(STRQPalette.textSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.76)
+                Text(L10n.format("plan_reveal_day_minutes", fallback: "~%d min", day.estimatedMinutes))
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .lineLimit(1)
+            }
+        }
+        .padding(12)
+        .background(STRQPalette.surfaceRaised, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .strokeBorder(index == 0 ? STRQPalette.borderStrong : STRQPalette.borderSubtle, lineWidth: 1)
+        )
+    }
+
+    private func qualityTile(_ label: String, _ value: String, _ icon: String, _ colorName: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(qualityColor(colorName))
+                .frame(width: 28, height: 28)
+                .background(qualityColor(colorName).opacity(0.14), in: Circle())
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .textCase(.uppercase)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                Text(value)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+            }
+
             Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(STRQPalette.surfaceRaised, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private func dayShortLabel(day: WorkoutDay, index: Int) -> String {
+        if let weekday = day.scheduledWeekday, (1...7).contains(weekday) {
+            return Calendar.current.shortWeekdaySymbols[weekday - 1]
+        }
+        return L10n.format("plan_reveal_day_short", fallback: "D%d", index + 1)
+    }
+
+    private func dayFocusText(_ day: WorkoutDay) -> String {
+        let text = day.focusMuscles.map(\.localizedDisplayName).joined(separator: " + ")
+        return text.isEmpty ? L10n.tr("plan_reveal_day_full_body", fallback: "Full body") : text
+    }
+
+    private func impactColor(_ colorName: String) -> Color {
+        switch colorName.lowercased() {
+        case "green":
+            return STRQPalette.success
+        case "red":
+            return STRQPalette.danger
+        case "orange", "yellow":
+            return STRQPalette.warning
+        case "purple", "blue":
+            return STRQBrand.steel
+        default:
+            return STRQPalette.textPrimary
+        }
+    }
+
+    private func qualityColor(_ colorName: String) -> Color {
+        switch colorName.lowercased() {
+        case "green":
+            return STRQPalette.success
+        case "red":
+            return STRQPalette.danger
+        case "orange", "yellow":
+            return STRQPalette.warning
+        default:
+            return STRQBrand.steel
+        }
+    }
+
+    private func animateSequence() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
+            withAnimation(reduceMotion ? nil : .spring(response: 0.55, dampingFraction: 0.86)) {
+                showDays = true
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.48) {
+            withAnimation(reduceMotion ? nil : .spring(response: 0.55, dampingFraction: 0.86)) {
+                showImpacts = true
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+            withAnimation(reduceMotion ? nil : .spring(response: 0.55, dampingFraction: 0.86)) {
+                showQuality = true
+            }
         }
     }
 }

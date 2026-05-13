@@ -3998,6 +3998,61 @@ Pending work:
 
 - Capture simulator screenshots for first-time, low-data, regular, and athlete-like states after a disposable state setup path is available for the new internal candidate.
 
+## 2026-05-13 - Plan Activation Visual Redesign
+
+Scope:
+
+- Redesigned Plan Generation and Plan Reveal together as one premium post-onboarding activation moment using existing behavior only.
+- Made generation feel like a calm plan build from profile inputs, with deterministic phases, proof rows, and dark carbon progress rhythm.
+- Made reveal lead with plan identity, weekly rhythm, why-it-fits evidence, and a neutral bridge into workout preparation.
+
+Files changed:
+
+- `ios/STRQ/Views/PlanGenerationView.swift`
+- `ios/STRQ/Views/PlanRevealView.swift`
+- `docs/migration-progress-log.md`
+- `docs/qa/plan-activation-redesign-2026-05-13/`
+
+Figma inspected:
+
+- Licensed Source Mode, read-only: `11604:62728`, `11611:134946`, and `9129:207997`.
+- Adapted dark metric density, activation rhythm, and progress primitives without copying source branding, copy, assets, or layouts.
+
+Verification run:
+
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+- `git diff --check`
+- `rg -n "beginPlanGeneration|finishPlanGeneration|completeOnboarding|prepareWorkoutHandoff|generatePlan|onComplete|onStart" ios/STRQ/Views/PlanGenerationView.swift ios/STRQ/Views/PlanRevealView.swift ios/STRQ/ContentView.swift ios/STRQ/ViewModels/AppViewModel.swift`
+- `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:STRQUITests/STRQCoreFlowSnapshotTests/testOnboardingFlowSnapshot -resultBundlePath /tmp/strq-plan-activation-17pro.xcresult CODE_SIGNING_ALLOWED=NO`
+- `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17e' -only-testing:STRQUITests/STRQCoreFlowSnapshotTests/testOnboardingFlowSnapshot -resultBundlePath /tmp/strq-plan-activation-17e.xcresult CODE_SIGNING_ALLOWED=NO`
+
+QA artifacts:
+
+- `08-generation.png`
+- `09-reveal-top.png`
+- `10-reveal-why-fits.png`
+- `11-reveal-lower-cta.png`
+- `12-pre-workout-handoff.png`
+- `13-small-iphone-reveal-top.png`
+
+Intentionally not changed:
+
+- `ios/STRQ/Localizable.xcstrings`
+- `ios/STRQ/ContentView.swift`
+- `ios/STRQ/ViewModels/AppViewModel.swift`
+- `ios/STRQ/Services/PlanGenerator.swift`
+- `ios/STRQ/Services/WorkoutController.swift`
+- Models, persistence, analytics, routing, schemas, paywall, project files, assets, tests, Watch, Widget, and Live Activity files.
+
+Pending work:
+
+- None for this slice.
+
+Warnings:
+
+- Visual QA found and fixed a Plan Generation phase text crossfade overlap and a deep-scrolled Plan Reveal status-bar readability issue.
+- Screenshot capture required a temporary UI-test-only harness adjustment to bypass the stale empty-name CTA assertion and add Plan Reveal scroll/Handoff captures. The UI test file was restored and is not part of this slice.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
