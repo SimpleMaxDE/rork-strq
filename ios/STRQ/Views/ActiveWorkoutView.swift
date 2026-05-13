@@ -204,7 +204,7 @@ struct ActiveWorkoutView: View {
 
     private func workoutHeader(_ workout: ActiveWorkoutState) -> some View {
         let total = workout.session.exerciseLogs.count
-        let done = workout.session.exerciseLogs.filter(\.isCompleted).count
+        let currentExercise = total > 0 ? min(max(workout.currentExerciseIndex + 1, 1), total) : 0
         return HStack(alignment: .center, spacing: 10) {
             Button { showExitDialog = true } label: {
                 Image(systemName: "chevron.down")
@@ -229,24 +229,27 @@ struct ActiveWorkoutView: View {
                     .foregroundStyle(STRQPalette.textPrimary)
                     .contentTransition(.numericText())
             }
-            .layoutPriority(1)
+            .layoutPriority(0)
 
             Spacer(minLength: 8)
 
             Button { showExerciseList = true } label: {
-                HStack(spacing: 6) {
-                    Text("\(done)/\(total)")
+                HStack(spacing: 0) {
+                    Text(L10n.format("EX %d/%d", currentExercise, total))
                         .font(.system(size: 12, weight: .heavy, design: .rounded).monospacedDigit())
-                    Image(systemName: "list.bullet")
-                        .font(.system(size: 11, weight: .bold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.76)
                 }
                 .foregroundStyle(.white.opacity(0.78))
-                .padding(.horizontal, 10)
+                .padding(.horizontal, 9)
                 .frame(height: 34)
                 .background(Color.white.opacity(0.055), in: Capsule())
                 .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
             }
             .buttonStyle(.strqPressable)
+            .accessibilityLabel(L10n.format("%@ %d/%d", L10n.tr("Exercise"), currentExercise, total))
+            .accessibilityHint(L10n.tr("Opens exercise list"))
+            .layoutPriority(1)
 
             Button {
                 finishWorkout()
@@ -267,6 +270,7 @@ struct ActiveWorkoutView: View {
             }
             .buttonStyle(.strqPressable)
             .accessibilityLabel(L10n.tr("Finish workout"))
+            .layoutPriority(1)
         }
         .padding(.horizontal, 14)
         .padding(.top, 28)
