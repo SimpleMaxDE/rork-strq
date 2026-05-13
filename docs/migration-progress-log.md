@@ -4053,6 +4053,66 @@ Warnings:
 - Visual QA found and fixed a Plan Generation phase text crossfade overlap and a deep-scrolled Plan Reveal status-bar readability issue.
 - Screenshot capture required a temporary UI-test-only harness adjustment to bypass the stale empty-name CTA assertion and add Plan Reveal scroll/Handoff captures. The UI test file was restored and is not part of this slice.
 
+## 2026-05-13 - Monetization And Paywall Strategy
+
+Scope:
+
+- Created a docs-only STRQ premium monetization and paywall strategy.
+- Chose the recommended V1 approach: hybrid free activation plus Pro upgrade after the user has seen value.
+- Kept the slice planning-only with no Swift, RevenueCat, paywall logic, asset, localization, or behavior changes.
+
+Files changed:
+
+- `docs/strq-monetization-paywall-strategy.md`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Licensed Source Mode, read-only: `11604:62728`, `11611:134946`, `9129:207997`, `11603:111144`, `11603:112700`, `11604:59713`, `11604:63115`, `11604:63236`, `11604:63410`, `11604:63724`, `11604:64200`, `11604:64937`, and `11604:66184`.
+- Adapted dark metric density, completion/readiness pacing, Progress primitives, and detail/evidence hierarchy.
+- Did not copy source branding, source copy, exact layouts, assets, or unsupported health claims.
+
+Code inspected:
+
+- `ios/STRQ/Views/OnboardingView.swift`
+- `ios/STRQ/Views/PlanGenerationView.swift`
+- `ios/STRQ/Views/PlanRevealView.swift`
+- `ios/STRQ/Views/DashboardView.swift`
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `ios/STRQ/Views/ProgressV5ProductionCandidateView.swift`
+- `ios/STRQ/Views/ActiveWorkoutView.swift`
+- `ios/STRQ/Views/STRQPaywallView.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/ViewModels/StoreViewModel.swift`
+- `ios/STRQ/STRQApp.swift`
+
+Verification run:
+
+- `git status --short --branch`
+- `git diff --name-only`
+- `git diff -- docs/strq-monetization-paywall-strategy.md docs/migration-progress-log.md`
+- `git diff --name-only -- ios ios/STRQWidget ios/STRQWatch`
+- `rg -n "RevenueCat|Paywall|Free|Pro|entitlement|restore|subscription|Training Map|Licensed Source Mode" docs/strq-monetization-paywall-strategy.md`
+- `git diff --check`
+
+Intentionally not changed:
+
+- Swift files.
+- RevenueCat integration.
+- Paywall placement or purchase logic.
+- Entitlement gates.
+- Assets, fonts, Localizable files, project files, tests, widgets, watch targets, analytics, persistence, onboarding, active workout, plan generation, Progress, Profile, and Training Map runtime behavior.
+
+Pending work:
+
+- Owner approval of the Free vs Pro boundary.
+- Owner approval of the first contextual paywall moment.
+- Future RevenueCat architecture implementation only after monetization strategy is accepted.
+
+Warnings:
+
+- No xcodebuild or screenshot QA was run because this was a docs-only planning slice.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
