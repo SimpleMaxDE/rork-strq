@@ -19,6 +19,11 @@ final class STRQUITestsLaunchTests: XCTestCase {
 
     @MainActor
     func testLaunch() throws {
+        try XCTSkipUnless(
+            ProcessInfo.processInfo.environment["STRQ_CAPTURE_LAUNCH_SCREEN"] == "1",
+            "Launch screenshot test is opt-in."
+        )
+
         let app = XCUIApplication()
         app.launch()
 

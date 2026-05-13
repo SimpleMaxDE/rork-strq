@@ -39,6 +39,17 @@
                ReferencedContainer = "container:STRQ.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "105FC5922E9EAD3200EA8BCF"
+               BuildableName = "STRQUITests.xctest"
+               BlueprintName = "STRQUITests"
+               ReferencedContainer = "container:STRQ.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

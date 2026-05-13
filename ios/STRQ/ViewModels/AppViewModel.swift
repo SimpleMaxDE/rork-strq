@@ -109,6 +109,12 @@ class AppViewModel {
         self._continuityCoordinator = ContinuityCoordinator(vm: self)
         self._reminderWidgetCoordinator = ReminderWidgetCoordinator(vm: self)
 
+        #if DEBUG
+        if installUITestFixtureIfRequested() {
+            return
+        }
+        #endif
+
         let legacyOnboardingFlag = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
 
         if let saved = persistence.load() {

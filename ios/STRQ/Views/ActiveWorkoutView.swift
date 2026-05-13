@@ -191,6 +191,7 @@ struct ActiveWorkoutView: View {
             .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.6), trigger: setCompletedTrigger)
             .sensoryFeedback(.success, trigger: swapFeedbackTrigger)
             .sensoryFeedback(.success, trigger: workoutCompletedTrigger)
+            .accessibilityIdentifier("strq.active-workout.root")
         }
     }
 
@@ -616,7 +617,8 @@ struct ActiveWorkoutView: View {
                                     unit: isBodyweight ? L10n.tr("kg added") : "kg"
                                 )
                             },
-                            plateMath: plateMathLabel(weight: setLog.weight, exercise: exerciseForIncrement)
+                            plateMath: plateMathLabel(weight: setLog.weight, exercise: exerciseForIncrement),
+                            valueAccessibilityIdentifier: "strq.active-workout.weight-value"
                         )
                         .frame(maxWidth: .infinity)
 
@@ -644,7 +646,8 @@ struct ActiveWorkoutView: View {
                                     unit: L10n.tr("reps")
                                 )
                             },
-                            plateMath: nil
+                            plateMath: nil,
+                            valueAccessibilityIdentifier: "strq.active-workout.reps-value"
                         )
                         .frame(maxWidth: .infinity)
                     }
@@ -684,6 +687,7 @@ struct ActiveWorkoutView: View {
                     }
                     .buttonStyle(.strqPressable)
                     .disabled(!canLogSet)
+                    .accessibilityIdentifier("strq.active-workout.log-set")
                     .accessibilityHint(canLogSet ? "" : L10n.tr("Add reps to log this set."))
 
                     if !canLogSet {
@@ -848,7 +852,8 @@ struct ActiveWorkoutView: View {
         onMinus: @escaping (Double?) -> Void,
         onPlus: @escaping (Double?) -> Void,
         onTapValue: @escaping () -> Void,
-        plateMath: String?
+        plateMath: String?,
+        valueAccessibilityIdentifier: String? = nil
     ) -> some View {
         VStack(spacing: 6) {
             Text(label)
@@ -871,6 +876,7 @@ struct ActiveWorkoutView: View {
                         .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier(valueAccessibilityIdentifier ?? "")
                 stepperButton(icon: "plus", disabled: false, onTap: { onPlus(nil) }, onLongStep: { onPlus(5) })
             }
 
@@ -1905,6 +1911,7 @@ struct ActiveWorkoutView: View {
         }
         .buttonStyle(.strqPressable)
         .accessibilityLabel(L10n.tr("Continue workout now"))
+        .accessibilityIdentifier("strq.active-workout.rest-continue")
     }
 
     private func restTimerAdjustmentButton(title: String, action: @escaping () -> Void) -> some View {
@@ -2617,6 +2624,7 @@ private struct NumericInputSheet: View {
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.primary)
                     .focused($focused)
+                    .accessibilityIdentifier("strq.active-workout.numeric-input")
 
                 HStack(spacing: 12) {
                     Button(L10n.tr("Cancel")) { dismiss() }

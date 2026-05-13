@@ -24,15 +24,16 @@ final class STRQUITests: XCTestCase {
 
     @MainActor
     func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        throw XCTSkip("Placeholder UI test. Use STRQCoreFlowSnapshotTests for flow snapshots.")
     }
 
     @MainActor
     func testLaunchPerformance() throws {
+        try XCTSkipUnless(
+            ProcessInfo.processInfo.environment["STRQ_RUN_UI_PERFORMANCE_TEST"] == "1",
+            "Launch performance UI test is opt-in."
+        )
+
         // This measures how long it takes to launch your application.
         measure(metrics: [XCTApplicationLaunchMetric()]) {
             XCUIApplication().launch()

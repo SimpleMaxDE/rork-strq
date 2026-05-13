@@ -84,6 +84,7 @@ struct PreWorkoutHandoffView: View {
                         .background(Color.white.opacity(0.065), in: Circle())
                         .overlay(Circle().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
                 }
+                .accessibilityIdentifier("strq.handoff.cancel")
                 Spacer()
                 if briefing.hasCoachAdjustment {
                     HStack(spacing: 5) {
@@ -418,6 +419,7 @@ struct PreWorkoutHandoffView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("strq.handoff.exercise.\(index)")
             }
         }
         .opacity(appeared ? 1 : 0)
@@ -527,6 +529,7 @@ struct PreWorkoutHandoffView: View {
                 )
                 .shadow(color: Color.white.opacity(0.10), radius: 16, y: 5)
             }
+            .accessibilityIdentifier("strq.handoff.start")
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
             .background(STRQPalette.backgroundPrimary)

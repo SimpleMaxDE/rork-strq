@@ -144,12 +144,12 @@ struct STRQTabBar: View {
     @Binding var selectedTab: Int
     let hasWorkoutToday: Bool
 
-    private let items: [(icon: String, labelKey: LocalizedStringKey, index: Int)] = [
-        ("house.fill", "Today", 0),
-        ("brain.head.profile.fill", "Coach", 1),
-        ("bolt.fill", "Train", 2),
-        ("chart.line.uptrend.xyaxis", "Progress", 3),
-        ("person.fill", "Profile", 4),
+    private let items: [(icon: String, labelKey: LocalizedStringKey, index: Int, identifier: String)] = [
+        ("house.fill", "Today", 0, "strq.tab.today"),
+        ("brain.head.profile.fill", "Coach", 1, "strq.tab.coach"),
+        ("bolt.fill", "Train", 2, "strq.tab.train"),
+        ("chart.line.uptrend.xyaxis", "Progress", 3, "strq.tab.progress"),
+        ("person.fill", "Profile", 4, "strq.tab.profile"),
     ]
 
     var body: some View {
@@ -172,7 +172,7 @@ struct STRQTabBar: View {
         }
     }
 
-    private func regularTab(_ item: (icon: String, labelKey: LocalizedStringKey, index: Int)) -> some View {
+    private func regularTab(_ item: (icon: String, labelKey: LocalizedStringKey, index: Int, identifier: String)) -> some View {
         let isSelected = selectedTab == item.index
 
         return Button {
@@ -190,9 +190,10 @@ struct STRQTabBar: View {
             .frame(height: 44)
         }
         .sensoryFeedback(.selection, trigger: selectedTab)
+        .accessibilityIdentifier(item.identifier)
     }
 
-    private func centerTrainTab(_ item: (icon: String, labelKey: LocalizedStringKey, index: Int)) -> some View {
+    private func centerTrainTab(_ item: (icon: String, labelKey: LocalizedStringKey, index: Int, identifier: String)) -> some View {
         let isSelected = selectedTab == item.index
 
         return Button {
@@ -230,5 +231,6 @@ struct STRQTabBar: View {
             .frame(maxWidth: .infinity)
         }
         .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.4), trigger: selectedTab)
+        .accessibilityIdentifier(item.identifier)
     }
 }

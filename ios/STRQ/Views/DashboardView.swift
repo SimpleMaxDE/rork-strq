@@ -374,12 +374,14 @@ struct DashboardView: View {
                 STRQPrimaryCTA(icon: "sparkles", title: L10n.tr("Start Workout 1")) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
+                .accessibilityIdentifier("strq.today.start-workout")
             }
         case .resumeWorkout:
             if let day = vm.todaysWorkout {
                 STRQPrimaryCTA(icon: "play.fill", title: L10n.tr("Resume Workout")) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
+                .accessibilityIdentifier("strq.today.start-workout")
             }
         default:
             EmptyView()
@@ -824,6 +826,7 @@ struct DashboardView: View {
                         todaySecondaryCTA(icon: "bolt.fill", title: L10n.tr("Start Workout")) {
                             vm.prepareWorkoutHandoff(day: day)
                         }
+                        .accessibilityIdentifier("strq.today.start-workout")
                     }
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
@@ -835,6 +838,7 @@ struct DashboardView: View {
                     ) {
                         vm.prepareWorkoutHandoff(day: day)
                     }
+                    .accessibilityIdentifier("strq.today.start-workout")
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
                 }
