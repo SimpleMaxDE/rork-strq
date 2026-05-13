@@ -67,6 +67,7 @@ struct STRQPaywallView: View {
                     .frame(width: 32, height: 32)
                     .background(.ultraThinMaterial, in: Circle())
             }
+            .accessibilityIdentifier("strq.pro-preview.close")
             .padding(16)
         }
         .onAppear { store.error = nil }
@@ -131,6 +132,7 @@ struct STRQPaywallView: View {
             .padding(.horizontal, 24)
         }
         .scrollIndicators(.hidden)
+        .accessibilityIdentifier("strq.pro-preview.scroll")
     }
 
     // MARK: - Hero
@@ -726,6 +728,7 @@ struct STRQPaywallView: View {
                 .font(.caption.weight(.medium))
                 .foregroundStyle(.secondary)
         }
+        .accessibilityIdentifier("strq.pro-preview.restore")
     }
 
     private var legalText: some View {

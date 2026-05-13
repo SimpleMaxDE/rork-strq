@@ -499,6 +499,7 @@ struct ProfileView: View {
                             .shadow(color: proAccent.opacity(0.28), radius: 4, y: 1)
                     }
                 }
+                .accessibilityIdentifier("strq.profile.pro-preview-card")
                 .buttonStyle(.plain)
             }
         }

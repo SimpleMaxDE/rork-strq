@@ -4215,6 +4215,61 @@ Warnings:
 - The current store remains a stub with no live products; this slice is copy-only.
 - New Profile copy strings rely on the existing `L10n.tr` fallback behavior because localization catalog edits were outside scope.
 
+## 2026-05-14 - STRQ Pro Preview Screenshot QA Harness
+
+Scope:
+
+- Added a focused opt-in UI screenshot harness for the accepted STRQ Pro Preview flow.
+- Captured Profile entry, Pro Preview top/lower/footer states, dismiss return, and small-iPhone top viewport.
+- Added stable accessibility identifiers only for the Pro Preview card, preview scroll view, close button, and restore button.
+
+Files changed:
+
+- `ios/STRQUITests/STRQProPreviewSnapshotTests.swift`
+- `scripts/qa/capture_strq_pro_preview.sh`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Views/STRQPaywallView.swift`
+- `docs/qa/strq-pro-preview-snapshot-2026-05-13/`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- Not needed. This pass captured accepted implementation QA screenshots without changing the visual direction.
+
+Code inspected:
+
+- `scripts/qa/capture_strq_core_flow.sh`
+- `scripts/qa/capture_strq_onboarding_v2.sh`
+- `ios/STRQUITests/STRQCoreFlowSnapshotTests.swift`
+- `ios/STRQUITests/STRQUITests.swift`
+- `ios/STRQUITests/STRQUITestsLaunchTests.swift`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Views/STRQPaywallView.swift`
+
+Verification run:
+
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' CODE_SIGNING_ALLOWED=NO build`
+- `scripts/qa/capture_strq_pro_preview.sh docs/qa/strq-pro-preview-snapshot-2026-05-13`
+- `git status --short`
+- `git diff --name-only`
+- `git diff -- scripts/qa ios/STRQUITests ios/STRQ/Views/ProfileView.swift ios/STRQ/Views/STRQPaywallView.swift docs/qa/strq-pro-preview-snapshot-2026-05-13 docs/migration-progress-log.md`
+- `rg -n "Pro Preview|STRQ Pro|Paywall|restore|RevenueCat|purchase|entitlement|Profile" ios/STRQUITests scripts/qa ios/STRQ/Views/ProfileView.swift ios/STRQ/Views/STRQPaywallView.swift docs/qa/strq-pro-preview-snapshot-2026-05-13`
+- `git diff --name-only -- ios/STRQ/ViewModels/StoreViewModel.swift ios/STRQ/Services ios/STRQ/Models ios/STRQ/ContentView.swift ios/STRQ/Localizable.xcstrings ios/STRQ/Assets.xcassets ios/STRQ.xcodeproj ios/STRQWidget ios/STRQWatch`
+- `git diff --check`
+
+Intentionally not changed:
+
+- `StoreViewModel`, RevenueCat/store files, entitlement logic, purchase logic, restore logic, app routing, models, services, analytics, persistence, assets, localization catalogs, project files, onboarding, plan, workout, Progress behavior, Widget, and Watch code.
+
+Pending work:
+
+- Keep the Pro Preview screenshot harness opt-in and run it before future monetization-surface copy or visual changes.
+
+Warnings:
+
+- The README records the base `HEAD` at capture time; the artifacts were generated from the working tree that became the QA commit.
+- The small iPhone pass captures the top Pro Preview viewport only.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
