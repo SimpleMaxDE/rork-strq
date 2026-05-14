@@ -4330,6 +4330,50 @@ Warnings:
 - Fetched offerings are intentionally not exposed through the Paywall UI yet.
 - Restore remains visible but unavailable until a separate restore implementation is approved.
 
+## 2026-05-14 - RevenueCat Purchase Restore Core
+
+Scope:
+
+- Implemented RevenueCat Slice C as a backend/view-model integration slice only.
+- Added purchase and restore APIs to `SubscriptionService`.
+- Added RevenueCat-backed purchase and restore handling that maps returned CustomerInfo entitlement `pro` into STRQ subscription state.
+- Connected `StoreViewModel` purchase/restore state handling, analytics, cancellation handling, and calm restore messages.
+
+Files changed:
+
+- `ios/STRQ/ViewModels/StoreViewModel.swift`
+- `ios/STRQ/Services/SubscriptionService.swift`
+- `ios/STRQ/Services/RevenueCatSubscriptionService.swift`
+- `ios/STRQTests/STRQTests.swift`
+- `docs/migration-progress-log.md`
+
+Implementation:
+
+- Resolves STRQ package metadata back to a RevenueCat package by matching package identifier and product identifier from Offering `default` or current Offering.
+- Calls RevenueCat purchase and restore APIs, then maps CustomerInfo to `StoreViewModel.isPro`.
+- Treats purchase cancellation as a non-failure with no user-facing error.
+- Keeps restore live-capable and transparent: active entitlement shows restored, inactive entitlement shows no active subscriptions.
+
+Intentionally not changed:
+
+- No visible purchase flow.
+- No live package cards, live prices, Subscribe CTA, or Trial CTA.
+- No DEBUG purchase test screen, hidden purchase button, debug overlay, or temporary UI route.
+- No feature gates, onboarding gates, first plan/workout gates, core logging gates, basic Progress gates, or Training Map gates.
+- No Paywall UI enablement; the Pro Preview remains preview-only.
+
+Verification completed:
+
+- `git diff --check`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+- `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:STRQTests/StoreViewModelTests CODE_SIGNING_ALLOWED=NO`
+- `scripts/qa/capture_strq_pro_preview.sh docs/qa/strq-pro-preview-snapshot-2026-05-13`
+- All commands passed. Snapshot QA artifacts were regenerated during verification, reviewed as non-semantic capture noise, and left out of the commit.
+
+Deferred:
+
+- Visible RevenueCat Test Store or Apple sandbox purchase-sheet QA belongs to the later live purchase UI slice.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

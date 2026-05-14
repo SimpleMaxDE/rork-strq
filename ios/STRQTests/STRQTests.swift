@@ -489,15 +489,25 @@ struct StoreViewModelTests {
         var isConfigured: Bool
         var customerInfoResult: Result<SubscriptionCustomerSnapshot, Error>
         var offeringsResult: Result<SubscriptionOffering?, Error>
+        var purchaseResult: Result<SubscriptionPurchaseResult, Error>
+        var restoreResult: Result<SubscriptionCustomerSnapshot, Error>
+        var purchaseCallCount = 0
+        var restoreCallCount = 0
 
         init(
             isConfigured: Bool = false,
             customerInfoResult: Result<SubscriptionCustomerSnapshot, Error> = .success(SubscriptionCustomerSnapshot(isPro: false)),
-            offeringsResult: Result<SubscriptionOffering?, Error> = .success(nil)
+            offeringsResult: Result<SubscriptionOffering?, Error> = .success(nil),
+            purchaseResult: Result<SubscriptionPurchaseResult, Error> = .success(
+                SubscriptionPurchaseResult(snapshot: SubscriptionCustomerSnapshot(isPro: false), userCancelled: false)
+            ),
+            restoreResult: Result<SubscriptionCustomerSnapshot, Error> = .success(SubscriptionCustomerSnapshot(isPro: false))
         ) {
             self.isConfigured = isConfigured
             self.customerInfoResult = customerInfoResult
             self.offeringsResult = offeringsResult
+            self.purchaseResult = purchaseResult
+            self.restoreResult = restoreResult
         }
 
         func customerInfo() async throws -> SubscriptionCustomerSnapshot {
@@ -506,6 +516,16 @@ struct StoreViewModelTests {
 
         func offerings() async throws -> SubscriptionOffering? {
             try offeringsResult.get()
+        }
+
+        func purchase(package: SubscriptionPackage) async throws -> SubscriptionPurchaseResult {
+            purchaseCallCount += 1
+            return try purchaseResult.get()
+        }
+
+        func restorePurchases() async throws -> SubscriptionCustomerSnapshot {
+            restoreCallCount += 1
+            return try restoreResult.get()
         }
     }
 
@@ -626,24 +646,139 @@ struct StoreViewModelTests {
         #expect(store.error == L10n.tr("Subscription products are temporarily unavailable."))
     }
 
-    @Test func restoreInUnconfiguredEnvSetsMessage() async {
+    @Test func purchaseAndRestoreInUnconfiguredEnvDoNotCallService() async {
         let service = FakeSubscriptionService(isConfigured: false)
         let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
 
+        await store.purchase(package: makePackage(identifier: "$rc_monthly", productIdentifier: "com.strq.pro.monthly"))
+        #expect(store.error == L10n.tr("Subscriptions are not available in this environment."))
+
         await store.restore()
 
         #expect(store.restoreMessage == L10n.tr("Subscriptions are not available in this environment."))
+        #expect(store.error == nil)
+        #expect(store.isPurchasing == false)
+        #expect(store.isRestoring == false)
+        #expect(service.purchaseCallCount == 0)
+        #expect(service.restoreCallCount == 0)
     }
 
-    @Test func purchaseAndRestoreRemainUnavailableStubs() async {
-        let service = FakeSubscriptionService(isConfigured: true)
+    @Test func purchaseSuccessWithActiveEntitlementMarksStorePro() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            purchaseResult: .success(
+                SubscriptionPurchaseResult(snapshot: SubscriptionCustomerSnapshot(isPro: true), userCancelled: false)
+            )
+        )
         let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
 
         await store.purchase(package: makePackage(identifier: "$rc_monthly", productIdentifier: "com.strq.pro.monthly"))
+
+        #expect(store.isPro == true)
+        #expect(store.error == nil)
+        #expect(store.isPurchasing == false)
+        #expect(service.purchaseCallCount == 1)
+    }
+
+    @Test func purchaseSuccessWithoutActiveEntitlementKeepsStoreFree() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            purchaseResult: .success(
+                SubscriptionPurchaseResult(snapshot: SubscriptionCustomerSnapshot(isPro: false), userCancelled: false)
+            )
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.purchase(package: makePackage(identifier: "$rc_monthly", productIdentifier: "com.strq.pro.monthly"))
+
+        #expect(store.isPro == false)
+        #expect(store.error == nil)
+        #expect(store.isPurchasing == false)
+        #expect(service.purchaseCallCount == 1)
+    }
+
+    @Test func purchaseCancellationDoesNotShowErrorOrChangeProState() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            purchaseResult: .success(
+                SubscriptionPurchaseResult(snapshot: SubscriptionCustomerSnapshot(isPro: false), userCancelled: true)
+            )
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+        store.isPro = true
+        store.error = L10n.tr("Subscription status is temporarily unavailable.")
+
+        await store.purchase(package: makePackage(identifier: "$rc_monthly", productIdentifier: "com.strq.pro.monthly"))
+
+        #expect(store.isPro == true)
+        #expect(store.error == nil)
+        #expect(store.isPurchasing == false)
+        #expect(service.purchaseCallCount == 1)
+    }
+
+    @Test func purchaseFailurePreservesProStateAndShowsCalmError() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            purchaseResult: .failure(FakeSubscriptionError.failed)
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+        store.isPro = true
+
+        await store.purchase(package: makePackage(identifier: "$rc_monthly", productIdentifier: "com.strq.pro.monthly"))
+
+        #expect(store.isPro == true)
+        #expect(store.error == L10n.tr("Subscription status is temporarily unavailable."))
+        #expect(store.isPurchasing == false)
+        #expect(service.purchaseCallCount == 1)
+    }
+
+    @Test func restoreSuccessWithActiveEntitlementMarksStorePro() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            restoreResult: .success(SubscriptionCustomerSnapshot(isPro: true))
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
         await store.restore()
 
-        #expect(store.error == L10n.tr("Subscriptions are not available in this environment."))
-        #expect(store.restoreMessage == L10n.tr("Subscriptions are not available in this environment."))
+        #expect(store.isPro == true)
+        #expect(store.restoreMessage == L10n.tr("Purchases restored successfully."))
+        #expect(store.error == nil)
+        #expect(store.isRestoring == false)
+        #expect(service.restoreCallCount == 1)
+    }
+
+    @Test func restoreSuccessWithoutActiveEntitlementKeepsStoreFree() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            restoreResult: .success(SubscriptionCustomerSnapshot(isPro: false))
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.restore()
+
+        #expect(store.isPro == false)
+        #expect(store.restoreMessage == L10n.tr("No active subscriptions found."))
+        #expect(store.error == nil)
+        #expect(store.isRestoring == false)
+        #expect(service.restoreCallCount == 1)
+    }
+
+    @Test func restoreFailurePreservesProStateAndShowsCalmError() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            restoreResult: .failure(FakeSubscriptionError.failed)
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+        store.isPro = true
+
+        await store.restore()
+
+        #expect(store.isPro == true)
+        #expect(store.restoreMessage == nil)
+        #expect(store.error == L10n.tr("Subscription status is temporarily unavailable."))
+        #expect(store.isRestoring == false)
+        #expect(service.restoreCallCount == 1)
     }
 }
 

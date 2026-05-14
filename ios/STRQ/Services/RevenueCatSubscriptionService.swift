@@ -21,8 +21,7 @@ struct RevenueCatSubscriptionService: SubscriptionService {
         }
 
         let customerInfo = try await Purchases.shared.customerInfo()
-        let isPro = customerInfo.entitlements[Self.proEntitlementIdentifier]?.isActive == true
-        return SubscriptionCustomerSnapshot(isPro: isPro)
+        return Self.mapCustomerInfo(customerInfo)
     }
 
     func offerings() async throws -> SubscriptionOffering? {
@@ -37,8 +36,64 @@ struct RevenueCatSubscriptionService: SubscriptionService {
         return Self.mapOffering(offering)
     }
 
+    func purchase(package requestedPackage: SubscriptionPackage) async throws -> SubscriptionPurchaseResult {
+        guard Self.isSDKConfigured else {
+            throw SubscriptionServiceError.notConfigured
+        }
+
+        guard let package = try await revenueCatPackage(matching: requestedPackage) else {
+            throw SubscriptionServiceError.packageUnavailable
+        }
+
+        do {
+            let result = try await Purchases.shared.purchase(package: package)
+            return SubscriptionPurchaseResult(
+                snapshot: Self.mapCustomerInfo(result.customerInfo),
+                userCancelled: result.userCancelled
+            )
+        } catch {
+            if Self.isPurchaseCancellation(error) {
+                throw SubscriptionServiceError.purchaseCancelled
+            }
+            throw SubscriptionServiceError.purchaseFailed
+        }
+    }
+
+    func restorePurchases() async throws -> SubscriptionCustomerSnapshot {
+        guard Self.isSDKConfigured else {
+            throw SubscriptionServiceError.notConfigured
+        }
+
+        do {
+            let customerInfo = try await Purchases.shared.restorePurchases()
+            return Self.mapCustomerInfo(customerInfo)
+        } catch {
+            throw SubscriptionServiceError.restoreFailed
+        }
+    }
+
+    private func revenueCatPackage(matching requestedPackage: SubscriptionPackage) async throws -> Package? {
+        let offerings = try await Purchases.shared.offerings()
+        let matchingOfferings = [
+            offerings.offering(identifier: Self.defaultOfferingIdentifier),
+            offerings.current
+        ].compactMap { $0 }
+
+        return matchingOfferings
+            .flatMap(\.availablePackages)
+            .first { package in
+                package.identifier == requestedPackage.identifier
+                    && package.storeProduct.productIdentifier == requestedPackage.storeProduct.productIdentifier
+            }
+    }
+
     private static func mapOffering(_ offering: Offering) -> SubscriptionOffering {
         SubscriptionOffering(availablePackages: offering.availablePackages.map(mapPackage))
+    }
+
+    private static func mapCustomerInfo(_ customerInfo: CustomerInfo) -> SubscriptionCustomerSnapshot {
+        let isPro = customerInfo.entitlements[proEntitlementIdentifier]?.isActive == true
+        return SubscriptionCustomerSnapshot(isPro: isPro)
     }
 
     private static func mapPackage(_ package: Package) -> SubscriptionPackage {
@@ -83,5 +138,10 @@ struct RevenueCatSubscriptionService: SubscriptionService {
         @unknown default:
             return nil
         }
+    }
+
+    private static func isPurchaseCancellation(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        return ErrorCode(rawValue: nsError.code) == .purchaseCancelledError
     }
 }
