@@ -47,17 +47,20 @@ struct TrainingPlanView: View {
                         } label: {
                             Label(L10n.tr("Edit Workout"), systemImage: "slider.horizontal.3")
                         }
+                        .accessibilityIdentifier("strq.train.menu.edit-workout")
                     }
                     Button {
                         showScheduleEditor = true
                     } label: {
                         Label(L10n.tr("Schedule"), systemImage: "calendar.badge.clock")
                     }
+                    .accessibilityIdentifier("strq.train.menu.schedule")
                     Button {
                         showLibrary = true
                     } label: {
                         Label(L10n.tr("Exercise Library"), systemImage: "books.vertical.fill")
                     }
+                    .accessibilityIdentifier("strq.train.menu.exercise-library")
                     Divider()
                     Button {
                         Analytics.shared.track(.regenerate_plan_dialog_opened, ["surface": "train"])
@@ -65,9 +68,12 @@ struct TrainingPlanView: View {
                     } label: {
                         Label(L10n.tr("profile.regeneratePlan", fallback: "Regenerate Plan"), systemImage: "arrow.triangle.2.circlepath")
                     }
+                    .accessibilityIdentifier("strq.train.menu.regenerate-plan")
                 } label: {
                     Image(systemName: "ellipsis.circle").font(.body)
                 }
+                .accessibilityLabel(L10n.tr("Train options"))
+                .accessibilityIdentifier("strq.train.menu")
             }
         }
         .planRegenerationFlow(vm: vm, isPresented: $showPlanRegenerationDialog)
@@ -220,6 +226,7 @@ struct TrainingPlanView: View {
         .contentMargins(.horizontal, 16)
         .scrollIndicators(.hidden)
         .padding(.top, 12)
+        .accessibilityIdentifier("strq.train.day-selector")
     }
 
     private func daySelectorPill(index: Int, day: WorkoutDay) -> some View {
@@ -277,6 +284,7 @@ struct TrainingPlanView: View {
             .opacity(isSkipped ? 0.6 : 1)
         }
         .sensoryFeedback(.selection, trigger: selectedDayIndex)
+        .accessibilityIdentifier("strq.train.day.\(index)")
     }
 
     // MARK: - Day Content

@@ -1129,7 +1129,8 @@ struct DashboardView: View {
                         label: L10n.tr("Protein"),
                         value: "\(Int(vm.todayProteinProgress * 100))%",
                         progress: vm.todayProteinProgress,
-                        color: STRQPalette.signalGreen
+                        color: STRQPalette.signalGreen,
+                        accessibilityIdentifier: "strq.today.signal.protein"
                     ) {
                         showNutritionLog = true
                     }
@@ -1140,7 +1141,8 @@ struct DashboardView: View {
                     label: L10n.tr("Sleep"),
                     value: String(format: "%.1fh", vm.averageSleepHours),
                     progress: min(1.0, vm.averageSleepHours / 8.0),
-                    color: ForgeTheme.sleepColor(for: vm.averageSleepHours)
+                    color: ForgeTheme.sleepColor(for: vm.averageSleepHours),
+                    accessibilityIdentifier: "strq.today.signal.sleep"
                 ) {
                     showSleepLog = true
                 }
@@ -1151,7 +1153,8 @@ struct DashboardView: View {
                         label: L10n.tr("Weight"),
                         value: vm.latestWeight.map { String(format: "%.1f", $0) } ?? "—",
                         progress: vm.latestWeight != nil ? 1.0 : 0.0,
-                        color: STRQPalette.steel
+                        color: STRQPalette.steel,
+                        accessibilityIdentifier: "strq.today.signal.weight"
                     ) {
                         showWeightLog = true
                     }
@@ -1190,6 +1193,7 @@ struct DashboardView: View {
                     )
                 }
                 .buttonStyle(.strqPressable)
+                .accessibilityIdentifier("strq.today.weekly-review")
             }
         }
         .opacity(appeared ? 1 : 0)
@@ -1197,7 +1201,15 @@ struct DashboardView: View {
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.1), value: appeared)
     }
 
-    private func signalButton(icon: String, label: String, value: String, progress: Double, color: Color, action: @escaping () -> Void) -> some View {
+    private func signalButton(
+        icon: String,
+        label: String,
+        value: String,
+        progress: Double,
+        color: Color,
+        accessibilityIdentifier: String,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
             STRQMetricTile(
                 value: value,
@@ -1209,6 +1221,7 @@ struct DashboardView: View {
             )
         }
         .buttonStyle(.strqPressable)
+        .accessibilityIdentifier(accessibilityIdentifier)
     }
 
     // MARK: - Week Pulse

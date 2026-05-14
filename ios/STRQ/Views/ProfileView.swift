@@ -231,6 +231,7 @@ struct ProfileView: View {
                 )
             }
         }
+        .accessibilityIdentifier("strq.profile.account")
     }
 
     private func proPillarChip(icon: String, label: String) -> some View {
@@ -399,6 +400,7 @@ struct ProfileView: View {
                         .padding(.horizontal, 14)
                         .padding(.vertical, 11)
                     }
+                    .accessibilityIdentifier("strq.profile.manage-subscription")
                 }
                 .background(
                     LinearGradient(
@@ -504,6 +506,7 @@ struct ProfileView: View {
             }
         }
         .manageSubscriptionsSheet(isPresented: $showManageSubscription)
+        .accessibilityIdentifier("strq.profile.subscription")
     }
 
     // MARK: - Header
@@ -546,6 +549,7 @@ struct ProfileView: View {
             Spacer()
         }
         .padding(.top, 4)
+        .accessibilityIdentifier("strq.profile.header")
     }
 
     // MARK: - Fitness Identity
@@ -692,6 +696,7 @@ struct ProfileView: View {
                 .scrollIndicators(.hidden)
             }
         }
+        .accessibilityIdentifier("strq.profile.training-setup")
     }
 
     // MARK: - Body & Nutrition
@@ -725,13 +730,16 @@ struct ProfileView: View {
                     bodyNutritionActionButton(title: L10n.tr("Edit Targets"), systemIcon: "slider.horizontal.3") {
                         showNutritionSettings = true
                     }
+                    .accessibilityIdentifier("strq.profile.nutrition-settings")
                 }
 
                 bodyNutritionActionButton(title: L10n.tr("Sleep Log"), systemIcon: "moon.zzz.fill") {
                     showSleepLog = true
                 }
+                .accessibilityIdentifier("strq.profile.sleep-log")
             }
         }
+        .accessibilityIdentifier("strq.profile.body-nutrition")
     }
 
     private var trackingToggleCard: some View {
@@ -844,6 +852,7 @@ struct ProfileView: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("strq.profile.coaching-style")
     }
 
     private func coachingStyleSummary(_ items: [(symbol: String, label: String)]) -> String {
@@ -861,6 +870,7 @@ struct ProfileView: View {
                 } label: {
                     controlsListRowContent(L10n.tr("Notifications"), icon: .bell, opticalEmphasis: .notifications)
                 }
+                .accessibilityIdentifier("strq.profile.notifications")
                 controlsListButtonRow(L10n.tr("Restore Purchases"), icon: .repeatAction) {
                     guard store.isConfigured else {
                         store.restoreMessage = L10n.tr("Subscriptions are not available in this environment.")
@@ -872,6 +882,7 @@ struct ProfileView: View {
                         showRestoreMessage = true
                     }
                 }
+                .accessibilityIdentifier("strq.profile.restore-purchases")
                 controlsListButtonRow(
                     L10n.tr("profile.regeneratePlan", fallback: "Regenerate Plan"),
                     icon: .repeatAction,
@@ -880,6 +891,7 @@ struct ProfileView: View {
                     Analytics.shared.track(.regenerate_plan_dialog_opened, ["surface": "profile"])
                     showPlanRegenerationDialog = true
                 }
+                .accessibilityIdentifier("strq.profile.regenerate-plan")
                 #if DEBUG
                 NavigationLink {
                     ProgressV5ProductionCandidateView(vm: vm)
@@ -892,11 +904,13 @@ struct ProfileView: View {
                         showsDivider: true
                     )
                 }
+                .accessibilityIdentifier("strq.profile.training-map-preview")
                 NavigationLink {
                     STRQDesignSystemPreviewView()
                 } label: {
                     controlsListSymbolRowContent("Design System Lab", systemIcon: "paintpalette.fill", showsDivider: false)
                 }
+                .accessibilityIdentifier("strq.profile.design-system-lab")
                 #endif
             }
             .buttonStyle(.plain)
@@ -907,6 +921,7 @@ struct ProfileView: View {
                     .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
             )
         }
+        .accessibilityIdentifier("strq.profile.controls")
     }
 
     private var footerSection: some View {
@@ -947,6 +962,7 @@ struct ProfileView: View {
                 controlRow(L10n.tr("Reset All Data"), icon: "trash.fill", color: .red) {
                     showResetAlert = true
                 }
+                .accessibilityIdentifier("strq.profile.reset-all-data")
             }
             .buttonStyle(.plain)
             .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
@@ -956,6 +972,7 @@ struct ProfileView: View {
                     .strokeBorder(Color.red.opacity(0.26), lineWidth: 1)
             )
         }
+        .accessibilityIdentifier("strq.profile.danger")
     }
 
     private var profileHeaderSummary: String {

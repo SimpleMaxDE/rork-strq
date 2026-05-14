@@ -26,6 +26,7 @@ struct ProgressV5ProductionCandidateView: View {
             .padding(.top, STRQSpacing.lg)
             .padding(.bottom, STRQSpacing.tabBarHeight + STRQSpacing.xxxl)
         }
+        .accessibilityIdentifier("strq.training-map.scroll")
         .background(TrainingProgressStyle.background.ignoresSafeArea())
         .navigationTitle("Training Map")
         .navigationBarTitleDisplayMode(.inline)
@@ -52,6 +53,7 @@ struct ProgressV5ProductionCandidateView: View {
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 8)
+        .accessibilityIdentifier("strq.training-map.header")
     }
 
     private func trainingMap(_ snapshot: TrainingProgressSnapshot) -> some View {
@@ -278,6 +280,7 @@ struct ProgressV5ProductionCandidateView: View {
                 .background(TrainingProgressStyle.panel, in: .rect(cornerRadius: STRQRadii.md))
             }
         }
+        .accessibilityIdentifier("strq.training-map.map")
     }
 
     private func nextUnlock(_ snapshot: TrainingProgressSnapshot) -> some View {
@@ -325,6 +328,7 @@ struct ProgressV5ProductionCandidateView: View {
                 }
             }
         }
+        .accessibilityIdentifier("strq.training-map.evidence")
     }
 
     private var emptyEvidence: some View {
@@ -440,6 +444,7 @@ struct ProgressV5ProductionCandidateView: View {
                 }
             }
         }
+        .accessibilityIdentifier("strq.training-map.signal-readiness")
     }
 
     private func analyticsDoorway(_ snapshot: TrainingProgressSnapshot) -> some View {

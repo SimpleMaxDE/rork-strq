@@ -371,6 +371,7 @@ struct ExerciseLibraryView: View {
             }
             .padding(.bottom, 32)
         }
+        .accessibilityIdentifier("strq.exercise-library.scroll")
         .background(STRQPalette.backgroundPrimary.ignoresSafeArea())
         .navigationTitle(L10n.tr("Exercise Library"))
         .navigationBarTitleDisplayMode(.large)
@@ -432,6 +433,7 @@ struct ExerciseLibraryView: View {
                 .submitLabel(.search)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
+                .accessibilityIdentifier("strq.exercise-library.search")
 
             if !searchText.isEmpty {
                 Button {
@@ -444,6 +446,7 @@ struct ExerciseLibraryView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(L10n.tr("Clear"))
+                .accessibilityIdentifier("strq.exercise-library.search.clear")
             }
         }
         .padding(.horizontal, 14)
@@ -959,6 +962,7 @@ struct ExerciseLibraryView: View {
                         .background(isActive ? STRQBrand.steel : STRQPalette.surfaceRaised, in: Capsule())
                         .overlay(Capsule().strokeBorder(isActive ? Color.clear : STRQPalette.borderSubtle, lineWidth: 1))
                     }
+                    .accessibilityIdentifier("strq.exercise-library.filters")
 
                     Menu {
                         Button(L10n.tr("All Patterns")) { selectedPattern = nil }
@@ -984,6 +988,7 @@ struct ExerciseLibraryView: View {
                         .background(isActive ? STRQBrand.steel : STRQPalette.surfaceRaised, in: Capsule())
                         .overlay(Capsule().strokeBorder(isActive ? Color.clear : STRQPalette.borderSubtle, lineWidth: 1))
                     }
+                    .accessibilityIdentifier("strq.exercise-library.pattern-menu")
 
                     ForEach(MuscleRegion.allCases) { region in
                         Menu {
@@ -1002,6 +1007,7 @@ struct ExerciseLibraryView: View {
                                 .background(isActive ? STRQBrand.steel : STRQPalette.surfaceRaised, in: Capsule())
                                 .overlay(Capsule().strokeBorder(isActive ? Color.clear : STRQPalette.borderSubtle, lineWidth: 1))
                         }
+                        .accessibilityIdentifier("strq.exercise-library.region.\(region.rawValue)")
                     }
 
                     Button {
@@ -1019,6 +1025,7 @@ struct ExerciseLibraryView: View {
                         .background(favoritesOnly ? STRQBrand.steel : STRQPalette.surfaceRaised, in: Capsule())
                         .overlay(Capsule().strokeBorder(favoritesOnly ? Color.clear : STRQPalette.borderSubtle, lineWidth: 1))
                     }
+                    .accessibilityIdentifier("strq.exercise-library.favorites")
                 }
             }
             .contentMargins(.horizontal, 16)
@@ -1029,6 +1036,7 @@ struct ExerciseLibraryView: View {
             }
         }
         .padding(.top, 12)
+        .accessibilityIdentifier("strq.exercise-library.filter-chips")
     }
 
     private var activeFilterSummary: some View {
@@ -1093,6 +1101,7 @@ struct ExerciseLibraryView: View {
                 }
                 .font(.caption.weight(.medium))
                 .foregroundStyle(STRQBrand.steel)
+                .accessibilityIdentifier("strq.exercise-library.clear-all")
             }
         }
         .padding(.horizontal, 16)
@@ -1157,6 +1166,7 @@ struct ExerciseLibraryView: View {
                 }
             }
             .padding(.top, 4)
+            .accessibilityIdentifier("strq.exercise-library.results")
         }
     }
 
@@ -1269,11 +1279,13 @@ struct ExerciseLibraryView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(L10n.tr("Done")) { showFilters = false }
                         .fontWeight(.semibold)
+                        .accessibilityIdentifier("strq.exercise-library.filters.done")
                 }
             }
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .accessibilityIdentifier("strq.exercise-library.filter-sheet")
     }
 
     @ViewBuilder
@@ -1464,6 +1476,7 @@ struct ExerciseCard: View {
                         .frame(width: 26, height: 26)
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("strq.exercise-card.favorite.\(exercise.id)")
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 10, weight: .bold))
@@ -1474,6 +1487,7 @@ struct ExerciseCard: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("strq.exercise-card.\(exercise.id)")
     }
 
     private var exerciseAccentColor: Color {

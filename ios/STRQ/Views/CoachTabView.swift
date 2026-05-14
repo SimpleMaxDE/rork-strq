@@ -75,6 +75,7 @@ struct CoachTabView: View {
             .padding(.top, 6)
             .padding(.bottom, 32)
         }
+        .accessibilityIdentifier("strq.coach.scroll")
         .background(Color(.systemBackground))
         .navigationTitle(L10n.tr("Coach"))
         .navigationBarTitleDisplayMode(.large)
