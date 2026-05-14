@@ -10,15 +10,7 @@ struct STRQApp: App {
 
     init() {
         STRQFontRegistrar.registerBundledFonts()
-
-        if StoreViewModel.hasRevenueCatKeys {
-            print("[STRQ] RevenueCat keys are present, but the SDK is omitted from this preview build")
-            ErrorReporter.shared.breadcrumb("RevenueCat SDK omitted from preview build", category: "subscription")
-        } else {
-            print("[STRQ] RevenueCat API key not configured — skipping initialization")
-            ErrorReporter.shared.breadcrumb("RevenueCat not configured", category: "subscription")
-        }
-
+        RevenueCatConfiguration.configureIfPossible()
         EnvironmentValidator.validateAndLog()
     }
 

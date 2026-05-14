@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4317AC2A324142BB9E033A87 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 23A049D533F048BD8E08031C /* RevenueCat */; };
 		XX5FBFA462C5DE5C3E750DXX /* STRQWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = XXC14A59B473A9FEE6F8FEXX /* STRQWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		XX8451EF78AEA171966CE9XX /* STRQWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = XXCFEF158FDFEC6E487025XX /* STRQWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -113,6 +114,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4317AC2A324142BB9E033A87 /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +211,7 @@
 			);
 			name = STRQ;
 			packageProductDependencies = (
+				23A049D533F048BD8E08031C /* RevenueCat */,
 			);
 			productName = STRQ;
 			productReference = 105FC57A2E9EAD3100EA8BCF /* STRQ.app */;
@@ -347,6 +350,7 @@
 				XX2044DAD7C2C197A8FE84XX /* STRQWatch */,
 			);
 			packageReferences = (
+				7BB2ED8C877D40709F01912D /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 			);
 		};
 /* End PBXProject section */
@@ -890,6 +894,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7BB2ED8C877D40709F01912D /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		23A049D533F048BD8E08031C /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7BB2ED8C877D40709F01912D /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 	};
 	rootObject = 105FC5722E9EAD3100EA8BCF /* Project object */;
