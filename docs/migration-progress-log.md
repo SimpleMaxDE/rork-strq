@@ -4418,6 +4418,63 @@ Verification planned:
 - `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:STRQUITests/STRQProPreviewSnapshotTests CODE_SIGNING_ALLOWED=NO`
 - `scripts/qa/capture_strq_pro_preview.sh docs/qa/strq-pro-package-preview-d1-2026-05-14`
 
+## 2026-05-14 - RevenueCat App Store Product Readiness Gate
+
+Scope:
+
+- Added the official docs-only readiness gate before RevenueCat D2 purchase UI enablement.
+- Documented current STRQ subscription state, expected RevenueCat/App Store identifiers, RevenueCat dashboard setup, App Store Connect setup, sandbox/TestFlight test coverage, restore verification, compliance copy, and D2 go/no-go criteria.
+- Explicitly kept D2 purchase UI blocked until RevenueCat Dashboard, App Store Connect products, Sandbox/TestFlight, restore, compliance copy, and paywall screenshots are verified.
+
+Files changed:
+
+- `docs/revenuecat-app-store-product-readiness-checklist.md`
+- `docs/migration-progress-log.md`
+
+Official references inspected:
+
+- RevenueCat Configuring Products, Entitlements, Offerings, Test Store, Sandbox Testing, Launch Checklist, and Connect Apps And Web Providers docs.
+- Apple Auto-renewable Subscriptions, App Review Guidelines 3.1.2, App Store Connect subscription setup, In-App Purchase metadata/status/submission, sandbox, and TestFlight IAP docs.
+
+Implementation:
+
+- Created a single source-of-truth readiness checklist for the D2 gate.
+- Locked the documented product contract to entitlement `pro`, offering `default`, monthly product `com.strq.pro.monthly`, and yearly product `com.strq.pro.yearly`.
+- Recorded that `STRQPaywallView` remains preview/package-preview only and that no purchase sheet may start from UI before the gate passes.
+
+Verification run:
+
+- `git diff --check`
+- `rg -n "pro|default|com\\.strq\\.pro\\.monthly|com\\.strq\\.pro\\.yearly|D2|Test Store|sandbox|App Review" docs/revenuecat-app-store-product-readiness-checklist.md`
+- `git diff --name-only -- ios/STRQ ios/STRQTests ios/STRQUITests ios/STRQ.xcodeproj scripts`
+- `git status --short`
+
+Intentionally not changed:
+
+- No Swift files.
+- No tests.
+- No scripts.
+- No Xcode project files.
+- No assets.
+- No localization files.
+- No config or environment files.
+- No RevenueCat runtime behavior.
+- No purchase UI enablement.
+- No feature gates.
+
+Pending work:
+
+- RevenueCat Dashboard product/entitlement/offering validation.
+- App Store Connect product metadata, review screenshot, and review notes validation.
+- DEBUG Test Store purchase-path validation.
+- Real Apple sandbox/TestFlight purchase and restore validation with the iOS SDK key.
+- Separate D2 implementation slice only after this gate passes.
+
+Warnings:
+
+- This checklist is the official gate before enabling real purchase UI.
+- D2 must remain blocked until every external setup and QA item in the checklist is verified.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
