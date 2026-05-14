@@ -69,15 +69,267 @@ struct ExerciseLibraryView: View {
         if favoritesOnly {
             results = results.filter { vm.favoriteExerciseIds.contains($0.id) }
         }
+        if !searchText.isEmpty {
+            results = rankedSearchResults(results, query: searchText)
+        }
         return results
     }
 
     private var groupedExercises: [(MuscleGroup, [Exercise])] {
-        let grouped = Dictionary(grouping: filteredExercises) { $0.primaryMuscle }
+        let exercises = filteredExercises
+        if !searchText.isEmpty {
+            return groupedInResultOrder(exercises)
+        }
+        let grouped = Dictionary(grouping: exercises) { $0.primaryMuscle }
         return MuscleGroup.allCases.compactMap { muscle in
             guard let exercises = grouped[muscle], !exercises.isEmpty else { return nil }
             return (muscle, exercises)
         }
+    }
+
+    private func groupedInResultOrder(_ exercises: [Exercise]) -> [(MuscleGroup, [Exercise])] {
+        var orderedMuscles: [MuscleGroup] = []
+        var grouped: [MuscleGroup: [Exercise]] = [:]
+
+        for exercise in exercises {
+            if grouped[exercise.primaryMuscle] == nil {
+                orderedMuscles.append(exercise.primaryMuscle)
+                grouped[exercise.primaryMuscle] = []
+            }
+            grouped[exercise.primaryMuscle]?.append(exercise)
+        }
+
+        return orderedMuscles.compactMap { muscle in
+            guard let exercises = grouped[muscle], !exercises.isEmpty else { return nil }
+            return (muscle, exercises)
+        }
+    }
+
+    private func rankedSearchResults(_ exercises: [Exercise], query: String) -> [Exercise] {
+        let normalizedQuery = normalizedSearchText(query)
+        let terms = searchTerms(in: normalizedQuery)
+
+        let ranked = exercises.map { exercise in
+            (
+                exercise: exercise,
+                score: searchRankScore(for: exercise, query: normalizedQuery, terms: terms)
+            )
+        }
+
+        return ranked.sorted { lhs, rhs in
+            if lhs.score != rhs.score {
+                return lhs.score > rhs.score
+            }
+
+            let lhsImported = isImportedExercise(lhs.exercise)
+            let rhsImported = isImportedExercise(rhs.exercise)
+            if lhsImported != rhsImported {
+                return !lhsImported
+            }
+
+            let nameOrder = lhs.exercise.name.localizedStandardCompare(rhs.exercise.name)
+            if nameOrder != .orderedSame {
+                return nameOrder == .orderedAscending
+            }
+
+            return lhs.exercise.id < rhs.exercise.id
+        }
+        .map { $0.exercise }
+    }
+
+    private func searchRankScore(for exercise: Exercise, query: String, terms: [String]) -> Int {
+        guard !query.isEmpty else { return 0 }
+
+        let name = normalizedSearchText(exercise.name)
+        let nameTokens = Set(searchTerms(in: name))
+        var score = 0
+
+        if name == query {
+            score += 900
+        }
+        if name.hasPrefix(query) {
+            score += 520
+        }
+        if terms.allSatisfy({ nameTokens.contains($0) }) {
+            score += 420
+        } else if terms.allSatisfy({ name.contains($0) }) {
+            score += 140
+        }
+        score += termScore(terms, in: name, tokens: nameTokens, exactWeight: 54, containsWeight: 12)
+
+        if !isImportedExercise(exercise) {
+            score += 620
+        }
+
+        score += muscleScore(for: exercise, terms: terms)
+        score += movementPatternScore(for: exercise, terms: terms)
+        score += equipmentScore(for: exercise, terms: terms)
+        score += tagScore(for: exercise, terms: terms)
+        score += commonDiscoveryScore(for: exercise, terms: terms, name: name, nameTokens: nameTokens)
+
+        if exercise.progressionLevel == .standard {
+            score += 24
+        }
+        if !exercise.instructions.isEmpty {
+            score += 20
+        }
+        if !exercise.cues.isEmpty {
+            score += 10
+        }
+        if !exercise.commonMistakes.isEmpty {
+            score += 8
+        }
+        if exercise.isBeginnerFriendly {
+            score += 18
+        }
+        if exercise.isJointFriendly {
+            score += 8
+        }
+        if exercise.difficulty == .beginner {
+            score += 10
+        }
+        if vm.favoriteExerciseIds.contains(exercise.id) {
+            score += 12
+        }
+
+        return score
+    }
+
+    private func commonDiscoveryScore(for exercise: Exercise, terms: [String], name: String, nameTokens: Set<String>) -> Int {
+        guard terms.count == 1, let term = terms.first else { return 0 }
+
+        switch term {
+        case "bench":
+            var score = 0
+            if name.contains("bench press") { score += 380 }
+            if exercise.primaryMuscle == .chest { score += 190 }
+            if exercise.category == .compound { score += 80 }
+            return score
+        case "squat":
+            var score = 0
+            if exercise.movementPattern == .squat { score += 180 }
+            if exercise.primaryMuscle == .quads || exercise.primaryMuscle == .glutes { score += 130 }
+            if exercise.category == .compound { score += 70 }
+            return score
+        case "row":
+            var score = 0
+            if nameTokens.contains("row") { score += 220 }
+            if exercise.movementPattern == .horizontalPull { score += 180 }
+            if exercise.primaryMuscle == .back || exercise.primaryMuscle == .lats { score += 140 }
+            if exercise.category == .compound { score += 60 }
+            return score
+        case "deadlift":
+            var score = 0
+            if nameTokens.contains("deadlift") { score += 260 }
+            if exercise.movementPattern == .hipHinge { score += 180 }
+            if exercise.primaryMuscle == .hamstrings || exercise.primaryMuscle == .glutes || exercise.primaryMuscle == .lowerBack { score += 120 }
+            if exercise.category == .compound { score += 70 }
+            return score
+        case "shoulder", "shoulders":
+            var score = 0
+            if exercise.primaryMuscle == .shoulders { score += 700 }
+            if name.contains("shoulder press") { score += 140 }
+            if exercise.movementPattern == .verticalPush { score += 150 }
+            return score
+        case "chest":
+            var score = 0
+            if exercise.primaryMuscle == .chest { score += 700 }
+            if exercise.movementPattern == .horizontalPush { score += 180 }
+            if exercise.category == .compound { score += 80 }
+            return score
+        case "leg", "legs":
+            var score = 0
+            if exercise.primaryMuscle.region == .lower { score += 520 }
+            if exercise.category == .compound { score += 80 }
+            return score
+        case "core", "abs":
+            var score = 0
+            if exercise.primaryMuscle.region == .core { score += 520 }
+            if exercise.isBeginnerFriendly { score += 40 }
+            return score
+        default:
+            return 0
+        }
+    }
+
+    private func muscleScore(for exercise: Exercise, terms: [String]) -> Int {
+        var score = 0
+        let primaryNames = [
+            exercise.primaryMuscle.rawValue,
+            exercise.primaryMuscle.displayName,
+            exercise.primaryMuscle.localizedDisplayName
+        ]
+
+        for name in primaryNames {
+            let normalized = normalizedSearchText(name)
+            score += termScore(terms, in: normalized, tokens: Set(searchTerms(in: normalized)), exactWeight: 74, containsWeight: 24)
+        }
+
+        for muscle in exercise.secondaryMuscles {
+            let normalized = normalizedSearchText(muscle.displayName)
+            score += termScore(terms, in: normalized, tokens: Set(searchTerms(in: normalized)), exactWeight: 32, containsWeight: 10)
+        }
+
+        if terms.contains("leg") || terms.contains("legs") {
+            score += exercise.primaryMuscle.region == .lower ? 70 : 0
+        }
+        if terms.contains("core") || terms.contains("abs") {
+            score += exercise.primaryMuscle.region == .core ? 70 : 0
+        }
+
+        return score
+    }
+
+    private func movementPatternScore(for exercise: Exercise, terms: [String]) -> Int {
+        let patternNames = [
+            exercise.movementPattern.rawValue,
+            exercise.movementPattern.displayName
+        ]
+
+        return patternNames.reduce(0) { partial, name in
+            let normalized = normalizedSearchText(name)
+            return partial + termScore(terms, in: normalized, tokens: Set(searchTerms(in: normalized)), exactWeight: 86, containsWeight: 26)
+        }
+    }
+
+    private func equipmentScore(for exercise: Exercise, terms: [String]) -> Int {
+        exercise.equipment.reduce(0) { partial, equipment in
+            let normalized = normalizedSearchText(equipment.displayName)
+            return partial + termScore(terms, in: normalized, tokens: Set(searchTerms(in: normalized)), exactWeight: 24, containsWeight: 8)
+        }
+    }
+
+    private func tagScore(for exercise: Exercise, terms: [String]) -> Int {
+        exercise.tags.reduce(0) { partial, tag in
+            let normalized = normalizedSearchText(tag)
+            return partial + termScore(terms, in: normalized, tokens: Set(searchTerms(in: normalized)), exactWeight: 20, containsWeight: 6)
+        }
+    }
+
+    private func termScore(_ terms: [String], in text: String, tokens: Set<String>, exactWeight: Int, containsWeight: Int) -> Int {
+        terms.reduce(0) { partial, term in
+            if tokens.contains(term) {
+                return partial + exactWeight
+            }
+            if text.contains(term) {
+                return partial + containsWeight
+            }
+            return partial
+        }
+    }
+
+    private func normalizedSearchText(_ text: String) -> String {
+        text
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+            .lowercased()
+    }
+
+    private func searchTerms(in text: String) -> [String] {
+        text.split { !$0.isLetter && !$0.isNumber }.map(String.init)
+    }
+
+    private func isImportedExercise(_ exercise: Exercise) -> Bool {
+        exercise.id.hasPrefix("edb-")
     }
 
     private var featuredExercises: [Exercise] {
