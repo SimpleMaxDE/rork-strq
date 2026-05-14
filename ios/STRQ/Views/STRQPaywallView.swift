@@ -51,7 +51,7 @@ struct STRQPaywallView: View {
                 activeProState
             } else if store.isLoading {
                 loadingState
-            } else if store.currentOffering != nil, !(store.currentOffering?.availablePackages.isEmpty ?? true) {
+            } else if showsLivePurchaseOptions, store.currentOffering != nil, !(store.currentOffering?.availablePackages.isEmpty ?? true) {
                 paywallContent
             } else {
                 comingSoonState
@@ -85,6 +85,10 @@ struct STRQPaywallView: View {
                 selectedPackage = monthly
             }
         }
+    }
+
+    private var showsLivePurchaseOptions: Bool {
+        false
     }
 
     // MARK: - Main content

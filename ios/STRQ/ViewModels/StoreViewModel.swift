@@ -41,13 +41,19 @@ struct SubscriptionOffering {
     var annual: SubscriptionPackage? {
         availablePackages.first { package in
             let id = package.identifier.lowercased()
-            return id.contains("annual") || id.contains("year")
+            let productId = package.storeProduct.productIdentifier.lowercased()
+            return id.contains("annual")
+                || id.contains("year")
+                || productId.contains("annual")
+                || productId.contains("year")
         }
     }
 
     var monthly: SubscriptionPackage? {
         availablePackages.first { package in
-            package.identifier.lowercased().contains("month")
+            let id = package.identifier.lowercased()
+            let productId = package.storeProduct.productIdentifier.lowercased()
+            return id.contains("month") || productId.contains("month")
         }
     }
 }
@@ -55,6 +61,9 @@ struct SubscriptionOffering {
 @Observable
 @MainActor
 class StoreViewModel {
+    private let subscriptionService: any SubscriptionService
+    private var fetchedOffering: SubscriptionOffering?
+
     var isPro: Bool = false
     var isLoading: Bool = false
     var isPurchasing: Bool = false
@@ -69,20 +78,79 @@ class StoreViewModel {
     }
 
     nonisolated static var isRevenueCatConfigured: Bool {
-        false
+        RevenueCatSubscriptionService.isSDKConfigured
     }
 
-    init() {
-        isConfigured = Self.isRevenueCatConfigured
+    convenience init() {
+        self.init(subscriptionService: RevenueCatSubscriptionService(), autoRefresh: true)
+    }
+
+    init(subscriptionService: any SubscriptionService, autoRefresh: Bool = true) {
+        self.subscriptionService = subscriptionService
+        isConfigured = subscriptionService.isConfigured
         if Self.hasRevenueCatKeys {
-            ErrorReporter.shared.breadcrumb("RevenueCat keys present but SDK omitted from preview build", category: "subscription")
+            ErrorReporter.shared.breadcrumb("RevenueCat keys present for subscription service", category: "subscription")
+        }
+        if autoRefresh {
+            Task { [weak self] in
+                await self?.refreshStatus()
+                await self?.fetchOfferings()
+            }
         }
     }
 
     func refreshStatus() async {
+        isConfigured = subscriptionService.isConfigured
+        guard isConfigured else {
+            isPro = false
+            error = nil
+            return
+        }
+
+        do {
+            let snapshot = try await subscriptionService.customerInfo()
+            isConfigured = subscriptionService.isConfigured
+            isPro = snapshot.isPro
+            error = nil
+        } catch let serviceError as SubscriptionServiceError where serviceError == .notConfigured {
+            isConfigured = false
+            isPro = false
+            error = nil
+        } catch {
+            isConfigured = subscriptionService.isConfigured
+            self.error = L10n.tr("Subscription status is temporarily unavailable.")
+            ErrorReporter.shared.breadcrumb(
+                "RevenueCat customer info refresh failed",
+                category: "subscription",
+                data: ["error": error.localizedDescription]
+            )
+        }
     }
 
     func fetchOfferings() async {
+        isConfigured = subscriptionService.isConfigured
+        guard isConfigured else {
+            fetchedOffering = nil
+            error = nil
+            return
+        }
+
+        do {
+            fetchedOffering = try await subscriptionService.offerings()
+            error = nil
+        } catch let serviceError as SubscriptionServiceError where serviceError == .notConfigured {
+            isConfigured = false
+            fetchedOffering = nil
+            error = nil
+        } catch {
+            fetchedOffering = nil
+            self.error = L10n.tr("Subscription products are temporarily unavailable.")
+            ErrorReporter.shared.breadcrumb(
+                "RevenueCat offerings fetch failed",
+                category: "subscription",
+                data: ["error": error.localizedDescription]
+            )
+        }
     }
 
     func purchase(package: SubscriptionPackage) async {
@@ -91,7 +159,7 @@ class StoreViewModel {
     }
 
     var productsUnavailable: Bool {
-        true
+        fetchedOffering?.availablePackages.isEmpty ?? true
     }
 
     func restore() async {
@@ -108,14 +176,17 @@ class StoreViewModel {
     }
 
     var currentOffering: SubscriptionOffering? {
+        // Slice B fetches products for readiness only. Keep the paywall preview-only.
         nil
     }
 
     var annualPackage: SubscriptionPackage? {
+        // Live package cards wait for the separate purchase/restore integration slice.
         nil
     }
 
     var monthlyPackage: SubscriptionPackage? {
+        // Live package cards wait for the separate purchase/restore integration slice.
         nil
     }
 }

@@ -4270,6 +4270,66 @@ Warnings:
 - The README records the base `HEAD` at capture time; the artifacts were generated from the working tree that became the QA commit.
 - The small iPhone pass captures the top Pro Preview viewport only.
 
+## 2026-05-14 - RevenueCat Subscription State Service
+
+Scope:
+
+- Implemented RevenueCat Slice B as a conservative state-read layer.
+- Added a `SubscriptionService` abstraction and RevenueCat-backed implementation for CustomerInfo and Offerings reads.
+- Connected `StoreViewModel` to real subscription status and product metadata readiness while keeping the Paywall preview-only.
+
+Files changed:
+
+- `ios/STRQ/ViewModels/StoreViewModel.swift`
+- `ios/STRQ/Services/SubscriptionService.swift`
+- `ios/STRQ/Services/RevenueCatSubscriptionService.swift`
+- `ios/STRQ/Views/STRQPaywallView.swift`
+- `ios/STRQTests/STRQTests.swift`
+- `docs/migration-progress-log.md`
+
+RevenueCat docs inspected:
+
+- CustomerInfo / subscription status
+- Entitlements
+- Offerings
+- Displaying Products
+- Error Handling
+- Restore Purchases
+- RevenueCat Test Store
+- Launch Checklist
+
+Implementation:
+
+- Mapped RevenueCat entitlement `pro` to `StoreViewModel.isPro`.
+- Fetched Offering `default` with current Offering fallback for metadata readiness.
+- Mapped RevenueCat packages into STRQ subscription package/product structs.
+- Preserved purchase and restore as unavailable stubs.
+- Hardened `STRQPaywallView` so live purchase options remain disabled in Slice B even if offerings load.
+
+Intentionally not changed:
+
+- No feature gates.
+- No live prices, package cards, Subscribe CTA, or trial CTA.
+- No purchase integration or restore integration.
+- No onboarding, plan generation, plan reveal, first workout, workout logging, Progress access, exercise basics, routing, persistence, assets, localization catalogs, Watch, Widget, or project setup changes.
+
+Verification run:
+
+- `git diff --check`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+- `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:STRQTests/StoreViewModelTests CODE_SIGNING_ALLOWED=NO`
+- `scripts/qa/capture_strq_pro_preview.sh docs/qa/strq-pro-preview-snapshot-2026-05-13`
+
+Pending work:
+
+- Future purchase/restore integration slice.
+- Future live product display slice after purchase/restore behavior and App Store compliance copy are approved.
+
+Warnings:
+
+- Fetched offerings are intentionally not exposed through the Paywall UI yet.
+- Restore remains visible but unavailable until a separate restore implementation is approved.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

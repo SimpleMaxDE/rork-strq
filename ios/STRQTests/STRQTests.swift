@@ -481,22 +481,169 @@ struct ResetTests {
 @MainActor
 @Suite("StoreViewModel helpers")
 struct StoreViewModelTests {
+    private enum FakeSubscriptionError: Error {
+        case failed
+    }
 
-    @Test func unconfiguredStateIsFree() {
-        let store = StoreViewModel()
-        if !store.isConfigured {
-            #expect(store.subscriptionStatusText == L10n.tr("Free"))
-            #expect(store.subscriptionPlanName == L10n.tr("Free"))
-            #expect(store.isPro == false)
+    private final class FakeSubscriptionService: SubscriptionService {
+        var isConfigured: Bool
+        var customerInfoResult: Result<SubscriptionCustomerSnapshot, Error>
+        var offeringsResult: Result<SubscriptionOffering?, Error>
+
+        init(
+            isConfigured: Bool = false,
+            customerInfoResult: Result<SubscriptionCustomerSnapshot, Error> = .success(SubscriptionCustomerSnapshot(isPro: false)),
+            offeringsResult: Result<SubscriptionOffering?, Error> = .success(nil)
+        ) {
+            self.isConfigured = isConfigured
+            self.customerInfoResult = customerInfoResult
+            self.offeringsResult = offeringsResult
+        }
+
+        func customerInfo() async throws -> SubscriptionCustomerSnapshot {
+            try customerInfoResult.get()
+        }
+
+        func offerings() async throws -> SubscriptionOffering? {
+            try offeringsResult.get()
         }
     }
 
+    private func makePackage(identifier: String, productIdentifier: String) -> SubscriptionPackage {
+        SubscriptionPackage(
+            identifier: identifier,
+            storeProduct: SubscriptionProduct(
+                productIdentifier: productIdentifier,
+                localizedPriceString: "TEST_PRICE",
+                price: NSDecimalNumber(value: 9.99),
+                priceFormatter: nil,
+                currencyCode: "USD",
+                introductoryDiscount: nil
+            )
+        )
+    }
+
+    @Test func unconfiguredStateIsFree() {
+        let service = FakeSubscriptionService(isConfigured: false)
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        #expect(store.isConfigured == false)
+        #expect(store.subscriptionStatusText == L10n.tr("Free"))
+        #expect(store.subscriptionPlanName == L10n.tr("Free"))
+        #expect(store.isPro == false)
+        #expect(store.productsUnavailable == true)
+    }
+
+    @Test func configuredStateWithoutEntitlementRemainsFree() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            customerInfoResult: .success(SubscriptionCustomerSnapshot(isPro: false))
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.refreshStatus()
+
+        #expect(store.isConfigured == true)
+        #expect(store.isPro == false)
+        #expect(store.subscriptionStatusText == L10n.tr("Free"))
+        #expect(store.subscriptionPlanName == L10n.tr("Free"))
+    }
+
+    @Test func activeProEntitlementMarksStorePro() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            customerInfoResult: .success(SubscriptionCustomerSnapshot(isPro: true))
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.refreshStatus()
+
+        #expect(store.isConfigured == true)
+        #expect(store.isPro == true)
+        #expect(store.subscriptionStatusText == L10n.tr("Active"))
+        #expect(store.subscriptionPlanName == L10n.tr("Pro"))
+    }
+
+    @Test func customerInfoFailurePreservesCurrentProState() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            customerInfoResult: .failure(FakeSubscriptionError.failed)
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+        store.isPro = true
+
+        await store.refreshStatus()
+
+        #expect(store.isConfigured == true)
+        #expect(store.isPro == true)
+        #expect(store.error == L10n.tr("Subscription status is temporarily unavailable."))
+    }
+
+    @Test func offeringsCanLoadWithoutExposingPaywallPackages() async {
+        let offering = SubscriptionOffering(
+            availablePackages: [
+                makePackage(identifier: "$rc_monthly", productIdentifier: "com.strq.pro.monthly"),
+                makePackage(identifier: "$rc_annual", productIdentifier: "com.strq.pro.yearly")
+            ]
+        )
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            offeringsResult: .success(offering)
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.fetchOfferings()
+
+        #expect(store.productsUnavailable == false)
+        #expect(store.currentOffering == nil)
+        #expect(store.annualPackage == nil)
+        #expect(store.monthlyPackage == nil)
+    }
+
+    @Test func emptyOfferingsRemainUnavailable() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            offeringsResult: .success(SubscriptionOffering(availablePackages: []))
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.fetchOfferings()
+
+        #expect(store.productsUnavailable == true)
+        #expect(store.currentOffering == nil)
+    }
+
+    @Test func offeringsFailureRemainsUnavailable() async {
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            offeringsResult: .failure(FakeSubscriptionError.failed)
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.fetchOfferings()
+
+        #expect(store.productsUnavailable == true)
+        #expect(store.error == L10n.tr("Subscription products are temporarily unavailable."))
+    }
+
     @Test func restoreInUnconfiguredEnvSetsMessage() async {
-        let store = StoreViewModel()
-        if !store.isConfigured {
-            await store.restore()
-            #expect(store.restoreMessage == L10n.tr("Subscriptions are not available in this environment."))
-        }
+        let service = FakeSubscriptionService(isConfigured: false)
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.restore()
+
+        #expect(store.restoreMessage == L10n.tr("Subscriptions are not available in this environment."))
+    }
+
+    @Test func purchaseAndRestoreRemainUnavailableStubs() async {
+        let service = FakeSubscriptionService(isConfigured: true)
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.purchase(package: makePackage(identifier: "$rc_monthly", productIdentifier: "com.strq.pro.monthly"))
+        await store.restore()
+
+        #expect(store.error == L10n.tr("Subscriptions are not available in this environment."))
+        #expect(store.restoreMessage == L10n.tr("Subscriptions are not available in this environment."))
     }
 }
 
