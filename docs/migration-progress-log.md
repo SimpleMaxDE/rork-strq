@@ -4475,6 +4475,39 @@ Warnings:
 - This checklist is the official gate before enabling real purchase UI.
 - D2 must remain blocked until every external setup and QA item in the checklist is verified.
 
+## 2026-05-14 - STRQ Screen Map Findings
+
+Scope:
+
+- Summarized the committed STRQ Screen Map snapshot output and prioritized actionable QA findings without changing app, test, or script code.
+
+Files changed:
+
+- `docs/qa/strq-screen-map-snapshot-2026-05-14/screen-map-findings.md`
+- `docs/migration-progress-log.md`
+
+Verification run:
+
+- `jq empty docs/qa/strq-screen-map-snapshot-2026-05-14/screen-map.json`
+- `rg -n "Top 20|Forbidden|STRQ Pro Preview|Recommendation|Accessibility" docs/qa/strq-screen-map-snapshot-2026-05-14/screen-map-findings.md`
+- `git diff --check`
+
+Intentionally not changed:
+
+- No Swift files.
+- No scripts.
+- No tests.
+- No app behavior.
+- No accessibility identifiers added in this pass.
+
+Pending work:
+
+- Recommended next slice is safer crawler guardrails and screen-map hygiene before broadening autonomous tapping or adding the prioritized identifier set.
+
+Warnings:
+
+- German Profile restore/regenerate/reset controls were observed and not tapped, but they are not classified as `forbidden` in the exported screen map.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
