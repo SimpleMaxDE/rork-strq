@@ -110,6 +110,7 @@ struct RevenueCatSubscriptionService: SubscriptionService {
             price: product.priceDecimalNumber,
             priceFormatter: product.priceFormatter,
             currencyCode: product.currencyCode,
+            subscriptionPeriod: mapPeriod(product.subscriptionPeriod),
             introductoryDiscount: mapIntroductoryDiscount(product.introductoryDiscount)
         )
     }
@@ -121,8 +122,15 @@ struct RevenueCatSubscriptionService: SubscriptionService {
         }
 
         return SubscriptionIntroductoryDiscount(
+            localizedPriceString: discount.localizedPriceString,
+            paymentMode: mapPaymentMode(discount.paymentMode),
             subscriptionPeriod: SubscriptionPeriod(unit: unit, value: discount.subscriptionPeriod.value)
         )
+    }
+
+    private static func mapPeriod(_ period: RevenueCat.SubscriptionPeriod?) -> SubscriptionPeriod? {
+        guard let period, let unit = mapUnit(period.unit) else { return nil }
+        return SubscriptionPeriod(unit: unit, value: period.value)
     }
 
     private static func mapUnit(_ unit: RevenueCat.SubscriptionPeriod.Unit) -> SubscriptionPeriod.Unit? {
@@ -137,6 +145,19 @@ struct RevenueCatSubscriptionService: SubscriptionService {
             return .year
         @unknown default:
             return nil
+        }
+    }
+
+    private static func mapPaymentMode(_ mode: StoreProductDiscount.PaymentMode) -> SubscriptionIntroductoryDiscount.PaymentMode {
+        switch mode {
+        case .payAsYouGo:
+            return .payAsYouGo
+        case .payUpFront:
+            return .payUpFront
+        case .freeTrial:
+            return .freeTrial
+        @unknown default:
+            return .payUpFront
         }
     }
 

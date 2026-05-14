@@ -6,12 +6,13 @@ struct STRQApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var isFirstLaunch: Bool = !UserDefaults.standard.bool(forKey: "strq_has_launched_before")
     @State private var vm = AppViewModel()
-    @State private var store = StoreViewModel()
+    @State private var store: StoreViewModel
 
     init() {
         STRQFontRegistrar.registerBundledFonts()
         RevenueCatConfiguration.configureIfPossible()
         EnvironmentValidator.validateAndLog()
+        _store = State(initialValue: Self.makeStore())
     }
 
     var body: some Scene {
@@ -46,5 +47,14 @@ struct STRQApp: App {
                 break
             }
         }
+    }
+
+    private static func makeStore() -> StoreViewModel {
+        #if DEBUG
+        if let fixtureStore = STRQSubscriptionFixture.makeStoreIfRequested() {
+            return fixtureStore
+        }
+        #endif
+        return StoreViewModel()
     }
 }

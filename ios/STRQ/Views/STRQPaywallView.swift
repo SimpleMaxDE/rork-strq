@@ -51,7 +51,7 @@ struct STRQPaywallView: View {
                 activeProState
             } else if store.isLoading {
                 loadingState
-            } else if showsLivePurchaseOptions, store.currentOffering != nil, !(store.currentOffering?.availablePackages.isEmpty ?? true) {
+            } else if showsLivePackagePreview {
                 paywallContent
             } else {
                 comingSoonState
@@ -74,21 +74,40 @@ struct STRQPaywallView: View {
         .onChange(of: store.isPro) { _, isPro in
             if isPro { dismiss() }
         }
+        .onChange(of: packageSelectionSignature) { _, _ in
+            selectDefaultPackageIfNeeded()
+        }
         .onChange(of: selectedPackage?.identifier) { _, newId in
             guard let newId else { return }
             Analytics.shared.track(.package_selected, ["package": newId, "source": source])
         }
         .onAppear {
-            if let annual = store.annualPackage {
-                selectedPackage = annual
-            } else if let monthly = store.monthlyPackage {
-                selectedPackage = monthly
-            }
+            selectDefaultPackageIfNeeded()
         }
     }
 
-    private var showsLivePurchaseOptions: Bool {
-        false
+    private var showsLivePackagePreview: Bool {
+        store.isConfigured && !livePackages.isEmpty
+    }
+
+    private var livePackages: [SubscriptionPackage] {
+        [store.annualPackage, store.monthlyPackage].compactMap { $0 }
+    }
+
+    private var packageSelectionSignature: String {
+        livePackages.map { "\($0.identifier):\($0.storeProduct.productIdentifier)" }.joined(separator: "|")
+    }
+
+    private func selectDefaultPackageIfNeeded() {
+        guard !livePackages.isEmpty else {
+            selectedPackage = nil
+            return
+        }
+        if let selectedPackage,
+           livePackages.contains(where: { $0.identifier == selectedPackage.identifier }) {
+            return
+        }
+        selectedPackage = store.annualPackage ?? store.monthlyPackage ?? livePackages.first
     }
 
     // MARK: - Main content
@@ -100,6 +119,10 @@ struct STRQPaywallView: View {
                     .padding(.top, 28)
 
                 Spacer().frame(height: 26)
+
+                freeAccessBlock
+
+                Spacer().frame(height: 22)
 
                 pillarList
 
@@ -517,7 +540,7 @@ struct STRQPaywallView: View {
             HStack(spacing: 6) {
                 Image(systemName: "apple.logo")
                     .font(.system(size: 10, weight: .bold))
-                Text(L10n.tr("Apple shows offer details before purchase"))
+                Text(L10n.tr("Offer details come from Apple product metadata"))
                     .font(.caption2.weight(.semibold))
             }
             .foregroundStyle(.secondary)
@@ -532,8 +555,9 @@ struct STRQPaywallView: View {
                 packageCard(
                     package: annual,
                     title: L10n.tr("Yearly"),
-                    subtitle: annualSubtitle(annual),
-                    trailing: perMonthLine(for: annual),
+                    priceLine: priceLine(for: annual),
+                    detailLine: billingLine(for: annual),
+                    secondaryLine: perMonthLine(for: annual),
                     badge: trialBadge(annual) ?? savingsBadge(),
                     isSelected: selectedPackage?.identifier == annual.identifier
                 )
@@ -542,9 +566,10 @@ struct STRQPaywallView: View {
                 packageCard(
                     package: monthly,
                     title: L10n.tr("Monthly"),
-                    subtitle: L10n.format("%@/month", monthly.storeProduct.localizedPriceString),
-                    trailing: nil,
-                    badge: nil,
+                    priceLine: priceLine(for: monthly),
+                    detailLine: billingLine(for: monthly),
+                    secondaryLine: nil,
+                    badge: trialBadge(monthly),
                     isSelected: selectedPackage?.identifier == monthly.identifier
                 )
             }
@@ -554,6 +579,7 @@ struct STRQPaywallView: View {
     private func savingsBadge() -> String? {
         guard let annual = store.annualPackage,
               let monthly = store.monthlyPackage else { return nil }
+        guard annual.storeProduct.currencyCode == monthly.storeProduct.currencyCode else { return nil }
         let annualPrice = annual.storeProduct.price
         let monthlyPrice = monthly.storeProduct.price
         let monthlyAsYear = monthlyPrice.doubleValue * 12
@@ -563,12 +589,22 @@ struct STRQPaywallView: View {
         return L10n.format("Save %d%%", Int(saved * 100))
     }
 
-    private func annualSubtitle(_ package: SubscriptionPackage) -> String {
-        let price = package.storeProduct.localizedPriceString
-        return L10n.format("%@/year", price)
+    private func priceLine(for package: SubscriptionPackage) -> String {
+        guard let period = package.storeProduct.subscriptionPeriod else {
+            return package.storeProduct.localizedPriceString
+        }
+        return "\(package.storeProduct.localizedPriceString)/\(periodPriceUnit(period))"
+    }
+
+    private func billingLine(for package: SubscriptionPackage) -> String {
+        guard let period = package.storeProduct.subscriptionPeriod else {
+            return L10n.tr("Billing period unavailable")
+        }
+        return L10n.format("Billed %@", billingPeriodName(period))
     }
 
     private func perMonthLine(for package: SubscriptionPackage) -> String? {
+        guard package.storeProduct.subscriptionPeriod?.unit == .year else { return nil }
         let priceValue = package.storeProduct.price.doubleValue
         guard priceValue > 0 else { return nil }
         let monthly = priceValue / 12.0
@@ -586,15 +622,71 @@ struct STRQPaywallView: View {
     private func trialBadge(_ package: SubscriptionPackage) -> String? {
         guard let intro = package.storeProduct.introductoryDiscount else { return nil }
         let period = intro.subscriptionPeriod
-        if period.unit == .day {
-            return L10n.format("%d-day free trial", period.value)
-        } else if period.unit == .week {
-            return L10n.format("%d-week free trial", period.value)
+        switch intro.paymentMode {
+        case .freeTrial:
+            return L10n.format("%@ free trial", introPeriodName(period))
+        case .payAsYouGo, .payUpFront:
+            return L10n.format("%@ intro", intro.localizedPriceString)
         }
-        return L10n.tr("Free trial")
     }
 
-    private func packageCard(package: SubscriptionPackage, title: String, subtitle: String, trailing: String?, badge: String?, isSelected: Bool) -> some View {
+    private func periodPriceUnit(_ period: SubscriptionPeriod) -> String {
+        if period.value == 1 {
+            return singularPeriodUnit(period.unit)
+        }
+        return "\(period.value) \(pluralPeriodUnit(period.unit))"
+    }
+
+    private func billingPeriodName(_ period: SubscriptionPeriod) -> String {
+        if period.value == 1 {
+            switch period.unit {
+            case .day:
+                return L10n.tr("daily")
+            case .week:
+                return L10n.tr("weekly")
+            case .month:
+                return L10n.tr("monthly")
+            case .year:
+                return L10n.tr("yearly")
+            }
+        }
+        return L10n.format("every %@ %@", "\(period.value)", pluralPeriodUnit(period.unit))
+    }
+
+    private func introPeriodName(_ period: SubscriptionPeriod) -> String {
+        if period.value == 1 {
+            return L10n.format("1 %@", singularPeriodUnit(period.unit))
+        }
+        return L10n.format("%d %@", period.value, pluralPeriodUnit(period.unit))
+    }
+
+    private func singularPeriodUnit(_ unit: SubscriptionPeriod.Unit) -> String {
+        switch unit {
+        case .day:
+            return L10n.tr("day")
+        case .week:
+            return L10n.tr("week")
+        case .month:
+            return L10n.tr("month")
+        case .year:
+            return L10n.tr("year")
+        }
+    }
+
+    private func pluralPeriodUnit(_ unit: SubscriptionPeriod.Unit) -> String {
+        switch unit {
+        case .day:
+            return L10n.tr("days")
+        case .week:
+            return L10n.tr("weeks")
+        case .month:
+            return L10n.tr("months")
+        case .year:
+            return L10n.tr("years")
+        }
+    }
+
+    private func packageCard(package: SubscriptionPackage, title: String, priceLine: String, detailLine: String, secondaryLine: String?, badge: String?, isSelected: Bool) -> some View {
         Button {
             withAnimation(.snappy(duration: 0.2)) {
                 selectedPackage = package
@@ -616,6 +708,7 @@ struct STRQPaywallView: View {
                     HStack(spacing: 8) {
                         Text(title)
                             .font(.subheadline.weight(.bold))
+                            .foregroundStyle(.white)
                         if let badge {
                             Text(badge)
                                 .font(.system(size: 10, weight: .bold))
@@ -625,24 +718,30 @@ struct STRQPaywallView: View {
                                 .background(STRQBrand.accentGradient, in: Capsule())
                         }
                     }
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    Text(priceLine)
+                        .font(.system(size: 17, weight: .black).monospacedDigit())
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
+                    Text(detailLine)
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(Color.white.opacity(0.58))
                 }
 
                 Spacer()
 
-                if let trailing {
-                    Text(trailing)
+                if let secondaryLine {
+                    Text(secondaryLine)
                         .font(.system(size: 12, weight: .bold).monospacedDigit())
                         .foregroundStyle(isSelected ? .white : .secondary)
+                        .accessibilityIdentifier("strq.pro-preview.package.secondary-price")
                 }
             }
             .padding(16)
             .background(
                 isSelected
                     ? Color.white.opacity(0.08)
-                    : Color(.secondarySystemGroupedBackground),
+                    : Color.white.opacity(0.045),
                 in: .rect(cornerRadius: 14)
             )
             .overlay(
@@ -653,48 +752,34 @@ struct STRQPaywallView: View {
                     )
             )
         }
+        .accessibilityIdentifier("strq.pro-preview.package.\(title.lowercased())")
     }
 
     // MARK: - Purchase button
 
     private var purchaseButton: some View {
-        Button {
-            guard let pkg = selectedPackage else { return }
-            Task { await store.purchase(package: pkg) }
-        } label: {
-            Group {
-                if store.isPurchasing {
-                    ProgressView()
-                        .tint(.black)
-                } else {
-                    Text(purchaseButtonTitle)
-                        .font(.body.weight(.bold))
-                }
+        Button {} label: {
+            VStack(spacing: 3) {
+                Text(purchaseButtonTitle)
+                    .font(.body.weight(.bold))
+                Text(L10n.tr("Package preview only"))
+                    .font(.caption2.weight(.semibold))
             }
-            .foregroundStyle(.black)
+            .foregroundStyle(Color.white.opacity(0.72))
             .frame(maxWidth: .infinity)
             .frame(height: 54)
-            .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 14))
+            .background(Color.white.opacity(0.055), in: .rect(cornerRadius: 14))
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(Color.white.opacity(0.1))
-                    .frame(height: 27)
-                    .frame(maxWidth: .infinity)
-                    .clipShape(.rect(cornerRadius: 14))
-                    .allowsHitTesting(false)
-                , alignment: .top
+                    .strokeBorder(previewBorder, lineWidth: 1)
             )
-            .shadow(color: .white.opacity(0.08), radius: 12, y: 2)
         }
-        .disabled(selectedPackage == nil || store.isPurchasing)
+        .disabled(true)
+        .accessibilityIdentifier("strq.pro-preview.purchase-disabled")
     }
 
     private var purchaseButtonTitle: String {
-        guard let pkg = selectedPackage else { return L10n.tr("Continue") }
-        if pkg.storeProduct.introductoryDiscount != nil {
-            return L10n.tr("Continue with STRQ Pro")
-        }
-        return L10n.tr("Continue with STRQ Pro")
+        L10n.tr("Purchases not enabled in this build")
     }
 
     private var trustRow: some View {
@@ -728,18 +813,41 @@ struct STRQPaywallView: View {
         Button {
             Task { await store.restore() }
         } label: {
-            Text(L10n.tr("Restore Purchases"))
-                .font(.caption.weight(.medium))
-                .foregroundStyle(.secondary)
+            if store.isRestoring {
+                ProgressView()
+                    .controlSize(.small)
+            } else {
+                Text(L10n.tr("Restore Purchases"))
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+            }
         }
+        .disabled(store.isRestoring)
         .accessibilityIdentifier("strq.pro-preview.restore")
     }
 
     private var legalText: some View {
-        Text(L10n.tr("Apple shows pricing, renewal, and cancellation details before any purchase is confirmed."))
-            .font(.system(size: 9))
-            .foregroundStyle(.quaternary)
-            .multilineTextAlignment(.center)
+        VStack(spacing: 8) {
+            if let message = store.restoreMessage ?? store.error {
+                Text(message)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(Color.white.opacity(0.58))
+                    .multilineTextAlignment(.center)
+            }
+
+            Text(L10n.tr("Subscriptions renew automatically unless canceled at least 24 hours before the end of the current period. Payment is charged to your Apple ID at confirmation. Manage or cancel in App Store settings."))
+                .font(.system(size: 9))
+                .foregroundStyle(.quaternary)
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: 16) {
+                Link(L10n.tr("Terms"), destination: STRQLinks.terms)
+                Text("·").foregroundStyle(.quaternary)
+                Link(L10n.tr("Privacy"), destination: STRQLinks.privacy)
+            }
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(.secondary)
+        }
     }
 
     // MARK: - States
@@ -980,10 +1088,20 @@ struct STRQPaywallView: View {
     }
 
     private var previewFooterText: some View {
-        Text(L10n.tr("Restore remains available from Profile and this preview. Pricing and Apple billing details are not shown because purchases are not active in this build."))
-            .font(.system(size: 9))
-            .foregroundStyle(Color.white.opacity(0.34))
-            .multilineTextAlignment(.center)
+        VStack(spacing: 8) {
+            Text(L10n.tr("Restore remains available from Profile and this preview. Pricing and Apple billing details are not shown because purchases are not active in this build."))
+                .font(.system(size: 9))
+                .foregroundStyle(Color.white.opacity(0.34))
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: 16) {
+                Link(L10n.tr("Terms"), destination: STRQLinks.terms)
+                Text("·").foregroundStyle(.quaternary)
+                Link(L10n.tr("Privacy"), destination: STRQLinks.privacy)
+            }
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(.secondary)
+        }
     }
 
     private var emptyState: some View {

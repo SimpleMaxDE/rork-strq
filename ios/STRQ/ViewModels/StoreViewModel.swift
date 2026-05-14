@@ -14,6 +14,14 @@ struct SubscriptionPeriod {
 }
 
 struct SubscriptionIntroductoryDiscount {
+    enum PaymentMode: Equatable {
+        case payAsYouGo
+        case payUpFront
+        case freeTrial
+    }
+
+    let localizedPriceString: String
+    let paymentMode: PaymentMode
     let subscriptionPeriod: SubscriptionPeriod
 }
 
@@ -23,6 +31,7 @@ struct SubscriptionProduct {
     let price: NSDecimalNumber
     let priceFormatter: NumberFormatter?
     let currencyCode: String?
+    let subscriptionPeriod: SubscriptionPeriod?
     let introductoryDiscount: SubscriptionIntroductoryDiscount?
 }
 
@@ -55,6 +64,26 @@ struct SubscriptionOffering {
             let productId = package.storeProduct.productIdentifier.lowercased()
             return id.contains("month") || productId.contains("month")
         }
+    }
+
+    var displayableForPaywall: SubscriptionOffering {
+        SubscriptionOffering(
+            availablePackages: availablePackages.filter(\.hasDisplayableSubscriptionMetadata)
+        )
+    }
+}
+
+extension SubscriptionPackage {
+    var hasDisplayableSubscriptionMetadata: Bool {
+        storeProduct.hasDisplayableSubscriptionMetadata
+    }
+}
+
+extension SubscriptionProduct {
+    var hasDisplayableSubscriptionMetadata: Bool {
+        !localizedPriceString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && price.doubleValue > 0
+            && subscriptionPeriod != nil
     }
 }
 
@@ -196,7 +225,7 @@ class StoreViewModel {
     }
 
     var productsUnavailable: Bool {
-        fetchedOffering?.availablePackages.isEmpty ?? true
+        currentOffering?.availablePackages.isEmpty ?? true
     }
 
     func restore() async {
@@ -243,18 +272,17 @@ class StoreViewModel {
     }
 
     var currentOffering: SubscriptionOffering? {
-        // Products stay internal until the separate live purchase UI slice.
-        nil
+        let offering = fetchedOffering?.displayableForPaywall
+        guard let offering, !offering.availablePackages.isEmpty else { return nil }
+        return offering
     }
 
     var annualPackage: SubscriptionPackage? {
-        // Live package cards wait for the separate live purchase UI slice.
-        nil
+        currentOffering?.annual
     }
 
     var monthlyPackage: SubscriptionPackage? {
-        // Live package cards wait for the separate live purchase UI slice.
-        nil
+        currentOffering?.monthly
     }
 
     private func purchaseAnalytics(

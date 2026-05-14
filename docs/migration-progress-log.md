@@ -4374,6 +4374,50 @@ Deferred:
 
 - Visible RevenueCat Test Store or Apple sandbox purchase-sheet QA belongs to the later live purchase UI slice.
 
+## 2026-05-14 - RevenueCat Package Preview D1
+
+Scope:
+
+- Implemented RevenueCat Slice D1 as display-only package preview UI.
+- Exposed valid RevenueCat package/product metadata to `STRQPaywallView`.
+- Rendered monthly/yearly package cards with real price, billing period, optional intro/trial metadata, legal links, restore, and Apple billing copy.
+- Kept the primary CTA disabled/internal so no purchase sheet can start from the UI.
+
+Files changed:
+
+- `ios/STRQ/ViewModels/StoreViewModel.swift`
+- `ios/STRQ/Services/RevenueCatSubscriptionService.swift`
+- `ios/STRQ/Views/STRQPaywallView.swift`
+- `ios/STRQ/STRQApp.swift`
+- `ios/STRQ/Debug/STRQSubscriptionFixture.swift`
+- `ios/STRQTests/STRQTests.swift`
+- `ios/STRQUITests/STRQProPreviewSnapshotTests.swift`
+- `scripts/qa/capture_strq_pro_preview.sh`
+- `docs/migration-progress-log.md`
+
+Implementation:
+
+- Added subscription period and introductory payment mode metadata to the app-facing subscription product model.
+- Filtered package exposure to products with displayable price and subscription period metadata.
+- Preserved preview-only behavior for no-key/unconfigured builds.
+- Added a DEBUG package-preview fixture for UI snapshots and an assertion that tapping the disabled D1 CTA does not call purchase.
+
+Intentionally not changed:
+
+- No active Subscribe, Start Trial, or Continue purchase CTA.
+- No purchase sheet from paywall UI.
+- No feature gates.
+- No paywall placement outside Profile.
+- No onboarding, plan, workout, Progress, Training Map, Coach, ContentView, AppViewModel, persistence, HealthKit, widget, watch, asset, project, or config changes.
+
+Verification planned:
+
+- `git diff --check`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+- `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:STRQTests/StoreViewModelTests CODE_SIGNING_ALLOWED=NO`
+- `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:STRQUITests/STRQProPreviewSnapshotTests CODE_SIGNING_ALLOWED=NO`
+- `scripts/qa/capture_strq_pro_preview.sh docs/qa/strq-pro-package-preview-d1-2026-05-14`
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

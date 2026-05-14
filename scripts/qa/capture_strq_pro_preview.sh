@@ -6,7 +6,8 @@ PRIMARY_DEVICE="${STRQ_QA_DEVICE:-iPhone 17 Pro}"
 SMALL_DEVICE="${STRQ_QA_SMALL_DEVICE:-iPhone 17e}"
 PRIMARY_DESTINATION="platform=iOS Simulator,name=${PRIMARY_DEVICE}"
 SMALL_DESTINATION="platform=iOS Simulator,name=${SMALL_DEVICE}"
-OUT_DIR="${1:-${ROOT_DIR}/docs/qa/strq-pro-preview-snapshot-2026-05-13}"
+RUN_DATE="${STRQ_QA_DATE:-$(date +%F)}"
+OUT_DIR="${1:-${ROOT_DIR}/docs/qa/strq-pro-preview-snapshot-${RUN_DATE}}"
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/strq-pro-preview.XXXXXX")"
 CONTROL_FILE="/tmp/strq_capture_pro_preview_enabled"
 BUNDLE_ID="app.rork.40gfu7dywfru7n82xfoy4"
@@ -18,6 +19,8 @@ SCREENSHOTS=(
   "04-pro-preview-footer-restore.png"
   "05-profile-after-dismiss.png"
   "06-small-iphone-pro-preview-top.png"
+  "07-package-preview-live-metadata.png"
+  "08-small-iphone-package-preview-top.png"
 )
 
 cleanup() {
@@ -103,9 +106,11 @@ run_snapshot_test() {
 
 prepare_simulator "${PRIMARY_DEVICE}"
 run_snapshot_test "${PRIMARY_DESTINATION}" "testProPreviewSnapshot" "STRQProPreviewPrimary"
+run_snapshot_test "${PRIMARY_DESTINATION}" "testPackagePreviewShowsLiveMetadataWithoutPurchasing" "STRQProPackagePreviewPrimary"
 
 prepare_simulator "${SMALL_DEVICE}"
 run_snapshot_test "${SMALL_DESTINATION}" "testProPreviewSmallPhoneSnapshot" "STRQProPreviewSmallPhone"
+run_snapshot_test "${SMALL_DESTINATION}" "testPackagePreviewSmallPhoneSnapshot" "STRQProPackagePreviewSmallPhone"
 
 missing=()
 for screenshot in "${SCREENSHOTS[@]}"; do
@@ -191,16 +196,17 @@ try data.write(to: outputURL)
 SWIFT
 
 {
-  echo "# STRQ Pro Preview Snapshot - 2026-05-13"
+  echo "# STRQ Pro Preview Snapshot - ${RUN_DATE}"
   echo
   echo "## Environment"
   echo
-  echo "- Commit SHA tested: \`${COMMIT_SHA}\`"
+  echo "- Base commit SHA at capture: \`${COMMIT_SHA}\`"
+  echo "- Working tree: includes local Slice D1 changes under test"
   echo "- Xcode: ${XCODE_VERSION}"
   echo "- Primary simulator/device: ${PRIMARY_DEVICE}"
   echo "- Small simulator/device: ${SMALL_DEVICE}"
   echo "- Build/test result: \`xcodebuild test passed\`"
-  echo "- Harness: \`STRQProPreviewSnapshotTests.testProPreviewSnapshot\` and \`testProPreviewSmallPhoneSnapshot\`"
+  echo "- Harness: \`STRQProPreviewSnapshotTests.testProPreviewSnapshot\`, \`testPackagePreviewShowsLiveMetadataWithoutPurchasing\`, \`testProPreviewSmallPhoneSnapshot\`, and \`testPackagePreviewSmallPhoneSnapshot\`"
   echo "- Contact sheet: \`contact-sheet.jpg\`"
   echo
   echo "## Screenshots"
@@ -211,10 +217,11 @@ SWIFT
   echo
   echo "## Monetization Guardrails"
   echo
-  echo "- No purchase UI was live in the captured Pro Preview flow."
-  echo "- The XCTest asserts that subscribe, trial, discount, monthly, annual, and price-string UI is absent."
+  echo "- No-key/unconfigured Pro Preview remains preview-only with no live package UI."
+  echo "- The default preview XCTest asserts that subscribe, trial, discount, monthly, annual, and price-string UI is absent."
+  echo "- The package-preview fixture asserts monthly/yearly metadata, legal copy, disabled/internal CTA behavior, and no call to purchase."
   echo "- RevenueCat integration, entitlement behavior, purchase behavior, and restore behavior were not changed by this QA harness."
-  echo "- \`StoreViewModel\` remains the existing stub."
+  echo "- \`StoreViewModel\` exposes display-only packages when valid product metadata is available."
   echo
   echo "## Visual Caveats"
   echo

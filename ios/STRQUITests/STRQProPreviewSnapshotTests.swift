@@ -3,6 +3,7 @@ import XCTest
 @MainActor
 final class STRQProPreviewSnapshotTests: XCTestCase {
     private var app: XCUIApplication!
+    private let purchaseMarkerPath = "/tmp/strq_d1_purchase_called"
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -55,6 +56,41 @@ final class STRQProPreviewSnapshotTests: XCTestCase {
         assertTopPreviewCopy()
         assertNoLivePurchaseUI()
         snapshot("06-small-iphone-pro-preview-top")
+    }
+
+    func testPackagePreviewShowsLiveMetadataWithoutPurchasing() throws {
+        try XCTSkipUnless(
+            FileManager.default.fileExists(atPath: "/tmp/strq_capture_pro_preview_enabled"),
+            "STRQ Pro Preview snapshots are opt-in. Run scripts/qa/capture_strq_pro_preview.sh."
+        )
+
+        try? FileManager.default.removeItem(atPath: purchaseMarkerPath)
+        app.launchArguments += ["-STRQSubscriptionFixture", "packagePreview"]
+        app.launch()
+        openProfile()
+
+        tap(app.buttons["strq.profile.pro-preview-card"], named: "Profile Pro package preview card")
+        waitForLabel(containing: "Yearly", timeout: 8)
+        assertLivePackageMetadata()
+        assertPrimaryCTADoesNotPurchase()
+        snapshot("07-package-preview-live-metadata")
+    }
+
+    func testPackagePreviewSmallPhoneSnapshot() throws {
+        try XCTSkipUnless(
+            FileManager.default.fileExists(atPath: "/tmp/strq_capture_pro_preview_enabled"),
+            "STRQ Pro Preview snapshots are opt-in. Run scripts/qa/capture_strq_pro_preview.sh."
+        )
+
+        try? FileManager.default.removeItem(atPath: purchaseMarkerPath)
+        app.launchArguments += ["-STRQSubscriptionFixture", "packagePreview"]
+        app.launch()
+        openProfile()
+        tap(app.buttons["strq.profile.pro-preview-card"], named: "Profile Pro package preview card on small iPhone")
+        waitForLabel(containing: "Yearly", timeout: 8)
+        assertLivePackageMetadata()
+        assertPrimaryCTADoesNotPurchase()
+        snapshot("08-small-iphone-package-preview-top")
     }
 
     private func configureLaunchArguments() {
@@ -115,6 +151,66 @@ final class STRQProPreviewSnapshotTests: XCTestCase {
                 line: line
             )
         }
+    }
+
+    private func assertLivePackageMetadata(file: StaticString = #filePath, line: UInt = #line) {
+        let joinedLabels = currentLabels().joined(separator: " ")
+        for required in [
+            "Yearly",
+            "Monthly",
+            "$59.99/year",
+            "$8.99/month",
+            "$5.00/mo",
+            "7 days free trial",
+            "Restore Purchases",
+            "Terms",
+            "Privacy",
+            "Payment is charged to your Apple ID",
+            "Manage or cancel in App Store settings",
+            "Purchases not enabled in this build",
+            "Free activation",
+            "First plan free",
+            "First workout free",
+            "Basic Progress free"
+        ] {
+            XCTAssertTrue(
+                joinedLabels.localizedCaseInsensitiveContains(required),
+                "Expected package preview to contain '\(required)'. Current labels: \(joinedLabels)",
+                file: file,
+                line: line
+            )
+        }
+
+        let forbiddenActiveCTAs = [
+            "Subscribe",
+            "Start Trial",
+            "Start Free Trial",
+            "Continue with STRQ Pro"
+        ]
+        for forbidden in forbiddenActiveCTAs {
+            XCTAssertFalse(
+                joinedLabels.localizedCaseInsensitiveContains(forbidden),
+                "Unexpected active purchase CTA '\(forbidden)' found. Current labels: \(joinedLabels)",
+                file: file,
+                line: line
+            )
+        }
+    }
+
+    private func assertPrimaryCTADoesNotPurchase(file: StaticString = #filePath, line: UInt = #line) {
+        let cta = app.buttons["strq.pro-preview.purchase-disabled"]
+        waitFor(cta, timeout: 4)
+        XCTAssertFalse(cta.isEnabled, "D1 primary CTA must remain disabled/internal.", file: file, line: line)
+
+        cta.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        settle(0.8)
+
+        XCTAssertFalse(
+            FileManager.default.fileExists(atPath: purchaseMarkerPath),
+            "Tapping the D1 primary CTA called StoreViewModel.purchase(package:).",
+            file: file,
+            line: line
+        )
     }
 
     private func snapshot(_ name: String) {

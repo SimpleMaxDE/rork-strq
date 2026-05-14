@@ -529,16 +529,25 @@ struct StoreViewModelTests {
         }
     }
 
-    private func makePackage(identifier: String, productIdentifier: String) -> SubscriptionPackage {
+    private func makePackage(
+        identifier: String,
+        productIdentifier: String,
+        localizedPriceString: String = "TEST_PRICE",
+        price: Double = 9.99,
+        currencyCode: String? = "USD",
+        period: SubscriptionPeriod? = SubscriptionPeriod(unit: .month, value: 1),
+        intro: SubscriptionIntroductoryDiscount? = nil
+    ) -> SubscriptionPackage {
         SubscriptionPackage(
             identifier: identifier,
             storeProduct: SubscriptionProduct(
                 productIdentifier: productIdentifier,
-                localizedPriceString: "TEST_PRICE",
-                price: NSDecimalNumber(value: 9.99),
+                localizedPriceString: localizedPriceString,
+                price: NSDecimalNumber(value: price),
                 priceFormatter: nil,
-                currencyCode: "USD",
-                introductoryDiscount: nil
+                currencyCode: currencyCode,
+                subscriptionPeriod: period,
+                introductoryDiscount: intro
             )
         )
     }
@@ -599,11 +608,17 @@ struct StoreViewModelTests {
         #expect(store.error == L10n.tr("Subscription status is temporarily unavailable."))
     }
 
-    @Test func offeringsCanLoadWithoutExposingPaywallPackages() async {
+    @Test func offeringsExposeDisplayablePaywallPackages() async {
         let offering = SubscriptionOffering(
             availablePackages: [
                 makePackage(identifier: "$rc_monthly", productIdentifier: "com.strq.pro.monthly"),
-                makePackage(identifier: "$rc_annual", productIdentifier: "com.strq.pro.yearly")
+                makePackage(
+                    identifier: "$rc_annual",
+                    productIdentifier: "com.strq.pro.yearly",
+                    localizedPriceString: "$59.99",
+                    price: 59.99,
+                    period: SubscriptionPeriod(unit: .year, value: 1)
+                )
             ]
         )
         let service = FakeSubscriptionService(
@@ -615,9 +630,69 @@ struct StoreViewModelTests {
         await store.fetchOfferings()
 
         #expect(store.productsUnavailable == false)
+        #expect(store.currentOffering?.availablePackages.count == 2)
+        #expect(store.annualPackage?.storeProduct.productIdentifier == "com.strq.pro.yearly")
+        #expect(store.monthlyPackage?.storeProduct.productIdentifier == "com.strq.pro.monthly")
+    }
+
+    @Test func offeringsDoNotExposePackagesWithoutDisplayMetadata() async {
+        let offering = SubscriptionOffering(
+            availablePackages: [
+                makePackage(
+                    identifier: "$rc_monthly",
+                    productIdentifier: "com.strq.pro.monthly",
+                    localizedPriceString: "",
+                    period: SubscriptionPeriod(unit: .month, value: 1)
+                ),
+                makePackage(
+                    identifier: "$rc_annual",
+                    productIdentifier: "com.strq.pro.yearly",
+                    localizedPriceString: "$59.99",
+                    price: 59.99,
+                    period: nil
+                )
+            ]
+        )
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            offeringsResult: .success(offering)
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.fetchOfferings()
+
+        #expect(store.productsUnavailable == true)
         #expect(store.currentOffering == nil)
         #expect(store.annualPackage == nil)
         #expect(store.monthlyPackage == nil)
+    }
+
+    @Test func introductoryMetadataPreservesFreeTrialModeOnlyFromProductData() async {
+        let intro = SubscriptionIntroductoryDiscount(
+            localizedPriceString: "$0.00",
+            paymentMode: .freeTrial,
+            subscriptionPeriod: SubscriptionPeriod(unit: .day, value: 7)
+        )
+        let offering = SubscriptionOffering(
+            availablePackages: [
+                makePackage(
+                    identifier: "$rc_monthly",
+                    productIdentifier: "com.strq.pro.monthly",
+                    period: SubscriptionPeriod(unit: .month, value: 1),
+                    intro: intro
+                )
+            ]
+        )
+        let service = FakeSubscriptionService(
+            isConfigured: true,
+            offeringsResult: .success(offering)
+        )
+        let store = StoreViewModel(subscriptionService: service, autoRefresh: false)
+
+        await store.fetchOfferings()
+
+        #expect(store.monthlyPackage?.storeProduct.introductoryDiscount?.paymentMode == .freeTrial)
+        #expect(store.monthlyPackage?.storeProduct.introductoryDiscount?.subscriptionPeriod.value == 7)
     }
 
     @Test func emptyOfferingsRemainUnavailable() async {
