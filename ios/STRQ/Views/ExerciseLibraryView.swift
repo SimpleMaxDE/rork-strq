@@ -18,6 +18,36 @@ struct ExerciseLibraryView: View {
     private let library = ExerciseLibrary.shared
     private let catalog = ExerciseCatalog.shared
 
+    private var hasActiveFilters: Bool {
+        selectedMuscle != nil ||
+        selectedWorld != nil ||
+        selectedPattern != nil ||
+        selectedDifficulty != nil ||
+        bodyweightOnly ||
+        jointFriendlyOnly ||
+        favoritesOnly
+    }
+
+    private var hasActiveQueryOrFilters: Bool {
+        !searchText.isEmpty || hasActiveFilters
+    }
+
+    private var sheetFilterCount: Int {
+        [selectedDifficulty != nil, bodyweightOnly, jointFriendlyOnly].filter { $0 }.count
+    }
+
+    private var activeFilterCount: Int {
+        [
+            selectedMuscle != nil,
+            selectedWorld != nil,
+            selectedPattern != nil,
+            selectedDifficulty != nil,
+            bodyweightOnly,
+            jointFriendlyOnly,
+            favoritesOnly
+        ].filter { $0 }.count
+    }
+
     private var filteredExercises: [Exercise] {
         var results: [Exercise]
         if !searchText.isEmpty {
@@ -72,7 +102,9 @@ struct ExerciseLibraryView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                if searchText.isEmpty && selectedWorld == nil && selectedMuscle == nil && !favoritesOnly {
+                discoveryHeader
+
+                if !hasActiveQueryOrFilters {
                     libraryHero
                     if !progressingExercises.isEmpty || !stalledExercises.isEmpty {
                         yourExercisesSection
@@ -80,17 +112,17 @@ struct ExerciseLibraryView: View {
                 }
 
                 trainingWorldsSection
-                    .padding(.top, searchText.isEmpty && selectedWorld == nil && selectedMuscle == nil && !favoritesOnly ? 8 : 0)
+                    .padding(.top, hasActiveQueryOrFilters ? 10 : 8)
                 filterChips
                 exerciseCountBar
                 exerciseList
             }
             .padding(.bottom, 32)
         }
-        .background(Color(.systemBackground))
-        .searchable(text: $searchText, prompt: L10n.tr("Search exercises, muscles, equipment..."))
+        .background(STRQPalette.backgroundPrimary.ignoresSafeArea())
         .navigationTitle(L10n.tr("Exercise Library"))
         .navigationBarTitleDisplayMode(.large)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .sheet(item: $selectedExercise) { exercise in
             NavigationStack {
                 ExerciseDetailView(exercise: exercise, vm: vm)
@@ -106,6 +138,79 @@ struct ExerciseLibraryView: View {
         }
     }
 
+    private var discoveryHeader: some View {
+        VStack(spacing: 12) {
+            searchField
+
+            if hasActiveQueryOrFilters {
+                HStack(spacing: 8) {
+                    libraryStatChip(
+                        L10n.format("%d exercises", filteredExercises.count),
+                        icon: "square.grid.2x2",
+                        color: STRQBrand.steel
+                    )
+                    if activeFilterCount > 0 {
+                        libraryStatChip(
+                            L10n.tr("Filters"),
+                            icon: "line.3.horizontal.decrease.circle",
+                            color: STRQBrand.steel
+                        )
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 16)
+            }
+        }
+        .padding(.top, 8)
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 6)
+        .animation(.easeOut(duration: 0.5), value: appeared)
+    }
+
+    private var searchField: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(STRQBrand.steel)
+
+            TextField(L10n.tr("Search exercises, muscles, equipment..."), text: $searchText)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(STRQPalette.textPrimary)
+                .tint(STRQBrand.steel)
+                .submitLabel(.search)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+
+            if !searchText.isEmpty {
+                Button {
+                    withAnimation(.snappy) { searchText = "" }
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(STRQPalette.textMuted)
+                        .frame(width: 28, height: 28)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(L10n.tr("Clear"))
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(
+            LinearGradient(
+                colors: [STRQPalette.surfaceRaised, STRQPalette.surfaceBase],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 16)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(searchText.isEmpty ? STRQPalette.borderSubtle : STRQBrand.steel.opacity(0.36), lineWidth: 1)
+        )
+        .padding(.horizontal, 16)
+    }
+
     private var libraryHero: some View {
         HStack(alignment: .center, spacing: 0) {
             libraryStatColumn(value: "\(catalog.all.count)", label: L10n.tr("Exercises"))
@@ -118,9 +223,13 @@ struct ExerciseLibraryView: View {
         }
         .padding(.vertical, 14)
         .padding(.horizontal, 4)
-        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .background(STRQPalette.surfaceRaised, in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(STRQPalette.borderSubtle, lineWidth: 1)
+        )
         .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(.top, 12)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 6)
         .animation(.easeOut(duration: 0.5), value: appeared)
@@ -158,7 +267,11 @@ struct ExerciseLibraryView: View {
                         }
                     }
                 }
-                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+                .background(STRQPalette.surfaceRaised, in: .rect(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(STRQPalette.borderSubtle, lineWidth: 1)
+                )
                 .padding(.horizontal, 16)
             }
             .opacity(appeared ? 1 : 0)
@@ -230,14 +343,14 @@ struct ExerciseLibraryView: View {
             Text(label.uppercased())
                 .font(.system(size: 9, weight: .bold))
                 .tracking(0.8)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(STRQPalette.textMuted)
         }
         .frame(maxWidth: .infinity)
     }
 
     private var libraryDivider: some View {
         Rectangle()
-            .fill(Color(.separator).opacity(0.6))
+            .fill(STRQPalette.borderSubtle)
             .frame(width: 1, height: 28)
     }
 
@@ -568,112 +681,163 @@ struct ExerciseLibraryView: View {
     }
 
     private var filterChips: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 8) {
-                Button {
-                    showFilters = true
-                } label: {
-                    let hasActiveFilters = bodyweightOnly || jointFriendlyOnly || selectedDifficulty != nil
-                    HStack(spacing: 5) {
-                        Image(systemName: "line.3.horizontal.decrease")
-                            .font(.system(size: 12))
-                        Text(L10n.tr("Filters"))
-                            .font(.subheadline.weight(.medium))
-                        if hasActiveFilters {
-                            Circle()
-                                .fill(STRQBrand.steel)
-                                .frame(width: 6, height: 6)
+        VStack(alignment: .leading, spacing: 10) {
+            ScrollView(.horizontal) {
+                HStack(spacing: 8) {
+                    Button {
+                        showFilters = true
+                    } label: {
+                        let isActive = sheetFilterCount > 0
+                        HStack(spacing: 6) {
+                            Image(systemName: "line.3.horizontal.decrease")
+                                .font(.system(size: 12, weight: .semibold))
+                            Text(L10n.tr("Filters"))
+                                .font(.subheadline.weight(.semibold))
+                            if isActive {
+                                Text("\(sheetFilterCount)")
+                                    .font(.system(size: 10, weight: .black).monospacedDigit())
+                                    .foregroundStyle(STRQPalette.backgroundPrimary)
+                                    .frame(width: 18, height: 18)
+                                    .background(.white, in: Circle())
+                            }
                         }
+                        .foregroundStyle(isActive ? STRQPalette.backgroundPrimary : STRQPalette.textPrimary)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 9)
+                        .background(isActive ? STRQBrand.steel : STRQPalette.surfaceRaised, in: Capsule())
+                        .overlay(Capsule().strokeBorder(isActive ? Color.clear : STRQPalette.borderSubtle, lineWidth: 1))
                     }
-                    .foregroundStyle(.primary)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(Color(.secondarySystemGroupedBackground), in: Capsule())
-                }
 
-                Menu {
-                    Button(L10n.tr("All Patterns")) { selectedPattern = nil }
-                    Divider()
-                    ForEach(MovementPatternGroup.allCases) { pattern in
-                        Button {
-                            selectedPattern = selectedPattern == pattern ? nil : pattern
-                        } label: {
-                            Label(pattern.displayName, systemImage: pattern.icon)
-                        }
-                    }
-                } label: {
-                    let isActive = selectedPattern != nil
-                    HStack(spacing: 5) {
-                        Image(systemName: selectedPattern?.icon ?? "arrow.triangle.swap")
-                            .font(.system(size: 12))
-                        Text(selectedPattern?.displayName ?? L10n.tr("Pattern"))
-                            .font(.subheadline.weight(.medium))
-                    }
-                    .foregroundStyle(isActive ? .white : .primary)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(isActive ? STRQBrand.steel : Color(.secondarySystemGroupedBackground), in: Capsule())
-                    .overlay(Capsule().strokeBorder(isActive ? Color.clear : STRQBrand.cardBorder, lineWidth: 1))
-                }
-
-                ForEach(MuscleRegion.allCases) { region in
                     Menu {
-                        ForEach(region.muscles) { muscle in
-                            Button(muscle.localizedDisplayName) {
-                                selectedMuscle = selectedMuscle == muscle ? nil : muscle
+                        Button(L10n.tr("All Patterns")) { selectedPattern = nil }
+                        Divider()
+                        ForEach(MovementPatternGroup.allCases) { pattern in
+                            Button {
+                                selectedPattern = selectedPattern == pattern ? nil : pattern
+                            } label: {
+                                Label(pattern.displayName, systemImage: pattern.icon)
                             }
                         }
                     } label: {
-                        let isActive = selectedMuscle.map { region.muscles.contains($0) } ?? false
-                        Text(region.localizedDisplayName)
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(isActive ? .white : .primary)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(isActive ? STRQBrand.steel : Color(.secondarySystemGroupedBackground), in: Capsule())
-                            .overlay(Capsule().strokeBorder(isActive ? Color.clear : STRQBrand.cardBorder, lineWidth: 1))
+                        let isActive = selectedPattern != nil
+                        HStack(spacing: 6) {
+                            Image(systemName: selectedPattern?.icon ?? "arrow.triangle.swap")
+                                .font(.system(size: 12, weight: .semibold))
+                            Text(selectedPattern?.displayName ?? L10n.tr("Pattern"))
+                                .font(.subheadline.weight(.semibold))
+                        }
+                        .foregroundStyle(isActive ? STRQPalette.backgroundPrimary : STRQPalette.textPrimary)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 9)
+                        .background(isActive ? STRQBrand.steel : STRQPalette.surfaceRaised, in: Capsule())
+                        .overlay(Capsule().strokeBorder(isActive ? Color.clear : STRQPalette.borderSubtle, lineWidth: 1))
+                    }
+
+                    ForEach(MuscleRegion.allCases) { region in
+                        Menu {
+                            ForEach(region.muscles) { muscle in
+                                Button(muscle.localizedDisplayName) {
+                                    selectedMuscle = selectedMuscle == muscle ? nil : muscle
+                                }
+                            }
+                        } label: {
+                            let isActive = selectedMuscle.map { region.muscles.contains($0) } ?? false
+                            Text(region.localizedDisplayName)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(isActive ? STRQPalette.backgroundPrimary : STRQPalette.textPrimary)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 9)
+                                .background(isActive ? STRQBrand.steel : STRQPalette.surfaceRaised, in: Capsule())
+                                .overlay(Capsule().strokeBorder(isActive ? Color.clear : STRQPalette.borderSubtle, lineWidth: 1))
+                        }
+                    }
+
+                    Button {
+                        withAnimation { favoritesOnly.toggle() }
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: favoritesOnly ? "heart.fill" : "heart")
+                                .font(.system(size: 12, weight: .semibold))
+                            Text(L10n.tr("Favorites"))
+                                .font(.subheadline.weight(.semibold))
+                        }
+                        .foregroundStyle(favoritesOnly ? STRQPalette.backgroundPrimary : STRQPalette.textPrimary)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 9)
+                        .background(favoritesOnly ? STRQBrand.steel : STRQPalette.surfaceRaised, in: Capsule())
+                        .overlay(Capsule().strokeBorder(favoritesOnly ? Color.clear : STRQPalette.borderSubtle, lineWidth: 1))
                     }
                 }
+            }
+            .contentMargins(.horizontal, 16)
+            .scrollIndicators(.hidden)
 
-                Button {
-                    withAnimation { favoritesOnly.toggle() }
-                } label: {
-                    HStack(spacing: 5) {
-                        Image(systemName: favoritesOnly ? "heart.fill" : "heart")
-                            .font(.system(size: 12))
-                        Text(L10n.tr("Favorites"))
-                            .font(.subheadline.weight(.medium))
-                    }
-                    .foregroundStyle(favoritesOnly ? .white : .primary)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(favoritesOnly ? STRQBrand.steel : Color(.secondarySystemGroupedBackground), in: Capsule())
-                    .overlay(Capsule().strokeBorder(favoritesOnly ? Color.clear : STRQBrand.cardBorder, lineWidth: 1))
+            if hasActiveFilters {
+                activeFilterSummary
+            }
+        }
+        .padding(.top, 12)
+    }
+
+    private var activeFilterSummary: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 6) {
+                if let selectedWorld {
+                    activeFilterPill(selectedWorld.displayName) { self.selectedWorld = nil }
+                }
+                if let selectedPattern {
+                    activeFilterPill(selectedPattern.displayName) { self.selectedPattern = nil }
+                }
+                if let selectedMuscle {
+                    activeFilterPill(selectedMuscle.localizedDisplayName) { self.selectedMuscle = nil }
+                }
+                if let selectedDifficulty {
+                    activeFilterPill(selectedDifficulty.displayName) { self.selectedDifficulty = nil }
+                }
+                if bodyweightOnly {
+                    activeFilterPill(L10n.tr("Bodyweight")) { bodyweightOnly = false }
+                }
+                if jointFriendlyOnly {
+                    activeFilterPill(L10n.tr("Joint-friendly")) { jointFriendlyOnly = false }
+                }
+                if favoritesOnly {
+                    activeFilterPill(L10n.tr("Favorites")) { favoritesOnly = false }
                 }
             }
         }
         .contentMargins(.horizontal, 16)
         .scrollIndicators(.hidden)
-        .padding(.top, 12)
+    }
+
+    private func activeFilterPill(_ title: String, action: @escaping () -> Void) -> some View {
+        Button {
+            withAnimation(.snappy) { action() }
+        } label: {
+            HStack(spacing: 5) {
+                Text(title)
+                    .font(.system(size: 11, weight: .bold))
+                    .lineLimit(1)
+                Image(systemName: "xmark")
+                    .font(.system(size: 8, weight: .black))
+            }
+            .foregroundStyle(STRQPalette.textSecondary)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(STRQPalette.surfaceBase, in: Capsule())
+            .overlay(Capsule().strokeBorder(STRQPalette.borderSubtle, lineWidth: 1))
+        }
+        .buttonStyle(.plain)
     }
 
     private var exerciseCountBar: some View {
         HStack {
             Text(L10n.format("%d exercises", filteredExercises.count))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(STRQPalette.textSecondary)
             Spacer()
-            if selectedMuscle != nil || selectedWorld != nil || selectedPattern != nil || bodyweightOnly || jointFriendlyOnly || favoritesOnly {
+            if hasActiveFilters {
                 Button(L10n.tr("Clear All")) {
-                    withAnimation {
-                        selectedMuscle = nil
-                        selectedWorld = nil
-                        selectedPattern = nil
-                        selectedDifficulty = nil
-                        bodyweightOnly = false
-                        jointFriendlyOnly = false
-                        favoritesOnly = false
-                    }
+                    clearFilters()
                 }
                 .font(.caption.weight(.medium))
                 .foregroundStyle(STRQBrand.steel)
@@ -683,56 +847,131 @@ struct ExerciseLibraryView: View {
         .padding(.top, 10)
     }
 
+    @ViewBuilder
     private var exerciseList: some View {
-        LazyVStack(spacing: 14, pinnedViews: [.sectionHeaders]) {
-            ForEach(groupedExercises, id: \.0) { muscle, exercises in
-                Section {
-                    LazyVStack(spacing: 2) {
-                        ForEach(Array(exercises.enumerated()), id: \.element.id) { index, exercise in
-                            ExerciseCard(
-                                exercise: exercise,
-                                isFavorite: vm.favoriteExerciseIds.contains(exercise.id),
-                                progression: vm.progressionStates.first(where: { $0.exerciseId == exercise.id })
-                            ) {
-                                selectedExercise = exercise
-                            } onFavorite: {
-                                vm.toggleFavorite(exercise.id)
-                            }
-                            if index < exercises.count - 1 {
-                                Rectangle()
-                                    .fill(Color(.separator).opacity(0.35))
-                                    .frame(height: 0.5)
-                                    .padding(.leading, 76)
+        if groupedExercises.isEmpty {
+            noResultsState
+        } else {
+            LazyVStack(spacing: 14, pinnedViews: [.sectionHeaders]) {
+                ForEach(groupedExercises, id: \.0) { muscle, exercises in
+                    Section {
+                        LazyVStack(spacing: 2) {
+                            ForEach(Array(exercises.enumerated()), id: \.element.id) { index, exercise in
+                                ExerciseCard(
+                                    exercise: exercise,
+                                    isFavorite: vm.favoriteExerciseIds.contains(exercise.id),
+                                    progression: vm.progressionStates.first(where: { $0.exerciseId == exercise.id })
+                                ) {
+                                    selectedExercise = exercise
+                                } onFavorite: {
+                                    vm.toggleFavorite(exercise.id)
+                                }
+                                if index < exercises.count - 1 {
+                                    Rectangle()
+                                        .fill(STRQPalette.borderSubtle)
+                                        .frame(height: 0.5)
+                                        .padding(.leading, 76)
+                                }
                             }
                         }
+                        .background(STRQPalette.surfaceRaised, in: .rect(cornerRadius: 14))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .strokeBorder(STRQPalette.borderSubtle, lineWidth: 1)
+                        )
+                        .padding(.horizontal, 16)
+                    } header: {
+                        HStack(spacing: 8) {
+                            Image(systemName: muscle.symbolName)
+                                .font(.caption)
+                                .foregroundStyle(STRQBrand.steel)
+                            Text(muscle.localizedDisplayName.uppercased())
+                                .font(.system(size: 11, weight: .black))
+                                .tracking(1.0)
+                                .foregroundStyle(STRQPalette.textSecondary)
+                            Text("\(exercises.count)")
+                                .font(.system(size: 10, weight: .bold).monospacedDigit())
+                                .foregroundStyle(STRQPalette.textMuted)
+                            Spacer()
+                            Rectangle()
+                                .fill(STRQPalette.borderSubtle)
+                                .frame(height: 0.5)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 10)
+                        .padding(.bottom, 6)
+                        .background(STRQPalette.backgroundPrimary)
                     }
-                    .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
-                    .padding(.horizontal, 16)
-                } header: {
-                    HStack(spacing: 8) {
-                        Image(systemName: muscle.symbolName)
-                            .font(.caption)
-                            .foregroundStyle(STRQBrand.steel)
-                        Text(muscle.localizedDisplayName.uppercased())
-                            .font(.system(size: 11, weight: .black))
-                            .tracking(1.0)
-                            .foregroundStyle(.secondary)
-                        Text("\(exercises.count)")
-                            .font(.system(size: 10, weight: .bold).monospacedDigit())
-                            .foregroundStyle(.tertiary)
-                        Spacer()
-                        Rectangle()
-                            .fill(Color(.separator).opacity(0.4))
-                            .frame(height: 0.5)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    .padding(.bottom, 6)
-                    .background(Color(.systemBackground))
                 }
             }
+            .padding(.top, 4)
         }
-        .padding(.top, 4)
+    }
+
+    private var noResultsState: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 24, weight: .semibold))
+                .foregroundStyle(STRQBrand.steel)
+                .frame(width: 52, height: 52)
+                .background(STRQBrand.steel.opacity(0.12), in: Circle())
+
+            VStack(spacing: 4) {
+                Text(L10n.tr("No results"))
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(STRQPalette.textPrimary)
+                Text(L10n.tr("Try fewer filters."))
+                    .font(.subheadline)
+                    .foregroundStyle(STRQPalette.textSecondary)
+            }
+
+            Button {
+                clearDiscovery()
+            } label: {
+                Text(L10n.tr("Reset"))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(STRQPalette.backgroundPrimary)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 10)
+                    .background(STRQBrand.steel, in: Capsule())
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 36)
+        .padding(.horizontal, 20)
+        .background(STRQPalette.surfaceRaised, in: .rect(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(STRQPalette.borderSubtle, lineWidth: 1)
+        )
+        .padding(.horizontal, 16)
+        .padding(.top, 18)
+    }
+
+    private func clearFilters() {
+        withAnimation(.snappy) {
+            selectedMuscle = nil
+            selectedWorld = nil
+            selectedPattern = nil
+            selectedDifficulty = nil
+            bodyweightOnly = false
+            jointFriendlyOnly = false
+            favoritesOnly = false
+        }
+    }
+
+    private func clearDiscovery() {
+        withAnimation(.snappy) {
+            searchText = ""
+            selectedMuscle = nil
+            selectedWorld = nil
+            selectedPattern = nil
+            selectedDifficulty = nil
+            bodyweightOnly = false
+            jointFriendlyOnly = false
+            favoritesOnly = false
+        }
     }
 
     private var filterSheet: some View {
@@ -770,8 +1009,10 @@ struct ExerciseLibraryView: View {
                 }
                 .padding(20)
             }
+            .background(STRQPalette.backgroundPrimary)
             .navigationTitle(L10n.tr("Filters"))
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(L10n.tr("Done")) { showFilters = false }
@@ -788,7 +1029,7 @@ struct ExerciseLibraryView: View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(STRQPalette.textSecondary)
             content()
         }
     }
@@ -798,10 +1039,11 @@ struct ExerciseLibraryView: View {
         Button(action: action) {
             Text(title)
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(selected ? .white : .primary)
+                .foregroundStyle(selected ? STRQPalette.backgroundPrimary : STRQPalette.textPrimary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
-                .background(selected ? color : Color(.secondarySystemGroupedBackground), in: Capsule())
+                .background(selected ? color : STRQPalette.surfaceRaised, in: Capsule())
+                .overlay(Capsule().strokeBorder(selected ? Color.clear : STRQPalette.borderSubtle, lineWidth: 1))
         }
     }
 
@@ -916,7 +1158,7 @@ struct ExerciseCard: View {
                     HStack(spacing: 5) {
                         Text(exercise.name)
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(STRQPalette.textPrimary)
                             .lineLimit(1)
                         if let p = progression {
                             Image(systemName: p.plateauStatus.icon)
@@ -928,26 +1170,26 @@ struct ExerciseCard: View {
                     HStack(spacing: 5) {
                         Text(exercise.primaryMuscle.localizedDisplayName)
                             .font(.system(size: 10.5, weight: .medium))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(STRQPalette.textSecondary)
 
                         if let family = familyName {
-                            Circle().fill(Color(.separator)).frame(width: 2, height: 2)
+                            Circle().fill(STRQPalette.borderStrong).frame(width: 2, height: 2)
                             Text(family)
                                 .font(.system(size: 10.5, weight: .medium))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(STRQPalette.textSecondary)
                                 .lineLimit(1)
                         } else {
-                            Circle().fill(Color(.separator)).frame(width: 2, height: 2)
+                            Circle().fill(STRQPalette.borderStrong).frame(width: 2, height: 2)
                             Text(exercise.category.displayName)
                                 .font(.system(size: 10.5, weight: .medium))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(STRQPalette.textSecondary)
                         }
 
                         if let equip = exercise.equipment.first(where: { $0 != .none }) {
-                            Circle().fill(Color(.separator)).frame(width: 2, height: 2)
+                            Circle().fill(STRQPalette.borderStrong).frame(width: 2, height: 2)
                             Text(equip.displayName)
                                 .font(.system(size: 10.5))
-                                .foregroundStyle(.tertiary)
+                                .foregroundStyle(STRQPalette.textMuted)
                                 .lineLimit(1)
                         }
                     }
@@ -958,7 +1200,7 @@ struct ExerciseCard: View {
                 HStack(spacing: 2) {
                     ForEach(0..<3, id: \.self) { i in
                         Capsule()
-                            .fill(i < diffLevel ? diffColor : Color(.separator).opacity(0.5))
+                            .fill(i < diffLevel ? diffColor : STRQPalette.borderSubtle)
                             .frame(width: 3, height: 8)
                     }
                 }
@@ -970,6 +1212,10 @@ struct ExerciseCard: View {
                         .frame(width: 26, height: 26)
                 }
                 .buttonStyle(.plain)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(STRQPalette.textMuted.opacity(0.7))
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
