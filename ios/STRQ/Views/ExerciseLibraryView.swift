@@ -917,10 +917,10 @@ struct ExerciseLibraryView: View {
                 .background(STRQBrand.steel.opacity(0.12), in: Circle())
 
             VStack(spacing: 4) {
-                Text(L10n.tr("No results"))
+                Text("Keine Übungen gefunden")
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(STRQPalette.textPrimary)
-                Text(L10n.tr("Try fewer filters."))
+                Text("Suche oder Filter zurücksetzen.")
                     .font(.subheadline)
                     .foregroundStyle(STRQPalette.textSecondary)
             }
