@@ -478,7 +478,7 @@ struct STRQPaywallView: View {
                 )
                 Divider().opacity(0.25).padding(.horizontal, 14)
                 compareRow(
-                    label: L10n.tr("History"),
+                    label: L10n.tr("proPreview.compare.history", fallback: "History"),
                     free: L10n.tr("Recent sessions"),
                     pro: L10n.tr("Longer evidence")
                 )

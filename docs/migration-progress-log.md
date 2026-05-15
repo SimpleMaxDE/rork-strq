@@ -4692,6 +4692,54 @@ Pending work:
 - Non-Progress English/generated strings remain for follow-up localization slices, including Today/Home coaching copy, Train/Exercise Library generated names and plural forms, Profile, and STRQ Pro Preview.
 - Pro Preview still exposes English copy such as `Evidence forming`; this slice did not change forbidden Profile/Paywall files.
 
+### 2026-05-15 - German Profile + STRQ Pro Preview Copy Cleanup
+
+Scope:
+
+- Added German catalog coverage for Profile and STRQ Pro Preview strings that were falling back to English.
+- Kept STRQ, STRQ Pro, Training Map, Workout(s), Apple, Apple ID, iCloud, App Store, and Pro/PRO as product/platform terms.
+- Used trust-first German copy for preview, free access, Pro depth, Training Map evidence, restore, and internal preview labels.
+
+Files changed:
+
+- `ios/STRQ/Localizable.xcstrings`
+- `ios/STRQ/Views/ProfileView.swift`
+- `ios/STRQ/Views/STRQPaywallView.swift`
+- `docs/migration-progress-log.md`
+
+Implementation notes:
+
+- Added Profile/Paywall-specific localization keys for `Split`, Profile footer `Support`, internal Training Map preview, Design System Lab, and Pro Preview compare-row `History` to avoid changing global workout/exercise semantics.
+- Localized Profile cloud badge labels and focus muscle chips through existing localization helpers.
+- Added German STRQ Pro Preview terms including `STRQ PRO VORSCHAU`, `Vorschau`, `Wochenrückblick`, `Mehr Verlauf`, `Hinweise entstehen`, `Abgedeckt`, `Leicht`, `Adaptive Pläne`, and `Käufe wiederherstellen`.
+
+Verification run:
+
+- `jq empty ios/STRQ/Localizable.xcstrings`
+- `rg -n "�|Ã|â|\\?rm|Haupt\\?|W\\?" ios/STRQ/Localizable.xcstrings ios/STRQ/Views/ProfileView.swift ios/STRQ/Views/STRQPaywallView.swift`
+- `git diff --check`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+- `OUT_DIR="docs/qa/pro-profile-de-copy-qa-$(date +%F-%H%M%S)"; scripts/qa/capture_strq_screen_map.sh "$OUT_DIR"`
+- Final Screen Map output path: `docs/qa/pro-profile-de-copy-qa-2026-05-15-171645`
+- German screenshots checked: `screenshots/de/14-profile.png`, `screenshots/de/15-profile-scroll-1.png`, `screenshots/de/16-profile-scroll-2.png`, `screenshots/de/17-profile-pro-preview.png`, and `screenshots/de/18-profile-pro-preview-scroll-1.png`.
+- Package/small-iPhone Pro Preview harness was attempted with `scripts/qa/capture_strq_pro_preview.sh`, but that harness still searches for the old `strq.profile.pro-preview-card` identifier and failed before capture. It was not changed in this slice because tests/scripts were outside the allowed diff.
+
+QA artifact handling:
+
+- Generated Screen Map artifacts were left untracked at `docs/qa/pro-profile-de-copy-qa-2026-05-15-171645/`.
+- No `docs/qa` artifacts were staged for commit.
+
+Intentionally not changed:
+
+- No `StoreViewModel`, RevenueCat service, purchase, restore, entitlement, package-selection, CTA enabled/disabled, feature-gate, onboarding, Today, Plan, Workout, Progress, Exercise Library, assets, tests, scripts, or project files were changed.
+- No `showsLivePurchaseOptions` or equivalent purchase-preview branching was changed.
+- No purchase UI was enabled and no Pro gates were added.
+
+Pending work:
+
+- English generated/model/workout/exercise strings remain for separate localization slices, including workout names, exercise names, and service-generated recommendations outside Profile/STRQ Pro Preview.
+- German package-preview and small-iPhone Pro Preview screenshots need a separate QA-harness update because the current dedicated Pro Preview snapshot test is English-only and references the old Profile card identifier.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

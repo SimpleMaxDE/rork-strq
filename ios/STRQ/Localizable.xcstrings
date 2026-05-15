@@ -1,6 +1,916 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "STRQ PRO PREVIEW": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ PRO VORSCHAU"
+          }
+        }
+      }
+    },
+    "Train with a plan that keeps learning.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainiere mit einem Plan, der dazulernt."
+          }
+        }
+      }
+    },
+    "Pro is the deeper layer after STRQ has real workouts to learn from: Training Map evidence, plan evolution, weekly review, and advanced history.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro ist die tiefere Ebene, sobald STRQ echte Workouts auswerten kann: Training Map-Hinweise, Planentwicklung, Wochenrückblick und mehr Verlauf."
+          }
+        }
+      }
+    },
+    "TRAINING MAP": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TRAINING MAP"
+          }
+        }
+      }
+    },
+    "Evidence forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinweise entstehen"
+          }
+        }
+      }
+    },
+    "Preview": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschau"
+          }
+        }
+      }
+    },
+    "First plan stays free": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der erste Plan bleibt kostenlos"
+          }
+        }
+      }
+    },
+    "Onboarding, plan reveal, first workout, and core logging remain useful.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onboarding, Plan-Reveal, erstes Workout und Basis-Logging bleiben nützlich."
+          }
+        }
+      }
+    },
+    "Pro adds depth later": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro fügt später Tiefe hinzu"
+          }
+        }
+      }
+    },
+    "Deeper evidence appears once your training record can support it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiefere Hinweise erscheinen, sobald dein Trainingsverlauf sie tragen kann."
+          }
+        }
+      }
+    },
+    "Covered": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abgedeckt"
+          }
+        }
+      }
+    },
+    "Light": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leicht"
+          }
+        }
+      }
+    },
+    "Adaptive plan evolution": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaptive Planentwicklung"
+          }
+        }
+      }
+    },
+    "Your plan can respond to completed sessions, missed days, fatigue signals, and real progress evidence.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Plan kann auf abgeschlossene Workouts, verpasste Tage, Ermüdungssignale und echte Fortschrittshinweise reagieren."
+          }
+        }
+      }
+    },
+    "Adjustments based on what you actually logged": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anpassungen anhand dessen, was du wirklich loggst"
+          }
+        }
+      }
+    },
+    "Comeback guidance after disrupted weeks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comeback-Hinweise nach unruhigen Wochen"
+          }
+        }
+      }
+    },
+    "Clear reasons before meaningful changes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klare Gründe vor wichtigen Änderungen"
+          }
+        }
+      }
+    },
+    "Deeper Training Map": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiefere Training Map"
+          }
+        }
+      }
+    },
+    "See what is covered, what is forming, what is light, and which workouts made the signal stronger.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sieh, was abgedeckt ist, was entsteht, was leicht bleibt und welche Workouts das Signal stärker gemacht haben."
+          }
+        }
+      }
+    },
+    "Evidence behind each training area": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinweise hinter jedem Trainingsbereich"
+          }
+        }
+      }
+    },
+    "Confidence labels before strong claims": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorsichtige Labels vor starken Aussagen"
+          }
+        }
+      }
+    },
+    "Next unlocks tied to real sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Einblicke hängen an echten Workouts"
+          }
+        }
+      }
+    },
+    "Weekly coach review": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach-Wochenrückblick"
+          }
+        }
+      }
+    },
+    "A calmer review of what moved, what stalled, and what STRQ recommends for the next week.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein ruhiger Rückblick darauf, was sich bewegt hat, was stockt und was STRQ für die nächste Woche empfiehlt."
+          }
+        }
+      }
+    },
+    "Training rhythm and consistency read": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainingsrhythmus und Konstanz"
+          }
+        }
+      }
+    },
+    "Progress signals that are ready to trust": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortschrittssignale, die belastbar genug sind"
+          }
+        }
+      }
+    },
+    "One next step, not a wall of metrics": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein nächster Schritt statt einer Wand aus Metriken"
+          }
+        }
+      }
+    },
+    "Advanced evidence history": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erweiterter Verlauf"
+          }
+        }
+      }
+    },
+    "Longer history, trend context, and evidence timelines for users who want to inspect the why.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr Verlauf, Trendkontext und Hinweis-Timelines für alle, die das Warum prüfen wollen."
+          }
+        }
+      }
+    },
+    "Session-to-session evidence trail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinweisspur von Workout zu Workout"
+          }
+        }
+      }
+    },
+    "Readable trends when data is mature": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lesbare Trends, wenn genug Daten da sind"
+          }
+        }
+      }
+    },
+    "Comparisons that stay tied to logged workouts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergleiche bleiben an geloggte Workouts gebunden"
+          }
+        }
+      }
+    },
+    "Activation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
+          }
+        }
+      }
+    },
+    "Onboarding + first plan": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onboarding + erster Plan"
+          }
+        }
+      }
+    },
+    "Learns over time": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lernt mit der Zeit"
+          }
+        }
+      }
+    },
+    "Core logging included": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basis-Logging inklusive"
+          }
+        }
+      }
+    },
+    "Deeper review": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tieferer Rückblick"
+          }
+        }
+      }
+    },
+    "Basic Training Map": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basis-Training Map"
+          }
+        }
+      }
+    },
+    "Evidence depth": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr Verlauf"
+          }
+        }
+      }
+    },
+    "Plan changes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planänderungen"
+          }
+        }
+      }
+    },
+    "Safe fixes remain": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sichere Korrekturen bleiben"
+          }
+        }
+      }
+    },
+    "Adaptive tuning": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaptive Feinabstimmung"
+          }
+        }
+      }
+    },
+    "Recent sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzte Workouts"
+          }
+        }
+      }
+    },
+    "Longer evidence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr Verlauf"
+          }
+        }
+      }
+    },
+    "Offer details come from Apple product metadata": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angebotsdetails kommen aus den Apple-Produktdaten"
+          }
+        }
+      }
+    },
+    "Billing period unavailable": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrechnungszeitraum nicht verfügbar"
+          }
+        }
+      }
+    },
+    "Billed %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrechnung %@"
+          }
+        }
+      }
+    },
+    "%@ free trial": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kostenlos testen"
+          }
+        }
+      }
+    },
+    "%@ intro": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Einführungspreis"
+          }
+        }
+      }
+    },
+    "daily": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "täglich"
+          }
+        }
+      }
+    },
+    "weekly": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "wöchentlich"
+          }
+        }
+      }
+    },
+    "monthly": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "monatlich"
+          }
+        }
+      }
+    },
+    "yearly": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "jährlich"
+          }
+        }
+      }
+    },
+    "every %@ %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "alle %@ %@"
+          }
+        }
+      }
+    },
+    "1 %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 %@"
+          }
+        }
+      }
+    },
+    "day": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tag"
+          }
+        }
+      }
+    },
+    "week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woche"
+          }
+        }
+      }
+    },
+    "month": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monat"
+          }
+        }
+      }
+    },
+    "year": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jahr"
+          }
+        }
+      }
+    },
+    "weeks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wochen"
+          }
+        }
+      }
+    },
+    "months": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monate"
+          }
+        }
+      }
+    },
+    "Package preview only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur Paketvorschau"
+          }
+        }
+      }
+    },
+    "Purchases not enabled in this build": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Käufe sind in diesem Build nicht aktiviert"
+          }
+        }
+      }
+    },
+    "Subscriptions renew automatically unless canceled at least 24 hours before the end of the current period. Payment is charged to your Apple ID at confirmation. Manage or cancel in App Store settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abos verlängern sich automatisch, wenn sie nicht mindestens 24 Stunden vor Ende des aktuellen Zeitraums gekündigt werden. Die Zahlung wird bei Bestätigung deiner Apple ID belastet. Verwalten oder kündigen kannst du in den App Store-Einstellungen."
+          }
+        }
+      }
+    },
+    "PREVIEW ONLY": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VORSCHAU"
+          }
+        }
+      }
+    },
+    "No purchase is available in this build.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In diesem Build ist kein Kauf verfügbar."
+          }
+        }
+      }
+    },
+    "This screen previews the kind of depth STRQ Pro may add after a user has seen value.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Ansicht zeigt als Vorschau, welche Tiefe STRQ Pro hinzufügen kann, nachdem der Nutzen sichtbar geworden ist."
+          }
+        }
+      }
+    },
+    "FREE ACCESS STAYS USEFUL": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KOSTENLOS BLEIBT NÜTZLICH"
+          }
+        }
+      }
+    },
+    "Free activation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kostenloser Start"
+          }
+        }
+      }
+    },
+    "Onboarding and setup remain open.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onboarding und Setup bleiben offen."
+          }
+        }
+      }
+    },
+    "First plan free": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erster Plan kostenlos"
+          }
+        }
+      }
+    },
+    "Plan reveal is not blocked.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein Plan wird nicht blockiert."
+          }
+        }
+      }
+    },
+    "First workout free": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstes Workout kostenlos"
+          }
+        }
+      }
+    },
+    "Core workout logging remains usable.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout-Logging bleibt nutzbar."
+          }
+        }
+      }
+    },
+    "Basic Progress free": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basis-Fortschritt kostenlos"
+          }
+        }
+      }
+    },
+    "The Training Map starts useful before Pro depth.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Training Map bleibt schon vor Pro nützlich."
+          }
+        }
+      }
+    },
+    "Preview only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschau"
+          }
+        }
+      }
+    },
+    "Purchases stay disabled until a separate purchase implementation is approved.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Käufe bleiben deaktiviert, bis eine separate Kauf-Implementierung freigegeben ist."
+          }
+        }
+      }
+    },
+    "No purchase today": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute kein Kauf"
+          }
+        }
+      }
+    },
+    "Training stays open": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Training bleibt offen"
+          }
+        }
+      }
+    },
+    "Restore remains available from Profile and this preview. Pricing and Apple billing details are not shown because purchases are not active in this build.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiederherstellen bleibt im Profil und in dieser Vorschau verfügbar. Preise und Apple-Abrechnungsdetails werden nicht gezeigt, weil Käufe in diesem Build nicht aktiv sind."
+          }
+        }
+      }
+    },
+    "STRQ Pro Preview is not connected to products in this build.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die STRQ Pro Vorschau ist in diesem Build nicht mit Produkten verbunden."
+          }
+        }
+      }
+    },
+    "Refresh Preview": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschau aktualisieren"
+          }
+        }
+      }
+    },
+    "Deeper coaching, evolving plans, and richer progress evidence.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tieferes Coaching, adaptive Pläne und mehr Fortschrittsverlauf."
+          }
+        }
+      }
+    },
+    "Adaptive plans": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaptive Pläne"
+          }
+        }
+      }
+    },
+    "Weekly review": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wochenrückblick"
+          }
+        }
+      }
+    },
+    "profile.trainingSetup.split": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Split"
+          }
+        }
+      }
+    },
+    "profile.footer.support": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Support"
+          }
+        }
+      }
+    },
+    "profile.internalTrainingMapPreview": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interne Vorschau: Training Map"
+          }
+        }
+      }
+    },
+    "profile.designSystemLab": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Design-System-Lab"
+          }
+        }
+      }
+    },
+    "proPreview.compare.history": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verlauf"
+          }
+        }
+      }
+    },
     "Today": {
       "localizations": {
         "de": {

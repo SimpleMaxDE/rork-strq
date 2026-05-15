@@ -319,12 +319,12 @@ struct ProfileView: View {
 
     private var cloudStatusBadge: some View {
         let (label, color): (String, Color) = {
-            guard vm.cloudSync.isAvailable else { return ("OFF", .gray) }
+            guard vm.cloudSync.isAvailable else { return (L10n.tr("OFF"), .gray) }
             switch vm.cloudSync.status {
-            case .syncing: return ("SYNC", STRQBrand.steel)
-            case .failed: return ("CHECK", STRQPalette.warning)
-            case .unavailable: return ("OFF", .gray)
-            case .success, .idle: return ("ON", STRQPalette.success)
+            case .syncing: return (L10n.tr("SYNC"), STRQBrand.steel)
+            case .failed: return (L10n.tr("CHECK"), STRQPalette.warning)
+            case .unavailable: return (L10n.tr("OFF"), .gray)
+            case .success, .idle: return (L10n.tr("ON"), STRQPalette.success)
             }
         }()
         return Text(label)
@@ -671,7 +671,7 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 trainingSetupInfoRow(L10n.tr("Days / Week"), value: "\(vm.profile.daysPerWeek)")
                 trainingSetupInfoRow(L10n.tr("Workout Length"), value: L10n.format("%d min", vm.profile.minutesPerSession))
-                trainingSetupInfoRow(L10n.tr("Split"), value: vm.profile.splitPreference.displayName)
+                trainingSetupInfoRow(L10n.tr("profile.trainingSetup.split", fallback: "Split"), value: vm.profile.splitPreference.displayName)
                 trainingSetupInfoRow(L10n.tr("Location"), value: vm.profile.trainingLocation.displayName, showsDivider: false)
             }
             .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
@@ -688,7 +688,7 @@ struct ProfileView: View {
                             .font(.caption.weight(.bold))
                             .foregroundStyle(.tertiary)
                         ForEach(vm.profile.focusMuscles) { muscle in
-                            ForgeChip(text: muscle.displayName)
+                            ForgeChip(text: muscle.localizedDisplayName)
                         }
                     }
                 }
@@ -895,11 +895,11 @@ struct ProfileView: View {
                 #if DEBUG
                 NavigationLink {
                     ProgressV5ProductionCandidateView(vm: vm)
-                        .navigationTitle("Training Map")
+                        .navigationTitle(L10n.tr("Training Map"))
                         .navigationBarTitleDisplayMode(.inline)
                 } label: {
                     controlsListSymbolRowContent(
-                        "Internal Preview: Training Map",
+                        L10n.tr("profile.internalTrainingMapPreview", fallback: "Internal Preview: Training Map"),
                         systemIcon: "eye.fill",
                         showsDivider: true
                     )
@@ -908,7 +908,7 @@ struct ProfileView: View {
                 NavigationLink {
                     STRQDesignSystemPreviewView()
                 } label: {
-                    controlsListSymbolRowContent("Design System Lab", systemIcon: "paintpalette.fill", showsDivider: false)
+                    controlsListSymbolRowContent(L10n.tr("profile.designSystemLab", fallback: "Design System Lab"), systemIcon: "paintpalette.fill", showsDivider: false)
                 }
                 .accessibilityIdentifier("strq.profile.design-system-lab")
                 #endif
@@ -946,7 +946,7 @@ struct ProfileView: View {
             Text("·").foregroundStyle(.quaternary)
             Link(L10n.tr("Terms"), destination: STRQLinks.terms)
             Text("·").foregroundStyle(.quaternary)
-            Link(L10n.tr("Support"), destination: STRQLinks.support)
+            Link(L10n.tr("profile.footer.support", fallback: "Support"), destination: STRQLinks.support)
         }
         .font(.caption.weight(.medium))
         .foregroundStyle(.secondary)
