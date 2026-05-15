@@ -4606,6 +4606,48 @@ Warnings:
 
 - The existing Profile/Pro Preview screens still appear in broad Screen Map output; this slice did not touch or mix those screens into Progress.
 
+### 2026-05-15 - Progress Top Support Cleanup
+
+Scope:
+
+- Replaced the old top support stack below the accepted Training Map Hero with one compact Signal Readiness strip.
+- Kept the Training Map Hero, Strength/Body/Volume tabs, lower Recent Evidence, Weekly Rhythm, Strength/Volume content, Session History route, and Muscle Balance gates unchanged.
+
+Files changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `docs/migration-progress-log.md`
+
+Implementation notes:
+
+- Removed the top-level calls to `whatsImprovingCard`, `signalStrip`, conditional `recentImprovementCard`, and conditional `momentumBreakdown`.
+- Added `signalReadinessStrip` between `headlineHero` and `tabSelector`.
+- The strip reads only `trainingMapHeroSnapshot`, `recentEvidenceSnapshot`, and `weeklyRhythmSnapshot`.
+- Top support copy avoids PR counts, streak language, recovery percentages, muscle coverage claims, and Pro/paywall wording.
+
+Verification run:
+
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+- `OUT_DIR="docs/qa/progress-top-support-cleanup-$(date +%F-%H%M%S)"; scripts/qa/capture_strq_screen_map.sh "$OUT_DIR"`
+- Screen Map output path: `docs/qa/progress-top-support-cleanup-2026-05-15-120926`
+- Progress screen-map output showed `SIGNAL READINESS`, `completed only`, `Training Map`, `Recent Evidence`, `Rhythm`, and the existing Strength/Body/Volume tabs below.
+- `git diff --check`
+- `git diff --name-only`
+
+QA artifact handling:
+
+- Generated QA artifacts were left untracked and were not staged for commit.
+- Existing untracked `docs/qa/progress-training-map-hero-review-2026-05-15/` artifacts were left untouched.
+
+Intentionally not changed:
+
+- No `ProgressV5ProductionCandidateView`, AppViewModel, services, models, analytics, persistence, navigation, RevenueCat, workout flows, onboarding, Active Workout, Exercise Library, Localizable, tests, assets, or project files were changed.
+- No Pro gates, fake precision, muscle coverage claims, or Muscle Balance gate changes were added.
+
+Pending work:
+
+- None for this narrow cleanup slice.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

@@ -18,21 +18,8 @@ struct ProgressAnalyticsView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 4)
 
-                whatsImprovingCard
+                signalReadinessStrip
                     .padding(.horizontal, 16)
-
-                signalStrip
-                    .padding(.horizontal, 16)
-
-                if !vm.isEarlyStage {
-                    recentImprovementCard
-                        .padding(.horizontal, 16)
-                }
-
-                if !vm.isEarlyStage {
-                    momentumBreakdown
-                        .padding(.horizontal, 16)
-                }
 
                 tabSelector
                     .padding(.horizontal, 16)
@@ -1018,6 +1005,132 @@ struct ProgressAnalyticsView: View {
         let detail: String
         let icon: String
         let state: STRQPalette.State
+    }
+
+    private struct SignalReadinessItem: Identifiable {
+        let title: String
+        let value: String
+        let detail: String
+        let icon: String
+        let tint: Color
+
+        var id: String { title }
+    }
+
+    private var signalReadinessItems: [SignalReadinessItem] {
+        let map = trainingMapHeroSnapshot
+        let evidence = recentEvidenceSnapshot
+        let rhythm = weeklyRhythmSnapshot
+
+        return [
+            SignalReadinessItem(
+                title: L10n.tr("Training Map"),
+                value: map.stateLabel,
+                detail: map.completedWorkouts == 0 ? L10n.tr("Waiting for completed sessions") : L10n.tr("Completed sessions only"),
+                icon: "map.fill",
+                tint: map.overallState.tint
+            ),
+            SignalReadinessItem(
+                title: L10n.tr("Recent Evidence"),
+                value: evidence.countValue,
+                detail: evidence.countDetail,
+                icon: "list.bullet.rectangle.portrait.fill",
+                tint: STRQPalette.color(for: evidence.state)
+            ),
+            SignalReadinessItem(
+                title: L10n.tr("Rhythm"),
+                value: "\(rhythm.currentWeekSessions)/\(rhythm.target)",
+                detail: L10n.tr("this week"),
+                icon: "calendar.badge.clock",
+                tint: STRQPalette.color(for: rhythm.state)
+            )
+        ]
+    }
+
+    private var signalReadinessStrip: some View {
+        let items = signalReadinessItems
+
+        return VStack(alignment: .leading, spacing: 11) {
+            HStack(spacing: 8) {
+                Text(L10n.tr("SIGNAL READINESS"))
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.1)
+                    .foregroundStyle(STRQBrand.steel)
+
+                Spacer(minLength: 0)
+
+                Text(L10n.tr("completed only"))
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.52))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.white.opacity(0.04), in: Capsule())
+            }
+
+            HStack(alignment: .top, spacing: 8) {
+                ForEach(items) { item in
+                    signalReadinessCell(item)
+                }
+            }
+        }
+        .padding(12)
+        .background(
+            LinearGradient(
+                colors: [Color(white: 0.105), Color(white: 0.066)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 16)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+    }
+
+    private func signalReadinessCell(_ item: SignalReadinessItem) -> some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Image(systemName: item.icon)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(item.tint)
+                .frame(width: 26, height: 26)
+                .background(item.tint.opacity(0.11), in: .rect(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.title)
+                    .font(.system(size: 8, weight: .black))
+                    .tracking(0.45)
+                    .foregroundStyle(.white.opacity(0.42))
+                    .textCase(.uppercase)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+
+                Text(item.value)
+                    .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
+                    .foregroundStyle(.white.opacity(0.92))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.68)
+
+                Text(item.detail)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.48))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 10)
+        .background(Color.white.opacity(0.032), in: .rect(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(item.tint.opacity(0.11), lineWidth: 1)
+        )
+        .accessibilityElement(children: .combine)
     }
 
     private var whatsImprovingCard: some View {
