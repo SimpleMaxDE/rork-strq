@@ -91,100 +91,581 @@ struct ProgressAnalyticsView: View {
         var id: String { title }
     }
 
-    private var headlineHero: some View {
-        let headline = proofHeadline
-        let maturity = proofMaturityCopy
-        let tint = STRQPalette.color(for: maturity.state)
-        let axisItems = proofAxisItems
+    private enum TrainingMapHeroStyle {
+        static let signal = Color(red: 0.412, green: 0.843, blue: 0.808)
+        static let amber = Color(red: 0.831, green: 0.722, blue: 0.416)
+        static let steel = STRQBrand.steel
+        static let plot = Color(red: 0.027, green: 0.039, blue: 0.059)
+        static let stage = Color(red: 0.035, green: 0.067, blue: 0.086)
+        static let surface = Color(red: 0.055, green: 0.066, blue: 0.082)
+        static let panel = Color.white.opacity(0.045)
+        static let track = Color(red: 0.153, green: 0.192, blue: 0.231)
+        static let border = Color.white.opacity(0.08)
+        static let grid = Color.white.opacity(0.06)
+    }
 
-        return VStack(alignment: .leading, spacing: 18) {
+    private enum TrainingMapHeroState: Equatable {
+        case locked
+        case forming
+        case readable
+
+        var tint: Color {
+            switch self {
+            case .locked:
+                return TrainingMapHeroStyle.steel
+            case .forming:
+                return TrainingMapHeroStyle.amber
+            case .readable:
+                return TrainingMapHeroStyle.signal
+            }
+        }
+
+        var background: Color {
+            switch self {
+            case .locked:
+                return TrainingMapHeroStyle.surface.opacity(0.72)
+            case .forming:
+                return TrainingMapHeroStyle.amber.opacity(0.16)
+            case .readable:
+                return TrainingMapHeroStyle.signal.opacity(0.16)
+            }
+        }
+
+        var border: Color {
+            switch self {
+            case .locked:
+                return TrainingMapHeroStyle.steel.opacity(0.22)
+            case .forming:
+                return TrainingMapHeroStyle.amber.opacity(0.50)
+            case .readable:
+                return TrainingMapHeroStyle.signal.opacity(0.54)
+            }
+        }
+
+        var iconTint: Color {
+            switch self {
+            case .locked:
+                return TrainingMapHeroStyle.steel.opacity(0.72)
+            default:
+                return tint
+            }
+        }
+
+        var ringProgress: CGFloat {
+            switch self {
+            case .locked:
+                return 0.10
+            case .forming:
+                return 0.42
+            case .readable:
+                return 0.82
+            }
+        }
+
+        var shadow: Color {
+            switch self {
+            case .locked:
+                return .clear
+            default:
+                return tint.opacity(0.24)
+            }
+        }
+    }
+
+    private struct TrainingMapHeroNode: Identifiable {
+        let title: String
+        let statusLabel: String
+        let icon: String
+        let state: TrainingMapHeroState
+        let x: CGFloat
+        let y: CGFloat
+        let size: CGFloat
+        let isPrimary: Bool
+
+        var id: String { title }
+    }
+
+    private struct TrainingMapHeroLink: Identifiable {
+        let start: String
+        let end: String
+
+        var id: String { "\(start)-\(end)" }
+
+        static let standard = [
+            TrainingMapHeroLink(start: "Sessions", end: "Rhythm"),
+            TrainingMapHeroLink(start: "Rhythm", end: "Evidence"),
+            TrainingMapHeroLink(start: "Evidence", end: "Strength"),
+            TrainingMapHeroLink(start: "Strength", end: "Detail"),
+            TrainingMapHeroLink(start: "Detail", end: "Sessions")
+        ]
+    }
+
+    private struct TrainingMapHeroSnapshot {
+        let completedWorkouts: Int
+        let sessionsInWindow: Int
+        let activeWeeks: Int
+        let currentWeekSessions: Int
+        let weeklyTarget: Int
+        let overallState: TrainingMapHeroState
+        let stateLabel: String
+        let headline: String
+        let detail: String
+        let mapCaption: String
+        let nextUnlockTitle: String
+        let nextUnlockDetail: String
+        let nextUnlockIcon: String
+        let nextUnlockState: TrainingMapHeroState
+        let mapNodes: [TrainingMapHeroNode]
+        let mapLinks: [TrainingMapHeroLink]
+
+        var accessibilityMapSummary: String {
+            mapNodes.map { "\($0.title) \($0.statusLabel)" }.joined(separator: ", ")
+        }
+
+        func node(named name: String) -> TrainingMapHeroNode {
+            mapNodes.first { $0.title == name } ?? mapNodes[0]
+        }
+    }
+
+    private var trainingMapHeroSnapshot: TrainingMapHeroSnapshot {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) ?? Date()
+        let windowStart = calendar.date(byAdding: .day, value: -27, to: today) ?? today
+        let completedSessions = vm.workoutHistory
+            .filter(\.isCompleted)
+            .sorted { $0.startTime > $1.startTime }
+        let sessionsInWindow = completedSessions.filter { session in
+            session.startTime >= windowStart && session.startTime < tomorrow
+        }
+        let activeWeekStarts = Set(sessionsInWindow.map {
+            calendar.dateInterval(of: .weekOfYear, for: $0.startTime)?.start ?? calendar.startOfDay(for: $0.startTime)
+        })
+        let currentWeekStart = calendar.dateInterval(of: .weekOfYear, for: today)?.start ?? today
+        let currentWeekSessions = sessionsInWindow.filter { $0.startTime >= currentWeekStart }.count
+        let weeklyTarget = max(1, min(vm.profile.daysPerWeek, 7))
+        let completedWorkouts = vm.totalCompletedWorkouts
+        let activeWeeks = activeWeekStarts.count
+
+        let overallState: TrainingMapHeroState
+        if completedWorkouts == 0 {
+            overallState = .locked
+        } else if completedWorkouts >= 4 && activeWeeks >= 2 {
+            overallState = .readable
+        } else {
+            overallState = .forming
+        }
+
+        let rhythmState: TrainingMapHeroState
+        if sessionsInWindow.isEmpty {
+            rhythmState = .locked
+        } else if (sessionsInWindow.count >= 4 && activeWeeks >= 2) || (currentWeekSessions >= weeklyTarget && sessionsInWindow.count >= weeklyTarget) {
+            rhythmState = .readable
+        } else {
+            rhythmState = .forming
+        }
+
+        let evidenceState: TrainingMapHeroState
+        if sessionsInWindow.isEmpty {
+            evidenceState = .locked
+        } else if sessionsInWindow.count >= 3 && activeWeeks >= 2 {
+            evidenceState = .readable
+        } else {
+            evidenceState = .forming
+        }
+
+        let strengthState: TrainingMapHeroState = vm.hasEnoughDataForStrengthChart
+            ? .readable
+            : (vm.strengthProgress.isEmpty ? .locked : .forming)
+        let detailState: TrainingMapHeroState = completedWorkouts >= 4
+            ? .readable
+            : (completedWorkouts > 0 ? .forming : .locked)
+
+        let stateLabel: String
+        let headline: String
+        let detail: String
+        let mapCaption: String
+        switch overallState {
+        case .locked:
+            stateLabel = L10n.tr("No claims yet")
+            headline = L10n.tr("Complete your first workout to start the map.")
+            detail = L10n.tr("The map fills from completed workouts only.")
+            mapCaption = L10n.tr("Complete your first workout to start the map. No claims yet.")
+        case .forming:
+            stateLabel = L10n.tr("Starting")
+            headline = completedWorkouts == 1 ? L10n.tr("One workout has started the record.") : L10n.tr("The map is taking shape.")
+            detail = L10n.tr("STRQ is using completed sessions only, keeping deeper reads quiet until repeats exist.")
+            mapCaption = L10n.tr("Early signals are visible. Detailed area reads stay quiet.")
+        case .readable:
+            stateLabel = L10n.tr("Readable")
+            headline = L10n.tr("Your recent training has a readable structure.")
+            detail = L10n.format("%d completed workouts across %d recent active weeks power this view.", completedWorkouts, activeWeeks)
+            mapCaption = L10n.tr("The structure is readable; detailed area claims stay conservative.")
+        }
+
+        let nextUnlock: (title: String, detail: String, icon: String, state: TrainingMapHeroState) = {
+            if completedWorkouts == 0 {
+                return (
+                    L10n.tr("One completed workout starts the map."),
+                    L10n.tr("Finish a workout so Progress can begin filling from real training history."),
+                    "play.fill",
+                    .locked
+                )
+            }
+            if completedWorkouts == 1 {
+                return (
+                    L10n.tr("One more session gives the map a repeat."),
+                    L10n.tr("Complete workout 2 to give STRQ the first real pattern to compare."),
+                    "repeat",
+                    .forming
+                )
+            }
+            if completedWorkouts == 2 {
+                return (
+                    L10n.tr("One more session steadies the rhythm."),
+                    L10n.tr("Complete workout 3 to make the weekly story easier to read."),
+                    "calendar.badge.plus",
+                    .forming
+                )
+            }
+            if currentWeekSessions < weeklyTarget {
+                let remaining = max(1, weeklyTarget - currentWeekSessions)
+                return (
+                    remaining == 1 ? L10n.tr("1 session left to steady this week.") : L10n.format("%d sessions left to steady this week.", remaining),
+                    remaining == 1 ? L10n.tr("Complete one more session to make this week easier to read.") : L10n.format("Complete %d more sessions to make this week easier to read.", remaining),
+                    "target",
+                    .forming
+                )
+            }
+            if !vm.hasEnoughDataForStrengthChart {
+                return (
+                    L10n.tr("Repeat one anchor to make strength readable."),
+                    L10n.tr("Repeated logged sets help the deeper trend view become easier to trust."),
+                    "chart.line.uptrend.xyaxis",
+                    .forming
+                )
+            }
+            return (
+                L10n.tr("Repeat the cadence next week."),
+                L10n.tr("A similar week keeps the structure easy to read without adding extra claims."),
+                "checkmark.seal.fill",
+                .readable
+            )
+        }()
+
+        func nodeLabel(for state: TrainingMapHeroState, locked: String, forming: String, readable: String) -> String {
+            switch state {
+            case .locked: return locked
+            case .forming: return forming
+            case .readable: return readable
+            }
+        }
+
+        let nodes = [
+            TrainingMapHeroNode(title: L10n.tr("Sessions"), statusLabel: nodeLabel(for: overallState, locked: L10n.tr("Start here"), forming: L10n.tr("Started"), readable: L10n.tr("Readable")), icon: "figure.strengthtraining.traditional", state: overallState, x: 0.28, y: 0.44, size: 86, isPrimary: true),
+            TrainingMapHeroNode(title: L10n.tr("Rhythm"), statusLabel: nodeLabel(for: rhythmState, locked: L10n.tr("Waiting"), forming: L10n.tr("Forming"), readable: L10n.tr("Readable")), icon: "calendar.badge.clock", state: rhythmState, x: 0.58, y: 0.24, size: 76, isPrimary: false),
+            TrainingMapHeroNode(title: L10n.tr("Evidence"), statusLabel: nodeLabel(for: evidenceState, locked: L10n.tr("Quiet"), forming: L10n.tr("Starting"), readable: L10n.tr("Readable")), icon: "list.bullet.rectangle.portrait.fill", state: evidenceState, x: 0.74, y: 0.52, size: 78, isPrimary: false),
+            TrainingMapHeroNode(title: L10n.tr("Strength"), statusLabel: nodeLabel(for: strengthState, locked: L10n.tr("Needs reps"), forming: L10n.tr("Forming"), readable: L10n.tr("Readable")), icon: "chart.line.uptrend.xyaxis", state: strengthState, x: 0.42, y: 0.72, size: 78, isPrimary: false),
+            TrainingMapHeroNode(title: L10n.tr("Detail"), statusLabel: nodeLabel(for: detailState, locked: L10n.tr("Later"), forming: L10n.tr("Opening"), readable: L10n.tr("Below")), icon: "rectangle.stack.fill", state: detailState, x: 0.22, y: 0.72, size: 70, isPrimary: false)
+        ]
+        let links = [
+            TrainingMapHeroLink(start: nodes[0].title, end: nodes[1].title),
+            TrainingMapHeroLink(start: nodes[1].title, end: nodes[2].title),
+            TrainingMapHeroLink(start: nodes[2].title, end: nodes[3].title),
+            TrainingMapHeroLink(start: nodes[3].title, end: nodes[4].title),
+            TrainingMapHeroLink(start: nodes[4].title, end: nodes[0].title)
+        ]
+
+        return TrainingMapHeroSnapshot(
+            completedWorkouts: completedWorkouts,
+            sessionsInWindow: sessionsInWindow.count,
+            activeWeeks: activeWeeks,
+            currentWeekSessions: currentWeekSessions,
+            weeklyTarget: weeklyTarget,
+            overallState: overallState,
+            stateLabel: stateLabel,
+            headline: headline,
+            detail: detail,
+            mapCaption: mapCaption,
+            nextUnlockTitle: nextUnlock.title,
+            nextUnlockDetail: nextUnlock.detail,
+            nextUnlockIcon: nextUnlock.icon,
+            nextUnlockState: nextUnlock.state,
+            mapNodes: nodes,
+            mapLinks: links
+        )
+    }
+
+    private var headlineHero: some View {
+        let snapshot = trainingMapHeroSnapshot
+        let tint = snapshot.overallState.tint
+
+        return VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 8) {
-                        Text(L10n.tr("STRQ REPORT"))
-                            .font(.system(size: 10, weight: .black))
-                            .tracking(1.2)
-                            .foregroundStyle(STRQBrand.steel)
-                        Text(maturity.eyebrow)
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(tint)
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 3)
-                            .background(tint.opacity(0.14), in: Capsule())
-                    }
+                    trainingMapStateCapsule(snapshot.stateLabel, state: snapshot.overallState)
 
-                    HStack(alignment: .lastTextBaseline, spacing: 9) {
-                        if let numeric = Double(headline.0) {
-                            STRQCountUpText(value: numeric, duration: 0.7)
-                                .font(.system(size: 62, weight: .heavy, design: .rounded).monospacedDigit())
-                                .foregroundStyle(.white)
-                        } else {
-                            Text(headline.0)
-                                .font(.system(size: 62, weight: .heavy, design: .rounded).monospacedDigit())
-                                .foregroundStyle(.white)
-                        }
-                        Text(headline.1)
-                            .font(.system(size: 17, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.54))
-                            .padding(.bottom, 8)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                    Text(L10n.tr("Training Map"))
+                        .font(.system(size: 10, weight: .black))
+                        .tracking(1.1)
+                        .foregroundStyle(.white.opacity(0.48))
+                        .textCase(.uppercase)
 
-                    Text(maturity.title)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.9))
+                    Text(snapshot.headline)
+                        .font(.system(size: 23, weight: .heavy, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.96))
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.82)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text(snapshot.detail)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.62))
+                        .lineLimit(3)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
                 Spacer(minLength: 0)
 
-                proofMaturityRing(progress: maturity.progress, tint: tint, icon: maturity.icon, label: maturity.meterLabel)
-            }
-
-            heroSignalPlot(items: axisItems, tint: tint)
-
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
-                ForEach(axisItems) { item in
-                    heroAxisReadout(item)
+                VStack(spacing: 3) {
+                    STRQCountUpText(value: Double(snapshot.completedWorkouts), duration: 0.7)
+                        .font(.system(size: 31, weight: .heavy, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white)
+                    Text(snapshot.completedWorkouts == 1 ? L10n.tr("workout") : L10n.tr("workouts"))
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.44))
+                        .lineLimit(1)
                 }
+                .frame(width: 76, height: 76)
+                .background(Color.white.opacity(0.04), in: Circle())
+                .overlay(Circle().strokeBorder(tint.opacity(0.2), lineWidth: 1))
             }
 
-            if !achievementChipsIsEmpty {
-                achievementChips
+            trainingMapCanvas(snapshot)
+                .frame(height: 286)
+
+            HStack(spacing: 0) {
+                trainingMapStat(title: L10n.tr("Window"), value: "\(snapshot.sessionsInWindow)", detail: L10n.tr("in 28d"))
+                Rectangle().fill(TrainingMapHeroStyle.border).frame(width: 1, height: 38)
+                trainingMapStat(title: L10n.tr("Weeks"), value: "\(snapshot.activeWeeks)/4", detail: L10n.tr("active"))
+                Rectangle().fill(TrainingMapHeroStyle.border).frame(width: 1, height: 38)
+                trainingMapStat(title: L10n.tr("Target"), value: "\(snapshot.currentWeekSessions)/\(snapshot.weeklyTarget)", detail: L10n.tr("this week"))
             }
+            .padding(.vertical, 11)
+            .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(TrainingMapHeroStyle.border, lineWidth: 1)
+            )
+
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: snapshot.nextUnlockIcon)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(snapshot.nextUnlockState.tint)
+                    .frame(width: 30, height: 30)
+                    .background(snapshot.nextUnlockState.tint.opacity(0.12), in: .rect(cornerRadius: 9))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(L10n.tr("Next Unlock"))
+                        .font(.system(size: 9, weight: .black))
+                        .tracking(0.7)
+                        .foregroundStyle(.white.opacity(0.42))
+                        .textCase(.uppercase)
+                    Text(snapshot.nextUnlockTitle)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.92))
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(snapshot.nextUnlockDetail)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.56))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(12)
+            .background(Color.white.opacity(0.028), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(snapshot.nextUnlockState.tint.opacity(0.14), lineWidth: 1)
+            )
+
         }
-        .padding(20)
+        .padding(16)
         .background {
             ZStack {
                 LinearGradient(
-                    colors: [Color(white: 0.13), Color(white: 0.052)],
+                    colors: [Color(red: 0.058, green: 0.069, blue: 0.085), Color(red: 0.025, green: 0.029, blue: 0.036)],
                     startPoint: .topLeading, endPoint: .bottomTrailing
                 )
-                VStack(spacing: 13) {
-                    ForEach(0..<7, id: \.self) { _ in
-                        Rectangle()
-                            .fill(Color.white.opacity(0.026))
-                            .frame(height: 1)
-                    }
-                }
-                .padding(.horizontal, 18)
-                .opacity(0.7)
             }
-            .clipShape(.rect(cornerRadius: 26))
+            .clipShape(.rect(cornerRadius: 24))
         }
         .overlay(
-            RoundedRectangle(cornerRadius: 26)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 24)
+                .strokeBorder(tint.opacity(0.22), lineWidth: 1)
         )
         .overlay(alignment: .topLeading) {
-            LinearGradient(colors: [tint.opacity(0.42), .clear], startPoint: .leading, endPoint: .trailing)
+            LinearGradient(colors: [tint.opacity(0.50), .clear], startPoint: .leading, endPoint: .trailing)
                 .frame(height: 2)
-                .clipShape(.rect(cornerRadii: .init(topLeading: 26, bottomLeading: 0, bottomTrailing: 0, topTrailing: 26)))
+                .clipShape(.rect(cornerRadii: .init(topLeading: 24, bottomLeading: 0, bottomTrailing: 0, topTrailing: 24)))
         }
         .shadow(color: .black.opacity(0.24), radius: 20, y: 7)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5), value: appeared)
+    }
+
+    private func trainingMapCanvas(_ snapshot: TrainingMapHeroSnapshot) -> some View {
+        GeometryReader { proxy in
+            let width = max(proxy.size.width, 1)
+            let height = max(proxy.size.height, 1)
+
+            ZStack {
+                RoundedRectangle(cornerRadius: 22)
+                    .fill(
+                        LinearGradient(
+                            colors: [TrainingMapHeroStyle.stage, TrainingMapHeroStyle.plot],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+
+                Path { path in
+                    path.addEllipse(in: CGRect(x: width * 0.12, y: height * 0.10, width: width * 0.76, height: height * 0.72))
+                    path.addEllipse(in: CGRect(x: width * 0.28, y: height * 0.23, width: width * 0.44, height: height * 0.42))
+                }
+                .stroke(snapshot.overallState.tint.opacity(snapshot.overallState == .locked ? 0.08 : 0.13), style: StrokeStyle(lineWidth: 1, dash: [6, 9]))
+
+                Path { path in
+                    path.move(to: CGPoint(x: width * 0.5, y: height * 0.08))
+                    path.addLine(to: CGPoint(x: width * 0.5, y: height * 0.88))
+                    path.move(to: CGPoint(x: width * 0.12, y: height * 0.5))
+                    path.addLine(to: CGPoint(x: width * 0.88, y: height * 0.5))
+                }
+                .stroke(TrainingMapHeroStyle.grid, style: StrokeStyle(lineWidth: 1, dash: [3, 8]))
+
+                ForEach(snapshot.mapLinks) { link in
+                    let start = snapshot.node(named: link.start)
+                    let end = snapshot.node(named: link.end)
+                    let isQuiet = start.state == .locked || end.state == .locked
+
+                    Path { path in
+                        path.move(to: CGPoint(x: width * start.x, y: height * start.y))
+                        path.addLine(to: CGPoint(x: width * end.x, y: height * end.y))
+                    }
+                    .trim(from: 0, to: appeared || reduceMotion ? 1 : 0)
+                    .stroke(
+                        (isQuiet ? TrainingMapHeroStyle.steel : end.state.tint).opacity(isQuiet ? 0.24 : 0.56),
+                        style: StrokeStyle(lineWidth: isQuiet ? 1.25 : 2.25, lineCap: .round, dash: isQuiet ? [5, 7] : [])
+                    )
+                    .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.6), value: appeared)
+                }
+
+                ForEach(snapshot.mapNodes) { node in
+                    trainingMapNode(node)
+                        .frame(width: node.size, height: node.size)
+                        .position(x: width * node.x, y: height * node.y)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(L10n.tr("Training Map"))
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.9))
+                    Text(snapshot.mapCaption)
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.52))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(width: min(190, width * 0.58), alignment: .leading)
+                .padding(10)
+                .background(Color(red: 0.067, green: 0.086, blue: 0.106).opacity(0.90), in: .rect(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(TrainingMapHeroStyle.border, lineWidth: 1)
+                )
+                .position(x: width * 0.31, y: height * 0.17)
+            }
+        }
+        .padding(5)
+        .background(TrainingMapHeroStyle.plot, in: .rect(cornerRadius: 24))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .strokeBorder(TrainingMapHeroStyle.border, lineWidth: 1)
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("\(L10n.tr("Training Map")), \(snapshot.accessibilityMapSummary)"))
+    }
+
+    private func trainingMapNode(_ node: TrainingMapHeroNode) -> some View {
+        ZStack {
+            Circle()
+                .fill(node.state.background)
+                .overlay(
+                    Circle()
+                        .strokeBorder(node.state.border, style: StrokeStyle(lineWidth: 1, dash: node.state == .locked ? [4, 5] : []))
+                )
+                .shadow(color: node.state.shadow, radius: node.state == .locked ? 0 : 11, y: 4)
+
+            Circle()
+                .trim(from: 0, to: appeared || reduceMotion ? node.state.ringProgress : 0.1)
+                .stroke(node.state.tint.opacity(node.state == .locked ? 0.24 : 0.92), style: StrokeStyle(lineWidth: node.isPrimary ? 3 : 2.5, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .padding(4)
+                .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.6), value: appeared)
+
+            VStack(spacing: 4) {
+                Image(systemName: node.icon)
+                    .font(.system(size: node.isPrimary ? 16 : 14, weight: .bold))
+                    .foregroundStyle(node.state.iconTint)
+
+                Text(node.title)
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(node.state == .locked ? .white.opacity(0.62) : .white.opacity(0.92))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+
+                Text(node.statusLabel)
+                    .font(.system(size: 8, weight: .black))
+                    .foregroundStyle(node.state.tint.opacity(node.state == .locked ? 0.70 : 0.94))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+            }
+            .padding(6)
+        }
+        .accessibilityLabel(Text("\(node.title), \(node.statusLabel)"))
+    }
+
+    private func trainingMapStat(title: String, value: String, detail: String) -> some View {
+        VStack(spacing: 4) {
+            Text(title.uppercased())
+                .font(.system(size: 8, weight: .black))
+                .foregroundStyle(.white.opacity(0.42))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Text(value)
+                .font(.system(size: 18, weight: .heavy, design: .rounded).monospacedDigit())
+                .foregroundStyle(.white.opacity(0.94))
+                .lineLimit(1)
+            Text(detail)
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.48))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func trainingMapStateCapsule(_ text: String, state: TrainingMapHeroState) -> some View {
+        Text(text.uppercased())
+            .font(.system(size: 9, weight: .black))
+            .foregroundStyle(state.tint)
+            .lineLimit(1)
+            .minimumScaleFactor(0.72)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .background(state.tint.opacity(0.10), in: Capsule())
+            .overlay(Capsule().strokeBorder(state.tint.opacity(0.18), lineWidth: 1))
     }
 
     private var achievementChipsIsEmpty: Bool {

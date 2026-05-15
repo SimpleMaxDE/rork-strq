@@ -4548,6 +4548,64 @@ Warnings:
 
 - The standalone `xcodebuild` command requires `/tmp/strq_capture_screen_map_enabled` to run the Screen Map tests instead of skipping; the capture script manages that control file automatically.
 
+## 2026-05-15 - Progress Training Map Hero Integration
+
+Scope:
+
+- Replaced only the top production Progress hero with a conservative real-data Training Map hero.
+- Preserved the real Progress tab route, Strength/Body/Volume tab behavior, existing lower Progress sections, History navigation, analytics, persistence, and app-wide flows.
+- Used `ProgressV5ProductionCandidateView.swift` as read-only reference only.
+
+Files changed:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `docs/migration-progress-log.md`
+
+Figma inspected:
+
+- No new Figma read in this implementation slice. Reused the accepted Training Map direction and previously inspected licensed-source mapping; no raw Figma assets, source branding, copy, or layouts were copied.
+
+Code inspected:
+
+- `ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `ios/STRQ/Views/ProgressV5ProductionCandidateView.swift`
+
+Implementation notes:
+
+- Added private view-local Training Map hero snapshot/types/canvas helpers in `ProgressAnalyticsView.swift`.
+- Hero data uses completed workouts, 28-day completed session count, recent active weeks, current-week sessions, `profile.daysPerWeek`, recent completed sessions, and `hasEnoughDataForStrengthChart`.
+- Hero states stay cautious: `No claims yet`, `Starting`, `Forming`, and `Readable`.
+- No demo/local scenario data, coverage percentages, `covered`/`improving`/`light` claims, plan-impact claims, coach-adjustment claims, Pro/paywall/subscription language, models, services, app shell files, localization files, assets, tests, or project files were added or changed.
+
+Verification run:
+
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+- `OUT_DIR="docs/qa/progress-training-map-hero-qa-$(date +%F-%H%M%S)"; scripts/qa/capture_strq_screen_map.sh "$OUT_DIR"`
+- Screen Map output path: `docs/qa/progress-training-map-hero-qa-2026-05-15-031119`
+- `jq empty docs/qa/progress-training-map-hero-qa-2026-05-15-031119/screen-map-en.json docs/qa/progress-training-map-hero-qa-2026-05-15-031119/screen-map-de.json docs/qa/progress-training-map-hero-qa-2026-05-15-031119/screen-contract-results-en.json docs/qa/progress-training-map-hero-qa-2026-05-15-031119/screen-contract-results-de.json`
+- `git diff --check`
+- `git diff --name-only`
+
+QA artifact handling:
+
+- Generated QA artifacts were removed before commit to keep the final diff scoped to product code plus this migration log entry.
+
+Intentionally not changed:
+
+- No Screen Crawler contract updates.
+- No Models, Services, AppViewModel, ContentView, Localizable, Assets, Tests, Xcode project, RevenueCat/store, Widget, Watch, or Live Activity files.
+- No replacement of the whole Progress tab.
+- No changes to Today, Handoff, Active Workout, Exercise Library, Onboarding, Plan Generation/Reveal, workout completion, or muscle coverage population.
+
+Pending work:
+
+- Separate QA follow-up can update Screen Crawler contracts if the team wants the new Progress hero text encoded in contract expectations.
+- Future Progress V5 work can continue below the hero after Muscle Coverage trust gates and runtime QA remain green.
+
+Warnings:
+
+- The existing Profile/Pro Preview screens still appear in broad Screen Map output; this slice did not touch or mix those screens into Progress.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name
