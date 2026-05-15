@@ -4648,6 +4648,50 @@ Pending work:
 
 - None for this narrow cleanup slice.
 
+### 2026-05-15 - Progress German Copy Localization Cleanup
+
+Scope:
+
+- Added German catalog coverage for visible Progress / Training Map strings that were falling back to English in German screenshots.
+- Aligned Progress terms with Signalstatus, Letzte Hinweise, Wochenrhythmus, Krafttrend, Nächster Fortschritt, Im Aufbau, Kraft, Körper, Volumen, and Belastbar.
+- Kept Training Map, STRQ, STRQ Pro, Workout(s), RPE, PR, and e1RM as accepted terms.
+
+Files changed:
+
+- `ios/STRQ/Localizable.xcstrings`
+- `docs/migration-progress-log.md`
+
+Implementation notes:
+
+- Localizable catalog only; `ProgressAnalyticsView.swift` did not need edits.
+- Preserved existing placeholders and product behavior.
+- Kept generated model, plan, workout, exercise, and Pro Preview strings outside this slice.
+
+Verification run:
+
+- `jq empty ios/STRQ/Localizable.xcstrings`
+- `git diff --check`
+- `rg -n "�|Ã|â|\\?rm|Haupt\\?|W\\?" ios/STRQ/Localizable.xcstrings ios/STRQ/Views/ProgressAnalyticsView.swift`
+- `xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build`
+- `OUT_DIR="docs/qa/progress-de-copy-qa-$(date +%F-%H%M%S)"; scripts/qa/capture_strq_screen_map.sh "$OUT_DIR"`
+- Final Screen Map output path: `docs/qa/progress-de-copy-qa-2026-05-15-133139`
+- Progress screenshots checked: `screenshots/de/12-progress.png`, `screenshots/de/13-progress-scroll-1.png`
+
+QA artifact handling:
+
+- Generated QA artifacts were left untracked at `docs/qa/progress-de-copy-qa-2026-05-15-131838/` and `docs/qa/progress-de-copy-qa-2026-05-15-133139/`.
+- Existing untracked `docs/qa/progress-top-support-cleanup-2026-05-15-120926/` and `docs/qa/progress-training-map-hero-review-2026-05-15/` artifacts were left untouched.
+
+Intentionally not changed:
+
+- No Progress Swift, services, models, AppViewModel, Dashboard, Onboarding, Plan, Workout, Exercise Library, Exercise Detail, Profile, Paywall, RevenueCat, assets, tests, project files, navigation, analytics, workout logic, screen crawler, or product behavior changed.
+- No new claims, fake precision, Pro/paywall language, models, services, assets, or features were added.
+
+Pending work:
+
+- Non-Progress English/generated strings remain for follow-up localization slices, including Today/Home coaching copy, Train/Exercise Library generated names and plural forms, Profile, and STRQ Pro Preview.
+- Pro Preview still exposes English copy such as `Evidence forming`; this slice did not change forbidden Profile/Paywall files.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

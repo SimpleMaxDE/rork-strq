@@ -8526,7 +8526,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Stärke"
+            "value": "Kraft"
           }
         }
       }
@@ -15320,7 +15320,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schlaf, Gewicht und Nutrition schärfen den Read."
+            "value": "Schlaf, Gewicht und Ernährung schärfen die Einschätzung."
           }
         }
       }
@@ -15340,7 +15340,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein paar Workouts zeigen Rhythmus, Mix und Workload."
+            "value": "Ein paar Workouts zeigen Wochenrhythmus, Mix und Trainingslast."
           }
         }
       }
@@ -17061,6 +17061,2056 @@
           "stringUnit": {
             "state": "translated",
             "value": "Volumen aktualisiert: %@"
+          }
+        }
+      }
+    },
+    "%@, %d completed workouts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, %d abgeschlossene Workouts"
+          }
+        }
+      }
+    },
+    "%d completed workouts across %d recent active weeks power this view.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d abgeschlossene Workouts über %d aktive Wochen stützen diese Ansicht."
+          }
+        }
+      }
+    },
+    "%d reps": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Wdh."
+          }
+        }
+      }
+    },
+    "%d sessions left to steady this week.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch %d Workouts stabilisieren diese Woche."
+          }
+        }
+      }
+    },
+    "%d-day streak with strength, recovery, and history now readable.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d-Tage-Serie; Kraft, Regeneration und Historie sind jetzt belastbar."
+          }
+        }
+      }
+    },
+    "/28 days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "/28 Tage"
+          }
+        }
+      }
+    },
+    "1 session left to steady this week.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch 1 Workout stabilisiert diese Woche."
+          }
+        }
+      }
+    },
+    "100% baseline": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "100% Basis"
+          }
+        }
+      }
+    },
+    "4-week average": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4-Wochen-Schnitt"
+          }
+        }
+      }
+    },
+    "4-week cadence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4-Wochen-Rhythmus"
+          }
+        }
+      }
+    },
+    "7-day adherence context": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "7-Tage-Kontext"
+          }
+        }
+      }
+    },
+    "70 reference": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "70er Referenz"
+          }
+        }
+      }
+    },
+    "8 weeks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "8 Wochen"
+          }
+        }
+      }
+    },
+    "8-week load rhythm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "8-Wochen-Lastrhythmus"
+          }
+        }
+      }
+    },
+    "A few more completed workouts are needed before muscle balance can be trusted.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein paar weitere abgeschlossene Workouts sind nötig, bevor die Muskelbalance belastbar ist."
+          }
+        }
+      }
+    },
+    "A few training days are visible. Repeated weeks will make the rhythm more stable.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein paar Trainingstage sind sichtbar. Wiederholte Wochen machen den Rhythmus stabiler."
+          }
+        }
+      }
+    },
+    "A similar week keeps the structure easy to read without adding extra claims.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine ähnliche Woche hält die Struktur lesbar, ohne neue Schlüsse zu ziehen."
+          }
+        }
+      }
+    },
+    "Active weeks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktive Wochen"
+          }
+        }
+      }
+    },
+    "Anchor evidence is present": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ankerhinweise sind da"
+          }
+        }
+      }
+    },
+    "Awaiting first workout": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wartet auf erstes Workout"
+          }
+        }
+      }
+    },
+    "Balance will appear once the comparison window is reliable.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balance erscheint, sobald das Vergleichsfenster belastbar ist."
+          }
+        }
+      }
+    },
+    "Bars show finished workouts per week; this is rhythm evidence, not intensity scoring.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balken zeigen abgeschlossene Workouts pro Woche; das ist Rhythmus, kein Intensitäts-Score."
+          }
+        }
+      }
+    },
+    "Baseline Forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basis im Aufbau"
+          }
+        }
+      }
+    },
+    "Baseline forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basis im Aufbau"
+          }
+        }
+      }
+    },
+    "Below": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unten"
+          }
+        }
+      }
+    },
+    "Body Baseline": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Körperbasis"
+          }
+        }
+      }
+    },
+    "Body baseline from logged weight": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Körperbasis aus geloggtem Gewicht"
+          }
+        }
+      }
+    },
+    "Body baseline is forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Körperbasis im Aufbau"
+          }
+        }
+      }
+    },
+    "Body trend": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Körpertrend"
+          }
+        }
+      }
+    },
+    "Body trend is not ready yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Körpertrend ist noch nicht bereit"
+          }
+        }
+      }
+    },
+    "Building pattern": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muster im Aufbau"
+          }
+        }
+      }
+    },
+    "Claim": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einordnung"
+          }
+        }
+      }
+    },
+    "Complete %d more sessions to make this week easier to read.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließe %d weitere Workouts ab, damit die Woche klarer lesbar wird."
+          }
+        }
+      }
+    },
+    "Complete one more session to make this week easier to read.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließe ein weiteres Workout ab, damit die Woche klarer lesbar wird."
+          }
+        }
+      }
+    },
+    "Complete workout 2 to give STRQ the first real pattern to compare.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließe Workout 2 ab, damit STRQ das erste Muster vergleichen kann."
+          }
+        }
+      }
+    },
+    "Complete workout 3 to make the weekly story easier to read.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließe Workout 3 ab, damit die Woche klarer lesbar wird."
+          }
+        }
+      }
+    },
+    "Complete workouts to create dated evidence with duration, sets, and volume when those fields exist in history.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließe Workouts ab, damit datierte Hinweise mit Dauer, Sätzen und Volumen entstehen, wenn diese Felder in der Historie vorhanden sind."
+          }
+        }
+      }
+    },
+    "Complete workouts to start the cadence map. The baseline stays quiet until real sessions land.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließe Workouts ab, damit die Rhythmuskarte startet. Die Basis bleibt ruhig, bis echte Einheiten da sind."
+          }
+        }
+      }
+    },
+    "Complete your first workout to start the map.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließe dein erstes Workout ab, um die Map zu starten."
+          }
+        }
+      }
+    },
+    "Complete your first workout to start the map. No claims yet.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließe dein erstes Workout ab, um die Map zu starten. Noch keine Schlüsse."
+          }
+        }
+      }
+    },
+    "Completed only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur abgeschlossen"
+          }
+        }
+      }
+    },
+    "Completed sessions now span multiple weeks, enough to read cadence without turning it into a streak game.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abgeschlossene Workouts verteilen sich über mehrere Wochen. Das reicht, um Rhythmus zu lesen, ohne daraus ein Streak-Spiel zu machen."
+          }
+        }
+      }
+    },
+    "Completed sessions only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur fertige Workouts"
+          }
+        }
+      }
+    },
+    "Completed workout cadence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rhythmus abgeschlossener Workouts"
+          }
+        }
+      }
+    },
+    "Completed workout day": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abgeschlossener Workout-Tag"
+          }
+        }
+      }
+    },
+    "Completed workout recorded from history.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abgeschlossenes Workout aus der Historie erfasst."
+          }
+        }
+      }
+    },
+    "Completed workouts now span multiple weeks, enough to read load rhythm without guessing at adaptation.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abgeschlossene Workouts verteilen sich über mehrere Wochen. Das reicht, um Lastrhythmus zu lesen, ohne Anpassung zu erraten."
+          }
+        }
+      }
+    },
+    "Completed workouts now span multiple weeks, enough to show which real sessions are shaping the current Progress picture.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abgeschlossene Workouts verteilen sich über mehrere Wochen. Das reicht, um zu zeigen, welche Einheiten das aktuelle Progress-Bild prägen."
+          }
+        }
+      }
+    },
+    "Consistent week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konstante Woche"
+          }
+        }
+      }
+    },
+    "Context": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontext"
+          }
+        }
+      }
+    },
+    "Context only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur Kontext"
+          }
+        }
+      }
+    },
+    "Current volume": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktuelles Volumen"
+          }
+        }
+      }
+    },
+    "Current week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktuelle Woche"
+          }
+        }
+      }
+    },
+    "Detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details"
+          }
+        }
+      }
+    },
+    "EVIDENCE NEEDED": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HINWEISE NÖTIG"
+          }
+        }
+      }
+    },
+    "EVIDENCE SIGNAL": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HINWEISSIGNAL"
+          }
+        }
+      }
+    },
+    "Early pattern building": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frühes Muster im Aufbau"
+          }
+        }
+      }
+    },
+    "Early rhythm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Früher Rhythmus"
+          }
+        }
+      }
+    },
+    "Early signal": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frühes Signal"
+          }
+        }
+      }
+    },
+    "Early signals are visible. Detailed area reads stay quiet.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erste Signale sind sichtbar. Detaillierte Bereiche bleiben noch ruhig."
+          }
+        }
+      }
+    },
+    "Estimated 1RM from logged sets": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM aus geloggten Sätzen"
+          }
+        }
+      }
+    },
+    "Estimated 1RM movement anchors": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM-Anker nach Bewegungsmuster"
+          }
+        }
+      }
+    },
+    "Evidence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinweise"
+          }
+        }
+      }
+    },
+    "Finish a workout so Progress can begin filling from real training history.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließe ein Workout ab, damit Progress mit echter Trainingshistorie startet."
+          }
+        }
+      }
+    },
+    "First signal": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstes Signal"
+          }
+        }
+      }
+    },
+    "First signal forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstes Signal im Aufbau"
+          }
+        }
+      }
+    },
+    "First training signal captured": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erstes Trainingssignal erfasst"
+          }
+        }
+      }
+    },
+    "Forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Aufbau"
+          }
+        }
+      }
+    },
+    "Hinge pattern": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinge-Muster"
+          }
+        }
+      }
+    },
+    "KEY PROOF POINTS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KERNHINWEISE"
+          }
+        }
+      }
+    },
+    "Later": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Später"
+          }
+        }
+      }
+    },
+    "Latest sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzte Workouts"
+          }
+        }
+      }
+    },
+    "Logged %d completed sets across %d exercises.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d abgeschlossene Sätze über %d Übungen geloggt."
+          }
+        }
+      }
+    },
+    "Logged %d completed sets with %@kg total volume.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d abgeschlossene Sätze mit %@kg Gesamtvolumen geloggt."
+          }
+        }
+      }
+    },
+    "Logged %d sets over %dmin with %@kg total volume.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Sätze in %dmin mit %@kg Gesamtvolumen geloggt."
+          }
+        }
+      }
+    },
+    "Logged sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geloggt"
+          }
+        }
+      }
+    },
+    "Logged sets are real proof, but repeated anchor evidence is still thin. The chart stays quiet until the existing gate passes.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geloggte Sätze sind echte Hinweise, aber die Ankerbasis ist noch dünn. Der Chart bleibt ruhig, bis genug Wiederholung da ist."
+          }
+        }
+      }
+    },
+    "Longer pattern": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Längeres Muster"
+          }
+        }
+      }
+    },
+    "Movement mix from current volume": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewegungsmix aus aktuellem Volumen"
+          }
+        }
+      }
+    },
+    "Muscle balance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muskelbalance"
+          }
+        }
+      }
+    },
+    "Muscle balance is still forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muskelbalance ist noch im Aufbau"
+          }
+        }
+      }
+    },
+    "Needs reps": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Braucht Reps"
+          }
+        }
+      }
+    },
+    "Next Unlock": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächster Fortschritt"
+          }
+        }
+      }
+    },
+    "No PR claim": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine PR-Wertung"
+          }
+        }
+      }
+    },
+    "No claims yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Schlüsse"
+          }
+        }
+      }
+    },
+    "No completed workouts are shown here until real workout history exists.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hier erscheinen keine Workouts, bis echte Trainingshistorie da ist."
+          }
+        }
+      }
+    },
+    "No conclusion": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Schlussfolgerung"
+          }
+        }
+      }
+    },
+    "Nothing yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nichts"
+          }
+        }
+      }
+    },
+    "One completed workout starts the map.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein abgeschlossenes Workout startet die Map."
+          }
+        }
+      }
+    },
+    "One finished workout is real evidence. A few more make strength, body, and volume trends trustworthy.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein abgeschlossenes Workout ist ein echtes Signal. Ein paar mehr machen Kraft-, Körper- und Volumentrends belastbarer."
+          }
+        }
+      }
+    },
+    "One more session gives the map a repeat.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein weiteres Workout gibt der Map den ersten Vergleich."
+          }
+        }
+      }
+    },
+    "One more session steadies the rhythm.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein weiteres Workout stabilisiert den Rhythmus."
+          }
+        }
+      }
+    },
+    "One or two sessions start the workload record. Weekly rhythm becomes useful after the same evidence repeats.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein oder zwei Workouts starten das Workload-Log. Der Wochenrhythmus wird nützlich, wenn sich die Hinweise wiederholen."
+          }
+        }
+      }
+    },
+    "One workout has started the record.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das erste Workout steht im Log."
+          }
+        }
+      }
+    },
+    "Open days stay neutral; readiness check-ins do not count here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offene Tage bleiben neutral; Readiness-Checks zählen hier nicht."
+          }
+        }
+      }
+    },
+    "Open training day": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offener Trainingstag"
+          }
+        }
+      }
+    },
+    "Opening": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffnet"
+          }
+        }
+      }
+    },
+    "Proof": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinweis"
+          }
+        }
+      }
+    },
+    "Proof Runway": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signalaufbau"
+          }
+        }
+      }
+    },
+    "Proof is becoming meaningful": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Hinweise werden belastbarer"
+          }
+        }
+      }
+    },
+    "Push anchor": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Push-Anker"
+          }
+        }
+      }
+    },
+    "Quiet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruhig"
+          }
+        }
+      }
+    },
+    "RECENT PROOF": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LETZTE HINWEISE"
+          }
+        }
+      }
+    },
+    "Readable": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belastbar"
+          }
+        }
+      }
+    },
+    "Readable rhythm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belastbarer Rhythmus"
+          }
+        }
+      }
+    },
+    "Readable trend": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belastbarer Trend"
+          }
+        }
+      }
+    },
+    "Real sessions logged, pattern still forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Echte Workouts geloggt, Muster noch im Aufbau"
+          }
+        }
+      }
+    },
+    "Recent Evidence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzte Hinweise"
+          }
+        }
+      }
+    },
+    "Recent sessions logged close together": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzte Workouts liegen nah beieinander"
+          }
+        }
+      }
+    },
+    "Recent sessions shaping Progress": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzte Workouts formen Progress"
+          }
+        }
+      }
+    },
+    "Recovery can add context now, but weight, nutrition, or goal data make the body read trustworthy.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regeneration kann jetzt Kontext geben, aber Gewicht, Ernährung oder Zieldaten machen die Körper-Einschätzung belastbarer."
+          }
+        }
+      }
+    },
+    "Repeat one anchor to make strength readable.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiederhole einen Ankerlift, um Kraft belastbar zu machen."
+          }
+        }
+      }
+    },
+    "Repeat the cadence next week.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiederhole den Rhythmus nächste Woche."
+          }
+        }
+      }
+    },
+    "Repeated logged sets are enough to draw the existing 8-week estimate. Treat this as strength signal, not a PR claim.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die geloggten Sätze reichen für die bestehende 8-Wochen-Schätzung. Behandle es als Kraftsignal, nicht als PR."
+          }
+        }
+      }
+    },
+    "Repeated logged sets help the deeper trend view become easier to trust.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiederholte geloggte Sätze machen den tieferen Trend belastbarer."
+          }
+        }
+      }
+    },
+    "Rhythm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rhythmus"
+          }
+        }
+      }
+    },
+    "SIGNAL READINESS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signalstatus"
+          }
+        }
+      }
+    },
+    "STRQ has dated session evidence, but the recent baseline needs more completed workouts before it can explain a rhythm.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ hat datierte Workouts, aber die aktuelle Basis braucht mehr abgeschlossene Workouts, bevor sie einen Rhythmus zeigt."
+          }
+        }
+      }
+    },
+    "STRQ has several completed workouts, but the weekly rhythm is still forming across the current evidence window.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ hat mehrere abgeschlossene Workouts, aber der Wochenrhythmus entsteht noch im aktuellen Fenster."
+          }
+        }
+      }
+    },
+    "STRQ is reading consistency and load. Conclusions stay cautious until the baseline fills in.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ liest Konstanz und Last. Schlüsse bleiben vorsichtig, bis die Basis steht."
+          }
+        }
+      }
+    },
+    "STRQ is using completed sessions only, keeping deeper reads quiet until repeats exist.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ nutzt nur abgeschlossene Workouts. Tiefere Signale bleiben ruhig, bis Wiederholungen da sind."
+          }
+        }
+      }
+    },
+    "STRQ needs current and comparison volume before showing balance as evidence.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STRQ braucht aktuelles und Vergleichsvolumen, bevor Balance als Hinweis erscheint."
+          }
+        }
+      }
+    },
+    "Session days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout-Tage"
+          }
+        }
+      }
+    },
+    "Sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workouts"
+          }
+        }
+      }
+    },
+    "Signal": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signal"
+          }
+        }
+      }
+    },
+    "Source": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quelle"
+          }
+        }
+      }
+    },
+    "Squat pattern": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Squat-Muster"
+          }
+        }
+      }
+    },
+    "Started": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gestartet"
+          }
+        }
+      }
+    },
+    "Starting": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Aufbau"
+          }
+        }
+      }
+    },
+    "Still forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch im Aufbau"
+          }
+        }
+      }
+    },
+    "Strength Trend": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krafttrend"
+          }
+        }
+      }
+    },
+    "Strength record is waiting": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kraftlog wartet"
+          }
+        }
+      }
+    },
+    "Strength trend": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krafttrend"
+          }
+        }
+      }
+    },
+    "Strength, recovery, and training history are now readable enough to trust.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kraft, Regeneration und Trainingshistorie sind jetzt belastbar genug."
+          }
+        }
+      }
+    },
+    "Target met": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziel erreicht"
+          }
+        }
+      }
+    },
+    "Target weeks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zielwochen"
+          }
+        }
+      }
+    },
+    "The map fills from completed workouts only.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Map füllt sich nur aus abgeschlossenen Workouts."
+          }
+        }
+      }
+    },
+    "The map is taking shape.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Training Map nimmt Form an."
+          }
+        }
+      }
+    },
+    "The structure is readable; detailed area claims stay conservative.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Struktur ist belastbar; Detailaussagen bleiben konservativ."
+          }
+        }
+      }
+    },
+    "The workload signal is present, but the weekly pattern is still thin. More completed sessions make the rhythm trustworthy.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Workload-Signal ist da, aber das Wochenmuster ist noch dünn. Mehr abgeschlossene Workouts machen den Rhythmus belastbar."
+          }
+        }
+      }
+    },
+    "This week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Woche"
+          }
+        }
+      }
+    },
+    "This week has enough completed sessions for your target. Longer rhythm still comes from repeat weeks.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Woche hat genug abgeschlossene Workouts für dein Ziel. Der längere Rhythmus entsteht weiter aus Wiederholungswochen."
+          }
+        }
+      }
+    },
+    "Training Map": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Training Map"
+          }
+        }
+      }
+    },
+    "Training baseline": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainingsbasis"
+          }
+        }
+      }
+    },
+    "Training context": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainingskontext"
+          }
+        }
+      }
+    },
+    "Training context, not a medical read": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainingskontext, keine medizinische Bewertung"
+          }
+        }
+      }
+    },
+    "Training data": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainingsdaten"
+          }
+        }
+      }
+    },
+    "Training evidence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainingshinweise"
+          }
+        }
+      }
+    },
+    "Training evidence starts with completed sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinweise starten mit abgeschlossenen Workouts"
+          }
+        }
+      }
+    },
+    "Training load baseline is forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trainingslast-Basis im Aufbau"
+          }
+        }
+      }
+    },
+    "Trust now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt belastbar"
+          }
+        }
+      }
+    },
+    "Trusted read": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belastbare Einschätzung"
+          }
+        }
+      }
+    },
+    "Trusted read after baseline gate": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belastbar nach dem Basischeck"
+          }
+        }
+      }
+    },
+    "Use this beside training load and sleep, not as a diagnosis.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutze das neben Trainingslast und Schlaf, nicht als Diagnose."
+          }
+        }
+      }
+    },
+    "Volume Trend": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumentrend"
+          }
+        }
+      }
+    },
+    "Waiting": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wartet"
+          }
+        }
+      }
+    },
+    "Waiting for completed sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wartet auf abgeschlossene Workouts"
+          }
+        }
+      }
+    },
+    "Weekly Rhythm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wochenrhythmus"
+          }
+        }
+      }
+    },
+    "Weekly Workouts from completed sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wöchentliche Workouts aus abgeschlossenen Einheiten"
+          }
+        }
+      }
+    },
+    "Weekly rhythm": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wochenrhythmus"
+          }
+        }
+      }
+    },
+    "Weeks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wochen"
+          }
+        }
+      }
+    },
+    "Window": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenster"
+          }
+        }
+      }
+    },
+    "Workout date": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout-Datum"
+          }
+        }
+      }
+    },
+    "Your first completed workout starts the strength record. STRQ waits for repeated lift evidence before drawing a trend.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein erstes abgeschlossenes Workout startet das Kraftlog. STRQ wartet auf wiederholte Lift-Hinweise, bevor ein Trend erscheint."
+          }
+        }
+      }
+    },
+    "Your recent training has a readable structure.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein aktuelles Training hat eine belastbare Struktur."
+          }
+        }
+      }
+    },
+    "active": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aktiv"
+          }
+        }
+      }
+    },
+    "anchor weeks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ankerwochen"
+          }
+        }
+      }
+    },
+    "anchors": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anker"
+          }
+        }
+      }
+    },
+    "baseline forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basis im Aufbau"
+          }
+        }
+      }
+    },
+    "building pattern": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muster im Aufbau"
+          }
+        }
+      }
+    },
+    "completed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "abgeschlossen"
+          }
+        }
+      }
+    },
+    "completed only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nur abgeschlossen"
+          }
+        }
+      }
+    },
+    "confidence": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sicherheit"
+          }
+        }
+      }
+    },
+    "context": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontext"
+          }
+        }
+      }
+    },
+    "current run": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aktuelle Serie"
+          }
+        }
+      }
+    },
+    "enough activity": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "genug Aktivität"
+          }
+        }
+      }
+    },
+    "existing chart": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bestehender Chart"
+          }
+        }
+      }
+    },
+    "first signal": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "erstes Signal"
+          }
+        }
+      }
+    },
+    "forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "im Aufbau"
+          }
+        }
+      }
+    },
+    "history": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Historie"
+          }
+        }
+      }
+    },
+    "in 28d": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "28 Tage"
+          }
+        }
+      }
+    },
+    "last 28 days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "letzte 28 Tage"
+          }
+        }
+      }
+    },
+    "logged in 28d": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "in 28 Tagen"
+          }
+        }
+      }
+    },
+    "met or above": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "erreicht oder höher"
+          }
+        }
+      }
+    },
+    "moving": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "in Bewegung"
+          }
+        }
+      }
+    },
+    "not PRs": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "keine PRs"
+          }
+        }
+      }
+    },
+    "not started": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nicht gestartet"
+          }
+        }
+      }
+    },
+    "of %d": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "von %d"
+          }
+        }
+      }
+    },
+    "of 4": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "von 4"
+          }
+        }
+      }
+    },
+    "peak %d/wk": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peak %d/Wo."
+          }
+        }
+      }
+    },
+    "ready": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bereit"
+          }
+        }
+      }
+    },
+    "recent weeks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "letzte Wochen"
+          }
+        }
+      }
+    },
+    "recovery": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regeneration"
+          }
+        }
+      }
+    },
+    "session": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout"
+          }
+        }
+      }
+    },
+    "sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workouts"
+          }
+        }
+      }
+    },
+    "still forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "noch im Aufbau"
+          }
+        }
+      }
+    },
+    "strength · body · consistency": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kraft · Körper · Konstanz"
+          }
+        }
+      }
+    },
+    "target %d/wk": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziel %d/Wo."
+          }
+        }
+      }
+    },
+    "target forming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziel im Aufbau"
+          }
+        }
+      }
+    },
+    "target reached": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ziel erreicht"
+          }
+        }
+      }
+    },
+    "this week": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "diese Woche"
+          }
+        }
+      }
+    },
+    "watching": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "im Blick"
+          }
+        }
+      }
+    },
+    "with work": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mit Workouts"
+          }
+        }
+      }
+    },
+    "workout": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workout"
+          }
+        }
+      }
+    },
+    "workouts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workouts"
           }
         }
       }
