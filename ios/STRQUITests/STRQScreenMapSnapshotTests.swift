@@ -53,6 +53,7 @@ final class STRQScreenMapSnapshotTests: XCTestCase {
         mapper.scrollToTop()
         captureProPreview(mapper)
 
+        mapper.attachContractResults()
         mapper.attachManifest()
     }
 
@@ -213,6 +214,424 @@ private struct ScreenMapFrame: Encodable {
     }
 }
 
+private struct ScreenContractSuite: Decodable {
+    let schemaVersion: Int
+    let globalNoGoLabels: [String]
+    let screens: [ScreenContract]
+}
+
+private struct ScreenContract: Decodable {
+    let screen: String
+    let locales: [String]
+    let allowedNavigationDepth: Int
+    let requiredRoles: [ScreenContractRole]
+    let optionalRoles: [ScreenContractRole]
+    let safeActions: [String]
+    let forbiddenActions: [String]
+    let scrollRegions: [ScreenContractRole]
+    let expectedScreenshots: [String]
+    let noGoLabels: [String]
+}
+
+private struct ScreenContractRole: Decodable {
+    let role: String
+    let id: String?
+    let label: String?
+    let classification: String?
+}
+
+private struct ScreenContractAttachment: Encodable {
+    let schemaVersion: Int
+    let contractSchemaVersion: Int
+    let generatedAt: String
+    let results: [ScreenContractLocaleResult]
+}
+
+private struct ScreenContractLocaleResult: Encodable {
+    let locale: String
+    let appleLocale: String
+    let passed: Bool
+    let screens: [ScreenContractScreenResult]
+    let warnings: [String]
+}
+
+private struct ScreenContractScreenResult: Encodable {
+    let screen: String
+    let passed: Bool
+    let allowedNavigationDepth: Int
+    let passedRoles: [ScreenContractRoleResult]
+    let missingRoles: [ScreenContractRoleResult]
+    let ambiguousRoles: [ScreenContractRoleResult]
+    let optionalMissingRoles: [ScreenContractRoleResult]
+    let forbiddenControlsFound: [ScreenContractElementEvidence]
+    let unsafeElementsSkipped: [ScreenContractElementEvidence]
+    let unknownHittableElements: [ScreenContractElementEvidence]
+    let screenshotCoverage: ScreenContractScreenshotCoverage
+    let scrollCoverage: ScreenContractScrollCoverage
+    let localizationIssues: [String]
+    let warnings: [String]
+}
+
+private struct ScreenContractRoleResult: Encodable {
+    let role: String
+    let id: String?
+    let label: String?
+    let classification: String?
+    let matches: Int
+    let screenshots: [String]
+}
+
+private struct ScreenContractElementEvidence: Encodable {
+    let id: String
+    let role: String?
+    let label: String
+    let type: String
+    let frame: ScreenMapFrame
+    let hittable: Bool
+    let safeAction: String
+    let classification: String
+    let screenshot: String
+    let actionResult: String
+    let reason: String
+}
+
+private struct ScreenContractScreenshotCoverage: Encodable {
+    let expected: [String]
+    let captured: [String]
+    let missing: [String]
+}
+
+private struct ScreenContractScrollCoverage: Encodable {
+    let expectedRegions: [String]
+    let capturedRegions: [String]
+    let missingRegions: [String]
+    let capturedPositions: [String]
+}
+
+private struct ScreenContractElementHit {
+    let screen: ScreenMapScreen
+    let element: ScreenMapElement
+}
+
+private enum ScreenContractEvaluator {
+    private static let safeClassifications = Set(["allowedTap", "safeTap"])
+    private static let interactiveTypes = Set(["Button", "TextField", "SecureTextField", "Switch", "Slider", "Link", "SearchField", "Menu", "MenuItem"])
+
+    static func contractURL(sourceFilePath: String) -> URL {
+        URL(fileURLWithPath: sourceFilePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("docs/qa/strq-screen-contracts/strq-screen-contracts.v1.json")
+    }
+
+    static func loadContracts(from url: URL) throws -> ScreenContractSuite {
+        let data = try Data(contentsOf: url)
+        return try JSONDecoder().decode(ScreenContractSuite.self, from: data)
+    }
+
+    static func evaluate(
+        manifest: ScreenMapManifest,
+        contracts: ScreenContractSuite,
+        generatedAt: String
+    ) -> ScreenContractAttachment {
+        let screenResults = contracts.screens
+            .filter { $0.locales.isEmpty || $0.locales.contains(manifest.appleLocale) }
+            .map { evaluate(screenContract: $0, manifest: manifest, globalNoGoLabels: contracts.globalNoGoLabels) }
+
+        let warnings = screenResults.flatMap { result in
+            result.warnings.map { "\(result.screen): \($0)" }
+        }
+
+        let localeResult = ScreenContractLocaleResult(
+            locale: manifest.locale,
+            appleLocale: manifest.appleLocale,
+            passed: screenResults.allSatisfy { $0.passed },
+            screens: screenResults,
+            warnings: warnings
+        )
+
+        return ScreenContractAttachment(
+            schemaVersion: 1,
+            contractSchemaVersion: contracts.schemaVersion,
+            generatedAt: generatedAt,
+            results: [localeResult]
+        )
+    }
+
+    private static func evaluate(
+        screenContract: ScreenContract,
+        manifest: ScreenMapManifest,
+        globalNoGoLabels: [String]
+    ) -> ScreenContractScreenResult {
+        let screens = manifest.screens.filter { $0.slug == screenContract.screen }
+        let elementHits = screens.flatMap { screen in
+            screen.elements.map { ScreenContractElementHit(screen: screen, element: $0) }
+        }
+        let scrollHits = screens.flatMap { screen in
+            screen.scrollableContainers.map { ScreenContractElementHit(screen: screen, element: $0) }
+        }
+
+        let requiredRoleResults = screenContract.requiredRoles.map { result(for: $0, in: elementHits) }
+        let optionalRoleResults = screenContract.optionalRoles.map { result(for: $0, in: elementHits) }
+        let passedRequiredRoles = requiredRoleResults.filter { $0.matches > 0 }
+        let missingRequiredRoles = requiredRoleResults.filter { $0.matches == 0 }
+        let optionalMissingRoles = optionalRoleResults.filter { $0.matches == 0 }
+        let ambiguousRoles = (screenContract.requiredRoles + screenContract.optionalRoles)
+            .filter { $0.id == nil && result(for: $0, in: elementHits).matches > 1 }
+            .map { result(for: $0, in: elementHits) }
+
+        let capturedScreenshots = screens.map { $0.scrollPosition }.uniquedSorted()
+        let missingScreenshots = screenContract.expectedScreenshots.filter { !capturedScreenshots.contains($0) }
+        let screenshotCoverage = ScreenContractScreenshotCoverage(
+            expected: screenContract.expectedScreenshots,
+            captured: capturedScreenshots,
+            missing: missingScreenshots
+        )
+
+        let expectedScrollRegions = screenContract.scrollRegions.compactMap { $0.id }.uniquedSorted()
+        let capturedScrollRegions = scrollHits.map { $0.element.identifier }.filter { !$0.isEmpty }.uniquedSorted()
+        let missingScrollRegions = expectedScrollRegions.filter { !capturedScrollRegions.contains($0) }
+        let scrollCoverage = ScreenContractScrollCoverage(
+            expectedRegions: expectedScrollRegions,
+            capturedRegions: capturedScrollRegions,
+            missingRegions: missingScrollRegions,
+            capturedPositions: capturedScreenshots
+        )
+
+        let noGoLabels = (globalNoGoLabels + screenContract.noGoLabels).uniquedSorted()
+        let coveredIDs = coveredIdentifiers(for: screenContract)
+        let forbiddenControls = unsafeElements(
+            in: elementHits,
+            forbiddenIDs: Set(screenContract.forbiddenActions),
+            noGoLabels: noGoLabels
+        )
+        let misclassifiedUnsafe = forbiddenControls.filter { safeClassifications.contains($0.element.safeAction) }
+        let unknownHittable = unknownHittableElements(in: elementHits, coveredIDs: coveredIDs, noGoLabels: noGoLabels)
+
+        var warnings: [String] = []
+        if !ambiguousRoles.isEmpty {
+            warnings.append("Ambiguous roles: \(ambiguousRoles.map { $0.role }.joined(separator: ", "))")
+        }
+        if !optionalMissingRoles.isEmpty {
+            warnings.append("Optional roles missing: \(optionalMissingRoles.map { $0.role }.joined(separator: ", "))")
+        }
+        if !missingScrollRegions.isEmpty {
+            warnings.append("Scroll regions not visible in exported map: \(missingScrollRegions.joined(separator: ", "))")
+        }
+        if !unknownHittable.isEmpty {
+            warnings.append("Unknown hittable elements observed: \(unknownHittable.count)")
+        }
+
+        let hardFailure = !missingRequiredRoles.isEmpty
+            || !missingScreenshots.isEmpty
+            || !misclassifiedUnsafe.isEmpty
+
+        return ScreenContractScreenResult(
+            screen: screenContract.screen,
+            passed: !hardFailure,
+            allowedNavigationDepth: screenContract.allowedNavigationDepth,
+            passedRoles: passedRequiredRoles + optionalRoleResults.filter { $0.matches > 0 },
+            missingRoles: missingRequiredRoles,
+            ambiguousRoles: ambiguousRoles,
+            optionalMissingRoles: optionalMissingRoles,
+            forbiddenControlsFound: forbiddenControls.map { evidence(for: $0, actionResult: "skipped", reason: "unsafe control observed") },
+            unsafeElementsSkipped: forbiddenControls.map { evidence(for: $0, actionResult: "skipped", reason: "contract forbids tapping this control") },
+            unknownHittableElements: unknownHittable.map { evidence(for: $0, actionResult: "not-tapped", reason: "not covered by screen contract") },
+            screenshotCoverage: screenshotCoverage,
+            scrollCoverage: scrollCoverage,
+            localizationIssues: [],
+            warnings: warnings
+        )
+    }
+
+    private static func result(for role: ScreenContractRole, in hits: [ScreenContractElementHit]) -> ScreenContractRoleResult {
+        let roleMatches = hits.filter { elementMatches(role: role, element: $0.element) }
+        return ScreenContractRoleResult(
+            role: role.role,
+            id: role.id,
+            label: role.label,
+            classification: role.classification,
+            matches: roleMatches.count,
+            screenshots: roleMatches.map { $0.screen.screenshot }.uniquedSorted()
+        )
+    }
+
+    private static func elementMatches(role: ScreenContractRole, element: ScreenMapElement) -> Bool {
+        if let id = role.id, !id.isEmpty {
+            return element.identifier == id
+        }
+
+        if let label = role.label, !label.isEmpty {
+            return normalized(element.label).contains(normalized(label))
+        }
+
+        return false
+    }
+
+    private static func coveredIdentifiers(for contract: ScreenContract) -> Set<String> {
+        let roleIDs = (contract.requiredRoles + contract.optionalRoles + contract.scrollRegions).compactMap { $0.id }
+        return Set(roleIDs + contract.safeActions + contract.forbiddenActions)
+    }
+
+    private static func unsafeElements(
+        in hits: [ScreenContractElementHit],
+        forbiddenIDs: Set<String>,
+        noGoLabels: [String]
+    ) -> [ScreenContractElementHit] {
+        unique(hits.filter { hit in
+            if forbiddenIDs.contains(hit.element.identifier) { return true }
+            if noGoLabels.contains(where: { normalized(hit.element.label).contains(normalized($0)) }) { return true }
+            return ["forbidden", "destructive", "purchase", "auth"].contains(classification(for: hit.element))
+        })
+    }
+
+    private static func unknownHittableElements(
+        in hits: [ScreenContractElementHit],
+        coveredIDs: Set<String>,
+        noGoLabels: [String]
+    ) -> [ScreenContractElementHit] {
+        unique(hits.filter { hit in
+            let element = hit.element
+            guard element.hittable, interactiveTypes.contains(element.type), !isSystemControl(element) else {
+                return false
+            }
+
+            if !element.identifier.isEmpty, coveredIDs.contains(element.identifier) {
+                return false
+            }
+
+            if noGoLabels.contains(where: { normalized(element.label).contains(normalized($0)) }) {
+                return false
+            }
+
+            return classification(for: element) == "unknown" || ["observeOnly", "allowedTap", "safeTap"].contains(element.safeAction)
+        })
+    }
+
+    private static func evidence(
+        for hit: ScreenContractElementHit,
+        actionResult: String,
+        reason: String
+    ) -> ScreenContractElementEvidence {
+        let element = hit.element
+        return ScreenContractElementEvidence(
+            id: element.identifier,
+            role: nil,
+            label: element.label,
+            type: element.type,
+            frame: element.frame,
+            hittable: element.hittable,
+            safeAction: element.safeAction,
+            classification: classification(for: element),
+            screenshot: hit.screen.screenshot,
+            actionResult: actionResult,
+            reason: reason
+        )
+    }
+
+    private static func unique(_ hits: [ScreenContractElementHit]) -> [ScreenContractElementHit] {
+        var seen = Set<String>()
+        var result: [ScreenContractElementHit] = []
+
+        for hit in hits {
+            let element = hit.element
+            let key = [
+                element.identifier,
+                element.label,
+                element.type,
+                element.safeAction,
+                classification(for: element)
+            ].joined(separator: "|")
+
+            guard !seen.contains(key) else { continue }
+            seen.insert(key)
+            result.append(hit)
+        }
+
+        return result
+    }
+
+    private static func classification(for element: ScreenMapElement) -> String {
+        let text = normalized("\(element.identifier) \(element.label)")
+
+        let purchaseTerms = [
+            "purchase",
+            "buy",
+            "start purchase",
+            "subscribe",
+            "abonnieren",
+            "kaufen",
+            "kaufen starten",
+            "restore",
+            "restore purchases",
+            "kaufe wiederherstellen",
+            "kaeufe wiederherstellen"
+        ]
+        if purchaseTerms.contains(where: { text.contains($0) }) {
+            return "purchase"
+        }
+
+        let authTerms = [
+            "sign in with apple",
+            "mit apple anmelden",
+            "sign out",
+            "signout"
+        ]
+        if authTerms.contains(where: { text.contains($0) }) {
+            return "auth"
+        }
+
+        let destructiveTerms = [
+            "reset",
+            "reset all data",
+            "alle daten zurucksetzen",
+            "delete",
+            "loschen",
+            "discard",
+            "verwerfen",
+            "finish workout",
+            "regenerate",
+            "regenerate plan",
+            "plan neu erstellen",
+            "destructive"
+        ]
+        if destructiveTerms.contains(where: { text.contains($0) }) {
+            return "destructive"
+        }
+
+        if element.safeAction == "forbidden" {
+            return "forbidden"
+        }
+
+        return "unknown"
+    }
+
+    private static func isSystemControl(_ element: ScreenMapElement) -> Bool {
+        let text = normalized("\(element.identifier) \(element.label)")
+        let systemTerms = [
+            "dictation",
+            "emoji",
+            "shift",
+            "next keyboard",
+            "nachste tastatur"
+        ]
+        return systemTerms.contains(where: { text.contains($0) })
+    }
+
+    private static func normalized(_ value: String) -> String {
+        value
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))
+            .lowercased()
+    }
+}
+
+private extension Array where Element == String {
+    func uniquedSorted() -> [String] {
+        Array(Set(self)).sorted()
+    }
+}
+
 @MainActor
 private final class STRQScreenMapExporter {
     private var app: XCUIApplication
@@ -327,6 +746,33 @@ private final class STRQScreenMapExporter {
             testCase.add(attachment)
         } catch {
             XCTFail("Failed to encode screen map manifest: \(error)")
+        }
+    }
+
+    func attachContractResults() {
+        do {
+            let contractURL = ScreenContractEvaluator.contractURL(sourceFilePath: #filePath)
+            let contracts = try ScreenContractEvaluator.loadContracts(from: contractURL)
+            let results = ScreenContractEvaluator.evaluate(
+                manifest: manifest,
+                contracts: contracts,
+                generatedAt: dateFormatter.string(from: Date())
+            )
+
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            let data = try encoder.encode(results)
+            let attachment = XCTAttachment(data: data, uniformTypeIdentifier: "public.json")
+            attachment.name = "screen-contract-results-\(locale.slug).json"
+            attachment.lifetime = .keepAlways
+            testCase.add(attachment)
+
+            XCTAssertTrue(
+                results.results.allSatisfy { $0.passed },
+                "Screen contract evaluation failed for \(locale.appleLocale)."
+            )
+        } catch {
+            XCTFail("Failed to evaluate screen contracts: \(error)")
         }
     }
 

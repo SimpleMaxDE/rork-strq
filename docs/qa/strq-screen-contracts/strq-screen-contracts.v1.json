@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "globalNoGoLabels": [
+    "Reset All Data",
+    "Alle Daten zurücksetzen",
+    "Regenerate Plan",
+    "Plan neu erstellen",
+    "Restore Purchases",
+    "Käufe wiederherstellen",
+    "Sign in with Apple",
+    "Mit Apple anmelden",
+    "Subscribe",
+    "Abonnieren",
+    "Buy",
+    "Kaufen",
+    "Delete",
+    "Löschen",
+    "Discard",
+    "Verwerfen"
+  ],
+  "screens": [
+    {
+      "screen": "today",
+      "locales": ["en_US", "de_DE"],
+      "allowedNavigationDepth": 0,
+      "requiredRoles": [
+        { "role": "tab", "id": "strq.tab.today" }
+      ],
+      "optionalRoles": [
+        { "role": "primaryAction", "id": "strq.today.start-workout" }
+      ],
+      "safeActions": ["strq.tab.today"],
+      "forbiddenActions": [],
+      "scrollRegions": [],
+      "expectedScreenshots": ["top", "max-depth"],
+      "noGoLabels": []
+    },
+    {
+      "screen": "coach",
+      "locales": ["en_US", "de_DE"],
+      "allowedNavigationDepth": 0,
+      "requiredRoles": [
+        { "role": "tab", "id": "strq.tab.coach" }
+      ],
+      "optionalRoles": [],
+      "safeActions": ["strq.tab.coach"],
+      "forbiddenActions": [],
+      "scrollRegions": [
+        { "role": "scrollRegion", "id": "strq.coach.scroll" }
+      ],
+      "expectedScreenshots": ["top", "max-depth"],
+      "noGoLabels": []
+    },
+    {
+      "screen": "train",
+      "locales": ["en_US", "de_DE"],
+      "allowedNavigationDepth": 0,
+      "requiredRoles": [
+        { "role": "tab", "id": "strq.tab.train" },
+        { "role": "secondaryAction", "id": "strq.train.menu" }
+      ],
+      "optionalRoles": [],
+      "safeActions": ["strq.tab.train", "strq.train.menu"],
+      "forbiddenActions": [],
+      "scrollRegions": [],
+      "expectedScreenshots": ["top", "max-depth"],
+      "noGoLabels": []
+    },
+    {
+      "screen": "train-options-menu",
+      "locales": ["en_US", "de_DE"],
+      "allowedNavigationDepth": 0,
+      "requiredRoles": [
+        { "role": "secondaryAction", "id": "strq.train.menu.exercise-library" }
+      ],
+      "optionalRoles": [
+        { "role": "destructiveAction", "id": "strq.train.menu.regenerate-plan", "classification": "destructive" }
+      ],
+      "safeActions": ["strq.train.menu.exercise-library"],
+      "forbiddenActions": ["strq.train.menu.regenerate-plan"],
+      "scrollRegions": [],
+      "expectedScreenshots": ["single"],
+      "noGoLabels": ["Regenerate Plan", "Plan neu erstellen"]
+    },
+    {
+      "screen": "exercise-library",
+      "locales": ["en_US", "de_DE"],
+      "allowedNavigationDepth": 0,
+      "requiredRoles": [
+        { "role": "searchField", "id": "strq.exercise-library.search" }
+      ],
+      "optionalRoles": [
+        { "role": "filterChip", "id": "strq.exercise-library.region.upper" },
+        { "role": "filterChip", "id": "strq.exercise-library.region.core" }
+      ],
+      "safeActions": [
+        "strq.exercise-library.search",
+        "strq.exercise-library.filters",
+        "strq.exercise-library.pattern-menu",
+        "strq.exercise-library.region.upper",
+        "strq.exercise-library.region.core"
+      ],
+      "forbiddenActions": [],
+      "scrollRegions": [
+        { "role": "scrollRegion", "id": "strq.exercise-library.scroll" },
+        { "role": "scrollRegion", "id": "strq.exercise-library.filter-chips" }
+      ],
+      "expectedScreenshots": ["top", "max-depth"],
+      "noGoLabels": []
+    },
+    {
+      "screen": "exercise-library-search-squat",
+      "locales": ["en_US", "de_DE"],
+      "allowedNavigationDepth": 0,
+      "requiredRoles": [
+        { "role": "searchField", "id": "strq.exercise-library.search" },
+        { "role": "secondaryAction", "id": "strq.exercise-library.search.clear" }
+      ],
+      "optionalRoles": [
+        { "role": "detailRow", "id": "strq.exercise-card.barbell-squat" }
+      ],
+      "safeActions": [
+        "strq.exercise-library.search",
+        "strq.exercise-library.search.clear",
+        "strq.exercise-library.filters",
+        "strq.exercise-library.pattern-menu",
+        "strq.exercise-library.region.upper",
+        "strq.exercise-library.region.core"
+      ],
+      "forbiddenActions": [],
+      "scrollRegions": [
+        { "role": "scrollRegion", "id": "strq.exercise-library.scroll" },
+        { "role": "scrollRegion", "id": "strq.exercise-library.filter-chips" }
+      ],
+      "expectedScreenshots": ["top", "max-depth"],
+      "noGoLabels": []
+    },
+    {
+      "screen": "progress",
+      "locales": ["en_US", "de_DE"],
+      "allowedNavigationDepth": 0,
+      "requiredRoles": [
+        { "role": "tab", "id": "strq.tab.progress" }
+      ],
+      "optionalRoles": [],
+      "safeActions": ["strq.tab.progress"],
+      "forbiddenActions": [],
+      "scrollRegions": [],
+      "expectedScreenshots": ["top", "max-depth"],
+      "noGoLabels": []
+    },
+    {
+      "screen": "profile",
+      "locales": ["en_US", "de_DE"],
+      "allowedNavigationDepth": 0,
+      "requiredRoles": [
+        { "role": "tab", "id": "strq.tab.profile" }
+      ],
+      "optionalRoles": [
+        { "role": "primaryAction", "id": "strq.profile.subscription" },
+        { "role": "purchaseAction", "id": "strq.profile.restore-purchases", "classification": "purchase" },
+        { "role": "destructiveAction", "id": "strq.profile.regenerate-plan", "classification": "destructive" },
+        { "role": "auth", "id": "strq.profile.account", "classification": "auth" },
+        { "role": "destructiveAction", "id": "strq.profile.reset-all-data", "classification": "destructive" }
+      ],
+      "safeActions": ["strq.tab.profile", "strq.profile.subscription"],
+      "forbiddenActions": [
+        "strq.profile.restore-purchases",
+        "strq.profile.regenerate-plan",
+        "strq.profile.reset-all-data"
+      ],
+      "scrollRegions": [
+        { "role": "scrollRegion", "id": "strq.profile.training-setup" }
+      ],
+      "expectedScreenshots": ["top", "middle", "max-depth"],
+      "noGoLabels": [
+        "Restore Purchases",
+        "Käufe wiederherstellen",
+        "Regenerate Plan",
+        "Plan neu erstellen",
+        "Sign in with Apple",
+        "Mit Apple anmelden",
+        "Reset All Data",
+        "Alle Daten zurücksetzen"
+      ]
+    },
+    {
+      "screen": "profile-pro-preview",
+      "locales": ["en_US", "de_DE"],
+      "allowedNavigationDepth": 0,
+      "requiredRoles": [
+        { "role": "sheetClose", "id": "strq.pro-preview.close" }
+      ],
+      "optionalRoles": [],
+      "safeActions": ["strq.pro-preview.close"],
+      "forbiddenActions": [],
+      "scrollRegions": [
+        { "role": "scrollRegion", "id": "strq.pro-preview.scroll" }
+      ],
+      "expectedScreenshots": ["top", "max-depth"],
+      "noGoLabels": ["Subscribe", "Abonnieren", "Buy", "Kaufen"]
+    }
+  ]
+}

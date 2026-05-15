@@ -1,0 +1,4472 @@
+{
+  "contractSchemaVersion" : 1,
+  "generatedAt" : "2026-05-15T00:40:25Z",
+  "results" : [
+    {
+      "appleLocale" : "de_DE",
+      "locale" : "de",
+      "passed" : true,
+      "screens" : [
+        {
+          "allowedNavigationDepth" : 0,
+          "ambiguousRoles" : [
+
+          ],
+          "forbiddenControlsFound" : [
+
+          ],
+          "localizationIssues" : [
+
+          ],
+          "missingRoles" : [
+
+          ],
+          "optionalMissingRoles" : [
+
+          ],
+          "passed" : true,
+          "passedRoles" : [
+            {
+              "id" : "strq.tab.today",
+              "matches" : 2,
+              "role" : "tab",
+              "screenshots" : [
+                "screenshots\/de\/01-today.png",
+                "screenshots\/de\/02-today-scroll-1.png"
+              ]
+            },
+            {
+              "id" : "strq.today.start-workout",
+              "matches" : 2,
+              "role" : "primaryAction",
+              "screenshots" : [
+                "screenshots\/de\/01-today.png",
+                "screenshots\/de\/02-today-scroll-1.png"
+              ]
+            }
+          ],
+          "screen" : "today",
+          "screenshotCoverage" : {
+            "captured" : [
+              "max-depth",
+              "top"
+            ],
+            "expected" : [
+              "top",
+              "max-depth"
+            ],
+            "missing" : [
+
+            ]
+          },
+          "scrollCoverage" : {
+            "capturedPositions" : [
+              "max-depth",
+              "top"
+            ],
+            "capturedRegions" : [
+
+            ],
+            "expectedRegions" : [
+
+            ],
+            "missingRegions" : [
+
+            ]
+          },
+          "unknownHittableElements" : [
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 36.33,
+                "width" : 338,
+                "x" : 32,
+                "y" : 735.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Deine erste Woche, 4\/5 erledigt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/01-today.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 66,
+                "width" : 77.33,
+                "x" : 162.33,
+                "y" : 770
+              },
+              "hittable" : true,
+              "id" : "strq.tab.train",
+              "label" : "Training",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/01-today.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 85.33,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.coach",
+              "label" : "Trainer",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/01-today.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 239.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.progress",
+              "label" : "Fortschritt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/01-today.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 316.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.profile",
+              "label" : "Profil",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/01-today.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 54,
+                "width" : 77,
+                "x" : 25,
+                "y" : 795
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/01-today.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 82.33,
+                "width" : 370,
+                "x" : 16,
+                "y" : 676.67
+              },
+              "hittable" : true,
+              "id" : "strq.today.signal.sleep",
+              "label" : "7.4h, SCHLAF",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/02-today-scroll-1.png",
+              "type" : "Button"
+            }
+          ],
+          "unsafeElementsSkipped" : [
+
+          ],
+          "warnings" : [
+            "Unknown hittable elements observed: 7"
+          ]
+        },
+        {
+          "allowedNavigationDepth" : 0,
+          "ambiguousRoles" : [
+
+          ],
+          "forbiddenControlsFound" : [
+
+          ],
+          "localizationIssues" : [
+
+          ],
+          "missingRoles" : [
+
+          ],
+          "optionalMissingRoles" : [
+
+          ],
+          "passed" : true,
+          "passedRoles" : [
+            {
+              "id" : "strq.tab.coach",
+              "matches" : 2,
+              "role" : "tab",
+              "screenshots" : [
+                "screenshots\/de\/03-coach.png",
+                "screenshots\/de\/04-coach-scroll-1.png"
+              ]
+            }
+          ],
+          "screen" : "coach",
+          "screenshotCoverage" : {
+            "captured" : [
+              "max-depth",
+              "top"
+            ],
+            "expected" : [
+              "top",
+              "max-depth"
+            ],
+            "missing" : [
+
+            ]
+          },
+          "scrollCoverage" : {
+            "capturedPositions" : [
+              "max-depth",
+              "top"
+            ],
+            "capturedRegions" : [
+              "strq.coach.scroll"
+            ],
+            "expectedRegions" : [
+              "strq.coach.scroll"
+            ],
+            "missingRegions" : [
+
+            ]
+          },
+          "unknownHittableElements" : [
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 66,
+                "width" : 77.33,
+                "x" : 162.33,
+                "y" : 770
+              },
+              "hittable" : true,
+              "id" : "strq.tab.train",
+              "label" : "Training",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/03-coach.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 8,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.today",
+              "label" : "Heute",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/03-coach.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 239.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.progress",
+              "label" : "Fortschritt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/03-coach.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 316.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.profile",
+              "label" : "Profil",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/03-coach.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 54,
+                "width" : 77,
+                "x" : 25,
+                "y" : 795
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/03-coach.png",
+              "type" : "Button"
+            }
+          ],
+          "unsafeElementsSkipped" : [
+
+          ],
+          "warnings" : [
+            "Unknown hittable elements observed: 5"
+          ]
+        },
+        {
+          "allowedNavigationDepth" : 0,
+          "ambiguousRoles" : [
+
+          ],
+          "forbiddenControlsFound" : [
+
+          ],
+          "localizationIssues" : [
+
+          ],
+          "missingRoles" : [
+
+          ],
+          "optionalMissingRoles" : [
+
+          ],
+          "passed" : true,
+          "passedRoles" : [
+            {
+              "id" : "strq.tab.train",
+              "matches" : 2,
+              "role" : "tab",
+              "screenshots" : [
+                "screenshots\/de\/05-train.png",
+                "screenshots\/de\/06-train-scroll-1.png"
+              ]
+            },
+            {
+              "id" : "strq.train.menu",
+              "matches" : 2,
+              "role" : "secondaryAction",
+              "screenshots" : [
+                "screenshots\/de\/05-train.png",
+                "screenshots\/de\/06-train-scroll-1.png"
+              ]
+            }
+          ],
+          "screen" : "train",
+          "screenshotCoverage" : {
+            "captured" : [
+              "max-depth",
+              "top"
+            ],
+            "expected" : [
+              "top",
+              "max-depth"
+            ],
+            "missing" : [
+
+            ]
+          },
+          "scrollCoverage" : {
+            "capturedPositions" : [
+              "max-depth",
+              "top"
+            ],
+            "capturedRegions" : [
+
+            ],
+            "expectedRegions" : [
+
+            ],
+            "missingRegions" : [
+
+            ]
+          },
+          "unknownHittableElements" : [
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 36,
+                "width" : 30,
+                "x" : 349,
+                "y" : 66
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 86,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Mo.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 178,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Mi.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 224,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Do.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 316,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Sa.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 40,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "So., Lower",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 132,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Di., Pull",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 270,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Fr., Upper",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25.33,
+                "width" : 112,
+                "x" : 147.67,
+                "y" : 420.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Überspringen",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25.33,
+                "width" : 102.33,
+                "x" : 267.67,
+                "y" : 420.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Verschieben",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 492.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "1, Barbell Bench Press, 3×6-8, ·, 0s, ·, RPE8, ·, 80 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 548.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "2, Lat Pulldown, 3×8-10, ·, 0s, ·, RPE8, ·, 70 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 630.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "3, Dumbbell Row, 3×10-12, ·, 0s, ·, RPE7, ·, 34 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 686.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "4, Dumbbell Shoulder Press, 2×8-10, ·, 0s, ·, RPE7, ·, 26 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 54,
+                "width" : 370,
+                "x" : 16,
+                "y" : 725
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Überprüfen und starten",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 768.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "5, Tricep Pushdown, 2×12-15, ·, 0s, ·, RPE7, ·, 30 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 8,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.today",
+              "label" : "Heute",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 85.33,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.coach",
+              "label" : "Trainer",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 239.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.progress",
+              "label" : "Fortschritt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 316.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.profile",
+              "label" : "Profil",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/05-train.png",
+              "type" : "Button"
+            }
+          ],
+          "unsafeElementsSkipped" : [
+
+          ],
+          "warnings" : [
+            "Unknown hittable elements observed: 20"
+          ]
+        },
+        {
+          "allowedNavigationDepth" : 0,
+          "ambiguousRoles" : [
+
+          ],
+          "forbiddenControlsFound" : [
+            {
+              "actionResult" : "skipped",
+              "classification" : "destructive",
+              "frame" : {
+                "height" : 42,
+                "width" : 250,
+                "x" : 144,
+                "y" : 219
+              },
+              "hittable" : true,
+              "id" : "strq.train.menu.regenerate-plan",
+              "label" : "Plan neu erstellen",
+              "reason" : "unsafe control observed",
+              "safeAction" : "forbidden",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            }
+          ],
+          "localizationIssues" : [
+
+          ],
+          "missingRoles" : [
+
+          ],
+          "optionalMissingRoles" : [
+
+          ],
+          "passed" : true,
+          "passedRoles" : [
+            {
+              "id" : "strq.train.menu.exercise-library",
+              "matches" : 1,
+              "role" : "secondaryAction",
+              "screenshots" : [
+                "screenshots\/de\/07-train-options-menu.png"
+              ]
+            },
+            {
+              "classification" : "destructive",
+              "id" : "strq.train.menu.regenerate-plan",
+              "matches" : 1,
+              "role" : "destructiveAction",
+              "screenshots" : [
+                "screenshots\/de\/07-train-options-menu.png"
+              ]
+            }
+          ],
+          "screen" : "train-options-menu",
+          "screenshotCoverage" : {
+            "captured" : [
+              "single"
+            ],
+            "expected" : [
+              "single"
+            ],
+            "missing" : [
+
+            ]
+          },
+          "scrollCoverage" : {
+            "capturedPositions" : [
+              "single"
+            ],
+            "capturedRegions" : [
+
+            ],
+            "expectedRegions" : [
+
+            ],
+            "missingRegions" : [
+
+            ]
+          },
+          "unknownHittableElements" : [
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 36,
+                "width" : 30,
+                "x" : 349,
+                "y" : 66
+              },
+              "hittable" : true,
+              "id" : "strq.train.menu",
+              "label" : "Train options",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 36,
+                "width" : 30,
+                "x" : 349,
+                "y" : 66
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 42,
+                "width" : 250,
+                "x" : 144,
+                "y" : 72
+              },
+              "hittable" : true,
+              "id" : "strq.train.menu.edit-workout",
+              "label" : "Workout bearbeiten",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 42,
+                "width" : 250,
+                "x" : 144,
+                "y" : 114
+              },
+              "hittable" : true,
+              "id" : "strq.train.menu.schedule",
+              "label" : "Zeitplan",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 86,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Mo.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 178,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Mi.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 224,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Do.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 316,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Sa.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 40,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "So., Lower",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 132,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Di., Pull",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 270,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Fr., Upper",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25.33,
+                "width" : 112,
+                "x" : 147.67,
+                "y" : 420.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Überspringen",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25.33,
+                "width" : 102.33,
+                "x" : 267.67,
+                "y" : 420.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Verschieben",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 492.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "1, Barbell Bench Press, 3×6-8, ·, 0s, ·, RPE8, ·, 80 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 548.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "2, Lat Pulldown, 3×8-10, ·, 0s, ·, RPE8, ·, 70 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 630.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "3, Dumbbell Row, 3×10-12, ·, 0s, ·, RPE7, ·, 34 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 686.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "4, Dumbbell Shoulder Press, 2×8-10, ·, 0s, ·, RPE7, ·, 26 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 54,
+                "width" : 370,
+                "x" : 16,
+                "y" : 725
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Überprüfen und starten",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 768.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "5, Tricep Pushdown, 2×12-15, ·, 0s, ·, RPE7, ·, 30 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 66,
+                "width" : 77.33,
+                "x" : 162.33,
+                "y" : 770
+              },
+              "hittable" : true,
+              "id" : "strq.tab.train",
+              "label" : "Training",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 8,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.today",
+              "label" : "Heute",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 85.33,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.coach",
+              "label" : "Trainer",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 239.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.progress",
+              "label" : "Fortschritt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 316.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.profile",
+              "label" : "Profil",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            }
+          ],
+          "unsafeElementsSkipped" : [
+            {
+              "actionResult" : "skipped",
+              "classification" : "destructive",
+              "frame" : {
+                "height" : 42,
+                "width" : 250,
+                "x" : 144,
+                "y" : 219
+              },
+              "hittable" : true,
+              "id" : "strq.train.menu.regenerate-plan",
+              "label" : "Plan neu erstellen",
+              "reason" : "contract forbids tapping this control",
+              "safeAction" : "forbidden",
+              "screenshot" : "screenshots\/de\/07-train-options-menu.png",
+              "type" : "Button"
+            }
+          ],
+          "warnings" : [
+            "Unknown hittable elements observed: 24"
+          ]
+        },
+        {
+          "allowedNavigationDepth" : 0,
+          "ambiguousRoles" : [
+
+          ],
+          "forbiddenControlsFound" : [
+
+          ],
+          "localizationIssues" : [
+
+          ],
+          "missingRoles" : [
+
+          ],
+          "optionalMissingRoles" : [
+
+          ],
+          "passed" : true,
+          "passedRoles" : [
+            {
+              "id" : "strq.exercise-library.search",
+              "matches" : 1,
+              "role" : "searchField",
+              "screenshots" : [
+                "screenshots\/de\/08-exercise-library.png"
+              ]
+            },
+            {
+              "id" : "strq.exercise-library.region.upper",
+              "matches" : 2,
+              "role" : "filterChip",
+              "screenshots" : [
+                "screenshots\/de\/08-exercise-library.png",
+                "screenshots\/de\/09-exercise-library-scroll-1.png"
+              ]
+            },
+            {
+              "id" : "strq.exercise-library.region.core",
+              "matches" : 2,
+              "role" : "filterChip",
+              "screenshots" : [
+                "screenshots\/de\/08-exercise-library.png",
+                "screenshots\/de\/09-exercise-library-scroll-1.png"
+              ]
+            }
+          ],
+          "screen" : "exercise-library",
+          "screenshotCoverage" : {
+            "captured" : [
+              "max-depth",
+              "top"
+            ],
+            "expected" : [
+              "top",
+              "max-depth"
+            ],
+            "missing" : [
+
+            ]
+          },
+          "scrollCoverage" : {
+            "capturedPositions" : [
+              "max-depth",
+              "top"
+            ],
+            "capturedRegions" : [
+              "strq.exercise-library.filter-chips",
+              "strq.exercise-library.scroll"
+            ],
+            "expectedRegions" : [
+              "strq.exercise-library.filter-chips",
+              "strq.exercise-library.scroll"
+            ],
+            "missingRegions" : [
+
+            ]
+          },
+          "unknownHittableElements" : [
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25,
+                "width" : 76,
+                "x" : 163,
+                "y" : 57
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Aufzeichnungsblatt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 36,
+                "width" : 30,
+                "x" : 349,
+                "y" : 66
+              },
+              "hittable" : true,
+              "id" : "strq.train.menu",
+              "label" : "Train options",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 36,
+                "width" : 30,
+                "x" : 349,
+                "y" : 66
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 86,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Mo.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 178,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Mi.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 224,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Do.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 316,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Sa.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 40,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "So., Lower",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 132,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Di., Pull",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 270,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Fr., Upper",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 370,
+                "x" : 16,
+                "y" : 361.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Romanian Deadlift, Beinbeuger, 1 Workouts, Im Plan",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25.33,
+                "width" : 112,
+                "x" : 147.67,
+                "y" : 420.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Überspringen",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25.33,
+                "width" : 102.33,
+                "x" : 267.67,
+                "y" : 420.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Verschieben",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 370,
+                "x" : 16,
+                "y" : 426
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Barbell Bench Press, Brust, 1 Workouts, Im Plan",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 370,
+                "x" : 16,
+                "y" : 490.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Barbell Back Squat, Quads, 1 Workouts, Im Plan",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 492.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "1, Barbell Bench Press, 3×6-8, ·, 0s, ·, RPE8, ·, 80 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 548.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "2, Lat Pulldown, 3×8-10, ·, 0s, ·, RPE8, ·, 70 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 90,
+                "width" : 80,
+                "x" : 16,
+                "y" : 595.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Gym Strength, 162",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 90,
+                "width" : 80,
+                "x" : 104,
+                "y" : 595.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Home Gym, 38",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 90,
+                "width" : 80,
+                "x" : 192,
+                "y" : 595.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Zuhause ohne Equipment, 84",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 90,
+                "width" : 80,
+                "x" : 280,
+                "y" : 595.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Calisthenics, 52",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 630.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "3, Dumbbell Row, 3×10-12, ·, 0s, ·, RPE7, ·, 34 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 686.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "4, Dumbbell Shoulder Press, 2×8-10, ·, 0s, ·, RPE7, ·, 26 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 54,
+                "width" : 370,
+                "x" : 16,
+                "y" : 725
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Überprüfen und starten",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 768.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "5, Tricep Pushdown, 2×12-15, ·, 0s, ·, RPE7, ·, 30 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 66,
+                "width" : 77.33,
+                "x" : 162.33,
+                "y" : 770
+              },
+              "hittable" : true,
+              "id" : "strq.tab.train",
+              "label" : "Training",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 8,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.today",
+              "label" : "Heute",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 85.33,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.coach",
+              "label" : "Trainer",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 239.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.progress",
+              "label" : "Fortschritt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 316.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.profile",
+              "label" : "Profil",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 811.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.barbell-bench-press",
+              "label" : "Barbell Bench Press, Brust, Bench Press, Langhantel",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 835.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.barbell-bench-press",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/08-exercise-library.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 195
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.dumbbell-bench-press",
+              "label" : "Dumbbell Bench Press, Brust, Bench Press, Kurzhantel",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 219
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.dumbbell-bench-press",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 259.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.incline-barbell-press",
+              "label" : "Incline Barbell Press, Brust, Incline Press, Langhantel",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 283.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.incline-barbell-press",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 324
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.incline-dumbbell-press",
+              "label" : "Incline Dumbbell Press, Brust, Incline Press, Kurzhantel",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 348
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.incline-dumbbell-press",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 388.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.decline-dumbbell-press",
+              "label" : "Decline Dumbbell Press, Brust, Grundübung, Kurzhantel",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 412.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.decline-dumbbell-press",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 453
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.machine-chest-press",
+              "label" : "Machine Chest Press, Brust, Bench Press, Maschine",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 477
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.machine-chest-press",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 517.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.incline-machine-press",
+              "label" : "Incline Machine Chest Press, Brust, Incline Press, Maschine",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 541.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.incline-machine-press",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 582
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.cable-chest-fly",
+              "label" : "Cable Chest Fly, Brust, Chest Fly, Kabelzug",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 606
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.cable-chest-fly",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 646.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.dumbbell-fly",
+              "label" : "Dumbbell Fly, Brust, Chest Fly, Kurzhantel",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 670.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.dumbbell-fly",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 711
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.pec-deck",
+              "label" : "Pec Deck Machine, Brust, Chest Fly, Maschine",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 735
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.pec-deck",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 775.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.push-up",
+              "label" : "Push-Up, Brust, Push-Up",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 799.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.push-up",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 840
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.knee-push-up",
+              "label" : "Knee Push-Up, Brust, Push-Up",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 864
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.knee-push-up",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/09-exercise-library-scroll-1.png",
+              "type" : "Button"
+            }
+          ],
+          "unsafeElementsSkipped" : [
+
+          ],
+          "warnings" : [
+            "Unknown hittable elements observed: 54"
+          ]
+        },
+        {
+          "allowedNavigationDepth" : 0,
+          "ambiguousRoles" : [
+
+          ],
+          "forbiddenControlsFound" : [
+
+          ],
+          "localizationIssues" : [
+
+          ],
+          "missingRoles" : [
+
+          ],
+          "optionalMissingRoles" : [
+
+          ],
+          "passed" : true,
+          "passedRoles" : [
+            {
+              "id" : "strq.exercise-library.search",
+              "matches" : 1,
+              "role" : "searchField",
+              "screenshots" : [
+                "screenshots\/de\/10-exercise-library-search-squat.png"
+              ]
+            },
+            {
+              "id" : "strq.exercise-library.search.clear",
+              "matches" : 1,
+              "role" : "secondaryAction",
+              "screenshots" : [
+                "screenshots\/de\/10-exercise-library-search-squat.png"
+              ]
+            },
+            {
+              "id" : "strq.exercise-card.barbell-squat",
+              "matches" : 1,
+              "role" : "detailRow",
+              "screenshots" : [
+                "screenshots\/de\/10-exercise-library-search-squat.png"
+              ]
+            }
+          ],
+          "screen" : "exercise-library-search-squat",
+          "screenshotCoverage" : {
+            "captured" : [
+              "max-depth",
+              "top"
+            ],
+            "expected" : [
+              "top",
+              "max-depth"
+            ],
+            "missing" : [
+
+            ]
+          },
+          "scrollCoverage" : {
+            "capturedPositions" : [
+              "max-depth",
+              "top"
+            ],
+            "capturedRegions" : [
+              "strq.exercise-library.filter-chips",
+              "strq.exercise-library.scroll"
+            ],
+            "expectedRegions" : [
+              "strq.exercise-library.filter-chips",
+              "strq.exercise-library.scroll"
+            ],
+            "missingRegions" : [
+
+            ]
+          },
+          "unknownHittableElements" : [
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25,
+                "width" : 76,
+                "x" : 163,
+                "y" : 57
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Aufzeichnungsblatt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 36,
+                "width" : 30,
+                "x" : 349,
+                "y" : 66
+              },
+              "hittable" : true,
+              "id" : "strq.train.menu",
+              "label" : "Train options",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 36,
+                "width" : 30,
+                "x" : 349,
+                "y" : 66
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 86,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Mo.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 178,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Mi.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 224,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Do.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 46,
+                "x" : 316,
+                "y" : 182
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Sa.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 40,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "So., Lower",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 132,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Di., Pull",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 63.67,
+                "width" : 46,
+                "x" : 270,
+                "y" : 182.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Fr., Upper",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 90,
+                "width" : 80,
+                "x" : 16,
+                "y" : 322.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Gym Strength, 162",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 90,
+                "width" : 80,
+                "x" : 104,
+                "y" : 322.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Home Gym, 38",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 90,
+                "width" : 80,
+                "x" : 192,
+                "y" : 322.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Zuhause ohne Equipment, 84",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 90,
+                "width" : 80,
+                "x" : 280,
+                "y" : 322.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Calisthenics, 52",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25.33,
+                "width" : 112,
+                "x" : 147.67,
+                "y" : 420.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Überspringen",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25.33,
+                "width" : 102.33,
+                "x" : 267.67,
+                "y" : 420.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Verschieben",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 66,
+                "width" : 77.33,
+                "x" : 162.33,
+                "y" : 469
+              },
+              "hittable" : true,
+              "id" : "strq.tab.train",
+              "label" : "Training",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 54,
+                "width" : 370,
+                "x" : 16,
+                "y" : 473
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Überprüfen und starten",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 8,
+                "y" : 480
+              },
+              "hittable" : true,
+              "id" : "strq.tab.today",
+              "label" : "Heute",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 85.33,
+                "y" : 480
+              },
+              "hittable" : true,
+              "id" : "strq.tab.coach",
+              "label" : "Trainer",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 239.67,
+                "y" : 480
+              },
+              "hittable" : true,
+              "id" : "strq.tab.progress",
+              "label" : "Fortschritt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 316.67,
+                "y" : 480
+              },
+              "hittable" : true,
+              "id" : "strq.tab.profile",
+              "label" : "Profil",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 492.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "1, Barbell Bench Press, 3×6-8, ·, 0s, ·, RPE8, ·, 80 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 537
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.goblet-squat",
+              "label" : "Goblet Squat, Quads, Squat, Kurzhantel",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 548.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "2, Lat Pulldown, 3×8-10, ·, 0s, ·, RPE8, ·, 70 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 561
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.goblet-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 625.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.barbell-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 630.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "3, Dumbbell Row, 3×10-12, ·, 0s, ·, RPE7, ·, 34 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 666
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.kettlebell-goblet-squat",
+              "label" : "Kettlebell Goblet Squat, Quads, Squat, Kettlebell",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 686.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "4, Dumbbell Shoulder Press, 2×8-10, ·, 0s, ·, RPE7, ·, 26 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 690
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.kettlebell-goblet-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 730.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.kettlebell-sumo-squat",
+              "label" : "Kettlebell Sumo Squat, Quads, Grundübung, Kettlebell",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 54,
+                "width" : 99,
+                "x" : 300.67,
+                "y" : 752
+              },
+              "hittable" : true,
+              "id" : "Search",
+              "label" : "Suchen",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 754.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.kettlebell-sumo-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 52,
+                "width" : 370,
+                "x" : 16,
+                "y" : 768.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "5, Tricep Pushdown, 2×12-15, ·, 0s, ·, RPE7, ·, 30 kg",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 795
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.belt-squat",
+              "label" : "Belt Squat, Quads, Squat, Maschine",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 819
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.belt-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/10-exercise-library-search-squat.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 178.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.landmine-squat",
+              "label" : "Landmine Squat, Quads, Squat, Langhantel",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 202.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.landmine-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 243
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.pendulum-squat",
+              "label" : "Pendulum Squat, Quads, Squat, Maschine",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 267
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.pendulum-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 307.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.smith-squat",
+              "label" : "Smith Machine Squat, Quads, Squat, Multipresse",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 331.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.smith-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 372
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.front-squat",
+              "label" : "Front Squat, Quads, Squat, Langhantel",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 396
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.front-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 436.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.hack-squat",
+              "label" : "Hack Squat, Quads, Squat, Maschine",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 460.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.hack-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 501
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.zercher-squat",
+              "label" : "Zercher Squat, Quads, Squat, Langhantel",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 525
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.zercher-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 565.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.band-squat",
+              "label" : "Banded Squat, Quads, Squat, Widerstandsband",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 589.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.band-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 630
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.bodyweight-squat",
+              "label" : "Bodyweight Squat, Quads, Bodyweight Squat Progressions",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 654.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.bodyweight-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 694.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.hindu-squat",
+              "label" : "Hindu Squat, Quads, Bodyweight Squat Progressions",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 718.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.hindu-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 759
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.trx-squat",
+              "label" : "TRX Assisted Squat, Quads, Bodyweight, TRX",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 783.33
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.trx-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 60,
+                "width" : 370,
+                "x" : 16,
+                "y" : 823.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.cossack-squat",
+              "label" : "Cossack Squat, Quads, Bodyweight Squat Progressions",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 11.67,
+                "width" : 12.67,
+                "x" : 334.67,
+                "y" : 847.67
+              },
+              "hittable" : true,
+              "id" : "strq.exercise-card.favorite.cossack-squat",
+              "label" : "Liebe",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/11-exercise-library-search-squat-scroll-1.png",
+              "type" : "Button"
+            }
+          ],
+          "unsafeElementsSkipped" : [
+
+          ],
+          "warnings" : [
+            "Unknown hittable elements observed: 59"
+          ]
+        },
+        {
+          "allowedNavigationDepth" : 0,
+          "ambiguousRoles" : [
+
+          ],
+          "forbiddenControlsFound" : [
+
+          ],
+          "localizationIssues" : [
+
+          ],
+          "missingRoles" : [
+
+          ],
+          "optionalMissingRoles" : [
+
+          ],
+          "passed" : true,
+          "passedRoles" : [
+            {
+              "id" : "strq.tab.progress",
+              "matches" : 2,
+              "role" : "tab",
+              "screenshots" : [
+                "screenshots\/de\/12-progress.png",
+                "screenshots\/de\/13-progress-scroll-1.png"
+              ]
+            }
+          ],
+          "screen" : "progress",
+          "screenshotCoverage" : {
+            "captured" : [
+              "max-depth",
+              "top"
+            ],
+            "expected" : [
+              "top",
+              "max-depth"
+            ],
+            "missing" : [
+
+            ]
+          },
+          "scrollCoverage" : {
+            "capturedPositions" : [
+              "max-depth",
+              "top"
+            ],
+            "capturedRegions" : [
+
+            ],
+            "expectedRegions" : [
+
+            ],
+            "missingRegions" : [
+
+            ]
+          },
+          "unknownHittableElements" : [
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 66,
+                "width" : 77.33,
+                "x" : 162.33,
+                "y" : 770
+              },
+              "hittable" : true,
+              "id" : "strq.tab.train",
+              "label" : "Training",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/12-progress.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 8,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.today",
+              "label" : "Heute",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/12-progress.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 85.33,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.coach",
+              "label" : "Trainer",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/12-progress.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 316.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.profile",
+              "label" : "Profil",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/12-progress.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 54,
+                "width" : 77,
+                "x" : 25,
+                "y" : 795
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/12-progress.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 38,
+                "width" : 118.33,
+                "x" : 17.33,
+                "y" : 449
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Stärke",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/13-progress-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 38,
+                "width" : 118.67,
+                "x" : 141.67,
+                "y" : 449
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Körper",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/13-progress-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 38,
+                "width" : 118.33,
+                "x" : 266.33,
+                "y" : 449
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Volumen",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/13-progress-scroll-1.png",
+              "type" : "Button"
+            }
+          ],
+          "unsafeElementsSkipped" : [
+
+          ],
+          "warnings" : [
+            "Unknown hittable elements observed: 8"
+          ]
+        },
+        {
+          "allowedNavigationDepth" : 0,
+          "ambiguousRoles" : [
+
+          ],
+          "forbiddenControlsFound" : [
+            {
+              "actionResult" : "skipped",
+              "classification" : "purchase",
+              "frame" : {
+                "height" : 65,
+                "width" : 370,
+                "x" : 16,
+                "y" : 784.67
+              },
+              "hittable" : true,
+              "id" : "strq.profile.controls",
+              "label" : "Käufe wiederherstellen",
+              "reason" : "unsafe control observed",
+              "safeAction" : "forbidden",
+              "screenshot" : "screenshots\/de\/15-profile-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "skipped",
+              "classification" : "purchase",
+              "frame" : {
+                "height" : 65,
+                "width" : 370,
+                "x" : 16,
+                "y" : 784.67
+              },
+              "hittable" : false,
+              "id" : "",
+              "label" : "Käufe wiederherstellen",
+              "reason" : "unsafe control observed",
+              "safeAction" : "none",
+              "screenshot" : "screenshots\/de\/15-profile-scroll-1.png",
+              "type" : "StaticText"
+            },
+            {
+              "actionResult" : "skipped",
+              "classification" : "destructive",
+              "frame" : {
+                "height" : 65,
+                "width" : 370,
+                "x" : 16,
+                "y" : 849.67
+              },
+              "hittable" : false,
+              "id" : "strq.profile.controls",
+              "label" : "Plan neu erstellen",
+              "reason" : "unsafe control observed",
+              "safeAction" : "forbidden",
+              "screenshot" : "screenshots\/de\/15-profile-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "skipped",
+              "classification" : "destructive",
+              "frame" : {
+                "height" : 65,
+                "width" : 370,
+                "x" : 16,
+                "y" : 849.67
+              },
+              "hittable" : false,
+              "id" : "",
+              "label" : "Plan neu erstellen",
+              "reason" : "unsafe control observed",
+              "safeAction" : "none",
+              "screenshot" : "screenshots\/de\/15-profile-scroll-1.png",
+              "type" : "StaticText"
+            },
+            {
+              "actionResult" : "skipped",
+              "classification" : "auth",
+              "frame" : {
+                "height" : 44,
+                "width" : 346,
+                "x" : 28,
+                "y" : 533
+              },
+              "hittable" : true,
+              "id" : "strq.profile.account",
+              "label" : "Mit Apple anmelden",
+              "reason" : "unsafe control observed",
+              "safeAction" : "forbidden",
+              "screenshot" : "screenshots\/de\/16-profile-scroll-2.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "skipped",
+              "classification" : "destructive",
+              "frame" : {
+                "height" : 64,
+                "width" : 370,
+                "x" : 16,
+                "y" : 701.33
+              },
+              "hittable" : true,
+              "id" : "strq.profile.danger",
+              "label" : "Alle Daten zurücksetzen, Alle Daten zurücksetzen",
+              "reason" : "unsafe control observed",
+              "safeAction" : "forbidden",
+              "screenshot" : "screenshots\/de\/16-profile-scroll-2.png",
+              "type" : "Button"
+            }
+          ],
+          "localizationIssues" : [
+
+          ],
+          "missingRoles" : [
+
+          ],
+          "optionalMissingRoles" : [
+            {
+              "classification" : "purchase",
+              "id" : "strq.profile.restore-purchases",
+              "matches" : 0,
+              "role" : "purchaseAction",
+              "screenshots" : [
+
+              ]
+            },
+            {
+              "classification" : "destructive",
+              "id" : "strq.profile.regenerate-plan",
+              "matches" : 0,
+              "role" : "destructiveAction",
+              "screenshots" : [
+
+              ]
+            },
+            {
+              "classification" : "destructive",
+              "id" : "strq.profile.reset-all-data",
+              "matches" : 0,
+              "role" : "destructiveAction",
+              "screenshots" : [
+
+              ]
+            }
+          ],
+          "passed" : true,
+          "passedRoles" : [
+            {
+              "id" : "strq.tab.profile",
+              "matches" : 3,
+              "role" : "tab",
+              "screenshots" : [
+                "screenshots\/de\/14-profile.png",
+                "screenshots\/de\/15-profile-scroll-1.png",
+                "screenshots\/de\/16-profile-scroll-2.png"
+              ]
+            },
+            {
+              "id" : "strq.profile.subscription",
+              "matches" : 1,
+              "role" : "primaryAction",
+              "screenshots" : [
+                "screenshots\/de\/14-profile.png"
+              ]
+            },
+            {
+              "classification" : "auth",
+              "id" : "strq.profile.account",
+              "matches" : 5,
+              "role" : "auth",
+              "screenshots" : [
+                "screenshots\/de\/16-profile-scroll-2.png"
+              ]
+            }
+          ],
+          "screen" : "profile",
+          "screenshotCoverage" : {
+            "captured" : [
+              "max-depth",
+              "middle",
+              "top"
+            ],
+            "expected" : [
+              "top",
+              "middle",
+              "max-depth"
+            ],
+            "missing" : [
+
+            ]
+          },
+          "scrollCoverage" : {
+            "capturedPositions" : [
+              "max-depth",
+              "middle",
+              "top"
+            ],
+            "capturedRegions" : [
+              "strq.profile.training-setup"
+            ],
+            "expectedRegions" : [
+              "strq.profile.training-setup"
+            ],
+            "missingRegions" : [
+
+            ]
+          },
+          "unknownHittableElements" : [
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 66,
+                "width" : 370,
+                "x" : 16,
+                "y" : 645.67
+              },
+              "hittable" : true,
+              "id" : "strq.profile.coaching-style",
+              "label" : "Coaching-Stil, PERSÖNLICH, Ausgewogen · Leistung · Standard",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/14-profile.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 66,
+                "width" : 77.33,
+                "x" : 162.33,
+                "y" : 770
+              },
+              "hittable" : true,
+              "id" : "strq.tab.train",
+              "label" : "Training",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/14-profile.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 108.67,
+                "width" : 346,
+                "x" : 28,
+                "y" : 779.33
+              },
+              "hittable" : true,
+              "id" : "strq.profile.body-nutrition",
+              "label" : "Physique- & Ernährungs-Coaching, Optional. Training und Recovery-Coaching bleiben auch ohne Ernährungs- oder Gewichtslogs vollständig aktiv.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/14-profile.png",
+              "type" : "Switch"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 8,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.today",
+              "label" : "Heute",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/14-profile.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 85.33,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.coach",
+              "label" : "Trainer",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/14-profile.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 239.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.progress",
+              "label" : "Fortschritt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/14-profile.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 54,
+                "width" : 77,
+                "x" : 25,
+                "y" : 795
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/14-profile.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 28,
+                "width" : 63,
+                "x" : 313,
+                "y" : 819.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/14-profile.png",
+              "type" : "Switch"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 370,
+                "x" : 16,
+                "y" : 364
+              },
+              "hittable" : true,
+              "id" : "strq.profile.body-nutrition",
+              "label" : "Schlafprotokoll",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/15-profile-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 65,
+                "width" : 370,
+                "x" : 16,
+                "y" : 719.67
+              },
+              "hittable" : true,
+              "id" : "strq.profile.controls",
+              "label" : "Benachrichtigungen",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/15-profile-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 65,
+                "width" : 370,
+                "x" : 16,
+                "y" : 233.67
+              },
+              "hittable" : true,
+              "id" : "strq.profile.controls",
+              "label" : "Internal Preview: Training Map, Internal Preview: Training Map",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/16-profile-scroll-2.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 64,
+                "width" : 370,
+                "x" : 16,
+                "y" : 298.67
+              },
+              "hittable" : true,
+              "id" : "strq.profile.controls",
+              "label" : "Design System Lab, Design System Lab",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/16-profile-scroll-2.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 14.33,
+                "width" : 73.67,
+                "x" : 20,
+                "y" : 791.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Datenschutz",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/16-profile-scroll-2.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 14.33,
+                "width" : 131.67,
+                "x" : 133.67,
+                "y" : 791.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Nutzungsbedingungen",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/16-profile-scroll-2.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 14.33,
+                "width" : 76.67,
+                "x" : 305.33,
+                "y" : 791.33
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "ERGÄNZUNG",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/16-profile-scroll-2.png",
+              "type" : "Button"
+            }
+          ],
+          "unsafeElementsSkipped" : [
+            {
+              "actionResult" : "skipped",
+              "classification" : "purchase",
+              "frame" : {
+                "height" : 65,
+                "width" : 370,
+                "x" : 16,
+                "y" : 784.67
+              },
+              "hittable" : true,
+              "id" : "strq.profile.controls",
+              "label" : "Käufe wiederherstellen",
+              "reason" : "contract forbids tapping this control",
+              "safeAction" : "forbidden",
+              "screenshot" : "screenshots\/de\/15-profile-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "skipped",
+              "classification" : "purchase",
+              "frame" : {
+                "height" : 65,
+                "width" : 370,
+                "x" : 16,
+                "y" : 784.67
+              },
+              "hittable" : false,
+              "id" : "",
+              "label" : "Käufe wiederherstellen",
+              "reason" : "contract forbids tapping this control",
+              "safeAction" : "none",
+              "screenshot" : "screenshots\/de\/15-profile-scroll-1.png",
+              "type" : "StaticText"
+            },
+            {
+              "actionResult" : "skipped",
+              "classification" : "destructive",
+              "frame" : {
+                "height" : 65,
+                "width" : 370,
+                "x" : 16,
+                "y" : 849.67
+              },
+              "hittable" : false,
+              "id" : "strq.profile.controls",
+              "label" : "Plan neu erstellen",
+              "reason" : "contract forbids tapping this control",
+              "safeAction" : "forbidden",
+              "screenshot" : "screenshots\/de\/15-profile-scroll-1.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "skipped",
+              "classification" : "destructive",
+              "frame" : {
+                "height" : 65,
+                "width" : 370,
+                "x" : 16,
+                "y" : 849.67
+              },
+              "hittable" : false,
+              "id" : "",
+              "label" : "Plan neu erstellen",
+              "reason" : "contract forbids tapping this control",
+              "safeAction" : "none",
+              "screenshot" : "screenshots\/de\/15-profile-scroll-1.png",
+              "type" : "StaticText"
+            },
+            {
+              "actionResult" : "skipped",
+              "classification" : "auth",
+              "frame" : {
+                "height" : 44,
+                "width" : 346,
+                "x" : 28,
+                "y" : 533
+              },
+              "hittable" : true,
+              "id" : "strq.profile.account",
+              "label" : "Mit Apple anmelden",
+              "reason" : "contract forbids tapping this control",
+              "safeAction" : "forbidden",
+              "screenshot" : "screenshots\/de\/16-profile-scroll-2.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "skipped",
+              "classification" : "destructive",
+              "frame" : {
+                "height" : 64,
+                "width" : 370,
+                "x" : 16,
+                "y" : 701.33
+              },
+              "hittable" : true,
+              "id" : "strq.profile.danger",
+              "label" : "Alle Daten zurücksetzen, Alle Daten zurücksetzen",
+              "reason" : "contract forbids tapping this control",
+              "safeAction" : "forbidden",
+              "screenshot" : "screenshots\/de\/16-profile-scroll-2.png",
+              "type" : "Button"
+            }
+          ],
+          "warnings" : [
+            "Optional roles missing: purchaseAction, destructiveAction, destructiveAction",
+            "Unknown hittable elements observed: 15"
+          ]
+        },
+        {
+          "allowedNavigationDepth" : 0,
+          "ambiguousRoles" : [
+
+          ],
+          "forbiddenControlsFound" : [
+            {
+              "actionResult" : "skipped",
+              "classification" : "purchase",
+              "frame" : {
+                "height" : 18,
+                "width" : 263.33,
+                "x" : 69.33,
+                "y" : 589.33
+              },
+              "hittable" : false,
+              "id" : "",
+              "label" : "No purchase is available in this build.",
+              "reason" : "unsafe control observed",
+              "safeAction" : "none",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "StaticText"
+            }
+          ],
+          "localizationIssues" : [
+
+          ],
+          "missingRoles" : [
+
+          ],
+          "optionalMissingRoles" : [
+
+          ],
+          "passed" : true,
+          "passedRoles" : [
+            {
+              "id" : "strq.pro-preview.close",
+              "matches" : 2,
+              "role" : "sheetClose",
+              "screenshots" : [
+                "screenshots\/de\/17-profile-pro-preview.png",
+                "screenshots\/de\/18-profile-pro-preview-scroll-1.png"
+              ]
+            }
+          ],
+          "screen" : "profile-pro-preview",
+          "screenshotCoverage" : {
+            "captured" : [
+              "max-depth",
+              "top"
+            ],
+            "expected" : [
+              "top",
+              "max-depth"
+            ],
+            "missing" : [
+
+            ]
+          },
+          "scrollCoverage" : {
+            "capturedPositions" : [
+              "max-depth",
+              "top"
+            ],
+            "capturedRegions" : [
+
+            ],
+            "expectedRegions" : [
+              "strq.pro-preview.scroll"
+            ],
+            "missingRegions" : [
+              "strq.pro-preview.scroll"
+            ]
+          },
+          "unknownHittableElements" : [
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 25,
+                "width" : 76,
+                "x" : 163,
+                "y" : 57
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Aufzeichnungsblatt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 141.33,
+                "width" : 370,
+                "x" : 16,
+                "y" : 289.33
+              },
+              "hittable" : true,
+              "id" : "strq.profile.subscription",
+              "label" : "STRQ Pro, Deeper coaching, evolving plans, and richer progress evidence.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 66,
+                "width" : 370,
+                "x" : 16,
+                "y" : 645.67
+              },
+              "hittable" : true,
+              "id" : "strq.profile.coaching-style",
+              "label" : "Coaching-Stil, PERSÖNLICH, Ausgewogen · Leistung · Standard",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 66,
+                "width" : 77.33,
+                "x" : 162.33,
+                "y" : 770
+              },
+              "hittable" : true,
+              "id" : "strq.tab.train",
+              "label" : "Training",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 108.67,
+                "width" : 346,
+                "x" : 28,
+                "y" : 779.33
+              },
+              "hittable" : true,
+              "id" : "strq.profile.body-nutrition",
+              "label" : "Physique- & Ernährungs-Coaching, Optional. Training und Recovery-Coaching bleiben auch ohne Ernährungs- oder Gewichtslogs vollständig aktiv.",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Switch"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 8,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.today",
+              "label" : "Heute",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 85.33,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.coach",
+              "label" : "Trainer",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77,
+                "x" : 239.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.progress",
+              "label" : "Fortschritt",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 44,
+                "width" : 77.33,
+                "x" : 316.67,
+                "y" : 781
+              },
+              "hittable" : true,
+              "id" : "strq.tab.profile",
+              "label" : "Profil",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 54,
+                "width" : 77,
+                "x" : 25,
+                "y" : 795
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Button"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 28,
+                "width" : 63,
+                "x" : 313,
+                "y" : 819.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "observeOnly",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "Switch"
+            },
+            {
+              "actionResult" : "not-tapped",
+              "classification" : "unknown",
+              "frame" : {
+                "height" : 14.33,
+                "width" : 57.33,
+                "x" : 90,
+                "y" : 315.67
+              },
+              "hittable" : true,
+              "id" : "",
+              "label" : "Details",
+              "reason" : "not covered by screen contract",
+              "safeAction" : "allowedTap",
+              "screenshot" : "screenshots\/de\/18-profile-pro-preview-scroll-1.png",
+              "type" : "Button"
+            }
+          ],
+          "unsafeElementsSkipped" : [
+            {
+              "actionResult" : "skipped",
+              "classification" : "purchase",
+              "frame" : {
+                "height" : 18,
+                "width" : 263.33,
+                "x" : 69.33,
+                "y" : 589.33
+              },
+              "hittable" : false,
+              "id" : "",
+              "label" : "No purchase is available in this build.",
+              "reason" : "contract forbids tapping this control",
+              "safeAction" : "none",
+              "screenshot" : "screenshots\/de\/17-profile-pro-preview.png",
+              "type" : "StaticText"
+            }
+          ],
+          "warnings" : [
+            "Scroll regions not visible in exported map: strq.pro-preview.scroll",
+            "Unknown hittable elements observed: 12"
+          ]
+        }
+      ],
+      "warnings" : [
+        "today: Unknown hittable elements observed: 7",
+        "coach: Unknown hittable elements observed: 5",
+        "train: Unknown hittable elements observed: 20",
+        "train-options-menu: Unknown hittable elements observed: 24",
+        "exercise-library: Unknown hittable elements observed: 54",
+        "exercise-library-search-squat: Unknown hittable elements observed: 59",
+        "progress: Unknown hittable elements observed: 8",
+        "profile: Optional roles missing: purchaseAction, destructiveAction, destructiveAction",
+        "profile: Unknown hittable elements observed: 15",
+        "profile-pro-preview: Scroll regions not visible in exported map: strq.pro-preview.scroll",
+        "profile-pro-preview: Unknown hittable elements observed: 12"
+      ]
+    }
+  ],
+  "schemaVersion" : 1
+}

@@ -23,7 +23,15 @@ cd "${ROOT_DIR}"
 mkdir -p "${OUT_DIR}/screenshots/en" "${OUT_DIR}/screenshots/de"
 rm -rf "${OUT_DIR}/screenshots/en" "${OUT_DIR}/screenshots/de"
 mkdir -p "${OUT_DIR}/screenshots/en" "${OUT_DIR}/screenshots/de"
-rm -f "${OUT_DIR}/screen-map.json" "${OUT_DIR}/screen-map-en.json" "${OUT_DIR}/screen-map-de.json" "${OUT_DIR}/contact-sheet.jpg" "${OUT_DIR}/README.md"
+rm -f \
+  "${OUT_DIR}/screen-map.json" \
+  "${OUT_DIR}/screen-map-en.json" \
+  "${OUT_DIR}/screen-map-de.json" \
+  "${OUT_DIR}/screen-contract-results.json" \
+  "${OUT_DIR}/screen-contract-results-en.json" \
+  "${OUT_DIR}/screen-contract-results-de.json" \
+  "${OUT_DIR}/contact-sheet.jpg" \
+  "${OUT_DIR}/README.md"
 touch "${CONTROL_FILE}"
 
 COMMIT_SHA="$(git rev-parse HEAD)"
@@ -78,6 +86,12 @@ jq -r '.[] | .attachments[] | [.exportedFileName, .suggestedHumanReadableName] |
       screen-map-de.json)
         cp "${source}" "${OUT_DIR}/screen-map-de.json"
         ;;
+      screen-contract-results-en.json)
+        cp "${source}" "${OUT_DIR}/screen-contract-results-en.json"
+        ;;
+      screen-contract-results-de.json)
+        cp "${source}" "${OUT_DIR}/screen-contract-results-de.json"
+        ;;
       en-*.png)
         cp "${source}" "${OUT_DIR}/screenshots/en/${readable#en-}"
         ;;
@@ -94,6 +108,16 @@ fi
 
 if [[ ! -f "${OUT_DIR}/screen-map-de.json" ]]; then
   echo "Missing German screen map JSON attachment." >&2
+  exit 1
+fi
+
+if [[ ! -f "${OUT_DIR}/screen-contract-results-en.json" ]]; then
+  echo "Missing English screen contract results JSON attachment." >&2
+  exit 1
+fi
+
+if [[ ! -f "${OUT_DIR}/screen-contract-results-de.json" ]]; then
+  echo "Missing German screen contract results JSON attachment." >&2
   exit 1
 fi
 
@@ -123,6 +147,26 @@ jq -n \
       de: $de[0]
     }
   }' > "${OUT_DIR}/screen-map.json"
+
+jq -n \
+  --arg generatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --arg commit "${COMMIT_SHA}" \
+  --arg xcode "${XCODE_VERSION}" \
+  --arg simulator "${DEVICE_NAME}" \
+  --arg booted "${BOOTED_DEVICES}" \
+  --slurpfile en "${OUT_DIR}/screen-contract-results-en.json" \
+  --slurpfile de "${OUT_DIR}/screen-contract-results-de.json" \
+  '{
+    schemaVersion: 1,
+    contractSchemaVersion: ($en[0].contractSchemaVersion // $de[0].contractSchemaVersion // 1),
+    generatedAt: $generatedAt,
+    commit: $commit,
+    xcode: $xcode,
+    simulator: $simulator,
+    bootedDevices: $booted,
+    appBundleId: "app.rork.40gfu7dywfru7n82xfoy4",
+    results: (($en[0].results // []) + ($de[0].results // []))
+  }' > "${OUT_DIR}/screen-contract-results.json"
 
 swift - "${OUT_DIR}/screenshots" "${OUT_DIR}/contact-sheet.jpg" <<'SWIFT'
 import AppKit
@@ -204,6 +248,9 @@ MISSING_ID_COUNT="$(jq '[.maps[] .screens[] | (.missingIdentifierCandidates // [
 FORBIDDEN_COUNT="$(jq '[.maps[] .screens[].elements[] | select(.safeAction == "forbidden")] | length' "${OUT_DIR}/screen-map.json")"
 WARNING_COUNT="$(jq '[.maps[] .warnings[]] | length' "${OUT_DIR}/screen-map.json")"
 SCROLL_POSITION_COUNTS="$(jq -r '[.maps[] .screens[].scrollPosition] | group_by(.) | map("\(.[0])=\(length)") | join(", ")' "${OUT_DIR}/screen-map.json")"
+CONTRACT_FAIL_COUNT="$(jq '[.results[].screens[] | select(.passed != true)] | length' "${OUT_DIR}/screen-contract-results.json")"
+CONTRACT_WARNING_COUNT="$(jq '[.results[].screens[] | (.warnings // [])[]] | length' "${OUT_DIR}/screen-contract-results.json")"
+UNKNOWN_HITTABLE_COUNT="$(jq '[.results[].screens[] | (.unknownHittableElements // [])[]] | length' "${OUT_DIR}/screen-contract-results.json")"
 
 {
   echo "# STRQ Screen Map Snapshot - ${RUN_DATE}"
@@ -219,6 +266,7 @@ SCROLL_POSITION_COUNTS="$(jq -r '[.maps[] .screens[].scrollPosition] | group_by(
   echo "- Harness: \`STRQScreenMapSnapshotTests\`"
   echo "- Contact sheet: \`contact-sheet.jpg\`"
   echo "- Screen map: \`screen-map.json\`"
+  echo "- Screen contract results: \`screen-contract-results.json\`"
   echo
   echo "## Output"
   echo
@@ -230,12 +278,16 @@ SCROLL_POSITION_COUNTS="$(jq -r '[.maps[] .screens[].scrollPosition] | group_by(
   echo "- Forbidden controls observed, not tapped: \`${FORBIDDEN_COUNT}\`"
   echo "- Warnings: \`${WARNING_COUNT}\`"
   echo "- Scroll positions: \`${SCROLL_POSITION_COUNTS}\`"
+  echo "- Contract failures: \`${CONTRACT_FAIL_COUNT}\`"
+  echo "- Contract warnings: \`${CONTRACT_WARNING_COUNT}\`"
+  echo "- Unknown hittable elements reported: \`${UNKNOWN_HITTABLE_COUNT}\`"
   echo
   echo "## Files"
   echo
   echo "- \`screenshots/en/\`"
   echo "- \`screenshots/de/\`"
   echo "- \`screen-map.json\`"
+  echo "- \`screen-contract-results.json\`"
   echo "- \`contact-sheet.jpg\`"
   echo
   echo "## Guardrails"
@@ -246,6 +298,8 @@ SCROLL_POSITION_COUNTS="$(jq -r '[.maps[] .screens[].scrollPosition] | group_by(
   echo "- German sensitive controls such as \`Käufe wiederherstellen\`, \`Plan neu erstellen\`, \`Alle Daten zurücksetzen\`, and \`Mit Apple anmelden\` are classified with the same never-tap guardrails as the English equivalents."
   echo "- Scrollable captures report their bounded position as top, middle, max-depth, bottom-or-repeat, or single."
   echo "- Each screen record includes visible scrollable containers for ScrollView, Table, and CollectionView elements."
+  echo "- Screen contracts hard-fail only for missing required roles, missing expected screenshots, or forbidden/no-go controls misclassified as safe."
+  echo "- Ambiguous roles, optional missing roles, missing scroll-region identifiers, and unknown hittable elements are reported as warnings."
   echo "- Full autonomous click crawling is deferred to a later allowlisted slice."
 } > "${OUT_DIR}/README.md"
 

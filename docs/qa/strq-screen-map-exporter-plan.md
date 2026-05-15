@@ -21,8 +21,45 @@ Implemented output:
 
 - screenshots grouped by locale
 - `screen-map.json`
+- `screen-contract-results.json`
 - `contact-sheet.jpg`
 - run `README.md`
+
+## Screen Crawler V2 Contract Layer
+
+Screen Crawler V2 adds a contract evaluator on top of the existing Screen Map exporter. It evaluates the already-captured `ScreenMapManifest` data only; it does not add taps, gestures, routes, navigation depth, or product accessibility identifiers.
+
+Contracts live at:
+
+- `docs/qa/strq-screen-contracts/strq-screen-contracts.v1.json`
+
+Each screen contract can define:
+
+- screen name
+- supported locales
+- allowed navigation depth
+- required semantic roles
+- optional semantic roles
+- safe actions
+- forbidden actions
+- scroll regions
+- expected screenshots
+- no-go labels / forbidden labels
+
+Initial contracts are intentionally minimal and high-confidence. Hard failures are limited to:
+
+- required roles missing
+- expected screenshots missing
+- forbidden, destructive, purchase, auth, or no-go controls classified as safe
+
+Warnings report:
+
+- optional roles missing
+- ambiguous roles
+- missing scroll-region identifiers
+- unknown hittable elements
+
+Unknown hittable elements do not fail the run unless they match forbidden, destructive, purchase, or auth rules and are misclassified as safe.
 
 ## Data Shape
 
@@ -47,6 +84,22 @@ Implemented output:
 - missing identifier candidates
 - warnings for optional screens that could not be opened
 
+`screen-contract-results.json` contains:
+
+- locale-level pass/fail
+- per-screen pass/fail
+- passed roles
+- missing required roles
+- ambiguous roles
+- optional missing roles
+- forbidden controls found
+- unsafe elements skipped
+- unknown hittable elements
+- screenshot coverage
+- scroll-region coverage
+- localization issues
+- warnings
+
 `hittable` is an exporter-safe viewport tap-point estimate in this slice. The test intentionally does not call `XCUIElement.isHittable` while enumerating every element, because XCTest can record a failure when that property is evaluated on some invalid or offscreen activation frames. Use Appium Inspector for exact blocked-overlay debugging, and use the exporter for repeatable inventory and screenshots.
 
 Safe action classifications:
@@ -55,6 +108,18 @@ Safe action classifications:
 - `forbidden`: purchase, restore, reset, delete, sign out, discard, finish, or destructive control
 - `observeOnly`: visible element should be documented but not tapped by the exporter
 - `none`: non-control element
+
+V2 contract result classifications are contract-facing:
+
+- `safeTap`: future explicit contract allowlist; current exporter data may still call these `allowedTap`
+- `observeOnly`: visible controls useful for QA but not tapped
+- `forbidden`: generic never-tap match
+- `destructive`: reset, delete, discard, finish, or regenerate
+- `purchase`: subscribe, buy, restore, or purchase
+- `auth`: sign in / sign out controls
+- `unknown`: hittable controls not covered by a contract
+
+The evaluator treats current `allowedTap` and future `safeTap` as safe classifications for hard-fail safety checks.
 
 ## Interaction Rules
 
@@ -80,6 +145,8 @@ Forbidden interactions:
 
 Destructive controls may appear in `screen-map.json` as `forbidden`, but the exporter must not tap them.
 
+`action-map.json` is intentionally deferred. A later slice can generate it after contracts and forbidden classification have another stable snapshot behind them.
+
 ## Command
 
 ```bash
@@ -95,9 +162,11 @@ xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk ip
 xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:STRQUITests/STRQScreenMapSnapshotTests CODE_SIGNING_ALLOWED=NO
 scripts/qa/capture_strq_screen_map.sh docs/qa/strq-screen-map-snapshot-$(date +%F)
 jq empty docs/qa/strq-screen-map-snapshot-$(date +%F)/screen-map.json
+jq empty docs/qa/strq-screen-map-snapshot-$(date +%F)/screen-contract-results.json
+jq -e '[.results[].screens[] | select(.passed != true)] | length == 0' docs/qa/strq-screen-map-snapshot-$(date +%F)/screen-contract-results.json
 git diff --check
 ```
 
 ## Next Slice
 
-After the exporter is stable, the next slice can add an allowlisted click graph crawler. That crawler should reuse the same safe action classification and only tap elements classified as safe.
+After contracts are stable, the next slice can either deepen contract coverage or add controlled scroll-region metadata. A depth-1 allowlisted action-map crawler should remain deferred until the contract surface and forbidden classifier have another clean snapshot run.
