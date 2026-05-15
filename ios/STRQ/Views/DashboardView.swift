@@ -14,12 +14,7 @@ struct DashboardView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                todayHero
-                    .padding(.horizontal, 16)
-                    .padding(.top, 4)
-
-                primaryActionCard
-                    .padding(.horizontal, 16)
+                premiumTodayFirstViewport
 
                 if let bridge = postWorkoutBridge {
                     postWorkoutBridgeCard(bridge)
@@ -157,7 +152,740 @@ struct DashboardView: View {
         }
     }
 
+    // MARK: - Premium Today First Viewport
+
+    private struct TodayDecisionSignal: Identifiable {
+        let id: String
+        let icon: String
+        let label: String
+        let value: String
+        let detail: String
+        let tint: Color
+        let action: (() -> Void)?
+    }
+
+    private var premiumTodayFirstViewport: some View {
+        VStack(spacing: 12) {
+            premiumTodayHeader
+
+            if let briefing = vm.dailyBriefing {
+                premiumSessionPoster(briefing)
+            } else {
+                premiumLoadingPoster
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.04), value: appeared)
+    }
+
+    private var premiumTodayHeader: some View {
+        let name = vm.profile.name.isEmpty ? L10n.tr("Athlete") : vm.profile.name
+
+        return HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(todayText(en: "Next move", de: "Nächster Schritt"))
+                    .font(.system(size: 15, weight: .black))
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .lineLimit(1)
+
+                Text("\(todayDateLabel) · \(name)")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 7) {
+                if vm.streak > 0 {
+                    HStack(spacing: 5) {
+                        Image(systemName: "flame.fill")
+                            .font(.system(size: 10, weight: .bold))
+                        Text("\(vm.streak)")
+                            .font(.system(size: 12, weight: .black).monospacedDigit())
+                    }
+                    .foregroundStyle(STRQPalette.gold)
+                    .padding(.horizontal, 8)
+                    .frame(height: 30)
+                    .background(Color.white.opacity(0.055), in: Capsule())
+                    .overlay(Capsule().strokeBorder(STRQPalette.gold.opacity(0.22), lineWidth: 1))
+                }
+
+                Text(vm.profile.name.prefix(1).isEmpty ? "A" : String(vm.profile.name.prefix(1)).uppercased())
+                    .font(.system(size: 14, weight: .black))
+                    .foregroundStyle(STRQPalette.backgroundDeep)
+                    .frame(width: 38, height: 38)
+                    .background(Color.white, in: Circle())
+                    .overlay(Circle().strokeBorder(Color.white.opacity(0.36), lineWidth: 1))
+                    .shadow(color: .black.opacity(0.28), radius: 14, y: 6)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 46, alignment: .center)
+    }
+
+    private func premiumSessionPoster(_ briefing: DailyBriefing) -> some View {
+        let primary = briefing.primary
+        let day = todayDecisionWorkout(for: primary)
+        let accent = todayCommandAccent(for: primary)
+
+        return VStack(spacing: 0) {
+            ZStack(alignment: .bottomLeading) {
+                premiumPosterBackdrop(accent: accent)
+
+                VStack(alignment: .leading, spacing: 14) {
+                    HStack(alignment: .center, spacing: 10) {
+                        premiumCommandBadge(primary: primary, accent: accent)
+
+                        Spacer(minLength: 8)
+
+                        premiumReadinessSeal(accent: accent)
+                    }
+
+                    Spacer(minLength: 44)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(premiumDecisionEyebrow(for: primary))
+                            .font(.system(size: 10, weight: .black))
+                            .tracking(1.2)
+                            .foregroundStyle(accent)
+                            .lineLimit(1)
+
+                        Text(premiumDecisionTitle(primary: primary, day: day))
+                            .font(.system(size: 32, weight: .black, design: .rounded))
+                            .foregroundStyle(.white)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.66)
+
+                        if let focus = premiumFocusLine(for: day) {
+                            Text(focus)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.76))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.76)
+                        }
+                    }
+
+                    premiumCoachReason(primary: primary, day: day, briefing: briefing, accent: accent)
+                }
+                .padding(18)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 326)
+
+            VStack(spacing: 12) {
+                HStack(spacing: 8) {
+                    ForEach(Array(todayDecisionSignals.prefix(3))) { signal in
+                        premiumSignalTile(signal)
+                    }
+                }
+
+                premiumPrimaryAction(primary: primary, day: day)
+            }
+            .padding(14)
+            .background(
+                LinearGradient(
+                    colors: [
+                        STRQPalette.surfaceRaised,
+                        STRQPalette.surfaceBase,
+                        STRQPalette.backgroundCarbon
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+        }
+        .clipShape(.rect(cornerRadius: 26, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.11), lineWidth: 1)
+                .allowsHitTesting(false)
+        )
+        .shadow(color: .black.opacity(0.34), radius: 28, y: 18)
+    }
+
+    private var premiumLoadingPoster: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            premiumCommandBadge(
+                title: todayText(en: "Today", de: "Heute"),
+                icon: "bolt.fill",
+                accent: STRQBrand.steel
+            )
+
+            Spacer(minLength: 72)
+
+            Text(todayText(en: "STRQ is reading today.", de: "STRQ liest den Tag."))
+                .font(.system(size: 30, weight: .black, design: .rounded))
+                .foregroundStyle(.white)
+
+            Text(todayText(en: "Your training decision will appear here.", de: "Deine Trainingsentscheidung erscheint hier."))
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(STRQPalette.textSecondary)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, minHeight: 430, alignment: .leading)
+        .background(STRQPalette.surfaceRaised, in: .rect(cornerRadius: 26))
+        .overlay(
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
+        )
+    }
+
+    private func premiumPosterBackdrop(accent: Color) -> some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    STRQPalette.backgroundDeep,
+                    STRQPalette.surfaceStrong,
+                    STRQPalette.backgroundCarbon
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            VStack(spacing: 12) {
+                ForEach(0..<9, id: \.self) { index in
+                    Rectangle()
+                        .fill(index.isMultiple(of: 3) ? accent.opacity(0.18) : Color.white.opacity(0.035))
+                        .frame(height: index.isMultiple(of: 3) ? 2 : 1)
+                        .offset(x: CGFloat(index % 3) * 18)
+                }
+            }
+            .rotationEffect(.degrees(-12))
+            .scaleEffect(1.22)
+            .allowsHitTesting(false)
+
+            HStack(alignment: .center, spacing: 12) {
+                VStack(spacing: 10) {
+                    ForEach(0..<3, id: \.self) { index in
+                        RoundedRectangle(cornerRadius: 3, style: .continuous)
+                            .fill(Color.white.opacity(index == 1 ? 0.14 : 0.08))
+                            .frame(width: 7, height: CGFloat(52 + index * 18))
+                    }
+                }
+
+                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                    .fill(Color.white.opacity(0.18))
+                    .frame(width: 118, height: 8)
+
+                VStack(spacing: 10) {
+                    ForEach(0..<3, id: \.self) { index in
+                        RoundedRectangle(cornerRadius: 3, style: .continuous)
+                            .fill(Color.white.opacity(index == 1 ? 0.14 : 0.08))
+                            .frame(width: 7, height: CGFloat(52 + index * 18))
+                    }
+                }
+            }
+            .opacity(0.34)
+            .offset(x: 92, y: -36)
+            .rotationEffect(.degrees(-8))
+            .allowsHitTesting(false)
+
+            STRQIconView(.barbell, size: 122, tint: .white.opacity(0.10))
+                .offset(x: 86, y: 58)
+                .allowsHitTesting(false)
+
+            LinearGradient(
+                colors: [
+                    Color.clear,
+                    STRQPalette.backgroundDeep.opacity(0.32),
+                    STRQPalette.backgroundDeep.opacity(0.92)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+    }
+
+    private func premiumCommandBadge(primary: DailyBriefing.Primary, accent: Color) -> some View {
+        premiumCommandBadge(
+            title: premiumCommandBadgeTitle(for: primary),
+            icon: primary.icon,
+            accent: accent
+        )
+    }
+
+    private func premiumCommandBadge(title: String, icon: String, accent: Color) -> some View {
+        HStack(spacing: 7) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .black))
+            Text(title)
+                .font(.system(size: 10, weight: .black))
+                .tracking(1.0)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .foregroundStyle(accent)
+        .padding(.horizontal, 10)
+        .frame(height: 30)
+        .background(Color.black.opacity(0.26), in: .rect(cornerRadius: 10))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .strokeBorder(accent.opacity(0.24), lineWidth: 1)
+        )
+    }
+
+    private func premiumReadinessSeal(accent: Color) -> some View {
+        let score = vm.todaysReadiness?.readinessScore ?? vm.effectiveRecoveryScore
+        let tint = vm.todaysReadiness.map { ForgeTheme.recoveryColor(for: $0.readinessScore) } ?? accent
+
+        return HStack(spacing: 7) {
+            Text("\(score)")
+                .font(.system(size: 13, weight: .black).monospacedDigit())
+            Text(L10n.tr("Recovery"))
+                .font(.system(size: 10, weight: .bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 10)
+        .frame(height: 30)
+        .background(Color.white.opacity(0.075), in: Capsule())
+        .overlay(Capsule().strokeBorder(tint.opacity(0.28), lineWidth: 1))
+    }
+
+    private func premiumCoachReason(
+        primary: DailyBriefing.Primary,
+        day: WorkoutDay?,
+        briefing: DailyBriefing,
+        accent: Color
+    ) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "quote.opening")
+                .font(.system(size: 12, weight: .black))
+                .foregroundStyle(accent)
+                .frame(width: 28, height: 28)
+                .background(accent.opacity(0.14), in: .rect(cornerRadius: 9))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(todayText(en: "Why this workout", de: "Warum dieses Workout"))
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(0.8)
+                    .foregroundStyle(.white.opacity(0.46))
+                    .lineLimit(1)
+
+                Text(premiumReasonCopy(primary: primary, day: day, briefing: briefing))
+                    .font(.system(size: 13, weight: .semibold))
+                    .lineSpacing(2)
+                    .foregroundStyle(.white.opacity(0.86))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(Color.black.opacity(0.26), in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+        )
+    }
+
+    @ViewBuilder
+    private func premiumSignalTile(_ signal: TodayDecisionSignal) -> some View {
+        let content = VStack(alignment: .leading, spacing: 7) {
+            HStack(spacing: 6) {
+                Image(systemName: signal.icon)
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundStyle(signal.tint)
+
+                Text(signal.label)
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(0.1)
+                    .foregroundStyle(STRQPalette.textMuted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.68)
+            }
+
+            Text(signal.value)
+                .font(.system(size: 17, weight: .black, design: .rounded).monospacedDigit())
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.66)
+
+            Text(signal.detail)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(STRQPalette.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.62)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, minHeight: 78, alignment: .leading)
+        .background(Color.white.opacity(0.045), in: .rect(cornerRadius: 15))
+        .overlay(
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .strokeBorder(signal.tint.opacity(0.16), lineWidth: 1)
+        )
+
+        if let action = signal.action {
+            Button(action: action) { content }
+                .buttonStyle(.strqPressable)
+        } else {
+            content
+        }
+    }
+
+    @ViewBuilder
+    private func premiumPrimaryAction(primary: DailyBriefing.Primary, day: WorkoutDay?) -> some View {
+        switch primary.kind {
+        case .checkInBeforeTraining:
+            HStack(spacing: 10) {
+                premiumCTA(icon: "heart.text.clipboard", title: L10n.tr("Check in"), tone: .primary) {
+                    showReadinessCheckIn = true
+                }
+
+                if let day {
+                    premiumCTA(icon: "bolt.fill", title: L10n.tr("Preview workout"), tone: .secondary) {
+                        vm.prepareWorkoutHandoff(day: day)
+                    }
+                    .accessibilityIdentifier("strq.today.start-workout")
+                }
+            }
+        case .logBodyWeight:
+            premiumCTA(icon: "scalemass.fill", title: primary.ctaTitle, tone: .primary) {
+                showWeightLog = true
+            }
+        case .recoveryDay where day == nil:
+            premiumCTA(icon: vm.hasCheckedInToday ? "moon.zzz.fill" : "heart.text.clipboard", title: vm.hasCheckedInToday ? todayText(en: "Log sleep", de: "Schlaf eintragen") : L10n.tr("Check in"), tone: .primary) {
+                if vm.hasCheckedInToday {
+                    showSleepLog = true
+                } else {
+                    showReadinessCheckIn = true
+                }
+            }
+        default:
+            if let day {
+                premiumCTA(icon: primary.kind == .resumeWorkout ? "play.fill" : "bolt.fill", title: premiumWorkoutActionTitle(for: primary), tone: .primary) {
+                    vm.prepareWorkoutHandoff(day: day)
+                }
+                .accessibilityIdentifier("strq.today.start-workout")
+            } else {
+                premiumCTA(icon: "heart.text.clipboard", title: L10n.tr("Check in"), tone: .primary) {
+                    showReadinessCheckIn = true
+                }
+            }
+        }
+    }
+
+    private enum PremiumCTATone: Equatable {
+        case primary
+        case secondary
+    }
+
+    private func premiumCTA(icon: String, title: String, tone: PremiumCTATone, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 9) {
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .black))
+                Text(title)
+                    .font(.system(size: tone == .primary ? 16 : 13, weight: .black))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+            .foregroundStyle(tone == .primary ? STRQPalette.backgroundDeep : STRQPalette.textPrimary)
+            .frame(maxWidth: .infinity)
+            .frame(height: 54)
+            .background {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(premiumCTAFill(for: tone))
+            }
+            .overlay(alignment: .top) {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color.white.opacity(tone == .primary ? 0.36 : 0.08))
+                    .frame(height: 24)
+                    .allowsHitTesting(false)
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(Color.white.opacity(tone == .primary ? 0.36 : 0.12), lineWidth: 1)
+            )
+            .shadow(color: tone == .primary ? Color.white.opacity(0.08) : Color.clear, radius: 14, y: 6)
+            .shadow(color: .black.opacity(tone == .primary ? 0.30 : 0.10), radius: 18, y: 9)
+        }
+        .buttonStyle(.strqPressable)
+    }
+
+    private func premiumCTAFill(for tone: PremiumCTATone) -> AnyShapeStyle {
+        if tone == .primary {
+            return AnyShapeStyle(
+                LinearGradient(
+                    colors: [Color.white, Color(red: 0.88, green: 0.89, blue: 0.91)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+        }
+
+        return AnyShapeStyle(
+            LinearGradient(
+                colors: [Color.white.opacity(0.08), Color.white.opacity(0.045)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+    }
+
+    private var todayDecisionSignals: [TodayDecisionSignal] {
+        let weeklyTarget = max(1, vm.profile.daysPerWeek)
+        let recoveryScore = vm.todaysReadiness?.readinessScore ?? vm.effectiveRecoveryScore
+        let sleepValue = vm.averageSleepHours > 0 ? String(format: "%.1fh", vm.averageSleepHours) : "—"
+        let sleepDetail = vm.averageSleepHours > 0 ? todayText(en: "7-day avg", de: "7 Tage Ø") : todayText(en: "Log needed", de: "Eintrag offen")
+        let rhythmDetail = vm.weeklyStats.sessions >= weeklyTarget ? todayText(en: "Target met", de: "Ziel erreicht") : todayText(en: "Planned slot", de: "Geplante Einheit")
+
+        return [
+            TodayDecisionSignal(
+                id: "recovery",
+                icon: vm.hasCheckedInToday ? "checkmark.circle.fill" : "heart.text.clipboard",
+                label: L10n.tr("Recovery"),
+                value: "\(recoveryScore)%",
+                detail: recoveryEvidenceDetail(for: recoveryScore),
+                tint: ForgeTheme.recoveryColor(for: recoveryScore),
+                action: vm.hasCheckedInToday ? nil : { showReadinessCheckIn = true }
+            ),
+            TodayDecisionSignal(
+                id: "sleep",
+                icon: "moon.zzz.fill",
+                label: L10n.tr("Sleep"),
+                value: sleepValue,
+                detail: sleepDetail,
+                tint: ForgeTheme.sleepColor(for: vm.averageSleepHours),
+                action: { showSleepLog = true }
+            ),
+            TodayDecisionSignal(
+                id: "week",
+                icon: "calendar.badge.checkmark",
+                label: todayText(en: "Rhythm", de: "Rhythmus"),
+                value: "\(vm.weeklyStats.sessions)/\(weeklyTarget)",
+                detail: rhythmDetail,
+                tint: vm.weeklyStats.sessions >= weeklyTarget ? STRQPalette.signalGreen : STRQBrand.steel,
+                action: nil
+            )
+        ]
+    }
+
+    private func todayDecisionWorkout(for primary: DailyBriefing.Primary) -> WorkoutDay? {
+        switch primary.kind {
+        case .prepNextSession, .recoveryDay, .logBodyWeight:
+            return vm.todaysWorkout ?? vm.nextWorkout
+        default:
+            return vm.todaysWorkout ?? vm.nextWorkout
+        }
+    }
+
+    private func premiumDecisionTitle(primary: DailyBriefing.Primary, day: WorkoutDay?) -> String {
+        switch primary.kind {
+        case .trainToday:
+            return day.map { localizedWorkoutName($0.name) } ?? primary.title
+        case .checkInBeforeTraining:
+            return L10n.tr("Check in, then train")
+        case .resumeWorkout:
+            return L10n.tr("Resume Workout")
+        case .recoverToday:
+            return L10n.tr("Keep it light today")
+        case .startFirstSession:
+            return L10n.tr("Start your first workout")
+        case .prepNextSession:
+            return day.map { localizedWorkoutName($0.name) } ?? primary.title
+        default:
+            return primary.title
+        }
+    }
+
+    private func premiumDecisionEyebrow(for primary: DailyBriefing.Primary) -> String {
+        switch primary.kind {
+        case .trainToday:
+            return todayText(en: "TRAIN TODAY", de: "HEUTE TRAINIEREN")
+        case .checkInBeforeTraining:
+            return todayText(en: "READINESS FIRST", de: "ERST CHECK-IN")
+        case .resumeWorkout:
+            return todayText(en: "IN PROGRESS", de: "LÄUFT")
+        case .recoverToday, .recoveryDay:
+            return todayText(en: "RECOVERY CALL", de: "ERHOLUNG HEUTE")
+        case .startFirstSession:
+            return todayText(en: "WORKOUT ONE", de: "WORKOUT EINS")
+        case .prepNextSession:
+            return todayText(en: "NEXT SESSION", de: "NÄCHSTE EINHEIT")
+        case .logBodyWeight:
+            return todayText(en: "QUICK LOG", de: "KURZER LOG")
+        case .logCompletion:
+            return todayText(en: "TODAY", de: "HEUTE")
+        }
+    }
+
+    private func premiumCommandBadgeTitle(for primary: DailyBriefing.Primary) -> String {
+        switch primary.kind {
+        case .trainToday, .checkInBeforeTraining, .resumeWorkout, .recoverToday, .startFirstSession:
+            return L10n.tr("TRAINING DAY")
+        case .prepNextSession:
+            return todayText(en: "PREP RECOMMENDED", de: "VORBEREITEN")
+        case .recoveryDay:
+            return L10n.tr("Recovery")
+        case .logBodyWeight:
+            return todayText(en: "BODY DATA", de: "KÖRPERDATEN")
+        case .logCompletion:
+            return todayText(en: "TODAY", de: "HEUTE")
+        }
+    }
+
+    private func premiumReasonCopy(primary: DailyBriefing.Primary, day: WorkoutDay?, briefing: DailyBriefing) -> String {
+        switch primary.kind {
+        case .trainToday:
+            return plannedExposureReason(for: day)
+        case .checkInBeforeTraining:
+            return todayText(
+                en: "A quick check-in lets STRQ tune today before the first working set.",
+                de: "Ein kurzer Check-in stimmt STRQ vor dem ersten Arbeitssatz auf heute ab."
+            )
+        case .resumeWorkout:
+            return todayText(
+                en: "The session is already open; finish the signal you started.",
+                de: "Die Einheit läuft bereits; schließe das begonnene Signal sauber ab."
+            )
+        case .recoverToday:
+            return todayText(
+                en: "The useful move is lighter work that you can actually absorb.",
+                de: "Der sinnvolle Reiz ist heute leichter und gut verarbeitbar."
+            )
+        case .startFirstSession:
+            return todayText(
+                en: "Workout one gives STRQ the baseline it needs for real coaching.",
+                de: "Workout eins gibt STRQ die Baseline für echtes Coaching."
+            )
+        case .prepNextSession:
+            return plannedExposureReason(for: day)
+        case .logBodyWeight:
+            return todayText(
+                en: "One body-weight entry keeps the trend honest without making it the focus.",
+                de: "Ein Gewichtseintrag hält den Trend ehrlich, ohne ihn zum Fokus zu machen."
+            )
+        case .recoveryDay:
+            return briefing.restPrep?.detail ?? todayText(
+                en: "No lift today; recovery is the work that protects the next push.",
+                de: "Heute kein schwerer Lift; Erholung schützt den nächsten Push."
+            )
+        case .logCompletion:
+            return primary.detail
+        }
+    }
+
+    private func premiumWorkoutActionTitle(for primary: DailyBriefing.Primary) -> String {
+        switch primary.kind {
+        case .prepNextSession, .recoveryDay, .logBodyWeight:
+            return L10n.tr("Preview workout")
+        case .recoverToday:
+            return L10n.tr("Start Light Workout")
+        default:
+            return todayText(en: "Begin workout", de: "Training starten")
+        }
+    }
+
+    private func recoveryEvidenceDetail(for score: Int) -> String {
+        if score >= 75 {
+            return todayText(en: "Stable", de: "Stabil")
+        }
+        if score >= 60 {
+            return todayText(en: "Workable", de: "Nutzbar")
+        }
+        return todayText(en: "Limited", de: "Begrenzt")
+    }
+
+    private func plannedExposureReason(for day: WorkoutDay?) -> String {
+        let recoveryLead: String
+        let recoveryScore = vm.todaysReadiness?.readinessScore ?? vm.effectiveRecoveryScore
+        if recoveryScore >= 75 {
+            recoveryLead = todayText(en: "Recovery is stable.", de: "Erholung ist stabil.")
+        } else if recoveryScore >= 60 {
+            recoveryLead = todayText(en: "Recovery is workable.", de: "Erholung ist nutzbar.")
+        } else {
+            recoveryLead = todayText(en: "Recovery is limited.", de: "Erholung ist begrenzt.")
+        }
+
+        if isGermanToday {
+            return "\(recoveryLead) \(plannedExposureLabel(for: day)) ist als Nächstes geplant."
+        }
+
+        return "\(recoveryLead) \(plannedExposureLabel(for: day)) is the next planned exposure."
+    }
+
+    private func plannedExposureLabel(for day: WorkoutDay?) -> String {
+        guard let day else {
+            return todayText(en: "This workout", de: "Diese Einheit")
+        }
+
+        let lowerCount = day.focusMuscles.filter { $0.region == .lower }.count
+        let upperCount = day.focusMuscles.filter { $0.region == .upper }.count
+        let coreCount = day.focusMuscles.filter { $0.region == .core }.count
+
+        if lowerCount > upperCount && lowerCount > coreCount {
+            return todayText(en: "Lower-body work", de: "Unterkörperarbeit")
+        }
+        if upperCount > lowerCount && upperCount > coreCount {
+            return todayText(en: "Upper-body work", de: "Oberkörperarbeit")
+        }
+        if coreCount > lowerCount && coreCount > upperCount {
+            return todayText(en: "Core work", de: "Rumpfarbeit")
+        }
+
+        return todayText(en: "This workout", de: "Diese Einheit")
+    }
+
+    private func premiumFocusLine(for day: WorkoutDay?) -> String? {
+        guard let day else { return nil }
+        let muscles = day.focusMuscles.prefix(2).map(\.localizedDisplayName)
+        guard !muscles.isEmpty else {
+            return L10n.tr("Workouts")
+        }
+        return muscles.joined(separator: " · ")
+    }
+
+    private func localizedWorkoutName(_ name: String) -> String {
+        let localized = L10n.tr(name, fallback: name)
+        guard isGermanToday, localized == name else { return localized }
+
+        let exactGermanNames: [String: String] = [
+            "Upper Strength": "Oberkörper Kraft",
+            "Lower Strength": "Unterkörper Kraft",
+            "Lower Power": "Unterkörper Kraft",
+            "Upper Power": "Oberkörper Kraft",
+            "Pull Volume": "Pull Volumen",
+            "Push Volume": "Push Volumen",
+            "Legs Volume": "Beine Volumen"
+        ]
+
+        if let exact = exactGermanNames[name] {
+            return exact
+        }
+
+        let replacements = [
+            ("Full Body", "Ganzkörper"),
+            ("Upper", "Oberkörper"),
+            ("Lower", "Unterkörper"),
+            ("Strength", "Kraft"),
+            ("Power", "Kraft"),
+            ("Volume", "Volumen"),
+            ("Legs", "Beine")
+        ]
+
+        return replacements.reduce(name) { partial, replacement in
+            partial.replacingOccurrences(of: replacement.0, with: replacement.1)
+        }
+    }
+
+    private var isGermanToday: Bool {
+        Locale.current.language.languageCode?.identifier == "de"
+    }
+
+    private func todayText(en: String, de: String) -> String {
+        isGermanToday ? de : en
+    }
+
     // MARK: - Today Hero
+
 
     private var todayHero: some View {
         let primary = vm.dailyBriefing?.primary
