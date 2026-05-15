@@ -4722,7 +4722,7 @@ Verification run:
 - `OUT_DIR="docs/qa/pro-profile-de-copy-qa-$(date +%F-%H%M%S)"; scripts/qa/capture_strq_screen_map.sh "$OUT_DIR"`
 - Final Screen Map output path: `docs/qa/pro-profile-de-copy-qa-2026-05-15-171645`
 - German screenshots checked: `screenshots/de/14-profile.png`, `screenshots/de/15-profile-scroll-1.png`, `screenshots/de/16-profile-scroll-2.png`, `screenshots/de/17-profile-pro-preview.png`, and `screenshots/de/18-profile-pro-preview-scroll-1.png`.
-- Package/small-iPhone Pro Preview harness was attempted with `scripts/qa/capture_strq_pro_preview.sh`, but that harness still searches for the old `strq.profile.pro-preview-card` identifier and failed before capture. It was not changed in this slice because tests/scripts were outside the allowed diff.
+- Package/small-iPhone Pro Preview harness was attempted with `scripts/qa/capture_strq_pro_preview.sh` and failed before capture. That follow-up harness repair is now documented in the Pro Preview Snapshot Harness Fix below.
 
 QA artifact handling:
 
@@ -4738,7 +4738,40 @@ Intentionally not changed:
 Pending work:
 
 - English generated/model/workout/exercise strings remain for separate localization slices, including workout names, exercise names, and service-generated recommendations outside Profile/STRQ Pro Preview.
-- German package-preview and small-iPhone Pro Preview screenshots need a separate QA-harness update because the current dedicated Pro Preview snapshot test is English-only and references the old Profile card identifier.
+- Resolved by the follow-up Pro Preview Snapshot Harness Fix below: German package-preview and small-iPhone Pro Preview coverage now runs in the dedicated harness.
+
+### 2026-05-15 - Pro Preview Snapshot Harness Fix
+
+Scope:
+
+- Fixed the dedicated STRQ Pro Preview snapshot harness after the German Profile/Pro copy cleanup.
+- Replaced the stale Profile Pro card identifier with `strq.profile.subscription`.
+- Added German snapshot coverage for the Profile Pro card, Pro Preview top/lower/footer/restore, package preview metadata, and small iPhone Pro Preview/package-preview top viewports.
+
+Files changed:
+
+- `ios/STRQUITests/STRQProPreviewSnapshotTests.swift`
+- `scripts/qa/capture_strq_pro_preview.sh`
+- `docs/migration-progress-log.md`
+
+Verification run:
+
+- `git status --short`
+- `git diff --name-only`
+- `git diff -- ios/STRQUITests/STRQProPreviewSnapshotTests.swift scripts/qa/capture_strq_pro_preview.sh docs/migration-progress-log.md`
+- `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:STRQUITests/STRQProPreviewSnapshotTests CODE_SIGNING_ALLOWED=NO`
+- `scripts/qa/capture_strq_pro_preview.sh docs/qa/strq-pro-preview-harness-fix-2026-05-15`
+- `git diff --check`
+
+QA artifact handling:
+
+- Generated QA artifacts were written to `docs/qa/strq-pro-preview-harness-fix-2026-05-15/` during verification and removed before commit.
+- Pre-existing untracked `docs/qa` artifacts from earlier runs were left untouched.
+
+Intentionally not changed:
+
+- No product Swift files, `Localizable.xcstrings`, StoreViewModel, RevenueCat services, AppViewModel, ContentView, models, services, assets, or project files were changed.
+- No purchase/restore behavior, package selection, entitlement logic, feature access, gates, purchase CTA state, or paywall logic was changed.
 
 ## Template For Future Entries
 

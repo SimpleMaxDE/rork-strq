@@ -21,6 +21,14 @@ SCREENSHOTS=(
   "06-small-iphone-pro-preview-top.png"
   "07-package-preview-live-metadata.png"
   "08-small-iphone-package-preview-top.png"
+  "09-de-profile-pro-card.png"
+  "10-de-pro-preview-top.png"
+  "11-de-pro-preview-lower.png"
+  "12-de-pro-preview-footer-restore.png"
+  "13-de-profile-after-dismiss.png"
+  "14-de-small-iphone-pro-preview-top.png"
+  "15-de-package-preview-live-metadata.png"
+  "16-de-small-iphone-package-preview-top.png"
 )
 
 cleanup() {
@@ -106,11 +114,15 @@ run_snapshot_test() {
 
 prepare_simulator "${PRIMARY_DEVICE}"
 run_snapshot_test "${PRIMARY_DESTINATION}" "testProPreviewSnapshot" "STRQProPreviewPrimary"
+run_snapshot_test "${PRIMARY_DESTINATION}" "testGermanProPreviewSnapshot" "STRQProPreviewPrimaryGerman"
 run_snapshot_test "${PRIMARY_DESTINATION}" "testPackagePreviewShowsLiveMetadataWithoutPurchasing" "STRQProPackagePreviewPrimary"
+run_snapshot_test "${PRIMARY_DESTINATION}" "testGermanPackagePreviewShowsLiveMetadataWithoutPurchasing" "STRQProPackagePreviewPrimaryGerman"
 
 prepare_simulator "${SMALL_DEVICE}"
 run_snapshot_test "${SMALL_DESTINATION}" "testProPreviewSmallPhoneSnapshot" "STRQProPreviewSmallPhone"
+run_snapshot_test "${SMALL_DESTINATION}" "testGermanProPreviewSmallPhoneSnapshot" "STRQProPreviewSmallPhoneGerman"
 run_snapshot_test "${SMALL_DESTINATION}" "testPackagePreviewSmallPhoneSnapshot" "STRQProPackagePreviewSmallPhone"
+run_snapshot_test "${SMALL_DESTINATION}" "testGermanPackagePreviewSmallPhoneSnapshot" "STRQProPackagePreviewSmallPhoneGerman"
 
 missing=()
 for screenshot in "${SCREENSHOTS[@]}"; do
@@ -206,7 +218,7 @@ SWIFT
   echo "- Primary simulator/device: ${PRIMARY_DEVICE}"
   echo "- Small simulator/device: ${SMALL_DEVICE}"
   echo "- Build/test result: \`xcodebuild test passed\`"
-  echo "- Harness: \`STRQProPreviewSnapshotTests.testProPreviewSnapshot\`, \`testPackagePreviewShowsLiveMetadataWithoutPurchasing\`, \`testProPreviewSmallPhoneSnapshot\`, and \`testPackagePreviewSmallPhoneSnapshot\`"
+  echo "- Harness: English and German \`STRQProPreviewSnapshotTests\` Pro Preview, package-preview, and small-phone snapshots"
   echo "- Contact sheet: \`contact-sheet.jpg\`"
   echo
   echo "## Screenshots"
@@ -225,9 +237,9 @@ SWIFT
   echo
   echo "## Visual Caveats"
   echo
-  echo "- The Profile card and Pro Preview were captured from the deterministic \`coreFlow\` UI fixture in English."
+  echo "- The Profile card and Pro Preview were captured from the deterministic \`coreFlow\` UI fixture in English and German."
   echo "- The preview footer includes restore access for continuity with the existing screen, but the test does not tap restore."
-  echo "- The small iPhone capture covers the top Pro Preview viewport only."
+  echo "- The small iPhone Pro Preview captures cover the top viewport only."
 } > "${OUT_DIR}/README.md"
 
 echo "STRQ Pro Preview QA artifacts written to: ${OUT_DIR}"
