@@ -90,7 +90,7 @@ final class STRQScreenMapSnapshotTests: XCTestCase {
     }
 
     private func captureProPreview(_ mapper: STRQScreenMapExporter) {
-        guard mapper.tap(id: "strq.profile.pro-preview-card", name: "STRQ Pro Preview card", optional: true) else {
+        guard mapper.tap(id: "strq.profile.subscription", name: "STRQ Pro Preview card", optional: true) else {
             mapper.recordWarning("STRQ Pro Preview card was not available from Profile.")
             return
         }
@@ -173,6 +173,7 @@ private struct ScreenMapScreen: Encodable {
     let capturedAt: String
     let viewport: ScreenMapFrame
     let scrollIndex: Int
+    let scrollPosition: String
     let scrollStopReason: String?
     let elements: [ScreenMapElement]
     let scrollableContainers: [ScreenMapElement]
@@ -240,16 +241,26 @@ private final class STRQScreenMapExporter {
                     "close",
                     "back",
                     "cancel",
-                    "done"
+                    "done",
+                    "explicit harness target only"
                 ],
                 forbidden: [
                     "purchase",
+                    "buy",
                     "subscribe",
                     "restore purchases",
+                    "Käufe wiederherstellen",
                     "reset all data",
+                    "Alle Daten zurücksetzen",
+                    "regenerate plan",
+                    "Plan neu erstellen",
+                    "sign in with Apple",
+                    "Mit Apple anmelden",
                     "sign out",
                     "delete",
+                    "löschen",
                     "discard workout",
+                    "verwerfen",
                     "finish workout",
                     "destructive confirmation"
                 ]
@@ -272,8 +283,22 @@ private final class STRQScreenMapExporter {
             let alreadySeen = seenFingerprints.contains(fingerprint)
             seenFingerprints.insert(fingerprint)
 
-            let stopReason = alreadySeen ? "repeated-fingerprint" : nil
-            captureScreen(slug, scrollIndex: scrollIndex, elements: elements, scrollStopReason: stopReason)
+            let stopReason: String?
+            if alreadySeen {
+                stopReason = "repeated-fingerprint"
+            } else if scrollIndex == maxScrolls {
+                stopReason = "max-depth-reached"
+            } else {
+                stopReason = nil
+            }
+
+            captureScreen(
+                slug,
+                scrollIndex: scrollIndex,
+                scrollPosition: scrollPosition(scrollIndex: scrollIndex, maxScrolls: maxScrolls, stopReason: stopReason),
+                elements: elements,
+                scrollStopReason: stopReason
+            )
 
             if alreadySeen || scrollIndex == maxScrolls { return }
 
@@ -283,7 +308,7 @@ private final class STRQScreenMapExporter {
     }
 
     func captureScreen(_ slug: String) {
-        captureScreen(slug, scrollIndex: 0, elements: collectVisibleElements(), scrollStopReason: nil)
+        captureScreen(slug, scrollIndex: 0, scrollPosition: "single", elements: collectVisibleElements(), scrollStopReason: nil)
     }
 
     func recordWarning(_ warning: String) {
@@ -357,6 +382,7 @@ private final class STRQScreenMapExporter {
     private func captureScreen(
         _ slug: String,
         scrollIndex: Int,
+        scrollPosition: String,
         elements: [ScreenMapElement],
         scrollStopReason: String?
     ) {
@@ -368,9 +394,7 @@ private final class STRQScreenMapExporter {
         testCase.add(attachment)
 
         let scrollables = elements.filter { ["ScrollView", "Table", "CollectionView"].contains($0.type) }
-        let missingIDs = elements.filter { element in
-            element.identifier.isEmpty && element.hittable && ["Button", "TextField", "SecureTextField", "Switch", "Slider", "Link"].contains(element.type)
-        }
+        let missingIDs = elements.filter { isMissingIdentifierCandidate($0, allElements: elements) }
 
         manifest.screens.append(
             ScreenMapScreen(
@@ -379,6 +403,7 @@ private final class STRQScreenMapExporter {
                 capturedAt: dateFormatter.string(from: Date()),
                 viewport: ScreenMapFrame(viewportFrame()),
                 scrollIndex: scrollIndex,
+                scrollPosition: scrollPosition,
                 scrollStopReason: scrollStopReason,
                 elements: elements,
                 scrollableContainers: scrollables,
@@ -391,6 +416,14 @@ private final class STRQScreenMapExporter {
         let frame = finiteFrame(element.frame)
         guard isVisible(frame, in: viewportFrame()), hasValidTapPoint(frame, in: viewportFrame()) else {
             XCTContext.runActivity(named: "Skip offscreen tap \(name)") { _ in }
+            return false
+        }
+
+        let type = elementTypeName(element.elementType)
+        if safeAction(identifier: element.identifier, label: element.label, type: type, hittable: true) == "forbidden" {
+            let label = element.label.isEmpty ? element.identifier : element.label
+            recordWarning("Skipped forbidden tap target: \(name) (\(label)).")
+            XCTContext.runActivity(named: "Skip forbidden tap \(name)") { _ in }
             return false
         }
 
@@ -457,6 +490,14 @@ private final class STRQScreenMapExporter {
             if $0.frame.y == $1.frame.y { return $0.frame.x < $1.frame.x }
             return $0.frame.y < $1.frame.y
         }
+    }
+
+    private func scrollPosition(scrollIndex: Int, maxScrolls: Int, stopReason: String?) -> String {
+        if maxScrolls == 0 { return "single" }
+        if scrollIndex == 0 { return "top" }
+        if stopReason == "repeated-fingerprint" { return "bottom-or-repeat" }
+        if scrollIndex == maxScrolls { return "max-depth" }
+        return "middle"
     }
 
     private func makeRecord(
@@ -537,22 +578,38 @@ private final class STRQScreenMapExporter {
     }
 
     private func safeAction(identifier: String, label: String, type: String, hittable: Bool) -> String {
-        guard hittable || ["Button", "TextField", "SecureTextField", "Switch", "Slider", "Link"].contains(type) else {
+        guard hittable || ["Button", "TextField", "SecureTextField", "Switch", "Slider", "Link", "SearchField", "Menu", "MenuItem"].contains(type) else {
             return "none"
         }
 
-        let text = "\(identifier) \(label)".lowercased()
+        let text = normalizedForSafety("\(identifier) \(label)")
         let forbiddenTerms = [
             "purchase",
+            "buy",
+            "start purchase",
             "subscribe",
+            "abonnieren",
+            "kaufen",
+            "kaufen starten",
             "restore",
+            "restore purchases",
+            "kaufe wiederherstellen",
+            "kaeufe wiederherstellen",
             "reset",
+            "reset all data",
+            "alle daten zurucksetzen",
             "delete",
+            "loschen",
             "sign out",
             "signout",
+            "sign in with apple",
+            "mit apple anmelden",
             "discard",
+            "verwerfen",
             "finish workout",
             "regenerate",
+            "regenerate plan",
+            "plan neu erstellen",
             "destructive"
         ]
 
@@ -579,6 +636,58 @@ private final class STRQScreenMapExporter {
         }
 
         return hittable ? "observeOnly" : "none"
+    }
+
+    private func normalizedForSafety(_ value: String) -> String {
+        value
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))
+            .lowercased()
+    }
+
+    private func isMissingIdentifierCandidate(_ element: ScreenMapElement, allElements: [ScreenMapElement]) -> Bool {
+        guard element.identifier.isEmpty, element.hittable else { return false }
+        guard ["Button", "TextField", "SecureTextField", "Switch", "Slider", "Link", "SearchField", "Menu", "MenuItem"].contains(element.type) else {
+            return false
+        }
+
+        if isSystemKeyboardCandidate(element) { return false }
+        if element.label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+           overlapsIdentifiedInteractiveElement(element, allElements: allElements) {
+            return false
+        }
+
+        return true
+    }
+
+    private func isSystemKeyboardCandidate(_ element: ScreenMapElement) -> Bool {
+        let text = normalizedForSafety("\(element.identifier) \(element.label)")
+        let keyboardTerms = [
+            "next keyboard",
+            "nachste tastatur"
+        ]
+        return keyboardTerms.contains(where: { text.contains($0) })
+    }
+
+    private func overlapsIdentifiedInteractiveElement(_ element: ScreenMapElement, allElements: [ScreenMapElement]) -> Bool {
+        allElements.contains { other in
+            guard !other.identifier.isEmpty, other.hittable else { return false }
+            guard ["Button", "TextField", "SecureTextField", "Switch", "Slider", "Link", "SearchField", "Menu", "MenuItem"].contains(other.type) else {
+                return false
+            }
+            return overlapRatio(element.frame, other.frame) >= 0.35
+        }
+    }
+
+    private func overlapRatio(_ lhs: ScreenMapFrame, _ rhs: ScreenMapFrame) -> Double {
+        let left = max(lhs.x, rhs.x)
+        let right = min(lhs.x + lhs.width, rhs.x + rhs.width)
+        let top = max(lhs.y, rhs.y)
+        let bottom = min(lhs.y + lhs.height, rhs.y + rhs.height)
+        let width = max(0, right - left)
+        let height = max(0, bottom - top)
+        let intersection = width * height
+        let smallerArea = max(1, min(lhs.width * lhs.height, rhs.width * rhs.height))
+        return intersection / smallerArea
     }
 
     private func elementTypeName(_ type: XCUIElement.ElementType) -> String {

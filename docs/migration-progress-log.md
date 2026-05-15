@@ -4508,6 +4508,46 @@ Warnings:
 
 - German Profile restore/regenerate/reset controls were observed and not tapped, but they are not classified as `forbidden` in the exported screen map.
 
+## 2026-05-15 - Screen Map Crawler Safety
+
+Scope:
+
+- Improved Screen Map harness safety classification and reporting without changing product behavior or adding product accessibility identifiers.
+- Classified English and German purchase/restore/reset/regenerate/sign-in/delete/discard style controls as never-tap.
+- Updated Pro Preview discovery to use the current Profile card identifier, `strq.profile.subscription`.
+- Suppressed low-value missing identifier noise from static/wrapper/system-keyboard artifacts.
+- Added scroll-position and visible scrollable-container reporting for each captured screen.
+
+Files changed:
+
+- `ios/STRQUITests/STRQScreenMapSnapshotTests.swift`
+- `scripts/qa/capture_strq_screen_map.sh`
+- `docs/qa/strq-screen-map-snapshot-2026-05-14/`
+- `docs/migration-progress-log.md`
+
+Verification run:
+
+- `scripts/qa/capture_strq_screen_map.sh docs/qa/strq-screen-map-snapshot-2026-05-14`
+- `jq empty docs/qa/strq-screen-map-snapshot-2026-05-14/screen-map.json`
+- `bash -n scripts/qa/capture_strq_screen_map.sh`
+- `git diff --check`
+- `xcodebuild test -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:STRQUITests/STRQScreenMapSnapshotTests CODE_SIGNING_ALLOWED=NO`
+
+Intentionally not changed:
+
+- No product Swift files.
+- No app behavior.
+- No product accessibility identifiers.
+- No broader autonomous tap coverage.
+
+Pending work:
+
+- Add the top 20 missing product accessibility identifiers in a separate implementation slice.
+
+Warnings:
+
+- The standalone `xcodebuild` command requires `/tmp/strq_capture_screen_map_enabled` to run the Screen Map tests instead of skipping; the capture script manages that control file automatically.
+
 ## Template For Future Entries
 
 ### YYYY-MM-DD - Pass Name

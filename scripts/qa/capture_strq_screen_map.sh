@@ -200,8 +200,10 @@ EN_SCREENSHOT_COUNT="$(find "${OUT_DIR}/screenshots/en" -type f -name '*.png' | 
 DE_SCREENSHOT_COUNT="$(find "${OUT_DIR}/screenshots/de" -type f -name '*.png' | wc -l | tr -d ' ')"
 EN_SCREEN_COUNT="$(jq '.maps.en.screens | length' "${OUT_DIR}/screen-map.json")"
 DE_SCREEN_COUNT="$(jq '.maps.de.screens | length' "${OUT_DIR}/screen-map.json")"
-MISSING_ID_COUNT="$(jq '[.maps.en.screens[].missingIdentifierCandidates[], .maps.de.screens[].missingIdentifierCandidates[]] | length' "${OUT_DIR}/screen-map.json")"
-FORBIDDEN_COUNT="$(jq '[.maps.en.screens[].elements[], .maps.de.screens[].elements[] | select(.safeAction == "forbidden")] | length' "${OUT_DIR}/screen-map.json")"
+MISSING_ID_COUNT="$(jq '[.maps[] .screens[] | (.missingIdentifierCandidates // [])[]] | length' "${OUT_DIR}/screen-map.json")"
+FORBIDDEN_COUNT="$(jq '[.maps[] .screens[].elements[] | select(.safeAction == "forbidden")] | length' "${OUT_DIR}/screen-map.json")"
+WARNING_COUNT="$(jq '[.maps[] .warnings[]] | length' "${OUT_DIR}/screen-map.json")"
+SCROLL_POSITION_COUNTS="$(jq -r '[.maps[] .screens[].scrollPosition] | group_by(.) | map("\(.[0])=\(length)") | join(", ")' "${OUT_DIR}/screen-map.json")"
 
 {
   echo "# STRQ Screen Map Snapshot - ${RUN_DATE}"
@@ -226,6 +228,8 @@ FORBIDDEN_COUNT="$(jq '[.maps.en.screens[].elements[], .maps.de.screens[].elemen
   echo "- German screen records: \`${DE_SCREEN_COUNT}\`"
   echo "- Missing identifier candidates: \`${MISSING_ID_COUNT}\`"
   echo "- Forbidden controls observed, not tapped: \`${FORBIDDEN_COUNT}\`"
+  echo "- Warnings: \`${WARNING_COUNT}\`"
+  echo "- Scroll positions: \`${SCROLL_POSITION_COUNTS}\`"
   echo
   echo "## Files"
   echo
@@ -238,7 +242,10 @@ FORBIDDEN_COUNT="$(jq '[.maps.en.screens[].elements[], .maps.de.screens[].elemen
   echo
   echo "- Appium Inspector remains an inspection aid only."
   echo "- XCTest remains the capture engine."
-  echo "- The exporter does not tap purchase, restore, reset, sign out, delete, discard, finish, or destructive confirmation controls."
+  echo "- The exporter does not tap purchase, subscribe, restore, reset, sign-in/account, sign out, delete, discard, finish, plan-regeneration, or destructive confirmation controls."
+  echo "- German sensitive controls such as \`Käufe wiederherstellen\`, \`Plan neu erstellen\`, \`Alle Daten zurücksetzen\`, and \`Mit Apple anmelden\` are classified with the same never-tap guardrails as the English equivalents."
+  echo "- Scrollable captures report their bounded position as top, middle, max-depth, bottom-or-repeat, or single."
+  echo "- Each screen record includes visible scrollable containers for ScrollView, Table, and CollectionView elements."
   echo "- Full autonomous click crawling is deferred to a later allowlisted slice."
 } > "${OUT_DIR}/README.md"
 
