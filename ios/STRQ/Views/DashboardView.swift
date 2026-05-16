@@ -174,7 +174,7 @@ struct DashboardView: View {
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.78)
 
-                            Text(activationSubheadLine(roadmap.subhead))
+                            Text(activationSubheadLine(for: roadmap))
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundStyle(STRQPalette.textMuted)
                                 .lineLimit(2)
@@ -239,7 +239,7 @@ struct DashboardView: View {
                     }
                 }
 
-                Text(activationLearningLine(step.learning))
+                Text(activationLearningLine(for: step))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(step.isComplete ? STRQPalette.signalGreen : STRQPalette.textMuted)
                     .lineLimit(1)
@@ -281,22 +281,25 @@ struct DashboardView: View {
         return step.title
     }
 
-    private func activationLearningLine(_ line: String) -> String {
-        switch line {
-        case "Progressionsintelligenz aktiv":
-            return "Fortschrittssignal aktiv"
-        case "Coach erkennt deine Muster":
-            return "Muster werden lesbar"
-        default:
-            return line
+    private func activationLearningLine(for step: ActivationRoadmap.Step) -> String {
+        if step.isComplete {
+            switch step.kind {
+            case .secondSession:
+                return "Fortschrittssignal aktiv"
+            case .thirdSession:
+                return "Muster werden lesbar"
+            default:
+                break
+            }
         }
+        return step.learning
     }
 
-    private func activationSubheadLine(_ line: String) -> String {
-        if line == "Wochensignal ist aktiv — der Coach ist vollständig auf dich kalibriert." {
+    private func activationSubheadLine(for roadmap: ActivationRoadmap) -> String {
+        if roadmap.completedCount > 3 {
             return "Wochensignal ist aktiv — dein Trainingsrhythmus wird lesbar."
         }
-        return line
+        return roadmap.subhead
     }
 
     private func comebackRunwayCard(_ comeback: ComebackGuidance) -> some View {
