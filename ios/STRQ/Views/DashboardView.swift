@@ -10,98 +10,13 @@ struct DashboardView: View {
     @State private var showSleepLog: Bool = false
     @State private var showWeightLog: Bool = false
     @State private var showWeekPulseDetails: Bool = false
+    @State private var showActivationRoadmapDetails: Bool = false
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
                 premiumTodayFirstViewport
-
-                if let bridge = postWorkoutBridge {
-                    postWorkoutBridgeCard(bridge)
-                        .padding(.horizontal, 16)
-                }
-
-                if isPostFirstSessionState {
-                    if let roadmap = vm.activationRoadmap {
-                        ActivationRoadmapCard(roadmap: roadmap, compact: true)
-                            .padding(.horizontal, 16)
-                            .onAppear {
-                                Analytics.shared.track(.activation_roadmap_viewed, [
-                                    "completed": String(roadmap.completedCount),
-                                    "surface": "today"
-                                ])
-                            }
-                    }
-
-                    scheduleTimeline
-                        .padding(.horizontal, 16)
-
-                    dailySignalsRow
-                        .padding(.horizontal, 16)
-
-                    if let since = vm.dailyBriefing?.sinceLast, postWorkoutBridge == nil {
-                        sinceLastCard(since)
-                            .padding(.horizontal, 16)
-                    }
-                } else {
-                    if let since = vm.dailyBriefing?.sinceLast, postWorkoutBridge == nil {
-                        sinceLastCard(since)
-                            .padding(.horizontal, 16)
-                    }
-
-                    if let roadmap = vm.activationRoadmap {
-                        ActivationRoadmapCard(roadmap: roadmap, compact: true)
-                            .padding(.horizontal, 16)
-                            .onAppear {
-                                Analytics.shared.track(.activation_roadmap_viewed, [
-                                    "completed": String(roadmap.completedCount),
-                                    "surface": "today"
-                                ])
-                            }
-                    } else if let comeback = vm.comebackGuidance {
-                        ComebackCard(
-                            guidance: comeback,
-                            onEaseNext: comeback.offersLighterSession ? {
-                                Analytics.shared.track(.comeback_cta_tapped, [
-                                    "action": "ease",
-                                    "tier": comeback.tier.rawValue,
-                                    "surface": "today"
-                                ])
-                                vm.applyComebackLighterSession()
-                            } : nil,
-                            onCheckIn: vm.hasCheckedInToday ? nil : {
-                                Analytics.shared.track(.comeback_cta_tapped, [
-                                    "action": "checkin",
-                                    "tier": comeback.tier.rawValue,
-                                    "surface": "today"
-                                ])
-                                showReadinessCheckIn = true
-                            }
-                        )
-                        .padding(.horizontal, 16)
-                        .onAppear {
-                            Analytics.shared.track(.comeback_card_viewed, [
-                                "tier": comeback.tier.rawValue,
-                                "days_since": String(comeback.daysSinceLastWorkout),
-                                "surface": "today"
-                            ])
-                        }
-                    } else if let guidance = vm.earlyStateGuidance {
-                        earlyStageHint(guidance)
-                            .padding(.horizontal, 16)
-                    }
-
-                    scheduleTimeline
-                        .padding(.horizontal, 16)
-
-                    dailySignalsRow
-                        .padding(.horizontal, 16)
-                }
-
-                if !vm.isEarlyStage {
-                    weekPulse
-                        .padding(.horizontal, 16)
-                }
+                lowerTodayRunway
             }
             .padding(.bottom, 32)
         }
@@ -150,6 +65,455 @@ struct DashboardView: View {
                 .presentationDragIndicator(.hidden)
                 .presentationContentInteraction(.scrolls)
         }
+    }
+
+    // MARK: - Today Lower Runway
+
+    private var lowerTodayRunway: some View {
+        let bridge = postWorkoutBridge
+
+        return VStack(spacing: 12) {
+            if let bridge {
+                postWorkoutBridgeCard(bridge)
+            }
+
+            lowerGuidanceBlock
+
+            scheduleTimeline
+
+            dailySignalsRow
+
+            if let since = vm.dailyBriefing?.sinceLast, bridge == nil {
+                sinceLastCard(since)
+            }
+
+            if !vm.isEarlyStage {
+                weekPulse
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+
+    @ViewBuilder
+    private var lowerGuidanceBlock: some View {
+        if let roadmap = vm.activationRoadmap {
+            activationRunwayCard(roadmap)
+        } else if let comeback = vm.comebackGuidance {
+            comebackRunwayCard(comeback)
+        } else if let guidance = vm.earlyStateGuidance {
+            earlyStageHint(guidance)
+        }
+    }
+
+    private func activationRunwayCard(_ roadmap: ActivationRoadmap) -> some View {
+        sandowRunwayCard(accent: STRQBrand.steel) {
+            VStack(alignment: .leading, spacing: 12) {
+                Button {
+                    withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.22)) {
+                        showActivationRoadmapDetails.toggle()
+                    }
+                } label: {
+                    HStack(alignment: .center, spacing: 12) {
+                        sandowIconBox(
+                            icon: "checkmark.seal.fill",
+                            tint: roadmap.progress >= 1 ? STRQPalette.signalGreen : STRQBrand.steel,
+                            size: 38,
+                            cornerRadius: 12
+                        )
+
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(L10n.tr("activationRoadmap.title", fallback: "Your first week"))
+                                .font(.system(size: 17, weight: .black, design: .rounded))
+                                .foregroundStyle(STRQPalette.textPrimary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.76)
+
+                            Text(L10n.format(
+                                "activationRoadmap.progressDone",
+                                fallback: "%d/%d done",
+                                roadmap.completedCount,
+                                roadmap.steps.count
+                            ))
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(STRQPalette.textSecondary)
+                        }
+
+                        Spacer(minLength: 8)
+
+                        Image(systemName: showActivationRoadmapDetails ? "chevron.up" : "chevron.down")
+                            .font(.system(size: 13, weight: .black))
+                            .foregroundStyle(STRQPalette.textMuted)
+                            .frame(width: 22, height: 22)
+                    }
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+
+                sandowProgressBar(progress: roadmap.progress, tint: STRQBrand.steel)
+
+                if showActivationRoadmapDetails {
+                    VStack(spacing: 10) {
+                        ForEach(Array(roadmap.steps.enumerated()), id: \.element.id) { index, step in
+                            activationStepRow(step, isLast: index == roadmap.steps.count - 1)
+                        }
+                    }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                } else if let nextStep = activationNextStep(for: roadmap) {
+                    HStack(alignment: .top, spacing: 10) {
+                        sandowIconBox(
+                            icon: nextStep.isComplete ? "checkmark" : nextStep.icon,
+                            tint: nextStep.isComplete ? STRQPalette.signalGreen : STRQBrand.steel,
+                            size: 32,
+                            cornerRadius: 10
+                        )
+
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(nextStepLine(for: nextStep))
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(STRQPalette.textPrimary.opacity(0.90))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.78)
+
+                            Text(activationSubheadLine(roadmap.subhead))
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(STRQPalette.textMuted)
+                                .lineLimit(2)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.top, 2)
+                }
+            }
+        }
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.06), value: appeared)
+        .onAppear {
+            Analytics.shared.track(.activation_roadmap_viewed, [
+                "completed": String(roadmap.completedCount),
+                "surface": "today"
+            ])
+        }
+    }
+
+    private func activationStepRow(_ step: ActivationRoadmap.Step, isLast: Bool) -> some View {
+        HStack(alignment: .top, spacing: 11) {
+            VStack(spacing: 4) {
+                ZStack {
+                    Circle()
+                        .fill(activationStepFill(step))
+                        .frame(width: 26, height: 26)
+                    if step.isActive && !step.isComplete {
+                        Circle()
+                            .strokeBorder(STRQBrand.steel.opacity(0.55), lineWidth: 1.2)
+                            .frame(width: 26, height: 26)
+                    }
+                    Image(systemName: step.isComplete ? "checkmark" : step.icon)
+                        .font(.system(size: 10, weight: .black))
+                        .foregroundStyle(activationStepTint(step))
+                }
+
+                if !isLast {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.07))
+                        .frame(width: 1, height: 18)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 6) {
+                    Text(step.title)
+                        .font(.system(size: 14, weight: step.isActive ? .black : .semibold))
+                        .foregroundStyle(step.isComplete || step.isActive ? STRQPalette.textPrimary : STRQPalette.textSecondary)
+                        .lineLimit(1)
+
+                    if step.isActive && !step.isComplete {
+                        Text(L10n.tr("NEXT"))
+                            .font(.system(size: 9, weight: .black))
+                            .foregroundStyle(STRQBrand.steel)
+                            .padding(.horizontal, 6)
+                            .frame(height: 18)
+                            .background(STRQBrand.steel.opacity(0.12), in: Capsule())
+                    }
+                }
+
+                Text(activationLearningLine(step.learning))
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(step.isComplete ? STRQPalette.signalGreen : STRQPalette.textMuted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+            }
+
+            Spacer(minLength: 0)
+        }
+    }
+
+    private func activationStepFill(_ step: ActivationRoadmap.Step) -> AnyShapeStyle {
+        if step.isComplete {
+            return AnyShapeStyle(STRQPalette.signalGreen.opacity(0.20))
+        }
+        if step.isActive {
+            return AnyShapeStyle(STRQBrand.steel.opacity(0.16))
+        }
+        return AnyShapeStyle(Color.white.opacity(0.055))
+    }
+
+    private func activationStepTint(_ step: ActivationRoadmap.Step) -> Color {
+        if step.isComplete {
+            return STRQPalette.signalGreen
+        }
+        if step.isActive {
+            return STRQBrand.steel
+        }
+        return STRQPalette.textMuted
+    }
+
+    private func activationNextStep(for roadmap: ActivationRoadmap) -> ActivationRoadmap.Step? {
+        roadmap.steps.first(where: { !$0.isComplete }) ?? roadmap.steps.last
+    }
+
+    private func nextStepLine(for step: ActivationRoadmap.Step) -> String {
+        if step.isComplete {
+            return L10n.tr("activationRoadmap.complete", fallback: "Week one is complete.")
+        }
+        return step.title
+    }
+
+    private func activationLearningLine(_ line: String) -> String {
+        switch line {
+        case "Progressionsintelligenz aktiv":
+            return "Fortschrittssignal aktiv"
+        case "Coach erkennt deine Muster":
+            return "Muster werden lesbar"
+        default:
+            return line
+        }
+    }
+
+    private func activationSubheadLine(_ line: String) -> String {
+        if line == "Wochensignal ist aktiv — der Coach ist vollständig auf dich kalibriert." {
+            return "Wochensignal ist aktiv — dein Trainingsrhythmus wird lesbar."
+        }
+        return line
+    }
+
+    private func comebackRunwayCard(_ comeback: ComebackGuidance) -> some View {
+        let tint = ForgeTheme.color(for: comeback.colorName)
+
+        return sandowRunwayCard(accent: tint) {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top, spacing: 12) {
+                    sandowIconBox(icon: comeback.icon, tint: tint)
+
+                    VStack(alignment: .leading, spacing: 5) {
+                        HStack(spacing: 7) {
+                            Text(comeback.tier.eyebrow)
+                                .font(.system(size: 10, weight: .black))
+                                .foregroundStyle(tint)
+                                .lineLimit(1)
+
+                            Text(L10n.format("%dD SINCE LAST WORKOUT", comeback.daysSinceLastWorkout))
+                                .font(.system(size: 10, weight: .black).monospacedDigit())
+                                .foregroundStyle(STRQPalette.textMuted)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.72)
+                        }
+
+                        Text(comeback.headline)
+                            .font(.system(size: 18, weight: .black, design: .rounded))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.78)
+
+                        Text(comeback.detail)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(STRQPalette.textSecondary)
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 0)
+                }
+
+                if !comeback.steps.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(Array(comeback.steps.prefix(3).enumerated()), id: \.offset) { _, step in
+                            HStack(alignment: .top, spacing: 8) {
+                                Circle()
+                                    .fill(tint)
+                                    .frame(width: 5, height: 5)
+                                    .padding(.top, 6)
+                                Text(step)
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundStyle(STRQPalette.textPrimary.opacity(0.84))
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                }
+
+                if comeback.offersLighterSession || !vm.hasCheckedInToday {
+                    HStack(spacing: 10) {
+                        if !vm.hasCheckedInToday {
+                            sandowSecondaryButton(icon: "heart.text.clipboard", title: L10n.tr("Check in")) {
+                                Analytics.shared.track(.comeback_cta_tapped, [
+                                    "action": "checkin",
+                                    "tier": comeback.tier.rawValue,
+                                    "surface": "today"
+                                ])
+                                showReadinessCheckIn = true
+                            }
+                        }
+
+                        if comeback.offersLighterSession {
+                            sandowSecondaryButton(icon: "leaf.arrow.triangle.circlepath", title: L10n.tr("Ease next workout"), tint: tint) {
+                                Analytics.shared.track(.comeback_cta_tapped, [
+                                    "action": "ease",
+                                    "tier": comeback.tier.rawValue,
+                                    "surface": "today"
+                                ])
+                                vm.applyComebackLighterSession()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.06), value: appeared)
+        .onAppear {
+            Analytics.shared.track(.comeback_card_viewed, [
+                "tier": comeback.tier.rawValue,
+                "days_since": String(comeback.daysSinceLastWorkout),
+                "surface": "today"
+            ])
+        }
+    }
+
+    private func sandowRunwayCard<Content: View>(
+        accent: Color? = nil,
+        padding: CGFloat = 14,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        content()
+            .padding(padding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                LinearGradient(
+                    colors: [
+                        STRQPalette.surfaceRaised,
+                        STRQPalette.surfaceBase,
+                        STRQPalette.backgroundDeep
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: .rect(cornerRadius: 22, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .strokeBorder((accent ?? STRQPalette.borderHairline).opacity(accent == nil ? 0.18 : 0.24), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.22), radius: 16, y: 8)
+    }
+
+    private func lowerSectionHeader(
+        title: String,
+        subtitle: String? = nil,
+        trailing: String? = nil,
+        accent: Color = STRQBrand.steel
+    ) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: subtitle == nil ? 0 : 3) {
+                Text(title)
+                    .font(.system(size: 17, weight: .black, design: .rounded))
+                    .foregroundStyle(STRQPalette.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.76)
+
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(STRQPalette.textMuted)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.76)
+                }
+            }
+
+            Spacer(minLength: 8)
+
+            if let trailing {
+                Text(trailing)
+                    .font(.system(size: 11, weight: .black).monospacedDigit())
+                    .foregroundStyle(accent)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                    .padding(.horizontal, 10)
+                    .frame(height: 28)
+                    .background(accent.opacity(0.12), in: Capsule())
+                    .overlay(Capsule().strokeBorder(accent.opacity(0.22), lineWidth: 1))
+            }
+        }
+    }
+
+    private func sandowIconBox(
+        icon: String,
+        tint: Color,
+        size: CGFloat = 40,
+        cornerRadius: CGFloat = 13
+    ) -> some View {
+        Image(systemName: icon)
+            .font(.system(size: size * 0.34, weight: .black))
+            .foregroundStyle(tint)
+            .frame(width: size, height: size)
+            .background(tint.opacity(0.14), in: .rect(cornerRadius: cornerRadius, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .strokeBorder(tint.opacity(0.18), lineWidth: 1)
+            )
+    }
+
+    private func sandowProgressBar(progress: Double, tint: Color) -> some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color.white.opacity(0.075))
+                Capsule()
+                    .fill(tint.gradient)
+                    .frame(width: max(6, geo.size.width * min(max(progress, 0), 1)))
+            }
+        }
+        .frame(height: 5)
+    }
+
+    private func sandowSecondaryButton(
+        icon: String,
+        title: String,
+        tint: Color = STRQBrand.steel,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 7) {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .black))
+                Text(title)
+                    .font(.system(size: 13, weight: .black))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+            .foregroundStyle(STRQPalette.textPrimary.opacity(0.92))
+            .frame(maxWidth: .infinity)
+            .frame(height: 42)
+            .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 13, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                    .strokeBorder(tint.opacity(0.18), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.strqPressable)
     }
 
     // MARK: - Premium Today First Viewport
@@ -1186,66 +1550,65 @@ struct DashboardView: View {
     }
 
     private func postWorkoutBridgeCard(_ bridge: PostWorkoutBridge) -> some View {
-        ForgeSurface(variant: .elevated, accent: bridge.accent, padding: 15) {
-            VStack(alignment: .leading, spacing: 13) {
-            HStack(spacing: 12) {
-                STRQPulseMark(size: 38, tint: bridge.accent) {
-                    Image(systemName: bridge.icon)
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(bridge.accent)
-                }
+        sandowRunwayCard(accent: bridge.accent) {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top, spacing: 12) {
+                    sandowIconBox(icon: bridge.icon, tint: bridge.accent)
 
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 6) {
-                        Text(L10n.tr("Workout saved"))
-                            .font(.system(size: 9, weight: .black))
-                            .tracking(1.1)
-                            .foregroundStyle(bridge.accent)
-                        Text(bridge.timeLabel)
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(.white.opacity(0.38))
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 7) {
+                            Text(L10n.tr("Workout saved"))
+                                .font(.system(size: 10, weight: .black))
+                                .foregroundStyle(bridge.accent)
+                                .lineLimit(1)
+                            Text(bridge.timeLabel)
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(STRQPalette.textMuted)
+                        }
+
+                        Text(bridge.sessionName)
+                            .font(.system(size: 18, weight: .black, design: .rounded))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.78)
+
+                        Text(bridge.stats)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(STRQPalette.textSecondary)
+                            .lineLimit(1)
                     }
-                    Text(bridge.sessionName)
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
-                    Text(bridge.stats)
-                        .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.58))
+
+                    Spacer(minLength: 0)
                 }
 
-                Spacer(minLength: 0)
-            }
-
-            VStack(alignment: .leading, spacing: 7) {
                 ForEach(Array(bridge.outcomes.prefix(2)), id: \.self) { outcome in
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(bridge.accent)
                         Text(outcome)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.white.opacity(0.88))
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(STRQPalette.textPrimary.opacity(0.88))
                             .lineLimit(1)
+                            .minimumScaleFactor(0.78)
                     }
                 }
-            }
 
-            Rectangle()
-                .fill(Color.white.opacity(0.08))
-                .frame(height: 1)
+                Rectangle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(height: 1)
 
-            HStack(alignment: .top, spacing: 10) {
-                Text(L10n.tr("NEXT ACTION"))
-                    .font(.system(size: 9, weight: .black))
-                    .tracking(0.9)
-                    .foregroundStyle(.white.opacity(0.42))
-                    .frame(width: 78, alignment: .leading)
-                Text(bridge.nextStep)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.88))
-                    .fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 0)
-            }
+                HStack(alignment: .top, spacing: 10) {
+                    Text(L10n.tr("NEXT ACTION"))
+                        .font(.system(size: 10, weight: .black))
+                        .foregroundStyle(STRQPalette.textMuted)
+                        .frame(width: 82, alignment: .leading)
+                    Text(bridge.nextStep)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(STRQPalette.textPrimary.opacity(0.88))
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 0)
+                }
             }
         }
         .opacity(appeared ? 1 : 0)
@@ -1357,39 +1720,39 @@ struct DashboardView: View {
     // MARK: - Since Last Session
 
     private func sinceLastCard(_ since: DailyBriefing.SinceLast) -> some View {
-        let isSupporting = isPostFirstSessionState
-
-        return ForgeSurface(
-            variant: isSupporting ? .standard : .elevated,
-            accent: STRQPalette.signalGreen,
-            padding: 12
-        ) {
+        sandowRunwayCard(accent: STRQPalette.signalGreen, padding: 14) {
             HStack(spacing: 12) {
-            Image(systemName: "arrow.up.right.circle.fill")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(STRQPalette.signalGreen)
-                .frame(width: 32, height: 32)
-                .background(STRQPalette.successSoft, in: .rect(cornerRadius: 9))
+                sandowIconBox(
+                    icon: "arrow.up.right.circle.fill",
+                    tint: STRQPalette.signalGreen,
+                    size: 34,
+                    cornerRadius: 11
+                )
 
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 6) {
-                    Text(since.eyebrow)
-                        .font(.system(size: 9, weight: .black))
-                        .tracking(1.1)
-                        .foregroundStyle(STRQPalette.success)
-                    Text(timeLabel(since.hoursAgo))
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(.tertiary)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Text(since.eyebrow)
+                            .font(.system(size: 10, weight: .black))
+                            .foregroundStyle(STRQPalette.signalGreen)
+                            .lineLimit(1)
+                        Text(timeLabel(since.hoursAgo))
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(STRQPalette.textMuted)
+                    }
+
+                    Text(since.summary)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(STRQPalette.textPrimary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
+
+                    Text(since.sessionName)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(STRQPalette.textMuted)
+                        .lineLimit(1)
                 }
-                Text(since.summary)
-                    .font((isSupporting ? Font.caption.weight(.semibold) : Font.subheadline.weight(.semibold)))
-                    .foregroundStyle(STRQPalette.textPrimary)
-                    .lineLimit(2)
-                Text(since.sessionName)
-                    .font(.caption2)
-                    .foregroundStyle(STRQPalette.textMuted)
-            }
-            Spacer(minLength: 0)
+
+                Spacer(minLength: 0)
             }
         }
         .opacity(appeared ? 1 : 0)
@@ -1411,40 +1774,52 @@ struct DashboardView: View {
 
     private func earlyStageHint(_ guidance: EarlyStateGuidance) -> some View {
         let tierIndex = max(0, min(3, guidance.tier.rawValue))
-        return ForgeSurface(variant: .standard, accent: STRQPalette.energyAccent, padding: 12) {
-            VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: guidance.icon)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(STRQPalette.energyAccent)
-                    .frame(width: 32, height: 32)
-                    .background(STRQPalette.energyAccentSoft, in: .rect(cornerRadius: 9))
+        return sandowRunwayCard(accent: STRQBrand.steel) {
+            VStack(alignment: .leading, spacing: 13) {
+                HStack(alignment: .top, spacing: 12) {
+                    sandowIconBox(icon: guidance.icon, tint: STRQBrand.steel)
 
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(L10n.tr("CALIBRATING"))
-                            .font(.system(size: 9, weight: .black))
-                            .tracking(1.1)
-                            .foregroundStyle(STRQBrand.steel)
-                        Spacer()
-                        Text("\(tierIndex + 1)/4")
-                            .font(.system(size: 9, weight: .bold).monospacedDigit())
-                            .foregroundStyle(STRQPalette.textMuted)
+                    VStack(alignment: .leading, spacing: 5) {
+                        HStack(spacing: 7) {
+                            Text(L10n.tr("CALIBRATING"))
+                                .font(.system(size: 10, weight: .black))
+                                .foregroundStyle(STRQBrand.steel)
+                            Text("\(tierIndex + 1)/4")
+                                .font(.system(size: 10, weight: .black).monospacedDigit())
+                                .foregroundStyle(STRQPalette.textMuted)
+                        }
+
+                        Text(guidance.headline)
+                            .font(.system(size: 18, weight: .black, design: .rounded))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.78)
+
+                        Text(guidance.message)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(STRQPalette.textSecondary)
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    Text(guidance.headline)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(STRQPalette.textPrimary)
-                }
-                Spacer(minLength: 0)
-            }
 
-            HStack(spacing: 4) {
-                ForEach(0..<4, id: \.self) { i in
-                    Capsule()
-                        .fill(i <= tierIndex ? AnyShapeStyle(STRQPalette.energyAccent.gradient) : AnyShapeStyle(Color.white.opacity(0.08)))
-                        .frame(height: 3)
+                    Spacer(minLength: 0)
                 }
-            }
+
+                HStack(spacing: 5) {
+                    ForEach(0..<4, id: \.self) { i in
+                        Capsule()
+                            .fill(i <= tierIndex ? AnyShapeStyle(STRQBrand.steel.gradient) : AnyShapeStyle(Color.white.opacity(0.08)))
+                            .frame(height: 5)
+                    }
+                }
+
+                if let unlock = guidance.unlocksNext {
+                    Text(unlock)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(STRQPalette.textMuted)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
         }
         .opacity(appeared ? 1 : 0)
@@ -1761,72 +2136,86 @@ struct DashboardView: View {
     @ViewBuilder
     private var scheduleTimeline: some View {
         if let plan = vm.currentPlan, plan.days.contains(where: { $0.scheduledWeekday != nil }) {
-            ForgeSurface(variant: .standard, padding: 14) {
-                VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    STRQSectionTitle(title: L10n.tr("Training Week"))
-                    Spacer()
-                    if let next = nextScheduledDay {
-                        STRQBadgeChip(
-                            label: L10n.format("Next: %@", vm.weekdayName(next.scheduledWeekday ?? 0)),
-                            variant: .accent
-                        )
-                    }
-                }
+            sandowRunwayCard(accent: STRQBrand.steel) {
+                VStack(alignment: .leading, spacing: 14) {
+                    lowerSectionHeader(
+                        title: L10n.tr("Training Week"),
+                        subtitle: todayText(en: "Planned rhythm", de: "Geplanter Rhythmus"),
+                        trailing: nextScheduledDay.map { L10n.format("Next: %@", vm.weekdayName($0.scheduledWeekday ?? 0)) },
+                        accent: STRQBrand.steel
+                    )
 
-                HStack(spacing: 0) {
-                    ForEach(1...7, id: \.self) { weekday in
-                        let matchingDay = plan.days.first { $0.scheduledWeekday == weekday && !$0.isSkipped }
-                        let isToday = Calendar.current.component(.weekday, from: Date()) == weekday
-                        let isPast = Calendar.current.component(.weekday, from: Date()) > weekday
-
-                        VStack(spacing: 5) {
-                            Text(vm.weekdayName(weekday))
-                                .font(.system(size: 9, weight: isToday ? .bold : .medium))
-                                .foregroundStyle(isToday ? STRQPalette.textPrimary : STRQPalette.textMuted)
-
-                            ZStack {
-                                if matchingDay != nil {
-                                    Circle()
-                                        .fill(isToday ? STRQPalette.energyAccent : isPast ? STRQPalette.signalGreen.opacity(0.26) : STRQPalette.textSecondary.opacity(0.36))
-                                        .frame(width: 28, height: 28)
-                                    Image(systemName: "figure.strengthtraining.traditional")
-                                        .font(.system(size: 10, weight: .medium))
-                                        .foregroundStyle(isToday ? STRQPalette.backgroundDeep : STRQPalette.textPrimary)
-                                } else {
-                                    Circle()
-                                        .fill(Color.white.opacity(isToday ? 0.1 : 0.04))
-                                        .frame(width: 28, height: 28)
-                                    if isToday {
-                                        Circle()
-                                            .strokeBorder(STRQPalette.energyAccent.opacity(0.5), lineWidth: 1.5)
-                                            .frame(width: 28, height: 28)
-                                    }
-                                }
-                            }
-
-                            if let day = matchingDay {
-                                Text(shortName(day.name))
-                                    .font(.system(size: 8, weight: .medium))
-                                    .foregroundStyle(isToday ? STRQPalette.energyAccent : STRQPalette.textMuted)
-                                    .lineLimit(1)
-                            } else {
-                                Text(isToday ? L10n.tr("Rest") : "")
-                                    .font(.system(size: 8, weight: .medium))
-                                    .foregroundStyle(STRQPalette.textMuted)
-                            }
+                    HStack(alignment: .top, spacing: 0) {
+                        ForEach(1...7, id: \.self) { weekday in
+                            trainingWeekDay(plan: plan, weekday: weekday)
                         }
-                        .frame(maxWidth: .infinity)
                     }
-                }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 4)
                 }
             }
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
             .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.07), value: appeared)
         }
+    }
+
+    private func trainingWeekDay(plan: WorkoutPlan, weekday: Int) -> some View {
+        let matchingDay = plan.days.first { $0.scheduledWeekday == weekday && !$0.isSkipped }
+        let todayWeekday = Calendar.current.component(.weekday, from: Date())
+        let isToday = todayWeekday == weekday
+        let isPast = todayWeekday > weekday
+        let tint: Color = {
+            if matchingDay == nil {
+                return isToday ? STRQBrand.steel : STRQPalette.textMuted
+            }
+            if isToday {
+                return STRQBrand.steel
+            }
+            return isPast ? STRQPalette.signalGreen : STRQPalette.textSecondary
+        }()
+
+        return VStack(spacing: 7) {
+            Text(vm.weekdayName(weekday))
+                .font(.system(size: 11, weight: isToday ? .black : .semibold))
+                .foregroundStyle(isToday ? STRQPalette.textPrimary : STRQPalette.textMuted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.62)
+
+            ZStack {
+                Circle()
+                    .fill(trainingWeekFill(hasWorkout: matchingDay != nil, isToday: isToday, isPast: isPast, tint: tint))
+                    .frame(width: 32, height: 32)
+
+                if isToday {
+                    Circle()
+                        .strokeBorder(tint.opacity(0.55), lineWidth: 1.4)
+                        .frame(width: 32, height: 32)
+                }
+
+                if matchingDay != nil {
+                    Image(systemName: "figure.strengthtraining.traditional")
+                        .font(.system(size: 12, weight: .black))
+                        .foregroundStyle(isToday ? STRQPalette.backgroundDeep : STRQPalette.textPrimary.opacity(0.82))
+                }
+            }
+
+            Text(matchingDay.map { shortName($0.name) } ?? (isToday ? L10n.tr("Rest") : ""))
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(isToday ? tint : STRQPalette.textMuted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.62)
+                .frame(height: 12)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func trainingWeekFill(hasWorkout: Bool, isToday: Bool, isPast: Bool, tint: Color) -> AnyShapeStyle {
+        if hasWorkout {
+            if isToday {
+                return AnyShapeStyle(tint.gradient)
+            }
+            return AnyShapeStyle((isPast ? STRQPalette.signalGreen : STRQPalette.textSecondary).opacity(isPast ? 0.22 : 0.12))
+        }
+        return AnyShapeStyle(Color.white.opacity(isToday ? 0.075 : 0.045))
     }
 
     private var nextScheduledDay: WorkoutDay? {
@@ -1849,84 +2238,110 @@ struct DashboardView: View {
     // MARK: - Daily Signals Row (compact)
 
     private var dailySignalsRow: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 10) {
-                if vm.profile.nutritionTrackingEnabled {
-                    signalButton(
-                        icon: "fork.knife",
-                        label: L10n.tr("Protein"),
-                        value: "\(Int(vm.todayProteinProgress * 100))%",
-                        progress: vm.todayProteinProgress,
-                        color: STRQPalette.signalGreen,
-                        accessibilityIdentifier: "strq.today.signal.protein"
-                    ) {
-                        showNutritionLog = true
-                    }
-                }
+        sandowRunwayCard(accent: STRQBrand.steel) {
+            VStack(alignment: .leading, spacing: 12) {
+                lowerSectionHeader(
+                    title: todayText(en: "Quick logs", de: "Kurz eintragen"),
+                    subtitle: todayText(en: "Support the next call", de: "Stützt die nächste Entscheidung"),
+                    accent: STRQBrand.steel
+                )
 
-                signalButton(
-                    icon: "moon.zzz.fill",
-                    label: L10n.tr("Sleep"),
-                    value: String(format: "%.1fh", vm.averageSleepHours),
-                    progress: min(1.0, vm.averageSleepHours / 8.0),
-                    color: ForgeTheme.sleepColor(for: vm.averageSleepHours),
-                    accessibilityIdentifier: "strq.today.signal.sleep"
-                ) {
-                    showSleepLog = true
-                }
-
-                if vm.profile.nutritionTrackingEnabled {
-                    signalButton(
-                        icon: "scalemass.fill",
-                        label: L10n.tr("Weight"),
-                        value: vm.latestWeight.map { String(format: "%.1f", $0) } ?? "—",
-                        progress: vm.latestWeight != nil ? 1.0 : 0.0,
-                        color: STRQPalette.steel,
-                        accessibilityIdentifier: "strq.today.signal.weight"
-                    ) {
-                        showWeightLog = true
-                    }
-                }
-            }
-
-            if vm.isWeeklyReviewReady {
-                Button {
-                    vm.generateWeeklyReview()
-                    showWeeklyReview = true
-                } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "doc.text.magnifyingglass")
-                            .font(.subheadline)
-                            .foregroundStyle(STRQPalette.energyAccent)
-                            .frame(width: 28, height: 28)
-                            .background(STRQPalette.energyAccentSoft, in: .rect(cornerRadius: 8))
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(L10n.tr("Weekly review ready"))
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(STRQPalette.textPrimary)
-                            Text(L10n.tr("Review this week and adjust"))
-                                .font(.caption2)
-                                .foregroundStyle(STRQPalette.textMuted)
+                VStack(spacing: 0) {
+                    if vm.profile.nutritionTrackingEnabled {
+                        signalButton(
+                            icon: "fork.knife",
+                            label: L10n.tr("Protein"),
+                            value: "\(Int(vm.todayProteinProgress * 100))%",
+                            progress: vm.todayProteinProgress,
+                            color: STRQPalette.signalGreen,
+                            accessibilityIdentifier: "strq.today.signal.protein"
+                        ) {
+                            showNutritionLog = true
                         }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(STRQPalette.textMuted)
+
+                        sandowRowDivider
                     }
-                    .padding(12)
-                    .background(STRQPalette.surfaceCarbon, in: .rect(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(STRQPalette.borderSubtle, lineWidth: 1)
-                    )
+
+                    signalButton(
+                        icon: "moon.zzz.fill",
+                        label: L10n.tr("Sleep"),
+                        value: String(format: "%.1fh", vm.averageSleepHours),
+                        progress: min(1.0, vm.averageSleepHours / 8.0),
+                        color: ForgeTheme.sleepColor(for: vm.averageSleepHours),
+                        accessibilityIdentifier: "strq.today.signal.sleep"
+                    ) {
+                        showSleepLog = true
+                    }
+
+                    if vm.profile.nutritionTrackingEnabled {
+                        sandowRowDivider
+
+                        signalButton(
+                            icon: "scalemass.fill",
+                            label: L10n.tr("Weight"),
+                            value: vm.latestWeight.map { String(format: "%.1f", $0) } ?? "—",
+                            progress: vm.latestWeight != nil ? 1.0 : 0.0,
+                            color: STRQBrand.steel,
+                            accessibilityIdentifier: "strq.today.signal.weight"
+                        ) {
+                            showWeightLog = true
+                        }
+                    }
+
+                    if vm.isWeeklyReviewReady {
+                        sandowRowDivider
+                        weeklyReviewRow
+                    }
                 }
-                .buttonStyle(.strqPressable)
-                .accessibilityIdentifier("strq.today.weekly-review")
             }
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.1), value: appeared)
+    }
+
+    private var sandowRowDivider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.075))
+            .frame(height: 1)
+            .padding(.leading, 52)
+    }
+
+    private var weeklyReviewRow: some View {
+        Button {
+            vm.generateWeeklyReview()
+            showWeeklyReview = true
+        } label: {
+            HStack(spacing: 12) {
+                sandowIconBox(
+                    icon: "doc.text.magnifyingglass",
+                    tint: STRQBrand.steel,
+                    size: 36,
+                    cornerRadius: 11
+                )
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(L10n.tr("Weekly review ready"))
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(STRQPalette.textPrimary)
+                        .lineLimit(1)
+                    Text(L10n.tr("Review this week and adjust"))
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(STRQPalette.textMuted)
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(STRQPalette.textMuted)
+            }
+            .padding(.vertical, 11)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.strqPressable)
+        .accessibilityIdentifier("strq.today.weekly-review")
     }
 
     private func signalButton(
@@ -1939,14 +2354,34 @@ struct DashboardView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            STRQMetricTile(
-                value: value,
-                label: label,
-                icon: icon,
-                tint: color,
-                progress: progress,
-                compact: true
-            )
+            HStack(spacing: 12) {
+                sandowIconBox(icon: icon, tint: color, size: 34, cornerRadius: 11)
+
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(label)
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                            .lineLimit(1)
+
+                        Spacer(minLength: 8)
+
+                        Text(value)
+                            .font(.system(size: 16, weight: .black, design: .rounded).monospacedDigit())
+                            .foregroundStyle(STRQPalette.textPrimary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                    }
+
+                    sandowProgressBar(progress: progress, tint: color)
+                }
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(STRQPalette.textMuted.opacity(0.72))
+            }
+            .padding(.vertical, 9)
+            .contentShape(.rect)
         }
         .buttonStyle(.strqPressable)
         .accessibilityIdentifier(accessibilityIdentifier)
@@ -1955,82 +2390,104 @@ struct DashboardView: View {
     // MARK: - Week Pulse
 
     private var weekPulse: some View {
-        ForgeSurface(variant: .standard, padding: 16) {
-            VStack(spacing: 14) {
+        sandowRunwayCard(accent: STRQPalette.signalGreen) {
+            VStack(alignment: .leading, spacing: 15) {
             Button {
                 withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .snappy(duration: 0.22)) {
                     showWeekPulseDetails.toggle()
                 }
             } label: {
-                HStack {
-                    STRQSectionTitle(title: L10n.tr("This Week"))
+                HStack(spacing: 12) {
+                    lowerSectionHeader(
+                        title: L10n.tr("This Week"),
+                        subtitle: todayText(en: "Weekly signal", de: "Wochensignal"),
+                        trailing: vm.momentumData?.paceMessage,
+                        accent: STRQPalette.signalGreen
+                    )
+
                     Spacer()
-                    if let momentum = vm.momentumData {
-                        let paceName = momentum.weeklyPace.colorName
-                        STRQBadgeChip(
-                            label: momentum.paceMessage,
-                            variant: ["green", "mint"].contains(paceName) ? .success : (["yellow", "orange"].contains(paceName) ? .warning : .neutral)
-                        )
-                    }
+
                     Image(systemName: showWeekPulseDetails ? "chevron.up" : "chevron.down")
-                        .font(.caption2.weight(.bold))
+                        .font(.system(size: 12, weight: .black))
                         .foregroundStyle(STRQPalette.textMuted)
+                        .frame(width: 24, height: 24)
                 }
+                .contentShape(.rect)
             }
             .buttonStyle(.plain)
 
-            HStack(spacing: 0) {
-                ForEach(vm.weeklyActivity) { day in
-                    VStack(spacing: 6) {
-                        Text(day.label)
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundStyle(STRQPalette.textMuted)
-                        Circle()
-                            .fill(day.didTrain ? STRQPalette.signalGreen : Color.white.opacity(0.06))
-                            .frame(width: 28, height: 28)
-                            .overlay {
-                                if day.didTrain {
-                                    Image(systemName: "checkmark")
-                                        .font(.system(size: 9, weight: .bold))
-                                        .foregroundStyle(STRQPalette.backgroundDeep)
+                HStack(spacing: 0) {
+                    ForEach(vm.weeklyActivity) { day in
+                        VStack(spacing: 7) {
+                            Text(day.label)
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(STRQPalette.textMuted)
+
+                            Circle()
+                                .fill(day.didTrain ? STRQPalette.signalGreen.opacity(0.24) : Color.white.opacity(0.045))
+                                .frame(width: 32, height: 32)
+                                .overlay {
+                                    if day.didTrain {
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 10, weight: .black))
+                                            .foregroundStyle(STRQPalette.signalGreen)
+                                    }
                                 }
-                            }
+                        }
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
                 }
-            }
 
             if showWeekPulseDetails {
-                HStack(spacing: 8) {
-                    STRQMetricTile(
-                        value: "\(vm.weeklyStats.sessions)/\(vm.profile.daysPerWeek)",
-                        label: L10n.tr("Workouts"),
-                        icon: "checkmark.seal.fill",
-                        tint: STRQPalette.signalGreen,
-                        compact: true
-                    )
-                    STRQMetricTile(
-                        value: ForgeTheme.formatVolume(vm.weeklyStats.volume),
-                        label: L10n.tr("Volume"),
-                        icon: "chart.bar.fill",
-                        tint: STRQPalette.steel,
-                        compact: true
-                    )
-                    STRQMetricTile(
-                        value: "\(vm.effectiveRecoveryScore)%",
-                        label: L10n.tr("Recovery"),
-                        icon: "waveform.path.ecg",
-                        tint: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore),
-                        compact: true
-                    )
+                    VStack(spacing: 0) {
+                        sandowRowDivider
+                        weekPulseDetailRow(
+                            value: "\(vm.weeklyStats.sessions)/\(vm.profile.daysPerWeek)",
+                            label: L10n.tr("Workouts"),
+                            icon: "checkmark.seal.fill",
+                            tint: STRQPalette.signalGreen
+                        )
+                        sandowRowDivider
+                        weekPulseDetailRow(
+                            value: ForgeTheme.formatVolume(vm.weeklyStats.volume),
+                            label: L10n.tr("Volume"),
+                            icon: "chart.bar.fill",
+                            tint: STRQBrand.steel
+                        )
+                        sandowRowDivider
+                        weekPulseDetailRow(
+                            value: "\(vm.effectiveRecoveryScore)%",
+                            label: L10n.tr("Recovery"),
+                            icon: "waveform.path.ecg",
+                            tint: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore)
+                        )
+                    }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
             }
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
         .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.12), value: appeared)
+    }
+
+    private func weekPulseDetailRow(value: String, label: String, icon: String, tint: Color) -> some View {
+        HStack(spacing: 12) {
+            sandowIconBox(icon: icon, tint: tint, size: 34, cornerRadius: 11)
+
+            Text(label)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(STRQPalette.textSecondary)
+
+            Spacer(minLength: 8)
+
+            Text(value)
+                .font(.system(size: 14, weight: .black, design: .rounded).monospacedDigit())
+                .foregroundStyle(STRQPalette.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.68)
+        }
+        .padding(.vertical, 10)
     }
 
     private var greeting: String {
