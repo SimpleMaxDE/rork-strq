@@ -2,6 +2,8 @@ import SwiftUI
 
 #if DEBUG
 struct STRQDesignSystemPreviewView: View {
+    @State private var showActiveWorkoutLoggerPrototype = false
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: STRQSpacing.sectionGap) {
@@ -12,6 +14,9 @@ struct STRQDesignSystemPreviewView: View {
                 ComponentsSection()
                 CardsMetricSection()
                 ProgressSection()
+                ActiveWorkoutLoggerPrototypeSection {
+                    showActiveWorkoutLoggerPrototype = true
+                }
                 ProgressV2PrototypeSection()
                 ProgressV3ConceptLabSection()
                 ProgressV4HybridCandidateSection()
@@ -25,6 +30,9 @@ struct STRQDesignSystemPreviewView: View {
         }
         .background(STRQColors.background.ignoresSafeArea())
         .preferredColorScheme(.dark)
+        .fullScreenCover(isPresented: $showActiveWorkoutLoggerPrototype) {
+            ActiveWorkoutLoggerPrototypeView(isFullscreen: true)
+        }
     }
 }
 
@@ -651,6 +659,57 @@ private struct ProgressV2PrototypeSection: View {
                     RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
                         .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
                 )
+        }
+    }
+}
+
+private struct ActiveWorkoutLoggerPrototypeSection: View {
+    let onOpen: () -> Void
+
+    var body: some View {
+        PreviewSection("Active Workout Logger Prototype") {
+            VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                HStack(alignment: .top, spacing: STRQSpacing.md) {
+                    STRQIconView(.barbell, size: STRQSpacing.iconLG, tint: STRQColors.primaryAccent)
+                        .frame(width: 52, height: 52)
+                        .background(STRQColors.primaryAccent.opacity(0.14), in: .rect(cornerRadius: STRQRadii.largeCard))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
+                                .strokeBorder(STRQColors.primaryAccent.opacity(0.22), lineWidth: 1)
+                        )
+
+                    VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                        Text("Fullscreen screenshot prototype")
+                            .font(STRQTypography.cardTitle)
+                            .foregroundStyle(STRQColors.primaryText)
+                        Text("Runs outside the design-system scroll and tab bar so the sticky logger control can be judged in a real active-workout viewport.")
+                            .font(STRQTypography.caption)
+                            .foregroundStyle(STRQColors.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                Button(action: onOpen) {
+                    HStack(spacing: STRQSpacing.sm) {
+                        STRQIconView(.arrowRight, size: STRQSpacing.iconSM, tint: STRQColors.actionText)
+                        Text("Open active logger prototype")
+                            .font(STRQTypography.button)
+                            .foregroundStyle(STRQColors.actionText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(STRQColors.primaryAccent, in: .rect(cornerRadius: STRQRadii.button))
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(STRQSpacing.md)
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.largeCard))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
         }
     }
 }
