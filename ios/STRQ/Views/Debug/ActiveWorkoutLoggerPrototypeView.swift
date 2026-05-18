@@ -5,15 +5,24 @@ struct ActiveWorkoutLoggerPrototypeView: View {
     let isFullscreen: Bool
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var density: ActiveWorkoutLoggerDensity = .beginner
     @State private var phase: ActiveWorkoutLoggerPhase = .beforeLogging
+    @State private var motionStep: ActiveWorkoutLoggerMotionStep = .ready
+    @State private var motionSequenceTask: Task<Void, Never>?
+    @State private var isMotionSequenceRunning = false
+    @State private var logSetFeedbackTrigger = false
 
     init(isFullscreen: Bool = false) {
         self.isFullscreen = isFullscreen
     }
 
     private var scenario: ActiveWorkoutLoggerScenario {
-        ActiveWorkoutLoggerScenario.make(density: density, phase: phase)
+        ActiveWorkoutLoggerScenario.make(
+            density: density,
+            phase: phase,
+            motionStep: phase == .beforeLogging ? motionStep : nil
+        )
     }
 
     var body: some View {
@@ -28,15 +37,17 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                         header
                         currentExercisePanel
                         stateLine
+                        if scenario.showUndo && !scenario.restActive {
+                            undoStrip
+                                .transition(quietInsertionTransition)
+                        }
                         setTable
                         if scenario.restActive {
-                            restStickyControl
+                            restInlineControl
+                                .transition(miniPlayerTransition)
                         }
                         secondaryActions
                         upNextPanel
-                        if !scenario.restActive {
-                            inlineActionPanel
-                        }
                     }
                     .frame(maxWidth: 430)
                     .frame(maxWidth: .infinity)
@@ -58,6 +69,10 @@ struct ActiveWorkoutLoggerPrototypeView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .sensoryFeedback(.impact(flexibility: .rigid, intensity: 0.52), trigger: logSetFeedbackTrigger)
+        .onDisappear {
+            cancelMotionSequence()
+        }
     }
 
     private func scrollToScenarioFocus(using proxy: ScrollViewProxy) {
@@ -67,9 +82,130 @@ struct ActiveWorkoutLoggerPrototypeView: View {
         let anchor = scenario.scrollAnchor
 
         DispatchQueue.main.async {
-            withAnimation(.easeInOut(duration: 0.24)) {
+            if reduceMotion {
                 proxy.scrollTo(target, anchor: anchor)
+            } else {
+                withAnimation(.easeInOut(duration: 0.24)) {
+                    proxy.scrollTo(target, anchor: anchor)
+                }
             }
+        }
+    }
+
+    private var phaseSelection: Binding<ActiveWorkoutLoggerPhase> {
+        Binding(
+            get: { phase },
+            set: { selectPhase($0) }
+        )
+    }
+
+    private var rowSettleAnimation: Animation {
+        reduceMotion ? .easeOut(duration: 0.08) : .easeOut(duration: 0.16)
+    }
+
+    private var rowSignatureAnimation: Animation {
+        reduceMotion ? .easeOut(duration: 0.08) : .spring(response: 0.28, dampingFraction: 0.9, blendDuration: 0)
+    }
+
+    private var quietRevealAnimation: Animation {
+        reduceMotion ? .easeOut(duration: 0.08) : .easeOut(duration: 0.26)
+    }
+
+    private var miniPlayerAnimation: Animation {
+        reduceMotion ? .easeOut(duration: 0.08) : .easeInOut(duration: 0.28)
+    }
+
+    private var quietInsertionTransition: AnyTransition {
+        let insertion: AnyTransition = reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 10))
+        return .asymmetric(
+            insertion: insertion.animation(quietRevealAnimation),
+            removal: AnyTransition.opacity.animation(.easeOut(duration: 0.08))
+        )
+    }
+
+    private var miniPlayerTransition: AnyTransition {
+        let insertion: AnyTransition = reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 12))
+        return .asymmetric(
+            insertion: insertion.animation(miniPlayerAnimation),
+            removal: AnyTransition.opacity.animation(.easeOut(duration: 0.08))
+        )
+    }
+
+    private var isPrimaryActionDisabled: Bool {
+        isMotionSequenceRunning
+    }
+
+    private func selectPhase(_ newPhase: ActiveWorkoutLoggerPhase) {
+        cancelMotionSequence()
+        motionStep = .ready
+        phase = newPhase
+    }
+
+    private func handlePrimaryAction() {
+        guard !isPrimaryActionDisabled else { return }
+
+        if phase == .beforeLogging {
+            startMotionSequence()
+        } else {
+            cancelMotionSequence()
+            withAnimation(rowSettleAnimation) {
+                phase = scenario.nextPhaseFromPrimary
+            }
+        }
+    }
+
+    private func startMotionSequence() {
+        guard phase == .beforeLogging, motionStep == .ready, !isMotionSequenceRunning else { return }
+
+        motionSequenceTask?.cancel()
+        isMotionSequenceRunning = true
+        logSetFeedbackTrigger.toggle()
+
+        motionSequenceTask = Task { @MainActor in
+            motionStep = .rowComplete
+            guard await pauseMotion(milliseconds: reduceMotion ? 70 : 230) else { return }
+
+            motionStep = .undoVisible
+            guard await pauseMotion(milliseconds: reduceMotion ? 70 : 320) else { return }
+
+            motionStep = .restVisible
+            guard await pauseMotion(milliseconds: reduceMotion ? 70 : 320) else { return }
+
+            motionStep = .nextActive
+            isMotionSequenceRunning = false
+            motionSequenceTask = nil
+        }
+    }
+
+    private func resetMotionPrototype() {
+        cancelMotionSequence()
+        phase = .beforeLogging
+        motionStep = .ready
+    }
+
+    private func startNextFromRest() {
+        cancelMotionSequence()
+        withAnimation(rowSettleAnimation) {
+            if phase == .beforeLogging {
+                motionStep = .nextActive
+            } else {
+                phase = .afterOne
+            }
+        }
+    }
+
+    private func cancelMotionSequence() {
+        motionSequenceTask?.cancel()
+        motionSequenceTask = nil
+        isMotionSequenceRunning = false
+    }
+
+    private func pauseMotion(milliseconds: Int) async -> Bool {
+        do {
+            try await Task.sleep(nanoseconds: UInt64(milliseconds) * 1_000_000)
+            return !Task.isCancelled
+        } catch {
+            return false
         }
     }
 
@@ -99,7 +235,7 @@ struct ActiveWorkoutLoggerPrototypeView: View {
     private var debugControls: some View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
-                Text("Active Workout Logger")
+                Text(verbatim: "Active Workout Logger")
                     .font(.system(size: 17, weight: .black, design: .rounded))
                     .foregroundStyle(STRQColors.primaryText)
                     .lineLimit(1)
@@ -107,7 +243,7 @@ struct ActiveWorkoutLoggerPrototypeView: View {
 
                 Spacer(minLength: 8)
 
-                Text("DEBUG")
+                Text(verbatim: "DEBUG")
                     .font(.system(size: 9, weight: .black))
                     .foregroundStyle(ActiveWorkoutLoggerStyle.signal)
                     .padding(.horizontal, 8)
@@ -138,7 +274,7 @@ struct ActiveWorkoutLoggerPrototypeView: View {
 
                 segmentedControl(
                     items: ActiveWorkoutLoggerPhase.allCases,
-                    selection: $phase,
+                    selection: phaseSelection,
                     label: \.shortTitle
                 )
             }
@@ -157,7 +293,7 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                         selection.wrappedValue = item
                     }
                 } label: {
-                    Text(label(item))
+                    Text(verbatim: label(item))
                         .font(.system(size: 10, weight: .heavy))
                         .foregroundStyle(selection.wrappedValue == item ? STRQColors.primaryText : STRQColors.mutedText)
                         .lineLimit(1)
@@ -195,21 +331,20 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                 .buttonStyle(.plain)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Chest & Back")
+                    Text(verbatim: "Chest & Back")
                         .font(.system(size: 9, weight: .black))
                         .foregroundStyle(STRQColors.mutedText)
                         .textCase(.uppercase)
-                    Text(scenario.elapsed)
+                    Text(verbatim: scenario.elapsed)
                         .font(.system(size: 27, weight: .black, design: .rounded).monospacedDigit())
                         .foregroundStyle(STRQColors.primaryText)
-                        .contentTransition(.numericText())
                 }
 
                 Spacer(minLength: 8)
 
                 Button {} label: {
                     HStack(spacing: 7) {
-                        Text(scenario.exerciseProgress)
+                        Text(verbatim: scenario.exerciseProgress)
                             .font(.system(size: 12, weight: .black).monospacedDigit())
                         STRQIconView(.checklist, size: 14, tint: STRQColors.iconSecondary)
                     }
@@ -255,53 +390,53 @@ struct ActiveWorkoutLoggerPrototypeView: View {
     private func finishButton(isPromoted: Bool) -> some View {
         Button {} label: {
             HStack(spacing: 6) {
-                STRQIconView(.checkCircle, size: 14, tint: isPromoted ? STRQColors.actionText : STRQColors.iconSecondary)
-                Text("Finish")
-                    .font(.system(size: 12, weight: .black))
+                STRQIconView(.checkCircle, size: isPromoted ? 14 : 12, tint: isPromoted ? STRQColors.actionText : STRQColors.iconSecondary.opacity(0.78))
+                Text(verbatim: "Finish")
+                    .font(.system(size: isPromoted ? 12 : 11, weight: .black))
                     .lineLimit(1)
             }
-            .foregroundStyle(isPromoted ? STRQColors.actionText : STRQColors.secondaryText)
+            .foregroundStyle(isPromoted ? STRQColors.actionText : STRQColors.mutedText)
             .padding(.horizontal, isPromoted ? 13 : 10)
-            .frame(height: 36)
+            .frame(height: isPromoted ? 36 : 32)
             .background(
-                isPromoted ? AnyShapeStyle(STRQColors.primaryAccent) : AnyShapeStyle(ActiveWorkoutLoggerStyle.control),
+                isPromoted ? AnyShapeStyle(STRQColors.primaryAccent) : AnyShapeStyle(Color.white.opacity(0.025)),
                 in: .capsule
             )
             .overlay(
                 Capsule()
-                    .strokeBorder(isPromoted ? Color.white.opacity(0.35) : ActiveWorkoutLoggerStyle.border, lineWidth: 1)
+                    .strokeBorder(isPromoted ? Color.white.opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
     }
 
     private var currentExercisePanel: some View {
-        VStack(alignment: .leading, spacing: 13) {
-            HStack(alignment: .top, spacing: 12) {
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(alignment: .top, spacing: 10) {
                 exerciseTile
 
-                VStack(alignment: .leading, spacing: 5) {
+                VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
-                        Text("1 of 6")
+                        Text(verbatim: "1 of 6")
                             .font(.system(size: 10, weight: .black).monospacedDigit())
                             .foregroundStyle(ActiveWorkoutLoggerStyle.signal)
                         Rectangle()
                             .fill(ActiveWorkoutLoggerStyle.borderStrong)
                             .frame(width: 1, height: 12)
-                        Text("Barbell")
+                        Text(verbatim: "Barbell")
                             .font(.system(size: 10, weight: .black))
                             .foregroundStyle(STRQColors.mutedText)
                     }
                     .textCase(.uppercase)
 
-                    Text(scenario.exerciseName)
-                        .font(.system(size: 25, weight: .black, design: .rounded))
+                    Text(verbatim: scenario.exerciseName)
+                        .font(.system(size: 22, weight: .black, design: .rounded))
                         .foregroundStyle(STRQColors.primaryText)
                         .lineLimit(2)
-                        .minimumScaleFactor(0.74)
+                        .minimumScaleFactor(0.72)
 
-                    Text(scenario.exerciseDetail)
-                        .font(.system(size: 13, weight: .semibold))
+                    Text(verbatim: scenario.exerciseDetail)
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(STRQColors.secondaryText)
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)
@@ -310,7 +445,7 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                 Spacer(minLength: 0)
 
                 VStack(alignment: .trailing, spacing: 5) {
-                    Text(scenario.setProgress)
+                    Text(verbatim: scenario.setProgress)
                         .font(.system(size: 12, weight: .black).monospacedDigit())
                         .foregroundStyle(STRQColors.primaryText)
                         .padding(.horizontal, 10)
@@ -318,14 +453,14 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                         .background(Color.white.opacity(0.06), in: .capsule)
                         .overlay(Capsule().strokeBorder(ActiveWorkoutLoggerStyle.borderStrong, lineWidth: 1))
 
-                    Text(scenario.targetLine)
+                    Text(verbatim: scenario.targetLine)
                         .font(.system(size: 10, weight: .bold).monospacedDigit())
                         .foregroundStyle(STRQColors.mutedText)
                         .lineLimit(1)
                 }
             }
 
-            HStack(spacing: 8) {
+            HStack(spacing: 7) {
                 metricPill(icon: .target, title: "Target", value: scenario.target)
                 metricPill(icon: .clock, title: "Rest", value: scenario.restTarget)
                 if density == .athlete {
@@ -333,7 +468,7 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                 }
             }
         }
-        .padding(14)
+        .padding(11)
         .background {
             ZStack(alignment: .topTrailing) {
                 LinearGradient(
@@ -346,16 +481,16 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                     endPoint: .bottomTrailing
                 )
 
-                STRQIconView(.barbell, size: 112, tint: Color.white.opacity(0.045))
+                STRQIconView(.barbell, size: 96, tint: Color.white.opacity(0.04))
                     .offset(x: 14, y: -16)
             }
-            .clipShape(.rect(cornerRadius: 24, style: .continuous))
+            .clipShape(.rect(cornerRadius: 22, style: .continuous))
         }
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .strokeBorder(ActiveWorkoutLoggerStyle.borderStrong, lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.24), radius: 24, y: 14)
+        .shadow(color: .black.opacity(0.18), radius: 18, y: 10)
     }
 
     private var exerciseTile: some View {
@@ -380,7 +515,7 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                     .frame(height: 3)
             }
         }
-        .frame(width: 62, height: 62)
+        .frame(width: 54, height: 54)
         .overlay(
             RoundedRectangle(cornerRadius: 17, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.15), lineWidth: 1)
@@ -391,20 +526,20 @@ struct ActiveWorkoutLoggerPrototypeView: View {
         HStack(spacing: 7) {
             STRQIconView(icon, size: 13, tint: ActiveWorkoutLoggerStyle.signal)
             VStack(alignment: .leading, spacing: 1) {
-                Text(title)
+                Text(verbatim: title)
                     .font(.system(size: 8, weight: .black))
                     .foregroundStyle(STRQColors.mutedText)
                     .textCase(.uppercase)
-                Text(value)
-                    .font(.system(size: 12, weight: .black).monospacedDigit())
+                Text(verbatim: value)
+                    .font(.system(size: 11, weight: .black).monospacedDigit())
                     .foregroundStyle(STRQColors.primaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 10)
-        .frame(height: 48)
+        .padding(.horizontal, 9)
+        .frame(height: 42)
         .background(ActiveWorkoutLoggerStyle.control, in: .rect(cornerRadius: 13))
         .overlay(
             RoundedRectangle(cornerRadius: 13, style: .continuous)
@@ -415,34 +550,38 @@ struct ActiveWorkoutLoggerPrototypeView: View {
     private var stateLine: some View {
         HStack(spacing: 10) {
             STRQIconView(scenario.stateIcon, size: 15, tint: scenario.stateTint)
-                .frame(width: 32, height: 32)
+                .frame(width: 30, height: 30)
                 .background(scenario.stateTint.opacity(0.12), in: Circle())
                 .overlay(Circle().strokeBorder(scenario.stateTint.opacity(0.25), lineWidth: 1))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(scenario.stateTitle)
+                Text(verbatim: scenario.stateTitle)
                     .font(.system(size: 13, weight: .black))
                     .foregroundStyle(STRQColors.primaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.78)
-                Text(scenario.stateSubtitle)
+                Text(verbatim: scenario.stateSubtitle)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(STRQColors.secondaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
             }
+            .layoutPriority(1)
 
             Spacer(minLength: 8)
 
             if scenario.restActive {
-                Text(scenario.restRemaining)
+                Text(verbatim: scenario.restRemaining)
                     .font(.system(size: 18, weight: .black, design: .rounded).monospacedDigit())
                     .foregroundStyle(ActiveWorkoutLoggerStyle.signal)
-                    .contentTransition(.numericText())
+            } else if phase == .beforeLogging && motionStep != .ready {
+                stateSavedPill
+            } else if !scenario.isComplete {
+                statePrimaryActionButton
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.vertical, 8)
         .background(ActiveWorkoutLoggerStyle.control, in: .rect(cornerRadius: 17))
         .overlay(
             RoundedRectangle(cornerRadius: 17, style: .continuous)
@@ -450,14 +589,54 @@ struct ActiveWorkoutLoggerPrototypeView: View {
         )
     }
 
+    private var statePrimaryActionButton: some View {
+        Button {
+            handlePrimaryAction()
+        } label: {
+            HStack(spacing: 6) {
+                STRQIconView(scenario.primaryActionIcon, size: 13, tint: STRQColors.actionText)
+                Text(verbatim: scenario.primaryActionTitle)
+                    .font(.system(size: 13, weight: .black))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+            .foregroundStyle(STRQColors.actionText)
+            .padding(.horizontal, 13)
+            .frame(height: 38)
+            .background(STRQColors.primaryAccent, in: .rect(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.22), lineWidth: 1)
+            )
+            .opacity(isPrimaryActionDisabled ? 0.58 : 1)
+        }
+        .buttonStyle(.plain)
+        .disabled(isPrimaryActionDisabled)
+    }
+
+    private var stateSavedPill: some View {
+        HStack(spacing: 6) {
+            STRQIconView(.check, size: 12, tint: STRQColors.successGreen)
+            Text(verbatim: "Saved")
+                .font(.system(size: 12, weight: .black))
+                .foregroundStyle(STRQColors.secondaryText)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 12)
+        .frame(height: 34)
+        .background(STRQColors.successGreen.opacity(0.11), in: .capsule)
+        .overlay(Capsule().strokeBorder(STRQColors.successGreen.opacity(0.24), lineWidth: 1))
+        .transition(quietInsertionTransition)
+    }
+
     private var setTable: some View {
         VStack(spacing: 0) {
             HStack(alignment: .center, spacing: 10) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Sets")
+                    Text(verbatim: "Sets")
                         .font(.system(size: 19, weight: .black, design: .rounded))
                         .foregroundStyle(STRQColors.primaryText)
-                    Text(scenario.tableSubtitle)
+                    Text(verbatim: scenario.tableSubtitle)
                         .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(STRQColors.mutedText)
                 }
@@ -467,19 +646,19 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                 tableProgressDots
             }
             .padding(.horizontal, 14)
-            .padding(.top, 14)
-            .padding(.bottom, 10)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
 
             tableHeader
 
-            VStack(spacing: 7) {
+            VStack(spacing: 5) {
                 ForEach(scenario.sets) { set in
                     setRow(set)
                         .id(ActiveWorkoutLoggerScrollTarget.set(set.number))
                 }
             }
-            .padding(.horizontal, 7)
-            .padding(.bottom, 7)
+            .padding(.horizontal, 6)
+            .padding(.bottom, 6)
         }
         .background(
             LinearGradient(
@@ -490,10 +669,10 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
-            in: .rect(cornerRadius: 24, style: .continuous)
+            in: .rect(cornerRadius: 22, style: .continuous)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .strokeBorder(ActiveWorkoutLoggerStyle.borderStrong, lineWidth: 1)
         )
     }
@@ -502,7 +681,7 @@ struct ActiveWorkoutLoggerPrototypeView: View {
         HStack(spacing: 5) {
             ForEach(scenario.sets) { set in
                 Capsule()
-                    .fill(set.completed ? STRQColors.successGreen : set.isActive ? STRQColors.primaryAccent : STRQColors.gray600)
+                    .fill(set.completed ? STRQColors.successGreen.opacity(0.62) : set.isActive ? STRQColors.primaryAccent : STRQColors.gray600)
                     .frame(width: set.isActive ? 22 : 8, height: 8)
                     .overlay(Capsule().strokeBorder(Color.white.opacity(set.isActive ? 0.22 : 0.08), lineWidth: 1))
             }
@@ -518,18 +697,17 @@ struct ActiveWorkoutLoggerPrototypeView: View {
             tableHeaderText("Set", width: 38, alignment: .leading)
             tableHeaderText("Previous", width: density.previousColumnWidth)
             tableHeaderText("kg")
-            tableHeaderText("Reps")
+            tableHeaderText("reps")
             tableHeaderText("", width: 34)
         }
         .padding(.horizontal, 14)
-        .padding(.bottom, 7)
+        .padding(.bottom, 6)
     }
 
     private func tableHeaderText(_ text: String, width: CGFloat? = nil, alignment: Alignment = .center) -> some View {
-        Text(text)
+        Text(verbatim: text)
             .font(.system(size: 9, weight: .black))
             .foregroundStyle(STRQColors.mutedText)
-            .textCase(.uppercase)
             .lineLimit(1)
             .minimumScaleFactor(0.7)
             .frame(maxWidth: width == nil ? .infinity : nil, alignment: alignment)
@@ -537,18 +715,18 @@ struct ActiveWorkoutLoggerPrototypeView: View {
     }
 
     private func setRow(_ set: ActiveWorkoutLoggerSet) -> some View {
-        HStack(spacing: 7) {
+        HStack(spacing: 6) {
             setNumberCell(set)
                 .frame(width: 38, alignment: .leading)
 
             VStack(spacing: 2) {
-                Text(set.previous)
+                Text(verbatim: set.previous)
                     .font(.system(size: 12, weight: .heavy, design: .rounded).monospacedDigit())
                     .foregroundStyle(set.isActive ? STRQColors.secondaryText : STRQColors.mutedText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.62)
                 if density == .athlete, let delta = set.delta {
-                    Text(delta)
+                    Text(verbatim: delta)
                         .font(.system(size: 8, weight: .black).monospacedDigit())
                         .foregroundStyle(set.deltaTint)
                         .lineLimit(1)
@@ -562,25 +740,34 @@ struct ActiveWorkoutLoggerPrototypeView: View {
             doneCell(set)
                 .frame(width: 34)
         }
-        .padding(.horizontal, 9)
+        .padding(.horizontal, 8)
         .padding(.vertical, density.rowVerticalPadding)
-        .background(rowBackground(set), in: .rect(cornerRadius: 16, style: .continuous))
+        .background {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(rowBackground(set))
+                .animation(rowSignatureAnimation, value: set.completed)
+                .animation(rowSignatureAnimation, value: set.isActive)
+        }
         .overlay(alignment: .leading) {
             Capsule()
                 .fill(rowRail(set))
-                .frame(width: 3)
-                .padding(.vertical, 10)
+                .frame(width: rowRailWidth(set))
+                .padding(.vertical, 8)
                 .padding(.leading, 1)
+                .animation(rowSignatureAnimation, value: motionStep)
         }
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .strokeBorder(rowBorder(set), lineWidth: 1)
+                .animation(rowSignatureAnimation, value: set.completed)
+                .animation(rowSignatureAnimation, value: set.isActive)
         )
-        .animation(.easeInOut(duration: 0.18), value: phase)
+        .offset(y: rowMotionOffset(set))
+        .animation(rowSignatureAnimation, value: motionStep)
     }
 
     private func setNumberCell(_ set: ActiveWorkoutLoggerSet) -> some View {
-        Text(set.kind)
+        Text(verbatim: set.kind)
             .font(.system(size: set.kind.count > 1 ? 10 : 14, weight: .black, design: .rounded).monospacedDigit())
             .foregroundStyle(set.isActive ? STRQColors.actionText : set.completed ? STRQColors.primaryText : STRQColors.mutedText)
             .frame(width: 30, height: 30)
@@ -594,7 +781,7 @@ struct ActiveWorkoutLoggerPrototypeView: View {
     }
 
     private func inputCell(_ value: String, active: Bool, completed: Bool) -> some View {
-        Text(value)
+        Text(verbatim: value)
             .font(.system(size: active ? 17 : 15, weight: .black, design: .rounded).monospacedDigit())
             .foregroundStyle(active || completed ? STRQColors.primaryText : STRQColors.mutedText)
             .lineLimit(1)
@@ -615,35 +802,78 @@ struct ActiveWorkoutLoggerPrototypeView: View {
 
     private func doneCell(_ set: ActiveWorkoutLoggerSet) -> some View {
         ZStack {
-            if set.completed {
-                Circle().fill(STRQColors.successGreen)
-                STRQIconView(.check, size: 12, tint: STRQColors.actionText)
-            } else if set.isActive {
-                Circle().strokeBorder(STRQColors.primaryText.opacity(0.82), lineWidth: 1.4)
-                Circle().fill(STRQColors.primaryText).frame(width: 6, height: 6)
-            } else {
-                Circle().strokeBorder(STRQColors.gray600, lineWidth: 1)
-            }
+            Circle()
+                .strokeBorder(STRQColors.successGreen.opacity(0.34), lineWidth: 2)
+                .opacity(isSignatureCompletedSet(set) ? 1 : 0)
+            Circle()
+                .fill(STRQColors.successGreen.opacity(0.2))
+                .opacity(set.completed ? 1 : 0)
+            Circle()
+                .strokeBorder(STRQColors.successGreen.opacity(0.52), lineWidth: 1)
+                .opacity(set.completed ? 1 : 0)
+            STRQIconView(.check, size: isSignatureCompletedSet(set) ? 14 : 12, tint: STRQColors.successGreen)
+                .opacity(set.completed ? 1 : 0)
+
+            Circle()
+                .strokeBorder(STRQColors.primaryText.opacity(0.82), lineWidth: 1.4)
+                .opacity(set.isActive ? 1 : 0)
+            Circle()
+                .fill(STRQColors.primaryText)
+                .frame(width: 6, height: 6)
+                .opacity(set.isActive ? 1 : 0)
+
+            Circle()
+                .strokeBorder(STRQColors.gray600, lineWidth: 1)
+                .opacity(!set.completed && !set.isActive ? 1 : 0)
         }
         .frame(width: 26, height: 26)
+        .animation(rowSignatureAnimation, value: set.completed)
+        .animation(rowSignatureAnimation, value: set.isActive)
+        .animation(rowSignatureAnimation, value: motionStep)
     }
 
     private func rowBackground(_ set: ActiveWorkoutLoggerSet) -> Color {
+        if isSignatureCompletedSet(set) { return STRQColors.successDim.opacity(0.24) }
+        if isSignatureNextSet(set) { return Color.white.opacity(0.1) }
         if set.isActive { return Color.white.opacity(0.07) }
-        if set.completed { return STRQColors.successDim.opacity(0.32) }
+        if set.completed { return STRQColors.successDim.opacity(0.14) }
         return Color.white.opacity(0.025)
     }
 
     private func rowBorder(_ set: ActiveWorkoutLoggerSet) -> Color {
+        if isSignatureCompletedSet(set) { return STRQColors.successGreen.opacity(0.22) }
+        if isSignatureNextSet(set) { return ActiveWorkoutLoggerStyle.steel.opacity(0.6) }
         if set.isActive { return ActiveWorkoutLoggerStyle.steel.opacity(0.42) }
-        if set.completed { return STRQColors.successGreen.opacity(0.16) }
+        if set.completed { return STRQColors.successGreen.opacity(0.1) }
         return ActiveWorkoutLoggerStyle.border
     }
 
     private func rowRail(_ set: ActiveWorkoutLoggerSet) -> Color {
-        if set.completed { return STRQColors.successGreen.opacity(0.9) }
+        if isSignatureCompletedSet(set) { return STRQColors.successGreen.opacity(0.82) }
+        if isSignatureNextSet(set) { return STRQColors.primaryAccent }
+        if set.completed { return STRQColors.successGreen.opacity(0.55) }
         if set.isActive { return STRQColors.primaryAccent.opacity(0.86) }
         return STRQColors.gray700
+    }
+
+    private func rowRailWidth(_ set: ActiveWorkoutLoggerSet) -> CGFloat {
+        isSignatureCompletedSet(set) || isSignatureNextSet(set) ? 5 : 3
+    }
+
+    private func rowMotionOffset(_ set: ActiveWorkoutLoggerSet) -> CGFloat {
+        guard !reduceMotion else { return 0 }
+        if isSignatureCompletedSet(set) { return -2 }
+        if isSignatureNextSet(set) { return -3 }
+        return 0
+    }
+
+    private func isSignatureCompletedSet(_ set: ActiveWorkoutLoggerSet) -> Bool {
+        guard phase == .beforeLogging, set.number == 1 else { return false }
+        return motionStep == .rowComplete || motionStep == .undoVisible || motionStep == .restVisible
+    }
+
+    private func isSignatureNextSet(_ set: ActiveWorkoutLoggerSet) -> Bool {
+        phase == .beforeLogging && set.number == 2 && motionStep == .nextActive
     }
 
     private var secondaryActions: some View {
@@ -658,13 +888,13 @@ struct ActiveWorkoutLoggerPrototypeView: View {
         Button {} label: {
             HStack(spacing: 7) {
                 STRQIconView(icon, size: 14, tint: STRQColors.iconSecondary)
-                Text(title)
+                Text(verbatim: title)
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(STRQColors.secondaryText)
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 42)
+            .frame(height: 38)
             .background(ActiveWorkoutLoggerStyle.control, in: .rect(cornerRadius: 13))
             .overlay(
                 RoundedRectangle(cornerRadius: 13, style: .continuous)
@@ -675,18 +905,18 @@ struct ActiveWorkoutLoggerPrototypeView: View {
     }
 
     private var upNextPanel: some View {
-        HStack(spacing: 11) {
+        HStack(spacing: 10) {
             STRQIconView(.arrowRight, size: 16, tint: ActiveWorkoutLoggerStyle.signal)
-                .frame(width: 38, height: 38)
+                .frame(width: 34, height: 34)
                 .background(ActiveWorkoutLoggerStyle.signal.opacity(0.12), in: .rect(cornerRadius: 12))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("Up next")
+                Text(verbatim: "Up next")
                     .font(.system(size: 9, weight: .black))
                     .foregroundStyle(STRQColors.mutedText)
                     .textCase(.uppercase)
-                Text(scenario.upNext)
-                    .font(.system(size: 14, weight: .black, design: .rounded))
+                Text(verbatim: scenario.upNext)
+                    .font(.system(size: 13, weight: .black, design: .rounded))
                     .foregroundStyle(STRQColors.primaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
@@ -694,11 +924,11 @@ struct ActiveWorkoutLoggerPrototypeView: View {
 
             Spacer(minLength: 8)
 
-            Text("2 of 6")
+            Text(verbatim: "2 of 6")
                 .font(.system(size: 11, weight: .black).monospacedDigit())
                 .foregroundStyle(STRQColors.secondaryText)
         }
-        .padding(12)
+        .padding(10)
         .background(ActiveWorkoutLoggerStyle.control, in: .rect(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -706,57 +936,46 @@ struct ActiveWorkoutLoggerPrototypeView: View {
         )
     }
 
-    private var inlineActionPanel: some View {
-        controlShell {
-            if scenario.showUndo {
-                undoStrip
-            }
-
-            logControl
-        }
-    }
-
-    private var restStickyControl: some View {
+    private var restInlineControl: some View {
         controlShell {
             restMiniPlayer
         }
-        .shadow(color: .black.opacity(0.36), radius: 28, y: 14)
+        .shadow(color: .black.opacity(0.16), radius: 16, y: 8)
     }
 
     private func controlShell<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 7) {
             content()
         }
-        .padding(10)
+        .padding(8)
         .background(
             ActiveWorkoutLoggerStyle.bottomGlass,
-            in: .rect(cornerRadius: 24, style: .continuous)
+            in: .rect(cornerRadius: 20, style: .continuous)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .strokeBorder(ActiveWorkoutLoggerStyle.borderStrong, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .strokeBorder(ActiveWorkoutLoggerStyle.border, lineWidth: 1)
         )
     }
 
     private var undoStrip: some View {
         HStack(spacing: 8) {
-            Text(scenario.undoTitle)
+            Text(verbatim: scenario.undoTitle)
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(STRQColors.secondaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             Spacer(minLength: 8)
             Button {
-                withAnimation(.easeInOut(duration: 0.18)) {
-                    phase = .beforeLogging
-                }
+                resetMotionPrototype()
             } label: {
-                Text("Undo")
+                Text(verbatim: "Undo")
                     .font(.system(size: 12, weight: .black))
-                    .foregroundStyle(STRQColors.primaryText)
+                    .foregroundStyle(STRQColors.secondaryText)
                     .padding(.horizontal, 12)
                     .frame(height: 30)
-                    .background(Color.white.opacity(0.07), in: .capsule)
+                    .background(Color.white.opacity(0.045), in: .capsule)
+                    .overlay(Capsule().strokeBorder(ActiveWorkoutLoggerStyle.border, lineWidth: 1))
             }
             .buttonStyle(.plain)
         }
@@ -766,9 +985,9 @@ struct ActiveWorkoutLoggerPrototypeView: View {
     }
 
     private var restMiniPlayer: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 7) {
             HStack(spacing: 8) {
-                Text(scenario.undoTitle)
+                Text(verbatim: scenario.undoTitle)
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(STRQColors.secondaryText)
                     .lineLimit(1)
@@ -777,31 +996,30 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                 Spacer(minLength: 8)
 
                 Button {
-                    withAnimation(.easeInOut(duration: 0.18)) {
-                        phase = .beforeLogging
-                    }
+                    resetMotionPrototype()
                 } label: {
-                    Text("Undo")
+                    Text(verbatim: "Undo")
                         .font(.system(size: 12, weight: .black))
-                        .foregroundStyle(STRQColors.primaryText)
+                        .foregroundStyle(STRQColors.secondaryText)
                         .padding(.horizontal, 12)
                         .frame(height: 30)
-                        .background(Color.white.opacity(0.07), in: .capsule)
+                        .background(Color.white.opacity(0.045), in: .capsule)
+                        .overlay(Capsule().strokeBorder(ActiveWorkoutLoggerStyle.border, lineWidth: 1))
                 }
                 .buttonStyle(.plain)
             }
             .padding(.horizontal, 10)
-            .frame(height: 36)
-            .background(ActiveWorkoutLoggerStyle.control.opacity(0.74), in: .rect(cornerRadius: 14))
+            .frame(height: 34)
+            .background(ActiveWorkoutLoggerStyle.control.opacity(0.64), in: .rect(cornerRadius: 14))
 
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Rest")
+                    Text(verbatim: "Rest")
                         .font(.system(size: 9, weight: .black))
                         .foregroundStyle(STRQColors.mutedText)
                         .textCase(.uppercase)
-                    Text(scenario.restRemaining)
-                        .font(.system(size: 25, weight: .black, design: .rounded).monospacedDigit())
+                    Text(verbatim: scenario.restRemaining)
+                        .font(.system(size: 23, weight: .black, design: .rounded).monospacedDigit())
                         .foregroundStyle(ActiveWorkoutLoggerStyle.signal)
                 }
 
@@ -810,29 +1028,16 @@ struct ActiveWorkoutLoggerPrototypeView: View {
                 restButton("-15")
                 restButton("+15")
                 Button {
-                    withAnimation(.easeInOut(duration: 0.18)) {
-                        phase = .afterOne
-                    }
+                    startNextFromRest()
                 } label: {
-                    STRQIconView(.skip, size: 14, tint: STRQColors.actionText)
-                        .frame(width: 38, height: 36)
-                        .background(STRQColors.primaryAccent, in: .capsule)
-                }
-                .buttonStyle(.plain)
-
-                Button {
-                    withAnimation(.easeInOut(duration: 0.18)) {
-                        phase = .afterOne
-                    }
-                } label: {
-                    Text("Start next")
+                    Text(verbatim: "Start next")
                         .font(.system(size: 13, weight: .black))
                         .foregroundStyle(STRQColors.actionText)
                         .lineLimit(1)
                         .minimumScaleFactor(0.74)
-                        .padding(.horizontal, 12)
-                        .frame(height: 36)
-                        .background(ActiveWorkoutLoggerStyle.signal, in: .capsule)
+                        .padding(.horizontal, 13)
+                        .frame(height: 38)
+                        .background(STRQColors.primaryAccent, in: .capsule)
                 }
                 .buttonStyle(.plain)
             }
@@ -841,51 +1046,14 @@ struct ActiveWorkoutLoggerPrototypeView: View {
 
     private func restButton(_ title: String) -> some View {
         Button {} label: {
-            Text(title)
+            Text(verbatim: title)
                 .font(.system(size: 12, weight: .black).monospacedDigit())
                 .foregroundStyle(STRQColors.primaryText)
-                .frame(width: 38, height: 36)
-                .background(Color.white.opacity(0.07), in: .capsule)
+                .frame(width: 38, height: 34)
+                .background(Color.white.opacity(0.045), in: .capsule)
                 .overlay(Capsule().strokeBorder(ActiveWorkoutLoggerStyle.border, lineWidth: 1))
         }
         .buttonStyle(.plain)
-    }
-
-    private var logControl: some View {
-        HStack(spacing: 9) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(scenario.primaryActionEyebrow)
-                    .font(.system(size: 9, weight: .black))
-                    .foregroundStyle(STRQColors.mutedText)
-                    .textCase(.uppercase)
-                Text(scenario.primaryActionDetail)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(STRQColors.secondaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.68)
-            }
-
-            Spacer(minLength: 8)
-
-            Button {
-                withAnimation(.easeInOut(duration: 0.18)) {
-                    phase = scenario.nextPhaseFromPrimary
-                }
-            } label: {
-                HStack(spacing: 7) {
-                    STRQIconView(scenario.primaryActionIcon, size: 15, tint: STRQColors.actionText)
-                    Text(scenario.primaryActionTitle)
-                        .font(.system(size: 14, weight: .black))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
-                }
-                .foregroundStyle(STRQColors.actionText)
-                .padding(.horizontal, 16)
-                .frame(height: 48)
-                .background(scenario.isComplete ? STRQColors.successGreen : STRQColors.primaryAccent, in: .rect(cornerRadius: 16))
-            }
-            .buttonStyle(.plain)
-        }
     }
 }
 
@@ -902,22 +1070,22 @@ private enum ActiveWorkoutLoggerDensity: String, CaseIterable, Hashable {
 
     var previousColumnWidth: CGFloat {
         switch self {
-        case .beginner: return 62
-        case .athlete: return 70
+        case .beginner: return 58
+        case .athlete: return 68
         }
     }
 
     var rowVerticalPadding: CGFloat {
         switch self {
-        case .beginner: return 12
-        case .athlete: return 8
+        case .beginner: return 7
+        case .athlete: return 6
         }
     }
 
     var inputHeight: CGFloat {
         switch self {
-        case .beginner: return 42
-        case .athlete: return 36
+        case .beginner: return 34
+        case .athlete: return 32
         }
     }
 }
@@ -938,6 +1106,14 @@ private enum ActiveWorkoutLoggerPhase: String, CaseIterable, Hashable {
     }
 }
 
+private enum ActiveWorkoutLoggerMotionStep: Hashable {
+    case ready
+    case rowComplete
+    case undoVisible
+    case restVisible
+    case nextActive
+}
+
 private enum ActiveWorkoutLoggerScrollTarget {
     static let top = "top"
 
@@ -949,6 +1125,7 @@ private enum ActiveWorkoutLoggerScrollTarget {
 private struct ActiveWorkoutLoggerScenario {
     let density: ActiveWorkoutLoggerDensity
     let phase: ActiveWorkoutLoggerPhase
+    let motionStep: ActiveWorkoutLoggerMotionStep?
     let sets: [ActiveWorkoutLoggerSet]
     let elapsed: String
     let exerciseName: String
@@ -1009,69 +1186,168 @@ private struct ActiveWorkoutLoggerScenario {
         }
     }
 
-    static func make(density: ActiveWorkoutLoggerDensity, phase: ActiveWorkoutLoggerPhase) -> ActiveWorkoutLoggerScenario {
-        let sets = ActiveWorkoutLoggerSet.make(phase: phase, density: density)
+    static func make(
+        density: ActiveWorkoutLoggerDensity,
+        phase: ActiveWorkoutLoggerPhase,
+        motionStep: ActiveWorkoutLoggerMotionStep? = nil
+    ) -> ActiveWorkoutLoggerScenario {
+        let motionStep = phase == .beforeLogging ? motionStep : nil
+        let sets = ActiveWorkoutLoggerSet.make(phase: phase, density: density, motionStep: motionStep)
         let completed = sets.filter(\.completed).count
         let active = sets.first(where: \.isActive)?.number ?? min(completed + 1, sets.count)
-        let restActive = phase == .rest
+        let restActive = phase == .rest || motionStep == .restVisible || motionStep == .nextActive
         let complete = phase == .complete
+        let loggedSetTitle = motionStep == nil && phase == .rest ? "Set 2 logged - 80 kg x 6" : "Set 1 logged - 80 kg x 8"
 
         return ActiveWorkoutLoggerScenario(
             density: density,
             phase: phase,
+            motionStep: motionStep,
             sets: sets,
-            elapsed: complete ? "41:08" : restActive ? "33:42" : phase == .afterOne ? "32:19" : "31:56",
+            elapsed: elapsed(phase: phase, motionStep: motionStep, restActive: restActive),
             exerciseName: "Barbell Bench Press",
             exerciseDetail: density == .beginner ? "Chest - anchor lift" : "Horizontal push - strength block",
             exerciseProgress: "1/6",
-            setProgress: complete ? "4/4 sets" : "Set \(active)/4",
+            setProgress: setProgress(phase: phase, motionStep: motionStep, active: active),
             targetLine: density == .beginner ? "Target 6-8" : "80 kg - RPE 8",
             target: density == .beginner ? "6-8 reps" : "80 kg x 6-8",
             restTarget: "120s",
             e1RMHint: complete ? "105" : "101",
-            tableSubtitle: "\(completed)/4 logged - active row stays clear",
-            stateTitle: stateTitle(phase: phase),
-            stateSubtitle: stateSubtitle(phase: phase, density: density),
-            stateIcon: stateIcon(phase: phase),
-            stateTint: stateTint(phase: phase),
-            restRemaining: restActive ? "01:17" : "02:00",
+            tableSubtitle: tableSubtitle(phase: phase, motionStep: motionStep, completed: completed, active: active),
+            stateTitle: stateTitle(phase: phase, motionStep: motionStep),
+            stateSubtitle: stateSubtitle(phase: phase, motionStep: motionStep, density: density),
+            stateIcon: stateIcon(phase: phase, motionStep: motionStep),
+            stateTint: stateTint(phase: phase, motionStep: motionStep),
+            restRemaining: restRemaining(phase: phase, motionStep: motionStep),
             restActive: restActive,
-            showUndo: phase == .afterOne || phase == .rest,
-            undoTitle: phase == .rest ? "Set 2 logged - 80 kg x 6" : "Set 1 logged - 80 kg x 8",
-            justLogged: phase == .rest ? "Just logged: Set 2 - 80 kg x 6" : "Just logged: Set 1 - 80 kg x 8",
-            nextSet: phase == .rest ? "Next: Set 3 - 80 kg x 6" : "Next: Set 2 - 80 kg x 6",
-            upNext: complete ? "Incline Bench Press" : "Incline Bench Press waits below",
-            primaryActionTitle: complete ? "Finish workout" : phase == .afterOne ? "Log Set 2" : "Log Set \(active)",
-            primaryActionDetail: complete ? "All working sets are logged." : density == .beginner ? "Tap the row values to edit before logging." : "Inline kg and reps stay ready for fast edits.",
+            showUndo: phase == .afterOne || phase == .rest || motionStep == .undoVisible || motionStep == .restVisible || motionStep == .nextActive,
+            undoTitle: loggedSetTitle,
+            justLogged: "Just logged: \(loggedSetTitle)",
+            nextSet: phase == .rest && motionStep == nil ? "Next: Set 3 - 80 kg x 6" : "Next: Set 2 - 80 kg x 6",
+            upNext: "Incline Bench Press",
+            primaryActionTitle: complete ? "Review" : "Log Set",
+            primaryActionDetail: complete ? "All working sets are logged." : "Set \(active) selected.",
             primaryActionEyebrow: complete ? "Complete" : "Current set",
             primaryActionIcon: complete ? .checkCircle : .check,
             nextPhaseFromPrimary: complete ? .complete : phase == .beforeLogging ? .afterOne : .rest
         )
     }
 
-    private static func stateTitle(phase: ActiveWorkoutLoggerPhase) -> String {
+    private static func elapsed(
+        phase: ActiveWorkoutLoggerPhase,
+        motionStep: ActiveWorkoutLoggerMotionStep?,
+        restActive: Bool
+    ) -> String {
+        if phase == .complete { return "41:08" }
+        if motionStep == .rowComplete { return "31:57" }
+        if motionStep == .undoVisible { return "31:58" }
+        if motionStep == .restVisible { return "32:00" }
+        if motionStep == .nextActive { return "32:01" }
+        if restActive { return "33:42" }
+        if phase == .afterOne { return "32:19" }
+        return "31:56"
+    }
+
+    private static func setProgress(
+        phase: ActiveWorkoutLoggerPhase,
+        motionStep: ActiveWorkoutLoggerMotionStep?,
+        active: Int
+    ) -> String {
+        if phase == .complete { return "4/4 sets" }
+        if motionStep == .rowComplete || motionStep == .undoVisible || motionStep == .restVisible {
+            return "1/4 sets"
+        }
+        return "Set \(active)/4"
+    }
+
+    private static func tableSubtitle(
+        phase: ActiveWorkoutLoggerPhase,
+        motionStep: ActiveWorkoutLoggerMotionStep?,
+        completed: Int,
+        active: Int
+    ) -> String {
+        if phase == .complete { return "4/4 logged" }
+
+        switch motionStep {
+        case .rowComplete:
+            return "1/4 logged - row settling"
+        case .undoVisible:
+            return "1/4 logged - undo available"
+        case .restVisible:
+            return "1/4 logged - rest started"
+        case .nextActive:
+            return "1/4 logged - Set 2 ready"
+        case .ready, nil:
+            return "\(completed)/4 logged - Set \(active) ready"
+        }
+    }
+
+    private static func stateTitle(
+        phase: ActiveWorkoutLoggerPhase,
+        motionStep: ActiveWorkoutLoggerMotionStep?
+    ) -> String {
+        if let motionStep {
+            switch motionStep {
+            case .ready: return "Ready to log Set 1"
+            case .rowComplete: return "Set 1 logged"
+            case .undoVisible: return "Set logged"
+            case .restVisible: return "Rest starting"
+            case .nextActive: return "Set 2 ready"
+            }
+        }
+
         switch phase {
         case .beforeLogging: return "Ready to log Set 1"
-        case .afterOne: return "Set logged. Next row is active."
-        case .rest: return "Rest running. Table stays usable."
+        case .afterOne: return "Set logged"
+        case .rest: return "Rest running"
         case .complete: return "Exercise complete"
         }
     }
 
-    private static func stateSubtitle(phase: ActiveWorkoutLoggerPhase, density: ActiveWorkoutLoggerDensity) -> String {
+    private static func stateSubtitle(
+        phase: ActiveWorkoutLoggerPhase,
+        motionStep: ActiveWorkoutLoggerMotionStep?,
+        density: ActiveWorkoutLoggerDensity
+    ) -> String {
+        if let motionStep {
+            switch motionStep {
+            case .ready:
+                return density == .beginner ? "Previous, kg, reps, check." : "Previous, delta, kg, reps."
+            case .rowComplete:
+                return "80 kg x 8 saved."
+            case .undoVisible:
+                return "Undo is quiet and non-blocking."
+            case .restVisible:
+                return "Rest is inline; the table stays usable."
+            case .nextActive:
+                return "Rest is running; Set 2 is active."
+            }
+        }
+
         switch phase {
         case .beforeLogging:
-            return density == .beginner ? "Previous, kg, reps, done - no hidden cockpit." : "Previous, target delta, kg, reps, check."
+            return density == .beginner ? "Previous, kg, reps, check." : "Previous, delta, kg, reps."
         case .afterOne:
-            return "Undo is quiet, not a blocking banner."
+            return "Set 2 is ready."
         case .rest:
-            return "Mini-player floats below without covering the active row."
+            return "Start next when rest is done."
         case .complete:
-            return "Finish is promoted only after the work is done."
+            return "All working sets are logged."
         }
     }
 
-    private static func stateIcon(phase: ActiveWorkoutLoggerPhase) -> STRQIcon {
+    private static func stateIcon(
+        phase: ActiveWorkoutLoggerPhase,
+        motionStep: ActiveWorkoutLoggerMotionStep?
+    ) -> STRQIcon {
+        if let motionStep {
+            switch motionStep {
+            case .ready: return .target
+            case .rowComplete, .undoVisible: return .checkCircle
+            case .restVisible, .nextActive: return .clock
+            }
+        }
+
         switch phase {
         case .beforeLogging: return .target
         case .afterOne: return .checkCircle
@@ -1080,12 +1356,37 @@ private struct ActiveWorkoutLoggerScenario {
         }
     }
 
-    private static func stateTint(phase: ActiveWorkoutLoggerPhase) -> Color {
+    private static func stateTint(
+        phase: ActiveWorkoutLoggerPhase,
+        motionStep: ActiveWorkoutLoggerMotionStep?
+    ) -> Color {
+        if let motionStep {
+            switch motionStep {
+            case .ready: return ActiveWorkoutLoggerStyle.signal
+            case .rowComplete, .undoVisible: return STRQColors.successGreen
+            case .restVisible, .nextActive: return ActiveWorkoutLoggerStyle.steel
+            }
+        }
+
         switch phase {
         case .beforeLogging: return ActiveWorkoutLoggerStyle.signal
         case .afterOne: return STRQColors.successGreen
         case .rest: return ActiveWorkoutLoggerStyle.steel
         case .complete: return STRQColors.successGreen
+        }
+    }
+
+    private static func restRemaining(
+        phase: ActiveWorkoutLoggerPhase,
+        motionStep: ActiveWorkoutLoggerMotionStep?
+    ) -> String {
+        switch motionStep {
+        case .restVisible:
+            return "02:00"
+        case .nextActive:
+            return "01:58"
+        case .ready, .rowComplete, .undoVisible, nil:
+            return phase == .rest ? "01:17" : "02:00"
         }
     }
 }
@@ -1102,34 +1403,53 @@ private struct ActiveWorkoutLoggerSet: Identifiable {
     let delta: String?
     let deltaTint: Color
 
-    static func make(phase: ActiveWorkoutLoggerPhase, density: ActiveWorkoutLoggerDensity) -> [ActiveWorkoutLoggerSet] {
+    static func make(
+        phase: ActiveWorkoutLoggerPhase,
+        density: ActiveWorkoutLoggerDensity,
+        motionStep: ActiveWorkoutLoggerMotionStep? = nil
+    ) -> [ActiveWorkoutLoggerSet] {
         let completed: Set<Int>
         let active: Int?
 
-        switch phase {
-        case .beforeLogging:
-            completed = []
-            active = 1
-        case .afterOne:
-            completed = [1]
-            active = 2
-        case .rest:
-            completed = [1, 2]
-            active = 3
-        case .complete:
-            completed = [1, 2, 3, 4]
-            active = nil
+        if let motionStep {
+            switch motionStep {
+            case .ready:
+                completed = []
+                active = 1
+            case .rowComplete, .undoVisible, .restVisible:
+                completed = [1]
+                active = nil
+            case .nextActive:
+                completed = [1]
+                active = 2
+            }
+        } else {
+            switch phase {
+            case .beforeLogging:
+                completed = []
+                active = 1
+            case .afterOne:
+                completed = [1]
+                active = 2
+            case .rest:
+                completed = [1, 2]
+                active = 3
+            case .complete:
+                completed = [1, 2, 3, 4]
+                active = nil
+            }
         }
 
+        let firstSetReady = phase == .beforeLogging && (motionStep == nil || motionStep == .ready)
         let rows: [(Int, String, String, String, String, String?)] = density == .beginner
             ? [
-                (1, "1", "77.5x8", "80", phase == .beforeLogging ? "6-8" : "8", nil),
+                (1, "1", "77.5x8", "80", firstSetReady ? "6-8" : "8", nil),
                 (2, "2", "80x6", "80", "6", nil),
                 (3, "3", "80x6", "80", "6", nil),
                 (4, "4", "77.5x8", "77.5", "8", nil)
             ]
             : [
-                (1, "1", "77.5x8", "80", phase == .beforeLogging ? "6-8" : "8", "+2.5"),
+                (1, "1", "77.5x8", "80", firstSetReady ? "6-8" : "8", "+2.5"),
                 (2, "2", "80x6", "80", "6", "="),
                 (3, "3", "80x6", "80", "6", "101 e1RM"),
                 (4, "4", "77.5x8", "77.5", "8", "-2.5")
@@ -1160,7 +1480,7 @@ private enum ActiveWorkoutLoggerStyle {
     static let control = hex(0x0C1016)
     static let inputIdle = hex(0x10141A)
     static let inputActive = hex(0x171D25)
-    static let bottomGlass = hex(0x0B0F14).opacity(0.95)
+    static let bottomGlass = hex(0x0B0F14).opacity(0.9)
     static let track = hex(0x252B32)
     static let border = Color.white.opacity(0.08)
     static let borderStrong = Color.white.opacity(0.14)
