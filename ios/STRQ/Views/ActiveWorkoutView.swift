@@ -24,7 +24,6 @@ struct ActiveWorkoutView: View {
     @State private var undoPrompt: LoggedSetUndoPrompt?
     @State private var undoDismissTask: Task<Void, Never>?
     @State private var showWorkoutDetails: Bool = false
-    @State private var rewardMoment: STRQRewardMoment?
     @State private var workoutCompletedTrigger: Bool = false
 
     private var workout: ActiveWorkoutState? { vm.activeWorkout }
@@ -51,6 +50,14 @@ struct ActiveWorkoutView: View {
                                 activeSetCard(workout)
                                     .padding(.horizontal, 14)
 
+                                if restTimerActive {
+                                    afterLogStateLine(workout)
+                                        .padding(.horizontal, 14)
+                                } else if let undoPrompt, vm.canUndoLastCompletedSet {
+                                    undoBanner(prompt: undoPrompt)
+                                        .padding(.horizontal, 14)
+                                }
+
                                 setLogTable(workout)
                                     .padding(.horizontal, 14)
 
@@ -73,9 +80,9 @@ struct ActiveWorkoutView: View {
                         }
                     }
                 }
-                .blur(radius: restTimerActive ? 8 : 0)
-                .saturation(restTimerActive ? 0.45 : 1)
-                .opacity(restTimerActive ? 0.38 : 1)
+                .blur(radius: restTimerActive ? 0.2 : 0)
+                .saturation(restTimerActive ? 0.82 : 1)
+                .opacity(restTimerActive ? 0.58 : 1)
                 .allowsHitTesting(!restTimerActive)
 
                 if let swapConfirmationText {
@@ -88,23 +95,12 @@ struct ActiveWorkoutView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
-                if let undoPrompt, vm.canUndoLastCompletedSet {
-                    VStack {
-                        Spacer()
-                        undoBanner(prompt: undoPrompt)
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, restTimerActive ? 28 : 92)
-                    }
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .zIndex(restTimerActive ? 4 : 1)
-                }
-
                 VStack {
                     Spacer()
                     bottomAction(workout)
                 }
-                .blur(radius: restTimerActive ? 8 : 0)
-                .opacity(restTimerActive ? 0.24 : 1)
+                .blur(radius: restTimerActive ? 0.2 : 0)
+                .opacity(restTimerActive ? 0.48 : 1)
                 .allowsHitTesting(!restTimerActive)
 
                 if restTimerActive {
@@ -113,7 +109,6 @@ struct ActiveWorkoutView: View {
                 }
             }
             .preferredColorScheme(.dark)
-            .strqRewardToast($rewardMoment, duration: 1.8, topPadding: 76)
             .onAppear {
                 startTimer(startTime: workout.session.startTime)
                 withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.4)) { appeared = true }
@@ -1583,42 +1578,102 @@ struct ActiveWorkoutView: View {
         )
     }
 
-    private func undoBanner(prompt: LoggedSetUndoPrompt) -> some View {
-        HStack(spacing: 12) {
+    private func afterLogStateLine(_ workout: ActiveWorkoutState) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "clock")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(STRQBrand.steel)
+                .frame(width: 30, height: 30)
+                .background(STRQBrand.steel.opacity(0.12), in: Circle())
+                .overlay(Circle().strokeBorder(STRQBrand.steel.opacity(0.22), lineWidth: 1))
+
             VStack(alignment: .leading, spacing: 3) {
-                Text(prompt.title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+                Text(L10n.tr("Rest"))
+                    .font(.system(size: 12, weight: .heavy, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.92))
                     .lineLimit(1)
-                Text(prompt.subtitle)
-                    .font(.caption)
+                Text(afterLogStateLineDetail(workout))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.55))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.78)
             }
+            .layoutPriority(1)
 
-            Spacer(minLength: 12)
+            Spacer(minLength: 8)
+
+            Text(formatTime(restTimeRemaining))
+                .font(.system(size: 18, weight: .black, design: .rounded).monospacedDigit())
+                .foregroundStyle(STRQBrand.steel)
+                .contentTransition(.numericText(countsDown: true))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.045), in: .rect(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(STRQBrand.steel.opacity(0.16), lineWidth: 1)
+        )
+    }
+
+    private func afterLogStateLineDetail(_ workout: ActiveWorkoutState) -> String {
+        let exerciseIndex = workout.currentExerciseIndex
+        guard exerciseIndex < workout.session.exerciseLogs.count else {
+            return L10n.tr("Use the bottom action to move forward when you're ready.")
+        }
+        let log = workout.session.exerciseLogs[exerciseIndex]
+        let exerciseName = vm.library.exercise(byId: log.exerciseId)?.name ?? L10n.tr("Exercise")
+        if let currentSet = activeSetFor(log: log, workout: workout) {
+            return L10n.format("%@ · Set %d ready", exerciseName, currentSet.setNumber)
+        }
+        return L10n.tr("Use the bottom action to move forward when you're ready.")
+    }
+
+    private func undoBanner(prompt: LoggedSetUndoPrompt) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(STRQPalette.success.opacity(0.86))
+                .frame(width: 28, height: 28)
+                .background(STRQPalette.success.opacity(0.10), in: Circle())
+                .overlay(Circle().strokeBorder(STRQPalette.success.opacity(0.18), lineWidth: 1))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(prompt.title)
+                    .font(.system(size: 12, weight: .heavy, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.88))
+                    .lineLimit(1)
+                Text(prompt.subtitle)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.50))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+            .layoutPriority(1)
+
+            Spacer(minLength: 8)
 
             Button {
                 undoLastCompletedSet()
             } label: {
                 Text(L10n.tr("Undo"))
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(.black)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(STRQBrand.accentGradient, in: Capsule())
+                    .font(.system(size: 12, weight: .black))
+                    .foregroundStyle(.white.opacity(0.74))
+                    .padding(.horizontal, 12)
+                    .frame(height: 30)
+                    .background(Color.white.opacity(0.045), in: Capsule())
+                    .overlay(Capsule().strokeBorder(Color.white.opacity(0.09), lineWidth: 1))
             }
             .buttonStyle(.strqPressable)
             .accessibilityLabel(L10n.tr("Undo last logged set"))
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(Color.white.opacity(0.08), in: .rect(cornerRadius: 16))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 15, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.075), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.18), radius: 16, y: 8)
     }
 
     // MARK: - Bottom CTA
@@ -1696,18 +1751,18 @@ struct ActiveWorkoutView: View {
         let progress = totalRest > 0 ? CGFloat(restTimeRemaining) / CGFloat(totalRest) : 0
 
         ZStack {
-            Color.black.opacity(0.80)
+            Color.black.opacity(0.58)
                 .ignoresSafeArea()
                 .onTapGesture { }
             Rectangle()
-                .fill(.ultraThinMaterial)
-                .opacity(0.18)
+                .fill(.black)
+                .opacity(0.08)
                 .ignoresSafeArea()
             LinearGradient(
                 colors: [
-                    Color.black.opacity(0.18),
+                    Color.black.opacity(0.04),
                     Color.black.opacity(0.02),
-                    Color.black.opacity(0.24)
+                    Color.black.opacity(0.16)
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -1716,9 +1771,13 @@ struct ActiveWorkoutView: View {
             .allowsHitTesting(false)
 
             VStack(spacing: 0) {
-                Spacer(minLength: 20)
+                Spacer(minLength: 96)
 
-                VStack(spacing: 18) {
+                VStack(spacing: 10) {
+                    if let undoPrompt, vm.canUndoLastCompletedSet {
+                        restUndoStrip(prompt: undoPrompt)
+                    }
+
                     if let last = lastLoggedSet,
                        last.exerciseIndex < workout.session.exerciseLogs.count,
                        last.setIndex < workout.session.exerciseLogs[last.exerciseIndex].sets.count {
@@ -1728,26 +1787,40 @@ struct ActiveWorkoutView: View {
                         let e1rm = estimatedOneRM(weight: loggedSet.weight, reps: loggedSet.reps)
                         let currentQuality = loggedSet.quality
 
-                        VStack(alignment: .leading, spacing: 14) {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(L10n.tr("JUST LOGGED"))
-                                    .font(.system(size: 9, weight: .black))
-                                    .tracking(1.5)
-                                    .foregroundStyle(STRQBrand.steel)
-                                Text(exerciseName)
-                                    .font(.headline.weight(.semibold))
-                                    .foregroundStyle(.white)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.85)
-                                Text(L10n.format("Set %d · %@ × %d", loggedSet.setNumber, formatWeight(loggedSet.weight, increment: 0.5), loggedSet.reps))
-                                    .font(.system(size: 24, weight: .heavy, design: .rounded).monospacedDigit())
-                                    .foregroundStyle(.white)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                                if e1rm > 0 {
-                                    Text(L10n.format("Estimated 1RM %.0f", e1rm))
-                                        .font(.caption.weight(.semibold).monospacedDigit())
-                                        .foregroundStyle(.white.opacity(0.52))
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack(spacing: 10) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 13, weight: .bold))
+                                    .foregroundStyle(STRQPalette.success.opacity(0.86))
+                                    .frame(width: 28, height: 28)
+                                    .background(STRQPalette.success.opacity(0.10), in: Circle())
+                                    .overlay(Circle().strokeBorder(STRQPalette.success.opacity(0.20), lineWidth: 1))
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(L10n.tr("Set logged"))
+                                        .font(.system(size: 10, weight: .black))
+                                        .tracking(0.8)
+                                        .foregroundStyle(.white.opacity(0.48))
+                                        .textCase(.uppercase)
+                                    Text(exerciseName)
+                                        .font(.system(size: 13, weight: .heavy, design: .rounded))
+                                        .foregroundStyle(.white.opacity(0.84))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.78)
+                                }
+                                .layoutPriority(1)
+
+                                VStack(alignment: .trailing, spacing: 2) {
+                                    Text(L10n.format("Set %d · %@ × %d", loggedSet.setNumber, formatWeight(loggedSet.weight, increment: 0.5), loggedSet.reps))
+                                        .font(.system(size: 14, weight: .black, design: .rounded).monospacedDigit())
+                                        .foregroundStyle(.white.opacity(0.74))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.72)
+                                    if e1rm > 0 {
+                                        Text(L10n.format("e1RM %.0f", e1rm))
+                                            .font(.system(size: 10, weight: .bold).monospacedDigit())
+                                            .foregroundStyle(.white.opacity(0.40))
+                                    }
                                 }
                             }
 
@@ -1757,16 +1830,12 @@ struct ActiveWorkoutView: View {
                                 setIndex: last.setIndex
                             )
                         }
-                        .padding(16)
-                        .background(Color.white.opacity(0.05), in: .rect(cornerRadius: 20))
+                        .padding(10)
+                        .background(Color.white.opacity(0.040), in: .rect(cornerRadius: 15, style: .continuous))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                .strokeBorder(Color.white.opacity(0.065), lineWidth: 1)
                         )
-                        .overlay(alignment: .topTrailing) {
-                            STRQSuccessPulse(size: 34, color: STRQPalette.success, icon: "checkmark")
-                                .padding(12)
-                        }
                     }
 
                     restTimerCircle(progress: progress)
@@ -1777,31 +1846,65 @@ struct ActiveWorkoutView: View {
 
                     restControls()
                 }
-                .padding(20)
-                .frame(maxWidth: 380)
+                .padding(12)
+                .frame(maxWidth: 372)
                 .background(
-                    Color(white: 0.075).opacity(0.96),
-                    in: .rect(cornerRadius: 28)
+                    Color(white: 0.055).opacity(0.96),
+                    in: .rect(cornerRadius: 22, style: .continuous)
                 )
                 .overlay(
                     LinearGradient(
-                        colors: [Color.white.opacity(0.11), Color.white.opacity(0.035)],
+                        colors: [Color.white.opacity(0.070), Color.white.opacity(0.012)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
-                    .clipShape(.rect(cornerRadius: 28))
+                    .clipShape(.rect(cornerRadius: 22, style: .continuous))
                     .allowsHitTesting(false)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 28)
-                        .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
                 )
-                .shadow(color: .black.opacity(0.48), radius: 28, y: 16)
+                .shadow(color: .black.opacity(0.34), radius: 22, y: 12)
                 .padding(.horizontal, 20)
 
-                Spacer(minLength: 92)
+                Color.clear
+                    .frame(height: 108)
             }
         }
+    }
+
+    private func restUndoStrip(prompt: LoggedSetUndoPrompt) -> some View {
+        HStack(spacing: 8) {
+            Text(prompt.title)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.white.opacity(0.52))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+
+            Spacer(minLength: 8)
+
+            Button {
+                undoLastCompletedSet()
+            } label: {
+                Text(L10n.tr("Undo"))
+                    .font(.system(size: 12, weight: .black))
+                    .foregroundStyle(.white.opacity(0.66))
+                    .padding(.horizontal, 12)
+                    .frame(height: 30)
+                    .background(Color.white.opacity(0.032), in: Capsule())
+                    .overlay(Capsule().strokeBorder(Color.white.opacity(0.06), lineWidth: 1))
+            }
+            .buttonStyle(.strqPressable)
+            .accessibilityLabel(L10n.tr("Undo last logged set"))
+        }
+        .padding(.horizontal, 10)
+        .frame(height: 34)
+        .background(Color.white.opacity(0.024), in: .rect(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.045), lineWidth: 1)
+        )
     }
 
     private func restQualityPicker(
@@ -1809,10 +1912,10 @@ struct ActiveWorkoutView: View {
         exerciseIndex: Int,
         setIndex: Int
     ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             Text(L10n.tr("How did that feel?"))
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.white.opacity(0.48))
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(.white.opacity(0.46))
 
             HStack(spacing: 8) {
                 ForEach(SetQuality.allCases, id: \.self) { quality in
@@ -1834,8 +1937,8 @@ struct ActiveWorkoutView: View {
         setIndex: Int
     ) -> some View {
         let foreground = isSelected ? Color.black : Color.white.opacity(0.74)
-        let background = isSelected ? qualityColor(quality.colorName) : Color.white.opacity(0.05)
-        let borderOpacity = isSelected ? 0.0 : 0.06
+        let background = isSelected ? qualityColor(quality.colorName) : Color.white.opacity(0.060)
+        let borderOpacity = isSelected ? 0.0 : 0.08
 
         return Button {
             let newQuality: SetQuality? = isSelected ? nil : quality
@@ -1843,17 +1946,18 @@ struct ActiveWorkoutView: View {
         } label: {
             VStack(spacing: 4) {
                 Image(systemName: quality.icon)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 11, weight: .semibold))
                 Text(quality.shortLabel)
-                    .font(.caption2.weight(.bold))
+                    .font(.system(size: 10, weight: .bold))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.76)
             }
             .foregroundStyle(foreground)
             .frame(maxWidth: .infinity)
-            .frame(minHeight: 50)
-            .background(background, in: .rect(cornerRadius: 12))
+            .frame(minHeight: 36)
+            .background(background, in: .rect(cornerRadius: 11))
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 11)
                     .strokeBorder(Color.white.opacity(borderOpacity), lineWidth: 1)
             )
         }
@@ -1862,47 +1966,62 @@ struct ActiveWorkoutView: View {
 
     private func restTimerCircle(progress: CGFloat) -> some View {
         let isAlmostDone = restTimeRemaining <= 10
-        let progressColor = isAlmostDone ? STRQPalette.warning : Color.white
+        let progressColor = isAlmostDone ? STRQPalette.warning : STRQBrand.steel
         let timerAnimation: Animation = reduceMotion ? .easeOut(duration: 0.12) : .linear(duration: 1)
+        let clampedProgress = min(max(progress, 0), 1)
 
-        return VStack(spacing: 10) {
+        return HStack(spacing: 13) {
             ZStack {
                 Circle()
-                    .stroke(Color.white.opacity(0.06), lineWidth: 6)
-                    .frame(width: 176, height: 176)
+                    .stroke(Color.white.opacity(0.08), lineWidth: 5)
+                    .frame(width: 76, height: 76)
 
                 Circle()
-                    .trim(from: 0, to: progress)
+                    .trim(from: 0, to: clampedProgress)
                     .stroke(
                         progressColor,
-                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                        style: StrokeStyle(lineWidth: 5, lineCap: .round)
                     )
-                    .frame(width: 176, height: 176)
+                    .frame(width: 76, height: 76)
                     .rotationEffect(.degrees(-90))
                     .animation(timerAnimation, value: restTimeRemaining)
 
-                VStack(spacing: 6) {
-                    Text(L10n.tr("REST"))
-                        .font(.system(size: 10, weight: .black))
-                        .tracking(2.0)
-                        .foregroundStyle(.white.opacity(0.46))
-                    Text(formatTime(restTimeRemaining))
-                        .font(.system(size: 42, weight: .bold, design: .monospaced))
-                        .foregroundStyle(progressColor)
-                        .contentTransition(.numericText(countsDown: true))
-                }
+                Image(systemName: "clock.fill")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(progressColor.opacity(0.82))
             }
 
-            Text(restCountdownHint())
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.white.opacity(0.58))
-                .multilineTextAlignment(.center)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(L10n.tr("REST"))
+                    .font(.system(size: 9, weight: .black))
+                    .tracking(1.5)
+                    .foregroundStyle(.white.opacity(0.50))
+                Text(formatTime(restTimeRemaining))
+                    .font(.system(size: 34, weight: .black, design: .rounded).monospacedDigit())
+                    .foregroundStyle(progressColor)
+                    .contentTransition(.numericText(countsDown: true))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+                Text(restCountdownHint())
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.60))
+                    .lineLimit(2)
+            }
+            .layoutPriority(1)
+
+            Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity)
+        .padding(11)
+        .background(Color.white.opacity(0.070), in: .rect(cornerRadius: 17, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 17, style: .continuous)
+                .strokeBorder(progressColor.opacity(0.18), lineWidth: 1)
+        )
     }
 
     private func restControls() -> some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 8) {
             restTimerAdjustmentButton(title: L10n.tr("-15s")) {
                 let updatedTime = max(0, restTimeRemaining - 15)
                 restTimeRemaining = updatedTime
@@ -1925,11 +2044,19 @@ struct ActiveWorkoutView: View {
             restTimerActive = false
         } label: {
             Text(L10n.tr("Continue Now"))
-                .font(.body.weight(.bold))
-                .foregroundStyle(.black)
+                .font(.system(size: 14, weight: .black))
+                .foregroundStyle(STRQPalette.backgroundDeep)
                 .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(STRQBrand.accentGradient, in: Capsule())
+                .frame(height: 42)
+                .background(
+                    LinearGradient(
+                        colors: [Color.white, Color(red: 0.92, green: 0.93, blue: 0.94)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    in: Capsule()
+                )
+                .overlay(Capsule().strokeBorder(Color.white.opacity(0.24), lineWidth: 1))
         }
         .buttonStyle(.strqPressable)
         .accessibilityLabel(L10n.tr("Continue workout now"))
@@ -1939,13 +2066,13 @@ struct ActiveWorkoutView: View {
     private func restTimerAdjustmentButton(title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.88))
-                .frame(width: 72, height: 46)
-                .background(Color.white.opacity(0.09), in: Capsule())
+                .font(.system(size: 13, weight: .black, design: .rounded).monospacedDigit())
+                .foregroundStyle(.white.opacity(0.76))
+                .frame(width: 50, height: 38)
+                .background(Color.white.opacity(0.060), in: Capsule())
                 .overlay(
                     Capsule()
-                        .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
+                        .strokeBorder(Color.white.opacity(0.11), lineWidth: 1)
                 )
         }
         .buttonStyle(.strqPressable)
@@ -1962,26 +2089,26 @@ struct ActiveWorkoutView: View {
     }
 
     private func restNextActionCard(_ nextRec: NextSetRec) -> some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .center, spacing: 10) {
             Image(systemName: nextRec.icon)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(nextRec.tint)
-                .frame(width: 40, height: 40)
-                .background(nextRec.tint.opacity(0.16), in: .rect(cornerRadius: 12))
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(nextRec.tint.opacity(0.92))
+                .frame(width: 30, height: 30)
+                .background(nextRec.tint.opacity(0.10), in: .rect(cornerRadius: 10, style: .continuous))
 
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(nextRec.eyebrow)
                     .font(.system(size: 9, weight: .black))
-                    .tracking(1.4)
-                    .foregroundStyle(nextRec.tint)
+                    .tracking(1.0)
+                    .foregroundStyle(nextRec.tint.opacity(0.88))
                 Text(nextRec.primary)
-                    .font(nextRec.usesMonospacedPrimary ? .system(size: 20, weight: .heavy, design: .rounded).monospacedDigit() : .title3.weight(.heavy))
-                    .foregroundStyle(.white)
+                    .font(nextRec.usesMonospacedPrimary ? .system(size: 15, weight: .black, design: .rounded).monospacedDigit() : .system(size: 14, weight: .heavy, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.82))
                     .lineLimit(2)
-                    .minimumScaleFactor(0.85)
+                    .minimumScaleFactor(0.78)
                 Text(nextRec.detail)
-                    .font(.footnote.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.58))
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.50))
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
             }
@@ -1989,11 +2116,11 @@ struct ActiveWorkoutView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(Color.white.opacity(0.05), in: .rect(cornerRadius: 18))
+        .padding(10)
+        .background(Color.white.opacity(0.036), in: .rect(cornerRadius: 15, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(nextRec.tint.opacity(0.22), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .strokeBorder(nextRec.tint.opacity(0.11), lineWidth: 1)
         )
     }
 
@@ -2329,11 +2456,6 @@ struct ActiveWorkoutView: View {
         setCompletedTrigger.toggle()
         lastLoggedSet = (exerciseIndex, setIndex)
         if let prompt {
-            presentRewardMoment(
-                title: L10n.tr("Set logged"),
-                subtitle: prompt.subtitle,
-                style: .success
-            )
             presentUndoPrompt(prompt)
         }
         guard rest > 0 else { return }
@@ -2406,12 +2528,6 @@ struct ActiveWorkoutView: View {
             await MainActor.run {
                 dismissUndoPrompt()
             }
-        }
-    }
-
-    private func presentRewardMoment(title: String, subtitle: String?, style: STRQRewardMoment.Style) {
-        withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.32, dampingFraction: 0.84)) {
-            rewardMoment = STRQRewardMoment(title: title, subtitle: subtitle, style: style)
         }
     }
 
