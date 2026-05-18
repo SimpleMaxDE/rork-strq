@@ -943,20 +943,15 @@ struct ActiveWorkoutView: View {
             let log = workout.session.exerciseLogs[exerciseIndex]
             let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
             let targetReps = planned?.reps ?? "—"
-            let suggestion = vm.loadSuggestion(for: log.exerciseId, planned: planned)
-            let targetWeight: String = {
-                guard let s = suggestion, s.suggestedWeight > 0 else { return "—" }
-                return formatWeight(s.suggestedWeight, increment: 0.5)
-            }()
             let lastSessionSets = previousSetsMap(for: log.exerciseId)
             let firstActiveIdx = log.sets.firstIndex(where: { !$0.isCompleted })
             let completedCount = log.sets.filter(\.isCompleted).count
 
-            VStack(spacing: 10) {
-                HStack(alignment: .center, spacing: 12) {
+            VStack(spacing: 8) {
+                HStack(alignment: .center, spacing: 10) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(L10n.tr("Sets"))
-                            .font(.system(size: 14, weight: .heavy, design: .rounded))
+                            .font(.system(size: 17, weight: .heavy, design: .rounded))
                             .foregroundStyle(.white.opacity(0.94))
                         Text("\(completedCount)/\(log.sets.count)")
                             .font(.system(size: 10, weight: .bold).monospacedDigit())
@@ -977,18 +972,17 @@ struct ActiveWorkoutView: View {
                 setHistoryProgressBar(completedCount: completedCount, totalSets: log.sets.count)
                     .padding(.horizontal, 14)
 
-                HStack(spacing: 6) {
-                    tableHeader("#", width: 36, alignment: .leading)
-                    tableHeader("KG")
-                    tableHeader("REPS")
-                    tableHeader("TGT")
-                    tableHeader("e1RM")
-                    Color.clear.frame(width: 26)
+                HStack(spacing: 7) {
+                    tableHeader("#", width: 38, alignment: .leading)
+                    tableHeader(L10n.tr("PREV"), width: 64)
+                    tableHeader(L10n.tr("kg"))
+                    tableHeader(L10n.tr("reps"))
+                    tableHeader(L10n.tr("Done"), width: 36)
                 }
-                .padding(.horizontal, 12)
-                .padding(.top, 1)
+                .padding(.horizontal, 14)
+                .padding(.top, 2)
 
-                VStack(spacing: 6) {
+                VStack(spacing: 5) {
                     ForEach(Array(log.sets.enumerated()), id: \.element.id) { idx, setLog in
                         let isActive = idx == firstActiveIdx
                         setLogRow(
@@ -997,7 +991,6 @@ struct ActiveWorkoutView: View {
                             isActive: isActive,
                             exerciseIndex: exerciseIndex,
                             targetReps: targetReps,
-                            targetWeight: targetWeight,
                             previousSet: lastSessionSets[setLog.setNumber]
                         )
                     }
@@ -1007,10 +1000,19 @@ struct ActiveWorkoutView: View {
             }
             .background(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(STRQPalette.surfaceRaised)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                STRQPalette.surfaceRaised,
+                                STRQPalette.backgroundCarbon.opacity(0.92)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                     .overlay(
                         LinearGradient(
-                            colors: [Color.white.opacity(0.065), Color.white.opacity(0.012)],
+                            colors: [Color.white.opacity(0.075), Color.white.opacity(0.014)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -1030,6 +1032,8 @@ struct ActiveWorkoutView: View {
             .font(.system(size: 9, weight: .black))
             .tracking(1.0)
             .foregroundStyle(.white.opacity(0.38))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
             .frame(maxWidth: width == nil ? .infinity : nil, alignment: alignment)
             .frame(width: width)
     }
@@ -1078,8 +1082,8 @@ struct ActiveWorkoutView: View {
     }
 
     private func setHistoryRailColor(completed: Bool, active: Bool) -> Color {
-        if completed { return STRQPalette.success.opacity(0.92) }
-        if active { return Color.white.opacity(0.86) }
+        if completed { return STRQPalette.success.opacity(0.72) }
+        if active { return Color.white.opacity(0.90) }
         return Color.white.opacity(0.20)
     }
 
@@ -1090,37 +1094,41 @@ struct ActiveWorkoutView: View {
         isActive: Bool,
         exerciseIndex: Int,
         targetReps: String,
-        targetWeight: String,
         previousSet: SetLog?
     ) -> some View {
         let completed = setLog.isCompleted
-        let e1rm = estimatedOneRM(weight: setLog.weight, reps: setLog.reps)
-        let rowOpacity: Double = completed ? 0.82 : (isActive ? 1.0 : 0.38)
-        let delta = completed ? deltaChip(current: setLog, previous: previousSet) : nil
+        let valueOpacity: Double = completed ? 0.78 : (isActive ? 1.0 : 0.34)
         let weightText = completed || setLog.weight > 0 ? formatWeight(setLog.weight, increment: 0.5) : "—"
         let repsIsPlaceholder = !(completed || setLog.reps > 0)
         let repsText = repsIsPlaceholder ? targetReps : "\(setLog.reps)"
-        let e1rmText = e1rm > 0 ? String(format: "%.0f", e1rm) : "—"
+        let previousText = previousSetText(previousSet)
+        let hasPrevious = previousSet != nil
 
         Button {
             if !completed && !isActive {
                 jumpToSet(exerciseIndex: exerciseIndex, setIndex: idx)
             }
         } label: {
-            HStack(spacing: 6) {
+            HStack(spacing: 7) {
                 setNumberBadge(setNumber: setLog.setNumber, completed: completed, isActive: isActive)
-                    .frame(width: 36, alignment: .leading)
+                    .frame(width: 38, alignment: .leading)
 
-                setPrimaryMetricCell(value: weightText, opacity: rowOpacity, isPlaceholder: weightText == "—")
-                setPrimaryMetricCell(value: repsText, opacity: repsIsPlaceholder ? 0.34 : rowOpacity, isPlaceholder: repsIsPlaceholder)
-                setQuietMetricCell(value: targetWeight, opacity: isActive ? 0.62 : (completed ? 0.46 : 0.28), delta: nil)
-                setQuietMetricCell(value: e1rmText, opacity: completed ? 0.56 : (isActive ? 0.34 : 0.24), delta: delta)
+                previousSetCell(
+                    value: previousText,
+                    completed: completed,
+                    isActive: isActive,
+                    hasPrevious: hasPrevious
+                )
+                .frame(width: 64)
+
+                setPrimaryMetricCell(value: weightText, opacity: valueOpacity, active: isActive, completed: completed, isPlaceholder: weightText == "—")
+                setPrimaryMetricCell(value: repsText, opacity: repsIsPlaceholder ? 0.42 : valueOpacity, active: isActive, completed: completed, isPlaceholder: repsIsPlaceholder)
 
                 setRowStatusIndicator(completed: completed, isActive: isActive)
-                    .frame(width: 26)
+                    .frame(width: 36)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
             .background(
                 ZStack {
                     RoundedRectangle(cornerRadius: 13, style: .continuous)
@@ -1129,7 +1137,7 @@ struct ActiveWorkoutView: View {
                         RoundedRectangle(cornerRadius: 13, style: .continuous)
                             .fill(
                                 LinearGradient(
-                                    colors: [Color.white.opacity(0.070), STRQBrand.steel.opacity(0.055)],
+                                    colors: [Color.white.opacity(0.115), STRQBrand.steel.opacity(0.095)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
@@ -1137,15 +1145,15 @@ struct ActiveWorkoutView: View {
                     }
                     if completed {
                         RoundedRectangle(cornerRadius: 13, style: .continuous)
-                            .fill(STRQPalette.success.opacity(0.035))
+                            .fill(STRQPalette.success.opacity(0.040))
                     }
                 }
             )
             .overlay(alignment: .leading) {
                 Capsule()
                     .fill(setRowRailColor(completed: completed, isActive: isActive))
-                    .frame(width: 3)
-                    .padding(.vertical, 10)
+                    .frame(width: setRowRailWidth(completed: completed, isActive: isActive))
+                    .padding(.vertical, 8)
                     .padding(.leading, 1)
             }
             .overlay(
@@ -1157,11 +1165,17 @@ struct ActiveWorkoutView: View {
         .disabled(completed)
     }
 
+    private func previousSetText(_ previousSet: SetLog?) -> String {
+        guard let previousSet else { return "—" }
+        guard previousSet.weight > 0 || previousSet.reps > 0 else { return "—" }
+        return "\(formatWeight(previousSet.weight, increment: 0.5))×\(previousSet.reps)"
+    }
+
     private func setNumberBadge(setNumber: Int, completed: Bool, isActive: Bool) -> some View {
         Text("\(setNumber)")
-            .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
+            .font(.system(size: 14, weight: .heavy, design: .rounded).monospacedDigit())
             .foregroundStyle(isActive ? .black.opacity(0.92) : .white.opacity(completed ? 0.82 : 0.48))
-            .frame(width: 28, height: 28)
+            .frame(width: 30, height: 30)
             .background(
                 isActive
                     ? Color.white.opacity(0.92)
@@ -1174,80 +1188,84 @@ struct ActiveWorkoutView: View {
             )
     }
 
-    private func setPrimaryMetricCell(value: String, opacity: Double, isPlaceholder: Bool) -> some View {
+    private func previousSetCell(value: String, completed: Bool, isActive: Bool, hasPrevious: Bool) -> some View {
         Text(value)
-            .font(.system(size: isPlaceholder ? 12 : 14, weight: isPlaceholder ? .semibold : .bold, design: .rounded).monospacedDigit())
-            .foregroundStyle(.white.opacity(opacity))
+            .font(.system(size: isActive ? 12 : 11, weight: isActive ? .heavy : .semibold, design: .rounded).monospacedDigit())
+            .foregroundStyle(.white.opacity(hasPrevious ? (isActive ? 0.78 : completed ? 0.58 : 0.38) : 0.26))
             .lineLimit(1)
-            .minimumScaleFactor(0.7)
+            .minimumScaleFactor(0.58)
             .frame(maxWidth: .infinity)
-            .frame(minHeight: 30)
-            .contentTransition(.numericText())
+            .frame(height: 32)
+            .background(Color.black.opacity(isActive ? 0.14 : 0.06), in: .rect(cornerRadius: 10, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(Color.white.opacity(isActive ? 0.075 : 0.035), lineWidth: 1)
+            )
     }
 
-    private func setQuietMetricCell(value: String, opacity: Double, delta: DeltaChip?) -> some View {
-        VStack(spacing: 2) {
-            Text(value)
-                .font(.system(size: 11, weight: .semibold, design: .rounded).monospacedDigit())
-                .foregroundStyle(.white.opacity(opacity))
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-            if let delta {
-                Text(delta.text)
-                    .font(.system(size: 8, weight: .heavy).monospacedDigit())
-                    .foregroundStyle(delta.color)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 1)
-                    .background(delta.color.opacity(0.14), in: Capsule())
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .frame(minHeight: 30)
-        .padding(.horizontal, 2)
-        .background(Color.black.opacity(0.12), in: .rect(cornerRadius: 9))
-        .overlay(
-            RoundedRectangle(cornerRadius: 9, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.035), lineWidth: 1)
-        )
+    private func setPrimaryMetricCell(value: String, opacity: Double, active: Bool, completed: Bool, isPlaceholder: Bool) -> some View {
+        Text(value)
+            .font(.system(size: active ? 17 : isPlaceholder ? 12 : 15, weight: isPlaceholder ? .semibold : .black, design: .rounded).monospacedDigit())
+            .foregroundStyle(.white.opacity(opacity))
+            .lineLimit(1)
+            .minimumScaleFactor(0.58)
+            .frame(maxWidth: .infinity)
+            .frame(height: 32)
+            .background(
+                active
+                    ? Color.white.opacity(0.075)
+                    : Color.black.opacity(completed ? 0.10 : 0.055),
+                in: .rect(cornerRadius: 11, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .strokeBorder(active ? STRQBrand.steel.opacity(0.42) : Color.white.opacity(completed ? 0.055 : 0.035), lineWidth: 1)
+            )
+            .contentTransition(.numericText())
     }
 
     private func setRowStatusIndicator(completed: Bool, isActive: Bool) -> some View {
         ZStack {
             if completed {
-                Circle().fill(STRQPalette.success).frame(width: 20, height: 20)
+                Circle().fill(STRQPalette.success.opacity(0.18)).frame(width: 24, height: 24)
+                Circle().strokeBorder(STRQPalette.success.opacity(0.42), lineWidth: 1).frame(width: 24, height: 24)
                 Image(systemName: "checkmark")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(.black.opacity(0.9))
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(STRQPalette.success)
             } else if isActive {
-                Circle().strokeBorder(Color.white.opacity(0.88), lineWidth: 1.4).frame(width: 20, height: 20)
+                Circle().strokeBorder(Color.white.opacity(0.88), lineWidth: 1.4).frame(width: 24, height: 24)
                 Circle().fill(Color.white).frame(width: 6, height: 6)
             } else {
                 Circle()
                     .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [2.2, 2.2]))
                     .foregroundStyle(Color.white.opacity(0.22))
-                    .frame(width: 20, height: 20)
+                    .frame(width: 24, height: 24)
             }
         }
     }
 
     private func setRowBaseColor(completed: Bool, isActive: Bool) -> Color {
-        if isActive { return Color.white.opacity(0.052) }
-        if completed { return Color.white.opacity(0.034) }
-        return Color.white.opacity(0.018)
+        if isActive { return Color.white.opacity(0.088) }
+        if completed { return Color.white.opacity(0.032) }
+        return Color.white.opacity(0.016)
     }
 
     private func setRowBorderColor(completed: Bool, isActive: Bool) -> Color {
-        if isActive { return Color.white.opacity(0.20) }
-        if completed { return STRQPalette.success.opacity(0.12) }
+        if isActive { return STRQBrand.steel.opacity(0.46) }
+        if completed { return STRQPalette.success.opacity(0.115) }
         return Color.white.opacity(0.045)
     }
 
     private func setRowRailColor(completed: Bool, isActive: Bool) -> Color {
-        if completed { return STRQPalette.success.opacity(0.88) }
-        if isActive { return Color.white.opacity(0.86) }
+        if completed { return STRQPalette.success.opacity(0.56) }
+        if isActive { return Color.white.opacity(0.90) }
         return Color.white.opacity(0.16)
+    }
+
+    private func setRowRailWidth(completed: Bool, isActive: Bool) -> CGFloat {
+        if isActive { return 5 }
+        if completed { return 4 }
+        return 3
     }
 
     private struct DeltaChip {
