@@ -1749,20 +1749,18 @@ struct ActiveWorkoutView: View {
         let planned = workout.currentExerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[workout.currentExerciseIndex] : nil
         let totalRest = planned?.restSeconds ?? 90
         let progress = totalRest > 0 ? CGFloat(restTimeRemaining) / CGFloat(totalRest) : 0
+        let nextRec = nextSetRecommendation(workout)
+        let rationale = nextRec?.detail ?? restCountdownHint()
 
         ZStack {
-            Color.black.opacity(0.58)
+            Color.black.opacity(0.72)
                 .ignoresSafeArea()
                 .onTapGesture { }
-            Rectangle()
-                .fill(.black)
-                .opacity(0.08)
-                .ignoresSafeArea()
             LinearGradient(
                 colors: [
-                    Color.black.opacity(0.04),
-                    Color.black.opacity(0.02),
-                    Color.black.opacity(0.16)
+                    Color.black.opacity(0.34),
+                    Color.black.opacity(0.08),
+                    Color.black.opacity(0.48)
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -1771,105 +1769,59 @@ struct ActiveWorkoutView: View {
             .allowsHitTesting(false)
 
             VStack(spacing: 0) {
-                Spacer(minLength: 96)
+                Spacer(minLength: 58)
 
-                VStack(spacing: 10) {
-                    if let undoPrompt, vm.canUndoLastCompletedSet {
-                        restUndoStrip(prompt: undoPrompt)
+                VStack(spacing: 12) {
+                    restFocusTimer(progress: progress, rationale: rationale)
+
+                    if let nextRec {
+                        restNextActionCard(nextRec)
                     }
 
                     if let last = lastLoggedSet,
                        last.exerciseIndex < workout.session.exerciseLogs.count,
                        last.setIndex < workout.session.exerciseLogs[last.exerciseIndex].sets.count {
-                        let log = workout.session.exerciseLogs[last.exerciseIndex]
-                        let loggedSet = log.sets[last.setIndex]
-                        let exerciseName = vm.library.exercise(byId: log.exerciseId)?.name ?? "Exercise"
-                        let e1rm = estimatedOneRM(weight: loggedSet.weight, reps: loggedSet.reps)
-                        let currentQuality = loggedSet.quality
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack(spacing: 10) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.system(size: 13, weight: .bold))
-                                    .foregroundStyle(STRQPalette.success.opacity(0.86))
-                                    .frame(width: 28, height: 28)
-                                    .background(STRQPalette.success.opacity(0.10), in: Circle())
-                                    .overlay(Circle().strokeBorder(STRQPalette.success.opacity(0.20), lineWidth: 1))
-
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(L10n.tr("Set logged"))
-                                        .font(.system(size: 10, weight: .black))
-                                        .tracking(0.8)
-                                        .foregroundStyle(.white.opacity(0.48))
-                                        .textCase(.uppercase)
-                                    Text(exerciseName)
-                                        .font(.system(size: 13, weight: .heavy, design: .rounded))
-                                        .foregroundStyle(.white.opacity(0.84))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.78)
-                                }
-                                .layoutPriority(1)
-
-                                VStack(alignment: .trailing, spacing: 2) {
-                                    Text(L10n.format("Set %d · %@ × %d", loggedSet.setNumber, formatWeight(loggedSet.weight, increment: 0.5), loggedSet.reps))
-                                        .font(.system(size: 14, weight: .black, design: .rounded).monospacedDigit())
-                                        .foregroundStyle(.white.opacity(0.74))
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.72)
-                                    if e1rm > 0 {
-                                        Text(L10n.format("e1RM %.0f", e1rm))
-                                            .font(.system(size: 10, weight: .bold).monospacedDigit())
-                                            .foregroundStyle(.white.opacity(0.40))
-                                    }
-                                }
-                            }
-
-                            restQualityPicker(
-                                currentQuality: currentQuality,
-                                exerciseIndex: last.exerciseIndex,
-                                setIndex: last.setIndex
-                            )
-                        }
-                        .padding(10)
-                        .background(Color.white.opacity(0.040), in: .rect(cornerRadius: 15, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15, style: .continuous)
-                                .strokeBorder(Color.white.opacity(0.065), lineWidth: 1)
+                        restLoggedSetSummary(
+                            workout: workout,
+                            exerciseIndex: last.exerciseIndex,
+                            setIndex: last.setIndex
                         )
                     }
 
-                    restTimerCircle(progress: progress)
-
-                    if let nextRec = nextSetRecommendation(workout) {
-                        restNextActionCard(nextRec)
-                    }
-
                     restControls()
+
+                    if let undoPrompt, vm.canUndoLastCompletedSet {
+                        restUndoStrip(prompt: undoPrompt)
+                    }
                 }
-                .padding(12)
+                .padding(14)
                 .frame(maxWidth: 372)
                 .background(
-                    Color(white: 0.055).opacity(0.96),
-                    in: .rect(cornerRadius: 22, style: .continuous)
+                    Color(white: 0.040).opacity(0.98),
+                    in: .rect(cornerRadius: 24, style: .continuous)
                 )
                 .overlay(
                     LinearGradient(
-                        colors: [Color.white.opacity(0.070), Color.white.opacity(0.012)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+                        colors: [
+                            Color.white.opacity(0.080),
+                            Color.white.opacity(0.018),
+                            Color.black.opacity(0.10)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
                     )
-                    .clipShape(.rect(cornerRadius: 22, style: .continuous))
+                    .clipShape(.rect(cornerRadius: 24, style: .continuous))
                     .allowsHitTesting(false)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 22, style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.105), lineWidth: 1)
                 )
-                .shadow(color: .black.opacity(0.34), radius: 22, y: 12)
-                .padding(.horizontal, 20)
+                .shadow(color: .black.opacity(0.46), radius: 30, y: 18)
+                .padding(.horizontal, 18)
 
                 Color.clear
-                    .frame(height: 108)
+                    .frame(height: 72)
             }
         }
     }
@@ -1904,6 +1856,68 @@ struct ActiveWorkoutView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.045), lineWidth: 1)
+        )
+    }
+
+    private func restLoggedSetSummary(
+        workout: ActiveWorkoutState,
+        exerciseIndex: Int,
+        setIndex: Int
+    ) -> some View {
+        let log = workout.session.exerciseLogs[exerciseIndex]
+        let loggedSet = log.sets[setIndex]
+        let exerciseName = vm.library.exercise(byId: log.exerciseId)?.name ?? "Exercise"
+        let e1rm = estimatedOneRM(weight: loggedSet.weight, reps: loggedSet.reps)
+        let currentQuality = loggedSet.quality
+
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(STRQPalette.success.opacity(0.76))
+                    .frame(width: 26, height: 26)
+                    .background(STRQPalette.success.opacity(0.09), in: Circle())
+                    .overlay(Circle().strokeBorder(STRQPalette.success.opacity(0.18), lineWidth: 1))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.tr("Set logged"))
+                        .font(.system(size: 9, weight: .black))
+                        .tracking(0.8)
+                        .foregroundStyle(.white.opacity(0.42))
+                        .textCase(.uppercase)
+                    Text(exerciseName)
+                        .font(.system(size: 12, weight: .heavy, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.78))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
+                }
+                .layoutPriority(1)
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(L10n.format("Set %d · %@ × %d", loggedSet.setNumber, formatWeight(loggedSet.weight, increment: 0.5), loggedSet.reps))
+                        .font(.system(size: 13, weight: .black, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white.opacity(0.70))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                    if e1rm > 0 {
+                        Text(L10n.format("e1RM %.0f", e1rm))
+                            .font(.system(size: 10, weight: .bold).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.34))
+                    }
+                }
+            }
+
+            restQualityPicker(
+                currentQuality: currentQuality,
+                exerciseIndex: exerciseIndex,
+                setIndex: setIndex
+            )
+        }
+        .padding(10)
+        .background(Color.white.opacity(0.032), in: .rect(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.060), lineWidth: 1)
         )
     }
 
@@ -1964,60 +1978,50 @@ struct ActiveWorkoutView: View {
         .buttonStyle(.strqPressable)
     }
 
-    private func restTimerCircle(progress: CGFloat) -> some View {
+    private func restFocusTimer(progress: CGFloat, rationale: String) -> some View {
         let isAlmostDone = restTimeRemaining <= 10
         let progressColor = isAlmostDone ? STRQPalette.warning : STRQBrand.steel
         let timerAnimation: Animation = reduceMotion ? .easeOut(duration: 0.12) : .linear(duration: 1)
         let clampedProgress = min(max(progress, 0), 1)
 
-        return HStack(spacing: 13) {
-            ZStack {
-                Circle()
-                    .stroke(Color.white.opacity(0.08), lineWidth: 5)
-                    .frame(width: 76, height: 76)
-
-                Circle()
-                    .trim(from: 0, to: clampedProgress)
-                    .stroke(
-                        progressColor,
-                        style: StrokeStyle(lineWidth: 5, lineCap: .round)
-                    )
-                    .frame(width: 76, height: 76)
-                    .rotationEffect(.degrees(-90))
-                    .animation(timerAnimation, value: restTimeRemaining)
-
-                Image(systemName: "clock.fill")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(progressColor.opacity(0.82))
-            }
-
-            VStack(alignment: .leading, spacing: 3) {
+        return VStack(spacing: 13) {
+            VStack(spacing: 5) {
                 Text(L10n.tr("REST"))
                     .font(.system(size: 9, weight: .black))
-                    .tracking(1.5)
-                    .foregroundStyle(.white.opacity(0.50))
+                    .tracking(1.6)
+                    .foregroundStyle(.white.opacity(0.46))
                 Text(formatTime(restTimeRemaining))
-                    .font(.system(size: 34, weight: .black, design: .rounded).monospacedDigit())
+                    .font(.system(size: 64, weight: .black, design: .rounded).monospacedDigit())
                     .foregroundStyle(progressColor)
                     .contentTransition(.numericText(countsDown: true))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.78)
-                Text(restCountdownHint())
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.60))
+                    .minimumScaleFactor(0.58)
+                    .shadow(color: progressColor.opacity(0.18), radius: 16, y: 6)
+                Text(rationale)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.64))
                     .lineLimit(2)
+                    .minimumScaleFactor(0.82)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
             }
-            .layoutPriority(1)
 
-            Spacer(minLength: 0)
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.080))
+                    Capsule()
+                        .fill(progressColor.opacity(0.82))
+                        .frame(width: proxy.size.width * clampedProgress)
+                        .animation(timerAnimation, value: restTimeRemaining)
+                }
+            }
+            .frame(height: 5)
         }
         .frame(maxWidth: .infinity)
-        .padding(11)
-        .background(Color.white.opacity(0.070), in: .rect(cornerRadius: 17, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 17, style: .continuous)
-                .strokeBorder(progressColor.opacity(0.18), lineWidth: 1)
-        )
+        .padding(.horizontal, 12)
+        .padding(.top, 8)
+        .padding(.bottom, 2)
     }
 
     private func restControls() -> some View {
@@ -2047,7 +2051,7 @@ struct ActiveWorkoutView: View {
                 .font(.system(size: 14, weight: .black))
                 .foregroundStyle(STRQPalette.backgroundDeep)
                 .frame(maxWidth: .infinity)
-                .frame(height: 42)
+                .frame(height: 44)
                 .background(
                     LinearGradient(
                         colors: [Color.white, Color(red: 0.92, green: 0.93, blue: 0.94)],
@@ -2068,7 +2072,7 @@ struct ActiveWorkoutView: View {
             Text(title)
                 .font(.system(size: 13, weight: .black, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white.opacity(0.76))
-                .frame(width: 50, height: 38)
+                .frame(width: 54, height: 40)
                 .background(Color.white.opacity(0.060), in: Capsule())
                 .overlay(
                     Capsule()
@@ -2091,9 +2095,9 @@ struct ActiveWorkoutView: View {
     private func restNextActionCard(_ nextRec: NextSetRec) -> some View {
         HStack(alignment: .center, spacing: 10) {
             Image(systemName: nextRec.icon)
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(nextRec.tint.opacity(0.92))
-                .frame(width: 30, height: 30)
+                .frame(width: 28, height: 28)
                 .background(nextRec.tint.opacity(0.10), in: .rect(cornerRadius: 10, style: .continuous))
 
             VStack(alignment: .leading, spacing: 3) {
@@ -2106,18 +2110,13 @@ struct ActiveWorkoutView: View {
                     .foregroundStyle(.white.opacity(0.82))
                     .lineLimit(2)
                     .minimumScaleFactor(0.78)
-                Text(nextRec.detail)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.50))
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
             }
 
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
-        .background(Color.white.opacity(0.036), in: .rect(cornerRadius: 15, style: .continuous))
+        .background(Color.white.opacity(0.040), in: .rect(cornerRadius: 15, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 15, style: .continuous)
                 .strokeBorder(nextRec.tint.opacity(0.11), lineWidth: 1)
