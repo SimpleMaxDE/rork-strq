@@ -1827,6 +1827,7 @@ struct ActiveWorkoutView: View {
         let progress = totalRest > 0 ? CGFloat(restTimeRemaining) / CGFloat(totalRest) : 0
         let nextRec = nextSetRecommendation(workout)
         let rationale = nextRec?.detail ?? restCountdownHint()
+        let overlayTint = STRQBrand.steel
 
         ZStack {
             Color.black.opacity(0.72)
@@ -1848,7 +1849,7 @@ struct ActiveWorkoutView: View {
                 Spacer(minLength: 58)
 
                 VStack(spacing: 12) {
-                    restFocusTimer(progress: progress, rationale: rationale)
+                    restFocusTimer(progress: progress, rationale: rationale, advisory: nextRec)
 
                     if let nextRec {
                         restNextActionCard(nextRec)
@@ -1873,7 +1874,15 @@ struct ActiveWorkoutView: View {
                 .padding(14)
                 .frame(maxWidth: 372)
                 .background(
-                    Color(white: 0.040).opacity(0.98),
+                    LinearGradient(
+                        colors: [
+                            overlayTint.opacity(0.070),
+                            Color(white: 0.040).opacity(0.98),
+                            Color(white: 0.028).opacity(0.98)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
                     in: .rect(cornerRadius: 24, style: .continuous)
                 )
                 .overlay(
@@ -1891,7 +1900,7 @@ struct ActiveWorkoutView: View {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.105), lineWidth: 1)
+                        .strokeBorder(overlayTint.opacity(0.16), lineWidth: 1)
                 )
                 .shadow(color: .black.opacity(0.46), radius: 30, y: 18)
                 .padding(.horizontal, 18)
@@ -1945,15 +1954,17 @@ struct ActiveWorkoutView: View {
         let exerciseName = vm.library.exercise(byId: log.exerciseId)?.name ?? "Exercise"
         let e1rm = estimatedOneRM(weight: loggedSet.weight, reps: loggedSet.reps)
         let currentQuality = loggedSet.quality
+        let summaryTint = currentQuality.map { qualityColor($0.colorName) } ?? STRQPalette.success
+        let summaryIcon = currentQuality?.icon ?? "checkmark.circle.fill"
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 10) {
-                Image(systemName: "checkmark.circle.fill")
+                Image(systemName: summaryIcon)
                     .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(STRQPalette.success.opacity(0.76))
+                    .foregroundStyle(summaryTint.opacity(0.82))
                     .frame(width: 26, height: 26)
-                    .background(STRQPalette.success.opacity(0.09), in: Circle())
-                    .overlay(Circle().strokeBorder(STRQPalette.success.opacity(0.18), lineWidth: 1))
+                    .background(summaryTint.opacity(0.11), in: Circle())
+                    .overlay(Circle().strokeBorder(summaryTint.opacity(0.24), lineWidth: 1))
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(L10n.tr("Set logged"))
@@ -1990,10 +2001,20 @@ struct ActiveWorkoutView: View {
             )
         }
         .padding(10)
-        .background(Color.white.opacity(0.032), in: .rect(cornerRadius: 16, style: .continuous))
+        .background(
+            LinearGradient(
+                colors: [
+                    summaryTint.opacity(currentQuality == nil ? 0.034 : 0.070),
+                    Color.white.opacity(0.026)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 16, style: .continuous)
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.060), lineWidth: 1)
+                .strokeBorder(summaryTint.opacity(currentQuality == nil ? 0.10 : 0.20), lineWidth: 1)
         )
     }
 
@@ -2026,9 +2047,10 @@ struct ActiveWorkoutView: View {
         exerciseIndex: Int,
         setIndex: Int
     ) -> some View {
-        let foreground = isSelected ? Color.black : Color.white.opacity(0.74)
-        let background = isSelected ? qualityColor(quality.colorName) : Color.white.opacity(0.060)
-        let borderOpacity = isSelected ? 0.0 : 0.08
+        let tint = qualityColor(quality.colorName)
+        let foreground = isSelected ? STRQPalette.backgroundDeep : Color.white.opacity(0.74)
+        let fillColors: [Color] = isSelected ? [tint.opacity(0.96), tint.opacity(0.72)] : [Color.white.opacity(0.065), Color.white.opacity(0.040)]
+        let borderColor = isSelected ? Color.white.opacity(0.22) : Color.white.opacity(0.08)
 
         return Button {
             let newQuality: SetQuality? = isSelected ? nil : quality
@@ -2045,18 +2067,30 @@ struct ActiveWorkoutView: View {
             .foregroundStyle(foreground)
             .frame(maxWidth: .infinity)
             .frame(minHeight: 36)
-            .background(background, in: .rect(cornerRadius: 11))
+            .background(
+                LinearGradient(
+                    colors: fillColors,
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: .rect(cornerRadius: 11)
+            )
             .overlay(
                 RoundedRectangle(cornerRadius: 11)
-                    .strokeBorder(Color.white.opacity(borderOpacity), lineWidth: 1)
+                    .strokeBorder(borderColor, lineWidth: 1)
             )
+            .shadow(color: isSelected ? tint.opacity(0.18) : Color.clear, radius: 9, y: 4)
         }
         .buttonStyle(.strqPressable)
     }
 
-    private func restFocusTimer(progress: CGFloat, rationale: String) -> some View {
+    private func restFocusTimer(progress: CGFloat, rationale: String, advisory: NextSetRec?) -> some View {
         let isAlmostDone = restTimeRemaining <= 10
-        let progressColor = isAlmostDone ? STRQPalette.warning : STRQBrand.steel
+        let restTint = isAlmostDone ? STRQPalette.warning : STRQBrand.steel
+        let timerTextColor = isAlmostDone ? STRQPalette.warning.opacity(0.88) : Color.white.opacity(0.88)
+        let timerGlowColor = isAlmostDone ? STRQPalette.warning.opacity(0.14) : Color.white.opacity(0.10)
+        let advisoryTint = advisory?.tint ?? STRQBrand.steel
+        let advisoryIcon = advisory?.icon ?? "figure.strengthtraining.traditional"
         let timerAnimation: Animation = reduceMotion ? .easeOut(duration: 0.12) : .linear(duration: 1)
         let clampedProgress = min(max(progress, 0), 1)
 
@@ -2068,18 +2102,33 @@ struct ActiveWorkoutView: View {
                     .foregroundStyle(.white.opacity(0.46))
                 Text(formatTime(restTimeRemaining))
                     .font(.system(size: 64, weight: .black, design: .rounded).monospacedDigit())
-                    .foregroundStyle(progressColor)
+                    .foregroundStyle(timerTextColor)
                     .contentTransition(.numericText(countsDown: true))
                     .lineLimit(1)
                     .minimumScaleFactor(0.58)
-                    .shadow(color: progressColor.opacity(0.18), radius: 16, y: 6)
-                Text(rationale)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.64))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.82)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
+                    .shadow(color: timerGlowColor, radius: 16, y: 6)
+                HStack(alignment: .center, spacing: 7) {
+                    Image(systemName: advisoryIcon)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(advisoryTint.opacity(0.94))
+                        .frame(width: 18, height: 18)
+                        .background(advisoryTint.opacity(0.12), in: Circle())
+                    Text(rationale)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.72))
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.82)
+                        .multilineTextAlignment(.leading)
+                        .layoutPriority(1)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .background(advisoryTint.opacity(0.070), in: .rect(cornerRadius: 13, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 13, style: .continuous)
+                        .strokeBorder(advisoryTint.opacity(0.16), lineWidth: 1)
+                )
             }
 
             GeometryReader { proxy in
@@ -2087,7 +2136,7 @@ struct ActiveWorkoutView: View {
                     Capsule()
                         .fill(Color.white.opacity(0.080))
                     Capsule()
-                        .fill(progressColor.opacity(0.82))
+                        .fill(restTint.opacity(0.82))
                         .frame(width: proxy.size.width * clampedProgress)
                         .animation(timerAnimation, value: restTimeRemaining)
                 }
@@ -2170,11 +2219,19 @@ struct ActiveWorkoutView: View {
 
     private func restNextActionCard(_ nextRec: NextSetRec) -> some View {
         HStack(alignment: .center, spacing: 10) {
+            Capsule()
+                .fill(nextRec.tint.opacity(0.58))
+                .frame(width: 3, height: 34)
+
             Image(systemName: nextRec.icon)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(nextRec.tint.opacity(0.92))
                 .frame(width: 28, height: 28)
-                .background(nextRec.tint.opacity(0.10), in: .rect(cornerRadius: 10, style: .continuous))
+                .background(nextRec.tint.opacity(0.13), in: .rect(cornerRadius: 10, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .strokeBorder(nextRec.tint.opacity(0.18), lineWidth: 1)
+                )
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(nextRec.eyebrow)
@@ -2192,11 +2249,22 @@ struct ActiveWorkoutView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
-        .background(Color.white.opacity(0.040), in: .rect(cornerRadius: 15, style: .continuous))
+        .background(
+            LinearGradient(
+                colors: [
+                    nextRec.tint.opacity(0.110),
+                    Color.white.opacity(0.036)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 15, style: .continuous)
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 15, style: .continuous)
-                .strokeBorder(nextRec.tint.opacity(0.11), lineWidth: 1)
+                .strokeBorder(nextRec.tint.opacity(0.22), lineWidth: 1)
         )
+        .shadow(color: nextRec.tint.opacity(0.10), radius: 12, y: 6)
     }
 
     private struct NextSetRec {
@@ -2209,26 +2277,18 @@ struct ActiveWorkoutView: View {
     }
 
     private func nextSetRecommendation(_ workout: ActiveWorkoutState) -> NextSetRec? {
+        let sourceWorkout = vm.activeWorkout ?? workout
         guard let last = lastLoggedSet,
-              last.exerciseIndex < workout.session.exerciseLogs.count else { return nil }
-        let log = workout.session.exerciseLogs[last.exerciseIndex]
-        guard last.setIndex < log.sets.count else { return nil }
-        let justLogged = log.sets[last.setIndex]
-        let nextPending = log.sets.dropFirst(last.setIndex + 1).first(where: { !$0.isCompleted })
+              last.exerciseIndex < sourceWorkout.session.exerciseLogs.count else { return nil }
+        let loggedLog = sourceWorkout.session.exerciseLogs[last.exerciseIndex]
+        guard last.setIndex < loggedLog.sets.count else { return nil }
+        let justLogged = loggedLog.sets[last.setIndex]
 
-        guard let next = nextPending else {
-            let nextIdx = last.exerciseIndex + 1
-            if nextIdx < workout.session.exerciseLogs.count {
-                let nextEx = vm.library.exercise(byId: workout.session.exerciseLogs[nextIdx].exerciseId)
-                return NextSetRec(
-                    eyebrow: L10n.tr("NEXT EXERCISE"),
-                    primary: nextEx?.name ?? L10n.tr("Next exercise"),
-                    detail: L10n.tr("This lift is done. Move on when the rest feels right."),
-                    icon: "arrow.right.circle.fill",
-                    tint: STRQBrand.steel,
-                    usesMonospacedPrimary: false
-                )
-            }
+        let activeExerciseIndex = sourceWorkout.currentExerciseIndex
+        guard activeExerciseIndex < sourceWorkout.session.exerciseLogs.count else { return nil }
+        let activeLog = sourceWorkout.session.exerciseLogs[activeExerciseIndex]
+
+        guard let next = activeSetFor(log: activeLog, workout: sourceWorkout) else {
             return NextSetRec(
                 eyebrow: L10n.tr("WORKOUT READY"),
                 primary: L10n.tr("Finish Workout"),
@@ -2239,71 +2299,81 @@ struct ActiveWorkoutView: View {
             )
         }
 
-        let planned = last.exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[last.exerciseIndex] : nil
+        let planned = last.exerciseIndex < sourceWorkout.plannedExercises.count ? sourceWorkout.plannedExercises[last.exerciseIndex] : nil
         let quality = justLogged.quality
-        var targetWeight = next.weight > 0 ? next.weight : justLogged.weight
-        let targetReps = next.reps > 0 ? next.reps : justLogged.reps
-        var guidance = "Repeat the last set cleanly."
+        var guidance = "Queued next set is ready. Adjust only if it feels right."
         var icon = "figure.strengthtraining.traditional"
         var tint: Color = STRQBrand.steel
 
-        let exercise = vm.library.exercise(byId: log.exerciseId)
+        let exercise = vm.library.exercise(byId: activeLog.exerciseId)
         let increment = weightIncrement(for: exercise)
+        let isSameExercise = activeExerciseIndex == last.exerciseIndex
 
-        if let q = quality {
-            switch q {
-            case .tooEasy:
-                targetWeight = roundTo(targetWeight + max(increment, 2.5), step: increment)
-                guidance = "Felt easy. Add a small bump and keep the reps clean."
-                icon = "arrow.up.right.circle.fill"
-                tint = STRQPalette.success
-            case .onTarget:
-                guidance = "Stay here. Same load, same standard."
-                icon = "checkmark.circle.fill"
-                tint = STRQBrand.steel
-            case .grinder:
-                guidance = "Hold the load. Match the reps if they're still clean."
-                icon = "minus.circle.fill"
-                tint = STRQPalette.warning
-            case .formBreakdown:
-                targetWeight = roundTo(max(0, targetWeight - max(increment, 2.5)), step: increment)
-                guidance = "Drop the load slightly and keep the pattern smooth."
-                icon = "arrow.down.right.circle.fill"
-                tint = STRQPalette.warning
-            case .pain:
-                guidance = "Pain noted. Swap or stop this movement if it doesn't settle."
-                icon = "exclamationmark.triangle.fill"
-                tint = STRQPalette.danger
-            }
+        if !isSameExercise {
+            guidance = "Next exercise is queued. Start when the rest feels right."
+            icon = "arrow.right.circle.fill"
+            tint = STRQBrand.steel
+        } else if let q = quality {
+            let advisory = restAdvisory(for: q)
+            guidance = advisory.guidance
+            icon = advisory.icon
+            tint = advisory.tint
         } else if let p = planned, let plannedTopReps = parsePlannedReps(p.reps), justLogged.reps >= plannedTopReps {
-            targetWeight = roundTo(targetWeight + increment, step: increment)
-            guidance = "Top of the range hit. Nudge the load up."
+            guidance = "Top of the range hit. Consider a small bump if it still feels clean."
             icon = "arrow.up.right.circle.fill"
             tint = STRQPalette.success
         }
 
-        let primary: String
-        if targetWeight <= 0 && (exercise?.isBodyweight ?? false) {
-            primary = "Set \(next.setNumber) · BW × \(targetReps)"
+        let queuedPrimary: String
+        if next.weight <= 0 && (exercise?.isBodyweight ?? false) {
+            queuedPrimary = "Set \(next.setNumber) · BW × \(next.reps)"
         } else {
-            primary = "Set \(next.setNumber) · \(formatWeight(targetWeight, increment: increment)) × \(targetReps)"
-        }
-
-        if next.weight != targetWeight || next.reps != targetReps {
-            let setIndex = last.setIndex + 1 + (log.sets.dropFirst(last.setIndex + 1).firstIndex(where: { !$0.isCompleted }) ?? 0)
-            if setIndex < log.sets.count {
-                vm.updateSetLoad(exerciseIndex: last.exerciseIndex, setIndex: setIndex, weight: targetWeight, reps: targetReps)
-            }
+            queuedPrimary = "Set \(next.setNumber) · \(formatWeight(next.weight, increment: increment)) × \(next.reps)"
         }
 
         return NextSetRec(
             eyebrow: L10n.tr("NEXT SET"),
-            primary: primary,
+            primary: queuedPrimary,
             detail: guidance,
             icon: icon,
             tint: tint,
             usesMonospacedPrimary: true
         )
+    }
+
+    private func restAdvisory(for quality: SetQuality) -> (guidance: String, icon: String, tint: Color) {
+        switch quality {
+        case .tooEasy:
+            return (
+                "Felt easy. Consider a small bump if the next set still feels clean.",
+                "arrow.up.right.circle.fill",
+                STRQPalette.info
+            )
+        case .onTarget:
+            return (
+                "Keep the next set controlled with the same standard.",
+                "checkmark.circle.fill",
+                STRQPalette.success
+            )
+        case .grinder:
+            return (
+                "Hold the load. Match clean reps before pushing.",
+                "flame.fill",
+                STRQPalette.warning
+            )
+        case .formBreakdown:
+            return (
+                "Technique flagged. Keep the next set cleaner before adding load.",
+                "exclamationmark.triangle.fill",
+                STRQPalette.warning
+            )
+        case .pain:
+            return (
+                "Pain noted. Swap or stop this movement if it does not settle.",
+                "cross.case.fill",
+                STRQPalette.danger
+            )
+        }
     }
 
     // MARK: - Exercise List Sheet
