@@ -29,6 +29,31 @@ struct ActiveWorkoutView: View {
     private var workout: ActiveWorkoutState? { vm.activeWorkout }
     private var completedSession: WorkoutSession? { vm.completedWorkoutHandoff }
 
+    private var activeWorkoutPanelFill: LinearGradient {
+        LinearGradient(
+            colors: [
+                activeWorkoutSignal.opacity(0.07),
+                STRQPalette.surfaceStrong.opacity(0.92),
+                STRQPalette.surfaceRaised.opacity(0.88),
+                STRQPalette.backgroundCarbon.opacity(0.96)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    private var activeWorkoutSignal: Color {
+        Color(red: 0.48, green: 0.74, blue: 0.68)
+    }
+
+    private var activeWorkoutControlFill: Color {
+        Color.white.opacity(0.055)
+    }
+
+    private var activeWorkoutControlStroke: Color {
+        Color.white.opacity(0.105)
+    }
+
     var body: some View {
         if let completedSession {
             WorkoutCompletionView(vm: vm, session: completedSession, onDismiss: onCompletionDismiss)
@@ -203,43 +228,45 @@ struct ActiveWorkoutView: View {
         return HStack(alignment: .center, spacing: 10) {
             Button { showExitDialog = true } label: {
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.78))
-                    .frame(width: 36, height: 36)
-                    .background(Color.white.opacity(0.055), in: Circle())
-                    .overlay(Circle().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
+                    .font(.system(size: 13, weight: .heavy))
+                    .foregroundStyle(STRQPalette.textSecondary)
+                    .frame(width: 38, height: 38)
+                    .background(activeWorkoutControlFill, in: Circle())
+                    .overlay(Circle().strokeBorder(activeWorkoutControlStroke, lineWidth: 1))
             }
             .buttonStyle(.strqPressable)
             .accessibilityLabel(L10n.tr("Workout options"))
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(workout.session.dayName.uppercased())
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.25)
-                    .foregroundStyle(STRQPalette.textMuted)
+                    .foregroundStyle(STRQPalette.textMuted.opacity(0.95))
                     .lineLimit(1)
                     .minimumScaleFactor(0.78)
                 Text(formatTime(elapsedSeconds))
-                    .font(.system(size: 22, weight: .heavy, design: .rounded).monospacedDigit())
+                    .font(.system(size: 24, weight: .black, design: .rounded).monospacedDigit())
                     .foregroundStyle(STRQPalette.textPrimary)
                     .contentTransition(.numericText())
             }
-            .layoutPriority(0)
+            .layoutPriority(1)
 
             Spacer(minLength: 8)
 
             Button { showExerciseList = true } label: {
-                HStack(spacing: 0) {
+                HStack(spacing: 6) {
                     Text(L10n.format("EX %d/%d", currentExercise, total))
-                        .font(.system(size: 12, weight: .heavy, design: .rounded).monospacedDigit())
+                        .font(.system(size: 12, weight: .black, design: .rounded).monospacedDigit())
                         .lineLimit(1)
                         .minimumScaleFactor(0.76)
+                    Image(systemName: "list.bullet")
+                        .font(.system(size: 10, weight: .heavy))
                 }
-                .foregroundStyle(.white.opacity(0.78))
-                .padding(.horizontal, 9)
-                .frame(height: 34)
+                .foregroundStyle(activeWorkoutSignal.opacity(0.82))
+                .padding(.horizontal, 10)
+                .frame(height: 36)
                 .background(Color.white.opacity(0.055), in: Capsule())
-                .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
+                .overlay(Capsule().strokeBorder(activeWorkoutSignal.opacity(0.12), lineWidth: 1))
             }
             .buttonStyle(.strqPressable)
             .accessibilityLabel(L10n.format("%@ %d/%d", L10n.tr("Exercise"), currentExercise, total))
@@ -251,17 +278,17 @@ struct ActiveWorkoutView: View {
             } label: {
                 HStack(spacing: 5) {
                     Image(systemName: "flag.checkered")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: 10, weight: .bold))
                     Text(L10n.tr("Finish Workout"))
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.system(size: 11, weight: .bold))
                         .lineLimit(1)
                         .minimumScaleFactor(0.72)
                 }
-                .foregroundStyle(STRQPalette.energyAccent)
-                .padding(.horizontal, 10)
-                .frame(height: 34)
-                .background(STRQPalette.energyAccent.opacity(0.10), in: Capsule())
-                .overlay(Capsule().strokeBorder(STRQPalette.energyAccent.opacity(0.24), lineWidth: 1))
+                .foregroundStyle(STRQPalette.textMuted)
+                .padding(.horizontal, 9)
+                .frame(height: 32)
+                .background(Color.white.opacity(0.028), in: Capsule())
+                .overlay(Capsule().strokeBorder(Color.white.opacity(0.065), lineWidth: 1))
             }
             .buttonStyle(.strqPressable)
             .accessibilityLabel(L10n.tr("Finish workout"))
@@ -269,10 +296,10 @@ struct ActiveWorkoutView: View {
         }
         .padding(.horizontal, 14)
         .padding(.top, 28)
-        .padding(.bottom, 10)
+        .padding(.bottom, 9)
         .background {
             LinearGradient(
-                colors: [STRQPalette.surfaceRaised.opacity(0.92), STRQPalette.backgroundCarbon.opacity(0.78)],
+                colors: [STRQPalette.surfaceBase.opacity(0.96), activeWorkoutSignal.opacity(0.025), STRQPalette.backgroundCarbon.opacity(0.93)],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -293,16 +320,22 @@ struct ActiveWorkoutView: View {
         return GeometryReader { geo in
             ZStack(alignment: .leading) {
                 Capsule().fill(Color.white.opacity(0.06))
-                Capsule().fill(STRQBrand.steelGradient)
+                Capsule().fill(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.72), STRQBrand.steel.opacity(0.58)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
                     .frame(width: geo.size.width * progress)
                     .animation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.4), value: progress)
             }
         }
         .frame(height: 4)
         .padding(.horizontal, 14)
-        .padding(.top, 8)
-        .padding(.bottom, 10)
-        .background(STRQPalette.backgroundCarbon.opacity(0.78))
+        .padding(.top, 0)
+        .padding(.bottom, 9)
+        .background(STRQPalette.backgroundCarbon.opacity(0.92))
     }
 
     // MARK: - Current Task Block (fused hero + meta + context)
@@ -323,14 +356,14 @@ struct ActiveWorkoutView: View {
                 let gradientColors = mediaProvider.heroGradient(for: ex)
 
                 VStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 11) {
                         HStack(spacing: 8) {
                             Text(L10n.format("EX %d/%d", exerciseIndex + 1, workout.session.exerciseLogs.count))
                                 .font(.system(size: 9, weight: .black).monospacedDigit())
-                                .foregroundStyle(STRQPalette.textMuted)
+                                .foregroundStyle(activeWorkoutSignal.opacity(0.68))
                                 .tracking(0.8)
                             Text("·")
-                                .foregroundStyle(.white.opacity(0.22))
+                                .foregroundStyle(.white.opacity(0.18))
                             Text(ex.primaryMuscle.displayName.uppercased())
                                 .font(.system(size: 9, weight: .black))
                                 .foregroundStyle(STRQPalette.textMuted)
@@ -341,11 +374,11 @@ struct ActiveWorkoutView: View {
                             Text(L10n.format("SET %d/%d", activeSetNumber, log.sets.count))
                                 .font(.system(size: 10, weight: .heavy).monospacedDigit())
                                 .tracking(0.7)
-                                .foregroundStyle(.white.opacity(0.9))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.white.opacity(0.07), in: Capsule())
-                                .overlay(Capsule().strokeBorder(Color.white.opacity(0.09), lineWidth: 1))
+                                .foregroundStyle(STRQPalette.textPrimary.opacity(0.92))
+                                .padding(.horizontal, 9)
+                                .frame(height: 27)
+                                .background(Color.white.opacity(0.055), in: Capsule())
+                                .overlay(Capsule().strokeBorder(Color.white.opacity(0.105), lineWidth: 1))
                         }
 
                         HStack(spacing: 12) {
@@ -359,36 +392,34 @@ struct ActiveWorkoutView: View {
                                         )
                                     )
                                 ExerciseThumbnail(exercise: ex, size: .small, cornerRadius: 10)
-                                    .frame(width: 46, height: 46)
+                                    .frame(width: 48, height: 48)
                             }
-                            .frame(width: 52, height: 52)
+                            .frame(width: 56, height: 56)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 13, style: .continuous)
-                                    .strokeBorder(Color.white.opacity(0.13), lineWidth: 1)
+                                    .strokeBorder(Color.white.opacity(0.16), lineWidth: 1)
                             )
+                            .overlay(alignment: .bottom) {
+                                Capsule()
+                                    .fill(activeWorkoutSignal.opacity(0.52))
+                                    .frame(width: 28, height: 3)
+                                    .padding(.bottom, 5)
+                            }
 
-                            VStack(alignment: .leading, spacing: 5) {
+                            VStack(alignment: .leading, spacing: 6) {
                                 Text(ex.name)
-                                    .font(.system(size: 18, weight: .heavy, design: .rounded))
+                                    .font(.system(size: 21, weight: .black, design: .rounded))
                                     .foregroundStyle(STRQPalette.textPrimary)
-                                    .lineLimit(1)
+                                    .lineLimit(2)
                                     .minimumScaleFactor(0.68)
 
                                 HStack(spacing: 6) {
                                     if let p = planned {
-                                        Text(L10n.format("Target %@", p.reps))
-                                            .font(.system(size: 10, weight: .bold).monospacedDigit())
-                                            .foregroundStyle(.white.opacity(0.72))
+                                        exerciseMetricPill(L10n.format("Target %@", p.reps))
                                         if let rpe = p.rpe {
-                                            Text("·").foregroundStyle(.white.opacity(0.24))
-                                            Text(L10n.format("RPE %@", formatRPE(rpe)))
-                                                .font(.system(size: 10, weight: .bold).monospacedDigit())
-                                                .foregroundStyle(.white.opacity(0.58))
+                                            exerciseMetricPill(L10n.format("RPE %@", formatRPE(rpe)))
                                         }
-                                        Text("·").foregroundStyle(.white.opacity(0.24))
-                                        Text(L10n.format("%ds rest", p.restSeconds))
-                                            .font(.system(size: 10, weight: .semibold).monospacedDigit())
-                                            .foregroundStyle(.white.opacity(0.48))
+                                        exerciseMetricPill(L10n.format("%ds rest", p.restSeconds))
                                     }
                                 }
                                 .lineLimit(1)
@@ -399,29 +430,35 @@ struct ActiveWorkoutView: View {
                             Spacer(minLength: 0)
                         }
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 13)
+                    .padding(.horizontal, 13)
+                    .padding(.vertical, 12)
                     .background(
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .fill(STRQPalette.surfaceRaised)
+                            .fill(activeWorkoutPanelFill)
                             .overlay(
                                 LinearGradient(
-                                    colors: [Color.white.opacity(0.085), Color.white.opacity(0.018)],
+                                    colors: [Color.white.opacity(0.075), Color.white.opacity(0.012)],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
                                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                             )
                     )
+                    .overlay(alignment: .leading) {
+                        Capsule()
+                            .fill(activeWorkoutSignal.opacity(0.34))
+                            .frame(width: 2)
+                            .padding(.vertical, 18)
+                            .padding(.leading, 1)
+                    }
                     .overlay(
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                            .strokeBorder(Color.white.opacity(0.13), lineWidth: 1)
                     )
-                    .shadow(color: .black.opacity(0.24), radius: 16, y: 10)
+                    .shadow(color: .black.opacity(0.18), radius: 12, y: 8)
 
-                    // Context strip: PREV · BEST · TARGET
                     workoutDetailsDisclosure(log: log, planned: planned, guidance: guidance)
-                        .padding(.top, 8)
+                        .padding(.top, 7)
 
                 }
                 .opacity(appeared ? 1 : 0)
@@ -431,6 +468,18 @@ struct ActiveWorkoutView: View {
                 .transition(reduceMotion ? .opacity : .opacity.combined(with: .move(edge: .top)))
             }
         }
+    }
+
+    private func exerciseMetricPill(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 10, weight: .bold).monospacedDigit())
+            .foregroundStyle(STRQPalette.textPrimary.opacity(0.76))
+            .lineLimit(1)
+            .minimumScaleFactor(0.72)
+            .padding(.horizontal, 8)
+            .frame(height: 24)
+            .background(Color.white.opacity(0.045), in: Capsule())
+            .overlay(Capsule().strokeBorder(Color.white.opacity(0.075), lineWidth: 1))
     }
 
     private func workoutDetailsDisclosure(
@@ -446,20 +495,20 @@ struct ActiveWorkoutView: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "info.circle")
-                        .font(.system(size: 10, weight: .semibold))
+                        .font(.system(size: 10, weight: .bold))
                     Text(L10n.tr("common.details", fallback: "Details"))
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 11, weight: .bold))
                     Spacer(minLength: 0)
                     Image(systemName: showWorkoutDetails ? "chevron.up" : "chevron.down")
                         .font(.system(size: 9, weight: .bold))
                 }
-                .foregroundStyle(.white.opacity(0.56))
+                .foregroundStyle(STRQPalette.textMuted)
                 .padding(.horizontal, 12)
-                .frame(minHeight: 40)
-                .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 12))
+                .frame(minHeight: 34)
+                .background(Color.white.opacity(0.025), in: .rect(cornerRadius: 11))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+                        .strokeBorder(Color.white.opacity(0.055), lineWidth: 1)
                 )
             }
             .buttonStyle(.strqPressable)
@@ -474,7 +523,7 @@ struct ActiveWorkoutView: View {
                             .foregroundStyle(guidanceColor(g.color))
                         Text(g.action)
                             .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(.white.opacity(0.82))
+                            .foregroundStyle(STRQPalette.textPrimary.opacity(0.84))
                             .lineLimit(1)
                             .minimumScaleFactor(0.85)
                         Spacer(minLength: 0)
@@ -482,10 +531,10 @@ struct ActiveWorkoutView: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(guidanceColor(g.color).opacity(0.10), in: .rect(cornerRadius: 9))
+                    .background(guidanceColor(g.color).opacity(0.085), in: .rect(cornerRadius: 9))
                     .overlay(
                         RoundedRectangle(cornerRadius: 9)
-                            .strokeBorder(guidanceColor(g.color).opacity(0.22), lineWidth: 1)
+                            .strokeBorder(guidanceColor(g.color).opacity(0.18), lineWidth: 1)
                     )
                 }
             }
@@ -517,11 +566,11 @@ struct ActiveWorkoutView: View {
                 secondary: planned.map { "× \($0.reps)" } ?? "—"
             )
         }
-        .padding(.vertical, 8)
-        .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 10))
+        .padding(.vertical, 7)
+        .background(Color.white.opacity(0.026), in: .rect(cornerRadius: 10))
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(Color.white.opacity(0.05), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.055), lineWidth: 1)
         )
     }
 
@@ -530,15 +579,15 @@ struct ActiveWorkoutView: View {
             Text(label)
                 .font(.system(size: 8, weight: .black))
                 .tracking(1.2)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(STRQPalette.textMuted.opacity(0.86))
             Text(primary)
                 .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
-                .foregroundStyle(.white.opacity(0.92))
+                .foregroundStyle(STRQPalette.textPrimary.opacity(0.92))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             Text(secondary)
                 .font(.system(size: 9, weight: .semibold).monospacedDigit())
-                .foregroundStyle(.white.opacity(0.42))
+                .foregroundStyle(STRQPalette.textMuted.opacity(0.82))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
@@ -547,7 +596,7 @@ struct ActiveWorkoutView: View {
 
     private func contextDivider() -> some View {
         Rectangle()
-            .fill(Color.white.opacity(0.06))
+            .fill(Color.white.opacity(0.052))
             .frame(width: 1, height: 30)
     }
 
@@ -570,7 +619,7 @@ struct ActiveWorkoutView: View {
                 let isBodyweight = exerciseForIncrement?.category == .bodyweight || (exerciseForIncrement?.isBodyweight ?? false)
                 let canLogSet = setLog.reps > 0
 
-                VStack(spacing: 12) {
+                VStack(spacing: 10) {
                     activeTaskHeader(
                         exercise: exerciseForIncrement,
                         currentSet: setLog,
@@ -589,7 +638,7 @@ struct ActiveWorkoutView: View {
                         targetReps: parsePlannedReps(planned?.reps)
                     )
 
-                    HStack(spacing: 10) {
+                    HStack(spacing: 9) {
                         inputColumn(
                             label: isBodyweight ? L10n.tr("ADDED LOAD") : L10n.tr("WEIGHT"),
                             value: isBodyweight && setLog.weight <= 0 ? L10n.tr("BW") : formatWeight(setLog.weight, increment: increment),
@@ -658,31 +707,31 @@ struct ActiveWorkoutView: View {
                         HStack(spacing: 8) {
                             Image(systemName: canLogSet ? "checkmark.circle.fill" : "checkmark.circle")
                                 .font(.system(size: 15, weight: .bold))
-                                .foregroundStyle(canLogSet ? STRQPalette.success : Color.white.opacity(0.28))
+                                .foregroundStyle(canLogSet ? activeWorkoutSignal.opacity(0.68) : Color.white.opacity(0.28))
                             Text(L10n.format("Log Set %d", setLog.setNumber))
                                 .font(.system(size: 16, weight: .heavy, design: .rounded))
-                                .foregroundStyle(canLogSet ? Color.black.opacity(0.92) : Color.white.opacity(0.38))
+                                .foregroundStyle(canLogSet ? STRQPalette.backgroundDeep.opacity(0.94) : Color.white.opacity(0.38))
                         }
                         .frame(maxWidth: .infinity)
-                        .frame(height: 50)
+                        .frame(height: 52)
                         .background(
                             canLogSet
                                 ? AnyShapeStyle(
                                     LinearGradient(
-                                        colors: [Color.white, Color.white.opacity(0.82)],
-                                        startPoint: .top,
-                                        endPoint: .bottom
+                                        colors: [Color.white, Color(red: 0.88, green: 0.89, blue: 0.91)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
                                     )
                                 )
-                                : AnyShapeStyle(Color.white.opacity(0.06)),
-                            in: .rect(cornerRadius: 14)
+                                : AnyShapeStyle(Color.white.opacity(0.045)),
+                            in: .rect(cornerRadius: 15)
                         )
                         .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .strokeBorder(Color.white.opacity(canLogSet ? 0.32 : 0.08), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: 15)
+                                .strokeBorder(Color.white.opacity(canLogSet ? 0.34 : 0.07), lineWidth: 1)
                         )
-                        .shadow(color: .white.opacity(canLogSet ? 0.12 : 0), radius: 12, y: 3)
-                        .shadow(color: .black.opacity(canLogSet ? 0.22 : 0), radius: 14, y: 8)
+                        .shadow(color: .white.opacity(canLogSet ? 0.07 : 0), radius: 10, y: 3)
+                        .shadow(color: .black.opacity(canLogSet ? 0.20 : 0), radius: 12, y: 7)
                     }
                     .buttonStyle(.strqPressable)
                     .disabled(!canLogSet)
@@ -696,25 +745,43 @@ struct ActiveWorkoutView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 14)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 12)
                 .background(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(STRQPalette.surfaceRaised)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    activeWorkoutSignal.opacity(0.055),
+                                    STRQPalette.surfaceRaised.opacity(0.90),
+                                    STRQPalette.surfaceBase.opacity(0.96),
+                                    STRQPalette.backgroundCarbon.opacity(0.96)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
                         .overlay(
                             LinearGradient(
-                                colors: [Color.white.opacity(0.08), Color.white.opacity(0.015)],
+                                colors: [Color.white.opacity(0.060), Color.white.opacity(0.010)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                         )
                 )
+                .overlay(alignment: .leading) {
+                    Capsule()
+                        .fill(activeWorkoutSignal.opacity(0.36))
+                        .frame(width: 2)
+                        .padding(.vertical, 18)
+                        .padding(.leading, 1)
+                }
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                        .strokeBorder(Color.white.opacity(0.105), lineWidth: 1)
                 )
-                .shadow(color: .black.opacity(0.28), radius: 18, y: 12)
+                .shadow(color: .black.opacity(0.18), radius: 12, y: 8)
                 .id(setLog.id)
                 .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.98)))
                 .animation(reduceMotion ? .easeOut(duration: 0.12) : .spring(response: 0.32, dampingFraction: 0.84), value: setLog.id)
@@ -759,7 +826,7 @@ struct ActiveWorkoutView: View {
         }()
 
         if showLast || showTarget {
-            HStack(spacing: 6) {
+            HStack(spacing: 7) {
                 if showLast, let lw = lastWeight {
                     matchChip(
                         icon: "arrow.uturn.backward",
@@ -798,18 +865,19 @@ struct ActiveWorkoutView: View {
             HStack(spacing: 5) {
                 Image(systemName: icon)
                     .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(activeWorkoutSignal.opacity(0.68))
                 Text(label)
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.55))
+                    .font(.system(size: 10, weight: .heavy))
+                    .foregroundStyle(STRQPalette.textMuted)
                 Text(value)
                     .font(.system(size: 10, weight: .heavy, design: .rounded).monospacedDigit())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(STRQPalette.textPrimary)
             }
-            .foregroundStyle(.white.opacity(0.75))
-            .padding(.horizontal, 9)
-            .padding(.vertical, 5)
-            .background(Color.white.opacity(0.06), in: Capsule())
-            .overlay(Capsule().strokeBorder(Color.white.opacity(0.09), lineWidth: 1))
+            .foregroundStyle(STRQPalette.textSecondary)
+            .padding(.horizontal, 10)
+            .frame(height: 30)
+            .background(Color.white.opacity(0.050), in: Capsule())
+            .overlay(Capsule().strokeBorder(Color.white.opacity(0.085), lineWidth: 1))
         }
         .buttonStyle(.strqPressable)
     }
@@ -825,12 +893,12 @@ struct ActiveWorkoutView: View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(Color.white.opacity(0.07))
+                    .fill(Color.white.opacity(0.055))
 
                 Capsule()
                     .fill(
                         LinearGradient(
-                            colors: [Color.white.opacity(0.92), STRQBrand.steel.opacity(0.78)],
+                            colors: [Color.white.opacity(0.84), activeWorkoutSignal.opacity(0.44)],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -854,23 +922,28 @@ struct ActiveWorkoutView: View {
         plateMath: String?,
         valueAccessibilityIdentifier: String? = nil
     ) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 7) {
             Text(label)
                 .font(.system(size: 9, weight: .black))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.48))
+                .foregroundStyle(STRQPalette.textMuted)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            HStack(spacing: 0) {
+            HStack(spacing: 4) {
                 stepperButton(icon: "minus", disabled: disableMinus, onTap: { onMinus(nil) }, onLongStep: { onMinus(5) })
                 Button(action: onTapValue) {
                     Text(value)
                         .font(.system(size: 30, weight: .heavy, design: .rounded).monospacedDigit())
-                        .foregroundStyle(.white)
+                        .foregroundStyle(STRQPalette.textPrimary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 44)
+                        .frame(height: 48)
+                        .background(Color.white.opacity(0.038), in: .rect(cornerRadius: 12, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .strokeBorder(Color.white.opacity(0.070), lineWidth: 1)
+                        )
                         .contentTransition(.numericText())
                         .contentShape(.rect)
                 }
@@ -881,18 +954,18 @@ struct ActiveWorkoutView: View {
 
             Text(plateMath ?? unit)
                 .font(.system(size: 9, weight: plateMath != nil ? .semibold : .medium, design: plateMath != nil ? .monospaced : .default))
-                .foregroundStyle(.white.opacity(plateMath != nil ? 0.55 : 0.4))
+                .foregroundStyle(STRQPalette.textMuted.opacity(plateMath != nil ? 0.95 : 0.78))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(10)
+        .padding(9)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color.black.opacity(0.16))
+                .fill(STRQPalette.backgroundCarbon.opacity(0.62))
                 .overlay(
                     LinearGradient(
-                        colors: [Color.white.opacity(0.065), Color.white.opacity(0.018)],
+                        colors: [Color.white.opacity(0.052), Color.white.opacity(0.012)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -901,20 +974,23 @@ struct ActiveWorkoutView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.085), lineWidth: 1)
         )
     }
 
     private func stepperButton(icon: String, disabled: Bool, onTap: @escaping () -> Void, onLongStep: @escaping () -> Void) -> some View {
         Button(action: onTap) {
             Image(systemName: icon)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.white.opacity(disabled ? 0.24 : 0.68))
-                .frame(width: 44, height: 44)
-                .background(Color.white.opacity(disabled ? 0.025 : 0.055), in: .rect(cornerRadius: 11))
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(.white.opacity(disabled ? 0.22 : 0.78))
+                .frame(width: 46, height: 48)
+                .background(
+                    Color.white.opacity(disabled ? 0.022 : 0.070),
+                    in: .rect(cornerRadius: 12, style: .continuous)
+                )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 11)
-                        .strokeBorder(Color.white.opacity(disabled ? 0.035 : 0.085), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(Color.white.opacity(disabled ? 0.035 : 0.105), lineWidth: 1)
                 )
                 .contentShape(.rect)
         }
@@ -2377,19 +2453,19 @@ struct ActiveWorkoutView: View {
     }
 
     private func activeTaskHeader(exercise: Exercise?, currentSet: SetLog?, totalSets: Int) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
+        HStack(alignment: .center, spacing: 10) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(currentSet == nil ? L10n.tr("NEXT ACTION") : L10n.tr("CURRENT TASK"))
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.0)
-                    .foregroundStyle(.white.opacity(0.45))
+                    .foregroundStyle(activeWorkoutSignal.opacity(0.58))
                 Text(taskHeaderTitle(exercise: exercise, currentSet: currentSet, totalSets: totalSets))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .font(.system(size: 15, weight: .heavy, design: .rounded))
+                    .foregroundStyle(STRQPalette.textPrimary)
                     .lineLimit(2)
                 Text(taskHeaderDetail(currentSet: currentSet, totalSets: totalSets))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(STRQPalette.textSecondary)
                     .lineLimit(2)
             }
             .layoutPriority(1)
@@ -2401,13 +2477,13 @@ struct ActiveWorkoutView: View {
                     showExerciseInfo = exercise
                 } label: {
                     Image(systemName: "info.circle")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.82))
-                        .frame(width: 44, height: 44)
-                        .background(Color.white.opacity(0.06), in: Circle())
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(STRQPalette.textSecondary)
+                        .frame(width: 38, height: 38)
+                        .background(activeWorkoutControlFill, in: Circle())
                         .overlay(
                             Circle()
-                                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                                .strokeBorder(activeWorkoutControlStroke, lineWidth: 1)
                         )
                 }
                 .buttonStyle(.strqPressable)
