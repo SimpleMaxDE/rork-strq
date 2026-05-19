@@ -31,12 +31,24 @@ struct WorkoutCompletionView: View {
 
     private var highlights: [WorkoutHighlight] { result.highlights }
     private var verdict: SessionVerdict { result.verdict }
-    private var hasPR: Bool { verdict.kind == .personalRecord }
+    private var primaryHighlight: WorkoutHighlight? { highlights.first }
+    private var isPeakCompletion: Bool {
+        verdict.kind == .personalRecord || verdict.kind == .bestSet || isPeakHighlight(primaryHighlight)
+    }
+    private var hasPR: Bool {
+        isPeakCompletion
+    }
+    private var isLighterDay: Bool {
+        verdict.kind == .volumeDown || primaryHighlight?.kind == .volumeDown
+    }
 
     private var primaryAccent: Color {
+        if isPeakCompletion { return STRQPalette.gold }
+
         switch verdict.kind {
         case .personalRecord: return STRQPalette.gold
-        case .bestSet, .volumeUp: return STRQPalette.success
+        case .bestSet: return STRQPalette.gold
+        case .volumeUp: return STRQPalette.success
         case .firstSession: return STRQPalette.info
         case .consolidated: return STRQBrand.steel
         case .volumeDown: return STRQPalette.warning
@@ -58,8 +70,8 @@ struct WorkoutCompletionView: View {
         ZStack {
             backgroundLayer
 
-            if !reduceMotion {
-                SparkField(trigger: sparkTrigger, intensity: hasPR ? 1.0 : 0.55, accent: primaryAccent)
+            if hasPR && !reduceMotion {
+                SparkField(trigger: sparkTrigger, intensity: 0.48, accent: STRQPalette.gold)
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
             }
@@ -94,7 +106,7 @@ struct WorkoutCompletionView: View {
         ZStack {
             Color.black.ignoresSafeArea()
             RadialGradient(
-                colors: [primaryAccent.opacity(hasPR ? 0.20 : 0.12), Color.clear],
+                colors: [primaryAccent.opacity(hasPR ? 0.20 : 0.075), Color.clear],
                 center: .top,
                 startRadius: 10,
                 endRadius: 520
@@ -114,12 +126,12 @@ struct WorkoutCompletionView: View {
 
     private var heroSection: some View {
         VStack(spacing: 14) {
-            STRQPulseMark(size: 96, tint: primaryAccent, trigger: sparkTrigger) {
+            STRQPulseMark(size: hasPR ? 102 : 88, tint: primaryAccent, trigger: sparkTrigger) {
                 Image(systemName: verdictIcon)
-                    .font(.system(size: 36, weight: .semibold))
+                    .font(.system(size: hasPR ? 38 : 32, weight: .semibold))
                     .foregroundStyle(hasPR ? AnyShapeStyle(STRQPalette.goldGradient) : AnyShapeStyle(primaryAccent.gradient))
-                    .scaleEffect(trophyPulse ? 1.04 : 1.0)
-                    .animation(reduceMotion ? nil : .easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: trophyPulse)
+                    .scaleEffect(hasPR && trophyPulse ? 1.045 : 1.0)
+                    .animation(hasPR && !reduceMotion ? .easeInOut(duration: 1.6).repeatForever(autoreverses: true) : nil, value: trophyPulse)
             }
             .scaleEffect(appeared ? 1 : 0.7)
             .opacity(appeared ? 1 : 0)
@@ -153,13 +165,57 @@ struct WorkoutCompletionView: View {
 
     @ViewBuilder
     private var primaryAchievementBadge: some View {
-        if let highlight = highlights.first {
-            STRQCelebrationBadge(
-                title: highlight.title,
-                subtitle: highlight.subtitle,
-                icon: badgeIcon(for: highlight.kind),
-                variant: badgeVariant(for: highlight.kind)
+        if let highlight = primaryHighlight {
+            let tint = proofAccent(for: highlight.kind)
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: badgeIcon(for: highlight.kind))
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(tint)
+                    .frame(width: 42, height: 42)
+                    .background(tint.opacity(hasPR ? 0.20 : 0.13), in: .rect(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(tint.opacity(hasPR ? 0.34 : 0.18), lineWidth: 1)
+                    )
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(highlight.title.uppercased())
+                        .font(.system(size: 10, weight: .black))
+                        .tracking(1.0)
+                        .foregroundStyle(tint)
+                        .lineLimit(1)
+                    if let subtitle = highlight.subtitle, !subtitle.isEmpty {
+                        Text(subtitle)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.62))
+                            .lineLimit(1)
+                    }
+                }
+
+                Spacer(minLength: 8)
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(highlight.valuePrimary)
+                        .font(.system(size: hasPR ? 22 : 20, weight: .bold, design: .rounded).monospacedDigit())
+                        .foregroundStyle(hasPR ? AnyShapeStyle(STRQPalette.goldGradient) : AnyShapeStyle(tint))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                    if let secondary = softenedCompletionSecondary(highlight.valueSecondary) {
+                        Text(secondary)
+                            .font(.system(size: 10, weight: .semibold).monospacedDigit())
+                            .foregroundStyle(.white.opacity(0.46))
+                            .lineLimit(1)
+                    }
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 13)
+            .background(Color.white.opacity(hasPR ? 0.065 : 0.045), in: .rect(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(tint.opacity(hasPR ? 0.36 : 0.18), lineWidth: 1)
             )
+            .shadow(color: hasPR ? STRQPalette.gold.opacity(0.16) : Color.clear, radius: 18, x: 0, y: 8)
             .padding(.horizontal, 20)
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 10)
@@ -170,14 +226,14 @@ struct WorkoutCompletionView: View {
     @ViewBuilder
     private var statsSection: some View {
         if let session {
-            let duration = session.endTime.map { Int($0.timeIntervalSince(session.startTime) / 60) } ?? 0
+            let duration = completionDurationDisplay(for: session)
             let totalSets = session.completedSetCount
             let totalReps = session.completedRepCount
             let completedExercises = session.distinctCompletedExerciseCount
 
             VStack(spacing: 10) {
                 HStack(spacing: 8) {
-                    completionStat(L10n.tr("Time"), value: "\(duration)", unit: "min")
+                    completionStat(L10n.tr("Time"), value: duration, unit: "min")
                     completionStat(L10n.tr("Exercises"), value: "\(completedExercises)", unit: nil)
                     completionStat(L10n.tr("Sets"), value: "\(totalSets)", unit: nil)
                     completionStat(L10n.tr("Reps"), value: "\(totalReps)", unit: nil)
@@ -193,20 +249,20 @@ struct WorkoutCompletionView: View {
                             STRQCountUpText(value: session.totalVolume) { value in
                                 String(format: "%.0f kg", value)
                             }
-                                .font(.system(size: 26, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
+                            .font(.system(size: 21, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
                         }
                         Spacer()
                         Image(systemName: "chart.bar.fill")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.system(size: 17, weight: .semibold))
                             .foregroundStyle(STRQBrand.steel.opacity(0.6))
                     }
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
-                    .background(Color(white: 0.095), in: .rect(cornerRadius: 14))
+                    .padding(.vertical, 11)
+                    .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
                     .overlay(
                         RoundedRectangle(cornerRadius: 14)
-                            .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                            .strokeBorder(Color.white.opacity(0.075), lineWidth: 1)
                     )
                 }
             }
@@ -289,7 +345,7 @@ struct WorkoutCompletionView: View {
             insights.append(ChangedInsight(
                 title: title,
                 detail: L10n.tr("Next targets will use this"),
-                icon: focus.symbolName,
+                icon: completionMuscleIcon(for: focus),
                 color: STRQBrand.steel
             ))
         }
@@ -339,6 +395,15 @@ struct WorkoutCompletionView: View {
         }
 
         return Array(insights.prefix(3))
+    }
+
+    private func completionMuscleIcon(for muscle: MuscleGroup) -> String {
+        switch muscle {
+        case .back, .lats, .lowerBack:
+            return "figure.strengthtraining.traditional"
+        default:
+            return muscle.symbolName
+        }
     }
 
     private func whatChangedRow(_ insight: ChangedInsight) -> some View {
@@ -500,7 +565,10 @@ struct WorkoutCompletionView: View {
     private var highlightsSection: some View {
         if !highlights.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                sectionHeader(title: L10n.tr("WHAT IMPROVED"), count: highlights.count)
+                sectionHeader(
+                    title: isLighterDay ? L10n.tr("What changed").uppercased() : L10n.tr("WHAT IMPROVED"),
+                    count: highlights.count
+                )
 
                 VStack(spacing: 8) {
                     ForEach(Array(highlights.enumerated()), id: \.element.id) { idx, h in
@@ -570,14 +638,16 @@ struct WorkoutCompletionView: View {
                                             .lineLimit(1)
                                     }
                                     Spacer(minLength: 4)
-                                    Text(item.tag)
-                                        .font(.system(size: 9, weight: .black))
-                                        .tracking(0.8)
-                                        .foregroundStyle(item.color)
-                                        .padding(.horizontal, 7)
-                                        .padding(.vertical, 3)
-                                        .background(item.color.opacity(0.12), in: Capsule())
-                                        .overlay(Capsule().strokeBorder(item.color.opacity(0.22), lineWidth: 0.5))
+                                    if !item.tag.isEmpty {
+                                        Text(item.tag)
+                                            .font(.system(size: 9, weight: .black))
+                                            .tracking(0.8)
+                                            .foregroundStyle(item.color)
+                                            .padding(.horizontal, 7)
+                                            .padding(.vertical, 3)
+                                            .background(item.color.opacity(0.12), in: Capsule())
+                                            .overlay(Capsule().strokeBorder(item.color.opacity(0.22), lineWidth: 0.5))
+                                    }
                                 }
                             }
                         }
@@ -689,9 +759,9 @@ struct WorkoutCompletionView: View {
                 items.append(BridgeItem(
                     exerciseName: ex.name,
                     detail: L10n.format("Deload to %.1f kg — rebuild clean", state.lastWeight * 0.85),
-                    tag: L10n.tr("DROP"),
+                    tag: "",
                     icon: "arrow.down.circle.fill",
-                    color: STRQPalette.danger
+                    color: STRQPalette.warning
                 ))
             default:
                 continue
@@ -713,10 +783,15 @@ struct WorkoutCompletionView: View {
                 Button { onDismiss() } label: {
                     Text(L10n.tr("Back to Today"))
                         .font(.body.weight(.bold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(Color.black.opacity(0.92))
                         .frame(maxWidth: .infinity)
                         .frame(height: 54)
-                        .background(STRQBrand.accentGradient, in: .rect(cornerRadius: 18))
+                        .background(Color.white.opacity(0.94), in: .rect(cornerRadius: 18))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 18)
+                                .strokeBorder(Color.white.opacity(0.22), lineWidth: 0.8)
+                        )
+                        .shadow(color: Color.white.opacity(0.10), radius: 12, x: 0, y: -2)
                 }
                 .buttonStyle(.strqPressable)
             }
@@ -746,16 +821,23 @@ struct WorkoutCompletionView: View {
         .padding(.horizontal, 4)
     }
 
+    private func completionDurationDisplay(for session: WorkoutSession) -> String {
+        guard let endTime = session.endTime else { return "<1" }
+        let elapsedSeconds = endTime.timeIntervalSince(session.startTime)
+        let elapsedMinutes = Int(elapsedSeconds / 60)
+        return elapsedMinutes > 0 ? "\(elapsedMinutes)" : "<1"
+    }
+
     private func completionStat(_ title: String, value: String, unit: String?) -> some View {
         VStack(spacing: 5) {
             HStack(alignment: .lastTextBaseline, spacing: 2) {
                 if let numeric = Double(value) {
                     STRQCountUpText(value: numeric)
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                 } else {
                     Text(value)
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                 }
                 if let unit {
@@ -770,22 +852,26 @@ struct WorkoutCompletionView: View {
                 .tracking(1.0)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
-        .background(Color(white: 0.095), in: .rect(cornerRadius: 12))
+        .padding(.vertical, 10)
+        .background(Color.white.opacity(0.035), in: .rect(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
         )
     }
 
-    private func badgeVariant(for kind: WorkoutHighlight.Kind) -> STRQCelebrationBadge.Variant {
+    private func proofAccent(for kind: WorkoutHighlight.Kind) -> Color {
         switch kind {
-        case .personalRecord, .longestSession, .streakMilestone, .setsMilestone:
-            return .gold
-        case .bestSet, .volumeUp, .firstTime:
-            return .green
-        case .volumeDown, .consolidation:
-            return .steel
+        case .personalRecord, .bestSet:
+            return STRQPalette.gold
+        case .volumeUp:
+            return STRQPalette.success
+        case .volumeDown:
+            return STRQPalette.warning
+        case .firstTime:
+            return STRQPalette.info
+        case .consolidation, .longestSession, .streakMilestone, .setsMilestone:
+            return STRQBrand.steel
         }
     }
 
@@ -814,7 +900,7 @@ struct WorkoutCompletionView: View {
 
     private func onFirstAppear() {
         withAnimation { appeared = true }
-        trophyPulse = true
+        trophyPulse = hasPR
         celebrationTrigger.toggle()
 
         guard !reduceMotion else {
@@ -823,15 +909,16 @@ struct WorkoutCompletionView: View {
         }
 
         Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(120))
-            sparkTrigger &+= 1
+            if hasPR {
+                try? await Task.sleep(for: .milliseconds(160))
+                sparkTrigger &+= 1
+            }
             try? await Task.sleep(for: .milliseconds(180))
             hapticTick &+= 1
             try? await Task.sleep(for: .milliseconds(200))
             highlightsAppeared = true
             if hasPR {
                 try? await Task.sleep(for: .milliseconds(260))
-                sparkTrigger &+= 1
                 hapticTick &+= 1
             }
         }
@@ -848,7 +935,7 @@ private struct HighlightRow: View {
         case .personalRecord:
             return (STRQPalette.gold, STRQPalette.goldSoft, "trophy.fill")
         case .bestSet:
-            return (STRQPalette.success, STRQPalette.successSoft, "bolt.fill")
+            return (STRQPalette.gold, STRQPalette.goldSoft, "bolt.fill")
         case .volumeUp:
             return (STRQPalette.success, STRQPalette.successSoft, "arrow.up.right.circle.fill")
         case .volumeDown:
@@ -863,6 +950,16 @@ private struct HighlightRow: View {
             return (STRQPalette.gold, STRQPalette.goldSoft, "flame.fill")
         case .setsMilestone:
             return (STRQPalette.gold, STRQPalette.goldSoft, "checkmark.seal.fill")
+        }
+    }
+
+    private var showsPeakBadge: Bool {
+        guard highlight.isPrimary else { return false }
+        switch highlight.kind {
+        case .personalRecord, .bestSet, .longestSession, .streakMilestone, .setsMilestone:
+            return true
+        case .volumeUp, .volumeDown, .firstTime, .consolidation:
+            return false
         }
     }
 
@@ -882,7 +979,7 @@ private struct HighlightRow: View {
                     Text(highlight.title)
                         .font(.system(size: highlight.isPrimary ? 14 : 13, weight: highlight.isPrimary ? .heavy : .bold))
                         .foregroundStyle(.white)
-                    if highlight.isPrimary {
+                    if showsPeakBadge {
                         Text(L10n.tr("TOP"))
                             .font(.system(size: 8, weight: .black))
                             .tracking(0.8)
@@ -906,7 +1003,7 @@ private struct HighlightRow: View {
                 Text(highlight.valuePrimary)
                     .font(.system(size: highlight.isPrimary ? 15 : 14, weight: .bold, design: .rounded).monospacedDigit())
                     .foregroundStyle(palette.color)
-                if let secondary = highlight.valueSecondary {
+                if let secondary = softenedCompletionSecondary(highlight.valueSecondary) {
                     Text(secondary)
                         .font(.system(size: 10, weight: .semibold).monospacedDigit())
                         .foregroundStyle(.white.opacity(0.42))
@@ -927,6 +1024,40 @@ private struct HighlightRow: View {
                 )
         )
     }
+}
+
+private func isPeakHighlight(_ highlight: WorkoutHighlight?) -> Bool {
+    guard let highlight else { return false }
+    switch highlight.kind {
+    case .personalRecord, .bestSet:
+        return true
+    case .volumeUp, .volumeDown, .firstTime, .consolidation, .longestSession, .streakMilestone, .setsMilestone:
+        return false
+    }
+}
+
+private func softenedCompletionSecondary(_ value: String?) -> String? {
+    guard let value, !value.isEmpty else { return nil }
+    guard value.contains("%") else { return value }
+    guard let magnitude = completionPercentMagnitude(from: value) else { return value }
+    return magnitude >= 300 ? nil : value
+}
+
+private func completionPercentMagnitude(from value: String) -> Double? {
+    var number = value
+        .replacingOccurrences(of: "%", with: "")
+        .replacingOccurrences(of: "+", with: "")
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+
+    if let separator = number.first(where: { $0 == "." || $0 == "," }),
+       let suffix = number.split(separator: separator).last,
+       suffix.count == 3 {
+        number.removeAll { $0 == "." || $0 == "," }
+    } else {
+        number = number.replacingOccurrences(of: ",", with: ".")
+    }
+
+    return Double(number).map(abs)
 }
 
 // MARK: - Particle Field
@@ -983,23 +1114,23 @@ private struct SparkField: View {
     }
 
     private func burst(at size: CGSize) {
-        let count = Int(Double(70) * intensity)
+        let count = Int(Double(44) * intensity)
         let now = Date().timeIntervalSinceReferenceDate
         let originX = size.width / 2
         let originY = size.height * 0.28
         var new: [Particle] = []
         for _ in 0..<count {
             let angle = Double.random(in: 0...(2 * .pi))
-            let speed = CGFloat.random(in: 90...260)
+            let speed = CGFloat.random(in: 70...190)
             let isAccent = Double.random(in: 0...1) < 0.55
             new.append(Particle(
                 x: originX,
                 y: originY,
                 vx: CGFloat(cos(angle)) * speed,
-                vy: CGFloat(sin(angle)) * speed - CGFloat.random(in: 20...80),
-                size: CGFloat.random(in: 2.0...4.5),
+                vy: CGFloat(sin(angle)) * speed - CGFloat.random(in: 18...66),
+                size: CGFloat.random(in: 1.6...3.6),
                 life: now,
-                maxLife: Double.random(in: 0.8...1.6),
+                maxLife: Double.random(in: 0.65...1.15),
                 hue: 0,
                 isAccent: isAccent
             ))
