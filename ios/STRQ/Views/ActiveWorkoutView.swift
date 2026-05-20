@@ -347,6 +347,7 @@ struct ActiveWorkoutView: View {
             let log = workout.session.exerciseLogs[exerciseIndex]
             let exercise = vm.library.exercise(byId: log.exerciseId)
             let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
+            let today = planned.map { vm.todayPrescription(for: $0) }
             let mediaProvider = ExerciseMediaProvider.shared
             let currentSet = activeSetFor(log: log, workout: workout)
             let activeSetNumber = currentSet?.setNumber ?? (log.sets.filter(\.isCompleted).count + 1)
@@ -415,8 +416,9 @@ struct ActiveWorkoutView: View {
 
                                 HStack(spacing: 6) {
                                     if let p = planned {
-                                        exerciseMetricPill(L10n.format("Target %@", p.reps))
-                                        if let rpe = p.rpe {
+                                        let targetReps = today?.suggestedRepRange ?? p.reps
+                                        exerciseMetricPill(L10n.format("Target %@", targetReps))
+                                        if let rpe = today?.targetRPE ?? p.rpe {
                                             exerciseMetricPill(L10n.format("RPE %@", formatRPE(rpe)))
                                         }
                                         exerciseMetricPill(L10n.format("%ds rest", p.restSeconds))
@@ -457,7 +459,7 @@ struct ActiveWorkoutView: View {
                     )
                     .shadow(color: .black.opacity(0.18), radius: 12, y: 8)
 
-                    workoutDetailsDisclosure(log: log, planned: planned, guidance: guidance)
+                    workoutDetailsDisclosure(log: log, planned: planned, currentSet: currentSet, guidance: guidance)
                         .padding(.top, 7)
 
                 }
@@ -485,6 +487,7 @@ struct ActiveWorkoutView: View {
     private func workoutDetailsDisclosure(
         log: ExerciseLog,
         planned: PlannedExercise?,
+        currentSet: SetLog?,
         guidance: NextSessionGuidance?
     ) -> some View {
         VStack(spacing: 6) {
@@ -514,9 +517,9 @@ struct ActiveWorkoutView: View {
             .buttonStyle(.strqPressable)
 
             if showWorkoutDetails {
-                contextStrip(log: log, planned: planned)
+                contextStrip(log: log, planned: planned, currentSet: currentSet)
 
-                if let g = guidance {
+                if let g = visibleNextSessionGuidance(guidance, planned: planned, currentSet: currentSet) {
                     HStack(spacing: 6) {
                         Image(systemName: g.icon)
                             .font(.system(size: 10))
@@ -541,11 +544,41 @@ struct ActiveWorkoutView: View {
         }
     }
 
+    private func visibleNextSessionGuidance(
+        _ guidance: NextSessionGuidance?,
+        planned: PlannedExercise?,
+        currentSet: SetLog?
+    ) -> NextSessionGuidance? {
+        guard let guidance else { return nil }
+        guard let planned else { return guidance }
+
+        let today = vm.todayPrescription(for: planned)
+        if today.suggestedSets != planned.sets ||
+            today.suggestedRepRange != planned.reps ||
+            today.weightChanged {
+            return nil
+        }
+
+        if let currentSet, today.suggestedWeight > 0, abs(today.suggestedWeight - currentSet.weight) >= 0.05 {
+            return nil
+        }
+
+        return guidance
+    }
+
     @ViewBuilder
-    private func contextStrip(log: ExerciseLog, planned: PlannedExercise?) -> some View {
+    private func contextStrip(log: ExerciseLog, planned: PlannedExercise?, currentSet: SetLog?) -> some View {
         let last = vm.lastPerformance(for: log.exerciseId)
         let best = personalBest(for: log.exerciseId)
-        let suggestion = vm.loadSuggestion(for: log.exerciseId, planned: planned)
+        let today = planned.map { vm.todayPrescription(for: $0) }
+        let exercise = vm.library.exercise(byId: log.exerciseId)
+        let targetPrimary = currentSet.flatMap { activeTargetWeightText(for: $0, exercise: exercise) }
+        let targetReps = currentSet.map { "\($0.reps)" } ?? today?.suggestedRepRange
+        let todayIsAdjusted = today.map { todayPrescriptionDiffersFromPlan($0, planned: planned, currentSet: currentSet) } ?? false
+        let targetValue = todayIsAdjusted ? compactTargetText(primary: targetPrimary, reps: targetReps) : (targetPrimary ?? "—")
+        let targetSecondary = todayIsAdjusted
+            ? (today?.setsReduced == true ? L10n.tr("Today calmer") : L10n.tr("From today's target"))
+            : (targetReps.map { "× \($0)" } ?? "—")
 
         HStack(spacing: 0) {
             contextCell(
@@ -555,43 +588,253 @@ struct ActiveWorkoutView: View {
             )
             contextDivider()
             contextCell(
-                label: L10n.tr("BEST"),
+                label: L10n.tr("PR"),
                 primary: best.map { "\(formatWeight($0.weight, increment: 0.5))×\($0.reps)" } ?? "—",
-                secondary: best.map { L10n.format("e1RM %.0f", $0.e1rm) } ?? "—"
+                secondary: best.map { _ in L10n.tr("Best mark") } ?? "—",
+                symbolName: "trophy.fill",
+                accent: STRQPalette.gold,
+                primaryTint: STRQPalette.gold.opacity(0.98),
+                lineOpacity: 0.78,
+                sparkle: best != nil
             )
             contextDivider()
             contextCell(
                 label: L10n.tr("TARGET"),
-                primary: suggestion.map { $0.suggestedWeight > 0 ? formatWeight($0.suggestedWeight, increment: 0.5) : L10n.tr("BW") } ?? "—",
-                secondary: planned.map { "× \($0.reps)" } ?? "—"
+                primary: targetValue,
+                secondary: targetSecondary,
+                accent: todayIsAdjusted ? activeWorkoutSignal : nil,
+                lineOpacity: 0.62
             )
         }
         .padding(.vertical, 7)
-        .background(Color.white.opacity(0.026), in: .rect(cornerRadius: 10))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(Color.white.opacity(0.055), lineWidth: 1)
-        )
     }
 
-    private func contextCell(label: String, primary: String, secondary: String) -> some View {
+    private func compactTargetText(primary: String?, reps: String?) -> String {
+        guard let primary, primary != "—" else { return "—" }
+        guard let reps, !reps.isEmpty else { return primary }
+        return "\(primary)×\(reps)"
+    }
+
+    private func todayPrescriptionDiffersFromPlan(
+        _ today: TodayPrescription,
+        planned: PlannedExercise?,
+        currentSet: SetLog?
+    ) -> Bool {
+        guard let planned else { return false }
+        if today.suggestedSets != planned.sets { return true }
+        if normalizedRepRange(today.suggestedRepRange) != normalizedRepRange(planned.reps) { return true }
+        if today.weightChanged { return true }
+        if let currentSet, today.suggestedWeight > 0, abs(today.suggestedWeight - currentSet.weight) >= 0.05 {
+            return true
+        }
+        return false
+    }
+
+    private func normalizedRepRange(_ reps: String) -> String {
+        reps
+            .replacingOccurrences(of: "–", with: "-")
+            .replacingOccurrences(of: " ", with: "")
+            .lowercased()
+    }
+
+    private func contextCell(
+        label: String,
+        primary: String,
+        secondary: String,
+        symbolName: String? = nil,
+        accent: Color? = nil,
+        primaryTint: Color? = nil,
+        lineOpacity: Double = 0.62,
+        sparkle: Bool = false
+    ) -> some View {
         VStack(alignment: .center, spacing: 2) {
-            Text(label)
-                .font(.system(size: 8, weight: .black))
-                .tracking(1.2)
-                .foregroundStyle(STRQPalette.textMuted.opacity(0.86))
-            Text(primary)
-                .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
-                .foregroundStyle(STRQPalette.textPrimary.opacity(0.92))
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+            HStack(spacing: 3) {
+                if let symbolName {
+                    Image(systemName: symbolName)
+                        .font(.system(size: 7.5, weight: .black))
+                        .accessibilityHidden(true)
+                }
+                Text(label)
+                    .font(.system(size: 8, weight: .black))
+                    .tracking(1.2)
+            }
+            .foregroundStyle(accent ?? STRQPalette.textMuted.opacity(0.86))
+            contextPrimaryText(
+                primary,
+                primaryTint: primaryTint,
+                accent: accent,
+                sparkle: sparkle
+            )
             Text(secondary)
                 .font(.system(size: 9, weight: .semibold).monospacedDigit())
-                .foregroundStyle(STRQPalette.textMuted.opacity(0.82))
+                .foregroundStyle(accent.map { AnyShapeStyle($0.opacity(0.78)) } ?? AnyShapeStyle(STRQPalette.textMuted.opacity(0.82)))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
+        .padding(.vertical, 5)
         .frame(maxWidth: .infinity)
+        .overlay {
+            if sparkle, let accent, !reduceMotion {
+                goldSparkleOverlay(accent: accent)
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if let accent {
+                Capsule()
+                    .fill(accent.opacity(lineOpacity))
+                    .frame(width: 24, height: 2)
+                    .padding(.bottom, 2)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func contextPrimaryText(
+        _ primary: String,
+        primaryTint: Color?,
+        accent: Color?,
+        sparkle: Bool
+    ) -> some View {
+        let tint = primaryTint ?? STRQPalette.textPrimary.opacity(0.92)
+
+        if sparkle, let accent, !reduceMotion {
+            TimelineView(.animation(minimumInterval: 1.0 / 24.0)) { timeline in
+                let time = timeline.date.timeIntervalSinceReferenceDate
+                let glow = max(
+                    randomSparkleIntensity(time: time, lane: 5, cycle: 5.9),
+                    randomSparkleIntensity(time: time, lane: 6, cycle: 8.8)
+                )
+
+                Text(primary)
+                    .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
+                    .foregroundStyle(tint.opacity(0.94 + glow * 0.06))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .background {
+                        Text(primary)
+                            .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
+                            .foregroundStyle(accent.opacity(glow * 0.42))
+                            .blur(radius: 2 + CGFloat(glow) * 6)
+                            .scaleEffect(1.02 + CGFloat(glow) * 0.05)
+                    }
+                    .shadow(color: accent.opacity(glow * 0.66), radius: 2 + CGFloat(glow) * 8)
+                    .shadow(color: accent.opacity(glow * 0.34), radius: CGFloat(glow) * 18)
+            }
+        } else {
+            Text(primary)
+                .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
+                .foregroundStyle(tint)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+    }
+
+    private func goldSparkleOverlay(accent: Color) -> some View {
+        GeometryReader { proxy in
+            TimelineView(.animation(minimumInterval: 1.0 / 24.0)) { timeline in
+                let time = timeline.date.timeIntervalSinceReferenceDate
+
+                ZStack {
+                    randomSparkleStar(
+                        accent: accent,
+                        time: time,
+                        lane: 0,
+                        cycle: 5.6,
+                        size: 7,
+                        bounds: proxy.size
+                    )
+                    randomSparkleStar(
+                        accent: accent,
+                        time: time,
+                        lane: 1,
+                        cycle: 7.1,
+                        size: 5.4,
+                        bounds: proxy.size
+                    )
+                    randomSparkleStar(
+                        accent: accent,
+                        time: time,
+                        lane: 2,
+                        cycle: 8.4,
+                        size: 4.1,
+                        bounds: proxy.size
+                    )
+                }
+                .frame(width: proxy.size.width, height: proxy.size.height)
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    private func randomSparkleStar(
+        accent: Color,
+        time: TimeInterval,
+        lane: Int,
+        cycle: Double,
+        size: CGFloat,
+        bounds: CGSize
+    ) -> some View {
+        let tick = floor(time / cycle)
+        let intensity = randomSparkleIntensity(time: time, lane: lane, cycle: cycle)
+        let xSeed = sparkleNoise(tick * 11.3 + Double(lane) * 23.7)
+        let ySeed = sparkleNoise(tick * 7.9 + Double(lane) * 31.1)
+        let sizeSeed = sparkleNoise(tick * 5.1 + Double(lane) * 17.4)
+        let laneAnchor = sparkleLaneAnchor(lane)
+        let x = bounds.width * (laneAnchor.x + (xSeed - 0.5) * 0.11)
+        let y = bounds.height * (laneAnchor.y + (ySeed - 0.5) * 0.10)
+        let adjustedSize = size * CGFloat(0.90 + sizeSeed * 0.14)
+
+        return sparkleStarCore(accent: accent, intensity: intensity, size: adjustedSize)
+            .position(x: x, y: y)
+    }
+
+    private func sparkleStarCore(accent: Color, intensity: Double, size: CGFloat) -> some View {
+        let pulse = min(1, intensity * intensity)
+        let visibleOpacity = pulse * 0.94
+        let scale = 0.62 + CGFloat(pulse) * 0.54
+
+        return Image(systemName: "star.fill")
+            .font(.system(size: size, weight: .black))
+            .foregroundStyle(accent.opacity(0.62 + pulse * 0.34))
+            .shadow(color: accent.opacity(0.20 + pulse * 0.58), radius: 2 + CGFloat(pulse) * 8)
+            .shadow(color: Color.white.opacity(pulse * 0.07), radius: 1 + CGFloat(pulse) * 2)
+            .scaleEffect(scale)
+            .opacity(visibleOpacity)
+            .blur(radius: 0.18 - CGFloat(pulse) * 0.08)
+    }
+
+    private func randomSparkleIntensity(time: TimeInterval, lane: Int, cycle: Double) -> Double {
+        let phase = time.truncatingRemainder(dividingBy: cycle)
+        let tick = floor(time / cycle)
+        let laneOffset = Double(lane) * 19.37
+        let duration = 0.62 + sparkleNoise(tick * 3.41 + laneOffset) * 0.42
+        let start = 0.10 + sparkleNoise(tick * 8.73 + laneOffset) * max(0.1, cycle - duration - 0.16)
+        let brightness = 0.74 + sparkleNoise(tick * 5.29 + laneOffset) * 0.24
+
+        return min(1, sparkleIntensity(phase: phase, start: start, duration: duration) * brightness)
+    }
+
+    private func sparkleLaneAnchor(_ lane: Int) -> (x: Double, y: Double) {
+        switch lane % 3 {
+        case 0:
+            return (0.39, 0.34)
+        case 1:
+            return (0.58, 0.51)
+        default:
+            return (0.74, 0.36)
+        }
+    }
+
+    private func sparkleIntensity(phase: Double, start: Double, duration: Double) -> Double {
+        let elapsed = phase - start
+        guard elapsed >= 0, elapsed <= duration else { return 0 }
+        return sin((elapsed / duration) * .pi)
+    }
+
+    private func sparkleNoise(_ value: Double) -> Double {
+        let raw = sin(value * 12.9898 + 78.233) * 43758.5453
+        return raw - floor(raw)
     }
 
     private func contextDivider() -> some View {
@@ -609,9 +852,7 @@ struct ActiveWorkoutView: View {
             let log = workout.session.exerciseLogs[exerciseIndex]
             let currentSet = activeSetFor(log: log, workout: workout)
             let activeSetIndex = currentSet.flatMap { s in log.sets.firstIndex(where: { $0.id == s.id }) } ?? workout.currentSetIndex
-            let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
             let lastPerf = vm.lastPerformance(for: log.exerciseId)
-            let suggestion = vm.loadSuggestion(for: log.exerciseId, planned: planned)
 
             if let setLog = currentSet {
                 let exerciseForIncrement = vm.library.exercise(byId: log.exerciseId)
@@ -634,8 +875,8 @@ struct ActiveWorkoutView: View {
                         setIndex: activeSetIndex,
                         lastWeight: lastPerf?.topWeight,
                         lastReps: lastPerf?.topReps,
-                        targetWeight: suggestion?.suggestedWeight,
-                        targetReps: parsePlannedReps(planned?.reps)
+                        targetWeight: setLog.weight,
+                        targetReps: setLog.reps
                     )
 
                     HStack(spacing: 9) {
@@ -1013,7 +1254,7 @@ struct ActiveWorkoutView: View {
         if exerciseIndex < workout.session.exerciseLogs.count {
             let log = workout.session.exerciseLogs[exerciseIndex]
             let planned = exerciseIndex < workout.plannedExercises.count ? workout.plannedExercises[exerciseIndex] : nil
-            let targetReps = planned?.reps ?? "—"
+            let targetReps = planned.map { vm.todayPrescription(for: $0).suggestedRepRange } ?? "—"
             let lastSessionSets = previousSetsMap(for: log.exerciseId)
             let firstActiveIdx = log.sets.firstIndex(where: { !$0.isCompleted })
             let completedCount = log.sets.filter(\.isCompleted).count
@@ -2300,6 +2541,7 @@ struct ActiveWorkoutView: View {
         }
 
         let planned = last.exerciseIndex < sourceWorkout.plannedExercises.count ? sourceWorkout.plannedExercises[last.exerciseIndex] : nil
+        let today = planned.map { vm.todayPrescription(for: $0) }
         let quality = justLogged.quality
         var guidance = "Queued next set is ready. Adjust only if it feels right."
         var icon = "figure.strengthtraining.traditional"
@@ -2308,17 +2550,29 @@ struct ActiveWorkoutView: View {
         let exercise = vm.library.exercise(byId: activeLog.exerciseId)
         let increment = weightIncrement(for: exercise)
         let isSameExercise = activeExerciseIndex == last.exerciseIndex
+        let todayIsAdjusted = today.map { todayPrescriptionDiffersFromPlan($0, planned: planned, currentSet: next) } ?? false
+        let reducedSetGuidance = L10n.tr("Keep today's calmer target for the next set.")
 
         if !isSameExercise {
             guidance = "Next exercise is queued. Start when the rest feels right."
             icon = "arrow.right.circle.fill"
             tint = STRQBrand.steel
         } else if let q = quality {
-            let advisory = restAdvisory(for: q)
-            guidance = advisory.guidance
-            icon = advisory.icon
-            tint = advisory.tint
-        } else if let p = planned, let plannedTopReps = parsePlannedReps(p.reps), justLogged.reps >= plannedTopReps {
+            if todayIsAdjusted && q == .tooEasy {
+                guidance = reducedSetGuidance
+                icon = "heart.circle.fill"
+                tint = activeWorkoutSignal
+            } else {
+                let advisory = restAdvisory(for: q)
+                guidance = advisory.guidance
+                icon = advisory.icon
+                tint = advisory.tint
+            }
+        } else if todayIsAdjusted {
+            guidance = reducedSetGuidance
+            icon = "heart.circle.fill"
+            tint = activeWorkoutSignal
+        } else if let today, let targetTopReps = parsePlannedReps(today.suggestedRepRange), justLogged.reps >= targetTopReps {
             guidance = "Top of the range hit. Consider a small bump if it still feels clean."
             icon = "arrow.up.right.circle.fill"
             tint = STRQPalette.success
@@ -2741,6 +2995,19 @@ struct ActiveWorkoutView: View {
             return String(format: "%.0f", weight)
         }
         return String(format: "%.1f", weight)
+    }
+
+    private func activeTargetWeightText(for setLog: SetLog, exercise: Exercise?) -> String? {
+        if setLog.weight > 0 {
+            return formatWeight(setLog.weight, increment: weightIncrement(for: exercise))
+        }
+        guard isBodyweightLoad(exercise) else { return nil }
+        return L10n.tr("BW")
+    }
+
+    private func isBodyweightLoad(_ exercise: Exercise?) -> Bool {
+        guard let exercise else { return false }
+        return exercise.isBodyweight || exercise.category == .bodyweight
     }
 
     private func formatRPE(_ rpe: Double) -> String {

@@ -5,9 +5,24 @@ struct ExercisePrescriptionSheet: View {
     let planned: PlannedExercise
     let prescription: ExercisePrescription
     let vm: AppViewModel
+    let todayOverride: TodayPrescription?
 
     @Environment(\.dismiss) private var dismiss
     @State private var appeared: Bool = false
+
+    init(
+        exercise: Exercise?,
+        planned: PlannedExercise,
+        prescription: ExercisePrescription,
+        vm: AppViewModel,
+        todayOverride: TodayPrescription? = nil
+    ) {
+        self.exercise = exercise
+        self.planned = planned
+        self.prescription = prescription
+        self.vm = vm
+        self.todayOverride = todayOverride
+    }
 
     var body: some View {
         ScrollView {
@@ -34,11 +49,16 @@ struct ExercisePrescriptionSheet: View {
     }
 
     private var today: TodayPrescription {
-        vm.todayPrescription(for: planned)
+        todayOverride ?? vm.todayPrescription(for: planned)
+    }
+
+    private var planLoad: StartingLoadEngine.LoadSuggestion? {
+        vm.loadSuggestion(for: planned.exerciseId, planned: planned)
     }
 
     private var todayCard: some View {
         let t = today
+        let loadText = todayLoadDisplayText
         let color = decisionColor(t.decision.colorName)
         return VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 6) {
@@ -50,7 +70,7 @@ struct ExercisePrescriptionSheet: View {
                     .foregroundStyle(color)
                     .tracking(0.6)
                 Spacer()
-                Text(t.decision.label)
+                Text(t.setsReduced ? L10n.tr("Today reduced") : t.decision.label)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(color)
                     .padding(.horizontal, 8)
@@ -59,25 +79,27 @@ struct ExercisePrescriptionSheet: View {
             }
 
             HStack(alignment: .firstTextBaseline, spacing: 14) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(t.formattedWeight)
-                        .font(.system(.title, design: .rounded, weight: .bold).monospacedDigit())
-                    if let delta = t.formattedDelta {
-                        Text(delta)
-                            .font(.caption.weight(.bold).monospacedDigit())
-                            .foregroundStyle(color)
-                    } else if let last = t.lastRepsSummary {
-                        Text(last)
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(.tertiary)
+                if let loadText {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(loadText)
+                            .font(.system(.title, design: .rounded, weight: .bold).monospacedDigit())
+                        if let delta = t.formattedDelta {
+                            Text(delta)
+                                .font(.caption.weight(.bold).monospacedDigit())
+                                .foregroundStyle(color)
+                        } else if let last = t.lastRepsSummary {
+                            Text(last)
+                                .font(.caption2.weight(.medium))
+                                .foregroundStyle(.tertiary)
+                        }
                     }
+                    Spacer(minLength: 0)
                 }
-                Spacer(minLength: 0)
-                VStack(alignment: .trailing, spacing: 2) {
+                VStack(alignment: loadText == nil ? .leading : .trailing, spacing: 2) {
                     Text("\(t.suggestedSets) \u{00D7} \(t.suggestedRepRange)")
                         .font(.system(.title3, design: .rounded, weight: .bold).monospacedDigit())
                     if t.setsReduced {
-                        Text("Reduced from \(t.plannedSets) sets")
+                        Text("\(L10n.tr("Plan")): \(t.plannedSets) \(L10n.tr("Sets"))")
                             .font(.caption2.weight(.medium))
                             .foregroundStyle(color)
                     } else if let rpe = t.targetRPE {
@@ -135,7 +157,9 @@ struct ExercisePrescriptionSheet: View {
     }
 
     private var headerSection: some View {
-        VStack(spacing: 14) {
+        let t = today
+        let loadText = todayLoadDisplayText
+        return VStack(spacing: 14) {
             if let ex = exercise {
                 let mediaProvider = ExerciseMediaProvider.shared
                 let gradientColors = mediaProvider.heroGradient(for: ex)
@@ -166,22 +190,37 @@ struct ExercisePrescriptionSheet: View {
             }
 
             HStack(spacing: 0) {
-                statItem(value: "\(planned.sets)", label: "Sets")
+                statItem(value: "\(t.suggestedSets)", label: L10n.tr("Sets"))
                 Divider().frame(height: 28).opacity(0.3)
-                statItem(value: planned.reps, label: "Reps")
+                statItem(value: t.suggestedRepRange, label: L10n.tr("Reps"))
                 Divider().frame(height: 28).opacity(0.3)
-                if let rpe = planned.rpe {
-                    statItem(value: "RPE \(Int(rpe))", label: "Effort")
+                if let rpe = t.targetRPE ?? planned.rpe {
+                    statItem(value: "RPE \(formatRPE(rpe))", label: L10n.tr("Effort"))
                     Divider().frame(height: 28).opacity(0.3)
                 }
-                statItem(value: "\(planned.restSeconds)s", label: "Rest")
-                if let weight = prescription.suggestedWeight {
+                statItem(value: "\(planned.restSeconds)s", label: L10n.tr("Set rest"))
+                if let loadText {
                     Divider().frame(height: 28).opacity(0.3)
-                    statItem(value: weight, label: "Load", valueColor: STRQPalette.success)
+                    statItem(
+                        value: loadText,
+                        label: L10n.tr("Load"),
+                        valueColor: t.suggestedWeight > 0 ? STRQPalette.success : .primary
+                    )
                 }
             }
             .padding(.vertical, 14)
             .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+
+            if let planReference = planReferenceText(for: planned, today: t, planLoad: planLoad) {
+                HStack(spacing: 6) {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.system(size: 10, weight: .semibold))
+                    Text(planReference)
+                        .font(.caption.weight(.semibold))
+                }
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
     }
 
@@ -219,33 +258,27 @@ struct ExercisePrescriptionSheet: View {
 
             prescriptionCard(
                 icon: "rectangle.stack.fill",
-                label: "SETS & REPS",
-                text: prescription.whySetsReps,
+                label: L10n.tr("TODAY'S SETS"),
+                text: todaySetsText,
                 color: STRQBrand.slate
             )
 
-            prescriptionCard(
-                icon: "scalemass.fill",
-                label: "SUGGESTED WEIGHT",
-                text: prescription.whyWeight,
-                color: STRQPalette.success
-            )
+            if let todayLoadText {
+                prescriptionCard(
+                    icon: "scalemass.fill",
+                    label: L10n.tr("TODAY'S LOAD"),
+                    text: todayLoadText,
+                    color: STRQPalette.success
+                )
+            }
 
             prescriptionCard(
                 icon: "gauge.with.needle.fill",
-                label: "TARGET EFFORT",
-                text: prescription.whyEffort,
+                label: L10n.tr("TODAY'S EFFORT"),
+                text: todayEffortText,
                 color: STRQBrand.steel
             )
 
-            if let progression = prescription.progressionNote {
-                prescriptionCard(
-                    icon: "arrow.up.right.circle.fill",
-                    label: "PROGRESSION",
-                    text: progression,
-                    color: guidanceColorValue
-                )
-            }
         }
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 10)
@@ -292,5 +325,81 @@ struct ExercisePrescriptionSheet: View {
         case "teal": STRQPalette.info
         default: STRQBrand.steel
         }
+    }
+
+    private var todaySetsText: String {
+        let primary = "\(today.suggestedSets) × \(today.suggestedRepRange)"
+        if let planReference = planReferenceText(for: planned, today: today, planLoad: planLoad) {
+            return "\(L10n.format("From today's target: %@", primary)) \(planReference)."
+        }
+        return L10n.format("From today's target: %@", primary)
+    }
+
+    private var todayLoadText: String? {
+        guard let primary = todayLoadDisplayText else { return nil }
+        if let delta = today.formattedDelta {
+            return "\(L10n.format("From today's target: %@", primary)) \(delta)."
+        }
+        return L10n.format("From today's target: %@", primary)
+    }
+
+    private var todayLoadDisplayText: String? {
+        loadText(for: today, exercise: exercise)
+    }
+
+    private var todayEffortText: String {
+        if let rpe = today.targetRPE ?? planned.rpe {
+            return L10n.format("From today's target: %@", "RPE \(formatRPE(rpe))")
+        }
+        return L10n.tr("From today's target")
+    }
+
+    private func planReferenceText(
+        for planned: PlannedExercise,
+        today: TodayPrescription,
+        planLoad: StartingLoadEngine.LoadSuggestion?
+    ) -> String? {
+        var parts: [String] = []
+        let repsChanged = normalizedReps(today.suggestedRepRange) != normalizedReps(planned.reps)
+
+        if today.suggestedSets != planned.sets || repsChanged {
+            if today.suggestedSets != planned.sets, !repsChanged {
+                parts.append("\(planned.sets) \(L10n.tr("Sets"))")
+            } else {
+                parts.append("\(planned.sets) × \(planned.reps)")
+            }
+        }
+
+        if let planLoad,
+           planLoad.suggestedWeight > 0,
+           abs(planLoad.suggestedWeight - today.suggestedWeight) >= 0.05 {
+            parts.append(planLoad.formattedWeight)
+        }
+
+        guard !parts.isEmpty else { return nil }
+        return "\(L10n.tr("Plan")): \(parts.joined(separator: " · "))"
+    }
+
+    private func loadText(for today: TodayPrescription, exercise: Exercise?) -> String? {
+        if today.suggestedWeight > 0 { return today.formattedWeight }
+        guard isBodyweightLoad(exercise) else { return nil }
+        return L10n.tr("BW")
+    }
+
+    private func isBodyweightLoad(_ exercise: Exercise?) -> Bool {
+        guard let exercise else { return false }
+        return exercise.isBodyweight || exercise.category == .bodyweight
+    }
+
+    private func normalizedReps(_ reps: String) -> String {
+        reps
+            .replacingOccurrences(of: "–", with: "-")
+            .replacingOccurrences(of: " ", with: "")
+            .lowercased()
+    }
+
+    private func formatRPE(_ rpe: Double) -> String {
+        if rpe.truncatingRemainder(dividingBy: 1) == 0 { return "\(Int(rpe))" }
+        return String(format: "%.1f", rpe)
     }
 }

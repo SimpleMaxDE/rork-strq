@@ -6791,6 +6791,16 @@
         }
       }
     },
+    "Best mark": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestwert"
+          }
+        }
+      }
+    },
     "BODY": {
       "localizations": {
         "de": {
@@ -20061,6 +20071,106 @@
           "stringUnit": {
             "state": "translated",
             "value": "Workout-Volumen aktualisiert"
+          }
+        }
+      }
+    },
+    "From today's target": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus heutiger Vorgabe"
+          }
+        }
+      }
+    },
+    "From today's target: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus heutiger Vorgabe: %@"
+          }
+        }
+      }
+    },
+    "Load": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last"
+          }
+        }
+      }
+    },
+    "Set rest": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        }
+      }
+    },
+    "TODAY'S EFFORT": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HEUTIGE INTENSITÄT"
+          }
+        }
+      }
+    },
+    "TODAY'S LOAD": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HEUTIGE LAST"
+          }
+        }
+      }
+    },
+    "TODAY'S SETS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HEUTIGE SÄTZE"
+          }
+        }
+      }
+    },
+    "Today reduced": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute reduziert"
+          }
+        }
+      }
+    },
+    "Today calmer": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute ruhiger"
+          }
+        }
+      }
+    },
+    "Keep today's calmer target for the next set.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute ruhiger: nächsten Satz aus heutiger Vorgabe halten."
           }
         }
       }

@@ -7,10 +7,16 @@ struct PreWorkoutHandoffView: View {
     let onCancel: () -> Void
 
     @State private var appeared: Bool = false
-    @State private var selectedExerciseIndex: Int?
+    @State private var selectedExercise: HandoffExerciseSelection?
 
     private var briefing: SessionBriefing {
         vm.sessionBriefing(for: day)
+    }
+
+    private var todayTotalSets: Int {
+        day.exercises.reduce(0) { total, planned in
+            total + vm.todayPrescription(for: planned).suggestedSets
+        }
     }
 
     private var backgroundSurface: some View {
@@ -52,7 +58,8 @@ struct PreWorkoutHandoffView: View {
         .onAppear {
             withAnimation(.easeOut(duration: 0.6)) { appeared = true }
         }
-        .sheet(item: $selectedExerciseIndex) { index in
+        .sheet(item: $selectedExercise) { selection in
+            let index = selection.index
             if index < day.exercises.count {
                 let planned = day.exercises[index]
                 let prescription = vm.exercisePrescription(for: planned, in: day, index: index)
@@ -61,7 +68,8 @@ struct PreWorkoutHandoffView: View {
                         exercise: vm.library.exercise(byId: planned.exerciseId),
                         planned: planned,
                         prescription: prescription,
-                        vm: vm
+                        vm: vm,
+                        todayOverride: selection.todayPrescription
                     )
                 }
                 .presentationDetents([.medium, .large])
@@ -265,7 +273,7 @@ struct PreWorkoutHandoffView: View {
         HStack(spacing: 0) {
             statItem(icon: "list.bullet.rectangle.portrait", value: "\(briefing.exerciseCount)", label: "Exercises")
             statDivider
-            statItem(icon: "square.stack.3d.up", value: "\(briefing.totalSets)", label: "Sets")
+            statItem(icon: "square.stack.3d.up", value: "\(todayTotalSets)", label: L10n.tr("Sets"))
             statDivider
             statItem(icon: "clock", value: "~\(briefing.estimatedMinutes)m", label: "Time")
             statDivider
@@ -362,10 +370,13 @@ struct PreWorkoutHandoffView: View {
 
             ForEach(Array(day.exercises.enumerated()), id: \.element.id) { index, planned in
                 let exercise = vm.library.exercise(byId: planned.exerciseId)
-                let suggestion = vm.loadSuggestion(for: planned.exerciseId, planned: planned)
+                let today = vm.todayPrescription(for: planned)
+                let planLoad = vm.loadSuggestion(for: planned.exerciseId, planned: planned)
+                let planReference = planReferenceText(for: planned, today: today, planLoad: planLoad)
+                let loadText = todayLoadText(for: today, exercise: exercise)
 
                 Button {
-                    selectedExerciseIndex = index
+                    selectedExercise = HandoffExerciseSelection(index: index, todayPrescription: today)
                 } label: {
                     HStack(spacing: 12) {
                         if let ex = exercise {
@@ -389,19 +400,30 @@ struct PreWorkoutHandoffView: View {
                                 }
                             }
                             HStack(spacing: 8) {
-                                Text("\(planned.sets) × \(planned.reps)")
+                                Text("\(today.suggestedSets) × \(today.suggestedRepRange)")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
-                                if let rpe = planned.rpe {
+                                if let rpe = today.targetRPE ?? planned.rpe {
                                     Text("RPE \(Int(rpe))")
                                         .font(.system(size: 10, weight: .semibold))
                                         .foregroundStyle(STRQBrand.steel)
                                 }
-                                if let s = suggestion, s.suggestedWeight > 0 {
-                                    Text(s.formattedWeight)
+                                if let loadText {
+                                    Text(loadText)
                                         .font(.system(size: 10, weight: .bold))
-                                        .foregroundStyle(STRQPalette.success)
+                                        .foregroundStyle(today.suggestedWeight > 0 ? STRQPalette.success : STRQPalette.textMuted)
                                 }
+                            }
+                            if let planReference {
+                                HStack(spacing: 6) {
+                                    Text(planReference)
+                                    if today.setsReduced {
+                                        Text(L10n.tr("Today reduced"))
+                                            .foregroundStyle(STRQPalette.warning)
+                                    }
+                                }
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(.tertiary)
                             }
                         }
                         Spacer()
@@ -578,6 +600,57 @@ struct PreWorkoutHandoffView: View {
         default: return STRQPalette.warning
         }
     }
+
+    private func planReferenceText(
+        for planned: PlannedExercise,
+        today: TodayPrescription,
+        planLoad: StartingLoadEngine.LoadSuggestion?
+    ) -> String? {
+        var parts: [String] = []
+        let repsChanged = normalizedReps(today.suggestedRepRange) != normalizedReps(planned.reps)
+
+        if today.suggestedSets != planned.sets || repsChanged {
+            if today.suggestedSets != planned.sets, !repsChanged {
+                parts.append("\(planned.sets) \(L10n.tr("Sets"))")
+            } else {
+                parts.append("\(planned.sets) × \(planned.reps)")
+            }
+        }
+
+        if let planLoad,
+           planLoad.suggestedWeight > 0,
+           abs(planLoad.suggestedWeight - today.suggestedWeight) >= 0.05 {
+            parts.append(planLoad.formattedWeight)
+        }
+
+        guard !parts.isEmpty else { return nil }
+        return "\(L10n.tr("Plan")): \(parts.joined(separator: " · "))"
+    }
+
+    private func todayLoadText(for today: TodayPrescription, exercise: Exercise?) -> String? {
+        if today.suggestedWeight > 0 { return today.formattedWeight }
+        guard isBodyweightLoad(exercise) else { return nil }
+        return L10n.tr("BW")
+    }
+
+    private func isBodyweightLoad(_ exercise: Exercise?) -> Bool {
+        guard let exercise else { return false }
+        return exercise.isBodyweight || exercise.category == .bodyweight
+    }
+
+    private func normalizedReps(_ reps: String) -> String {
+        reps
+            .replacingOccurrences(of: "–", with: "-")
+            .replacingOccurrences(of: " ", with: "")
+            .lowercased()
+    }
+}
+
+private struct HandoffExerciseSelection: Identifiable {
+    let index: Int
+    let todayPrescription: TodayPrescription
+
+    var id: Int { index }
 }
 
 extension Int: @retroactive Identifiable {
