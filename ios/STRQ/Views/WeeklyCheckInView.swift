@@ -10,6 +10,31 @@ struct WeeklyCheckInView: View {
     @State private var showConfirmation: Bool = false
     @State private var currentPage: Int = 0
 
+    private struct WeeklyTargetDisplay {
+        let primary: String
+        let secondary: String
+    }
+
+    private func weeklyTargetDisplay(completed rawCompleted: Int, target rawTarget: Int) -> WeeklyTargetDisplay {
+        let completed = max(0, rawCompleted)
+        guard rawTarget > 0 else {
+            return WeeklyTargetDisplay(primary: "\(completed)", secondary: L10n.tr("Workouts"))
+        }
+
+        let target = rawTarget
+        let primary = "\(min(completed, target))/\(target)"
+
+        if completed > target {
+            return WeeklyTargetDisplay(primary: primary, secondary: L10n.format("+%d zusätzlich", completed - target))
+        }
+
+        if completed == target {
+            return WeeklyTargetDisplay(primary: primary, secondary: L10n.tr("target reached"))
+        }
+
+        return WeeklyTargetDisplay(primary: primary, secondary: L10n.tr("Workouts"))
+    }
+
     private let pages = ["summary", "highlights", "coach"]
     private var reportBackground: Color { Color(red: 0.010, green: 0.013, blue: 0.018) }
     private var reportNavy: Color { Color(red: 0.045, green: 0.075, blue: 0.125) }
@@ -165,6 +190,7 @@ struct WeeklyCheckInView: View {
     private var completionRing: some View {
         let completion = Double(review.summary.completedWorkouts) / Double(max(1, review.summary.plannedWorkouts))
         let ringColor: Color = completion >= 1.0 ? STRQPalette.success : completion >= 0.75 ? reportInk : STRQPalette.warning
+        let display = weeklyTargetDisplay(completed: review.summary.completedWorkouts, target: review.summary.plannedWorkouts)
 
         return HStack(alignment: .center, spacing: 18) {
             ZStack {
@@ -197,12 +223,14 @@ struct WeeklyCheckInView: View {
                     .animation(.easeOut(duration: 1.0).delay(0.3), value: appeared)
 
                 VStack(spacing: 3) {
-                    Text("\(review.summary.completedWorkouts)/\(review.summary.plannedWorkouts)")
+                    Text(display.primary)
                         .font(.system(size: 28, weight: .heavy, design: .rounded).monospacedDigit())
                         .foregroundStyle(STRQPalette.textPrimary)
-                    Text(L10n.tr("Workouts"))
+                    Text(display.secondary)
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(STRQPalette.textSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
                 }
             }
             .frame(width: 148, height: 148)
@@ -214,12 +242,14 @@ struct WeeklyCheckInView: View {
                     .frame(width: 28, height: 28)
                     .background(ringColor.opacity(0.12), in: .rect(cornerRadius: 8))
 
-                Text("\(review.summary.completedWorkouts)/\(review.summary.plannedWorkouts)")
+                Text(display.primary)
                     .font(.system(.title2, design: .rounded, weight: .bold).monospacedDigit())
                     .foregroundStyle(STRQPalette.textPrimary)
-                Text(L10n.tr("Workouts"))
+                Text(display.secondary)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(STRQPalette.textSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
 
                 if review.summary.streakDays > 0 {
                     HStack(spacing: 6) {

@@ -108,6 +108,11 @@ nonisolated struct DailyBriefingInput: Sendable {
 
 nonisolated struct DailyBriefingEngine: Sendable {
 
+    private struct WeeklyTargetDisplay {
+        let primary: String
+        let inlinePrimary: String
+    }
+
     func build(_ input: DailyBriefingInput) -> DailyBriefing {
         let rawPrimary = resolvePrimary(input)
         let primary = applyToneAndEmphasis(rawPrimary, input: input)
@@ -123,6 +128,26 @@ nonisolated struct DailyBriefingEngine: Sendable {
             sinceLast: sinceLast,
             restPrep: restPrep,
             moreSignalsCount: extra
+        )
+    }
+
+    private func weeklyTargetDisplay(completed rawCompleted: Int, target rawTarget: Int) -> WeeklyTargetDisplay {
+        let completed = max(0, rawCompleted)
+        guard rawTarget > 0 else {
+            return WeeklyTargetDisplay(primary: "\(completed)", inlinePrimary: "\(completed)")
+        }
+
+        let target = rawTarget
+        let shown = min(completed, target)
+        let primary = "\(shown)/\(target)"
+
+        guard completed > target else {
+            return WeeklyTargetDisplay(primary: primary, inlinePrimary: primary)
+        }
+
+        return WeeklyTargetDisplay(
+            primary: primary,
+            inlinePrimary: L10n.format("%@ · +%d zusätzlich", primary, completed - target)
         )
     }
 
@@ -310,7 +335,8 @@ nonisolated struct DailyBriefingEngine: Sendable {
             return DailyBriefing.Momentum(title: L10n.format("%d-day streak holding", i.streak), icon: "flame.fill")
         }
         if i.weeklyPlanned > 0, i.weeklyCompleted >= i.weeklyPlanned {
-            return DailyBriefing.Momentum(title: L10n.format("Weekly target hit — %d/%d", i.weeklyCompleted, i.weeklyPlanned), icon: "checkmark.seal.fill")
+            let display = weeklyTargetDisplay(completed: i.weeklyCompleted, target: i.weeklyPlanned)
+            return DailyBriefing.Momentum(title: L10n.format("Weekly target hit — %@", display.inlinePrimary), icon: "checkmark.seal.fill")
         }
         return nil
     }

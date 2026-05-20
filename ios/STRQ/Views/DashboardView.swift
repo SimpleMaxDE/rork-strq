@@ -12,6 +12,60 @@ struct DashboardView: View {
     @State private var showWeekPulseDetails: Bool = false
     @State private var showActivationRoadmapDetails: Bool = false
 
+    private struct WeeklyTargetDisplay {
+        let primary: String
+        let inlinePrimary: String
+        let detail: String
+        let isAtOrAboveTarget: Bool
+        let isOverflow: Bool
+    }
+
+    private func weeklyTargetDisplay(completed rawCompleted: Int, target rawTarget: Int) -> WeeklyTargetDisplay {
+        let completed = max(0, rawCompleted)
+        guard rawTarget > 0 else {
+            return WeeklyTargetDisplay(
+                primary: "\(completed)",
+                inlinePrimary: "\(completed)",
+                detail: todayText(en: "Target open", de: "Ziel offen"),
+                isAtOrAboveTarget: false,
+                isOverflow: false
+            )
+        }
+
+        let target = rawTarget
+        let shown = min(completed, target)
+        let primary = "\(shown)/\(target)"
+
+        if completed > target {
+            let overflow = completed - target
+            return WeeklyTargetDisplay(
+                primary: primary,
+                inlinePrimary: "\(primary) +\(overflow)",
+                detail: todayText(en: "+\(overflow) extra", de: "+\(overflow) zusätzlich"),
+                isAtOrAboveTarget: true,
+                isOverflow: true
+            )
+        }
+
+        if completed == target {
+            return WeeklyTargetDisplay(
+                primary: primary,
+                inlinePrimary: primary,
+                detail: todayText(en: "Target met", de: "Ziel erreicht"),
+                isAtOrAboveTarget: true,
+                isOverflow: false
+            )
+        }
+
+        return WeeklyTargetDisplay(
+            primary: primary,
+            inlinePrimary: primary,
+            detail: todayText(en: "Planned slot", de: "Geplante Einheit"),
+            isAtOrAboveTarget: false,
+            isOverflow: false
+        )
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -999,10 +1053,11 @@ struct DashboardView: View {
 
     private var todayDecisionSignals: [TodayDecisionSignal] {
         let weeklyTarget = max(1, vm.profile.daysPerWeek)
+        let rhythmDisplay = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: vm.profile.daysPerWeek)
         let recoveryScore = vm.todaysReadiness?.readinessScore ?? vm.effectiveRecoveryScore
         let sleepValue = vm.averageSleepHours > 0 ? String(format: "%.1fh", vm.averageSleepHours) : "—"
         let sleepDetail = vm.averageSleepHours > 0 ? todayText(en: "7-day avg", de: "7 Tage Ø") : todayText(en: "Log needed", de: "Eintrag offen")
-        let rhythmDetail = vm.weeklyStats.sessions >= weeklyTarget ? todayText(en: "Target met", de: "Ziel erreicht") : todayText(en: "Planned slot", de: "Geplante Einheit")
+        let rhythmDetail = rhythmDisplay.detail
 
         return [
             TodayDecisionSignal(
@@ -1027,7 +1082,7 @@ struct DashboardView: View {
                 id: "week",
                 icon: "calendar.badge.checkmark",
                 label: todayText(en: "Rhythm", de: "Rhythmus"),
-                value: "\(vm.weeklyStats.sessions)/\(weeklyTarget)",
+                value: rhythmDisplay.primary,
                 detail: rhythmDetail,
                 tint: vm.weeklyStats.sessions >= weeklyTarget ? STRQPalette.signalGreen : STRQBrand.steel,
                 action: nil
@@ -2444,8 +2499,9 @@ struct DashboardView: View {
             if showWeekPulseDetails {
                     VStack(spacing: 0) {
                         sandowRowDivider
+                        let weekDisplay = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: vm.profile.daysPerWeek)
                         weekPulseDetailRow(
-                            value: "\(vm.weeklyStats.sessions)/\(vm.profile.daysPerWeek)",
+                            value: weekDisplay.inlinePrimary,
                             label: L10n.tr("Workouts"),
                             icon: "checkmark.seal.fill",
                             tint: STRQPalette.signalGreen

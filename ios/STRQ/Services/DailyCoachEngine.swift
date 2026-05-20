@@ -2,6 +2,11 @@ import Foundation
 
 struct DailyCoachEngine {
 
+    private func weeklyOverflow(completed: Int, planned: Int) -> Int {
+        guard planned > 0 else { return 0 }
+        return max(0, completed - planned)
+    }
+
     func generateCoachResponse(
         readiness: DailyReadiness,
         recoveryScore: Int,
@@ -248,9 +253,12 @@ struct DailyCoachEngine {
         }
 
         if weeklySessionsCompleted >= weeklySessionsPlanned && weeklySessionsPlanned > 0 {
+            let overflow = weeklyOverflow(completed: weeklySessionsCompleted, planned: weeklySessionsPlanned)
             return DailyCoachMessage(
                 headline: L10n.tr("Weekly target hit"),
-                detail: L10n.tr("You've completed all planned workouts. Great discipline - enjoy the rest."),
+                detail: overflow > 0
+                    ? L10n.format("Wochenziel erreicht, +%d zusätzlich protokolliert. Erholung ehrlich halten, bevor du mehr machst.", overflow)
+                    : L10n.tr("You've completed all planned workouts. Great discipline - enjoy the rest."),
                 icon: "trophy.fill",
                 colorName: "yellow"
             )
@@ -325,8 +333,16 @@ nonisolated struct MomentumData: Sendable {
 
     var paceMessage: String {
         switch weeklyPace {
-        case .ahead: return L10n.tr("Ahead of schedule this week")
-        case .onTrack: return L10n.tr("On track for your weekly target")
+        case .ahead:
+            if weeklySessionsPlanned > 0 && weeklySessionsCompleted > weeklySessionsPlanned {
+                return L10n.format("Ziel erreicht · +%d zusätzlich", weeklySessionsCompleted - weeklySessionsPlanned)
+            }
+            return L10n.tr("Ahead of schedule this week")
+        case .onTrack:
+            if weeklySessionsPlanned > 0 && weeklySessionsCompleted == weeklySessionsPlanned {
+                return L10n.tr("Weekly target reached")
+            }
+            return L10n.tr("On track for your weekly target")
         case .behind: return L10n.tr("Behind this week - time to catch up")
         case .missed: return L10n.tr("No workouts yet this week")
         }

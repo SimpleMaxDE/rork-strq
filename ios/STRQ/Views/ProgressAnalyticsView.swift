@@ -11,6 +11,75 @@ struct ProgressAnalyticsView: View {
     @State private var selectedTab: Int = 0
     @State private var appeared: Bool = false
 
+    private struct WeeklyTargetDisplay {
+        let primary: String
+        let inlinePrimary: String
+        let detail: String
+        let compactDetail: String
+        let countValue: String
+        let countDetail: String
+        let isAtOrAboveTarget: Bool
+        let isOverflow: Bool
+    }
+
+    private func weeklyTargetDisplay(completed rawCompleted: Int, target rawTarget: Int) -> WeeklyTargetDisplay {
+        let completed = max(0, rawCompleted)
+        guard rawTarget > 0 else {
+            return WeeklyTargetDisplay(
+                primary: "\(completed)",
+                inlinePrimary: "\(completed)",
+                detail: L10n.tr("target open"),
+                compactDetail: L10n.tr("target open"),
+                countValue: "\(completed)",
+                countDetail: L10n.tr("completed"),
+                isAtOrAboveTarget: false,
+                isOverflow: false
+            )
+        }
+
+        let target = rawTarget
+        let shown = min(completed, target)
+        let primary = "\(shown)/\(target)"
+
+        if completed > target {
+            let overflow = completed - target
+            return WeeklyTargetDisplay(
+                primary: primary,
+                inlinePrimary: "\(primary) +\(overflow)",
+                detail: L10n.format("+%d zusätzlich", overflow),
+                compactDetail: L10n.format("+%d zusätzlich", overflow),
+                countValue: "\(target)",
+                countDetail: L10n.format("+%d zusätzlich", overflow),
+                isAtOrAboveTarget: true,
+                isOverflow: true
+            )
+        }
+
+        if completed == target {
+            return WeeklyTargetDisplay(
+                primary: primary,
+                inlinePrimary: primary,
+                detail: L10n.tr("target reached"),
+                compactDetail: L10n.tr("reached"),
+                countValue: "\(target)",
+                countDetail: L10n.tr("target reached"),
+                isAtOrAboveTarget: true,
+                isOverflow: false
+            )
+        }
+
+        return WeeklyTargetDisplay(
+            primary: primary,
+            inlinePrimary: primary,
+            detail: L10n.tr("this week"),
+            compactDetail: L10n.tr("forming"),
+            countValue: "\(completed)",
+            countDetail: L10n.format("of %d", target),
+            isAtOrAboveTarget: false,
+            isOverflow: false
+        )
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -231,6 +300,7 @@ struct ProgressAnalyticsView: View {
         let currentWeekStart = calendar.dateInterval(of: .weekOfYear, for: today)?.start ?? today
         let currentWeekSessions = sessionsInWindow.filter { $0.startTime >= currentWeekStart }.count
         let weeklyTarget = max(1, min(vm.profile.daysPerWeek, 7))
+        let currentWeekOverflow = currentWeekSessions > weeklyTarget
         let completedWorkouts = vm.totalCompletedWorkouts
         let activeWeeks = activeWeekStarts.count
 
@@ -246,7 +316,7 @@ struct ProgressAnalyticsView: View {
         let rhythmState: TrainingMapHeroState
         if sessionsInWindow.isEmpty {
             rhythmState = .locked
-        } else if (sessionsInWindow.count >= 4 && activeWeeks >= 2) || (currentWeekSessions >= weeklyTarget && sessionsInWindow.count >= weeklyTarget) {
+        } else if (sessionsInWindow.count >= 4 && activeWeeks >= 2) || (!currentWeekOverflow && currentWeekSessions >= weeklyTarget && sessionsInWindow.count >= weeklyTarget) {
             rhythmState = .readable
         } else {
             rhythmState = .forming
@@ -386,6 +456,7 @@ struct ProgressAnalyticsView: View {
     private var headlineHero: some View {
         let snapshot = trainingMapHeroSnapshot
         let tint = snapshot.overallState.tint
+        let targetDisplay = weeklyTargetDisplay(completed: snapshot.currentWeekSessions, target: snapshot.weeklyTarget)
 
         return VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 14) {
@@ -436,7 +507,7 @@ struct ProgressAnalyticsView: View {
                 Rectangle().fill(TrainingMapHeroStyle.border).frame(width: 1, height: 38)
                 trainingMapStat(title: L10n.tr("Weeks"), value: "\(snapshot.activeWeeks)/4", detail: L10n.tr("active"))
                 Rectangle().fill(TrainingMapHeroStyle.border).frame(width: 1, height: 38)
-                trainingMapStat(title: L10n.tr("Target"), value: "\(snapshot.currentWeekSessions)/\(snapshot.weeklyTarget)", detail: L10n.tr("this week"))
+                trainingMapStat(title: L10n.tr("Target"), value: targetDisplay.primary, detail: targetDisplay.detail)
             }
             .padding(.vertical, 11)
             .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 16))
@@ -671,6 +742,7 @@ struct ProgressAnalyticsView: View {
 
     private var proofAxisItems: [ProofAxisItem] {
         let target = max(1, min(3, vm.profile.daysPerWeek))
+        let consistencyDisplay = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: target)
         let workoutProgress = min(Double(vm.totalCompletedWorkouts) / 4.0, 1)
         let consistencyProgress = min(Double(vm.weeklyStats.sessions) / Double(target), 1)
         let recoveryProgress = min(Double(vm.effectiveRecoveryScore) / 100.0, 1)
@@ -695,8 +767,8 @@ struct ProgressAnalyticsView: View {
             ),
             ProofAxisItem(
                 title: L10n.tr("Rhythm"),
-                value: "\(vm.weeklyStats.sessions)/\(target)",
-                detail: L10n.tr("this week"),
+                value: consistencyDisplay.primary,
+                detail: consistencyDisplay.detail,
                 icon: "calendar.badge.clock",
                 progress: consistencyProgress,
                 state: vm.weeklyStats.sessions >= target ? .success : (vm.weeklyStats.sessions > 0 ? .warning : .neutral)
@@ -878,6 +950,7 @@ struct ProgressAnalyticsView: View {
 
     private var proofTrustItems: [ProofTrustItem] {
         let target = max(1, min(3, vm.profile.daysPerWeek))
+        let consistencyDisplay = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: target)
         let workoutsState: STRQPalette.State = vm.totalCompletedWorkouts >= 4 ? .success : (vm.totalCompletedWorkouts > 0 ? .info : .neutral)
         let consistencyState: STRQPalette.State = vm.weeklyStats.sessions >= target ? .success : (vm.weeklyStats.sessions > 0 ? .warning : .neutral)
         let recoveryState: STRQPalette.State = vm.totalCompletedWorkouts == 0 ? .neutral : (vm.effectiveRecoveryScore >= 70 ? .success : (vm.effectiveRecoveryScore >= 55 ? .warning : .danger))
@@ -892,8 +965,8 @@ struct ProgressAnalyticsView: View {
             ),
             ProofTrustItem(
                 title: L10n.tr("Consistency"),
-                value: "\(vm.weeklyStats.sessions)/\(target)",
-                detail: vm.weeklyStats.sessions >= target ? L10n.tr("Target met") : L10n.tr("Building pattern"),
+                value: consistencyDisplay.primary,
+                detail: consistencyDisplay.isOverflow ? consistencyDisplay.detail : (consistencyDisplay.isAtOrAboveTarget ? L10n.tr("Target met") : L10n.tr("Building pattern")),
                 icon: "calendar.badge.clock",
                 state: consistencyState
             ),
@@ -1021,6 +1094,7 @@ struct ProgressAnalyticsView: View {
         let map = trainingMapHeroSnapshot
         let evidence = recentEvidenceSnapshot
         let rhythm = weeklyRhythmSnapshot
+        let rhythmDisplay = weeklyTargetDisplay(completed: rhythm.currentWeekSessions, target: rhythm.target)
 
         return [
             SignalReadinessItem(
@@ -1039,8 +1113,8 @@ struct ProgressAnalyticsView: View {
             ),
             SignalReadinessItem(
                 title: L10n.tr("Rhythm"),
-                value: "\(rhythm.currentWeekSessions)/\(rhythm.target)",
-                detail: L10n.tr("this week"),
+                value: rhythmDisplay.primary,
+                detail: rhythmDisplay.detail,
                 icon: "calendar.badge.clock",
                 tint: STRQPalette.color(for: rhythm.state)
             )
@@ -1309,9 +1383,10 @@ struct ProgressAnalyticsView: View {
         }
 
         if vm.weeklyStats.sessions >= consistencyTarget {
+            let display = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: consistencyTarget)
             return ImprovementSignal(
-                title: L10n.tr("Consistency is building"),
-                detail: L10n.format("%d workouts", vm.weeklyStats.sessions),
+                title: display.isOverflow ? L10n.tr("More than planned") : L10n.tr("Consistency is building"),
+                detail: display.isOverflow ? display.detail : L10n.format("%d workouts", min(vm.weeklyStats.sessions, consistencyTarget)),
                 icon: "flame.fill",
                 state: .success
             )
@@ -1584,10 +1659,13 @@ struct ProgressAnalyticsView: View {
     }
 
     private var metricItems: [(icon: String, value: String, label: String, caption: String, color: Color)] {
+        let target = max(1, min(3, vm.profile.daysPerWeek))
+        let targetDisplay = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: target)
+
         if vm.isEarlyStage {
             return [
                 ("figure.strengthtraining.traditional", "\(vm.totalCompletedWorkouts)", L10n.tr("Logged"), vm.totalCompletedWorkouts == 0 ? L10n.tr("baseline forming") : L10n.tr("first signal"), STRQBrand.steel),
-                ("calendar.badge.clock", "\(vm.weeklyStats.sessions)/\(max(1, min(3, vm.profile.daysPerWeek)))", L10n.tr("Target"), L10n.tr("building pattern"), STRQBrand.steel),
+                ("calendar.badge.clock", targetDisplay.primary, L10n.tr("Target"), targetDisplay.isAtOrAboveTarget ? targetDisplay.compactDetail : L10n.tr("building pattern"), STRQBrand.steel),
                 ("flame.fill", "\(vm.streak)", L10n.tr("Streak"), vm.streak > 0 ? L10n.tr("active") : L10n.tr("not started"), STRQBrand.steel),
                 ("heart.fill", "\(vm.effectiveRecoveryScore)%", L10n.tr("Recovery"), L10n.tr("context"), ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
             ]
@@ -2462,6 +2540,8 @@ struct ProgressAnalyticsView: View {
             detail = L10n.tr("No completed workouts are shown here until real workout history exists.")
         }
 
+        let currentWeekDisplay = weeklyTargetDisplay(completed: currentWeekSessions, target: target)
+
         return RecentEvidenceSnapshot(
             state: state,
             stateLabel: stateLabel,
@@ -2479,8 +2559,8 @@ struct ProgressAnalyticsView: View {
                 ),
                 RecentEvidenceMetric(
                     title: L10n.tr("This week"),
-                    value: "\(currentWeekSessions)",
-                    detail: L10n.format("of %d", target),
+                    value: currentWeekDisplay.countValue,
+                    detail: currentWeekDisplay.countDetail,
                     icon: "checkmark.seal",
                     state: currentWeekSessions >= target ? .success : (currentWeekSessions > 0 ? .warning : .neutral)
                 ),
@@ -2797,6 +2877,7 @@ struct ProgressAnalyticsView: View {
         let snapshot = weeklyRhythmSnapshot
         let stateTint = STRQPalette.color(for: snapshot.state)
         let completionTint = STRQPalette.success
+        let currentWeekDisplay = weeklyTargetDisplay(completed: snapshot.currentWeekSessions, target: snapshot.target)
 
         return evidenceModule(border: stateTint.opacity(snapshot.daysWithSessions > 0 ? 0.2 : 0.14)) {
             VStack(alignment: .leading, spacing: 14) {
@@ -2834,10 +2915,10 @@ struct ProgressAnalyticsView: View {
                             .tracking(0.7)
                             .foregroundStyle(.white.opacity(0.42))
                             .textCase(.uppercase)
-                        Text("\(snapshot.currentWeekSessions)/\(snapshot.target)")
+                        Text(currentWeekDisplay.primary)
                             .font(.system(size: 22, weight: .heavy, design: .rounded).monospacedDigit())
                             .foregroundStyle(snapshot.currentWeekMetTarget ? completionTint : stateTint)
-                        Text(snapshot.currentWeekMetTarget ? L10n.tr("target reached") : L10n.tr("target forming"))
+                        Text(snapshot.currentWeekMetTarget ? currentWeekDisplay.detail : L10n.tr("target forming"))
                             .font(.caption2.weight(.semibold))
                             .foregroundStyle(.white.opacity(0.5))
                             .lineLimit(1)
@@ -2918,8 +2999,9 @@ struct ProgressAnalyticsView: View {
         let activeWeeks = weeks.filter { $0.sessions > 0 }.count
         let targetWeeks = weeks.filter(\.metTarget).count
         let currentWeekMetTarget = currentWeekSessions >= target
+        let currentWeekOverflow = currentWeekSessions > target
         let readable = daysWithSessions >= 4 && activeWeeks >= 2
-        let consistentWeek = currentWeekMetTarget && daysWithSessions >= max(4, target)
+        let consistentWeek = currentWeekMetTarget && !currentWeekOverflow && daysWithSessions >= max(4, target)
 
         let stateLabel: String
         let detail: String
@@ -2959,11 +3041,13 @@ struct ProgressAnalyticsView: View {
     }
 
     private func weeklyRhythmMetricGrid(_ snapshot: WeeklyRhythmSnapshot) -> some View {
-        LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+        let currentWeekDisplay = weeklyTargetDisplay(completed: snapshot.currentWeekSessions, target: snapshot.target)
+
+        return LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
             weeklyRhythmMetric(
                 title: L10n.tr("This week"),
-                value: "\(snapshot.currentWeekSessions)/\(snapshot.target)",
-                detail: snapshot.currentWeekMetTarget ? L10n.tr("enough activity") : L10n.tr("still forming"),
+                value: currentWeekDisplay.primary,
+                detail: snapshot.currentWeekMetTarget ? currentWeekDisplay.compactDetail : L10n.tr("still forming"),
                 icon: "target",
                 state: snapshot.currentWeekMetTarget ? .success : (snapshot.currentWeekSessions > 0 ? .warning : .neutral)
             )

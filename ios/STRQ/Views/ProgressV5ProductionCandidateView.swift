@@ -9,6 +9,45 @@ struct ProgressV5ProductionCandidateView: View {
         TrainingProgressSnapshot(vm: vm)
     }
 
+    private struct WeeklyTargetDisplay {
+        let primary: String
+        let inlinePrimary: String
+        let detail: String
+        let isOverflow: Bool
+    }
+
+    private func weeklyTargetDisplay(completed rawCompleted: Int, target rawTarget: Int) -> WeeklyTargetDisplay {
+        let completed = max(0, rawCompleted)
+        guard rawTarget > 0 else {
+            return WeeklyTargetDisplay(
+                primary: "\(completed)",
+                inlinePrimary: "\(completed)",
+                detail: "target open",
+                isOverflow: false
+            )
+        }
+
+        let target = rawTarget
+        let shown = min(completed, target)
+        let primary = "\(shown)/\(target)"
+        guard completed > target else {
+            return WeeklyTargetDisplay(
+                primary: primary,
+                inlinePrimary: primary,
+                detail: completed == target ? "target reached" : "this week",
+                isOverflow: false
+            )
+        }
+
+        let overflow = completed - target
+        return WeeklyTargetDisplay(
+            primary: primary,
+            inlinePrimary: "\(primary) +\(overflow)",
+            detail: "+\(overflow) zusätzlich",
+            isOverflow: true
+        )
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: STRQSpacing.md) {
@@ -57,7 +96,9 @@ struct ProgressV5ProductionCandidateView: View {
     }
 
     private func trainingMap(_ snapshot: TrainingProgressSnapshot) -> some View {
-        moduleShell(border: snapshot.overallState.tint.opacity(0.24)) {
+        let targetDisplay = weeklyTargetDisplay(completed: snapshot.currentWeekSessions, target: snapshot.weeklyTarget)
+
+        return moduleShell(border: snapshot.overallState.tint.opacity(0.24)) {
             VStack(alignment: .leading, spacing: STRQSpacing.md) {
                 HStack(alignment: .top, spacing: STRQSpacing.sm) {
                     VStack(alignment: .leading, spacing: 8) {
@@ -98,7 +139,7 @@ struct ProgressV5ProductionCandidateView: View {
                     divider
                     mapStat("Weeks", "\(snapshot.activeWeeks)/4", "active")
                     divider
-                    mapStat("Target", "\(snapshot.currentWeekSessions)/\(snapshot.weeklyTarget)", "this week")
+                    mapStat("Target", targetDisplay.primary, targetDisplay.detail)
                 }
                 .padding(.vertical, STRQSpacing.sm)
                 .background(TrainingProgressStyle.panel, in: .rect(cornerRadius: 18))
@@ -255,6 +296,8 @@ struct ProgressV5ProductionCandidateView: View {
 
                 HStack(alignment: .bottom, spacing: 8) {
                     ForEach(snapshot.weekRows) { week in
+                        let weekDisplay = weeklyTargetDisplay(completed: week.sessions, target: week.target)
+
                         VStack(spacing: 6) {
                             GeometryReader { proxy in
                                 VStack {
@@ -269,9 +312,11 @@ struct ProgressV5ProductionCandidateView: View {
                             Text(week.label)
                                 .font(STRQTypography.micro)
                                 .foregroundStyle(week.isCurrent ? snapshot.rhythmState.tint : STRQPalette.textMuted)
-                            Text("\(week.sessions)/\(week.target)")
+                            Text(weekDisplay.inlinePrimary)
                                 .font(.system(size: 10, weight: .heavy, design: .rounded).monospacedDigit())
                                 .foregroundStyle(STRQPalette.textSecondary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.72)
                         }
                         .frame(maxWidth: .infinity)
                     }
@@ -696,7 +741,7 @@ private struct TrainingProgressSnapshot {
     private static func rhythmState(daysWithSessions: Int, activeWeeks: Int, currentWeekSessions: Int, target: Int) -> TrainingReadinessState {
         if daysWithSessions == 0 { return .locked }
         if daysWithSessions >= 4 && activeWeeks >= 2 { return .readable }
-        if currentWeekSessions >= target && daysWithSessions >= target { return .readable }
+        if currentWeekSessions >= target && currentWeekSessions <= target && daysWithSessions >= target { return .readable }
         return .forming
     }
 
