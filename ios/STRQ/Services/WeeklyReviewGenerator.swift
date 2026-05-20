@@ -182,6 +182,37 @@ struct WeeklyReviewGenerator {
         return (upper: upperVol / total, lower: lowerVol / total)
     }
 
+    private func localizedMuscleName(_ displayName: String) -> String {
+        MuscleGroup.localizedDisplayName(forDisplayName: displayName)
+    }
+
+    private func localizedMuscleList(_ names: [String]) -> String {
+        let localized = names.map(localizedMuscleName)
+        guard localized.count == 2 else { return localized.joined(separator: ", ") }
+        return localized.joined(separator: " und ")
+    }
+
+    private func streakTitle(_ days: Int) -> String {
+        days == 1 ? "1 Tag am Stück" : "\(days) Tage am Stück"
+    }
+
+    private func personalRecordTitle(_ count: Int) -> String {
+        count == 1 ? "1 neuer PR" : "\(count) neue PRs"
+    }
+
+    private func personalRecordPhrase(_ count: Int) -> String {
+        count == 1 ? "1 neuer PR" : "\(count) neue PRs"
+    }
+
+    private func recoveryTrendTitle(_ trend: RecoveryTrend) -> String {
+        switch trend {
+        case .improving: return "Erholung steigt"
+        case .stable: return "Erholung stabil"
+        case .declining: return "Erholung sinkt"
+        case .critical: return "Erholung niedrig"
+        }
+    }
+
     private func buildWins(summary: WeekSummary, recentPRs: [PersonalRecord], muscleBalance: [MuscleBalanceEntry], profile: UserProfile) -> [ReviewHighlight] {
         var wins: [ReviewHighlight] = []
         let targetDisplay = weeklyTargetDisplay(completed: summary.completedWorkouts, target: summary.plannedWorkouts)
@@ -189,28 +220,26 @@ struct WeeklyReviewGenerator {
         if summary.plannedWorkouts > 0 && summary.completedWorkouts >= summary.plannedWorkouts {
             wins.append(ReviewHighlight(
                 icon: "checkmark.seal.fill",
-                title: targetDisplay.isOverflow ? "More Than Planned" : "Weekly Target Reached",
+                title: "Wochenziel erreicht",
                 detail: targetDisplay.overflowDetail.map {
-                    "Du hast \(targetDisplay.primary) geplante Workouts erreicht — \($0)."
-                } ?? "You hit \(targetDisplay.primary) planned workouts this week.",
+                    "Wochenziel erreicht: \(targetDisplay.primary), \($0)."
+                } ?? "Wochenziel erreicht: \(targetDisplay.primary).",
                 color: "green"
             ))
         } else if summary.plannedWorkouts > 0 && summary.completedWorkouts > 0 && Double(summary.completedWorkouts) / Double(max(1, summary.plannedWorkouts)) >= 0.75 {
             wins.append(ReviewHighlight(
                 icon: "figure.strengthtraining.traditional",
-                title: "Strong Week",
-                detail: "\(summary.completedWorkouts) of \(summary.plannedWorkouts) workouts completed — solid consistency.",
+                title: "Starke Woche",
+                detail: "\(summary.completedWorkouts)/\(summary.plannedWorkouts) Einheiten abgeschlossen. Der Rhythmus passt.",
                 color: "green"
             ))
         }
 
         if summary.personalRecordsCount > 0 {
-            let prNames = recentPRs.prefix(2).compactMap { library.exercise(byId: $0.exerciseId)?.name }
-            let namesText = prNames.isEmpty ? "" : " on \(prNames.joined(separator: " and "))"
             wins.append(ReviewHighlight(
                 icon: "trophy.fill",
-                title: "\(summary.personalRecordsCount) Personal Record\(summary.personalRecordsCount > 1 ? "s" : "")",
-                detail: "New best\(summary.personalRecordsCount > 1 ? "s" : "")\(namesText). Your training is paying off.",
+                title: personalRecordTitle(summary.personalRecordsCount),
+                detail: "Neue Bestleistung gespeichert.",
                 color: "yellow"
             ))
         }
@@ -218,8 +247,8 @@ struct WeeklyReviewGenerator {
         if summary.streakDays >= 7 {
             wins.append(ReviewHighlight(
                 icon: "flame.fill",
-                title: "\(summary.streakDays)-Day Streak",
-                detail: "Consistency is the key to progress. Keep this momentum going.",
+                title: streakTitle(summary.streakDays),
+                detail: "Konstanz sichtbar. Halte den Rhythmus.",
                 color: "orange"
             ))
         }
@@ -229,8 +258,8 @@ struct WeeklyReviewGenerator {
             if volumeChange > 0.05 && volumeChange < 0.2 {
                 wins.append(ReviewHighlight(
                     icon: "chart.line.uptrend.xyaxis",
-                    title: "Volume Increased",
-                    detail: "Total volume up \(Int(volumeChange * 100))% vs last week. Progressive overload in action.",
+                    title: "Volumen gestiegen",
+                    detail: "Gesamtvolumen \(Int(volumeChange * 100))% über der Vorwoche.",
                     color: "blue"
                 ))
             }
@@ -239,8 +268,10 @@ struct WeeklyReviewGenerator {
         if summary.recoveryTrend == .improving || summary.recoveryTrend == .stable {
             wins.append(ReviewHighlight(
                 icon: "heart.fill",
-                title: "Recovery \(summary.recoveryTrend.label)",
-                detail: "Your body is handling the current training load well.",
+                title: recoveryTrendTitle(summary.recoveryTrend),
+                detail: summary.recoveryTrend == .improving
+                    ? "Das Erholungssignal verbessert sich."
+                    : "Belastung und Erholung wirken im Rahmen.",
                 color: "green"
             ))
         }
@@ -249,11 +280,11 @@ struct WeeklyReviewGenerator {
         let focusNames = Set(profile.focusMuscles.map(\.displayName))
         let onTargetFocus = strongMuscles.filter { focusNames.contains($0.muscle) }
         if !onTargetFocus.isEmpty {
-            let names = onTargetFocus.prefix(2).map(\.muscle).joined(separator: " and ")
+            let names = localizedMuscleList(onTargetFocus.prefix(2).map(\.muscle))
             wins.append(ReviewHighlight(
                 icon: "target",
-                title: "Focus Muscles On Track",
-                detail: "\(names) volume is right where it should be.",
+                title: "Fokusmuskeln im Plan",
+                detail: "\(names) liegen im Zielbereich.",
                 color: "blue"
             ))
         }
@@ -268,18 +299,19 @@ struct WeeklyReviewGenerator {
             let missed = summary.plannedWorkouts - summary.completedWorkouts
             areas.append(ReviewHighlight(
                 icon: "calendar.badge.exclamationmark",
-                title: "\(missed) Missed Workout\(missed > 1 ? "s" : "")",
-                detail: "You completed \(summary.completedWorkouts) of \(summary.plannedWorkouts) planned. Try to stay consistent next week.",
+                title: missed == 1 ? "1 Einheit offen" : "\(missed) Einheiten offen",
+                detail: "\(summary.completedWorkouts)/\(summary.plannedWorkouts) geplante Einheiten abgeschlossen.",
                 color: "yellow"
             ))
         }
 
         let undertrained = muscleBalance.filter { $0.percentOfAverage < 0.8 }
         if let weakest = undertrained.first {
+            let muscle = localizedMuscleName(weakest.muscle)
             areas.append(ReviewHighlight(
                 icon: "arrow.down.circle.fill",
-                title: "\(weakest.muscle) Volume Low",
-                detail: "\(weakest.muscle) is \(Int((1.0 - weakest.percentOfAverage) * 100))% below your recent average. Prioritize it next week.",
+                title: "\(muscle): Volumen niedrig",
+                detail: "\(muscle) liegt \(Int((1.0 - weakest.percentOfAverage) * 100))% unter deinem letzten Schnitt.",
                 color: "orange"
             ))
         }
@@ -287,10 +319,10 @@ struct WeeklyReviewGenerator {
         if summary.recoveryTrend == .declining || summary.recoveryTrend == .critical {
             areas.append(ReviewHighlight(
                 icon: "heart.slash.fill",
-                title: "Recovery \(summary.recoveryTrend.label)",
+                title: recoveryTrendTitle(summary.recoveryTrend),
                 detail: recoveryScore < 50
-                    ? "Your body needs more rest. Consider a deload or lighter week."
-                    : "Watch your fatigue. Sustained high training density can lead to burnout.",
+                    ? "Nächste Woche leichter und ruhiger planen."
+                    : "Belastung nächste Woche dosiert halten.",
                 color: "red"
             ))
         }
@@ -298,15 +330,15 @@ struct WeeklyReviewGenerator {
         if let pp = summary.pushPullRatio, pp.push > 0.63 {
             areas.append(ReviewHighlight(
                 icon: "arrow.left.arrow.right",
-                title: "Push-Heavy Balance",
-                detail: "Push:Pull ratio is \(Int(pp.push * 100)):\(Int(pp.pull * 100)). Add more pulling work for shoulder health.",
+                title: "Push dominiert",
+                detail: "Push:Pull \(Int(pp.push * 100)):\(Int(pp.pull * 100)). Etwas mehr Pull einplanen.",
                 color: "orange"
             ))
         } else if let pp = summary.pushPullRatio, pp.pull > 0.63 {
             areas.append(ReviewHighlight(
                 icon: "arrow.left.arrow.right",
-                title: "Pull-Heavy Balance",
-                detail: "Pull:Push ratio is \(Int(pp.pull * 100)):\(Int(pp.push * 100)). Add more pressing movements.",
+                title: "Pull dominiert",
+                detail: "Pull:Push \(Int(pp.pull * 100)):\(Int(pp.push * 100)). Etwas mehr Push einplanen.",
                 color: "orange"
             ))
         }
@@ -316,15 +348,15 @@ struct WeeklyReviewGenerator {
             if volumeChange > 0.25 {
                 areas.append(ReviewHighlight(
                     icon: "exclamationmark.triangle.fill",
-                    title: "Volume Spike",
-                    detail: "Volume jumped \(Int(volumeChange * 100))% vs last week. Sharp increases raise injury risk.",
+                    title: "Volumen stark gestiegen",
+                    detail: "Gesamtvolumen \(Int(volumeChange * 100))% über der Vorwoche. Nächste Woche dosiert halten.",
                     color: "red"
                 ))
             } else if volumeChange < -0.2 {
                 areas.append(ReviewHighlight(
                     icon: "chart.line.downtrend.xyaxis",
-                    title: "Volume Drop",
-                    detail: "Volume decreased \(Int(abs(volumeChange) * 100))% vs last week. Ensure this was intentional.",
+                    title: "Volumen gesunken",
+                    detail: "\(Int(abs(volumeChange) * 100))% unter der Vorwoche. Prüfe, ob das geplant war.",
                     color: "yellow"
                 ))
             }
@@ -341,55 +373,55 @@ struct WeeklyReviewGenerator {
 
         if recoveryScore < 45 {
             return CoachConclusion(
-                headline: "Recovery Needs Attention",
-                message: "Your fatigue signals are elevated. Consider a deload week or significantly lighter sessions. Training through high fatigue increases injury risk and slows progress.",
+                headline: "Erholung braucht Fokus",
+                message: "Die Belastung war hoch. Plane die nächste Woche ruhiger.",
                 tone: .urgent
             )
         }
 
         if recoveryScore < 65 && completionRate >= 0.75 {
             return CoachConclusion(
-                headline: "Good Work, But Watch Fatigue",
+                headline: "Starke Arbeit, Erholung im Blick",
                 message: !hasPlannedTarget
-                    ? "Training volume is logged, but recovery is trending down. Keep the next week measured until the target is clear."
+                    ? "Volumen ist protokolliert, die Erholung sinkt. Halte die nächste Woche dosiert, bis das Wochenziel klarer ist."
                     : targetDisplay.isOverflow
-                    ? "Wochenziel erreicht, zusätzliche Einheiten sind protokolliert, aber die Erholung sinkt. Reduziere Volumen oder trainiere nächste Woche leichter, damit dein Körper aufholen kann."
-                    : "Strong training consistency this week, but recovery is trending down. Consider reducing volume or going lighter next week to let your body catch up.",
+                    ? "Wochenziel erreicht, zusätzliche Einheiten protokolliert. Die Erholung sinkt - nächste Woche dosiert halten."
+                    : "Gute Trainingskonstanz, aber die Erholung sinkt. Nächste Woche Volumen oder Intensität etwas ruhiger halten.",
                 tone: .cautious
             )
         }
 
         if hasPlannedTarget && completionRate >= 1.0 && summary.personalRecordsCount > 0 && recoveryScore >= 65 {
             return CoachConclusion(
-                headline: targetDisplay.isOverflow ? "Target Reached" : "Outstanding Week",
+                headline: targetDisplay.isOverflow ? "Wochenziel erreicht" : "Sehr starke Woche",
                 message: targetDisplay.isOverflow
-                    ? "Wochenziel erreicht, \(summary.personalRecordsCount) neue PR\(summary.personalRecordsCount > 1 ? "s" : ""), und die Erholung sieht gut aus. Zusätzliche Einheiten sind protokolliert, also halte die nächste Woche dosiert."
-                    : "All sessions completed, \(summary.personalRecordsCount) new PR\(summary.personalRecordsCount > 1 ? "s" : ""), and recovery looks good. Continue with your current plan — momentum is on your side.",
+                    ? "Wochenziel erreicht, \(personalRecordPhrase(summary.personalRecordsCount)) und \(targetDisplay.overflowDetail ?? "zusätzliche Einheiten protokolliert"). Nächste Woche dosiert weiter."
+                    : "Alle Einheiten abgeschlossen, \(personalRecordPhrase(summary.personalRecordsCount)). Erholung stabil - gute Basis für die nächste Woche.",
                 tone: .positive
             )
         }
 
         if hasPlannedTarget && completionRate >= 0.75 && hasGoodVolume && recoveryScore >= 65 {
             return CoachConclusion(
-                headline: "Solid Week Overall",
+                headline: "Solide Woche",
                 message: targetDisplay.isOverflow
                     ? "Wochenziel erreicht, zusätzliche Einheiten sind protokolliert. Behalte die Erholung im Blick, bevor du mehr ergänzt."
-                    : "Good consistency and volume this week. Keep training with intent and the results will follow. Your plan is working.",
+                    : "Gute Konstanz und solides Volumen. Nächste Woche den Rhythmus halten.",
                 tone: .positive
             )
         }
 
         if hasPlannedTarget && completionRate < 0.5 {
             return CoachConclusion(
-                headline: "Let's Get Back on Track",
-                message: "This week was lighter than planned. That's okay — consistency has ups and downs. Focus on hitting your sessions next week. Even partial workouts count.",
+                headline: "Rhythmus wieder aufnehmen",
+                message: "Diese Woche war leichter als geplant. Nächste Woche zählt zuerst der Einstieg: Einheiten kurz halten, aber abschließen.",
                 tone: .encouraging
             )
         }
 
         return CoachConclusion(
-            headline: "Keep Building",
-            message: "Decent week with room for improvement. Stay focused on your \(profile.goal.displayName.lowercased()) goal and aim for more consistent sessions next week.",
+            headline: "Weiter aufbauen",
+            message: "Solide Basis mit Luft nach oben. Nächste Woche zählt ein konstanterer Trainingsrhythmus.",
             tone: .encouraging
         )
     }
@@ -404,9 +436,9 @@ struct WeeklyReviewGenerator {
         if recoveryScore < 50 {
             actions.append(ReviewAction(
                 type: .deloadWeek,
-                label: "Start Deload Week",
+                label: "Deload-Woche starten",
                 icon: "arrow.down.to.line",
-                description: "Reduce volume and intensity to let your body recover and supercompensate.",
+                description: "Volumen und Intensität bewusst reduzieren.",
                 isPrimary: true
             ))
         }
@@ -415,9 +447,9 @@ struct WeeklyReviewGenerator {
         if undertrained.count >= 2 || (recoveryScore >= 50 && recoveryScore < 70) {
             actions.append(ReviewAction(
                 type: .regenerateWeek,
-                label: "Regenerate Next Week",
+                label: "Nächste Woche neu planen",
                 icon: "arrow.triangle.2.circlepath.circle.fill",
-                description: "Rebuild your week to improve muscle balance and match your current recovery state.",
+                description: "Woche neu aufbauen, damit Balance und Erholung besser zusammenpassen.",
                 isPrimary: recoveryScore >= 50
             ))
         }
@@ -425,20 +457,20 @@ struct WeeklyReviewGenerator {
         if recoveryScore >= 60 && recoveryScore < 80 && summary.totalVolume > summary.previousWeekVolume * 1.1 {
             actions.append(ReviewAction(
                 type: .reduceVolume,
-                label: "Reduce Volume Next Week",
+                label: "Volumen senken",
                 icon: "minus.circle.fill",
-                description: "Lower accessory sets to manage fatigue while keeping main lifts on track."
+                description: "Nebenübungen etwas reduzieren und Hauptübungen stabil halten."
             ))
         }
 
         if hasPlannedTarget && completionRate >= 0.75 && recoveryScore >= 65 && undertrained.count < 2 {
             actions.append(ReviewAction(
                 type: .keepAsIs,
-                label: "Keep Next Week As Is",
+                label: "Woche beibehalten",
                 icon: "checkmark.circle.fill",
                 description: targetDisplay.isOverflow
-                    ? "Wochenziel erreicht, zusätzliche Einheiten sind protokolliert. Halte die nächste Woche dosiert, bevor du mehr ergänzt."
-                    : "Your current plan is working well. No changes needed.",
+                    ? "Wochenziel erreicht, zusätzliche Einheiten protokolliert. Nächste Woche dosiert weiterführen."
+                    : "Aktuelle Struktur beibehalten. Keine Änderung nötig.",
                 isPrimary: actions.filter(\.isPrimary).isEmpty
             ))
         }
@@ -446,31 +478,31 @@ struct WeeklyReviewGenerator {
         if let pp = summary.pushPullRatio, (pp.push > 0.6 || pp.pull > 0.6) || undertrained.count >= 3 {
             actions.append(ReviewAction(
                 type: .rebalancePlan,
-                label: "Rebalance Plan",
+                label: "Verteilung anpassen",
                 icon: "arrow.left.arrow.right",
-                description: "Adjust exercise selection and volume to improve muscle and movement balance."
+                description: "Übungsauswahl und Volumen ruhiger zwischen Muskelgruppen verteilen."
             ))
         }
 
         if hasPlannedTarget && completionRate < 0.5 && summary.plannedWorkouts > 3 {
             actions.append(ReviewAction(
                 type: .increaseFrequency,
-                label: "Adjust Frequency",
+                label: "Frequenz anpassen",
                 icon: "calendar.badge.plus",
-                description: "Update your plan to match your actual availability for better results."
+                description: "Plan an deine echte Verfügbarkeit anpassen."
             ))
         }
 
         if actions.isEmpty {
             actions.append(ReviewAction(
                 type: .keepAsIs,
-                label: "Keep Next Week As Is",
+                label: "Woche beibehalten",
                 icon: "checkmark.circle.fill",
                 description: targetDisplay.isOverflow
-                    ? "Wochenziel erreicht, zusätzliche Einheiten sind protokolliert. Halte die nächste Woche stabil."
+                    ? "Wochenziel erreicht, zusätzliche Einheiten protokolliert. Nächste Woche stabil halten."
                     : hasPlannedTarget
-                    ? "Everything looks good. Continue with your current plan."
-                    : "Weekly target is open. Keep logging sessions so next week's review has enough context.",
+                    ? "Alles im Rahmen. Aktuelle Struktur beibehalten."
+                    : "Wochenziel ist offen. Weiter Einheiten protokollieren, damit der Rückblick klarer wird.",
                 isPrimary: true
             ))
         }

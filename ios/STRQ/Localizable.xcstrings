@@ -6706,7 +6706,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Verbesserungswürdige Bereiche"
+            "value": "Im Blick behalten"
           }
         }
       }
@@ -6986,7 +6986,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Körpergewichtstrend"
+            "value": "Gewichtstrend"
           }
         }
       }
@@ -7166,7 +7166,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Meinung des Trainers"
+            "value": "Coach-Einschätzung"
           }
         }
       }
@@ -7786,7 +7786,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Höhepunkte"
+            "value": "Signale"
           }
         }
       }
@@ -10146,7 +10146,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Was ist gut gelaufen und was gibt es zu verbessern?"
+            "value": "Was gut lief und was Aufmerksamkeit braucht"
           }
         }
       }
@@ -10156,7 +10156,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Was kommt als nächstes?"
+            "value": "Nächste Schritte"
           }
         }
       }
@@ -10206,7 +10206,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erfolge"
+            "value": "Stark"
           }
         }
       }
@@ -10386,7 +10386,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Kraft schreitet voran. Weiter so."
+            "value": "Neue Bestleistung gespeichert."
           }
         }
       }
@@ -20331,6 +20331,296 @@
           "stringUnit": {
             "state": "translated",
             "value": "Du baust Momentum auf"
+          }
+        }
+      }
+    },
+    "%d Tag am Stück": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Tag am Stück"
+          }
+        }
+      }
+    },
+    "%d Tage am Stück": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Tage am Stück"
+          }
+        }
+      }
+    },
+    "%d neue PRs": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d neue PRs"
+          }
+        }
+      }
+    },
+    "%d neuer PR": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d neuer PR"
+          }
+        }
+      }
+    },
+    "weeklyReview.applyDialogTitle": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anwenden: %@"
+          }
+        }
+      }
+    },
+    "weeklyReview.areas": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Blick behalten"
+          }
+        }
+      }
+    },
+    "weeklyReview.bodyweightTrend": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gewichtstrend"
+          }
+        }
+      }
+    },
+    "weeklyReview.coachTake": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach-Einschätzung"
+          }
+        }
+      }
+    },
+    "weeklyReview.highlights": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signale"
+          }
+        }
+      }
+    },
+    "weeklyReview.highlightsSubtitle": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Was gut lief und was Aufmerksamkeit braucht"
+          }
+        }
+      }
+    },
+    "weeklyReview.lastWeek": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorwoche"
+          }
+        }
+      }
+    },
+    "weeklyReview.lower": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unterkörper"
+          }
+        }
+      }
+    },
+    "weeklyReview.nextSteps": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Schritte"
+          }
+        }
+      }
+    },
+    "weeklyReview.prCelebrationDetail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Bestleistung gespeichert."
+          }
+        }
+      }
+    },
+    "weeklyReview.recovery.label": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erholung"
+          }
+        }
+      }
+    },
+    "weeklyReview.recovery.declining": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sinkend"
+          }
+        }
+      }
+    },
+    "weeklyReview.recovery.improving": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steigend"
+          }
+        }
+      }
+    },
+    "weeklyReview.recovery.low": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niedrig"
+          }
+        }
+      }
+    },
+    "weeklyReview.recovery.stable": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stabil"
+          }
+        }
+      }
+    },
+    "weeklyReview.stat.avgDuration": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ø Dauer"
+          }
+        }
+      }
+    },
+    "weeklyReview.stat.totalSets": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sätze gesamt"
+          }
+        }
+      }
+    },
+    "weeklyReview.stat.totalVolume": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesamtvolumen"
+          }
+        }
+      }
+    },
+    "weeklyReview.targetReached": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wochenziel erreicht"
+          }
+        }
+      }
+    },
+    "weeklyReview.thisWeek": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Woche"
+          }
+        }
+      }
+    },
+    "weeklyReview.title": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wochenrückblick"
+          }
+        }
+      }
+    },
+    "weeklyReview.upper": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oberkörper"
+          }
+        }
+      }
+    },
+    "weeklyReview.volumeComparison": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumenvergleich"
+          }
+        }
+      }
+    },
+    "weeklyReview.wins": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stark"
+          }
+        }
+      }
+    },
+    "weeklyReview.vsLastWeek": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "vs. Vorwoche"
           }
         }
       }

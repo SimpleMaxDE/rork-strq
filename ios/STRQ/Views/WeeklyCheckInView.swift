@@ -29,7 +29,7 @@ struct WeeklyCheckInView: View {
         }
 
         if completed == target {
-            return WeeklyTargetDisplay(primary: primary, secondary: L10n.tr("target reached"))
+            return WeeklyTargetDisplay(primary: primary, secondary: L10n.tr("weeklyReview.targetReached", fallback: "Wochenziel erreicht"))
         }
 
         return WeeklyTargetDisplay(primary: primary, secondary: L10n.tr("Workouts"))
@@ -80,7 +80,7 @@ struct WeeklyCheckInView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(reportBackground)
-            .navigationTitle(L10n.tr("Weekly Review"))
+            .navigationTitle(weeklyReviewText("weeklyReview.title", fallback: "Wochenrückblick"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -164,7 +164,7 @@ struct WeeklyCheckInView: View {
                 Spacer(minLength: 0)
             }
 
-            Text(L10n.tr("Week in Review"))
+            Text(weeklyReviewText("weeklyReview.title", fallback: "Wochenrückblick"))
                 .font(.system(.title, design: .rounded, weight: .bold))
                 .foregroundStyle(STRQPalette.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -256,7 +256,7 @@ struct WeeklyCheckInView: View {
                         Image(systemName: "flame.fill")
                             .font(.caption)
                             .foregroundStyle(reportInk)
-                        Text("\(review.summary.streakDays)-day streak")
+                        Text(streakLabel(review.summary.streakDays))
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(reportInk)
                     }
@@ -285,28 +285,28 @@ struct WeeklyCheckInView: View {
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
             statTile(
                 value: formatVolume(review.summary.totalVolume),
-                label: "Total Volume",
+                label: weeklyReviewText("weeklyReview.stat.totalVolume", fallback: "Gesamtvolumen"),
                 icon: "scalemass.fill",
                 color: reportInk,
                 trend: volumeTrend
             )
             statTile(
                 value: "\(review.summary.totalSets)",
-                label: "Total Sets",
+                label: weeklyReviewText("weeklyReview.stat.totalSets", fallback: "Sätze gesamt"),
                 icon: "checkmark.circle.fill",
                 color: reportSteel,
                 trend: nil
             )
             statTile(
                 value: "\(review.summary.averageDuration)m",
-                label: "Avg Duration",
+                label: weeklyReviewText("weeklyReview.stat.avgDuration", fallback: "Ø Dauer"),
                 icon: "clock.fill",
                 color: reportSteel,
                 trend: nil
             )
             statTile(
-                value: review.summary.recoveryTrend.label,
-                label: "Recovery",
+                value: recoveryTrendLabel(review.summary.recoveryTrend),
+                label: weeklyReviewText("weeklyReview.recovery.label", fallback: "Erholung"),
                 icon: review.summary.recoveryTrend.icon,
                 color: recoveryColor(review.summary.recoveryTrend),
                 trend: nil
@@ -374,18 +374,18 @@ struct WeeklyCheckInView: View {
                     .foregroundStyle(reportInk)
                     .frame(width: 28, height: 28)
                     .background(reportInk.opacity(0.10), in: .rect(cornerRadius: 8))
-                Text(L10n.tr("Volume Comparison"))
+                Text(weeklyReviewText("weeklyReview.volumeComparison", fallback: "Volumenvergleich"))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(STRQPalette.textPrimary)
                 Spacer()
-                Text(L10n.tr("vs last week"))
+                Text(weeklyReviewText("weeklyReview.vsLastWeek", fallback: "vs. Vorwoche"))
                     .font(.caption2)
                     .foregroundStyle(STRQPalette.textSecondary)
             }
 
             HStack(spacing: 16) {
-                volumeBar(label: "Last Week", value: review.summary.previousWeekVolume, maxValue: max(review.summary.totalVolume, review.summary.previousWeekVolume), color: Color.white.opacity(0.28))
-                volumeBar(label: "This Week", value: review.summary.totalVolume, maxValue: max(review.summary.totalVolume, review.summary.previousWeekVolume), color: reportInk)
+                volumeBar(label: weeklyReviewText("weeklyReview.lastWeek", fallback: "Vorwoche"), value: review.summary.previousWeekVolume, maxValue: max(review.summary.totalVolume, review.summary.previousWeekVolume), color: Color.white.opacity(0.28))
+                volumeBar(label: weeklyReviewText("weeklyReview.thisWeek", fallback: "Diese Woche"), value: review.summary.totalVolume, maxValue: max(review.summary.totalVolume, review.summary.previousWeekVolume), color: reportInk)
             }
             .frame(height: 98)
         }
@@ -452,11 +452,11 @@ struct WeeklyCheckInView: View {
                 balanceBar(first: ul.upper, second: ul.lower, firstColor: Color.white.opacity(0.66), secondColor: reportInk.opacity(0.74))
 
                 HStack {
-                    Label("Upper \(Int(ul.upper * 100))%", systemImage: "arrow.up")
+                    Label("\(weeklyReviewText("weeklyReview.upper", fallback: "Oberkörper")) \(Int(ul.upper * 100))%", systemImage: "arrow.up")
                         .font(.caption2)
                         .foregroundStyle(.white)
                     Spacer()
-                    Label("Lower \(Int(ul.lower * 100))%", systemImage: "arrow.down")
+                    Label("\(weeklyReviewText("weeklyReview.lower", fallback: "Unterkörper")) \(Int(ul.lower * 100))%", systemImage: "arrow.down")
                         .font(.caption2)
                         .foregroundStyle(STRQBrand.steel)
                 }
@@ -494,12 +494,12 @@ struct WeeklyCheckInView: View {
                         .foregroundStyle(reportInk)
                         .frame(width: 26, height: 26)
                         .background(reportInk.opacity(0.10), in: .rect(cornerRadius: 8))
-                    Text(L10n.tr("Highlights"))
+                    Text(weeklyReviewText("weeklyReview.highlights", fallback: "Signale"))
                         .font(.system(.title2, design: .rounded, weight: .bold))
                         .foregroundStyle(STRQPalette.textPrimary)
                     Spacer(minLength: 0)
                 }
-                Text(L10n.tr("What went well and what to improve"))
+                Text(weeklyReviewText("weeklyReview.highlightsSubtitle", fallback: "Was gut lief und was Aufmerksamkeit braucht"))
                     .font(.subheadline)
                     .foregroundStyle(STRQPalette.textSecondary)
             }
@@ -533,7 +533,7 @@ struct WeeklyCheckInView: View {
     private var winsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                Label(L10n.tr("Wins"), systemImage: "star.fill")
+                Label(weeklyReviewText("weeklyReview.wins", fallback: "Stark"), systemImage: "star.fill")
                     .font(.headline)
                     .foregroundStyle(STRQPalette.success)
                 Spacer(minLength: 0)
@@ -560,7 +560,7 @@ struct WeeklyCheckInView: View {
     private var areasSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                Label(L10n.tr("Areas to Improve"), systemImage: "arrow.up.right")
+                Label(weeklyReviewText("weeklyReview.areas", fallback: "Im Blick behalten"), systemImage: "arrow.up.right")
                     .font(.headline)
                     .foregroundStyle(STRQPalette.warning)
                 Spacer(minLength: 0)
@@ -598,10 +598,10 @@ struct WeeklyCheckInView: View {
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(item.title)
+                Text(displayHighlightTitle(item))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(STRQPalette.textPrimary)
-                Text(item.detail)
+                Text(displayHighlightDetail(item))
                     .font(.caption)
                     .foregroundStyle(STRQPalette.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -634,9 +634,9 @@ struct WeeklyCheckInView: View {
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(L10n.tr("Bodyweight Trend"))
+                Text(weeklyReviewText("weeklyReview.bodyweightTrend", fallback: "Gewichtstrend"))
                     .font(.subheadline.weight(.semibold))
-                Text("\(change > 0 ? "+" : "")\(String(format: "%.1f", change))kg vs last week")
+                Text("\(change > 0 ? "+" : "")\(String(format: "%.1f", change))kg \(weeklyReviewText("weeklyReview.vsLastWeek", fallback: "vs. Vorwoche"))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -664,10 +664,12 @@ struct WeeklyCheckInView: View {
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                let prLabel = review.summary.personalRecordsCount > 1 ? L10n.tr("New PRs This Week") : L10n.tr("New PR This Week")
-                Text(L10n.format("%d %@", review.summary.personalRecordsCount, prLabel))
+                let prLabel = review.summary.personalRecordsCount == 1
+                    ? L10n.format("%d neuer PR", review.summary.personalRecordsCount)
+                    : L10n.format("%d neue PRs", review.summary.personalRecordsCount)
+                Text(prLabel)
                     .font(.subheadline.weight(.bold))
-                Text(L10n.tr("Your strength is progressing. Keep it up."))
+                Text(weeklyReviewText("weeklyReview.prCelebrationDetail", fallback: "Neue Bestleistung gespeichert."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -712,19 +714,19 @@ struct WeeklyCheckInView: View {
                 )
 
                 VStack(alignment: .leading, spacing: 7) {
-                    Text(L10n.tr("Coach's Take"))
+                    Text(weeklyReviewText("weeklyReview.coachTake", fallback: "Coach-Einschätzung"))
                         .font(.caption.weight(.bold))
                         .foregroundStyle(color)
                         .tracking(0.5)
 
-                    Text(review.coachConclusion.headline)
+                    Text(displayConclusionHeadline(review.coachConclusion))
                         .font(.system(.title2, design: .rounded, weight: .bold))
                         .foregroundStyle(STRQPalette.textPrimary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
 
-            Text(review.coachConclusion.message)
+            Text(displayConclusionMessage(review.coachConclusion))
                 .font(.subheadline)
                 .foregroundStyle(STRQPalette.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -751,7 +753,7 @@ struct WeeklyCheckInView: View {
                     .foregroundStyle(reportInk)
                     .frame(width: 28, height: 28)
                     .background(reportInk.opacity(0.10), in: .rect(cornerRadius: 8))
-                Text(L10n.tr("What's Next?"))
+                Text(weeklyReviewText("weeklyReview.nextSteps", fallback: "Nächste Schritte"))
                     .font(.headline)
                     .foregroundStyle(STRQPalette.textPrimary)
                 Spacer(minLength: 0)
@@ -792,10 +794,10 @@ struct WeeklyCheckInView: View {
                 )
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(action.label)
+                    Text(displayActionLabel(action))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(STRQPalette.textPrimary)
-                    Text(action.description)
+                    Text(displayActionDescription(action))
                         .font(.caption)
                         .foregroundStyle(STRQPalette.textSecondary)
                         .lineLimit(2)
@@ -831,12 +833,16 @@ struct WeeklyCheckInView: View {
         .buttonStyle(.plain)
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.4), trigger: showConfirmation)
         .confirmationDialog(
-            "Apply: \(selectedAction?.label ?? "")",
+            L10n.format(
+                "weeklyReview.applyDialogTitle",
+                fallback: "Anwenden: %@",
+                selectedAction.map(displayActionLabel) ?? ""
+            ),
             isPresented: $showConfirmation,
             titleVisibility: .visible
         ) {
             if let selected = selectedAction {
-                Button(selected.label) {
+                Button(displayActionLabel(selected)) {
                     withAnimation(.snappy(duration: 0.3)) {
                         vm.applyReviewAction(selected)
                     }
@@ -845,12 +851,234 @@ struct WeeklyCheckInView: View {
             }
         } message: {
             if let selected = selectedAction {
-                Text(selected.description)
+                Text(displayActionDescription(selected))
             }
         }
     }
 
     // MARK: - Helpers
+
+    private func weeklyReviewText(_ key: String, fallback: String) -> String {
+        let localized = L10n.tr(key, fallback: fallback)
+        return localized == key ? fallback : localized
+    }
+
+    private func isText(_ value: String, _ parts: String...) -> Bool {
+        value == parts.joined()
+    }
+
+    private func containsText(_ value: String, _ parts: String...) -> Bool {
+        value.contains(parts.joined())
+    }
+
+    private func targetReachedHighlightDetail() -> String {
+        let completed = max(0, review.summary.completedWorkouts)
+        let target = review.summary.plannedWorkouts
+        guard target > 0 else { return "Ziel erreicht." }
+        guard completed > target else { return "Ziel erreicht." }
+        return "Ziel erreicht. +\(completed - target) zusätzlich, \(completed) gesamt."
+    }
+
+    private func displayHighlightTitle(_ item: ReviewHighlight) -> String {
+        let title = item.title
+
+        if isText(title, "More ", "Than Planned") { return "Mehr als geplant" }
+        if isText(title, "Weekly ", "Target Reached") { return "Wochenziel erreicht" }
+        if isText(title, "Strong ", "Week") { return "Starke Woche" }
+        if isText(title, "Volume ", "Increased") { return "Volumen gestiegen" }
+        if isText(title, "Volume ", "Spike") { return "Volumen stark gestiegen" }
+        if isText(title, "Volume ", "Drop") { return "Volumen gesunken" }
+        if isText(title, "Recovery ", "Low") { return "Erholung niedrig" }
+        if isText(title, "Recovery ", "Declining") { return "Erholung sinkt" }
+        if isText(title, "Recovery ", "Stable") { return "Erholung stabil" }
+        if isText(title, "Recovery ", "Improving") { return "Erholung steigt" }
+        if isText(title, "Focus ", "Muscles On Track") { return "Fokusmuskeln im Plan" }
+        if isText(title, "Push-", "Heavy Balance") { return "Push dominiert" }
+        if isText(title, "Pull-", "Heavy Balance") { return "Pull dominiert" }
+
+        if title.hasSuffix("-Day Streak"), let firstPart = title.split(separator: "-").first, let days = Int(firstPart) {
+            return streakLabel(days)
+        }
+
+        if containsText(title, "Personal ", "Record") {
+            return review.summary.personalRecordsCount == 1
+                ? "1 neuer PR"
+                : "\(review.summary.personalRecordsCount) neue PRs"
+        }
+
+        if containsText(title, "Missed ", "Workout") {
+            let missed = max(0, review.summary.plannedWorkouts - review.summary.completedWorkouts)
+            return missed == 1 ? "1 Einheit offen" : "\(missed) Einheiten offen"
+        }
+
+        if containsText(title, "Volume ", "Low") {
+            let muscleName = title
+                .replacingOccurrences(of: " Volume Low", with: "")
+                .replacingOccurrences(of: "Volume Low", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let localizedMuscle = MuscleGroup.localizedDisplayName(forDisplayName: muscleName)
+            return localizedMuscle.isEmpty ? "Volumen niedrig" : "\(localizedMuscle): Volumen niedrig"
+        }
+
+        if title.hasSuffix(" Volumen niedrig"), !title.hasSuffix(": Volumen niedrig") {
+            let muscleName = String(title.dropLast(" Volumen niedrig".count))
+            return "\(muscleName): Volumen niedrig"
+        }
+
+        return title
+    }
+
+    private func displayHighlightDetail(_ item: ReviewHighlight) -> String {
+        let title = item.title
+        let detail = item.detail
+
+        if isText(title, "More ", "Than Planned") || isText(title, "Weekly ", "Target Reached") {
+            return targetReachedHighlightDetail()
+        }
+
+        if isText(title, "Strong ", "Week") {
+            return "\(review.summary.completedWorkouts)/\(review.summary.plannedWorkouts) Einheiten abgeschlossen. Der Rhythmus passt."
+        }
+
+        if containsText(title, "Personal ", "Record") || title == "1 neuer PR" || title.hasSuffix("neue PRs") {
+            return "Neue Bestleistung gespeichert."
+        }
+
+        if title.hasSuffix("-Day Streak") {
+            return "Konstanz sichtbar. Halte den Rhythmus."
+        }
+
+        if isText(title, "Recovery ", "Stable") {
+            return "Belastung und Erholung wirken im Rahmen."
+        }
+
+        if isText(title, "Recovery ", "Improving") {
+            return "Das Erholungssignal verbessert sich."
+        }
+
+        if containsText(title, "Recovery") || containsText(detail, "fatigue") || containsText(detail, "Your ", "body") {
+            return "Erholung war niedrig. Nächste Woche ruhiger planen."
+        }
+
+        if containsText(detail, "You hit") || containsText(detail, "planned ", "workouts") {
+            return targetReachedHighlightDetail()
+        }
+
+        if containsText(detail, "current ", "training load") {
+            return "Belastung und Erholung wirken im Rahmen."
+        }
+
+        if containsText(detail, "Progressive ", "overload") {
+            return "Gesamtvolumen liegt über der Vorwoche."
+        }
+
+        if containsText(detail, "Sharp ", "increases") || containsText(detail, "Volume ", "jumped") {
+            return "Volumen stark gestiegen. Nächste Woche dosiert halten."
+        }
+
+        if containsText(detail, "Volume ", "decreased") {
+            return "Volumen unter der Vorwoche. Prüfe, ob das geplant war."
+        }
+
+        if containsText(detail, "Try ", "to stay consistent") {
+            return "\(review.summary.completedWorkouts)/\(review.summary.plannedWorkouts) geplante Einheiten abgeschlossen."
+        }
+
+        if containsText(detail, "Prioritize ", "it next") {
+            return "Nächste Woche gezielt ruhiger ausgleichen."
+        }
+
+        if containsText(detail, "shoulder ", "health") {
+            return "Etwas mehr Pull einplanen."
+        }
+
+        if containsText(detail, "pressing ", "movements") {
+            return "Etwas mehr Push einplanen."
+        }
+
+        return detail
+    }
+
+    private func displayConclusionHeadline(_ conclusion: CoachConclusion) -> String {
+        if conclusion.tone == .urgent { return "Erholung braucht Fokus" }
+        if isText(conclusion.headline, "Good ", "Work, But Watch Fatigue") { return "Starke Arbeit, Erholung im Blick" }
+        if isText(conclusion.headline, "Target ", "Reached") { return "Wochenziel erreicht" }
+        if isText(conclusion.headline, "Outstanding ", "Week") { return "Sehr starke Woche" }
+        if isText(conclusion.headline, "Solid ", "Week Overall") { return "Solide Woche" }
+        if isText(conclusion.headline, "Let's ", "Get Back on Track") { return "Rhythmus wieder aufnehmen" }
+        if isText(conclusion.headline, "Keep ", "Building") { return "Weiter aufbauen" }
+        return conclusion.headline
+    }
+
+    private func displayConclusionMessage(_ conclusion: CoachConclusion) -> String {
+        if conclusion.tone == .urgent {
+            return "Die Belastung war hoch. Plane die nächste Woche ruhiger."
+        }
+
+        let message = conclusion.message
+        if containsText(message, "fatigue") || containsText(message, "recovery ", "is trending down") {
+            return "Erholung war niedrig. Nächste Woche ruhiger planen."
+        }
+        if containsText(message, "All ", "sessions completed") {
+            return "Alle Einheiten abgeschlossen. Konstanz sichtbar."
+        }
+        if containsText(message, "Your ", "plan is working") || containsText(message, "current ", "plan") {
+            return "Aktuelle Struktur beibehalten."
+        }
+        if containsText(message, "room ", "for improvement") {
+            return "Solide Basis mit Luft nach oben. Nächste Woche zählt ein konstanterer Trainingsrhythmus."
+        }
+        if containsText(message, "lighter ", "than planned") {
+            return "Diese Woche war leichter als geplant. Nächste Woche zählt zuerst der Einstieg."
+        }
+        return message
+    }
+
+    private func displayActionLabel(_ action: ReviewAction) -> String {
+        switch action.type {
+        case .deloadWeek: return "Deload-Woche starten"
+        case .regenerateWeek: return "Nächste Woche neu planen"
+        case .reduceVolume: return "Volumen senken"
+        case .keepAsIs: return "Woche beibehalten"
+        case .rebalancePlan: return "Verteilung anpassen"
+        case .increaseFrequency: return "Frequenz anpassen"
+        }
+    }
+
+    private func displayActionDescription(_ action: ReviewAction) -> String {
+        switch action.type {
+        case .deloadWeek:
+            return "Volumen und Intensität bewusst reduzieren."
+        case .regenerateWeek:
+            return "Woche neu aufbauen, damit Balance und Erholung besser zusammenpassen."
+        case .reduceVolume:
+            return "Nebenübungen etwas reduzieren und Hauptübungen stabil halten."
+        case .keepAsIs:
+            if review.summary.plannedWorkouts > 0 && review.summary.completedWorkouts > review.summary.plannedWorkouts {
+                return "Ziel erreicht. +\(review.summary.completedWorkouts - review.summary.plannedWorkouts) zusätzlich, \(review.summary.completedWorkouts) gesamt."
+            }
+            return "Aktuelle Struktur beibehalten."
+        case .rebalancePlan:
+            return "Übungsauswahl und Volumen ruhiger zwischen Muskelgruppen verteilen."
+        case .increaseFrequency:
+            return "Plan an deine echte Verfügbarkeit anpassen."
+        }
+    }
+
+    private func streakLabel(_ days: Int) -> String {
+        days == 1
+            ? L10n.format("%d Tag am Stück", days)
+            : L10n.format("%d Tage am Stück", days)
+    }
+
+    private func recoveryTrendLabel(_ trend: RecoveryTrend) -> String {
+        switch trend {
+        case .improving: return L10n.tr("weeklyReview.recovery.improving", fallback: "Steigend")
+        case .stable: return L10n.tr("weeklyReview.recovery.stable", fallback: "Stabil")
+        case .declining: return L10n.tr("weeklyReview.recovery.declining", fallback: "Sinkend")
+        case .critical: return L10n.tr("weeklyReview.recovery.low", fallback: "Niedrig")
+        }
+    }
 
     private func balanceBar(first: Double, second: Double, firstColor: Color, secondColor: Color) -> some View {
         let safeFirst = max(0, first)
