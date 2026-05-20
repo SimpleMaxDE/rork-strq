@@ -6686,7 +6686,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alle Arbeitssätze sind geloggt. Beende, wenn du bereit bist."
+            "value": "Übung abgeschlossen."
           }
         }
       }
@@ -7736,7 +7736,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mach dich bereit für den nächsten Einsatz."
+            "value": "Nächster Satz kommt."
           }
         }
       }
@@ -9006,7 +9006,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zurücksetzen, dann wieder los."
+            "value": "Kurz sammeln."
           }
         }
       }
@@ -16120,7 +16120,157 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nächster Satz ist bereit."
+            "value": "Nächster Satz bereit."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.guidance.clean": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sauber. Vorgabe halten."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.guidance.default": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächster Satz bereit."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.guidance.easy": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lief leicht. Steigerung möglich."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.guidance.form": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Technik prüfen. Nicht steigern."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.guidance.grind": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hart. Last halten."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.guidance.nextExercise": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Übung bereit."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.guidance.pain": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schmerz notiert. Nicht erzwingen."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.guidance.todayAdjusted": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heute ruhiger halten."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.guidance.topOfRange": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oberes Ziel getroffen."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.quality.accessibilityHint": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ändert die Vorgabe nicht."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.quality.clean.accessibility": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clean. Sauber. Vorgabe halten."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.quality.easy.accessibility": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Easy. Lief leicht. Steigerung möglich."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.quality.form.accessibility": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Form. Technik prüfen. Nicht steigern."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.quality.grind.accessibility": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grind. Hart. Last halten."
+          }
+        }
+      }
+    },
+    "activeWorkout.rest.quality.pain.accessibility": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pain. Schmerz notiert. Nicht erzwingen."
           }
         }
       }
@@ -20170,7 +20320,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heute ruhiger: nächsten Satz aus heutiger Vorgabe halten."
+            "value": "Heute ruhiger halten."
           }
         }
       }

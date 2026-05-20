@@ -2323,6 +2323,23 @@ struct ActiveWorkoutView: View {
             .shadow(color: isSelected ? tint.opacity(0.18) : Color.clear, radius: 9, y: 4)
         }
         .buttonStyle(.strqPressable)
+        .accessibilityLabel(restQualityAccessibilityLabel(for: quality))
+        .accessibilityHint(L10n.tr("activeWorkout.rest.quality.accessibilityHint", fallback: "Ändert die Vorgabe nicht."))
+    }
+
+    private func restQualityAccessibilityLabel(for quality: SetQuality) -> String {
+        switch quality {
+        case .tooEasy:
+            return L10n.tr("activeWorkout.rest.quality.easy.accessibility", fallback: "Easy. Lief leicht. Steigerung möglich.")
+        case .onTarget:
+            return L10n.tr("activeWorkout.rest.quality.clean.accessibility", fallback: "Clean. Sauber. Vorgabe halten.")
+        case .grinder:
+            return L10n.tr("activeWorkout.rest.quality.grind.accessibility", fallback: "Grind. Hart. Last halten.")
+        case .formBreakdown:
+            return L10n.tr("activeWorkout.rest.quality.form.accessibility", fallback: "Form. Technik prüfen. Nicht steigern.")
+        case .pain:
+            return L10n.tr("activeWorkout.rest.quality.pain.accessibility", fallback: "Pain. Schmerz notiert. Nicht erzwingen.")
+        }
     }
 
     private func restFocusTimer(progress: CGFloat, rationale: String, advisory: NextSetRec?) -> some View {
@@ -2543,7 +2560,7 @@ struct ActiveWorkoutView: View {
         let planned = last.exerciseIndex < sourceWorkout.plannedExercises.count ? sourceWorkout.plannedExercises[last.exerciseIndex] : nil
         let today = planned.map { vm.todayPrescription(for: $0) }
         let quality = justLogged.quality
-        var guidance = "Queued next set is ready. Adjust only if it feels right."
+        var guidance = L10n.tr("activeWorkout.rest.guidance.default", fallback: "Nächster Satz bereit.")
         var icon = "figure.strengthtraining.traditional"
         var tint: Color = STRQBrand.steel
 
@@ -2551,29 +2568,23 @@ struct ActiveWorkoutView: View {
         let increment = weightIncrement(for: exercise)
         let isSameExercise = activeExerciseIndex == last.exerciseIndex
         let todayIsAdjusted = today.map { todayPrescriptionDiffersFromPlan($0, planned: planned, currentSet: next) } ?? false
-        let reducedSetGuidance = L10n.tr("Keep today's calmer target for the next set.")
+        let reducedSetGuidance = L10n.tr("activeWorkout.rest.guidance.todayAdjusted", fallback: "Heute ruhiger halten.")
 
         if !isSameExercise {
-            guidance = "Next exercise is queued. Start when the rest feels right."
+            guidance = L10n.tr("activeWorkout.rest.guidance.nextExercise", fallback: "Nächste Übung bereit.")
             icon = "arrow.right.circle.fill"
             tint = STRQBrand.steel
         } else if let q = quality {
-            if todayIsAdjusted && q == .tooEasy {
-                guidance = reducedSetGuidance
-                icon = "heart.circle.fill"
-                tint = activeWorkoutSignal
-            } else {
-                let advisory = restAdvisory(for: q)
-                guidance = advisory.guidance
-                icon = advisory.icon
-                tint = advisory.tint
-            }
+            let advisory = restAdvisory(for: q)
+            guidance = advisory.guidance
+            icon = advisory.icon
+            tint = advisory.tint
         } else if todayIsAdjusted {
             guidance = reducedSetGuidance
             icon = "heart.circle.fill"
             tint = activeWorkoutSignal
         } else if let today, let targetTopReps = parsePlannedReps(today.suggestedRepRange), justLogged.reps >= targetTopReps {
-            guidance = "Top of the range hit. Consider a small bump if it still feels clean."
+            guidance = L10n.tr("activeWorkout.rest.guidance.topOfRange", fallback: "Oberes Ziel getroffen.")
             icon = "arrow.up.right.circle.fill"
             tint = STRQPalette.success
         }
@@ -2599,31 +2610,31 @@ struct ActiveWorkoutView: View {
         switch quality {
         case .tooEasy:
             return (
-                "Felt easy. Consider a small bump if the next set still feels clean.",
+                L10n.tr("activeWorkout.rest.guidance.easy", fallback: "Lief leicht. Steigerung möglich."),
                 "arrow.up.right.circle.fill",
                 STRQPalette.info
             )
         case .onTarget:
             return (
-                "Keep the next set controlled with the same standard.",
+                L10n.tr("activeWorkout.rest.guidance.clean", fallback: "Sauber. Vorgabe halten."),
                 "checkmark.circle.fill",
                 STRQPalette.success
             )
         case .grinder:
             return (
-                "Hold the load. Match clean reps before pushing.",
+                L10n.tr("activeWorkout.rest.guidance.grind", fallback: "Hart. Last halten."),
                 "flame.fill",
                 STRQPalette.warning
             )
         case .formBreakdown:
             return (
-                "Technique flagged. Keep the next set cleaner before adding load.",
+                L10n.tr("activeWorkout.rest.guidance.form", fallback: "Technik prüfen. Nicht steigern."),
                 "exclamationmark.triangle.fill",
                 STRQPalette.warning
             )
         case .pain:
             return (
-                "Pain noted. Swap or stop this movement if it does not settle.",
+                L10n.tr("activeWorkout.rest.guidance.pain", fallback: "Schmerz notiert. Nicht erzwingen."),
                 "cross.case.fill",
                 STRQPalette.danger
             )
