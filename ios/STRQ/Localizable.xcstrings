@@ -256,7 +256,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fortschrittssignale, die belastbar genug sind"
+            "value": "Fortschritt, der klar genug ist"
           }
         }
       }
@@ -1086,7 +1086,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Halte die Last konservativ und lass Erholung heute führen."
+            "value": "Gewicht halten und Erholung heute führen lassen."
           }
         }
       }
@@ -1726,7 +1726,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erhol dich, iss gut und komm stärker zurück."
+            "value": "Erhol dich, iss gut und prüfe morgen neu."
           }
         }
       }
@@ -4126,7 +4126,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Baseline-Lasten festgelegt"
+            "value": "Baseline-Gewichte festgelegt"
           }
         }
       }
@@ -4246,7 +4246,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Baseline wird aufgebaut"
+            "value": "Ausgangswert entsteht"
           }
         }
       }
@@ -4316,7 +4316,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Coach erkennt deine Muster"
+            "value": "Coach lernt dein Training"
           }
         }
       }
@@ -4776,7 +4776,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Leichterer Tag — Qualität vor Last"
+            "value": "Leichterer Tag — Technik vor Gewicht"
           }
         }
       }
@@ -4796,7 +4796,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lege deine Baseline fest. STRQ kalibriert jede Last anhand deiner realen Leistung."
+            "value": "Lege deine Baseline fest. STRQ kalibriert jedes Gewicht anhand deiner realen Leistung."
           }
         }
       }
@@ -4916,7 +4916,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "NEUER PERSÖNLICHER REKORD"
+            "value": "NEUER PR"
           }
         }
       }
@@ -4926,7 +4926,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Neuer PR bei %@"
+            "value": "Neuer PR · %@"
           }
         }
       }
@@ -4996,7 +4996,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mustererkennung ist aktiv"
+            "value": "Coach lernt mit"
           }
         }
       }
@@ -5006,7 +5006,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mustererkennung wird präziser — Balance, Ermüdung und Laststeuerung werden konkret."
+            "value": "Der Coach wird genauer — Balance, Erholung und Gewicht werden konkreter."
           }
         }
       }
@@ -5136,7 +5136,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Progressionssignale starten. Der Coach passt Last und Volumen an."
+            "value": "Progression startet. Der Coach passt Gewicht und Volumen an."
           }
         }
       }
@@ -5266,7 +5266,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STRQ passt Last und Volumen anhand der Signale an."
+            "value": "STRQ passt Gewicht und Volumen anhand deiner Logs an."
           }
         }
       }
@@ -5486,7 +5486,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schaltet Coaching auf Muster-Ebene frei"
+            "value": "Schaltet genaueres Coaching frei"
           }
         }
       }
@@ -5506,7 +5506,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schaltet echte Lastvorgaben frei"
+            "value": "Schaltet echte Gewichtschecks frei"
           }
         }
       }
@@ -6666,7 +6666,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alle Muster"
+            "value": "Alle Bereiche"
           }
         }
       }
@@ -7226,7 +7226,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abgeschlossene Workouts geben STRQ genug Kontext für Lastverteilung, Wochenrhythmus und Übungsmix."
+            "value": "Abgeschlossene Workouts geben STRQ genug Kontext für Gewicht, Wochenrhythmus und Übungsmix."
           }
         }
       }
@@ -7806,7 +7806,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Last halten – Technik festigen"
+            "value": "Gewicht halten – Technik festigen"
           }
         }
       }
@@ -8291,16 +8291,6 @@
         }
       }
     },
-    "NEXT SHIFT": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "NÄCHSTE SCHICHT"
-          }
-        }
-      }
-    },
     "NUTRITION GOAL": {
       "localizations": {
         "de": {
@@ -8396,7 +8386,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Noch keine Änderungen – jede Entscheidung wird hier protokolliert."
+            "value": "Änderungen erscheinen hier."
           }
         }
       }
@@ -8406,7 +8396,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bisher keine Trainerwechsel"
+            "value": "Noch keine Planänderungen"
           }
         }
       }
@@ -8466,7 +8456,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sobald Coach Volumen anpasst, einen Lift tauscht oder deine Phase verschiebt, siehst du hier jede Änderung inklusive Begründung."
+            "value": "Sobald STRQ Volumen, Übungen oder Phasen anpasst, erscheint hier die Begründung."
           }
         }
       }
@@ -8646,7 +8636,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Muster liest sich entsperrt"
+            "value": "Coach-Check freigeschaltet"
           }
         }
       }
@@ -9136,7 +9126,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STRQ analysiert Balance, Ermüdung und Laststeuerung. Schließ die Woche ab, um dein erstes Review freizuschalten."
+            "value": "STRQ prüft Balance, Erholung und Gewicht. Schließ die Woche ab, um dein erstes Review freizuschalten."
           }
         }
       }
@@ -9486,7 +9476,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starker Start. STRQ erkennt bereits Last, Regeneration und Konstanz."
+            "value": "Starker Start. STRQ erkennt bereits Gewicht, Erholung und Konstanz."
           }
         }
       }
@@ -9796,7 +9786,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heute war leichter — trotzdem schärft das STRQs Laststeuerung."
+            "value": "Heute war leichter — trotzdem hilft es STRQ beim nächsten Gewicht."
           }
         }
       }
@@ -10196,7 +10186,87 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Warum das wichtig ist"
+            "value": "Warum das zählt"
+          }
+        }
+      }
+    },
+    "coach.effortReduced": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufwand reduziert"
+          }
+        }
+      }
+    },
+    "coach.moreSignals.empty.detail": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine weiteren klaren Signale."
+          }
+        }
+      }
+    },
+    "coach.phase.compactNext": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weiter → %@"
+          }
+        }
+      }
+    },
+    "coach.phase.expected": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erwartet: %@"
+          }
+        }
+      }
+    },
+    "coach.phase.header": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PHASE · WOCHE %d/%d"
+          }
+        }
+      }
+    },
+    "coach.phase.nextShift": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NÄCHSTER WECHSEL"
+          }
+        }
+      }
+    },
+    "coach.signal.saved": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gespeichert"
+          }
+        }
+      }
+    },
+    "coach.whyThisMatters": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warum das zählt"
           }
         }
       }
@@ -10346,7 +10416,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Hauptlifts liefern das erste belastbare Kraftbild."
+            "value": "Deine Hauptlifts liefern das erste klare Kraftbild."
           }
         }
       }
@@ -10726,7 +10796,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lift-Tracker"
+            "value": "Lift-Status"
           }
         }
       }
@@ -11396,7 +11466,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Das Volumen ist konservativ gesetzt und passt zu deiner Regenerationskapazität."
+            "value": "Das Volumen ist bewusst niedriger gesetzt und passt zu deiner Erholung."
           }
         }
       }
@@ -11706,7 +11776,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Leistung ist im Plateau. Versuche 1-2 zusätzliche Wiederholungen vor der Gewichtserhöhung oder wechsle zu einer ähnlichen Übung für neuen Reiz."
+            "value": "Die Leistung ist im Plateau. Versuche 1-2 zusätzliche Wiederholungen vor der Gewichtserhöhung oder prüfe eine ähnliche Übung."
           }
         }
       }
@@ -11756,7 +11826,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Stabiler Aufbau. Ergänze ein bis zwei Wiederholungen mit gleichem Gewicht, bevor du die Last erhöhst."
+            "value": "Stabiler Aufbau. Ergänze ein bis zwei Wiederholungen mit gleichem Gewicht, bevor du das Gewicht erhöhst."
           }
         }
       }
@@ -11766,7 +11836,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Leistung fällt ab. Reduziere die Last um 10-15 % und baue mit sauberer Technik neu auf. Das ist normal - es zeigt, dass du hart gepusht hast."
+            "value": "Die Leistung fällt ab. Reduziere das Gewicht um 10-15 % und baue mit sauberer Technik neu auf."
           }
         }
       }
@@ -11906,7 +11976,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Regeneration ist kritisch niedrig. Eine Deload-Woche verhindert Übertraining und hilft dir, stärker zurückzukommen."
+            "value": "Erholung ist niedrig. Eine Deload-Woche hält das Training leichter."
           }
         }
       }
@@ -11976,7 +12046,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Regeneration ist kritisch niedrig. Eine Deload-Woche hilft deinem Körper, sich zu erholen und stärker zurückzukommen."
+            "value": "Erholung ist niedrig. Eine Deload-Woche hält das Training leichter."
           }
         }
       }
@@ -12186,7 +12256,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gewicht erhöhen"
+            "value": "Gewicht leicht erhöhen"
           }
         }
       }
@@ -12216,7 +12286,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bleib beim gleichen Gewicht und peile mehr Wiederholungen an, bevor du die Last erhöhst."
+            "value": "Bleib beim gleichen Gewicht und peile mehr Wiederholungen an, bevor du das Gewicht erhöhst."
           }
         }
       }
@@ -12386,7 +12456,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Last und Volumen gezielt steigern, um neue Leistungslevel zu erreichen."
+            "value": "Gewicht und Volumen gezielt steigern."
           }
         }
       }
@@ -12416,7 +12486,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Progressive Overload"
+            "value": "Progression steuern"
           }
         }
       }
@@ -12946,7 +13016,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Progressionssignale pro Lift und Plateau-Reads"
+            "value": "Lift-Progression und Plateaus"
           }
         }
       }
@@ -14910,7 +14980,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Muskelregeneration eingeschränkt"
+            "value": "Erholung eingeschränkt"
           }
         }
       }
@@ -14940,7 +15010,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schlafdefizit kann Maximalkraft reduzieren. Wähle leichtere Lasten, bis der Schlaf besser wird."
+            "value": "Bei wenig Schlaf: leichter trainieren, bis der Schlaf besser wird."
           }
         }
       }
@@ -14980,7 +15050,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dein Schlaf unterstützt Muskelregeneration und Leistung. Behalte diese Konstanz."
+            "value": "Dein Schlaf unterstützt Erholung und Leistung. Behalte diese Konstanz."
           }
         }
       }
@@ -15190,7 +15260,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Muster"
+            "value": "Bereich"
           }
         }
       }
@@ -15380,7 +15450,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Du hast etwas gemeldet%@. Mach das Workout, aber bleib aus dem Schmerzbereich. Tausche riskante Varianten, reduziere Last bei Bedarf und beende einen Satz früher, wenn die Form kippt."
+            "value": "Du hast etwas gemeldet%@. Mach das Workout, aber bleib aus dem Schmerzbereich. Tausche riskante Varianten, reduziere Gewicht bei Bedarf und beende einen Satz früher, wenn die Technik kippt."
           }
         }
       }
@@ -15410,7 +15480,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Last bei betroffenen Mustern um ~15 % reduzieren"
+            "value": "Gewicht bei betroffenen Übungen um ~15 % reduzieren"
           }
         }
       }
@@ -15530,7 +15600,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schlaf, Energie und Regeneration stehen gut.%@ Greif den Top-Satz an und such beim Ankerlift nach einem echten Wiederholungs- oder Last-PR."
+            "value": "Schlaf, Energie und Erholung stehen gut.%@ Greif den Top-Satz an und such beim Hauptlift nach einem echten Wdh.- oder Gewichts-PR."
           }
         }
       }
@@ -15630,7 +15700,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Du bist gut erholt. Folge heute genau der Vorgabe - auf solchen Tagen entsteht Fortschritt. Nichts extra."
+            "value": "Du bist gut erholt. Folge heute genau dem Plan. Nichts extra."
           }
         }
       }
@@ -15750,7 +15820,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Last halten, ~1 RIR leichter als sonst bleiben"
+            "value": "Gewicht halten, 1 Wdh. im Tank lassen"
           }
         }
       }
@@ -15770,7 +15840,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Regeneration ist gemischt. Heute keinen PR jagen - Ankerlifts mit geplanter Last, Zubehör gekürzt. Qualität > Tonnage."
+            "value": "Erholung ist gemischt. Heute keinen PR jagen - Hauptlifts nach Plan, Zubehör gekürzt. Technik vor Gewicht."
           }
         }
       }
@@ -15870,7 +15940,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Readiness ist niedrig. Ein kurzes, leichteres Workout ist besser als komplett auszulassen - aber nicht durch Schmerz oder Formverlust pushen. Sichere Satzqualität, nicht Intensität."
+            "value": "Tagesform ist niedrig. Eine kurze, leichtere Einheit passt besser als heute hart zu erzwingen. Satzqualität vor Intensität."
           }
         }
       }
@@ -15880,7 +15950,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mehrere Signale sind belastet. Heute geht es um Erholung. Du kommst messbar stärker zurück."
+            "value": "Mehrere Werte stehen niedrig. Heute ruhiger trainieren und die nächste Einheit leichter angehen."
           }
         }
       }
@@ -16130,7 +16200,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sauber. Vorgabe halten."
+            "value": "Sauber. Plan halten."
           }
         }
       }
@@ -16170,7 +16240,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hart. Last halten."
+            "value": "Hart. Gewicht halten."
           }
         }
       }
@@ -16230,7 +16300,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Clean. Sauber. Vorgabe halten."
+            "value": "Clean. Sauber. Plan halten."
           }
         }
       }
@@ -16260,7 +16330,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Grind. Hart. Last halten."
+            "value": "Grind. Hart. Gewicht halten."
           }
         }
       }
@@ -16340,7 +16410,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hauptlift: stärkster Reiz, höchste Priorität."
+            "value": "Hauptlift: wichtigste Übung, höchste Priorität."
           }
         }
       }
@@ -16770,7 +16840,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Noch ein paar Workouts und dein Coach trifft schärfere Entscheidungen zu Last, Wiederholungen und Erholung."
+            "value": "Noch ein paar Workouts und dein Coach wird bei Gewicht, Wdh. und Erholung genauer."
           }
         }
       }
@@ -16850,7 +16920,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Coach kann Last und Volumen jetzt anpassen. Ein weiteres Workout schärft die Muster-Reads."
+            "value": "Der Coach kann Gewicht und Volumen jetzt anpassen. Ein weiteres Workout macht die nächsten Checks genauer."
           }
         }
       }
@@ -16960,7 +17030,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Das erste Workout schaltet echte Progressionssignale frei"
+            "value": "Das erste Workout schaltet echte Progression frei"
           }
         }
       }
@@ -17140,7 +17210,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Progressionssignale werden etwa ab Workout 3 freigeschaltet"
+            "value": "Progression wird etwa ab Workout 3 konkreter"
           }
         }
       }
@@ -17170,7 +17240,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Readiness ist niedrig. Ein kürzeres, leichteres Workout ist besser als ein Grind, den du nicht verarbeitest."
+            "value": "Tagesform ist niedrig. Eine kürzere, leichtere Einheit passt besser als heute hart zu erzwingen."
           }
         }
       }
@@ -17300,7 +17370,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Workout 3 schaltet echtes Muster-Coaching frei."
+            "value": "Workout 3 macht das Coaching konkreter."
           }
         }
       }
@@ -17420,7 +17490,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heute übernimmt den nächsten Schritt. Der Coach formt Last und Erholung, sobald dein erstes echtes Workout drin ist."
+            "value": "Heute zählt der nächste Schritt. Der Coach justiert Gewicht und Erholung, sobald dein erstes echtes Workout drin ist."
           }
         }
       }
@@ -18070,7 +18140,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "N\u00e4chster Reiz wird angepasst"
+            "value": "N\u00e4chstes Workout wird angepasst"
           }
         }
       }
@@ -18180,7 +18250,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%d-Tage-Serie; Kraft, Regeneration und Historie sind jetzt belastbar."
+            "value": "%d-Tage-Serie; Kraft, Erholung und Historie werden klarer."
           }
         }
       }
@@ -18270,7 +18340,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "8-Wochen-Lastrhythmus"
+            "value": "8-Wochen-Gewichtsrhythmus"
           }
         }
       }
@@ -18280,7 +18350,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein paar weitere abgeschlossene Workouts sind nötig, bevor die Muskelbalance belastbar ist."
+            "value": "Ein paar weitere abgeschlossene Workouts machen die Muskelbalance klarer."
           }
         }
       }
@@ -18340,7 +18410,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Balance erscheint, sobald das Vergleichsfenster belastbar ist."
+            "value": "Balance erscheint, sobald genug Vergleich da ist."
           }
         }
       }
@@ -18440,7 +18510,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Muster im Aufbau"
+            "value": "Training im Aufbau"
           }
         }
       }
@@ -18480,7 +18550,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schließe Workout 2 ab, damit STRQ das erste Muster vergleichen kann."
+            "value": "Schließe Workout 2 ab, damit STRQ die ersten Logs vergleichen kann."
           }
         }
       }
@@ -18600,7 +18670,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abgeschlossene Workouts verteilen sich über mehrere Wochen. Das reicht, um Lastrhythmus zu lesen, ohne Anpassung zu erraten."
+            "value": "Abgeschlossene Workouts verteilen sich über mehrere Wochen. Das reicht, um den Gewichtsrhythmus zu lesen."
           }
         }
       }
@@ -18700,7 +18770,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frühes Muster im Aufbau"
+            "value": "Frühes Training im Aufbau"
           }
         }
       }
@@ -18820,7 +18890,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hinge-Muster"
+            "value": "Hinge"
           }
         }
       }
@@ -18910,7 +18980,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Längeres Muster"
+            "value": "Längerer Verlauf"
           }
         }
       }
@@ -19030,7 +19100,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein abgeschlossenes Workout ist ein echtes Signal. Ein paar mehr machen Kraft-, Körper- und Volumentrends belastbarer."
+            "value": "Ein abgeschlossenes Workout zählt. Ein paar mehr machen Kraft-, Körper- und Volumentrends klarer."
           }
         }
       }
@@ -19130,7 +19200,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Hinweise werden belastbarer"
+            "value": "Die Hinweise werden klarer"
           }
         }
       }
@@ -19200,7 +19270,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Echte Workouts geloggt, Muster noch im Aufbau"
+            "value": "Echte Workouts geloggt, Verlauf noch im Aufbau"
           }
         }
       }
@@ -19240,7 +19310,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Regeneration kann jetzt Kontext geben, aber Gewicht, Ernährung oder Zieldaten machen die Körper-Einschätzung belastbarer."
+            "value": "Erholung gibt jetzt Kontext. Gewicht, Ernährung oder Zieldaten machen die Körper-Einschätzung klarer."
           }
         }
       }
@@ -19250,7 +19320,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wiederhole einen Ankerlift, um Kraft belastbar zu machen."
+            "value": "Wiederhole einen Hauptlift, damit Kraft klarer wird."
           }
         }
       }
@@ -19280,7 +19350,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wiederholte geloggte Sätze machen den tieferen Trend belastbarer."
+            "value": "Wiederholte geloggte Sätze machen den tieferen Trend klarer."
           }
         }
       }
@@ -19330,7 +19400,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "STRQ liest Konstanz und Last. Schlüsse bleiben vorsichtig, bis die Basis steht."
+            "value": "STRQ liest Konstanz und Gewicht. Schlüsse bleiben vorsichtig, bis die Basis steht."
           }
         }
       }
@@ -19400,7 +19470,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Squat-Muster"
+            "value": "Squat"
           }
         }
       }
@@ -19470,7 +19540,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kraft, Regeneration und Trainingshistorie sind jetzt belastbar genug."
+            "value": "Kraft, Erholung und Trainingshistorie sind jetzt klar genug."
           }
         }
       }
@@ -19520,7 +19590,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Struktur ist belastbar; Detailaussagen bleiben konservativ."
+            "value": "Die Struktur ist klar; Detailaussagen bleiben ruhig."
           }
         }
       }
@@ -19530,7 +19600,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Das Workload-Signal ist da, aber das Wochenmuster ist noch dünn. Mehr abgeschlossene Workouts machen den Rhythmus belastbar."
+            "value": "Training ist geloggt, aber die Woche ist noch dünn. Mehr abgeschlossene Workouts machen den Rhythmus klarer."
           }
         }
       }
@@ -19640,7 +19710,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Jetzt belastbar"
+            "value": "Jetzt klarer"
           }
         }
       }
@@ -19780,7 +19850,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dein aktuelles Training hat eine belastbare Struktur."
+            "value": "Dein aktuelles Training hat eine klare Struktur."
           }
         }
       }
@@ -19830,7 +19900,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Muster im Aufbau"
+            "value": "Training im Aufbau"
           }
         }
       }

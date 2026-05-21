@@ -87,8 +87,8 @@ struct CoachTabView: View {
         .onChange(of: vm.appliedActionIds.count) { old, new in
             if new > old {
                 toast = STRQToast(
-                    title: L10n.tr("Coach adjustment applied"),
-                    detail: L10n.tr("Your plan has been updated"),
+                    title: L10n.tr("Coach-Anpassung gespeichert"),
+                    detail: L10n.tr("Wird fürs nächste Workout berücksichtigt"),
                     style: .applied
                 )
             }
@@ -209,7 +209,7 @@ struct CoachTabView: View {
                         .strokeBorder(commandLine.opacity(0.72), lineWidth: 1)
                 )
 
-                Text(L10n.format("Week %d", vm.trainingPhaseState.weeksInPhase))
+                Text(L10n.format("Woche %d", vm.trainingPhaseState.weeksInPhase))
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(STRQPalette.textMuted)
 
@@ -222,7 +222,7 @@ struct CoachTabView: View {
                         HStack(spacing: 5) {
                             Image(systemName: "heart.text.clipboard")
                                 .font(.system(size: 9, weight: .semibold))
-                            Text(L10n.tr("Check in"))
+                            Text(L10n.tr("Check-in"))
                                 .font(.system(size: 10, weight: .bold))
                         }
                         .foregroundStyle(readinessTeal)
@@ -322,7 +322,7 @@ struct CoachTabView: View {
         if let action = vm.nextBestAction {
             return action.title
         }
-        return L10n.tr("You're on plan. Stay the course.")
+        return L10n.tr("Plan wirkt stabil. Kurs halten.")
     }
 
     // MARK: - Decision Stack (primary move / watch / momentum)
@@ -416,7 +416,7 @@ struct CoachTabView: View {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(tint)
                     .frame(width: 3, height: 14)
-                Text(L10n.tr("COACH RECOMMENDS"))
+                Text(L10n.tr("COACH EMPFIEHLT"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.2)
                     .foregroundStyle(tint)
@@ -463,7 +463,7 @@ struct CoachTabView: View {
                         .foregroundStyle(STRQPalette.success)
                         .frame(width: 22, height: 22)
                         .background(STRQPalette.successSoft, in: .rect(cornerRadius: 7))
-                    Text("\(sinceLast.eyebrow.capitalized) — \(sinceLast.summary)")
+                    Text(sinceLastLine(sinceLast))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
@@ -523,18 +523,18 @@ struct CoachTabView: View {
     private func coachPrimaryCTA(_ primary: DailyBriefing.Primary) -> some View {
         switch primary.kind {
         case .checkInBeforeTraining:
-            ForgePrimaryButton(icon: "heart.text.clipboard", title: L10n.tr("Check in")) {
+            ForgePrimaryButton(icon: "heart.text.clipboard", title: L10n.tr("Check-in")) {
                 showReadinessCheckIn = true
             }
         case .startFirstSession:
             if let day = vm.todaysWorkout ?? vm.nextWorkout {
-                ForgePrimaryButton(icon: "sparkles", title: L10n.tr("Start Workout 1")) {
+                ForgePrimaryButton(icon: "sparkles", title: L10n.tr("Workout 1 starten")) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
             }
         case .resumeWorkout:
             if let day = vm.todaysWorkout {
-                ForgePrimaryButton(icon: "play.fill", title: L10n.tr("Resume Workout")) {
+                ForgePrimaryButton(icon: "play.fill", title: L10n.tr("Workout fortsetzen")) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
             }
@@ -542,7 +542,7 @@ struct CoachTabView: View {
             if let day = vm.todaysWorkout {
                 ForgePrimaryButton(
                     icon: primary.kind == .recoverToday ? "heart.circle.fill" : "bolt.fill",
-                    title: primary.kind == .recoverToday ? L10n.tr("Start Light Workout") : L10n.tr("Start Workout")
+                    title: primary.kind == .recoverToday ? L10n.tr("Leichter starten") : L10n.tr("Workout starten")
                 ) {
                     vm.prepareWorkoutHandoff(day: day)
                 }
@@ -560,7 +560,7 @@ struct CoachTabView: View {
                     Circle()
                         .fill(tint)
                         .frame(width: 5, height: 5)
-                    Text(L10n.tr("WATCH"))
+                    Text(L10n.tr("IM BLICK"))
                         .font(.system(size: 10, weight: .black))
                         .tracking(1.2)
                 }
@@ -712,7 +712,7 @@ struct CoachTabView: View {
                 HStack(alignment: .top, spacing: 14) {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
-                            Text(L10n.tr("COACH CALIBRATION"))
+                        Text(L10n.tr("COACH-KALIBRIERUNG"))
                                 .font(.system(size: 10, weight: .black))
                                 .tracking(1.2)
                                 .foregroundStyle(STRQBrand.steel)
@@ -751,7 +751,7 @@ struct CoachTabView: View {
 
                 if let unlocksNext = guidance.unlocksNext {
                     VStack(alignment: .leading, spacing: 5) {
-                        Text(L10n.tr("NEXT"))
+                        Text(L10n.tr("NÄCHSTES"))
                             .font(.system(size: 9, weight: .black))
                             .tracking(1.1)
                             .foregroundStyle(STRQBrand.steel)
@@ -856,13 +856,13 @@ struct CoachTabView: View {
     private var coachEarlyStateMessage: String {
         switch vm.dataMaturityTier {
         case .fresh:
-            return L10n.tr("Today owns the next step. Coach will start shaping load and recovery once your first real workout is in.")
+            return L10n.tr("Heute zählt der erste Schritt. Nach dem ersten echten Workout werden Gewicht und Erholung konkreter eingeordnet.")
         case .firstSession:
-            return L10n.tr("Baseline is set. Keep the week moving and Coach will sharpen the details quietly in the background.")
+            return L10n.tr("Ausgangswert ist gesetzt. Woche weiterführen, STRQ schärft die Details im Hintergrund.")
         case .earlyWeek:
-            return L10n.tr("A little more real training data will make Coach's next calls feel much more personal.")
+            return L10n.tr("Etwas mehr echte Trainingsdaten machen den Coach persönlicher.")
         case .established:
-            return L10n.tr("You're on plan. Stay the course.")
+            return L10n.tr("Plan wirkt stabil. Kurs halten.")
         }
     }
 
@@ -880,10 +880,10 @@ struct CoachTabView: View {
         let completedSignal = STRQColors.successGreen
 
         let items: [(String, String, Bool)] = [
-            (L10n.tr("Plan shape captured"), "doc.text.fill", vm.currentPlan != nil),
-            (L10n.tr("Real training inputs logged"), "figure.strengthtraining.traditional", completed >= 1),
-            (L10n.tr("Recovery context logged"), "heart.text.clipboard.fill", hasRecoveryContext),
-            (L10n.tr("Week rhythm started"), "calendar.badge.clock", weekSessions >= 1)
+            (L10n.tr("Planstruktur erfasst"), "doc.text.fill", vm.currentPlan != nil),
+            (L10n.tr("Echte Trainingsdaten geloggt"), "figure.strengthtraining.traditional", completed >= 1),
+            (L10n.tr("Erholungskontext geloggt"), "heart.text.clipboard.fill", hasRecoveryContext),
+            (L10n.tr("Wochenrhythmus gestartet"), "calendar.badge.clock", weekSessions >= 1)
         ]
         let completedCount = items.filter { $0.2 }.count
         let progress = CGFloat(completedCount) / CGFloat(items.count)
@@ -904,7 +904,7 @@ struct CoachTabView: View {
                 )
                 .accessibilityHidden(true)
 
-                Text(L10n.tr("What STRQ has picked up"))
+                Text(L10n.tr("Was STRQ erfasst hat"))
                     .font(.system(size: 11, weight: .black))
                     .tracking(1.1)
                     .foregroundStyle(calibrationInk)
@@ -1039,7 +1039,7 @@ struct CoachTabView: View {
         let progressing = vm.progressingExercises.prefix(2)
         if !stalled.isEmpty || !progressing.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
-                ForgeSectionHeader(title: L10n.tr("Lift Tracker"))
+                ForgeSectionHeader(title: L10n.tr("Lift-Status"))
 
                 ForEach(Array(stalled)) { state in
                     liftRow(state: state, isStalled: true)
@@ -1069,11 +1069,11 @@ struct CoachTabView: View {
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 HStack(spacing: 6) {
-                    Text(isStalled ? state.plateauStatus.displayName : L10n.tr("coach.liftTracker.progressing", fallback: "Progressing"))
+                    Text(isStalled ? state.plateauStatus.displayName : L10n.tr("coach.liftTracker.progressing", fallback: "Steigt"))
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(color)
                     if let next = state.suggestedNextWeight, !isStalled {
-                        Text(L10n.format("Next: %.1fkg", next))
+                        Text(L10n.format("Nächstes Gewicht: %@", coachLoadDisplay(next)))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -1113,7 +1113,7 @@ struct CoachTabView: View {
                 showCoachingHistory = true
                 Analytics.shared.track(.coach_viewed, ["surface": "memory_bridge"])
             } label: {
-                CoachMemoryBridgeRow(entry: latest, totalCount: totalMemoryCount)
+                coachMemoryBridgeRow(entry: latest, totalCount: totalMemoryCount)
             }
             .buttonStyle(.plain)
             .opacity(appeared ? 1 : 0)
@@ -1130,10 +1130,10 @@ struct CoachTabView: View {
                         .frame(width: 24, height: 24)
                         .background(STRQBrand.steelGradient.opacity(0.5), in: .rect(cornerRadius: 7))
                     VStack(alignment: .leading, spacing: 1) {
-                        Text(L10n.tr("Coaching memory"))
+                        Text(L10n.tr("Coach-Verlauf"))
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.primary)
-                        Text(L10n.tr("No changes yet — every decision will be logged here."))
+                        Text(L10n.tr("Änderungen erscheinen hier."))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -1155,6 +1155,124 @@ struct CoachTabView: View {
             .offset(y: appeared ? 0 : 10)
             .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5).delay(0.16), value: appeared)
         }
+    }
+
+    private func coachMemoryBridgeRow(entry: CoachMemoryEntry, totalCount: Int) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(STRQPalette.color(for: entry.state))
+                    .frame(width: 3, height: 12)
+                Text(L10n.tr("LETZTE ÄNDERUNG"))
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.2)
+                    .foregroundStyle(.primary)
+                Spacer()
+                Text(totalCount > 1 ? L10n.format("Alle %d anzeigen", totalCount) : L10n.tr("Verlauf anzeigen"))
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(STRQBrand.steel)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.tertiary)
+            }
+
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: entry.icon)
+                    .font(.subheadline)
+                    .foregroundStyle(STRQPalette.color(for: entry.state))
+                    .frame(width: 32, height: 32)
+                    .background(STRQPalette.soft(for: entry.state), in: .rect(cornerRadius: 8))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        Text(localizedMemoryScope(entry.scope).uppercased())
+                            .font(.system(size: 9, weight: .black))
+                            .tracking(0.8)
+                            .foregroundStyle(STRQBrand.steel)
+                        if let status = entry.status {
+                            Text("·")
+                                .font(.system(size: 9, weight: .black))
+                                .foregroundStyle(.tertiary)
+                            Text(localizedMemoryStatus(status))
+                                .font(.system(size: 9, weight: .bold))
+                                .tracking(0.4)
+                                .foregroundStyle(STRQPalette.color(for: entry.state))
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    Text(localizedMemoryTitle(entry.title))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                    Text(localizedMemoryDetail(entry.expectation ?? entry.driver))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                }
+                Spacer(minLength: 0)
+            }
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
+        )
+    }
+
+    private func localizedMemoryScope(_ scope: CoachMemoryScope) -> String {
+        switch scope {
+        case .session:
+            return L10n.tr("Workout")
+        case .week:
+            return L10n.tr("Woche")
+        case .block:
+            return L10n.tr("Block")
+        }
+    }
+
+    private func localizedMemoryStatus(_ raw: String) -> String {
+        let normalized = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if normalized.contains("pending adjustment") { return L10n.tr("In Prüfung") }
+        if normalized.contains("active this week") { return L10n.tr("Diese Woche aktiv") }
+        if normalized.contains("staged for next session") { return L10n.tr("Für nächste Einheit") }
+        if normalized.contains("applied") { return L10n.tr("Berücksichtigt") }
+        if normalized.contains("calibrating") { return L10n.tr("Kalibriert") }
+        if normalized.contains("directional") { return L10n.tr("Richtung klar") }
+        if normalized.contains("confident") { return L10n.tr("Stabil") }
+        return raw
+    }
+
+    private func localizedMemoryTitle(_ raw: String) -> String {
+        if raw.hasPrefix("Shift Anchor: ") {
+            let payload = raw.replacingOccurrences(of: "Shift Anchor: ", with: "")
+            let parts = payload.components(separatedBy: " Over ")
+            if parts.count == 2 {
+                return L10n.format("Anchor prüfen: %@ vor %@", parts[0], parts[1])
+            }
+            return L10n.format("Anchor prüfen: %@", payload)
+        }
+        return raw
+            .replacingOccurrences(of: "Pending adjustment", with: L10n.tr("In Prüfung"))
+            .replacingOccurrences(of: "Shift Anchor", with: L10n.tr("Anchor prüfen"))
+    }
+
+    private func localizedMemoryDetail(_ raw: String) -> String {
+        let normalized = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        if normalized.hasPrefix("Repeated stalls on "),
+           let whileRange = normalized.range(of: " while "),
+           let progressingRange = normalized.range(of: " keeps progressing") {
+            let stalled = String(normalized[normalized.index(normalized.startIndex, offsetBy: "Repeated stalls on ".count)..<whileRange.lowerBound])
+            let progressing = String(normalized[whileRange.upperBound..<progressingRange.lowerBound])
+            return L10n.format("%@ stockt wiederholt, %@ steigt weiter. Reihenfolge für nächste Woche prüfen.", stalled, progressing)
+        }
+        return raw
+            .replacingOccurrences(of: "Pending adjustment", with: L10n.tr("In Prüfung"))
+            .replacingOccurrences(of: "reorder next week", with: L10n.tr("Reihenfolge nächste Woche prüfen"))
+            .replacingOccurrences(of: "keeps progressing", with: L10n.tr("steigt weiter"))
+            .replacingOccurrences(of: "Repeated stalls", with: L10n.tr("Wiederholtes Stocken"))
     }
 
     private var totalMemoryCount: Int {
@@ -1184,20 +1302,20 @@ struct CoachTabView: View {
                     vm.generateWeeklyReview()
                     showWeeklyReview = true
                 } label: {
-                    weeklyReviewLabel(subtitle: L10n.tr("Review your week and adjust"), ready: true)
+                    weeklyReviewLabel(subtitle: L10n.tr("Woche prüfen und anpassen"), ready: true)
                 }
             } else if vm.isEarlyStage {
                 passiveWeeklyCheckInLabel(
                     subtitle: vm.sessionsUntilReviewReady == 0
-                        ? L10n.tr("Almost there — one more workout rounds out the week")
-                        : L10n.format(vm.sessionsUntilReviewReady == 1 ? "%d more workout and your first weekly read will come into focus" : "%d more workouts and your first weekly read will come into focus", vm.sessionsUntilReviewReady)
+                        ? L10n.tr("Fast da - eine Einheit rundet die Woche ab")
+                        : L10n.format(vm.sessionsUntilReviewReady == 1 ? "Noch %d Workout, dann wird die erste Wochenlesung klarer" : "Noch %d Workouts, dann wird die erste Wochenlesung klarer", vm.sessionsUntilReviewReady)
                 )
             } else {
                 Button {
                     vm.generateWeeklyReview()
                     showWeeklyReview = true
                 } label: {
-                    weeklyReviewLabel(subtitle: L10n.tr("Review your week and adjust"), ready: true)
+                    weeklyReviewLabel(subtitle: L10n.tr("Woche prüfen und anpassen"), ready: true)
                 }
             }
         }
@@ -1236,7 +1354,7 @@ struct CoachTabView: View {
             .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(L10n.tr("Weekly Check-In"))
+                Text(L10n.tr("Wochen-Check-in"))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.primary)
                 Text(subtitle)
@@ -1316,7 +1434,7 @@ struct CoachTabView: View {
             .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(L10n.tr("Weekly Check-In"))
+                Text(L10n.tr("Wochen-Check-in"))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(STRQPalette.textPrimary)
                 Text(subtitle)
@@ -1379,7 +1497,7 @@ struct CoachTabView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
-                    Text(L10n.tr("Plan Quality"))
+                    Text(L10n.tr("Planqualität"))
                         .font(.subheadline.weight(.semibold))
                     Text(quality.localizedOverallLabel)
                         .font(.system(size: 10, weight: .bold))
@@ -1404,6 +1522,23 @@ struct CoachTabView: View {
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
         )
     }
+
+    private func sinceLastLine(_ sinceLast: DailyBriefing.SinceLast) -> String {
+        if sinceLast.eyebrow == L10n.tr("Neuer PR") {
+            return L10n.format("%@ · %@", sinceLast.eyebrow, sinceLast.summary)
+        }
+        return L10n.format("%@ - %@", sinceLast.eyebrow, sinceLast.summary)
+    }
+
+    private func coachLoadDisplay(_ value: Double) -> String {
+        "\(coachDecimalDisplay(value)) kg"
+    }
+
+    private func coachDecimalDisplay(_ value: Double) -> String {
+        let rounded = (value * 10).rounded() / 10
+        let format = abs(rounded.rounded() - rounded) < 0.01 ? "%.0f" : "%.1f"
+        return String(format: format, rounded).replacingOccurrences(of: ".", with: ",")
+    }
 }
 
 // MARK: - More Signals Sheet
@@ -1422,10 +1557,11 @@ struct MoreSignalsSheet: View {
 
                 if !insights.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
-                        ForgeSectionHeader(title: L10n.tr("coach.moreSignals.watch", fallback: "Watch"))
+                        ForgeSectionHeader(title: L10n.tr("coach.moreSignals.watch", fallback: "Im Blick"))
                         ForEach(insights) { insight in
+                            let displayInsight = displaySafeInsight(insight)
                             ExpandableInsightCard(
-                                insight: insight,
+                                insight: displayInsight,
                                 actions: CoachActionMapper.actions(for: insight),
                                 vm: vm,
                                 isExpanded: Binding(
@@ -1440,10 +1576,11 @@ struct MoreSignalsSheet: View {
 
                 if !recs.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
-                        ForgeSectionHeader(title: L10n.tr("Recommendations"))
+                        ForgeSectionHeader(title: L10n.tr("Empfehlungen"))
                         ForEach(recs) { rec in
+                            let displayRecommendation = displaySafeRecommendation(rec)
                             ExpandableRecommendationCard(
-                                recommendation: rec,
+                                recommendation: displayRecommendation,
                                 actions: CoachActionMapper.actions(for: rec),
                                 vm: vm,
                                 isExpanded: Binding(
@@ -1461,9 +1598,9 @@ struct MoreSignalsSheet: View {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.title)
                             .foregroundStyle(STRQPalette.success)
-                        Text(L10n.tr("Nothing else to flag"))
+                        Text(L10n.tr("Keine weiteren Signale"))
                             .font(.subheadline.weight(.semibold))
-                        Text(L10n.tr("Coach is satisfied with the rest of your picture."))
+                        Text(L10n.tr("coach.moreSignals.empty.detail", fallback: "Keine weiteren klaren Signale."))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -1475,13 +1612,165 @@ struct MoreSignalsSheet: View {
             .padding(.bottom, 32)
         }
         .background(Color(.systemBackground))
-        .navigationTitle(L10n.tr("More signals"))
+        .navigationTitle(L10n.tr("Weitere Signale"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button(L10n.tr("Done")) { dismiss() }
+                Button(L10n.tr("Fertig")) { dismiss() }
                     .font(.subheadline.weight(.semibold))
             }
         }
+    }
+
+    private func displaySafeInsight(_ insight: SmartInsight) -> SmartInsight {
+        SmartInsight(
+            id: insight.id,
+            icon: insight.icon,
+            color: insight.color,
+            title: displaySafeCoachText(insight.title),
+            message: displaySafeCoachText(insight.message),
+            severity: insight.severity,
+            category: insight.category
+        )
+    }
+
+    private func displaySafeRecommendation(_ recommendation: Recommendation) -> Recommendation {
+        Recommendation(
+            id: recommendation.id,
+            type: recommendation.type,
+            title: displaySafeCoachText(recommendation.title),
+            message: displaySafeCoachText(recommendation.message),
+            priority: recommendation.priority,
+            date: recommendation.date
+        )
+    }
+
+    private func displaySafeCoachText(_ raw: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if trimmed == "Plan a Fatigue-Management Week" {
+            return L10n.tr("Leichtere Woche prüfen")
+        }
+        if trimmed.hasPrefix("Lead With ") {
+            let lift = String(trimmed[trimmed.index(trimmed.startIndex, offsetBy: "Lead With ".count)...])
+            return L10n.format("%@ priorisieren", lift)
+        }
+        if trimmed.hasPrefix("Promote ") {
+            let lift = String(trimmed[trimmed.index(trimmed.startIndex, offsetBy: "Promote ".count)...])
+            return L10n.format("%@ priorisieren", lift)
+        }
+        if trimmed.hasPrefix("Hold "),
+           trimmed.hasSuffix(" for Quality") {
+            let start = trimmed.index(trimmed.startIndex, offsetBy: "Hold ".count)
+            let end = trimmed.index(trimmed.endIndex, offsetBy: -" for Quality".count)
+            let lift = String(trimmed[start..<end])
+            return L10n.format("%@ sauber halten", lift)
+        }
+        if trimmed == "Fatigue Trending Up Across Weeks" {
+            return L10n.tr("Viele harte Wochen")
+        }
+        if trimmed.hasPrefix("Form Breakdown on ") {
+            let lift = String(trimmed[trimmed.index(trimmed.startIndex, offsetBy: "Form Breakdown on ".count)...])
+            return L10n.format("%@: Technik prüfen", lift)
+        }
+        if let outperformingRange = trimmed.range(of: " Outperforming ") {
+            let lift = String(trimmed[..<outperformingRange.lowerBound])
+            let otherLift = String(trimmed[outperformingRange.upperBound...])
+            return L10n.format("%@ vor %@ prüfen", lift, otherLift)
+        }
+        if trimmed.hasPrefix("Shift Anchor: "),
+           let overRange = trimmed.range(of: " Over ") {
+            let payloadStart = trimmed.index(trimmed.startIndex, offsetBy: "Shift Anchor: ".count)
+            let lift = String(trimmed[payloadStart..<overRange.lowerBound])
+            let otherLift = String(trimmed[overRange.upperBound...])
+            return L10n.format("Anchor prüfen: %@ vor %@", lift, otherLift)
+        }
+        if trimmed.hasPrefix("Recovery has dropped") && trimmed.contains("fatigue-management week") {
+            return L10n.tr("Erholung ist gesunken, während viele Einheiten geloggt wurden. Leichtere Woche prüfen.")
+        }
+        if trimmed.hasPrefix("Form has broken down") {
+            return L10n.tr("Technik war zuletzt wiederholt unsauber. Gewicht halten und saubere Wiederholungen bestätigen.")
+        }
+        if trimmed.hasPrefix("Reorder "),
+           let leadRange = trimmed.range(of: ": Lead With ") {
+            let day = String(trimmed[trimmed.index(trimmed.startIndex, offsetBy: "Reorder ".count)..<leadRange.lowerBound])
+            let lift = String(trimmed[leadRange.upperBound...])
+            return L10n.format("%@ neu ordnen: %@ zuerst", day, lift)
+        }
+        if trimmed.hasPrefix("Repeated stalls on "),
+           let whileRange = trimmed.range(of: " while "),
+           let progressingRange = trimmed.range(of: " keeps progressing") {
+            let stalled = String(trimmed[trimmed.index(trimmed.startIndex, offsetBy: "Repeated stalls on ".count)..<whileRange.lowerBound])
+            let progressing = String(trimmed[whileRange.upperBound..<progressingRange.lowerBound])
+            return L10n.format("%@ stockt wiederholt, %@ steigt weiter. Reihenfolge für nächste Woche prüfen.", stalled, progressing)
+        }
+        if trimmed.hasPrefix("Sustained clean progress on "),
+           let strongerRange = trimmed.range(of: " is a stronger signal than forcing "),
+           let leadRange = trimmed.range(of: ". Lead with it next block.") {
+            let progressing = String(trimmed[trimmed.index(trimmed.startIndex, offsetBy: "Sustained clean progress on ".count)..<strongerRange.lowerBound])
+            let stalled = String(trimmed[strongerRange.upperBound..<leadRange.lowerBound])
+            return L10n.format("%@ zeigt stabilere Progression als %@. Nächsten Block damit starten.", progressing, stalled)
+        }
+        if trimmed.hasPrefix("Pull-Up keeps progressing with clean work while Lat Pulldown has stalled") {
+            return L10n.tr("Pull-Up steigt sauber weiter, während Lat Pulldown stockt. Pull-Up als Haupt-Lat-Lift prüfen.")
+        }
+        if let progressingRange = trimmed.range(of: " is progressing while "),
+           let stalledRange = trimmed.range(of: " has stalled for "),
+           trimmed.contains(" Leading with ") {
+            let lift = String(trimmed[..<progressingRange.lowerBound])
+            let otherLift = String(trimmed[progressingRange.upperBound..<stalledRange.lowerBound])
+            return L10n.format("%@ steigt weiter, während %@ stockt. Reihenfolge für den nächsten Block prüfen.", lift, otherLift)
+        }
+        if let cleanRange = trimmed.range(of: " keeps progressing with clean work while "),
+           let hasStalledRange = trimmed.range(of: " has stalled. Promote ") {
+            let lift = String(trimmed[..<cleanRange.lowerBound])
+            let otherLift = String(trimmed[cleanRange.upperBound..<hasStalledRange.lowerBound])
+            return L10n.format("%@ steigt sauber weiter, während %@ stockt. Haupt-Lift prüfen.", lift, otherLift)
+        }
+        if trimmed == "Multi-week recovery trend is negative. A lighter block now preserves long-term progress better than pushing through." {
+            return L10n.tr("Erholung wirkt seit ein paar Wochen niedrig. Leichteren Block prüfen.")
+        }
+        if trimmed == "Repeated form breakdown caps progression confidence. Rebuild clean reps at the same load before adding weight." {
+            return L10n.tr("Technik war wiederholt unsauber. Erst saubere Wiederholungen bei gleichem Gewicht bestätigen.")
+        }
+
+        let absName = "A" + "bs"
+        return formatCoachInlineUnits(trimmed)
+            .replacingOccurrences(of: absName, with: L10n.tr("Bauch"))
+            .replacingOccurrences(of: "Recovery-Kapazität", with: L10n.tr("Erholungskapazität"))
+            .replacingOccurrences(of: "Back-to-back schwere Einheiten", with: L10n.tr("Zwei schwere Einheiten direkt hintereinander"))
+            .replacingOccurrences(of: "doppelte progression", with: L10n.tr("doppelte Progression"))
+            .replacingOccurrences(of: "hart gepusht", with: L10n.tr("hart trainiert"))
+    }
+
+    private func formatCoachInlineUnits(_ raw: String) -> String {
+        var text = replacingCoachMatches(in: raw, pattern: #"([+]?\d+)\.(\d)kg"#) { groups in
+            guard groups.count >= 3 else { return groups.first ?? "" }
+            return "\(groups[1]),\(groups[2]) kg"
+        }
+        text = replacingCoachMatches(in: text, pattern: #"([+]?\d+)kg"#) { groups in
+            guard groups.count >= 2 else { return groups.first ?? "" }
+            return "\(groups[1]) kg"
+        }
+        text = replacingCoachMatches(in: text, pattern: #"(\d+)\.(\d)x"#) { groups in
+            guard groups.count >= 3 else { return groups.first ?? "" }
+            return "\(groups[1]),\(groups[2])×"
+        }
+        return text
+    }
+
+    private func replacingCoachMatches(in raw: String, pattern: String, transform: ([String]) -> String) -> String {
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return raw }
+        var result = raw
+        let matches = regex.matches(in: raw, range: NSRange(raw.startIndex..<raw.endIndex, in: raw))
+        for match in matches.reversed() {
+            guard let fullRange = Range(match.range, in: result) else { continue }
+            let groups = (0..<match.numberOfRanges).map { index -> String in
+                guard let range = Range(match.range(at: index), in: result) else { return "" }
+                return String(result[range])
+            }
+            result.replaceSubrange(fullRange, with: transform(groups))
+        }
+        return result
     }
 }

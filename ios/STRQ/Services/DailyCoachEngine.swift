@@ -37,27 +37,27 @@ struct DailyCoachEngine {
     // MARK: Pain
 
     private func painResponse(readiness: DailyReadiness, hasWorkout: Bool) -> ReadinessCoachResponse {
-        let noteFragment = readiness.painNote.isEmpty ? "" : L10n.format(" around %@", readiness.painNote.lowercased())
+        let noteFragment = readiness.painNote.isEmpty ? "" : L10n.format(" bei %@", readiness.painNote.lowercased())
         let message = hasWorkout
-            ? L10n.format("You flagged something off%@. Keep the workout, but stay out of the pain path. Swap risky variations, drop load where needed, and end a set early if form breaks.", noteFragment)
-            : L10n.format("You flagged something off%@. Treat today as a recovery day: mobility, circulation, and sleep. Don't test it.", noteFragment)
+            ? L10n.format("Du hast eine Einschränkung%@ markiert. Einheit behalten, aber riskante Varianten tauschen, Gewicht reduzieren und Sätze früher beenden, wenn die Technik kippt.", noteFragment)
+            : L10n.format("Du hast eine Einschränkung%@ markiert. Heute ruhiger planen: Mobility, leichte Bewegung und Schlaf priorisieren.", noteFragment)
 
         return ReadinessCoachResponse(
-            headline: hasWorkout ? L10n.tr("Train around it") : L10n.tr("Protect it today"),
+            headline: hasWorkout ? L10n.tr("Schonend trainieren") : L10n.tr("Heute schützen"),
             message: message,
             icon: "shield.checkered",
             colorName: "orange",
             trainingAdvice: hasWorkout ? .useSaferVariations : .restDay,
             adjustments: hasWorkout
                 ? [
-                    L10n.tr("Swap to joint-friendly variations"),
-                    L10n.tr("Drop load ~15% on affected patterns"),
-                    L10n.tr("Stop a set the moment form slips")
+                    L10n.tr("Gelenkfreundliche Varianten wählen"),
+                    L10n.tr("Gewicht bei betroffenen Übungen um ca. 15% senken"),
+                    L10n.tr("Satz beenden, sobald die Technik kippt")
                 ]
                 : [
-                    L10n.tr("Mobility + light cardio only"),
-                    L10n.tr("Prioritize sleep and protein"),
-                    L10n.tr("Re-check tomorrow before training")
+                    L10n.tr("Nur Mobility und leichte Bewegung"),
+                    L10n.tr("Schlaf und Protein priorisieren"),
+                    L10n.tr("Morgen vor dem Training neu prüfen")
                 ]
         )
     }
@@ -67,30 +67,30 @@ struct DailyCoachEngine {
     private func highReadinessResponse(readiness: DailyReadiness, phase: TrainingPhase, hasWorkout: Bool) -> ReadinessCoachResponse {
         if !hasWorkout {
             return ReadinessCoachResponse(
-                headline: L10n.tr("Bank the recovery"),
-                message: L10n.tr("You're fresh and firing, but no workout is planned. Don't burn it on junk volume. Keep today active and easy so tomorrow's workout gets the benefit."),
+                headline: L10n.tr("Erholung nutzen"),
+                message: L10n.tr("Readiness wirkt hoch, aber heute ist keine Einheit geplant. Aktiv und leicht bleiben, damit die nächste Einheit sauber sitzt."),
                 icon: "bolt.fill",
                 colorName: "mint",
                 trainingAdvice: .trainAsPlanned,
                 adjustments: [
-                    L10n.tr("Walk, mobility, or light skill work"),
-                    L10n.tr("Hit protein + sleep targets"),
-                    L10n.tr("Prep tomorrow's lifts mentally")
+                    L10n.tr("Spaziergang, Mobility oder leichte Technikarbeit"),
+                    L10n.tr("Protein- und Schlafziel treffen"),
+                    L10n.tr("Lifts für morgen kurz vorbereiten")
                 ]
             )
         }
 
-        let phaseNote = phase == .push ? " " + L10n.tr("You're in a push phase - this is a progression day.") : ""
+        let phaseNote = phase == .push ? " " + L10n.tr("Push-Phase: Progression vorsichtig prüfen.") : ""
         return ReadinessCoachResponse(
-            headline: L10n.tr("Green light - push"),
-            message: L10n.format("Sleep, energy, and recovery are all stacked.%@ Attack the top set and look for a real rep or load PR on the anchor lift.", phaseNote),
+            headline: L10n.tr("Grünes Licht"),
+            message: L10n.format("Schlaf, Energie und Erholung wirken gut.%@ Top-Set sauber ausführen und bei den Hauptlifts nur verdiente Steigerungen nehmen.", phaseNote),
             icon: "bolt.fill",
             colorName: "mint",
             trainingAdvice: readiness.motivation.rawValue >= 4 ? .pushHard : .trainAsPlanned,
             adjustments: [
-                L10n.tr("Warm up thoroughly - earn the intensity"),
-                L10n.tr("Push anchor lift: +1 rep or +2.5 kg"),
-                L10n.tr("Keep accessory quality, not just tonnage")
+                L10n.tr("Gründlich aufwärmen"),
+                L10n.tr("Hauptlift prüfen: +1 Wdh. oder +2,5 kg"),
+                L10n.tr("Accessory-Qualität vor Tonnage")
             ]
         )
     }
@@ -100,29 +100,29 @@ struct DailyCoachEngine {
     private func goodReadinessResponse(readiness: DailyReadiness, hasWorkout: Bool) -> ReadinessCoachResponse {
         if !hasWorkout {
             return ReadinessCoachResponse(
-                headline: L10n.tr("Solid baseline"),
-                message: L10n.tr("Recovery is on track and no workout is scheduled. Log your inputs and keep the signal clean for STRQ."),
+                headline: L10n.tr("Solide Basis"),
+                message: L10n.tr("Erholung wirkt stabil und heute ist keine Einheit geplant. Inputs loggen, damit STRQ die nächsten Workouts sauber einordnet."),
                 icon: "checkmark.circle.fill",
                 colorName: "green",
                 trainingAdvice: .trainAsPlanned,
                 adjustments: [
-                    L10n.tr("Log weight and sleep"),
-                    L10n.tr("Keep steps moving"),
-                    L10n.tr("Stay on nutrition")
+                    L10n.tr("Gewicht und Schlaf loggen"),
+                    L10n.tr("Schritte locker halten"),
+                    L10n.tr("Ernährung im Ziel halten")
                 ]
             )
         }
 
         return ReadinessCoachResponse(
-            headline: L10n.tr("Run the plan"),
-            message: L10n.tr("You're well-recovered. Follow today's prescription exactly - this is the kind of day progress is built on. Nothing fancy."),
+            headline: L10n.tr("Plan ausführen"),
+            message: L10n.tr("Readiness wirkt gut. Heutiges Workout sauber treffen: Ziel-Wiederholungen, Ziel-RPE, keine Extras erzwingen."),
             icon: "checkmark.circle.fill",
             colorName: "green",
             trainingAdvice: .trainAsPlanned,
             adjustments: [
-                L10n.tr("Hit target reps at target RPE"),
-                L10n.tr("Clean tempo, full ROM"),
-                L10n.tr("Log every set honestly")
+                L10n.tr("Ziel-Wdh. bei Ziel-RPE treffen"),
+                L10n.tr("Sauberes Tempo, volle ROM"),
+                L10n.tr("Jeden Satz ehrlich loggen")
             ]
         )
     }
@@ -132,31 +132,31 @@ struct DailyCoachEngine {
     private func moderateReadinessResponse(readiness: DailyReadiness, hasWorkout: Bool) -> ReadinessCoachResponse {
         if !hasWorkout {
             return ReadinessCoachResponse(
-                headline: L10n.tr("Stack recovery"),
-                message: L10n.tr("You're not quite fresh and no workout is planned - that's a fit. Use the day to rebuild: sleep, food, and light movement."),
+                headline: L10n.tr("Erholung stapeln"),
+                message: L10n.tr("Du wirkst nicht ganz frisch und heute ist keine Einheit geplant. Passt: Schlaf, Essen und leichte Bewegung priorisieren."),
                 icon: "arrow.down.circle.fill",
                 colorName: "yellow",
                 trainingAdvice: .restDay,
                 adjustments: [
-                    L10n.tr("20-30 min walk or mobility"),
-                    L10n.tr("Hit protein target"),
-                    L10n.tr("Target 7h+ sleep tonight")
+                    L10n.tr("20-30 Min. Spaziergang oder Mobility"),
+                    L10n.tr("Proteinziel treffen"),
+                    L10n.tr("Heute 7+ Std. Schlaf anpeilen")
                 ]
             )
         }
 
-        var adjustments = [L10n.tr("Warm-up sets matter - don't rush them")]
+        var adjustments = [L10n.tr("Warm-up-Sätze ernst nehmen")]
         if readiness.soreness.rawValue >= 2 {
-            adjustments.append(L10n.tr("Cut last accessory set on sore muscles"))
+            adjustments.append(L10n.tr("Letzten Accessory-Satz bei müden Muskeln streichen"))
         }
         if readiness.energyLevel.rawValue <= 2 {
-            adjustments.append(L10n.tr("Cap workout at ~45 min"))
+            adjustments.append(L10n.tr("Einheit auf ca. 45 Min. deckeln"))
         }
-        adjustments.append(L10n.tr("Hold load, stay ~1 RIR lighter than usual"))
+        adjustments.append(L10n.tr("Gewicht halten, 1 Wdh. im Tank lassen"))
 
         return ReadinessCoachResponse(
-            headline: L10n.tr("Train, but tune it down"),
-            message: L10n.tr("Recovery is mixed. Don't chase a PR today - anchor lifts at planned load, accessories trimmed. Quality > tonnage."),
+            headline: L10n.tr("Trainieren, aber ruhiger"),
+            message: L10n.tr("Erholung wirkt gemischt. Heute keinen PR jagen: Hauptlifts nach Plan, Zubehör gekürzt. Qualität vor Tonnage."),
             icon: "arrow.down.circle.fill",
             colorName: "yellow",
             trainingAdvice: readiness.soreness.rawValue >= 3 ? .reduceAccessories : .trainButLighter,
@@ -169,32 +169,32 @@ struct DailyCoachEngine {
     private func lowReadinessResponse(readiness: DailyReadiness, hasWorkout: Bool) -> ReadinessCoachResponse {
         if !hasWorkout {
             return ReadinessCoachResponse(
-                headline: L10n.tr("Full recovery day"),
-                message: L10n.tr("Your body is telling you it needs time. Let it. Sleep, food, and walking will pay off more than anything else today."),
+                headline: L10n.tr("Ruhiger Tag"),
+                message: L10n.tr("Erholung wirkt niedrig. Heute Schlaf, Essen und lockere Bewegung priorisieren."),
                 icon: "bed.double.fill",
                 colorName: "orange",
                 trainingAdvice: .restDay,
                 adjustments: [
-                    L10n.tr("No training today"),
-                    L10n.tr("Extra hour of sleep if possible"),
-                    L10n.tr("Protein + water first"),
-                    L10n.tr("Re-check tomorrow")
+                    L10n.tr("Heute kein hartes Training"),
+                    L10n.tr("Wenn möglich: mehr Schlaf"),
+                    L10n.tr("Protein und Wasser zuerst"),
+                    L10n.tr("Morgen neu prüfen")
                 ]
             )
         }
 
         var adjustments = [
-            L10n.tr("Drop working load ~15-20%"),
-            L10n.tr("Cut 1-2 accessory exercises"),
-            L10n.tr("Keep workout under 40 min")
+            L10n.tr("Arbeitslast um ca. 15-20% senken"),
+            L10n.tr("1-2 Accessory-Übungen streichen"),
+            L10n.tr("Einheit unter 40 Min. halten")
         ]
         if readiness.stressLevel.rawValue >= 4 {
-            adjustments.append(L10n.tr("If it still feels wrong - swap to mobility"))
+            adjustments.append(L10n.tr("Wenn es weiter falsch wirkt: auf Mobility wechseln"))
         }
 
         return ReadinessCoachResponse(
-            headline: L10n.tr("Movement, not a grind"),
-            message: L10n.tr("Readiness is low. A short, lighter workout beats skipping outright - but do not push through pain or form breakdown. Bank the rep quality, not the intensity."),
+            headline: L10n.tr("Bewegung, kein Grind"),
+            message: L10n.tr("Readiness ist niedrig. Eine kurze, leichtere Einheit ist okay, aber nicht durch Schmerz oder Technikverlust drücken. Wiederholungsqualität zählt."),
             icon: "heart.circle.fill",
             colorName: "orange",
             trainingAdvice: .shortenSession,
@@ -206,18 +206,18 @@ struct DailyCoachEngine {
 
     private func veryLowReadinessResponse(readiness: DailyReadiness, hasWorkout: Bool) -> ReadinessCoachResponse {
         return ReadinessCoachResponse(
-            headline: hasWorkout ? L10n.tr("Skip today") : L10n.tr("Rest & rebuild"),
+            headline: hasWorkout ? L10n.tr("Heute aussetzen") : L10n.tr("Erholen und neu prüfen"),
             message: hasWorkout
-                ? L10n.tr("Multiple systems are flagged. Training today costs more than it pays. Move the workout - STRQ will rebalance the week.")
-                : L10n.tr("Multiple systems are flagged. Let today be about recovery. You'll come back measurably stronger."),
+                ? L10n.tr("Mehrere Werte stehen niedrig. Einheit verschieben und die nächste Einheit leichter angehen.")
+                : L10n.tr("Mehrere Werte stehen niedrig. Heute Erholung priorisieren und morgen neu prüfen."),
             icon: "bed.double.fill",
             colorName: "red",
             trainingAdvice: .restDay,
             adjustments: [
-                L10n.tr("No lifting today"),
-                L10n.tr("Light walk, stretch, sunlight"),
-                L10n.tr("Eat well, sleep early"),
-                L10n.tr("Re-check tomorrow morning")
+                L10n.tr("Heute kein Lifting"),
+                L10n.tr("Leichter Spaziergang, Stretching, Tageslicht"),
+                L10n.tr("Gut essen, früh schlafen"),
+                L10n.tr("Morgen früh neu prüfen")
             ]
         )
     }
@@ -237,15 +237,15 @@ struct DailyCoachEngine {
             let score = r.readinessScore
             if score >= 80 && hasWorkoutToday {
                 return DailyCoachMessage(
-                    headline: L10n.tr("You're ready - let's train"),
-                    detail: L10n.tr("Readiness is high and today's workout is waiting. Make it count."),
+                    headline: L10n.tr("Bereit fürs Training"),
+                    detail: L10n.tr("Readiness ist hoch und die heutige Einheit wartet. Sauber ausführen."),
                     icon: "bolt.heart.fill",
                     colorName: "green"
                 )
             } else if score < 50 {
                 return DailyCoachMessage(
-                    headline: L10n.tr("Recovery comes first today"),
-                    detail: L10n.tr("Your body is asking for rest. Light movement or a full rest day is the smart play."),
+                    headline: L10n.tr("Heute Erholung zuerst"),
+                    detail: L10n.tr("Erholung wirkt niedrig. Leichte Bewegung oder ein ruhiger Tag ist sinnvoll."),
                     icon: "heart.circle.fill",
                     colorName: "orange"
                 )
@@ -255,10 +255,10 @@ struct DailyCoachEngine {
         if weeklySessionsCompleted >= weeklySessionsPlanned && weeklySessionsPlanned > 0 {
             let overflow = weeklyOverflow(completed: weeklySessionsCompleted, planned: weeklySessionsPlanned)
             return DailyCoachMessage(
-                headline: L10n.tr("Weekly target hit"),
+                headline: L10n.tr("Wochenziel erreicht"),
                 detail: overflow > 0
                     ? L10n.format("Wochenziel erreicht, +%d zusätzlich protokolliert. Erholung ehrlich halten, bevor du mehr machst.", overflow)
-                    : L10n.tr("You've completed all planned workouts. Great discipline - enjoy the rest."),
+                    : L10n.tr("Alle geplanten Einheiten sind erledigt. Rest der Woche ruhig einordnen."),
                 icon: "trophy.fill",
                 colorName: "yellow"
             )
@@ -267,8 +267,8 @@ struct DailyCoachEngine {
         let remaining = weeklySessionsPlanned - weeklySessionsCompleted
         if remaining == 1 && hasWorkoutToday {
             return DailyCoachMessage(
-                headline: L10n.tr("One workout to go this week"),
-                detail: L10n.tr("Finish strong and you'll complete your weekly target."),
+                headline: L10n.tr("Noch eine Einheit diese Woche"),
+                detail: L10n.tr("Sauber abschließen, dann ist das Wochenziel erfüllt."),
                 icon: "flag.fill",
                 colorName: "orange"
             )
@@ -276,8 +276,8 @@ struct DailyCoachEngine {
 
         if streak >= 7 {
             return DailyCoachMessage(
-                headline: L10n.tr("Momentum is building"),
-                detail: L10n.format("%d-day streak. Consistency like this drives real results.", streak),
+                headline: L10n.tr("Momentum baut sich auf"),
+                detail: L10n.format("%d-Tage-Serie. Konstanz bleibt der stärkste Hebel.", streak),
                 icon: "flame.fill",
                 colorName: "orange"
             )
@@ -285,16 +285,16 @@ struct DailyCoachEngine {
 
         if hasWorkoutToday {
             return DailyCoachMessage(
-                headline: L10n.tr("Training day"),
-                detail: L10n.tr("Today's workout is ready. Warm up well and focus on quality."),
+                headline: L10n.tr("Trainingstag"),
+                detail: L10n.tr("Die heutige Einheit ist bereit. Gut aufwärmen und Qualität priorisieren."),
                 icon: "figure.strengthtraining.traditional",
                 colorName: "blue"
             )
         }
 
         return DailyCoachMessage(
-            headline: L10n.tr("Active recovery day"),
-            detail: L10n.tr("No workout planned. Light movement, stretching, or complete rest - you choose."),
+            headline: L10n.tr("Aktiver Erholungstag"),
+            detail: L10n.tr("Keine Einheit geplant. Leichte Bewegung, Stretching oder komplette Ruhe - du entscheidest."),
             icon: "leaf.fill",
             colorName: "green"
         )
@@ -319,15 +319,15 @@ nonisolated struct MomentumData: Sendable {
 
     var streakMessage: String {
         if currentStreak >= 14 {
-            return L10n.format("Incredible discipline. %d days and counting.", currentStreak)
+            return L10n.format("Starke Disziplin. %d Tage in Folge.", currentStreak)
         } else if currentStreak >= 7 {
-            return L10n.tr("Strong momentum. Keep the streak alive.")
+            return L10n.tr("Starkes Momentum. Serie halten.")
         } else if currentStreak >= 3 {
-            return L10n.tr("Building consistency. Stay on track.")
+            return L10n.tr("Konstanz baut sich auf. Dranbleiben.")
         } else if currentStreak > 0 {
-            return L10n.tr("Getting started. Every workout counts.")
+            return L10n.tr("Guter Start. Jede Einheit zählt.")
         } else {
-            return L10n.tr("Start fresh today. One workout at a time.")
+            return L10n.tr("Heute neu starten. Eine Einheit nach der anderen.")
         }
     }
 
@@ -337,14 +337,14 @@ nonisolated struct MomentumData: Sendable {
             if weeklySessionsPlanned > 0 && weeklySessionsCompleted > weeklySessionsPlanned {
                 return L10n.format("Ziel erreicht · +%d zusätzlich", weeklySessionsCompleted - weeklySessionsPlanned)
             }
-            return L10n.tr("Ahead of schedule this week")
+            return L10n.tr("Diese Woche vor dem Plan")
         case .onTrack:
             if weeklySessionsPlanned > 0 && weeklySessionsCompleted == weeklySessionsPlanned {
-                return L10n.tr("Weekly target reached")
+                return L10n.tr("Wochenziel erreicht")
             }
-            return L10n.tr("On track for your weekly target")
-        case .behind: return L10n.tr("Behind this week - time to catch up")
-        case .missed: return L10n.tr("No workouts yet this week")
+            return L10n.tr("Auf Kurs fürs Wochenziel")
+        case .behind: return L10n.tr("Diese Woche hinter dem Plan")
+        case .missed: return L10n.tr("Diese Woche noch keine Einheit")
         }
     }
 }

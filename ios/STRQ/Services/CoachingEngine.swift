@@ -5,6 +5,42 @@ struct CoachingEngine {
     private let progressionEngine = ProgressionEngine()
     private let volumeEngine = SmartVolumeEngine()
 
+    private func muscleDisplayName(_ raw: String) -> String {
+        switch raw.lowercased() {
+        case "back": return "Rücken"
+        case "chest": return "Brust"
+        case "shoulders": return "Schultern"
+        case "arms": return "Arme"
+        case "quads": return "Quads"
+        case "hamstrings": return "Hamstrings"
+        case "glutes": return "Glutes"
+        case "calves": return "Waden"
+        case "abs": return "Bauch"
+        default: return raw
+        }
+    }
+
+    private func coachDecimal(_ value: Double) -> String {
+        let rounded = (value * 10).rounded() / 10
+        let format = abs(rounded.rounded() - rounded) < 0.01 ? "%.0f" : "%.1f"
+        return String(format: format, rounded).replacingOccurrences(of: ".", with: ",")
+    }
+
+    private func coachLoad(_ value: Double) -> String {
+        "\(coachDecimal(value)) kg"
+    }
+
+    private func coachMultiplier(_ value: Double) -> String {
+        "\(coachDecimal(value))×"
+    }
+
+    private func safeShortWindowTrainingLoadMessage(count: Int, days: Int) -> String {
+        if count > 3 {
+            return "Heute ruhiger trainieren und die nächste Einheit leicht halten."
+        }
+        return "In den letzten \(days) Tagen sind \(count) Einheiten geloggt. Heute ruhiger trainieren."
+    }
+
     func generateInsights(
         profile: UserProfile,
         workoutHistory: [WorkoutSession],
@@ -60,16 +96,16 @@ struct CoachingEngine {
 
     private func softenForLowConfidence(_ insight: SmartInsight) -> SmartInsight {
         let severity: InsightSeverity = insight.severity == .high ? .medium : insight.severity
-        return SmartInsight(
-            id: insight.id,
-            icon: insight.icon,
-            color: insight.color,
-            title: insight.title,
-            message: insight.message + " STRQ is still calibrating — treat this as directional.",
-            severity: severity,
-            category: insight.category
-        )
-    }
+            return SmartInsight(
+                id: insight.id,
+                icon: insight.icon,
+                color: insight.color,
+                title: insight.title,
+                message: insight.message + " STRQ kalibriert noch - das ist nur eine grobe Richtung.",
+                severity: severity,
+                category: insight.category
+            )
+        }
 
     func generateRecommendations(
         profile: UserProfile,
@@ -168,8 +204,8 @@ struct CoachingEngine {
                 results.append(SmartInsight(
                     icon: "exclamationmark.triangle.fill",
                     color: "red",
-                    title: "\(entry.muscle) Volume Significantly Low",
-                    message: "Your \(entry.muscle.lowercased()) volume is \(Int((1.0 - ratio) * 100))% below your recent average. This could slow progress on that muscle group.",
+                    title: "\(muscleDisplayName(entry.muscle)): Volumen niedrig",
+                    message: "\(muscleDisplayName(entry.muscle)) liegt \(Int((1.0 - ratio) * 100))% unter deinem letzten Durchschnitt. Volumen im Blick behalten und die nächste Einheit sauber prüfen.",
                     severity: .high,
                     category: .volumeBalance
                 ))
@@ -177,8 +213,8 @@ struct CoachingEngine {
                 results.append(SmartInsight(
                     icon: "arrow.down.circle.fill",
                     color: "yellow",
-                    title: "\(entry.muscle) Volume Below Average",
-                    message: "Your \(entry.muscle.lowercased()) work is \(Int((1.0 - ratio) * 100))% below your 4-week average. Consider adding an extra set next session.",
+                    title: "\(muscleDisplayName(entry.muscle)): Unter Durchschnitt",
+                    message: "\(muscleDisplayName(entry.muscle)) liegt \(Int((1.0 - ratio) * 100))% unter dem 4-Wochen-Schnitt. Zusatzvolumen nur ergänzen, wenn die nächste Einheit sauber passt.",
                     severity: .medium,
                     category: .volumeBalance
                 ))
@@ -186,8 +222,8 @@ struct CoachingEngine {
                 results.append(SmartInsight(
                     icon: "arrow.up.circle.fill",
                     color: "orange",
-                    title: "\(entry.muscle) Volume Very High",
-                    message: "Your \(entry.muscle.lowercased()) volume is \(Int((ratio - 1.0) * 100))% above average. Be mindful of recovery if you feel joint fatigue.",
+                    title: "\(muscleDisplayName(entry.muscle)): Volumen hoch",
+                    message: "\(muscleDisplayName(entry.muscle)) liegt \(Int((ratio - 1.0) * 100))% über dem Durchschnitt. Volumen im Blick behalten und die nächste Einheit nicht erzwingen.",
                     severity: .low,
                     category: .volumeBalance
                 ))
@@ -200,8 +236,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "target",
                 color: "red",
-                title: "\(entry.muscle) is a Focus Muscle but Undertrained",
-                message: "You marked \(entry.muscle.lowercased()) as a priority, but your volume is below average. Prioritize it in your next session.",
+                title: "\(muscleDisplayName(entry.muscle)): Fokus prüfen",
+                message: "\(muscleDisplayName(entry.muscle)) ist als Fokus gesetzt, liegt aber unter dem Durchschnitt. In der nächsten passenden Einheit priorisieren.",
                 severity: .high,
                 category: .volumeBalance
             ))
@@ -244,8 +280,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "arrow.left.arrow.right",
                 color: "orange",
-                title: "Push Volume Dominates Pull",
-                message: "Your push:pull ratio is \(Int(pushRatio * 100)):\(Int(pullRatio * 100)). Add more rowing or pull-up variations to balance your upper body.",
+                title: "Push dominiert Pull",
+                message: "Push:Pull liegt bei \(Int(pushRatio * 100)):\(Int(pullRatio * 100)). Mehr Row- oder Pull-up-Variationen prüfen, wenn es zur Woche passt.",
                 severity: .medium,
                 category: .movementBalance
             )]
@@ -253,8 +289,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "arrow.left.arrow.right",
                 color: "orange",
-                title: "Pull Volume Dominates Push",
-                message: "Your pull:push ratio is \(Int(pullRatio * 100)):\(Int(pushRatio * 100)). Consider adding pressing movements for balance.",
+                title: "Pull dominiert Push",
+                message: "Pull:Push liegt bei \(Int(pullRatio * 100)):\(Int(pushRatio * 100)). Press-Variationen prüfen, wenn die nächste Einheit Raum dafür hat.",
                 severity: .medium,
                 category: .movementBalance
             )]
@@ -279,8 +315,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "figure.stand",
                 color: "yellow",
-                title: "Upper Body Dominant Training",
-                message: "Your upper body volume is \(String(format: "%.1f", ratio))x your lower body. This imbalance may limit athletic performance and increase injury risk.",
+                title: "Oberkörper dominiert",
+                message: "Oberkörper dominiert. Unterkörper nächste Woche stärker einplanen.",
                 severity: .medium,
                 category: .movementBalance
             )]
@@ -288,8 +324,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "figure.stand",
                 color: "yellow",
-                title: "Lower Body Dominant Training",
-                message: "Your lower body volume significantly exceeds upper body. Consider balancing with more pressing and rowing work.",
+                title: "Unterkörper dominiert",
+                message: "Unterkörper dominiert. Oberkörper nächste Woche stärker einplanen.",
                 severity: .medium,
                 category: .movementBalance
             )]
@@ -310,8 +346,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "bed.double.fill",
                 color: "red",
-                title: "High Training Density",
-                message: "\(recentSessions.count) sessions in the last 3 days is very demanding. Consider a rest day to allow your muscles and CNS to recover.",
+                title: "Viele Einheiten in kurzer Zeit",
+                message: safeShortWindowTrainingLoadMessage(count: recentSessions.count, days: 3),
                 severity: .high,
                 category: .recovery
             ))
@@ -319,8 +355,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "moon.fill",
                 color: "yellow",
-                    title: "3 Workouts in 3 Days",
-                message: "Training daily is fine occasionally, but sustained high frequency may impair recovery. Listen to your body.",
+                    title: "Heute ruhiger trainieren",
+                message: safeShortWindowTrainingLoadMessage(count: recentSessions.count, days: 3),
                 severity: .medium,
                 category: .recovery
             ))
@@ -331,8 +367,8 @@ struct CoachingEngine {
                 results.append(SmartInsight(
                     icon: "zzz",
                     color: "purple",
-                    title: "Sleep & Training Load Mismatch",
-                    message: "Your sleep quality is reported as \(profile.sleepQuality.displayName.lowercased()). High training volume with poor sleep can lead to overtraining. Prioritize rest.",
+                    title: "Schlaf und Belastung prüfen",
+                    message: "Schlafqualität und Trainingslast passen gerade nicht ideal zusammen. Heute ruhiger planen.",
                     severity: .medium,
                     category: .recovery
                 ))
@@ -343,8 +379,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "brain.head.profile.fill",
                 color: "purple",
-                title: "High Stress May Limit Recovery",
-                message: "Elevated stress reduces your body's ability to recover. Consider lighter sessions or more recovery-focused work this week.",
+                    title: "Stress im Blick",
+                    message: "Bei hohem Stress heute ruhiger trainieren. Leichtere Sätze oder mehr Pause zwischen harten Einheiten prüfen.",
                 severity: .low,
                 category: .recovery
             ))
@@ -368,8 +404,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "arrow.up.forward.circle.fill",
                 color: "green",
-                title: "Frequency Improved",
-                message: "You trained \(thisWeekCount) times this week vs \(lastWeekCount) last week. Great consistency improvement!",
+                title: "Frequenz steigt",
+                message: "Diese Woche sind mehr Einheiten geloggt als letzte Woche. Rhythmus halten, ohne Zusatzvolumen zu erzwingen.",
                 severity: .positive,
                 category: .consistency
             ))
@@ -377,8 +413,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "arrow.down.forward.circle.fill",
                 color: "yellow",
-                title: "Frequency Dropped",
-                message: "You trained \(thisWeekCount) times this week vs \(lastWeekCount) last week. Try to stay consistent with your \(profile.daysPerWeek)-day plan.",
+                title: "Frequenz niedriger",
+                message: "Diese Woche liegt unter der letzten. Nächste Einheit sauber einplanen und den Wochenrhythmus wieder stabilisieren.",
                 severity: .low,
                 category: .consistency
             ))
@@ -389,8 +425,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "calendar.badge.exclamationmark",
                 color: "yellow",
-                title: "Below Target Frequency",
-                message: "You've completed \(thisWeekCount) of your planned \(profile.daysPerWeek) sessions this week. \(gap) more to go to hit your target.",
+                title: "Unter Wochenziel",
+                message: "\(thisWeekCount) von \(profile.daysPerWeek) geplanten Einheiten sind geloggt. Noch \(gap) offen, wenn die Woche es hergibt.",
                 severity: .low,
                 category: .consistency
             ))
@@ -413,8 +449,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "trophy.fill",
                 color: "yellow",
-                title: "New Best: \(exerciseName)",
-                message: "\(Int(pr.weight))kg × \(pr.reps) reps — estimated 1RM of \(Int(pr.estimatedOneRepMax))kg. Keep pushing!",
+                title: "Neue Bestleistung: \(exerciseName)",
+                message: "\(coachLoad(pr.weight)) × \(pr.reps) Wdh. - e1RM \(coachLoad(pr.estimatedOneRepMax)). Nächste Einheit sauber bestätigen.",
                 severity: .positive,
                 category: .progression
             ))
@@ -441,8 +477,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "calendar.badge.checkmark",
                 color: "blue",
-                title: "Strongest Day: \(dayName)",
-                message: "You've trained on \(dayName) \(count) times in the last 6 weeks. This is your most consistent training day.",
+                title: "Stabilster Trainingstag: \(dayName)",
+                message: "\(dayName) ist in den letzten 6 Wochen am häufigsten geloggt. Das ist dein verlässlichster Trainingstag.",
                 severity: .positive,
                 category: .consistency
             )]
@@ -480,8 +516,8 @@ struct CoachingEngine {
                 results.append(SmartInsight(
                     icon: "arrow.down.circle.fill",
                     color: "green",
-                    title: "Weight Trending Down",
-                    message: "Your bodyweight is dropping at a healthy pace (about \(String(format: "%.1f", abs(delta)))kg recently). Stay the course.",
+                    title: "Gewichtstrend sinkt",
+                    message: "Das Körpergewicht sinkt zuletzt um ca. \(coachLoad(abs(delta))). Kurs beibehalten und Trend weiter beobachten.",
                     severity: .positive,
                     category: .bodyComposition
                 ))
@@ -489,8 +525,8 @@ struct CoachingEngine {
                 results.append(SmartInsight(
                     icon: "arrow.up.circle.fill",
                     color: "orange",
-                    title: "Weight Trending Up During Cut",
-                    message: "Your goal is fat loss, but bodyweight is trending up. Review your nutrition or increase activity.",
+                    title: "Gewicht steigt im Cut",
+                    message: "Das Ziel ist Fettverlust, der Gewichtstrend steigt aber. Ernährung und Aktivität prüfen.",
                     severity: .medium,
                     category: .bodyComposition
                 ))
@@ -500,8 +536,8 @@ struct CoachingEngine {
                 results.append(SmartInsight(
                     icon: "arrow.up.circle.fill",
                     color: "green",
-                    title: "Weight Trending Up",
-                    message: "Gaining at about \(String(format: "%.1f", delta))kg recently — on track for muscle gain. Ensure strength is also increasing.",
+                    title: "Gewichtstrend steigt",
+                    message: "Zuletzt ca. \(coachLoad(delta)) mehr. Passt zur Aufbauphase, solange Kraftwerte mitziehen.",
                     severity: .positive,
                     category: .bodyComposition
                 ))
@@ -509,8 +545,8 @@ struct CoachingEngine {
                 results.append(SmartInsight(
                     icon: "arrow.down.circle.fill",
                     color: "orange",
-                    title: "Weight Dropping During Bulk",
-                    message: "Your goal is muscle gain, but you're losing weight. You may need to increase calories to support growth.",
+                    title: "Gewicht sinkt im Aufbau",
+                    message: "Das Ziel ist Muskelaufbau, der Gewichtstrend sinkt aber. Kalorien und Trainingstage prüfen.",
                     severity: .medium,
                     category: .bodyComposition
                 ))
@@ -542,8 +578,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "exclamationmark.triangle.fill",
                 color: "orange",
-                title: "Training Volume Spike",
-                message: "Your set count jumped \(Int(setIncrease * 100))% vs last week. Sharp volume increases raise injury risk. Consider tapering next week.",
+                title: "Volumenanstieg prüfen",
+                message: "Die Satzanzahl liegt \(Int(setIncrease * 100))% über letzter Woche. Volumen im Blick behalten und nächste Woche nicht extra draufpacken.",
                 severity: .medium,
                 category: .recovery
             )]
@@ -562,8 +598,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "arrow.down.to.line",
                 color: "blue",
-                title: "Consider a Deload Week",
-                message: "You've completed \(recentSessions.count) sessions in 4 weeks with no deload. A lighter week can boost long-term progress and reduce injury risk.",
+                title: "Deload prüfen",
+                message: "Die letzten Wochen wirken trainingsdicht. Eine leichtere Woche hält die Belastung kontrollierter.",
                 severity: .medium,
                 category: .recovery
             )]
@@ -583,8 +619,8 @@ struct CoachingEngine {
         if let top = overtrained.first, let bottom = undertrained.first {
             recs.append(Recommendation(
                 type: .volumeImbalance,
-                title: "Balance \(top.muscle) and \(bottom.muscle)",
-                message: "\(top.muscle) volume is \(Int((top.percentOfAverage - 1.0) * 100))% above average while \(bottom.muscle) is \(Int((1.0 - bottom.percentOfAverage) * 100))% below. Shift a set or two from \(top.muscle.lowercased()) to \(bottom.muscle.lowercased()).",
+                title: "\(muscleDisplayName(top.muscle)) und \(muscleDisplayName(bottom.muscle)) ausgleichen",
+                message: "\(muscleDisplayName(top.muscle)) liegt über dem Durchschnitt, \(muscleDisplayName(bottom.muscle)) darunter. In der nächsten passenden Einheit 1-2 Sätze verschieben.",
                 priority: 3
             ))
         }
@@ -594,8 +630,8 @@ struct CoachingEngine {
             if focusMuscleNames.contains(entry.muscle) {
                 recs.append(Recommendation(
                     type: .volumeImbalance,
-                    title: "Prioritize \(entry.muscle)",
-                    message: "\(entry.muscle) is one of your focus muscles but volume is below your recent average. Add 2-3 extra sets this week.",
+                    title: "\(muscleDisplayName(entry.muscle)) priorisieren",
+                    message: "\(muscleDisplayName(entry.muscle)) ist Fokus, liegt aber unter deinem letzten Durchschnitt. Zusatzvolumen nur ergänzen, wenn die Woche es sauber hergibt.",
                     priority: 4
                 ))
             }
@@ -617,8 +653,8 @@ struct CoachingEngine {
                 let suggestedWeight = pr.weight + (exercise.primaryMuscle.region == .lower ? 5.0 : 2.5)
                 recs.append(Recommendation(
                     type: .progressionSuggestion,
-                    title: "Progress \(exercise.name)",
-                    message: "You hit \(Int(pr.weight))kg × \(pr.reps). Try \(String(format: "%.1f", suggestedWeight))kg next session, aiming for the same reps.",
+                    title: "Gewicht leicht erhöhen: \(exercise.name)",
+                    message: "\(coachLoad(pr.weight)) × \(pr.reps) war stabil. Nächste Einheit \(coachLoad(suggestedWeight)) prüfen, wenn die Wiederholungsqualität passt.",
                     priority: 2
                 ))
             }
@@ -636,8 +672,8 @@ struct CoachingEngine {
         if recentCount >= 3 {
             recs.append(Recommendation(
                 type: .recoveryConcern,
-                title: "Recovery Day Recommended",
-                message: "You've trained \(recentCount) times in 2 days. A rest day will help your muscles repair and grow stronger. Consider light stretching or a walk instead.",
+                title: "Erholung niedrig",
+                message: safeShortWindowTrainingLoadMessage(count: recentCount, days: 2),
                 priority: 4
             ))
         }
@@ -645,8 +681,8 @@ struct CoachingEngine {
         if profile.recoveryCapacity == .low && recentCount >= 2 {
             recs.append(Recommendation(
                 type: .recoveryConcern,
-                title: "Manage Training Load",
-                message: "With your current recovery capacity, spacing sessions with rest days is important. Avoid back-to-back heavy sessions.",
+                title: "Heute ruhiger trainieren",
+                message: "Erholung wirkt niedrig. Mehr Pause zwischen harten Einheiten einplanen.",
                 priority: 3
             ))
         }
@@ -666,8 +702,8 @@ struct CoachingEngine {
             if let suggestion = unused.first {
                 recs.append(Recommendation(
                     type: .exerciseSwap,
-                    title: "Try \(suggestion.name)",
-                    message: "Since \(muscle.displayName.lowercased()) is a focus area, adding \(suggestion.name) could provide a new stimulus for growth.",
+                    title: "\(suggestion.name) prüfen",
+                    message: "\(muscleDisplayName(muscle.displayName)) ist Fokus. \(suggestion.name) kann als Variation geprüft werden, wenn es zur nächsten Einheit passt.",
                     priority: 1
                 ))
             }
@@ -685,8 +721,8 @@ struct CoachingEngine {
         if weeklyCount > profile.daysPerWeek + 1 {
             recs.append(Recommendation(
                 type: .splitSuggestion,
-                title: "You're Training More Than Planned",
-                message: "You completed \(weeklyCount) sessions vs your \(profile.daysPerWeek)-day plan. Consider updating your plan to match your actual frequency for better volume management.",
+                title: "Mehr Training als geplant",
+                message: "Mehr als geplant geloggt. Volumen im Blick behalten und nächste Woche nicht extra draufpacken.",
                 priority: 2
             ))
         }
@@ -707,8 +743,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "arrow.down.right",
                 color: "red",
-                title: "\(name) Performance Declining",
-                message: "\(state.coachNote) Consider reducing load by 10-15% and rebuilding with strict form.",
+                title: "\(name): Leistung rückläufig",
+                message: "\(state.coachNote) Nächste Einheit leichter: Gewicht um 10-15% reduzieren und Technik sauber halten.",
                 severity: .high,
                 category: .progression
             ))
@@ -719,7 +755,7 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "pause.circle.fill",
                 color: "orange",
-                title: "\(name) Has Plateaued",
+                title: "\(name): Plateau",
                 message: "\(state.coachNote)",
                 severity: .medium,
                 category: .progression
@@ -731,8 +767,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "arrow.right",
                 color: "yellow",
-                title: "Multiple Exercises Stalling",
-                message: "\(stallingCount) exercises are showing slowed progress. This may signal accumulated fatigue. Consider a lighter week or exercise rotation.",
+                title: "Mehrere Lifts stocken",
+                message: "\(stallingCount) Übungen zeigen langsamere Progression. Das deutet auf hohe Belastung hin. Leichtere Woche oder Variation prüfen.",
                 severity: .medium,
                 category: .progression
             ))
@@ -749,8 +785,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "arrow.down.to.line",
                 color: "purple",
-                title: "Deload Phase Active",
-                message: "This is a planned recovery period. Focus on form, reduce intensity, and let your body adapt to recent training stress.",
+                title: "Deload aktiv",
+                message: "Geplante leichtere Phase. Technik sauber halten und Gewicht rausnehmen.",
                 severity: .low,
                 category: .recovery
             )]
@@ -758,8 +794,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "heart.circle.fill",
                 color: "orange",
-                title: "Recovery Phase",
-                message: "Managing accumulated fatigue. Volume and intensity are reduced to protect long-term progress. You'll push harder next phase.",
+                title: "Erholungsphase",
+                message: "Die Woche läuft leichter. Volumen und Intensität sind reduziert.",
                 severity: .low,
                 category: .recovery
             )]
@@ -767,8 +803,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "arrow.up.right.circle.fill",
                 color: "green",
-                title: "Push Phase — Time to Progress",
-                message: "You're in a progression phase. Aim for small improvements each session. Recovery supports harder training right now.",
+                title: "Push-Phase: Progression prüfen",
+                message: "Kleine Steigerungen prüfen, solange Technik und Erholung passen.",
                 severity: .positive,
                 category: .progression
             )]
@@ -776,8 +812,8 @@ struct CoachingEngine {
             return [SmartInsight(
                 icon: "arrow.left.arrow.right",
                 color: "cyan",
-                title: "Rebalance Phase",
-                message: "Addressing muscle imbalances and weak points. Some exercises may change to prioritize undertrained areas.",
+                title: "Ausgleichsphase",
+                message: "Fokus wird auf weniger abgedeckte Bereiche verschoben. Übungsauswahl kann sich dafür anpassen.",
                 severity: .low,
                 category: .volumeBalance
             )]
@@ -799,8 +835,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "exclamationmark.circle.fill",
                 color: isFocus ? "red" : "orange",
-                title: "\(lm.muscleGroup) Below Minimum Effective Volume",
-                message: "At \(lm.currentWeeklySets) sets/week, \(lm.muscleGroup.lowercased()) isn't receiving enough stimulus to grow. Minimum effective volume is \(lm.minimumEffectiveVolume) sets.",
+                title: "\(muscleDisplayName(lm.muscleGroup)): Volumen niedrig",
+                message: "\(muscleDisplayName(lm.muscleGroup)) liegt bei \(lm.currentWeeklySets) Sätzen/Woche. Für dieses Ziel wirkt das niedrig; nächste Einheit prüfen.",
                 severity: isFocus ? .high : .medium,
                 category: .volumeBalance
             ))
@@ -810,8 +846,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "exclamationmark.triangle.fill",
                 color: "orange",
-                title: "\(lm.muscleGroup) Exceeding Recovery Capacity",
-                message: "At \(lm.currentWeeklySets) sets/week, \(lm.muscleGroup.lowercased()) volume exceeds your maximum recoverable volume (\(lm.maximumRecoverableVolume) sets). This can lead to overtraining.",
+                title: "\(muscleDisplayName(lm.muscleGroup)): Volumen prüfen",
+                message: "\(muscleDisplayName(lm.muscleGroup)) liegt bei \(lm.currentWeeklySets) Sätzen/Woche und damit über dem Zielbereich (\(lm.maximumRecoverableVolume) Sätze). Volumen im Blick behalten.",
                 severity: .medium,
                 category: .volumeBalance
             ))
@@ -835,8 +871,8 @@ struct CoachingEngine {
                 results.append(SmartInsight(
                     icon: "arrow.up.right",
                     color: "green",
-                    title: "Ready to Progress: \(exercise.name)",
-                    message: "Performance is stable at \(Int(state.lastWeight))kg × \(state.lastReps). Try \(String(format: "%.1f", nextWeight))kg next session.",
+                    title: "Gewicht erhöhen: \(exercise.name)",
+                    message: "\(coachLoad(state.lastWeight)) × \(state.lastReps) wirkt stabil. Nächste Einheit \(coachLoad(nextWeight)) prüfen, wenn die Qualität passt.",
                     severity: .positive,
                     category: .progression
                 ))
@@ -852,8 +888,8 @@ struct CoachingEngine {
             results.append(SmartInsight(
                 icon: "pause.circle",
                 color: "blue",
-                title: "Hold Steady: \(exercise.name)",
-                message: "Performance isn't stable yet. Repeat at \(Int(state.lastWeight))kg × \(state.lastReps) with focus on quality before increasing.",
+                title: "\(exercise.name): Stabil halten",
+                message: "Leistung wirkt noch nicht stabil genug. \(coachLoad(state.lastWeight)) × \(state.lastReps) wiederholen und Qualität bestätigen, bevor du erhöhst.",
                 severity: .low,
                 category: .progression
             ))
@@ -874,11 +910,10 @@ struct CoachingEngine {
             guard let exercise = library.exercise(byId: state.exerciseId),
                   let nextWeight = state.suggestedNextWeight else { continue }
 
-            let strategyLabel = state.recommendedStrategy.displayName.lowercased()
             recs.append(Recommendation(
                 type: .progressionSuggestion,
-                title: "\(state.recommendedStrategy.displayName): \(exercise.name)",
-                message: "Strategy: \(strategyLabel). Try \(String(format: "%.1f", nextWeight))kg\(state.suggestedNextReps.map { " for \($0) reps" } ?? ""). \(state.recommendedStrategy.explanation)",
+                title: state.recommendedStrategy == .loadFirst ? "Gewicht leicht erhöhen: \(exercise.name)" : "\(state.recommendedStrategy.displayName): \(exercise.name)",
+                message: "Nächste Einheit: \(coachLoad(nextWeight))\(state.suggestedNextReps.map { " für \($0) Wdh." } ?? "") prüfen. \(state.recommendedStrategy.explanation)",
                 priority: 3
             ))
         }
@@ -898,16 +933,16 @@ struct CoachingEngine {
             if state.plateauStatus == .regressing {
                 recs.append(Recommendation(
                     type: .exerciseSwap,
-                    title: "Consider Replacing \(exercise.name)",
-                    message: "Performance is declining on this exercise. A fresh variation targeting \(exercise.primaryMuscle.displayName.lowercased()) may restart progress.",
+                    title: "Variation für \(exercise.name) prüfen",
+                    message: "Die Leistung bei dieser Übung ist rückläufig. Eine ähnliche Variation für \(muscleDisplayName(exercise.primaryMuscle.displayName)) kann als nächster Schritt geprüft werden.",
                     priority: 4
                 ))
             } else {
                 let strategy = state.recommendedStrategy
                 recs.append(Recommendation(
                     type: .progressionSuggestion,
-                    title: "Unstick \(exercise.name)",
-                    message: "This lift has plateaued. Recommended approach: \(strategy.displayName.lowercased()). \(strategy.explanation)",
+                    title: "\(exercise.name): Plateau lösen",
+                    message: "Dieser Lift steht im Plateau. Ansatz prüfen: \(strategy.displayName.lowercased()). \(strategy.explanation)",
                     priority: 3
                 ))
             }
