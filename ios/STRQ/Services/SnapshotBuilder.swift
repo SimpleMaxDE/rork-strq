@@ -36,7 +36,7 @@ enum SnapshotBuilder {
             nutritionTarget: vm.nutritionTarget,
             nutritionLogs: vm.nutritionLogs,
             bodyWeightEntries: vm.bodyWeightEntries,
-            sleepEntries: vm.sleepEntries,
+            sleepEntries: SleepEntryNormalizer.normalized(vm.sleepEntries),
             activeWorkoutDraft: draft,
             familyResponseProfile: vm.familyResponseProfile
         )
@@ -49,7 +49,7 @@ enum SnapshotBuilder {
         score += state.workoutHistory.filter(\.isCompleted).count * 10
         score += state.readinessHistory.count
         score += state.bodyWeightEntries.count
-        score += state.sleepEntries.count
+        score += SleepEntryNormalizer.normalized(state.sleepEntries).count
         score += state.nutritionLogs.count
         score += state.progressionStates.count
         if state.hasCompletedOnboarding { score += 5 }

@@ -438,6 +438,128 @@ struct AppViewModelEarlyStateTests {
     }
 }
 
+// MARK: - Sleep Logging Idempotency
+
+@MainActor
+@Suite("Sleep logging idempotency")
+struct SleepLoggingIdempotencyTests {
+
+    private func makeVM() -> AppViewModel {
+        PersistenceStore.shared.clear()
+        return AppViewModel()
+    }
+
+    private func makeState(sleepEntries: [SleepEntry]) -> PersistedAppState {
+        PersistedAppState(
+            version: 1,
+            hasCompletedOnboarding: true,
+            profile: UserProfile(),
+            currentPlan: nil,
+            workoutHistory: [],
+            personalRecords: [],
+            progressEntries: [],
+            favoriteExerciseIds: [],
+            progressionStates: [],
+            trainingPhaseState: TrainingPhaseState(),
+            coachAdjustments: [],
+            appliedActionIds: [],
+            weekAdjustmentActive: nil,
+            previousPlanBeforeWeekAction: nil,
+            weeklyReviewDismissed: false,
+            todaysReadiness: nil,
+            readinessHistory: [],
+            notificationSettings: NotificationSettings(),
+            nutritionTarget: NutritionTarget(),
+            nutritionLogs: [],
+            bodyWeightEntries: [],
+            sleepEntries: sleepEntries,
+            activeWorkoutDraft: nil
+        )
+    }
+
+    @Test func loggingSleepTwiceTodayUpdatesSingleEntry() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+
+        vm.logSleep(hours: 5.5, quality: .poor)
+        let firstID = vm.sleepEntries.first?.id
+
+        vm.logSleep(hours: 8.0, quality: .great)
+
+        #expect(vm.sleepEntries.count == 1)
+        #expect(vm.sleepEntries.first?.id == firstID)
+        #expect(vm.sleepEntries.first?.hoursSlept == 8.0)
+        #expect(vm.sleepEntries.first?.quality == .great)
+    }
+
+    @Test func duplicateSameDaySnapshotEntriesNormalizeToOnePerDay() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today) ?? today
+        let entries = [
+            SleepEntry(id: "today-old", date: today.addingTimeInterval(8 * 3600), hoursSlept: 5.0, quality: .poor),
+            SleepEntry(id: "yesterday", date: yesterday.addingTimeInterval(8 * 3600), hoursSlept: 7.0, quality: .good),
+            SleepEntry(id: "today-new", date: today.addingTimeInterval(20 * 3600), hoursSlept: 8.5, quality: .great)
+        ]
+
+        vm.apply(snapshot: makeState(sleepEntries: entries))
+
+        let todayEntry = vm.sleepEntries.first { calendar.isDate($0.date, inSameDayAs: today) }
+        #expect(vm.sleepEntries.count == 2)
+        #expect(todayEntry?.id == "today-new")
+        #expect(todayEntry?.hoursSlept == 8.5)
+        #expect(todayEntry?.quality == .great)
+    }
+
+    @Test func recentSleepEntriesHaveNoDuplicateCalendarDaysAndStayBounded() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+
+        let calendar = Calendar.current
+        let now = Date()
+        vm.sleepEntries = (0..<20).flatMap { offset -> [SleepEntry] in
+            let day = calendar.date(byAdding: .day, value: -offset, to: now) ?? now
+            let dayStart = calendar.startOfDay(for: day)
+            return [
+                SleepEntry(id: "day-\(offset)-old", date: dayStart.addingTimeInterval(7 * 3600), hoursSlept: 5.0, quality: .poor),
+                SleepEntry(id: "day-\(offset)-new", date: dayStart.addingTimeInterval(22 * 3600), hoursSlept: 8.0, quality: .great)
+            ]
+        }
+
+        let recent = vm.recentSleepEntries(limit: 14)
+        let days = recent.map { calendar.startOfDay(for: $0.date) }
+
+        #expect(recent.count == 14)
+        #expect(Set(days).count == recent.count)
+        #expect(recent.allSatisfy { $0.id.hasSuffix("-new") })
+    }
+
+    @Test func recoveryTrendRemainsCappedAtFourteenCalendarPoints() {
+        let vm = makeVM()
+        defer { PersistenceStore.shared.clear() }
+
+        let calendar = Calendar.current
+        let now = Date()
+        vm.sleepEntries = (0..<25).flatMap { offset -> [SleepEntry] in
+            let day = calendar.date(byAdding: .day, value: -offset, to: now) ?? now
+            let dayStart = calendar.startOfDay(for: day)
+            return [
+                SleepEntry(id: "recovery-\(offset)-old", date: dayStart.addingTimeInterval(6 * 3600), hoursSlept: 4.5, quality: .poor),
+                SleepEntry(id: "recovery-\(offset)-new", date: dayStart.addingTimeInterval(21 * 3600), hoursSlept: 8.5, quality: .great)
+            ]
+        }
+
+        let trend = vm.recoveryTrendData
+        let days = trend.map { calendar.startOfDay(for: $0.date) }
+
+        #expect(trend.count == 14)
+        #expect(Set(days).count == 14)
+    }
+}
+
 // MARK: - Reset Behavior
 
 @MainActor

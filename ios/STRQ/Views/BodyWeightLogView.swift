@@ -303,7 +303,8 @@ struct BodyWeightLogView: View {
 
     @ViewBuilder
     private var sleepOverviewCard: some View {
-        if !vm.sleepEntries.isEmpty {
+        let entries = vm.recentSleepEntries(limit: 7)
+        if !entries.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 6) {
                     Image(systemName: "moon.zzz.fill")
@@ -347,7 +348,7 @@ struct BodyWeightLogView: View {
                 }
 
                 HStack(spacing: 0) {
-                    ForEach(vm.sleepEntries.prefix(7).reversed()) { entry in
+                    ForEach(entries.reversed()) { entry in
                         VStack(spacing: 4) {
                             let barHeight = max(8, CGFloat(entry.hoursSlept / 10.0) * 40)
                             RoundedRectangle(cornerRadius: 3)

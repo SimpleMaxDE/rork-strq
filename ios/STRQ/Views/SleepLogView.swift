@@ -128,7 +128,7 @@ struct SleepLogView: View {
 
     @ViewBuilder
     private var sleepTrendChart: some View {
-        let entries = vm.sleepEntries.prefix(14).reversed().map { $0 }
+        let entries = vm.recentSleepEntries(limit: 14).reversed().map { $0 }
         if entries.count >= 3 {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
@@ -354,12 +354,13 @@ struct SleepLogView: View {
 
     @ViewBuilder
     private var recentSleepList: some View {
-        if !vm.sleepEntries.isEmpty {
+        let entries = vm.recentSleepEntries(limit: 10)
+        if !entries.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
                 Text(L10n.tr("Recent Sleep"))
                     .font(.headline)
 
-                ForEach(vm.sleepEntries.prefix(10)) { entry in
+                ForEach(entries) { entry in
                     let isToday = Calendar.current.isDateInToday(entry.date)
                     HStack(spacing: 12) {
                         VStack(alignment: .leading, spacing: 2) {
@@ -446,7 +447,7 @@ struct SleepLogView: View {
             ))
         }
 
-        let recentQuality = vm.sleepEntries.prefix(7)
+        let recentQuality = vm.recentSleepEntries(limit: 7)
         let poorNights = recentQuality.filter { $0.quality.rawValue <= 2 }.count
         if poorNights >= 3 {
             results.append((

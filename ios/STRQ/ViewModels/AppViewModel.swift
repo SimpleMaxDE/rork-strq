@@ -141,7 +141,7 @@ class AppViewModel {
             self.nutritionTarget = saved.nutritionTarget
             self.nutritionLogs = saved.nutritionLogs
             self.bodyWeightEntries = saved.bodyWeightEntries
-            self.sleepEntries = saved.sleepEntries
+            self.sleepEntries = SleepEntryNormalizer.normalized(saved.sleepEntries)
             self.familyResponseProfile = saved.familyResponseProfile ?? .empty
             // Canonicalize any legacy alias ids carried forward from older
             // snapshots so history / progression / response / media all
@@ -224,7 +224,7 @@ class AppViewModel {
         nutritionTarget = saved.nutritionTarget
         nutritionLogs = saved.nutritionLogs
         bodyWeightEntries = saved.bodyWeightEntries
-        sleepEntries = saved.sleepEntries
+        sleepEntries = SleepEntryNormalizer.normalized(saved.sleepEntries)
         familyResponseProfile = saved.familyResponseProfile ?? .empty
         // Canonicalize any legacy alias ids inside the incoming cloud snapshot
         // so restored data doesn't fragment history / progression / response.
@@ -741,7 +741,7 @@ class AppViewModel {
         let fourWeeksAgo = calendar.date(byAdding: .day, value: -28, to: Date()) ?? Date()
         let completed = workoutHistory.filter { $0.startTime > fourWeeksAgo && $0.isCompleted }.count
         let readinessCount = readinessHistory.prefix(14).count
-        let sleepCount = sleepEntries.prefix(7).count
+        let sleepCount = recentSleepEntries(limit: 7).count
         let weightCount = bodyWeightEntries.prefix(14).count
         let firstSession = workoutHistory.filter(\.isCompleted).last?.startTime
         let weeksTrained: Int = {
@@ -850,7 +850,7 @@ class AppViewModel {
         }
 
         // Sleep signal (last 3 nights).
-        let recentSleep = sleepEntries.prefix(3)
+        let recentSleep = recentSleepEntries(limit: 3)
         if !recentSleep.isEmpty {
             let avgHours = recentSleep.map(\.hoursSlept).reduce(0, +) / Double(recentSleep.count)
             let avgQuality = Double(recentSleep.map { $0.quality.rawValue }.reduce(0, +)) / Double(recentSleep.count)
@@ -1787,7 +1787,7 @@ class AppViewModel {
     }
 
     var averageSleepHours: Double {
-        let last7 = sleepEntries.prefix(7)
+        let last7 = recentSleepEntries(limit: 7)
         guard !last7.isEmpty else { return 0 }
         return last7.map(\.hoursSlept).reduce(0, +) / Double(last7.count)
     }
@@ -1797,6 +1797,14 @@ class AppViewModel {
         if avg >= 7.5 { return L10n.tr("Good") }
         if avg >= 6.5 { return L10n.tr("Okay") }
         return L10n.tr("Poor")
+    }
+
+    func recentSleepEntries(limit: Int) -> [SleepEntry] {
+        Array(SleepEntryNormalizer.normalized(sleepEntries).prefix(max(0, limit)))
+    }
+
+    private func normalizeSleepEntries() {
+        sleepEntries = SleepEntryNormalizer.normalized(sleepEntries)
     }
 
     func logNutrition(_ log: DailyNutritionLog) {
@@ -1829,8 +1837,19 @@ class AppViewModel {
     }
 
     func logSleep(hours: Double, quality: ReadinessLevel) {
-        let entry = SleepEntry(hoursSlept: hours, quality: quality)
+        let now = Date()
+        let calendar = Calendar.current
+        let existingToday = SleepEntryNormalizer.normalized(sleepEntries)
+            .first { calendar.isDate($0.date, inSameDayAs: now) }
+        let entry = SleepEntry(
+            id: existingToday?.id ?? UUID().uuidString,
+            date: now,
+            hoursSlept: hours,
+            quality: quality
+        )
+        sleepEntries.removeAll { calendar.isDate($0.date, inSameDayAs: now) }
         sleepEntries.insert(entry, at: 0)
+        normalizeSleepEntries()
         refreshNutritionInsights()
         persist()
         Analytics.shared.track(.sleep_logged, [
@@ -1916,9 +1935,12 @@ class AppViewModel {
 
     var recoveryTrendData: [(date: Date, score: Int)] {
         let calendar = Calendar.current
+        let sleepByDay = Dictionary(uniqueKeysWithValues: SleepEntryNormalizer.normalized(sleepEntries).map {
+            (calendar.startOfDay(for: $0.date), $0)
+        })
         return (0..<14).reversed().compactMap { dayOffset -> (Date, Int)? in
             guard let date = calendar.date(byAdding: .day, value: -dayOffset, to: Date()) else { return nil }
-            let sleepForDay = sleepEntries.first { calendar.isDate($0.date, inSameDayAs: date) }
+            let sleepForDay = sleepByDay[calendar.startOfDay(for: date)]
             let readinessForDay = readinessHistory.first { calendar.isDate($0.date, inSameDayAs: date) }
             let workedOut = workoutHistory.contains { calendar.isDate($0.startTime, inSameDayAs: date) && $0.isCompleted }
 

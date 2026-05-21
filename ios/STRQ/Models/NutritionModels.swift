@@ -222,6 +222,22 @@ nonisolated struct SleepEntry: Codable, Identifiable, Sendable {
     }
 }
 
+nonisolated enum SleepEntryNormalizer {
+    static func normalized(_ entries: [SleepEntry], calendar: Calendar = .current) -> [SleepEntry] {
+        var newestByDay: [Date: SleepEntry] = [:]
+
+        for entry in entries {
+            let day = calendar.startOfDay(for: entry.date)
+            if let existing = newestByDay[day], existing.date >= entry.date {
+                continue
+            }
+            newestByDay[day] = entry
+        }
+
+        return newestByDay.values.sorted { $0.date > $1.date }
+    }
+}
+
 nonisolated struct NutritionCoachInsight: Identifiable, Sendable {
     let id: String
     let icon: String
