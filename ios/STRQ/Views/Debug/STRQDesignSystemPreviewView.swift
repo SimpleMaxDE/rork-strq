@@ -767,7 +767,7 @@ private struct ProgressTrainingMapPrototypeSection: View {
     let onOpen: () -> Void
 
     var body: some View {
-        PreviewSection("Progress Training Map Prototype") {
+        PreviewSection("Progress Path Prototype") {
             VStack(alignment: .leading, spacing: STRQSpacing.md) {
                 HStack(alignment: .top, spacing: STRQSpacing.md) {
                     STRQIconView(.chartBar, size: STRQSpacing.iconLG, tint: STRQPalette.signalGreen)
@@ -779,13 +779,13 @@ private struct ProgressTrainingMapPrototypeSection: View {
                         )
 
                     VStack(alignment: .leading, spacing: STRQSpacing.xs) {
-                        Text("DEBUG-only Training Map brief")
+                        Text("DEBUG-only Progress path")
                             .font(STRQTypography.cardTitle)
                             .foregroundStyle(STRQColors.primaryText)
                             .lineLimit(1)
                             .minimumScaleFactor(0.72)
 
-                        Text("Local demo data with 12 approved states, German gym-native copy, proof row, next move, and lower evidence scroll.")
+                        Text("English-first local demo states with a readable path, proof strip, next move, and short lower scroll.")
                             .font(STRQTypography.caption)
                             .foregroundStyle(STRQColors.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
@@ -795,7 +795,7 @@ private struct ProgressTrainingMapPrototypeSection: View {
                 Button(action: onOpen) {
                     HStack(spacing: STRQSpacing.sm) {
                         STRQIconView(.arrowRight, size: STRQSpacing.iconSM, tint: STRQColors.actionText)
-                        Text("Open progress map prototype")
+                        Text("Open Progress prototype")
                             .font(STRQTypography.button)
                             .foregroundStyle(STRQColors.actionText)
                             .lineLimit(1)
