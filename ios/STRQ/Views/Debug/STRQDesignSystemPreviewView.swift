@@ -3,10 +3,14 @@ import SwiftUI
 #if DEBUG
 struct STRQDesignSystemPreviewView: View {
     @State private var showActiveWorkoutLoggerPrototype = false
+    @State private var showProgressTrainingMapPrototype = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: STRQSpacing.sectionGap) {
+                ProgressTrainingMapPrototypeSection {
+                    showProgressTrainingMapPrototype = true
+                }
                 TokenParitySection()
                 ColorSurfacesSection()
                 TypographySection()
@@ -32,6 +36,9 @@ struct STRQDesignSystemPreviewView: View {
         .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: $showActiveWorkoutLoggerPrototype) {
             ActiveWorkoutLoggerPrototypeView(isFullscreen: true)
+        }
+        .fullScreenCover(isPresented: $showProgressTrainingMapPrototype) {
+            ProgressTrainingMapPrototypeView(isFullscreen: true)
         }
     }
 }
@@ -752,6 +759,61 @@ private struct ProgressV5ExperienceSection: View {
                     RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
                         .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
                 )
+        }
+    }
+}
+
+private struct ProgressTrainingMapPrototypeSection: View {
+    let onOpen: () -> Void
+
+    var body: some View {
+        PreviewSection("Progress Training Map Prototype") {
+            VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                HStack(alignment: .top, spacing: STRQSpacing.md) {
+                    STRQIconView(.chartBar, size: STRQSpacing.iconLG, tint: STRQPalette.signalGreen)
+                        .frame(width: 52, height: 52)
+                        .background(STRQPalette.signalGreen.opacity(0.14), in: .rect(cornerRadius: STRQRadii.largeCard))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
+                                .strokeBorder(STRQPalette.signalGreen.opacity(0.22), lineWidth: 1)
+                        )
+
+                    VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                        Text("DEBUG-only Training Map brief")
+                            .font(STRQTypography.cardTitle)
+                            .foregroundStyle(STRQColors.primaryText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+
+                        Text("Local demo data with 12 approved states, German gym-native copy, proof row, next move, and lower evidence scroll.")
+                            .font(STRQTypography.caption)
+                            .foregroundStyle(STRQColors.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                Button(action: onOpen) {
+                    HStack(spacing: STRQSpacing.sm) {
+                        STRQIconView(.arrowRight, size: STRQSpacing.iconSM, tint: STRQColors.actionText)
+                        Text("Open progress map prototype")
+                            .font(STRQTypography.button)
+                            .foregroundStyle(STRQColors.actionText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(STRQColors.primaryAccent, in: .rect(cornerRadius: STRQRadii.button))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("strq.design-lab.open-progress-training-map-prototype")
+            }
+            .padding(STRQSpacing.md)
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.largeCard))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
         }
     }
 }
