@@ -22,6 +22,84 @@ struct ProgressAnalyticsView: View {
         let isOverflow: Bool
     }
 
+    private enum ProgressP1Family: String {
+        case lowData
+        case bestSet
+        case clusteredOverhit
+        case targetHitTight
+        case targetHit
+        case weekOpen
+        case weekRunning
+    }
+
+    private struct ProgressP1BestSet {
+        let liftName: String
+        let value: String
+        let sessionId: String
+        let date: Date
+    }
+
+    private struct ProgressP1FactTile: Identifiable {
+        let value: String
+        let label: String
+        let state: STRQPalette.State
+
+        var id: String { "\(value)-\(label)" }
+    }
+
+    private struct ProgressP1WeekNode: Identifiable {
+        let date: Date
+        let topLabel: String
+        let bottomLabel: String
+        let symbol: String
+        let state: STRQPalette.State
+        let isCompleted: Bool
+        let isNext: Bool
+        let isClustered: Bool
+        let isEmphasized: Bool
+
+        var id: Date { date }
+    }
+
+    private struct ProgressP1DetailItem: Identifiable {
+        let id: String
+        let title: String
+        let detail: String
+        let icon: String
+        let state: STRQPalette.State
+    }
+
+    private struct ProgressP1RecentWork: Identifiable {
+        let id: String
+        let title: String
+        let detail: String
+        let icon: String
+        let state: STRQPalette.State
+    }
+
+    private struct ProgressP1Snapshot {
+        let family: ProgressP1Family
+        let headline: String
+        let explanation: String
+        let state: STRQPalette.State
+        let completedWorkouts: Int
+        let completedThisWeek: Int
+        let weeklyTarget: Int
+        let remaining: Int
+        let weekSummary: String
+        let pathNodes: [ProgressP1WeekNode]
+        let factTiles: [ProgressP1FactTile]
+        let nextMove: String
+        let nextMoveDetail: String
+        let nextMoveState: STRQPalette.State
+        let confirmed: [ProgressP1DetailItem]
+        let building: [ProgressP1DetailItem]
+        let needsMore: [ProgressP1DetailItem]
+        let recentWork: [ProgressP1RecentWork]
+        let bestSet: ProgressP1BestSet?
+        let hasRecoveryModifier: Bool
+    }
+
     private func weeklyTargetDisplay(completed rawCompleted: Int, target rawTarget: Int) -> WeeklyTargetDisplay {
         let completed = max(0, rawCompleted)
         guard rawTarget > 0 else {
@@ -46,10 +124,10 @@ struct ProgressAnalyticsView: View {
             return WeeklyTargetDisplay(
                 primary: primary,
                 inlinePrimary: "\(primary) +\(overflow)",
-                detail: L10n.format("+%d zusätzlich", overflow),
-                compactDetail: L10n.format("+%d zusätzlich", overflow),
+                detail: L10n.format("+%d extra", overflow),
+                compactDetail: L10n.format("+%d extra", overflow),
                 countValue: "\(target)",
-                countDetail: L10n.format("+%d zusätzlich", overflow),
+                countDetail: L10n.format("+%d extra", overflow),
                 isAtOrAboveTarget: true,
                 isOverflow: true
             )
@@ -82,36 +160,1003 @@ struct ProgressAnalyticsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
-                headlineHero
-                    .padding(.horizontal, 16)
-                    .padding(.top, 4)
+            VStack(alignment: .leading, spacing: 12) {
+                progressP1ScreenHeader
+                    .padding(.horizontal, 14)
+                    .padding(.top, 14)
 
-                signalReadinessStrip
-                    .padding(.horizontal, 16)
+                progressP1FirstViewport
+                    .padding(.horizontal, 14)
 
-                tabSelector
-                    .padding(.horizontal, 16)
-
-                Group {
-                    switch selectedTab {
-                    case 0: strengthSignals
-                    case 1: bodySignals
-                    case 2: volumeSignals
-                    default: strengthSignals
-                    }
-                }
-                .padding(.horizontal, 16)
+                progressP1LowerSections
+                    .padding(.horizontal, 14)
             }
-            .padding(.bottom, 32)
+            .frame(maxWidth: 430)
+            .frame(maxWidth: .infinity)
+            .padding(.bottom, 36)
         }
-        .background(Color(.systemBackground))
-        .navigationTitle(L10n.tr("Progress"))
-        .navigationBarTitleDisplayMode(.large)
+        .scrollContentBackground(.hidden)
+        .background(Color(red: 0.018, green: 0.019, blue: 0.023).ignoresSafeArea())
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .preferredColorScheme(.dark)
         .onAppear {
             withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5)) { appeared = true }
             Analytics.shared.track(.progress_viewed)
         }
+    }
+
+    // MARK: - P1 First Viewport
+
+    private var progressP1ScreenHeader: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(L10n.tr("Progress"))
+                .font(.system(size: 26, weight: .black, design: .rounded))
+                .foregroundStyle(.white.opacity(0.96))
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+
+            Text(L10n.tr("Training Path"))
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundStyle(STRQBrand.steel)
+                .lineLimit(1)
+        }
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+    }
+
+    private var progressP1FirstViewport: some View {
+        let snapshot = progressP1Snapshot
+        let tint = progressP1Tint(for: snapshot.state)
+
+        return VStack(alignment: .leading, spacing: 10) {
+            progressP1Hero(snapshot)
+            progressP1WeekPath(snapshot)
+            progressP1FactTiles(snapshot)
+            progressP1NextMove(snapshot)
+        }
+        .padding(12)
+        .background(Color(red: 0.052, green: 0.055, blue: 0.064), in: .rect(cornerRadius: 22))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .strokeBorder(tint.opacity(0.18), lineWidth: 1)
+        )
+        .overlay(alignment: .topLeading) {
+            Rectangle()
+                .fill(tint)
+                .frame(width: 96, height: 3)
+                .padding(.leading, 18)
+        }
+        .opacity(appeared ? 1 : 0.9)
+        .scaleEffect(appeared || reduceMotion ? 1 : 0.985)
+        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.42), value: appeared)
+    }
+
+    private var progressP1Snapshot: ProgressP1Snapshot {
+        let calendar = Calendar.current
+        let now = Date()
+        let weekInterval = calendar.dateInterval(of: .weekOfYear, for: now)
+        let weekStart = weekInterval?.start ?? calendar.startOfDay(for: now)
+        let weekEnd = weekInterval?.end ?? calendar.date(byAdding: .day, value: 7, to: weekStart) ?? now
+        let completedSessions = vm.workoutHistory
+            .filter(\.isCompleted)
+            .sorted { $0.startTime < $1.startTime }
+        let completedThisWeek = completedSessions.filter { session in
+            session.startTime >= weekStart && session.startTime < weekEnd
+        }
+        let completedCount = completedThisWeek.count
+        let completedTotal = completedSessions.count
+        let weeklyTarget = max(1, min(vm.profile.daysPerWeek, 7))
+        let remaining = max(0, weeklyTarget - completedCount)
+        let bestSet = completedThisWeek
+            .reversed()
+            .compactMap { progressP1CurrentWeekBestSet(from: $0, allCompletedSessions: completedSessions) }
+            .first
+        let tightSpacing = progressP1HasClusteredWorkouts(completedThisWeek, calendar: calendar)
+        let isClustered = completedCount > weeklyTarget && tightSpacing
+        let extra = max(0, completedCount - weeklyTarget)
+        let hasGoodSpacing = progressP1HasGoodSpacing(completedThisWeek, calendar: calendar)
+
+        let family: ProgressP1Family
+        if completedTotal <= 1 {
+            family = .lowData
+        } else if isClustered {
+            family = .clusteredOverhit
+        } else if bestSet != nil {
+            family = .bestSet
+        } else if completedCount >= weeklyTarget && tightSpacing {
+            family = .targetHitTight
+        } else if completedCount >= weeklyTarget {
+            family = .targetHit
+        } else if completedCount == 0 {
+            family = .weekOpen
+        } else {
+            family = .weekRunning
+        }
+
+        let baseNextMove: String
+        let nextMoveDetail: String
+        let headline: String
+        let explanation: String
+        let state: STRQPalette.State
+        let tiles: [ProgressP1FactTile]
+        let confirmed: [ProgressP1DetailItem]
+        let building: [ProgressP1DetailItem]
+        let needsMore: [ProgressP1DetailItem]
+
+        switch family {
+        case .lowData:
+            headline = L10n.tr("The path starts here.")
+            explanation = L10n.tr("Log completed workouts before STRQ calls a pattern.")
+            state = .neutral
+            tiles = [
+                ProgressP1FactTile(value: "\(completedTotal)", label: completedTotal == 1 ? L10n.tr("Workout") : L10n.tr("Workouts"), state: completedTotal == 1 ? .success : .neutral),
+                ProgressP1FactTile(value: "\(completedCount)/\(weeklyTarget)", label: L10n.tr("Target"), state: completedCount > 0 ? .success : .neutral),
+                ProgressP1FactTile(value: L10n.tr("Week"), label: L10n.tr("open"), state: .neutral),
+                ProgressP1FactTile(value: L10n.tr("Next"), label: L10n.tr("workout"), state: .warning)
+            ]
+            baseNextMove = L10n.tr("Log the next workout.")
+            nextMoveDetail = L10n.tr("Use Today or Train when you are ready. Progress updates after a completed log.")
+            confirmed = completedTotal == 0
+                ? [progressP1Item(L10n.tr("Nothing confirmed yet"), L10n.tr("No completed workouts logged yet."), "circle.dashed", .neutral)]
+                : [progressP1Item(L10n.tr("First workout"), L10n.tr("1 completed workout is recorded."), "checkmark.circle.fill", .success)]
+            building = [
+                progressP1Item(L10n.tr("Weekly rhythm"), L10n.tr("Too early, but started."), "calendar", .warning),
+                progressP1Item(L10n.tr("Exercise history"), L10n.tr("Comparable sets come next."), "dumbbell.fill", .warning)
+            ]
+            needsMore = [
+                progressP1Item(L10n.tr("More sessions needed"), L10n.tr("STRQ stays quiet until repeated workouts exist."), "circle.dashed", .neutral)
+            ]
+
+        case .bestSet:
+            headline = L10n.tr("Best set logged.")
+            explanation = L10n.tr("One set stood out. Repeat it before chasing more.")
+            state = .gold
+            tiles = [
+                ProgressP1FactTile(value: L10n.tr("Best"), label: L10n.tr("set"), state: .gold),
+                ProgressP1FactTile(value: bestSet?.value ?? L10n.tr("Set"), label: L10n.tr("Logged"), state: .gold),
+                ProgressP1FactTile(value: progressP1LiftTileName(bestSet?.liftName ?? L10n.tr("Lift")), label: L10n.tr("Lift"), state: .gold),
+                ProgressP1FactTile(value: L10n.tr("Confirm"), label: L10n.tr("next"), state: .info)
+            ]
+            baseNextMove = L10n.tr("Keep the weight and repeat clean reps.")
+            nextMoveDetail = L10n.tr("The repeat matters more than chasing a new top set.")
+            confirmed = [
+                progressP1Item(L10n.tr("Best set logged"), L10n.format("%@ %@.", bestSet?.liftName ?? L10n.tr("Lift"), bestSet?.value ?? L10n.tr("set")), "star.circle.fill", .gold)
+            ]
+            building = [
+                progressP1Item(L10n.tr("Strength repeat"), L10n.tr("One best set needs a repeat."), "repeat.circle.fill", .info)
+            ]
+            needsMore = [
+                progressP1Item(L10n.tr("Repeat first"), L10n.tr("Confirm the set before chasing more."), "circle.dashed", .neutral)
+            ]
+
+        case .clusteredOverhit:
+            headline = L10n.tr("More work than planned.")
+            explanation = L10n.tr("You cleared the target, but sessions landed close together.")
+            state = .warning
+            tiles = [
+                ProgressP1FactTile(value: "\(completedCount)", label: L10n.tr("Workouts"), state: .success),
+                ProgressP1FactTile(value: "\(weeklyTarget)/\(weeklyTarget) +\(extra)", label: L10n.tr("Target"), state: .success),
+                ProgressP1FactTile(value: L10n.tr("Tight"), label: L10n.tr("spacing"), state: .warning),
+                ProgressP1FactTile(value: L10n.tr("Watch"), label: L10n.tr("next week"), state: .warning)
+            ]
+            baseNextMove = L10n.tr("Space the sessions next week.")
+            nextMoveDetail = L10n.tr("Keep the work, but give the next week more room.")
+            confirmed = [
+                progressP1Item(L10n.tr("Target cleared"), L10n.tr("The planned week is done."), "checkmark.seal.fill", .success),
+                progressP1Item(L10n.tr("Extra work logged"), L10n.format("+%d completed %@", extra, extra == 1 ? L10n.tr("session") : L10n.tr("sessions")), "plus.circle.fill", .success)
+            ]
+            building = [
+                progressP1Item(L10n.tr("Spacing"), L10n.tr("Several sessions landed close together."), "calendar.badge.exclamationmark", .warning),
+                progressP1Item(L10n.tr("Next week"), L10n.tr("Give the next week more room."), "arrow.left.and.right", .warning)
+            ]
+            needsMore = [
+                progressP1Item(L10n.tr("Stable rhythm"), L10n.tr("Repeat the target with wider spacing."), "circle.dashed", .neutral)
+            ]
+
+        case .targetHitTight:
+            headline = L10n.tr("Target hit. Rhythm still open.")
+            explanation = L10n.tr("The target is done, but the sessions landed close together.")
+            state = .warning
+            tiles = [
+                ProgressP1FactTile(value: "\(completedCount)", label: L10n.tr("Workouts"), state: .success),
+                ProgressP1FactTile(value: "\(weeklyTarget)/\(weeklyTarget)", label: L10n.tr("Target"), state: .success),
+                ProgressP1FactTile(value: L10n.tr("Tight"), label: L10n.tr("spacing"), state: .warning),
+                ProgressP1FactTile(value: L10n.tr("Watch"), label: L10n.tr("next week"), state: .warning)
+            ]
+            baseNextMove = L10n.tr("Space the sessions next week.")
+            nextMoveDetail = L10n.tr("Keep the work. Spread it better.")
+            confirmed = [
+                progressP1Item(L10n.tr("Work done"), L10n.tr("All planned sessions are done."), "checkmark.circle.fill", .success),
+                progressP1Item(L10n.tr("Target cleared"), L10n.format("%d of %d sessions completed.", completedCount, weeklyTarget), "checkmark.seal.fill", .success)
+            ]
+            building = [
+                progressP1Item(L10n.tr("Spacing"), L10n.tr("Sessions landed close together."), "calendar.badge.exclamationmark", .warning),
+                progressP1Item(L10n.tr("Rhythm repeat"), L10n.tr("Repeat the work with more room."), "arrow.left.and.right", .warning)
+            ]
+            needsMore = [
+                progressP1Item(L10n.tr("Stable rhythm"), L10n.tr("Repeat the target with wider spacing."), "circle.dashed", .neutral),
+                progressP1Item(L10n.tr("Spread it first"), L10n.tr("Keep the work. Spread it better."), "circle.dashed", .neutral)
+            ]
+
+        case .targetHit:
+            headline = L10n.tr("Weekly target hit.")
+            explanation = L10n.tr("The planned work is done. Now repeat the spacing.")
+            state = .success
+            tiles = [
+                ProgressP1FactTile(value: "\(completedCount)", label: L10n.tr("Workouts"), state: .success),
+                ProgressP1FactTile(value: "\(weeklyTarget)/\(weeklyTarget)", label: L10n.tr("Target"), state: .success),
+                ProgressP1FactTile(value: L10n.tr("Week"), label: L10n.tr("done"), state: .success),
+                ProgressP1FactTile(value: L10n.tr("Repeat"), label: L10n.tr("next"), state: .info)
+            ]
+            baseNextMove = L10n.tr("Repeat the week with similar spacing.")
+            nextMoveDetail = L10n.tr("Keep the pattern easy to read next week.")
+            confirmed = [
+                progressP1Item(L10n.tr("Work done"), L10n.tr("All planned sessions are done."), "checkmark.circle.fill", .success),
+                progressP1Item(L10n.tr("Target cleared"), L10n.format("%d of %d sessions completed.", completedCount, weeklyTarget), "checkmark.seal.fill", .success)
+            ]
+            building = [
+                progressP1Item(L10n.tr("Repeatability"), L10n.tr("One clean week needs another."), "repeat.circle.fill", .warning)
+            ]
+            needsMore = [
+                progressP1Item(L10n.tr("Repeat first"), L10n.tr("Keep the week easy to compare before adding more."), "circle.dashed", .neutral)
+            ]
+
+        case .weekOpen:
+            headline = L10n.tr("The week is open.")
+            explanation = L10n.tr("Your first completed session sets this week’s path.")
+            state = .neutral
+            tiles = [
+                ProgressP1FactTile(value: "0", label: L10n.tr("Workouts"), state: .neutral),
+                ProgressP1FactTile(value: "0/\(weeklyTarget)", label: L10n.tr("Target"), state: .neutral),
+                ProgressP1FactTile(value: L10n.tr("Spacing"), label: L10n.tr("open"), state: .neutral),
+                ProgressP1FactTile(value: L10n.tr("First"), label: L10n.tr("session"), state: .warning)
+            ]
+            baseNextMove = L10n.tr("Set the first session of the week.")
+            nextMoveDetail = L10n.tr("Use Today or Train when you are ready. Progress will update after completion.")
+            confirmed = [
+                progressP1Item(L10n.tr("Training history"), L10n.format("%d completed %@ recorded.", completedTotal, completedTotal == 1 ? L10n.tr("workout") : L10n.tr("workouts")), "checkmark.circle.fill", .success)
+            ]
+            building = [
+                progressP1Item(L10n.tr("This week"), L10n.tr("The first completed session will start the path."), "calendar", .warning)
+            ]
+            needsMore = [
+                progressP1Item(L10n.tr("Week not closed"), L10n.tr("No session completed this week yet."), "circle.dashed", .neutral)
+            ]
+
+        case .weekRunning:
+            headline = L10n.tr("Rhythm is building.")
+            explanation = L10n.tr("Completed sessions are in. The target is still open.")
+            state = .warning
+            tiles = [
+                ProgressP1FactTile(value: "\(completedCount)", label: L10n.tr("Workouts"), state: .success),
+                ProgressP1FactTile(value: "\(remaining)", label: L10n.tr("Left"), state: .warning),
+                ProgressP1FactTile(value: hasGoodSpacing ? L10n.tr("Good") : L10n.tr("Spacing"), label: hasGoodSpacing ? L10n.tr("spacing") : L10n.tr("open"), state: hasGoodSpacing ? .info : .neutral),
+                ProgressP1FactTile(value: L10n.tr("Target"), label: L10n.tr("open"), state: .warning)
+            ]
+            baseNextMove = L10n.tr("Hold the next planned session.")
+            nextMoveDetail = L10n.tr("No extra work required. Let the next completed session carry the path forward.")
+            confirmed = [
+                progressP1Item(L10n.tr("Work done"), L10n.format("%d completed %@ this week.", completedCount, completedCount == 1 ? L10n.tr("session") : L10n.tr("sessions")), "checkmark.circle.fill", .success)
+            ]
+            building = [
+                progressP1Item(L10n.tr("Target still open"), remaining == 1 ? L10n.tr("1 session left this week.") : L10n.format("%d sessions left this week.", remaining), "target", .warning),
+                progressP1Item(L10n.tr("Spacing"), hasGoodSpacing ? L10n.tr("Current session dates are spread out.") : L10n.tr("More completed days will make spacing clearer."), "calendar.badge.clock", hasGoodSpacing ? .info : .warning)
+            ]
+            needsMore = [
+                progressP1Item(L10n.tr("Week not closed"), remaining == 1 ? L10n.tr("One more completed session closes the target.") : L10n.format("%d more completed sessions close the target.", remaining), "circle.dashed", .neutral)
+            ]
+        }
+
+        let recoveryModifier = family == .lowData ? nil : progressP1RecoveryNextMoveModifier(calendar: calendar)
+        let nextMove = recoveryModifier ?? baseNextMove
+        let nextMoveState: STRQPalette.State = recoveryModifier == nil ? state : .danger
+        let lowerNextDetail = recoveryModifier == nil ? nextMoveDetail : L10n.tr("Use Today or Train as usual and keep the session controlled.")
+
+        return ProgressP1Snapshot(
+            family: family,
+            headline: headline,
+            explanation: explanation,
+            state: state,
+            completedWorkouts: completedTotal,
+            completedThisWeek: completedCount,
+            weeklyTarget: weeklyTarget,
+            remaining: remaining,
+            weekSummary: progressP1WeekSummary(family: family, completed: completedCount, target: weeklyTarget, remaining: remaining),
+            pathNodes: progressP1WeekNodes(
+                weekStart: weekStart,
+                completedThisWeek: completedThisWeek,
+                target: weeklyTarget,
+                family: family,
+                bestSet: bestSet,
+                calendar: calendar
+            ),
+            factTiles: tiles,
+            nextMove: nextMove,
+            nextMoveDetail: lowerNextDetail,
+            nextMoveState: nextMoveState,
+            confirmed: confirmed,
+            building: building,
+            needsMore: needsMore,
+            recentWork: progressP1RecentWorkRows(completedSessions: completedSessions, bestSet: bestSet),
+            bestSet: bestSet,
+            hasRecoveryModifier: recoveryModifier != nil
+        )
+    }
+
+    private func progressP1Hero(_ snapshot: ProgressP1Snapshot) -> some View {
+        let tint = progressP1Tint(for: snapshot.state)
+
+        return VStack(alignment: .leading, spacing: 5) {
+            Text(snapshot.headline)
+                .font(.system(size: 27, weight: .black, design: .rounded))
+                .foregroundStyle(.white.opacity(0.96))
+                .lineLimit(2)
+                .minimumScaleFactor(0.68)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(snapshot.explanation)
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.64))
+                .lineSpacing(2)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .overlay(alignment: .topTrailing) {
+            Circle()
+                .fill(tint)
+                .frame(width: 8, height: 8)
+                .padding(.top, 5)
+        }
+    }
+
+    private func progressP1WeekPath(_ snapshot: ProgressP1Snapshot) -> some View {
+        VStack(alignment: .leading, spacing: 11) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.tr("This Week Path"))
+                        .font(.system(size: 14, weight: .black, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.95))
+                        .lineLimit(1)
+                    Text(snapshot.weekSummary)
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.58))
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+
+                Text(snapshot.remaining == 0 ? "\(snapshot.weeklyTarget)/\(snapshot.weeklyTarget)" : "\(snapshot.remaining) \(L10n.tr("left"))")
+                    .font(.system(size: 10, weight: .black, design: .rounded).monospacedDigit())
+                    .foregroundStyle(progressP1Tint(for: snapshot.state))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(progressP1Tint(for: snapshot.state).opacity(0.11), in: Capsule())
+                    .overlay(Capsule().strokeBorder(progressP1Tint(for: snapshot.state).opacity(0.2), lineWidth: 1))
+            }
+
+            ZStack {
+                GeometryReader { proxy in
+                    let midY = max(proxy.size.height * 0.42, 26)
+                    Path { path in
+                        path.move(to: CGPoint(x: 20, y: midY))
+                        path.addLine(to: CGPoint(x: max(proxy.size.width - 20, 20), y: midY))
+                    }
+                    .stroke(Color.white.opacity(0.10), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                }
+
+                HStack(alignment: .top, spacing: 0) {
+                    ForEach(snapshot.pathNodes) { node in
+                        progressP1PathNode(node)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+            }
+            .frame(height: 94)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(L10n.format("%d of %d target sessions this week", min(snapshot.completedThisWeek, snapshot.weeklyTarget), snapshot.weeklyTarget)))
+        }
+        .padding(11)
+        .background(Color(red: 0.028, green: 0.031, blue: 0.038), in: .rect(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+        )
+    }
+
+    private func progressP1PathNode(_ node: ProgressP1WeekNode) -> some View {
+        let tint = progressP1Tint(for: node.state)
+        let dotSize: CGFloat = node.isEmphasized ? 30 : 25
+        let fill = node.isCompleted ? STRQPalette.success.opacity(0.18) : (node.isNext ? tint.opacity(0.12) : Color.white.opacity(0.055))
+        let strokeTint = node.isCompleted ? STRQPalette.success : tint
+
+        return VStack(spacing: 5) {
+            Text(node.topLabel)
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .foregroundStyle(.white.opacity(0.90))
+                .lineLimit(1)
+                .minimumScaleFactor(0.64)
+
+            ZStack {
+                Circle()
+                    .fill(fill)
+                    .overlay(
+                        Circle()
+                            .strokeBorder(
+                                strokeTint.opacity(node.isCompleted || node.isNext ? 0.78 : 0.34),
+                                style: StrokeStyle(lineWidth: node.isEmphasized ? 2 : 1.2, dash: node.isCompleted || node.isNext ? [] : [4, 4])
+                            )
+                    )
+
+                Image(systemName: node.symbol)
+                    .font(.system(size: node.isEmphasized ? 12 : 10, weight: .black))
+                    .foregroundStyle(node.isCompleted ? STRQPalette.success : tint.opacity(0.82))
+                    .accessibilityHidden(true)
+
+                if node.isClustered {
+                    Circle()
+                        .stroke(progressP1Tint(for: .warning).opacity(0.72), lineWidth: 1.5)
+                        .padding(-3)
+                }
+            }
+            .frame(width: dotSize, height: dotSize)
+            .shadow(color: node.isEmphasized ? tint.opacity(0.20) : .clear, radius: 8, y: 4)
+
+            Text(node.bottomLabel)
+                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .foregroundStyle(node.state == .neutral ? .white.opacity(0.42) : .white.opacity(0.62))
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.58)
+                .frame(minHeight: 22, alignment: .top)
+        }
+        .padding(.horizontal, 1)
+        .accessibilityLabel(Text("\(node.topLabel), \(node.bottomLabel)"))
+    }
+
+    private func progressP1FactTiles(_ snapshot: ProgressP1Snapshot) -> some View {
+        HStack(spacing: 7) {
+            ForEach(snapshot.factTiles) { tile in
+                progressP1FactTile(tile)
+            }
+        }
+    }
+
+    private func progressP1FactTile(_ tile: ProgressP1FactTile) -> some View {
+        let tint = progressP1Tint(for: tile.state)
+
+        return VStack(alignment: .leading, spacing: 3) {
+            Text(tile.value)
+                .font(.system(size: 14, weight: .black, design: .rounded))
+                .foregroundStyle(tile.state == .neutral ? .white.opacity(0.72) : tint)
+                .lineLimit(1)
+                .minimumScaleFactor(0.52)
+            Text(tile.label)
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.42))
+                .lineLimit(2)
+                .minimumScaleFactor(0.62)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(Color.white.opacity(0.045), in: .rect(cornerRadius: 11))
+        .overlay(
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                .strokeBorder(tint.opacity(tile.state == .neutral ? 0.10 : 0.15), lineWidth: 1)
+        )
+    }
+
+    private func progressP1NextMove(_ snapshot: ProgressP1Snapshot) -> some View {
+        let tint = progressP1Tint(for: snapshot.nextMoveState)
+
+        return HStack(alignment: .top, spacing: 10) {
+            Image(systemName: snapshot.nextMoveState == .danger ? "exclamationmark.circle.fill" : "arrow.right.circle.fill")
+                .font(.system(size: 16, weight: .black))
+                .foregroundStyle(tint)
+                .frame(width: 40, height: 40)
+                .background(tint.opacity(0.13), in: .rect(cornerRadius: 12))
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(L10n.tr("Next Move"))
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.42))
+                    .lineLimit(1)
+
+                Text(snapshot.nextMove)
+                    .font(.system(size: 15, weight: .black, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.94))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.76)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(10)
+        .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 15))
+        .overlay(
+            RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .strokeBorder(tint.opacity(snapshot.nextMoveState == .danger ? 0.22 : 0.20), lineWidth: 1)
+        )
+    }
+
+    private var progressP1LowerSections: some View {
+        let snapshot = progressP1Snapshot
+
+        return VStack(alignment: .leading, spacing: 12) {
+            progressP1DetailSection(title: L10n.tr("Confirmed"), items: snapshot.confirmed, defaultState: progressP1ConfirmedSectionState(snapshot))
+            progressP1DetailSection(title: L10n.tr("Building"), items: snapshot.building, defaultState: .warning)
+            progressP1DetailSection(title: L10n.tr("Needs More"), items: snapshot.needsMore, defaultState: .neutral)
+            progressP1RecentWorkSection(snapshot.recentWork)
+            progressP1NextMoveDetail(snapshot)
+        }
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 8)
+    }
+
+    private func progressP1DetailSection(title: String, items: [ProgressP1DetailItem], defaultState: STRQPalette.State) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            progressP1SectionTitle(title, state: defaultState)
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 148), spacing: 8)], alignment: .leading, spacing: 8) {
+                ForEach(items) { item in
+                    progressP1DetailCard(item)
+                }
+            }
+        }
+    }
+
+    private func progressP1SectionTitle(_ title: String, state: STRQPalette.State) -> some View {
+        HStack(spacing: 7) {
+            Circle()
+                .fill(progressP1Tint(for: state))
+                .frame(width: 7, height: 7)
+            Text(title)
+                .font(.system(size: 15, weight: .black, design: .rounded))
+                .foregroundStyle(.white.opacity(0.94))
+                .lineLimit(1)
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 2)
+    }
+
+    private func progressP1ConfirmedSectionState(_ snapshot: ProgressP1Snapshot) -> STRQPalette.State {
+        if snapshot.bestSet != nil {
+            return .gold
+        }
+        return snapshot.completedWorkouts > 0 ? .success : .neutral
+    }
+
+    private func progressP1DetailCard(_ item: ProgressP1DetailItem) -> some View {
+        let tint = progressP1Tint(for: item.state)
+
+        return HStack(alignment: .top, spacing: 9) {
+            Image(systemName: item.icon)
+                .font(.system(size: 12, weight: .black))
+                .foregroundStyle(tint)
+                .frame(width: 28, height: 28)
+                .background(tint.opacity(0.12), in: .rect(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.title)
+                    .font(.system(size: 13, weight: .black, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.92))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+
+                Text(item.detail)
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.58))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(9)
+        .frame(maxWidth: .infinity, minHeight: 64, alignment: .topLeading)
+        .background(Color(red: 0.047, green: 0.050, blue: 0.058), in: .rect(cornerRadius: 13))
+        .overlay(
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+        )
+    }
+
+    private func progressP1RecentWorkSection(_ items: [ProgressP1RecentWork]) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            progressP1SectionTitle(L10n.tr("Recent Work"), state: .info)
+
+            VStack(spacing: 7) {
+                ForEach(items) { item in
+                    progressP1RecentWorkRow(item)
+                }
+            }
+        }
+    }
+
+    private func progressP1RecentWorkRow(_ item: ProgressP1RecentWork) -> some View {
+        let tint = progressP1Tint(for: item.state)
+
+        return HStack(spacing: 9) {
+            Image(systemName: item.icon)
+                .font(.system(size: 12, weight: .black))
+                .foregroundStyle(tint)
+                .frame(width: 28, height: 28)
+                .background(tint.opacity(0.12), in: .rect(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(item.title)
+                    .font(.system(size: 13, weight: .black, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.92))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.74)
+                Text(item.detail)
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.58))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.70)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(9)
+        .background(Color(red: 0.047, green: 0.050, blue: 0.058), in: .rect(cornerRadius: 13))
+        .overlay(
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.07), lineWidth: 1)
+        )
+    }
+
+    private func progressP1NextMoveDetail(_ snapshot: ProgressP1Snapshot) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            progressP1SectionTitle(L10n.tr("Next Move"), state: snapshot.nextMoveState)
+
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: snapshot.nextMoveState == .danger ? "exclamationmark.circle.fill" : "arrow.right.circle.fill")
+                    .font(.system(size: 17, weight: .black))
+                    .foregroundStyle(progressP1Tint(for: snapshot.nextMoveState))
+                    .frame(width: 44, height: 44)
+                    .background(progressP1Tint(for: snapshot.nextMoveState).opacity(0.13), in: .rect(cornerRadius: 12))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(snapshot.nextMove)
+                        .font(.system(size: 16, weight: .black, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.94))
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.76)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text(snapshot.nextMoveDetail)
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.58))
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(10)
+            .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 15))
+            .overlay(
+                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    .strokeBorder(progressP1Tint(for: snapshot.nextMoveState).opacity(0.2), lineWidth: 1)
+            )
+        }
+    }
+
+    private func progressP1Tint(for state: STRQPalette.State) -> Color {
+        switch state {
+        case .warning:
+            return STRQPalette.warningAmber
+        case .info:
+            return STRQBrand.steel
+        default:
+            return STRQPalette.color(for: state)
+        }
+    }
+
+    private func progressP1SoftTint(for state: STRQPalette.State) -> Color {
+        switch state {
+        case .warning:
+            return STRQPalette.warningAmber.opacity(0.12)
+        case .info:
+            return STRQBrand.steel.opacity(0.12)
+        default:
+            return STRQPalette.soft(for: state)
+        }
+    }
+
+    private func progressP1HasClusteredWorkouts(_ sessions: [WorkoutSession], calendar: Calendar) -> Bool {
+        let startDays = sessions
+            .map { calendar.startOfDay(for: $0.startTime) }
+            .sorted()
+
+        for startDay in startDays {
+            guard let windowEnd = calendar.date(byAdding: .day, value: 4, to: startDay) else { continue }
+            let count = startDays.filter { $0 >= startDay && $0 < windowEnd }.count
+            if count >= 3 { return true }
+        }
+        return false
+    }
+
+    private func progressP1HasGoodSpacing(_ sessions: [WorkoutSession], calendar: Calendar) -> Bool {
+        let days = Array(Set(sessions.map { calendar.startOfDay(for: $0.startTime) })).sorted()
+        guard days.count >= 2 else { return false }
+        for index in 1..<days.count {
+            let gap = calendar.dateComponents([.day], from: days[index - 1], to: days[index]).day ?? 0
+            if gap < 2 { return false }
+        }
+        return !progressP1HasClusteredWorkouts(sessions, calendar: calendar)
+    }
+
+    private func progressP1ClusteredDays(_ sessions: [WorkoutSession], calendar: Calendar) -> Set<Date> {
+        let startDays = sessions
+            .map { calendar.startOfDay(for: $0.startTime) }
+            .sorted()
+
+        for startDay in startDays {
+            guard let windowEnd = calendar.date(byAdding: .day, value: 4, to: startDay) else { continue }
+            let daysInWindow = startDays.filter { $0 >= startDay && $0 < windowEnd }
+            if daysInWindow.count >= 3 {
+                return Set(daysInWindow)
+            }
+        }
+        return []
+    }
+
+    private func progressP1CurrentWeekBestSet(
+        from session: WorkoutSession?,
+        allCompletedSessions: [WorkoutSession]
+    ) -> ProgressP1BestSet? {
+        guard let session else { return nil }
+        let highlights = WorkoutHighlightBuilder.build(
+            session: session,
+            history: allCompletedSessions,
+            streak: vm.streak,
+            exerciseName: { id in vm.library.exercise(byId: id)?.name ?? L10n.tr("Lift") }
+        )
+        guard let highlight = highlights.first, highlight.kind == .bestSet else { return nil }
+        let liftName = (highlight.subtitle ?? L10n.tr("Lift")).trimmingCharacters(in: .whitespacesAndNewlines)
+        let value = highlight.valuePrimary.replacingOccurrences(of: "×", with: "x")
+        return ProgressP1BestSet(
+            liftName: liftName.isEmpty ? L10n.tr("Lift") : liftName,
+            value: value,
+            sessionId: session.id,
+            date: session.startTime
+        )
+    }
+
+    private func progressP1RecoveryNextMoveModifier(calendar: Calendar) -> String? {
+        if let readiness = vm.todaysReadiness, calendar.isDateInToday(readiness.date) {
+            if readiness.painOrRestriction || readiness.soreness.rawValue >= SorenessLevel.severe.rawValue {
+                return L10n.tr("Keep today lighter.")
+            }
+            if readiness.readinessScore < 45 {
+                return L10n.tr("Drop weight. Keep form clean.")
+            }
+            if readiness.readinessScore < 55 || readiness.soreness.rawValue >= SorenessLevel.significant.rawValue {
+                return L10n.tr("Limit the push.")
+            }
+        }
+
+        let recentSleep = vm.recentSleepEntries(limit: 3).filter { entry in
+            guard let cutoff = calendar.date(byAdding: .day, value: -3, to: Date()) else { return true }
+            return entry.date >= cutoff
+        }
+        guard !recentSleep.isEmpty else { return nil }
+
+        let averageSleep = recentSleep.map(\.hoursSlept).reduce(0, +) / Double(recentSleep.count)
+        let weakestQuality = recentSleep.map(\.quality.rawValue).min() ?? ReadinessLevel.good.rawValue
+        if averageSleep < 5.5 || weakestQuality <= ReadinessLevel.poor.rawValue {
+            return L10n.tr("Drop weight. Keep form clean.")
+        }
+        if averageSleep < 6.5 {
+            return L10n.tr("Keep today lighter.")
+        }
+        return nil
+    }
+
+    private func progressP1WeekSummary(family: ProgressP1Family, completed: Int, target: Int, remaining: Int) -> String {
+        switch family {
+        case .lowData:
+            return completed == 0 ? L10n.tr("Completed workouts will fill this week.") : L10n.tr("One completed workout starts the path.")
+        case .bestSet:
+            return L10n.tr("Best set this week.")
+        case .clusteredOverhit:
+            return L10n.tr("Target cleared with tight spacing.")
+        case .targetHitTight:
+            return L10n.tr("Target hit with tight spacing.")
+        case .targetHit:
+            return L10n.tr("Planned sessions landed this week.")
+        case .weekOpen:
+            return L10n.tr("No completed session this week yet.")
+        case .weekRunning:
+            return remaining == 1 ? L10n.tr("One session left to close the target.") : L10n.format("%d sessions left to close the target.", remaining)
+        }
+    }
+
+    private func progressP1WeekNodes(
+        weekStart: Date,
+        completedThisWeek: [WorkoutSession],
+        target: Int,
+        family: ProgressP1Family,
+        bestSet: ProgressP1BestSet?,
+        calendar: Calendar
+    ) -> [ProgressP1WeekNode] {
+        let sessionsByDay = Dictionary(grouping: completedThisWeek) { session in
+            calendar.startOfDay(for: session.startTime)
+        }
+        let clusteredDays = progressP1ClusteredDays(completedThisWeek, calendar: calendar)
+        let completedCount = completedThisWeek.count
+        let shouldShowNext = completedCount < target
+        let today = calendar.startOfDay(for: Date())
+        let weekDates = (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: weekStart).map { calendar.startOfDay(for: $0) } }
+        let nextDate = shouldShowNext
+            ? weekDates.first { $0 >= today && sessionsByDay[$0] == nil }
+            : nil
+
+        return weekDates.map { date in
+            let sessions = (sessionsByDay[date] ?? []).sorted { $0.startTime < $1.startTime }
+            let isCompleted = !sessions.isEmpty
+            let isBestSetDay = bestSet.map { calendar.isDate($0.date, inSameDayAs: date) } ?? false
+            let isNext = nextDate.map { calendar.isDate($0, inSameDayAs: date) } ?? false
+            let isClustered = clusteredDays.contains(date)
+            let bottomLabel: String
+            let symbol: String
+            let state: STRQPalette.State
+
+            if isBestSetDay {
+                bottomLabel = L10n.tr("Best")
+                symbol = "star.fill"
+                state = .gold
+            } else if sessions.count > 1 {
+                bottomLabel = L10n.format("%d Done", sessions.count)
+                symbol = "checkmark"
+                state = .success
+            } else if let session = sessions.first {
+                bottomLabel = progressP1PathWorkoutLabel(session)
+                symbol = "checkmark"
+                state = .success
+            } else if isNext {
+                bottomLabel = L10n.tr("Next")
+                symbol = "arrow.right"
+                state = .warning
+            } else {
+                bottomLabel = L10n.tr("Open")
+                symbol = "circle"
+                state = .neutral
+            }
+
+            return ProgressP1WeekNode(
+                date: date,
+                topLabel: date.formatted(.dateTime.weekday(.abbreviated)),
+                bottomLabel: bottomLabel,
+                symbol: symbol,
+                state: state,
+                isCompleted: isCompleted,
+                isNext: isNext,
+                isClustered: isClustered,
+                isEmphasized: isBestSetDay || isNext || isClustered || (family == .targetHit && sessions.last?.id == completedThisWeek.last?.id)
+            )
+        }
+    }
+
+    private func progressP1PathWorkoutLabel(_ session: WorkoutSession) -> String {
+        let label = progressP1SafeWorkoutLabel(session)
+        let normalized = label.lowercased()
+        let tokens = normalized.split { !$0.isLetter }.map(String.init)
+
+        if normalized.contains("full body") || (tokens.contains("full") && tokens.contains("body")) {
+            return L10n.tr("Full Body")
+        }
+        if normalized.contains("upper") {
+            return L10n.tr("Upper")
+        }
+        if normalized.contains("lower") {
+            return L10n.tr("Lower")
+        }
+        if normalized.contains("push") {
+            return L10n.tr("Push")
+        }
+        if normalized.contains("pull") {
+            return L10n.tr("Pull")
+        }
+        if tokens.contains("leg") || tokens.contains("legs") {
+            return L10n.tr("Legs")
+        }
+        return L10n.tr("Done")
+    }
+
+    private func progressP1SafeWorkoutLabel(_ session: WorkoutSession) -> String {
+        let trimmed = session.dayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return L10n.tr("Done") }
+        return trimmed
+    }
+
+    private func progressP1LiftTileName(_ liftName: String) -> String {
+        let trimmed = liftName.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch trimmed {
+        case "Barbell Bench Press", "Dumbbell Bench Press":
+            return L10n.tr("Bench Press")
+        case "Barbell Back Squat":
+            return L10n.tr("Back Squat")
+        default:
+            return trimmed.isEmpty ? L10n.tr("Lift") : trimmed
+        }
+    }
+
+    private func progressP1Item(_ title: String, _ detail: String, _ icon: String, _ state: STRQPalette.State) -> ProgressP1DetailItem {
+        ProgressP1DetailItem(id: "\(title)-\(detail)-\(icon)", title: title, detail: detail, icon: icon, state: state)
+    }
+
+    private func progressP1RecentWorkRows(completedSessions: [WorkoutSession], bestSet: ProgressP1BestSet?) -> [ProgressP1RecentWork] {
+        let sortedSessions = completedSessions.sorted { $0.startTime > $1.startTime }
+        guard !sortedSessions.isEmpty else {
+            return [
+                ProgressP1RecentWork(
+                    id: "empty",
+                    title: L10n.tr("No completed workouts yet"),
+                    detail: L10n.tr("Completed sessions will appear here."),
+                    icon: "circle.dashed",
+                    state: .neutral
+                )
+            ]
+        }
+
+        let calendar = Calendar.current
+        let groupedSessions = Dictionary(grouping: sortedSessions) { session in
+            let day = calendar.startOfDay(for: session.startTime).timeIntervalSinceReferenceDate
+            return "\(day)-\(progressP1SafeWorkoutLabel(session))"
+        }
+
+        let groupedRows = groupedSessions.values.map { sessions -> (latestDate: Date, row: ProgressP1RecentWork) in
+            let sessions = sessions.sorted { $0.startTime > $1.startTime }
+            let latest = sessions[0]
+            let workoutName = progressP1SafeWorkoutLabel(latest)
+            let dateTitle = latest.startTime.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day())
+            let detail: String
+
+            if sessions.count > 1 {
+                detail = workoutName == L10n.tr("Done")
+                    ? L10n.format("Workout completed %d times.", sessions.count)
+                    : L10n.format("%@ completed %d times.", workoutName, sessions.count)
+            } else if workoutName == L10n.tr("Done") {
+                detail = L10n.tr("Workout completed.")
+            } else {
+                detail = L10n.format("%@ completed.", workoutName)
+            }
+
+            return (
+                latest.startTime,
+                ProgressP1RecentWork(
+                id: "work-\(calendar.startOfDay(for: latest.startTime).timeIntervalSinceReferenceDate)-\(workoutName)",
+                title: dateTitle,
+                detail: detail,
+                icon: "checkmark.circle.fill",
+                state: .success
+                )
+            )
+        }
+        .sorted { $0.latestDate > $1.latestDate }
+        .map(\.row)
+
+        if let bestSet {
+            let bestRow = ProgressP1RecentWork(
+                id: "best-\(bestSet.sessionId)",
+                title: bestSet.date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()),
+                detail: L10n.format("%@ %@.", bestSet.liftName, bestSet.value),
+                icon: "star.circle.fill",
+                state: .gold
+            )
+            return [bestRow] + Array(groupedRows.prefix(3))
+        }
+
+        return Array(groupedRows.prefix(4))
     }
 
     // MARK: - Headline Hero
@@ -1781,18 +2826,18 @@ struct ProgressAnalyticsView: View {
                 stateLabel: L10n.tr("Readable trend"),
                 state: .info,
                 anchorWeeks: anchorWeeks,
-                caption: L10n.tr("Estimated 1RM movement anchors"),
-                detail: L10n.tr("Repeated logged sets are enough to draw the existing 8-week estimate. Treat this as strength signal, not a PR claim.")
+                caption: L10n.tr("Strength anchors from logged sets"),
+                detail: L10n.tr("Repeated logged sets are enough to draw the existing 8-week view. Treat this as training context, not a record call.")
             )
         }
 
         if anchorWeeks > 0 || vm.totalCompletedWorkouts > 0 {
             return StrengthTrendSnapshot(
-                stateLabel: L10n.tr("Early signal"),
+                stateLabel: L10n.tr("Early read"),
                 state: .warning,
                 anchorWeeks: anchorWeeks,
-                caption: L10n.tr("Anchor evidence is present"),
-                detail: L10n.tr("Logged sets are real proof, but repeated anchor evidence is still thin. The chart stays quiet until the existing gate passes.")
+                caption: L10n.tr("Strength anchors are starting"),
+                detail: L10n.tr("Logged sets are real proof, but repeated anchor work is still thin. The chart stays quiet until the existing gate passes.")
             )
         }
 
@@ -1830,11 +2875,11 @@ struct ProgressAnalyticsView: View {
         return evidenceModule(border: tint.opacity(0.2)) {
             VStack(alignment: .leading, spacing: 16) {
                 evidenceHeader(
-                    title: L10n.tr("Strength Trend"),
+                    title: L10n.tr("Strength anchors"),
                     trailing: snapshot.stateLabel,
                     icon: "chart.line.uptrend.xyaxis",
                     state: snapshot.state,
-                    subtitle: L10n.tr("Estimated 1RM from logged sets")
+                    subtitle: L10n.tr("Heavy sets from logged workouts")
                 )
 
                 HStack(alignment: .lastTextBaseline, spacing: 6) {
@@ -1846,7 +2891,7 @@ struct ProgressAnalyticsView: View {
                         .foregroundStyle(.white.opacity(0.5))
                         .padding(.bottom, 6)
                     Spacer(minLength: 0)
-                    evidenceChip(icon: "circle.dashed", text: L10n.tr("No PR claim"), state: .neutral)
+                    evidenceChip(icon: "circle.dashed", text: L10n.tr("sets only"), state: .neutral)
                 }
 
                 plotShell(height: 118) {
@@ -1865,9 +2910,9 @@ struct ProgressAnalyticsView: View {
 
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
                     trendProofMetric(
-                        title: L10n.tr("Signal"),
+                        title: L10n.tr("Proof"),
                         value: snapshot.stateLabel,
-                        detail: L10n.tr("confidence"),
+                        detail: L10n.tr("current read"),
                         icon: "waveform.path.ecg",
                         state: snapshot.state
                     )
@@ -1975,25 +3020,25 @@ struct ProgressAnalyticsView: View {
         return evidenceModule(border: tint.opacity(0.2)) {
             VStack(alignment: .leading, spacing: 16) {
                 evidenceHeader(
-                    title: L10n.tr("Strength Trend"),
+                    title: L10n.tr("Strength anchors"),
                     trailing: snapshot.stateLabel,
                     icon: "chart.line.uptrend.xyaxis",
                     state: snapshot.state,
-                    subtitle: L10n.tr("Estimated 1RM movement anchors")
+                    subtitle: L10n.tr("Heavy sets from logged workouts")
                 )
 
                 HStack(alignment: .top, spacing: 10) {
                     trendProofMetric(
-                        title: L10n.tr("Evidence"),
+                        title: L10n.tr("Proof"),
                         value: "\(snapshot.anchorWeeks)",
                         detail: L10n.tr("anchor weeks"),
                         icon: "checkmark.seal",
                         state: snapshot.state
                     )
                     trendProofMetric(
-                        title: L10n.tr("Claim"),
-                        value: L10n.tr("Signal"),
-                        detail: L10n.tr("not PRs"),
+                        title: L10n.tr("View"),
+                        value: L10n.tr("sets"),
+                        detail: L10n.tr("logged"),
                         icon: "exclamationmark.shield",
                         state: .neutral
                     )
@@ -2161,7 +3206,7 @@ struct ProgressAnalyticsView: View {
         let sortedPRs = vm.personalRecords.sorted { $0.date > $1.date }
         return VStack(alignment: .leading, spacing: 12) {
             HStack {
-                ForgeSectionHeader(title: L10n.tr("Personal Records"))
+                ForgeSectionHeader(title: L10n.tr("Records"))
                 Spacer()
                 if !sortedPRs.isEmpty {
                     Text("\(sortedPRs.count)")
@@ -2237,7 +3282,7 @@ struct ProgressAnalyticsView: View {
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.5))
                 }
-                Text(L10n.format("× %d · e1RM %d", pr.reps, Int(pr.estimatedOneRepMax)))
+                Text(L10n.format("%d reps", pr.reps))
                     .font(.caption2.weight(.medium).monospacedDigit())
                     .foregroundStyle(.tertiary)
             }
@@ -2358,7 +3403,7 @@ struct ProgressAnalyticsView: View {
         .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 10))
     }
 
-    // MARK: - Recent Evidence
+    // MARK: - Recent Work
 
     private var recentSessionsCard: some View {
         let snapshot = recentEvidenceSnapshot
@@ -2374,7 +3419,7 @@ struct ProgressAnalyticsView: View {
                         .background(tint.opacity(0.12), in: .rect(cornerRadius: 8))
 
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(L10n.tr("Recent Evidence"))
+                        Text(L10n.tr("Recent Work"))
                             .font(.system(size: 10, weight: .black))
                             .tracking(0.8)
                             .foregroundStyle(.white.opacity(0.52))
@@ -2514,29 +3559,29 @@ struct ProgressAnalyticsView: View {
         case 0:
             state = .neutral
             stateLabel = L10n.tr("Baseline forming")
-            subtitle = L10n.tr("Training evidence starts with completed sessions")
+            subtitle = L10n.tr("Training proof starts with completed sessions")
             detail = L10n.tr("No completed workouts are shown here until real workout history exists.")
         case 1...2:
             state = .warning
             stateLabel = L10n.tr("Baseline forming")
             subtitle = L10n.tr("Real sessions logged, pattern still forming")
-            detail = L10n.tr("STRQ has dated session evidence, but the recent baseline needs more completed workouts before it can explain a rhythm.")
+            detail = L10n.tr("STRQ has dated session proof, but the recent baseline needs more completed workouts before it can explain a rhythm.")
         case 3...:
             if activeWeeks >= 2 {
                 state = .info
-                stateLabel = L10n.tr("Training evidence")
+                stateLabel = L10n.tr("Training proof")
                 subtitle = L10n.tr("Recent sessions shaping Progress")
                 detail = L10n.tr("Completed workouts now span multiple weeks, enough to show which real sessions are shaping the current Progress picture.")
             } else {
                 state = .warning
                 stateLabel = L10n.tr("Building pattern")
                 subtitle = L10n.tr("Recent sessions logged close together")
-                detail = L10n.tr("STRQ has several completed workouts, but the weekly rhythm is still forming across the current evidence window.")
+                detail = L10n.tr("STRQ has several completed workouts, but the weekly rhythm is still forming across recent work.")
             }
         default:
             state = .neutral
             stateLabel = L10n.tr("Baseline forming")
-            subtitle = L10n.tr("Training evidence starts with completed sessions")
+            subtitle = L10n.tr("Training proof starts with completed sessions")
             detail = L10n.tr("No completed workouts are shown here until real workout history exists.")
         }
 
@@ -2565,14 +3610,14 @@ struct ProgressAnalyticsView: View {
                     state: currentWeekSessions >= target ? .success : (currentWeekSessions > 0 ? .warning : .neutral)
                 ),
                 RecentEvidenceMetric(
-                    title: L10n.tr("Source"),
+                    title: L10n.tr("Logged"),
                     value: "\(completedSessions.count)",
                     detail: L10n.tr("completed"),
                     icon: "list.bullet.rectangle.portrait",
                     state: completedSessions.isEmpty ? .neutral : .info
                 ),
                 RecentEvidenceMetric(
-                    title: L10n.tr("Window"),
+                    title: L10n.tr("Recent"),
                     value: "28",
                     detail: L10n.tr("days"),
                     icon: "clock.arrow.circlepath",
