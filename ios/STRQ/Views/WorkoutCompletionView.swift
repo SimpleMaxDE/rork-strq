@@ -83,7 +83,6 @@ struct WorkoutCompletionView: View {
                     primaryAchievementBadge
                     statsSection
                     whatChangedSection
-                    activationRibbon
                     highlightsSection
                     nextSessionBridge
                     Color.clear.frame(height: 24)
@@ -352,7 +351,9 @@ struct WorkoutCompletionView: View {
 
         if let next = nextSessionItems().first {
             insights.append(ChangedInsight(
-                title: L10n.tr("Next targets will adapt"),
+                title: next.usesFallbackTarget
+                    ? L10n.tr("Next targets need one more clean set.")
+                    : L10n.tr("Next targets will adapt"),
                 detail: next.exerciseName,
                 icon: next.icon,
                 color: next.color
@@ -462,104 +463,6 @@ struct WorkoutCompletionView: View {
     }
 
     // MARK: - Highlights
-
-    // MARK: - Activation Ribbon (first-week framing)
-
-    private struct ActivationRibbonCopy {
-        let headline: String
-        let detail: String
-        let icon: String
-    }
-
-    private func activationRibbonCopy(for roadmap: ActivationRoadmap) -> ActivationRibbonCopy {
-        switch vm.totalCompletedWorkouts {
-        case 1:
-            return .init(
-                headline: L10n.tr("Baseline locked in"),
-                detail: L10n.tr("STRQ now knows your starting loads. Workout 2 switches on real progression calls."),
-                icon: "scalemass.fill"
-            )
-        case 2:
-            return .init(
-                headline: L10n.tr("Progression is live"),
-                detail: L10n.tr("Coach can now adjust load and volume. One more workout sharpens pattern reads."),
-                icon: "chart.line.uptrend.xyaxis"
-            )
-        case 3:
-            return .init(
-                headline: L10n.tr("Pattern reads unlocked"),
-                detail: L10n.tr("STRQ is reading balance, fatigue, and load pacing. Finish the week to unlock your first review."),
-                icon: "waveform.path.ecg"
-            )
-        default:
-            return .init(
-                headline: L10n.format("Step %d of %d", roadmap.completedCount, roadmap.steps.count),
-                detail: roadmap.subhead,
-                icon: "sparkles"
-            )
-        }
-    }
-
-    @ViewBuilder
-    private var activationRibbon: some View {
-        if let roadmap = vm.activationRoadmap {
-            let copy = activationRibbonCopy(for: roadmap)
-            let headline = copy.headline
-            let detail = copy.detail
-            let icon = copy.icon
-
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 10) {
-                    Image(systemName: icon)
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 32, height: 32)
-                        .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack(spacing: 6) {
-                            Text(L10n.tr("COACH CALIBRATION"))
-                                .font(.system(size: 9, weight: .black))
-                                .tracking(1.2)
-                                .foregroundStyle(STRQBrand.steel)
-                            Text("\(roadmap.completedCount)/\(roadmap.steps.count)")
-                                .font(.system(size: 9, weight: .black).monospacedDigit())
-                                .foregroundStyle(.white.opacity(0.5))
-                        }
-                        Text(headline)
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(.white)
-                    }
-                    Spacer(minLength: 0)
-                }
-
-                Text(detail)
-                    .font(.system(size: 11.5, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.65))
-                    .fixedSize(horizontal: false, vertical: true)
-
-                HStack(spacing: 4) {
-                    ForEach(0..<roadmap.steps.count, id: \.self) { i in
-                        Capsule()
-                            .fill(i < roadmap.completedCount
-                                  ? AnyShapeStyle(STRQBrand.accentGradient)
-                                  : AnyShapeStyle(Color.white.opacity(0.08)))
-                            .frame(height: 3)
-                    }
-                }
-            }
-            .padding(14)
-            .background(Color.white.opacity(0.04), in: .rect(cornerRadius: 14))
-            .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
-            )
-            .padding(.horizontal, 20)
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 10)
-            .animation(.easeOut(duration: 0.5).delay(0.35), value: appeared)
-        }
-    }
 
     @ViewBuilder
     private var highlightsSection: some View {
@@ -704,6 +607,32 @@ struct WorkoutCompletionView: View {
         let tag: String
         let icon: String
         let color: Color
+        let usesFallbackTarget: Bool
+    }
+
+    private struct NextTargetDisplay {
+        let detail: String
+        let usesFallbackTarget: Bool
+    }
+
+    private func nextTargetDetail(weight: Double?, reps: Int?) -> NextTargetDisplay {
+        guard
+            let weight,
+            let reps,
+            weight.isFinite,
+            weight > 0,
+            reps > 0
+        else {
+            return NextTargetDisplay(
+                detail: L10n.tr("Next target will update after another clean set."),
+                usesFallbackTarget: true
+            )
+        }
+
+        return NextTargetDisplay(
+            detail: L10n.format("Next: %.1f kg × %d", weight, reps),
+            usesFallbackTarget: false
+        )
     }
 
     private func nextSessionItems() -> [BridgeItem] {
@@ -727,7 +656,8 @@ struct WorkoutCompletionView: View {
                 detail: detail,
                 tag: L10n.tr("PUSH"),
                 icon: "arrow.up.right.circle.fill",
-                color: STRQPalette.success
+                color: STRQPalette.success,
+                usesFallbackTarget: false
             ))
             if items.count >= 2 { return items }
         }
@@ -740,12 +670,14 @@ struct WorkoutCompletionView: View {
 
             switch state.recommendedStrategy {
             case .loadFirst where state.plateauStatus == .progressing:
+                let target = nextTargetDetail(weight: state.lastWeight + 2.5, reps: state.lastReps)
                 items.append(BridgeItem(
                     exerciseName: ex.name,
-                    detail: L10n.format("Next: %.1f kg × %d", state.lastWeight + 2.5, state.lastReps),
+                    detail: target.detail,
                     tag: L10n.tr("PUSH"),
                     icon: "arrow.up.right.circle.fill",
-                    color: STRQPalette.success
+                    color: STRQPalette.success,
+                    usesFallbackTarget: target.usesFallbackTarget
                 ))
             case .holdAndConsolidate:
                 items.append(BridgeItem(
@@ -753,7 +685,8 @@ struct WorkoutCompletionView: View {
                     detail: L10n.tr("Hold load — consolidate technique"),
                     tag: L10n.tr("HOLD"),
                     icon: "pause.circle.fill",
-                    color: STRQPalette.warning
+                    color: STRQPalette.warning,
+                    usesFallbackTarget: false
                 ))
             case .deloadAndRebuild:
                 items.append(BridgeItem(
@@ -761,7 +694,8 @@ struct WorkoutCompletionView: View {
                     detail: L10n.format("Deload to %.1f kg — rebuild clean", state.lastWeight * 0.85),
                     tag: "",
                     icon: "arrow.down.circle.fill",
-                    color: STRQPalette.warning
+                    color: STRQPalette.warning,
+                    usesFallbackTarget: false
                 ))
             default:
                 continue
