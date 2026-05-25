@@ -18,6 +18,7 @@ struct ProgressAnalyticsView: View {
         let compactDetail: String
         let countValue: String
         let countDetail: String
+        let overflow: Int
         let isAtOrAboveTarget: Bool
         let isOverflow: Bool
     }
@@ -110,6 +111,7 @@ struct ProgressAnalyticsView: View {
                 compactDetail: L10n.tr("target open"),
                 countValue: "\(completed)",
                 countDetail: L10n.tr("completed"),
+                overflow: 0,
                 isAtOrAboveTarget: false,
                 isOverflow: false
             )
@@ -121,13 +123,15 @@ struct ProgressAnalyticsView: View {
 
         if completed > target {
             let overflow = completed - target
+            let overflowPrimary = "\(primary) +\(overflow)"
             return WeeklyTargetDisplay(
-                primary: primary,
-                inlinePrimary: "\(primary) +\(overflow)",
+                primary: overflowPrimary,
+                inlinePrimary: overflowPrimary,
                 detail: L10n.format("+%d extra", overflow),
                 compactDetail: L10n.format("+%d extra", overflow),
                 countValue: "\(target)",
                 countDetail: L10n.format("+%d extra", overflow),
+                overflow: overflow,
                 isAtOrAboveTarget: true,
                 isOverflow: true
             )
@@ -141,6 +145,7 @@ struct ProgressAnalyticsView: View {
                 compactDetail: L10n.tr("reached"),
                 countValue: "\(target)",
                 countDetail: L10n.tr("target reached"),
+                overflow: 0,
                 isAtOrAboveTarget: true,
                 isOverflow: false
             )
@@ -153,30 +158,37 @@ struct ProgressAnalyticsView: View {
             compactDetail: L10n.tr("forming"),
             countValue: "\(completed)",
             countDetail: L10n.format("of %d", target),
+            overflow: 0,
             isAtOrAboveTarget: false,
             isOverflow: false
         )
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                progressP1ScreenHeader
-                    .padding(.horizontal, 14)
-                    .padding(.top, 14)
+        ZStack(alignment: .top) {
+            progressP1Background
+                .ignoresSafeArea()
 
-                progressP1FirstViewport
-                    .padding(.horizontal, 14)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    progressP1ScreenHeader
+                        .padding(.horizontal, 14)
+                        .padding(.top, 14)
 
-                progressP1LowerSections
-                    .padding(.horizontal, 14)
+                    progressP1FirstViewport
+                        .padding(.horizontal, 14)
+
+                    progressP1LowerSections
+                        .padding(.horizontal, 14)
+                }
+                .frame(maxWidth: 430)
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 36)
             }
-            .frame(maxWidth: 430)
-            .frame(maxWidth: .infinity)
-            .padding(.bottom, 36)
+            .scrollContentBackground(.hidden)
+
+            progressP1TopStatusScrim
         }
-        .scrollContentBackground(.hidden)
-        .background(Color(red: 0.018, green: 0.019, blue: 0.023).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(.dark)
@@ -184,6 +196,30 @@ struct ProgressAnalyticsView: View {
             withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5)) { appeared = true }
             Analytics.shared.track(.progress_viewed)
         }
+    }
+
+    private var progressP1Background: Color {
+        Color(red: 0.018, green: 0.019, blue: 0.023)
+    }
+
+    private var progressP1TopStatusScrim: some View {
+        VStack(spacing: 0) {
+            progressP1Background
+                .frame(height: 64)
+
+            LinearGradient(
+                colors: [
+                    progressP1Background,
+                    progressP1Background.opacity(0)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 26)
+        }
+        .ignoresSafeArea(edges: .top)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 
     // MARK: - P1 First Viewport
@@ -247,14 +283,15 @@ struct ProgressAnalyticsView: View {
         let completedCount = completedThisWeek.count
         let completedTotal = completedSessions.count
         let weeklyTarget = max(1, min(vm.profile.daysPerWeek, 7))
+        let targetDisplay = weeklyTargetDisplay(completed: completedCount, target: weeklyTarget)
         let remaining = max(0, weeklyTarget - completedCount)
         let bestSet = completedThisWeek
             .reversed()
             .compactMap { progressP1CurrentWeekBestSet(from: $0, allCompletedSessions: completedSessions) }
             .first
         let tightSpacing = progressP1HasClusteredWorkouts(completedThisWeek, calendar: calendar)
+        let sameDayCluster = progressP1HasSameDayCluster(completedThisWeek, calendar: calendar)
         let isClustered = completedCount > weeklyTarget && tightSpacing
-        let extra = max(0, completedCount - weeklyTarget)
         let hasGoodSpacing = progressP1HasGoodSpacing(completedThisWeek, calendar: calendar)
 
         let family: ProgressP1Family
@@ -287,12 +324,12 @@ struct ProgressAnalyticsView: View {
         switch family {
         case .lowData:
             headline = L10n.tr("The path starts here.")
-            explanation = L10n.tr("Log completed workouts before STRQ calls a pattern.")
+            explanation = L10n.tr("Log a few more workouts to make the trend clearer.")
             state = .neutral
             tiles = [
                 ProgressP1FactTile(value: "\(completedTotal)", label: completedTotal == 1 ? L10n.tr("Workout") : L10n.tr("Workouts"), state: completedTotal == 1 ? .success : .neutral),
-                ProgressP1FactTile(value: "\(completedCount)/\(weeklyTarget)", label: L10n.tr("Target"), state: completedCount > 0 ? .success : .neutral),
-                ProgressP1FactTile(value: L10n.tr("Week"), label: L10n.tr("open"), state: .neutral),
+                ProgressP1FactTile(value: targetDisplay.primary, label: L10n.tr("Target"), state: completedCount > 0 ? .success : .neutral),
+                ProgressP1FactTile(value: L10n.tr("Week"), label: L10n.tr("Open"), state: .neutral),
                 ProgressP1FactTile(value: L10n.tr("Next"), label: L10n.tr("workout"), state: .warning)
             ]
             baseNextMove = L10n.tr("Log the next workout.")
@@ -305,7 +342,7 @@ struct ProgressAnalyticsView: View {
                 progressP1Item(L10n.tr("Exercise history"), L10n.tr("Comparable sets come next."), "dumbbell.fill", .warning)
             ]
             needsMore = [
-                progressP1Item(L10n.tr("More sessions needed"), L10n.tr("STRQ stays quiet until repeated workouts exist."), "circle.dashed", .neutral)
+                progressP1Item(L10n.tr("More sessions needed"), L10n.tr("A few more workouts will make the trend clearer."), "circle.dashed", .neutral)
             ]
 
         case .bestSet:
@@ -332,11 +369,13 @@ struct ProgressAnalyticsView: View {
 
         case .clusteredOverhit:
             headline = L10n.tr("More work than planned.")
-            explanation = L10n.tr("You cleared the target, but sessions landed close together.")
+            explanation = sameDayCluster
+                ? L10n.tr("Target cleared, but sessions were packed together.")
+                : L10n.tr("You cleared the target, but sessions landed close together.")
             state = .warning
             tiles = [
                 ProgressP1FactTile(value: "\(completedCount)", label: L10n.tr("Workouts"), state: .success),
-                ProgressP1FactTile(value: "\(weeklyTarget)/\(weeklyTarget) +\(extra)", label: L10n.tr("Target"), state: .success),
+                ProgressP1FactTile(value: targetDisplay.primary, label: L10n.tr("Target"), state: .success),
                 ProgressP1FactTile(value: L10n.tr("Tight"), label: L10n.tr("spacing"), state: .warning),
                 ProgressP1FactTile(value: L10n.tr("Watch"), label: L10n.tr("next week"), state: .warning)
             ]
@@ -344,23 +383,25 @@ struct ProgressAnalyticsView: View {
             nextMoveDetail = L10n.tr("Keep the work, but give the next week more room.")
             confirmed = [
                 progressP1Item(L10n.tr("Target cleared"), L10n.tr("The planned week is done."), "checkmark.seal.fill", .success),
-                progressP1Item(L10n.tr("Extra work logged"), L10n.format("+%d completed %@", extra, extra == 1 ? L10n.tr("session") : L10n.tr("sessions")), "plus.circle.fill", .success)
+                progressP1Item(L10n.tr("Extra work logged"), L10n.format("+%d completed %@", targetDisplay.overflow, targetDisplay.overflow == 1 ? L10n.tr("session") : L10n.tr("sessions")), "plus.circle.fill", .success)
             ]
             building = [
-                progressP1Item(L10n.tr("Spacing"), L10n.tr("Several sessions landed close together."), "calendar.badge.exclamationmark", .warning),
+                progressP1Item(L10n.tr("Spacing"), sameDayCluster ? L10n.tr("Several sessions landed on one day.") : L10n.tr("Several sessions landed close together."), "calendar.badge.exclamationmark", .warning),
                 progressP1Item(L10n.tr("Next week"), L10n.tr("Give the next week more room."), "arrow.left.and.right", .warning)
             ]
             needsMore = [
-                progressP1Item(L10n.tr("Stable rhythm"), L10n.tr("Repeat the target with wider spacing."), "circle.dashed", .neutral)
+                progressP1Item(L10n.tr("Wider spacing"), L10n.tr("Repeat the target with more room."), "circle.dashed", .neutral)
             ]
 
         case .targetHitTight:
             headline = L10n.tr("Target hit. Rhythm still open.")
-            explanation = L10n.tr("The target is done, but the sessions landed close together.")
+            explanation = sameDayCluster
+                ? L10n.tr("Target hit, but sessions were packed together.")
+                : L10n.tr("The target is done, but the sessions landed close together.")
             state = .warning
             tiles = [
                 ProgressP1FactTile(value: "\(completedCount)", label: L10n.tr("Workouts"), state: .success),
-                ProgressP1FactTile(value: "\(weeklyTarget)/\(weeklyTarget)", label: L10n.tr("Target"), state: .success),
+                ProgressP1FactTile(value: targetDisplay.primary, label: L10n.tr("Target"), state: .success),
                 ProgressP1FactTile(value: L10n.tr("Tight"), label: L10n.tr("spacing"), state: .warning),
                 ProgressP1FactTile(value: L10n.tr("Watch"), label: L10n.tr("next week"), state: .warning)
             ]
@@ -371,21 +412,23 @@ struct ProgressAnalyticsView: View {
                 progressP1Item(L10n.tr("Target cleared"), L10n.format("%d of %d sessions completed.", completedCount, weeklyTarget), "checkmark.seal.fill", .success)
             ]
             building = [
-                progressP1Item(L10n.tr("Spacing"), L10n.tr("Sessions landed close together."), "calendar.badge.exclamationmark", .warning),
+                progressP1Item(L10n.tr("Spacing"), sameDayCluster ? L10n.tr("Several sessions landed on one day.") : L10n.tr("Sessions landed close together."), "calendar.badge.exclamationmark", .warning),
                 progressP1Item(L10n.tr("Rhythm repeat"), L10n.tr("Repeat the work with more room."), "arrow.left.and.right", .warning)
             ]
             needsMore = [
-                progressP1Item(L10n.tr("Stable rhythm"), L10n.tr("Repeat the target with wider spacing."), "circle.dashed", .neutral),
+                progressP1Item(L10n.tr("Wider spacing"), L10n.tr("Repeat the target with more room."), "circle.dashed", .neutral),
                 progressP1Item(L10n.tr("Spread it first"), L10n.tr("Keep the work. Spread it better."), "circle.dashed", .neutral)
             ]
 
         case .targetHit:
             headline = L10n.tr("Weekly target hit.")
-            explanation = L10n.tr("The planned work is done. Now repeat the spacing.")
+            explanation = targetDisplay.isOverflow
+                ? L10n.tr("Target cleared. Keep the week easy to repeat.")
+                : L10n.tr("The planned work is done. Now repeat the spacing.")
             state = .success
             tiles = [
                 ProgressP1FactTile(value: "\(completedCount)", label: L10n.tr("Workouts"), state: .success),
-                ProgressP1FactTile(value: "\(weeklyTarget)/\(weeklyTarget)", label: L10n.tr("Target"), state: .success),
+                ProgressP1FactTile(value: targetDisplay.primary, label: L10n.tr("Target"), state: .success),
                 ProgressP1FactTile(value: L10n.tr("Week"), label: L10n.tr("done"), state: .success),
                 ProgressP1FactTile(value: L10n.tr("Repeat"), label: L10n.tr("next"), state: .info)
             ]
@@ -408,8 +451,8 @@ struct ProgressAnalyticsView: View {
             state = .neutral
             tiles = [
                 ProgressP1FactTile(value: "0", label: L10n.tr("Workouts"), state: .neutral),
-                ProgressP1FactTile(value: "0/\(weeklyTarget)", label: L10n.tr("Target"), state: .neutral),
-                ProgressP1FactTile(value: L10n.tr("Spacing"), label: L10n.tr("open"), state: .neutral),
+                ProgressP1FactTile(value: targetDisplay.primary, label: L10n.tr("Target"), state: .neutral),
+                ProgressP1FactTile(value: L10n.tr("Spacing"), label: L10n.tr("Not ready"), state: .neutral),
                 ProgressP1FactTile(value: L10n.tr("First"), label: L10n.tr("session"), state: .warning)
             ]
             baseNextMove = L10n.tr("Set the first session of the week.")
@@ -431,8 +474,8 @@ struct ProgressAnalyticsView: View {
             tiles = [
                 ProgressP1FactTile(value: "\(completedCount)", label: L10n.tr("Workouts"), state: .success),
                 ProgressP1FactTile(value: "\(remaining)", label: L10n.tr("Left"), state: .warning),
-                ProgressP1FactTile(value: hasGoodSpacing ? L10n.tr("Good") : L10n.tr("Spacing"), label: hasGoodSpacing ? L10n.tr("spacing") : L10n.tr("open"), state: hasGoodSpacing ? .info : .neutral),
-                ProgressP1FactTile(value: L10n.tr("Target"), label: L10n.tr("open"), state: .warning)
+                ProgressP1FactTile(value: hasGoodSpacing ? L10n.tr("Good") : L10n.tr("Spacing"), label: hasGoodSpacing ? L10n.tr("spacing") : L10n.tr("Not ready"), state: hasGoodSpacing ? .info : .neutral),
+                ProgressP1FactTile(value: targetDisplay.primary, label: L10n.tr("Target"), state: .warning)
             ]
             baseNextMove = L10n.tr("Hold the next planned session.")
             nextMoveDetail = L10n.tr("No extra work required. Let the next completed session carry the path forward.")
@@ -462,7 +505,7 @@ struct ProgressAnalyticsView: View {
             completedThisWeek: completedCount,
             weeklyTarget: weeklyTarget,
             remaining: remaining,
-            weekSummary: progressP1WeekSummary(family: family, completed: completedCount, target: weeklyTarget, remaining: remaining),
+            weekSummary: progressP1WeekSummary(family: family, completed: completedCount, target: weeklyTarget, remaining: remaining, sameDayCluster: sameDayCluster),
             pathNodes: progressP1WeekNodes(
                 weekStart: weekStart,
                 completedThisWeek: completedThisWeek,
@@ -511,10 +554,12 @@ struct ProgressAnalyticsView: View {
     }
 
     private func progressP1WeekPath(_ snapshot: ProgressP1Snapshot) -> some View {
-        VStack(alignment: .leading, spacing: 11) {
+        let targetDisplay = weeklyTargetDisplay(completed: snapshot.completedThisWeek, target: snapshot.weeklyTarget)
+
+        return VStack(alignment: .leading, spacing: 11) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(L10n.tr("This Week Path"))
+                    Text(L10n.tr("This Week"))
                         .font(.system(size: 14, weight: .black, design: .rounded))
                         .foregroundStyle(.white.opacity(0.95))
                         .lineLimit(1)
@@ -527,7 +572,7 @@ struct ProgressAnalyticsView: View {
 
                 Spacer(minLength: 0)
 
-                Text(snapshot.remaining == 0 ? "\(snapshot.weeklyTarget)/\(snapshot.weeklyTarget)" : "\(snapshot.remaining) \(L10n.tr("left"))")
+                Text(targetDisplay.primary)
                     .font(.system(size: 10, weight: .black, design: .rounded).monospacedDigit())
                     .foregroundStyle(progressP1Tint(for: snapshot.state))
                     .lineLimit(1)
@@ -557,7 +602,7 @@ struct ProgressAnalyticsView: View {
             }
             .frame(height: 94)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text(L10n.format("%d of %d target sessions this week", min(snapshot.completedThisWeek, snapshot.weeklyTarget), snapshot.weeklyTarget)))
+            .accessibilityLabel(Text(L10n.format("%@ target sessions this week", targetDisplay.primary)))
         }
         .padding(11)
         .background(Color(red: 0.028, green: 0.031, blue: 0.038), in: .rect(cornerRadius: 16))
@@ -894,6 +939,13 @@ struct ProgressAnalyticsView: View {
         return !progressP1HasClusteredWorkouts(sessions, calendar: calendar)
     }
 
+    private func progressP1HasSameDayCluster(_ sessions: [WorkoutSession], calendar: Calendar) -> Bool {
+        let sessionsByDay = Dictionary(grouping: sessions) { session in
+            calendar.startOfDay(for: session.startTime)
+        }
+        return sessionsByDay.values.contains { $0.count > 1 }
+    }
+
     private func progressP1ClusteredDays(_ sessions: [WorkoutSession], calendar: Calendar) -> Set<Date> {
         let startDays = sessions
             .map { calendar.startOfDay(for: $0.startTime) }
@@ -961,18 +1013,18 @@ struct ProgressAnalyticsView: View {
         return nil
     }
 
-    private func progressP1WeekSummary(family: ProgressP1Family, completed: Int, target: Int, remaining: Int) -> String {
+    private func progressP1WeekSummary(family: ProgressP1Family, completed: Int, target: Int, remaining: Int, sameDayCluster: Bool) -> String {
         switch family {
         case .lowData:
             return completed == 0 ? L10n.tr("Completed workouts will fill this week.") : L10n.tr("One completed workout starts the path.")
         case .bestSet:
             return L10n.tr("Best set this week.")
         case .clusteredOverhit:
-            return L10n.tr("Target cleared with tight spacing.")
+            return sameDayCluster ? L10n.tr("Several sessions landed on one day.") : L10n.tr("Target cleared, but sessions were packed together.")
         case .targetHitTight:
-            return L10n.tr("Target hit with tight spacing.")
+            return sameDayCluster ? L10n.tr("Several sessions landed on one day.") : L10n.tr("Target hit, but spacing is tight.")
         case .targetHit:
-            return L10n.tr("Planned sessions landed this week.")
+            return completed > target ? L10n.tr("Target cleared. Keep spacing repeatable.") : L10n.tr("Planned sessions landed this week.")
         case .weekOpen:
             return L10n.tr("No completed session this week yet.")
         case .weekRunning:
@@ -1110,21 +1162,24 @@ struct ProgressAnalyticsView: View {
 
         let calendar = Calendar.current
         let groupedSessions = Dictionary(grouping: sortedSessions) { session in
-            let day = calendar.startOfDay(for: session.startTime).timeIntervalSinceReferenceDate
-            return "\(day)-\(progressP1SafeWorkoutLabel(session))"
+            calendar.startOfDay(for: session.startTime)
         }
 
         let groupedRows = groupedSessions.values.map { sessions -> (latestDate: Date, row: ProgressP1RecentWork) in
             let sessions = sessions.sorted { $0.startTime > $1.startTime }
             let latest = sessions[0]
+            let workoutNames = sessions
+                .map(progressP1SafeWorkoutLabel)
+                .filter { $0 != L10n.tr("Done") }
+            let uniqueWorkoutNames = Array(Set(workoutNames))
             let workoutName = progressP1SafeWorkoutLabel(latest)
             let dateTitle = latest.startTime.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day())
             let detail: String
 
             if sessions.count > 1 {
-                detail = workoutName == L10n.tr("Done")
-                    ? L10n.format("Workout completed %d times.", sessions.count)
-                    : L10n.format("%@ completed %d times.", workoutName, sessions.count)
+                detail = uniqueWorkoutNames.count == 1
+                    ? L10n.format("%@ · %d sessions", uniqueWorkoutNames[0], sessions.count)
+                    : L10n.format("%d sessions logged", sessions.count)
             } else if workoutName == L10n.tr("Done") {
                 detail = L10n.tr("Workout completed.")
             } else {
@@ -1134,7 +1189,7 @@ struct ProgressAnalyticsView: View {
             return (
                 latest.startTime,
                 ProgressP1RecentWork(
-                id: "work-\(calendar.startOfDay(for: latest.startTime).timeIntervalSinceReferenceDate)-\(workoutName)",
+                id: "work-\(calendar.startOfDay(for: latest.startTime).timeIntervalSinceReferenceDate)",
                 title: dateTitle,
                 detail: detail,
                 icon: "checkmark.circle.fill",
