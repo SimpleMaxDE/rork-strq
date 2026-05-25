@@ -336,13 +336,12 @@ struct ProgressAnalyticsView: View {
             nextMoveDetail = L10n.tr("Use Today or Train when you are ready. Progress updates after a completed log.")
             confirmed = completedTotal == 0
                 ? [progressP1Item(L10n.tr("Nothing confirmed yet"), L10n.tr("No completed workouts logged yet."), "circle.dashed", .neutral)]
-                : [progressP1Item(L10n.tr("First workout"), L10n.tr("1 completed workout is recorded."), "checkmark.circle.fill", .success)]
+                : [progressP1Item(L10n.tr("Training history"), progressP1WorkoutLogDetail(completedTotal), "checkmark.circle.fill", .success)]
             building = [
-                progressP1Item(L10n.tr("Weekly rhythm"), L10n.tr("Too early, but started."), "calendar", .warning),
-                progressP1Item(L10n.tr("Exercise history"), L10n.tr("Comparable sets come next."), "dumbbell.fill", .warning)
+                progressP1Item(L10n.tr("Training record"), L10n.tr("A few more workouts make this clearer."), "calendar", .warning)
             ]
             needsMore = [
-                progressP1Item(L10n.tr("More sessions needed"), L10n.tr("A few more workouts will make the trend clearer."), "circle.dashed", .neutral)
+                progressP1Item(L10n.tr("More sessions"), L10n.tr("Log a few workouts before judging the path."), "circle.dashed", .neutral)
             ]
 
         case .bestSet:
@@ -358,13 +357,13 @@ struct ProgressAnalyticsView: View {
             baseNextMove = L10n.tr("Keep the weight and repeat clean reps.")
             nextMoveDetail = L10n.tr("The repeat matters more than chasing a new top set.")
             confirmed = [
-                progressP1Item(L10n.tr("Best set logged"), L10n.format("%@ %@.", bestSet?.liftName ?? L10n.tr("Lift"), bestSet?.value ?? L10n.tr("set")), "star.circle.fill", .gold)
+                progressP1Item(L10n.tr("Best set logged"), L10n.format("%@ · %@", bestSet?.liftName ?? L10n.tr("Lift"), bestSet?.value ?? L10n.tr("set")), "star.circle.fill", .gold)
             ]
             building = [
-                progressP1Item(L10n.tr("Strength repeat"), L10n.tr("One best set needs a repeat."), "repeat.circle.fill", .info)
+                progressP1Item(L10n.tr("Repeat"), L10n.tr("Hold the weight and make it clean."), "repeat.circle.fill", .info)
             ]
             needsMore = [
-                progressP1Item(L10n.tr("Repeat first"), L10n.tr("Confirm the set before chasing more."), "circle.dashed", .neutral)
+                progressP1Item(L10n.tr("Confirmation"), L10n.tr("Repeat it before chasing more."), "circle.dashed", .neutral)
             ]
 
         case .clusteredOverhit:
@@ -383,11 +382,11 @@ struct ProgressAnalyticsView: View {
             nextMoveDetail = L10n.tr("Keep the work, but give the next week more room.")
             confirmed = [
                 progressP1Item(L10n.tr("Target cleared"), L10n.tr("The planned week is done."), "checkmark.seal.fill", .success),
-                progressP1Item(L10n.tr("Extra work logged"), L10n.format("+%d completed %@", targetDisplay.overflow, targetDisplay.overflow == 1 ? L10n.tr("session") : L10n.tr("sessions")), "plus.circle.fill", .success)
+                progressP1Item(L10n.tr("Training history"), progressP1SessionLogDetail(completedCount), "plus.circle.fill", .success)
             ]
             building = [
-                progressP1Item(L10n.tr("Spacing"), sameDayCluster ? L10n.tr("Several sessions landed on one day.") : L10n.tr("Several sessions landed close together."), "calendar.badge.exclamationmark", .warning),
-                progressP1Item(L10n.tr("Next week"), L10n.tr("Give the next week more room."), "arrow.left.and.right", .warning)
+                progressP1Item(L10n.tr("Spacing"), sameDayCluster ? L10n.tr("Sessions landed on one day.") : L10n.tr("Sessions landed close together."), "calendar.badge.exclamationmark", .warning),
+                progressP1Item(L10n.tr("Next week"), L10n.tr("Give the week more room."), "arrow.left.and.right", .warning)
             ]
             needsMore = [
                 progressP1Item(L10n.tr("Wider spacing"), L10n.tr("Repeat the target with more room."), "circle.dashed", .neutral)
@@ -408,16 +407,15 @@ struct ProgressAnalyticsView: View {
             baseNextMove = L10n.tr("Space the sessions next week.")
             nextMoveDetail = L10n.tr("Keep the work. Spread it better.")
             confirmed = [
-                progressP1Item(L10n.tr("Work done"), L10n.tr("All planned sessions are done."), "checkmark.circle.fill", .success),
-                progressP1Item(L10n.tr("Target cleared"), L10n.format("%d of %d sessions completed.", completedCount, weeklyTarget), "checkmark.seal.fill", .success)
+                progressP1Item(L10n.tr("Target cleared"), L10n.tr("The planned week is done."), "checkmark.seal.fill", .success),
+                progressP1Item(L10n.tr("Training history"), progressP1SessionLogDetail(completedCount), "checkmark.circle.fill", .success)
             ]
             building = [
-                progressP1Item(L10n.tr("Spacing"), sameDayCluster ? L10n.tr("Several sessions landed on one day.") : L10n.tr("Sessions landed close together."), "calendar.badge.exclamationmark", .warning),
-                progressP1Item(L10n.tr("Rhythm repeat"), L10n.tr("Repeat the work with more room."), "arrow.left.and.right", .warning)
+                progressP1Item(L10n.tr("Spacing"), sameDayCluster ? L10n.tr("Sessions landed on one day.") : L10n.tr("Sessions landed close together."), "calendar.badge.exclamationmark", .warning),
+                progressP1Item(L10n.tr("Next week"), L10n.tr("Give the week more room."), "arrow.left.and.right", .warning)
             ]
             needsMore = [
-                progressP1Item(L10n.tr("Wider spacing"), L10n.tr("Repeat the target with more room."), "circle.dashed", .neutral),
-                progressP1Item(L10n.tr("Spread it first"), L10n.tr("Keep the work. Spread it better."), "circle.dashed", .neutral)
+                progressP1Item(L10n.tr("Wider spacing"), L10n.tr("Repeat the target with more room."), "circle.dashed", .neutral)
             ]
 
         case .targetHit:
@@ -435,14 +433,14 @@ struct ProgressAnalyticsView: View {
             baseNextMove = L10n.tr("Repeat the week with similar spacing.")
             nextMoveDetail = L10n.tr("Keep the pattern easy to read next week.")
             confirmed = [
-                progressP1Item(L10n.tr("Work done"), L10n.tr("All planned sessions are done."), "checkmark.circle.fill", .success),
-                progressP1Item(L10n.tr("Target cleared"), L10n.format("%d of %d sessions completed.", completedCount, weeklyTarget), "checkmark.seal.fill", .success)
+                progressP1Item(L10n.tr("Target cleared"), L10n.tr("The planned week is done."), "checkmark.seal.fill", .success),
+                progressP1Item(L10n.tr("Training history"), progressP1SessionLogDetail(completedCount), "checkmark.circle.fill", .success)
             ]
             building = [
-                progressP1Item(L10n.tr("Repeatability"), L10n.tr("One clean week needs another."), "repeat.circle.fill", .warning)
+                progressP1Item(L10n.tr("Next week"), L10n.tr("Make this week easy to repeat."), "repeat.circle.fill", .warning)
             ]
             needsMore = [
-                progressP1Item(L10n.tr("Repeat first"), L10n.tr("Keep the week easy to compare before adding more."), "circle.dashed", .neutral)
+                progressP1Item(L10n.tr("Keep it readable"), L10n.tr("Repeat before adding more."), "circle.dashed", .neutral)
             ]
 
         case .weekOpen:
@@ -458,13 +456,13 @@ struct ProgressAnalyticsView: View {
             baseNextMove = L10n.tr("Set the first session of the week.")
             nextMoveDetail = L10n.tr("Use Today or Train when you are ready. Progress will update after completion.")
             confirmed = [
-                progressP1Item(L10n.tr("Training history"), L10n.format("%d completed %@ recorded.", completedTotal, completedTotal == 1 ? L10n.tr("workout") : L10n.tr("workouts")), "checkmark.circle.fill", .success)
+                progressP1Item(L10n.tr("Training history"), progressP1WorkoutLogDetail(completedTotal), "checkmark.circle.fill", .success)
             ]
             building = [
-                progressP1Item(L10n.tr("This week"), L10n.tr("The first completed session will start the path."), "calendar", .warning)
+                progressP1Item(L10n.tr("This week"), L10n.tr("First completed session starts the path."), "calendar", .warning)
             ]
             needsMore = [
-                progressP1Item(L10n.tr("Week not closed"), L10n.tr("No session completed this week yet."), "circle.dashed", .neutral)
+                progressP1Item(L10n.tr("Week not started"), L10n.tr("Finish a session to start this week."), "circle.dashed", .neutral)
             ]
 
         case .weekRunning:
@@ -480,14 +478,14 @@ struct ProgressAnalyticsView: View {
             baseNextMove = L10n.tr("Hold the next planned session.")
             nextMoveDetail = L10n.tr("No extra work required. Let the next completed session carry the path forward.")
             confirmed = [
-                progressP1Item(L10n.tr("Work done"), L10n.format("%d completed %@ this week.", completedCount, completedCount == 1 ? L10n.tr("session") : L10n.tr("sessions")), "checkmark.circle.fill", .success)
+                progressP1Item(L10n.tr("This week"), progressP1SessionLogDetail(completedCount), "checkmark.circle.fill", .success)
             ]
             building = [
-                progressP1Item(L10n.tr("Target still open"), remaining == 1 ? L10n.tr("1 session left this week.") : L10n.format("%d sessions left this week.", remaining), "target", .warning),
-                progressP1Item(L10n.tr("Spacing"), hasGoodSpacing ? L10n.tr("Current session dates are spread out.") : L10n.tr("More completed days will make spacing clearer."), "calendar.badge.clock", hasGoodSpacing ? .info : .warning)
+                progressP1Item(L10n.tr("Target"), remaining == 1 ? L10n.tr("1 session left.") : L10n.format("%d sessions left.", remaining), "target", .warning),
+                progressP1Item(L10n.tr("Spacing"), hasGoodSpacing ? L10n.tr("Sessions have room.") : L10n.tr("More completed days will show spacing."), "calendar.badge.clock", hasGoodSpacing ? .info : .warning)
             ]
             needsMore = [
-                progressP1Item(L10n.tr("Week not closed"), remaining == 1 ? L10n.tr("One more completed session closes the target.") : L10n.format("%d more completed sessions close the target.", remaining), "circle.dashed", .neutral)
+                progressP1Item(L10n.tr("Week not closed"), remaining == 1 ? L10n.tr("Finish one session to close the target.") : L10n.format("Finish %d sessions to close the target.", remaining), "circle.dashed", .neutral)
             ]
         }
 
@@ -748,11 +746,12 @@ struct ProgressAnalyticsView: View {
         VStack(alignment: .leading, spacing: 8) {
             progressP1SectionTitle(title, state: defaultState)
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 148), spacing: 8)], alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 7) {
                 ForEach(items) { item in
                     progressP1DetailCard(item)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -791,13 +790,13 @@ struct ProgressAnalyticsView: View {
                 Text(item.title)
                     .font(.system(size: 13, weight: .black, design: .rounded))
                     .foregroundStyle(.white.opacity(0.92))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(item.detail)
                     .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.58))
-                    .lineLimit(2)
+                    .lineSpacing(1)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
@@ -816,11 +815,12 @@ struct ProgressAnalyticsView: View {
         VStack(alignment: .leading, spacing: 8) {
             progressP1SectionTitle(L10n.tr("Recent Work"), state: .info)
 
-            VStack(spacing: 7) {
+            VStack(alignment: .leading, spacing: 7) {
                 ForEach(items) { item in
                     progressP1RecentWorkRow(item)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -843,13 +843,14 @@ struct ProgressAnalyticsView: View {
                 Text(item.detail)
                     .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.58))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.70)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Spacer(minLength: 0)
         }
         .padding(9)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(red: 0.047, green: 0.050, blue: 0.058), in: .rect(cornerRadius: 13))
         .overlay(
             RoundedRectangle(cornerRadius: 13, style: .continuous)
@@ -861,23 +862,22 @@ struct ProgressAnalyticsView: View {
         VStack(alignment: .leading, spacing: 8) {
             progressP1SectionTitle(L10n.tr("Next Move"), state: snapshot.nextMoveState)
 
-            HStack(alignment: .top, spacing: 10) {
+            HStack(alignment: .top, spacing: 9) {
                 Image(systemName: snapshot.nextMoveState == .danger ? "exclamationmark.circle.fill" : "arrow.right.circle.fill")
-                    .font(.system(size: 17, weight: .black))
+                    .font(.system(size: 13, weight: .black))
                     .foregroundStyle(progressP1Tint(for: snapshot.nextMoveState))
-                    .frame(width: 44, height: 44)
-                    .background(progressP1Tint(for: snapshot.nextMoveState).opacity(0.13), in: .rect(cornerRadius: 12))
+                    .frame(width: 30, height: 30)
+                    .background(progressP1Tint(for: snapshot.nextMoveState).opacity(0.11), in: .rect(cornerRadius: 9))
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(snapshot.nextMove)
-                        .font(.system(size: 16, weight: .black, design: .rounded))
+                    Text(progressP1LowerNextMoveSummary(snapshot))
+                        .font(.system(size: 13, weight: .black, design: .rounded))
                         .foregroundStyle(.white.opacity(0.94))
                         .lineLimit(2)
-                        .minimumScaleFactor(0.76)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Text(snapshot.nextMoveDetail)
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                    Text(progressP1LowerNextMoveReason(snapshot))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.58))
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
@@ -885,12 +885,54 @@ struct ProgressAnalyticsView: View {
 
                 Spacer(minLength: 0)
             }
-            .padding(10)
-            .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 15))
+            .padding(9)
+            .background(Color.white.opacity(0.045), in: .rect(cornerRadius: 13))
             .overlay(
-                RoundedRectangle(cornerRadius: 15, style: .continuous)
-                    .strokeBorder(progressP1Tint(for: snapshot.nextMoveState).opacity(0.2), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                    .strokeBorder(progressP1Tint(for: snapshot.nextMoveState).opacity(0.14), lineWidth: 1)
             )
+        }
+    }
+
+    private func progressP1LowerNextMoveSummary(_ snapshot: ProgressP1Snapshot) -> String {
+        if snapshot.hasRecoveryModifier {
+            return L10n.tr("Control today first.")
+        }
+
+        switch snapshot.family {
+        case .lowData:
+            return L10n.tr("One clean log starts the path.")
+        case .bestSet:
+            return L10n.tr("Repeat before adding more.")
+        case .clusteredOverhit, .targetHitTight:
+            return L10n.tr("Keep the work. Space it better.")
+        case .targetHit:
+            return L10n.tr("Make the week repeatable.")
+        case .weekOpen:
+            return L10n.tr("Start the week clean.")
+        case .weekRunning:
+            return L10n.tr("Stay on the planned next session.")
+        }
+    }
+
+    private func progressP1LowerNextMoveReason(_ snapshot: ProgressP1Snapshot) -> String {
+        if snapshot.hasRecoveryModifier {
+            return L10n.tr("Use Today or Train as usual and keep it clean.")
+        }
+
+        switch snapshot.family {
+        case .lowData:
+            return L10n.tr("Use Today or Train when ready.")
+        case .bestSet:
+            return L10n.tr("The next clean set confirms it.")
+        case .clusteredOverhit, .targetHitTight:
+            return L10n.tr("Give next week more room.")
+        case .targetHit:
+            return L10n.tr("Hold the pattern before adding more.")
+        case .weekOpen:
+            return L10n.tr("Finish one session to start this week.")
+        case .weekRunning:
+            return L10n.tr("No extra work needed.")
         }
     }
 
@@ -1142,6 +1184,14 @@ struct ProgressAnalyticsView: View {
         }
     }
 
+    private func progressP1SessionLogDetail(_ count: Int) -> String {
+        count == 1 ? L10n.tr("1 session logged.") : L10n.format("%d sessions logged.", count)
+    }
+
+    private func progressP1WorkoutLogDetail(_ count: Int) -> String {
+        count == 1 ? L10n.tr("1 workout logged.") : L10n.format("%d workouts logged.", count)
+    }
+
     private func progressP1Item(_ title: String, _ detail: String, _ icon: String, _ state: STRQPalette.State) -> ProgressP1DetailItem {
         ProgressP1DetailItem(id: "\(title)-\(detail)-\(icon)", title: title, detail: detail, icon: icon, state: state)
     }
@@ -1181,9 +1231,9 @@ struct ProgressAnalyticsView: View {
                     ? L10n.format("%@ · %d sessions", uniqueWorkoutNames[0], sessions.count)
                     : L10n.format("%d sessions logged", sessions.count)
             } else if workoutName == L10n.tr("Done") {
-                detail = L10n.tr("Workout completed.")
+                detail = L10n.tr("Workout logged")
             } else {
-                detail = L10n.format("%@ completed.", workoutName)
+                detail = L10n.format("%@ logged", workoutName)
             }
 
             return (
@@ -1204,14 +1254,14 @@ struct ProgressAnalyticsView: View {
             let bestRow = ProgressP1RecentWork(
                 id: "best-\(bestSet.sessionId)",
                 title: bestSet.date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()),
-                detail: L10n.format("%@ %@.", bestSet.liftName, bestSet.value),
+                detail: L10n.format("%@ · %@", bestSet.liftName, bestSet.value),
                 icon: "star.circle.fill",
                 state: .gold
             )
-            return [bestRow] + Array(groupedRows.prefix(3))
+            return [bestRow] + Array(groupedRows.prefix(2))
         }
 
-        return Array(groupedRows.prefix(4))
+        return Array(groupedRows.prefix(3))
     }
 
     // MARK: - Headline Hero
