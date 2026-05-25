@@ -167,7 +167,7 @@ struct STRQPaywallView: View {
     private var heroSection: some View {
         VStack(spacing: 18) {
             VStack(spacing: 7) {
-                Text(L10n.tr("STRQ PRO PREVIEW"))
+                Text(proHeroEyebrow)
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.8)
                     .foregroundStyle(proAccentInk)
@@ -211,7 +211,7 @@ struct STRQPaywallView: View {
                         .foregroundStyle(.white)
                 }
                 Spacer()
-                Text(L10n.tr("Preview"))
+                Text(trainingMapBadgeTitle)
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(proAccentInk)
                     .padding(.horizontal, 9)
@@ -283,6 +283,22 @@ struct STRQPaywallView: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
         )
+    }
+
+    private var proHeroEyebrow: String {
+        #if DEBUG
+        return L10n.tr("STRQ PRO PREVIEW")
+        #else
+        return L10n.tr("proPreview.eyebrow.release", fallback: "STRQ PRO")
+        #endif
+    }
+
+    private var trainingMapBadgeTitle: String {
+        #if DEBUG
+        return L10n.tr("proPreview.trainingMapBadge.debug", fallback: "Debug preview")
+        #else
+        return L10n.tr("Pro")
+        #endif
     }
 
     private func evidenceLine(icon: String, title: String, detail: String) -> some View {
@@ -762,7 +778,7 @@ struct STRQPaywallView: View {
             VStack(spacing: 3) {
                 Text(purchaseButtonTitle)
                     .font(.body.weight(.bold))
-                Text(L10n.tr("Package preview only"))
+                Text(purchaseButtonSubtitle)
                     .font(.caption2.weight(.semibold))
             }
             .foregroundStyle(Color.white.opacity(0.72))
@@ -779,7 +795,19 @@ struct STRQPaywallView: View {
     }
 
     private var purchaseButtonTitle: String {
-        L10n.tr("Purchases not enabled in this build")
+        #if DEBUG
+        return L10n.tr("proPreview.purchaseDisabled.debug", fallback: "Debug build: purchases disabled")
+        #else
+        return L10n.tr("proPreview.purchaseUnavailable.title", fallback: "STRQ Pro is not available right now.")
+        #endif
+    }
+
+    private var purchaseButtonSubtitle: String {
+        #if DEBUG
+        return L10n.tr("proPreview.purchaseDisabled.subtitle.debug", fallback: "Debug package preview")
+        #else
+        return L10n.tr("proPreview.purchaseUnavailable.subtitle", fallback: "Please try again later.")
+        #endif
     }
 
     private var trustRow: some View {
@@ -929,7 +957,11 @@ struct STRQPaywallView: View {
 
                 Spacer().frame(height: 22)
 
-                previewBanner
+                #if DEBUG
+                debugPreviewBanner
+                #else
+                unavailableBanner
+                #endif
 
                 Spacer().frame(height: 22)
 
@@ -945,11 +977,17 @@ struct STRQPaywallView: View {
 
                 Spacer().frame(height: 22)
 
-                disabledCTA
+                #if DEBUG
+                disabledDebugCTA
+                #else
+                unavailableCTA
+                #endif
 
                 Spacer().frame(height: 10)
 
+                #if DEBUG
                 previewTrustRow
+                #endif
 
                 Spacer().frame(height: 12)
 
@@ -957,7 +995,11 @@ struct STRQPaywallView: View {
 
                 Spacer().frame(height: 10)
 
-                previewFooterText
+                #if DEBUG
+                debugPreviewFooterText
+                #else
+                unavailableFooterText
+                #endif
 
                 Spacer().frame(height: 28)
             }
@@ -966,23 +1008,54 @@ struct STRQPaywallView: View {
         .scrollIndicators(.hidden)
     }
 
-    private var previewBanner: some View {
+    private var debugPreviewBanner: some View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: "eye.fill")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(proAccentInk)
-                Text(L10n.tr("PREVIEW ONLY"))
+                Text(L10n.tr("proPreview.debugBanner.eyebrow", fallback: "DEBUG PREVIEW"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.4)
                     .foregroundStyle(proAccentInk)
             }
-            Text(L10n.tr("No purchase is available in this build."))
+            Text(L10n.tr("proPreview.debugBanner.title", fallback: "Debug build: purchase flow is disabled."))
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
             Text(L10n.tr("This screen previews the kind of depth STRQ Pro may add after a user has seen value."))
+                .font(.caption)
+                .foregroundStyle(Color.white.opacity(0.62))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(16)
+        .background(previewSurface, in: .rect(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .strokeBorder(previewBorder, lineWidth: 1)
+        )
+    }
+
+    private var unavailableBanner: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "clock.fill")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(proAccentInk)
+                Text(L10n.tr("proPreview.unavailable.eyebrow", fallback: "STRQ PRO"))
+                    .font(.system(size: 10, weight: .black))
+                    .tracking(1.4)
+                    .foregroundStyle(proAccentInk)
+            }
+            Text(L10n.tr("proPreview.purchaseUnavailable.title", fallback: "STRQ Pro is not available right now."))
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(L10n.tr("proPreview.purchaseUnavailable.subtitle", fallback: "Please try again later."))
                 .font(.caption)
                 .foregroundStyle(Color.white.opacity(0.62))
                 .multilineTextAlignment(.center)
@@ -1045,12 +1118,12 @@ struct STRQPaywallView: View {
         }
     }
 
-    private var disabledCTA: some View {
+    private var disabledDebugCTA: some View {
         VStack(spacing: 6) {
             HStack(spacing: 8) {
                 Image(systemName: "eye.fill")
                     .font(.system(size: 12, weight: .bold))
-                Text(L10n.tr("Preview only"))
+                Text(L10n.tr("proPreview.disabledCTA.debug", fallback: "Debug preview"))
                     .font(.body.weight(.bold))
             }
             .foregroundStyle(Color.white.opacity(0.72))
@@ -1061,7 +1134,30 @@ struct STRQPaywallView: View {
                 RoundedRectangle(cornerRadius: 14)
                     .strokeBorder(previewBorder, lineWidth: 1)
             )
-            Text(L10n.tr("Purchases stay disabled until a separate purchase implementation is approved."))
+            Text(L10n.tr("proPreview.disabledCTA.detail.debug", fallback: "Purchases stay disabled in this debug slice."))
+                .font(.caption2)
+                .foregroundStyle(Color.white.opacity(0.46))
+                .multilineTextAlignment(.center)
+        }
+    }
+
+    private var unavailableCTA: some View {
+        VStack(spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: "clock.fill")
+                    .font(.system(size: 12, weight: .bold))
+                Text(L10n.tr("proPreview.unavailableCTA", fallback: "Try again later"))
+                    .font(.body.weight(.bold))
+            }
+            .foregroundStyle(Color.white.opacity(0.72))
+            .frame(maxWidth: .infinity)
+            .frame(height: 54)
+            .background(Color.white.opacity(0.055), in: .rect(cornerRadius: 14))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(previewBorder, lineWidth: 1)
+            )
+            Text(L10n.tr("proPreview.purchaseUnavailable.subtitle", fallback: "Please try again later."))
                 .font(.caption2)
                 .foregroundStyle(Color.white.opacity(0.46))
                 .multilineTextAlignment(.center)
@@ -1087,9 +1183,26 @@ struct STRQPaywallView: View {
         .foregroundStyle(Color.white.opacity(0.46))
     }
 
-    private var previewFooterText: some View {
+    private var debugPreviewFooterText: some View {
         VStack(spacing: 8) {
-            Text(L10n.tr("Restore remains available from Profile and this preview. Pricing and Apple billing details are not shown because purchases are not active in this build."))
+            Text(L10n.tr("proPreview.footer.debug", fallback: "Restore remains available from Profile. Pricing and Apple billing details may be hidden while debug purchases are inactive."))
+                .font(.system(size: 9))
+                .foregroundStyle(Color.white.opacity(0.34))
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: 16) {
+                Link(L10n.tr("Terms"), destination: STRQLinks.terms)
+                Text("·").foregroundStyle(.quaternary)
+                Link(L10n.tr("Privacy"), destination: STRQLinks.privacy)
+            }
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(.secondary)
+        }
+    }
+
+    private var unavailableFooterText: some View {
+        VStack(spacing: 8) {
+            Text(L10n.tr("proPreview.unavailableFooter", fallback: "Restore remains available from Profile."))
                 .font(.system(size: 9))
                 .foregroundStyle(Color.white.opacity(0.34))
                 .multilineTextAlignment(.center)
@@ -1118,7 +1231,7 @@ struct STRQPaywallView: View {
             Spacer().frame(height: 28)
 
             VStack(spacing: 14) {
-                Text(L10n.tr("STRQ Pro Preview is not connected to products in this build."))
+                Text(L10n.tr("proPreview.purchaseUnavailable.title", fallback: "STRQ Pro is not available right now."))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -1126,7 +1239,7 @@ struct STRQPaywallView: View {
                 Button {
                     Task { await store.fetchOfferings() }
                 } label: {
-                    Text(L10n.tr("Refresh Preview"))
+                    Text(L10n.tr("proPreview.refresh", fallback: "Try Again"))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 28)

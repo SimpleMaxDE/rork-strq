@@ -15,7 +15,9 @@ struct ProfileView: View {
     @State private var showCloudRestoreConfirm: Bool = false
     @State private var cloudRestoreMessage: String?
     @State private var showCloudRestoreMessage: Bool = false
+    #if DEBUG
     @State private var showMediaDiagnostics: Bool = false
+    #endif
     @State private var showPlanRegenerationDialog: Bool = false
 
     var body: some View {
@@ -66,9 +68,11 @@ struct ProfileView: View {
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $showMediaDiagnostics) {
-            NavigationStack { MediaDiagnosticsView() }
-        }
+        #if DEBUG
+            .sheet(isPresented: $showMediaDiagnostics) {
+                NavigationStack { MediaDiagnosticsView() }
+            }
+        #endif
         .planRegenerationFlow(vm: vm, isPresented: $showPlanRegenerationDialog) {
             vm.requestTodayTab()
         }
@@ -884,7 +888,7 @@ struct ProfileView: View {
                 }
                 .accessibilityIdentifier("strq.profile.restore-purchases")
                 controlsListButtonRow(
-                    L10n.tr("profile.regeneratePlan", fallback: "Regenerate Plan"),
+                    L10n.tr("profile.rebuildTrainingPlan", fallback: "Rebuild Training Plan"),
                     icon: .repeatAction,
                     showsDivider: controlsSectionShowsDesignSystemLab
                 ) {
@@ -928,16 +932,27 @@ struct ProfileView: View {
         VStack(spacing: 10) {
             legalLinks
 
-            Text(appVersionString)
-                .font(.caption2)
-                .foregroundStyle(.quaternary)
-                .frame(maxWidth: .infinity)
-                .contentShape(Rectangle())
-                .onLongPressGesture(minimumDuration: 1.2) {
-                    showMediaDiagnostics = true
-                }
+            appVersionFooter
         }
         .padding(.top, 2)
+    }
+
+    private var appVersionFooter: some View {
+        #if DEBUG
+        return Text(appVersionString)
+            .font(.caption2)
+            .foregroundStyle(.quaternary)
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+            .onLongPressGesture(minimumDuration: 1.2) {
+                showMediaDiagnostics = true
+            }
+        #else
+        return Text(appVersionString)
+            .font(.caption2)
+            .foregroundStyle(.quaternary)
+            .frame(maxWidth: .infinity)
+        #endif
     }
 
     private var legalLinks: some View {
@@ -955,7 +970,7 @@ struct ProfileView: View {
 
     private var dangerSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            STRQSectionHeader(L10n.tr("Danger Zone"))
+            STRQSectionHeader(L10n.tr("profile.dataReset", fallback: "Data & Reset"))
                 .textCase(.uppercase)
 
             VStack(spacing: 0) {
