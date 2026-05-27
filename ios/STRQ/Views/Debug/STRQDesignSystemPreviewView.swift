@@ -2,12 +2,16 @@ import SwiftUI
 
 #if DEBUG
 struct STRQDesignSystemPreviewView: View {
+    @State private var showProfileV4SignatureExploration = false
     @State private var showActiveWorkoutLoggerPrototype = false
     @State private var showProgressTrainingMapPrototype = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: STRQSpacing.sectionGap) {
+                ProfileV4SignatureExplorationSection {
+                    showProfileV4SignatureExploration = true
+                }
                 ProgressTrainingMapPrototypeSection {
                     showProgressTrainingMapPrototype = true
                 }
@@ -34,6 +38,9 @@ struct STRQDesignSystemPreviewView: View {
         }
         .background(STRQColors.background.ignoresSafeArea())
         .preferredColorScheme(.dark)
+        .fullScreenCover(isPresented: $showProfileV4SignatureExploration) {
+            ProfileV4SignatureExplorationView(isFullscreen: true)
+        }
         .fullScreenCover(isPresented: $showActiveWorkoutLoggerPrototype) {
             ActiveWorkoutLoggerPrototypeView(isFullscreen: true)
         }
@@ -666,6 +673,62 @@ private struct ProgressV2PrototypeSection: View {
                     RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
                         .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
                 )
+        }
+    }
+}
+
+private struct ProfileV4SignatureExplorationSection: View {
+    let onOpen: () -> Void
+
+    var body: some View {
+        PreviewSection("Profile V4.1 Compact") {
+            VStack(alignment: .leading, spacing: STRQSpacing.md) {
+                HStack(alignment: .top, spacing: STRQSpacing.md) {
+                    STRQIconView(.profile, size: STRQSpacing.iconLG, tint: STRQColors.primaryAccent)
+                        .frame(width: 52, height: 52)
+                        .background(STRQColors.primaryAccent.opacity(0.12), in: .rect(cornerRadius: STRQRadii.largeCard))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
+                                .strokeBorder(STRQColors.primaryAccent.opacity(0.20), lineWidth: 1)
+                        )
+
+                    VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                        Text("Profile V4.1 Compact")
+                            .font(STRQTypography.cardTitle)
+                            .foregroundStyle(STRQColors.primaryText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+
+                        Text("Approved Profile direction for review with athlete identity, setup controls, and calm account data.")
+                            .font(STRQTypography.caption)
+                            .foregroundStyle(STRQColors.secondaryText)
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                Button(action: onOpen) {
+                    HStack(spacing: STRQSpacing.sm) {
+                        STRQIconView(.arrowRight, size: STRQSpacing.iconSM, tint: STRQColors.actionText)
+                        Text("Open Profile V4.1")
+                            .font(STRQTypography.button)
+                            .foregroundStyle(STRQColors.actionText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(STRQColors.primaryAccent, in: .rect(cornerRadius: STRQRadii.button))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("strq.design-lab.open-profile-v4-signature-exploration")
+            }
+            .padding(STRQSpacing.md)
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.largeCard))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.largeCard, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
         }
     }
 }
