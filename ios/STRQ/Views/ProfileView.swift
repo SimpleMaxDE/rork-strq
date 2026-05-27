@@ -23,12 +23,12 @@ struct ProfileView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                profileHeader
-                subscriptionSection
-                fitnessIdentity
+                profileFirstViewport
+                trainingSetup
                 coachingStyleRow
                 bodyNutrition
-                trainingSetup
+                fitnessIdentity
+                subscriptionSection
                 controlsSection
                 accountSection
                 dangerSection
@@ -515,6 +515,317 @@ struct ProfileView: View {
 
     // MARK: - Header
 
+    private var profileFirstViewport: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            athletePassportHero
+            profileOverviewRows
+        }
+        .padding(.top, 4)
+        .accessibilityIdentifier("strq.profile.v4.first-viewport")
+    }
+
+    private var athletePassportHero: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 12) {
+                profileInitialsBadge
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(profileDisplayName)
+                        .font(STRQTypography.caption)
+                        .foregroundStyle(STRQColors.secondaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.76)
+
+                    Text(vm.profile.goal.displayName)
+                        .font(.system(size: 31, weight: .black, design: .rounded))
+                        .foregroundStyle(STRQColors.primaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.70)
+
+                    Text(profilePassportSecondaryRead)
+                        .font(STRQTypography.labelLarge)
+                        .foregroundStyle(STRQColors.primaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.70)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            if let supportingRead = profilePassportSupportingRead {
+                profileInlineFactRow(supportingRead)
+            }
+        }
+        .padding(16)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(red: 0.118, green: 0.116, blue: 0.102),
+                    Color(red: 0.070, green: 0.073, blue: 0.071)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 22, style: .continuous)
+        )
+        .overlay(alignment: .topLeading) {
+            Capsule()
+                .fill(STRQBrand.steel.opacity(0.62))
+                .frame(width: 86, height: 2)
+                .padding(.leading, 27)
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.145), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.18), radius: 18, y: 10)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("strq.profile.v4.passport")
+    }
+
+    private var profileInitialsBadge: some View {
+        ZStack {
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            STRQColors.white.opacity(0.16),
+                            STRQColors.white.opacity(0.05)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+
+            Circle()
+                .strokeBorder(Color.white.opacity(0.145), lineWidth: 1)
+
+            Text(profileInitials)
+                .font(.system(size: 15, weight: .black, design: .rounded))
+                .foregroundStyle(STRQColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .frame(width: 48, height: 48)
+        .accessibilityHidden(true)
+    }
+
+    private func profileInlineFactRow(_ text: String) -> some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(STRQBrand.steel.opacity(0.74))
+                .frame(width: 6, height: 6)
+
+            Text(text)
+                .font(.system(size: 13, weight: .bold, design: .rounded))
+                .foregroundStyle(STRQColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.70)
+        }
+        .padding(.horizontal, 10)
+        .frame(height: 30)
+        .background(STRQColors.white.opacity(0.060), in: Capsule())
+        .overlay(Capsule().strokeBorder(STRQColors.white.opacity(0.10), lineWidth: 1))
+    }
+
+    private var profileOverviewRows: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(profileOverviewRowData.enumerated()), id: \.element.id) { index, row in
+                profileOverviewRow(row)
+
+                if index < profileOverviewRowData.count - 1 {
+                    Rectangle()
+                        .fill(STRQColors.white.opacity(0.075))
+                        .frame(height: 1 / UIScreen.main.scale)
+                        .padding(.leading, 54)
+                }
+            }
+        }
+        .padding(.vertical, 5)
+        .background(STRQColors.cardSurface, in: .rect(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+        )
+        .accessibilityIdentifier("strq.profile.v4.rows")
+    }
+
+    private func profileOverviewRow(_ row: ProfileOverviewRowData) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: row.icon)
+                .font(.system(size: 15, weight: .bold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(STRQColors.primaryText)
+                .frame(width: 34, height: 34)
+                .background(STRQColors.white.opacity(0.07), in: Circle())
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(row.title)
+                    .font(STRQTypography.labelLarge)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.74)
+
+                Text(row.detail)
+                    .font(STRQTypography.caption)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.68)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 12)
+        .frame(minHeight: 58)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var profileOverviewRowData: [ProfileOverviewRowData] {
+        [
+            ProfileOverviewRowData(
+                id: "training",
+                icon: "figure.strengthtraining.traditional",
+                title: L10n.tr("profile.v4.trainingSetup", fallback: "Training Setup"),
+                detail: trainingSetupOverviewDetail
+            ),
+            ProfileOverviewRowData(
+                id: "coach",
+                icon: "slider.horizontal.3",
+                title: L10n.tr("profile.v4.coachInputs", fallback: "Coach & Inputs"),
+                detail: coachInputsOverviewDetail
+            ),
+            ProfileOverviewRowData(
+                id: "account",
+                icon: "person.crop.circle",
+                title: L10n.tr("profile.v4.accountData", fallback: "Account & Data"),
+                detail: accountDataOverviewDetail
+            )
+        ]
+    }
+
+    private var profileDisplayName: String {
+        let trimmed = vm.profile.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? L10n.tr("profile.v4.athleteFallback", fallback: "Athlete") : trimmed
+    }
+
+    private var profileInitials: String {
+        let trimmed = vm.profile.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let source = trimmed.isEmpty ? L10n.tr("profile.v4.athleteFallback", fallback: "Athlete") : trimmed
+        let parts = source.split { character in
+            character.isWhitespace || character == "-" || character == "_"
+        }
+        let initials = parts.prefix(2).compactMap(\.first).map { String($0) }.joined()
+        if !initials.isEmpty {
+            return initials.uppercased()
+        }
+        return String(source.prefix(2)).uppercased()
+    }
+
+    private var profilePassportSecondaryRead: String {
+        [
+            vm.profile.trainingLevel.shortName,
+            profileDaysPerWeekText,
+            vm.profile.trainingLocation.displayName
+        ].joined(separator: " · ")
+    }
+
+    private var profilePassportSupportingRead: String? {
+        var reads: [String] = []
+        if let split = profileSplitRead {
+            reads.append(split)
+        }
+        if let focus = profileFocusRead {
+            reads.append(focus)
+        }
+        return reads.isEmpty ? nil : reads.joined(separator: " · ")
+    }
+
+    private var trainingSetupOverviewDetail: String {
+        var reads = [
+            profileDaysPerWeekText,
+            vm.profile.trainingLocation.displayName
+        ]
+        if let split = profileSplitRead {
+            reads.append(split)
+        }
+        return reads.joined(separator: " · ")
+    }
+
+    private var coachInputsOverviewDetail: String {
+        let coachTone = L10n.format(
+            "profile.v4.coachTone",
+            fallback: "%@ coach",
+            vm.profile.coachingPreferences.tone.displayName
+        )
+        let nutrition = vm.profile.nutritionTrackingEnabled
+            ? L10n.tr("profile.v4.nutritionOn", fallback: "Nutrition on")
+            : L10n.tr("profile.v4.nutritionOff", fallback: "Nutrition off")
+        return [coachTone, nutrition].joined(separator: " · ")
+    }
+
+    private var accountDataOverviewDetail: String {
+        let proState = store.isPro
+            ? L10n.tr("profile.v4.pro", fallback: "Pro")
+            : L10n.tr("profile.v4.free", fallback: "Free")
+        let accountState = vm.account.isSignedIn
+            ? L10n.tr("profile.v4.signedIn", fallback: "Signed in")
+            : L10n.tr("profile.v4.notSignedIn", fallback: "Not signed in")
+        return [proState, accountState].joined(separator: " · ")
+    }
+
+    private var profileDaysPerWeekText: String {
+        if vm.profile.daysPerWeek == 1 {
+            return L10n.tr("profile.v4.oneDayPerWeek", fallback: "1 day/week")
+        }
+        return L10n.format("profile.v4.daysPerWeek", fallback: "%d days/week", vm.profile.daysPerWeek)
+    }
+
+    private var profileSplitRead: String? {
+        if let planSplit = vm.currentPlan?.splitType.trimmingCharacters(in: .whitespacesAndNewlines),
+           !planSplit.isEmpty {
+            let displayName = normalizeSplitDisplayName(SplitDisplayName.localizedDisplayName(for: planSplit))
+            if isReadableSplit(displayName) {
+                return displayName
+            }
+        }
+
+        guard vm.profile.splitPreference != .automatic else {
+            return nil
+        }
+        let displayName = normalizeSplitDisplayName(vm.profile.splitPreference.displayName)
+        return isReadableSplit(displayName) ? displayName : nil
+    }
+
+    private var profileFocusRead: String? {
+        let names = vm.profile.focusMuscles
+            .prefix(3)
+            .map(\.localizedDisplayName)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        return names.isEmpty ? nil : names.joined(separator: ", ")
+    }
+
+    private func normalizeSplitDisplayName(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: "/", with: " / ")
+            .split(separator: " ")
+            .joined(separator: " ")
+    }
+
+    private func isReadableSplit(_ value: String) -> Bool {
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return !normalized.isEmpty
+            && normalized != "automatic"
+            && !normalized.contains("let ai decide")
+    }
+
+    private struct ProfileOverviewRowData {
+        let id: String
+        let icon: String
+        let title: String
+        let detail: String
+    }
+
     private var profileHeader: some View {
         HStack(spacing: 14) {
             ZStack {
@@ -556,7 +867,7 @@ struct ProfileView: View {
         .accessibilityIdentifier("strq.profile.header")
     }
 
-    // MARK: - Fitness Identity
+    // MARK: - Body & Recovery
 
     private var fitnessIdentity: some View {
         VStack(alignment: .leading, spacing: STRQSpacing.sm) {
@@ -573,13 +884,13 @@ struct ProfileView: View {
                     )
 
                 VStack(alignment: .leading, spacing: STRQSpacing.px50) {
-                    Text(vm.profile.goal.displayName)
+                    Text(L10n.tr("profile.bodyRecovery", fallback: "Body & Recovery"))
                         .font(STRQTypography.labelLarge)
                         .foregroundStyle(STRQColors.primaryText)
                         .lineLimit(1)
                         .minimumScaleFactor(0.82)
                     if !vm.isEarlyStage {
-                        Text(goalDescription)
+                        Text(bodyRecoverySummary)
                             .font(STRQTypography.captionRegular)
                             .foregroundStyle(STRQColors.secondaryText)
                             .lineLimit(2)
@@ -670,7 +981,6 @@ struct ProfileView: View {
     private var trainingSetup: some View {
         VStack(alignment: .leading, spacing: 10) {
             STRQSectionHeader(L10n.tr("Training Setup"))
-                .textCase(.uppercase)
 
             VStack(spacing: 0) {
                 trainingSetupInfoRow(L10n.tr("Days / Week"), value: "\(vm.profile.daysPerWeek)")
@@ -708,7 +1018,6 @@ struct ProfileView: View {
     private var bodyNutrition: some View {
         VStack(alignment: .leading, spacing: 10) {
             STRQSectionHeader(L10n.tr("Body & Nutrition"))
-                .textCase(.uppercase)
 
             trackingToggleCard
 
@@ -866,7 +1175,6 @@ struct ProfileView: View {
     private var controlsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             STRQSectionHeader(L10n.tr("Notifications & Tools"))
-                .textCase(.uppercase)
 
             VStack(spacing: 0) {
                 NavigationLink {
@@ -971,7 +1279,6 @@ struct ProfileView: View {
     private var dangerSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             STRQSectionHeader(L10n.tr("profile.dataReset", fallback: "Data & Reset"))
-                .textCase(.uppercase)
 
             VStack(spacing: 0) {
                 controlRow(L10n.tr("Reset All Data"), icon: "trash.fill", color: .red) {
@@ -1246,5 +1553,12 @@ struct ProfileView: View {
         case .athleticPerformance: L10n.tr("Sport-specific training for peak performance")
         case .rehabilitation: L10n.tr("Safe, progressive training for recovery")
         }
+    }
+
+    private var bodyRecoverySummary: String {
+        if vm.profile.nutritionTrackingEnabled {
+            return L10n.tr("profile.bodyRecovery.summaryWithNutrition", fallback: "Recovery, sleep, and nutrition signals.")
+        }
+        return L10n.tr("profile.bodyRecovery.summary", fallback: "Recovery, sleep, and training streak.")
     }
 }
