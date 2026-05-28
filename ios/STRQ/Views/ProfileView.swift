@@ -733,6 +733,14 @@ struct ProfileView: View {
         return isReadableSplit(displayName) ? displayName : nil
     }
 
+    private var trainingSetupSplitValue: String {
+        let displayName = normalizeSplitDisplayName(vm.profile.splitPreference.displayName)
+        if vm.profile.splitPreference == .automatic || isAutomaticSplitDisplayName(displayName) {
+            return L10n.tr("profile.trainingSetup.autoSplit", fallback: "Auto split")
+        }
+        return displayName
+    }
+
     private var profileFocusRead: String? {
         let names = vm.profile.focusMuscles
             .prefix(3)
@@ -754,6 +762,13 @@ struct ProfileView: View {
         return !normalized.isEmpty
             && normalized != "automatic"
             && !normalized.contains("let ai decide")
+    }
+
+    private func isAutomaticSplitDisplayName(_ value: String) -> Bool {
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return normalized == "automatic"
+            || normalized.contains("let ai decide")
+            || normalized.contains("ai decide")
     }
 
     private struct ProfileOverviewRowData {
@@ -1132,7 +1147,7 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 trainingSetupInfoRow(L10n.tr("Days / Week"), value: "\(vm.profile.daysPerWeek)")
                 trainingSetupInfoRow(L10n.tr("Workout Length"), value: L10n.format("%d min", vm.profile.minutesPerSession))
-                trainingSetupInfoRow(L10n.tr("profile.trainingSetup.split", fallback: "Split"), value: vm.profile.splitPreference.displayName)
+                trainingSetupInfoRow(L10n.tr("profile.trainingSetup.split", fallback: "Split"), value: trainingSetupSplitValue)
                 trainingSetupInfoRow(L10n.tr("Location"), value: vm.profile.trainingLocation.displayName, showsDivider: false)
             }
             .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
