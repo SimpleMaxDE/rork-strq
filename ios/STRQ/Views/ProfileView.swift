@@ -907,7 +907,7 @@ struct ProfileView: View {
             HStack(spacing: STRQSpacing.xs) {
                 statusChip(
                     icon: "heart.fill",
-                    value: "\(vm.effectiveRecoveryScore)%",
+                    value: profileRecoveryStateLabel,
                     label: L10n.tr("Recovery"),
                     color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore)
                 )
@@ -917,22 +917,18 @@ struct ProfileView: View {
                     label: L10n.tr("Sleep"),
                     color: ForgeTheme.sleepColor(for: vm.averageSleepHours)
                 )
-                if vm.profile.nutritionTrackingEnabled {
-                    statusChip(
-                        icon: "fork.knife",
-                        value: "\(Int(vm.weeklyNutritionAdherence * 100))%",
-                        label: L10n.tr("Nutrition"),
-                        color: vm.weeklyNutritionAdherence >= 0.8 ? STRQPalette.success : STRQBrand.steel
-                    )
-                } else {
-                    statusChip(
-                        icon: "flame.fill",
-                        value: "\(vm.streak)",
-                        label: L10n.tr("Streak"),
-                        color: STRQBrand.steel
-                    )
-                }
+                statusChip(
+                    icon: "fork.knife",
+                    value: profileNutritionStateLabel,
+                    label: L10n.tr("Nutrition"),
+                    color: vm.weeklyNutritionAdherence >= 0.8 ? STRQPalette.success : STRQBrand.steel
+                )
             }
+
+            bodyNutritionActionButton(title: L10n.tr("Sleep Log"), systemIcon: "moon.zzz.fill") {
+                showSleepLog = true
+            }
+            .accessibilityIdentifier("strq.profile.sleep-log")
         }
         .padding(STRQSpacing.cardPaddingCompact)
         .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
@@ -1038,18 +1034,13 @@ struct ProfileView: View {
                     .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
             )
 
-            HStack(spacing: 10) {
-                if vm.profile.nutritionTrackingEnabled {
+            if vm.profile.nutritionTrackingEnabled {
+                HStack(spacing: 10) {
                     bodyNutritionActionButton(title: L10n.tr("Edit Targets"), systemIcon: "slider.horizontal.3") {
                         showNutritionSettings = true
                     }
                     .accessibilityIdentifier("strq.profile.nutrition-settings")
                 }
-
-                bodyNutritionActionButton(title: L10n.tr("Sleep Log"), systemIcon: "moon.zzz.fill") {
-                    showSleepLog = true
-                }
-                .accessibilityIdentifier("strq.profile.sleep-log")
             }
         }
         .accessibilityIdentifier("strq.profile.body-nutrition")
@@ -1559,6 +1550,35 @@ struct ProfileView: View {
         if vm.profile.nutritionTrackingEnabled {
             return L10n.tr("profile.bodyRecovery.summaryWithNutrition", fallback: "Recovery, sleep, and nutrition signals.")
         }
-        return L10n.tr("profile.bodyRecovery.summary", fallback: "Recovery, sleep, and training streak.")
+        return L10n.tr("profile.bodyRecovery.summary", fallback: "Recovery, sleep, and nutrition status.")
+    }
+
+    private var profileRecoveryStateLabel: String {
+        switch vm.effectiveRecoveryScore {
+        case 85...:
+            return L10n.tr("profile.bodyRecovery.state.ready", fallback: "Ready")
+        case 70..<85:
+            return L10n.tr("profile.bodyRecovery.state.steady", fallback: "Steady")
+        case 55..<70:
+            return L10n.tr("profile.bodyRecovery.state.light", fallback: "Light")
+        case 40..<55:
+            return L10n.tr("profile.bodyRecovery.state.low", fallback: "Low")
+        default:
+            return L10n.tr("profile.bodyRecovery.state.rest", fallback: "Rest")
+        }
+    }
+
+    private var profileNutritionStateLabel: String {
+        guard vm.profile.nutritionTrackingEnabled else {
+            return L10n.tr("profile.bodyRecovery.nutrition.off", fallback: "Off")
+        }
+
+        let hasUsableLog = vm.nutritionLogs.contains { log in
+            log.calories > 0 || log.proteinGrams > 0 || log.carbsGrams > 0 || log.fatGrams > 0 || log.waterLiters > 0
+        }
+
+        return hasUsableLog
+            ? L10n.tr("profile.bodyRecovery.nutrition.logged", fallback: "Logged")
+            : L10n.tr("profile.bodyRecovery.nutrition.noLogs", fallback: "No logs")
     }
 }
