@@ -129,7 +129,7 @@ struct CoachTabView: View {
         let score = vm.effectiveRecoveryScore
         let color = coachReadinessColor(for: score)
         let phase = vm.currentPhase
-        let status = vm.readinessBasedRecoveryStatus
+        let state = coachRecoveryStateLabel(for: score)
         let readinessTeal = Color(red: 0.300, green: 0.780, blue: 0.740)
         let commandLine = STRQPalette.borderStrong.opacity(0.72)
         let moduleSurface = Color.white.opacity(0.035)
@@ -148,20 +148,22 @@ struct CoachTabView: View {
                         )
                         .frame(width: 82, height: 82)
                     Circle()
-                        .stroke(commandLine.opacity(0.62), lineWidth: 6)
-                        .frame(width: 68, height: 68)
-                    Circle()
-                        .trim(from: 0, to: appeared ? CGFloat(score) / 100 : 0)
-                        .stroke(color, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-                        .frame(width: 68, height: 68)
-                        .rotationEffect(.degrees(-90))
-                        .animation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 1.0).delay(0.15), value: appeared)
-                    Circle()
                         .stroke(color.opacity(0.20), lineWidth: 1)
                         .frame(width: 82, height: 82)
-                    STRQCountUpText(value: Double(score), duration: 0.75)
-                        .font(.system(size: 22, weight: .heavy, design: .rounded).monospacedDigit())
-                        .foregroundStyle(STRQPalette.textPrimary)
+                    VStack(spacing: 5) {
+                        Image(systemName: coachRecoveryStateIcon(for: score))
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(color)
+                        Text(state)
+                            .font(.system(size: 18, weight: .heavy, design: .rounded))
+                            .foregroundStyle(STRQPalette.textPrimary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                        Text(L10n.tr("Context"))
+                            .font(.system(size: 8, weight: .bold))
+                            .tracking(0.7)
+                            .foregroundStyle(STRQPalette.textMuted)
+                    }
                 }
                 .frame(width: 88, height: 88)
                 .background(moduleSurface, in: .rect(cornerRadius: 18))
@@ -175,7 +177,7 @@ struct CoachTabView: View {
                         Circle()
                             .fill(color)
                             .frame(width: 6, height: 6)
-                        Text(status.uppercased())
+                        Text(state.uppercased())
                             .font(.system(size: 10, weight: .black))
                             .tracking(1.2)
                             .foregroundStyle(color)
@@ -309,6 +311,26 @@ struct CoachTabView: View {
             return STRQPalette.danger.opacity(0.84)
         default:
             return STRQPalette.danger
+        }
+    }
+
+    private func coachRecoveryStateLabel(for score: Int) -> String {
+        switch score {
+        case 85...: return L10n.tr("Ready")
+        case 70..<85: return L10n.tr("Steady")
+        case 55..<70: return L10n.tr("Light")
+        case 40..<55: return L10n.tr("Low")
+        default: return L10n.tr("Rest")
+        }
+    }
+
+    private func coachRecoveryStateIcon(for score: Int) -> String {
+        switch score {
+        case 85...: return "bolt.fill"
+        case 70..<85: return "checkmark.circle.fill"
+        case 55..<70: return "arrow.down.circle.fill"
+        case 40..<55: return "heart.circle.fill"
+        default: return "bed.double.fill"
         }
     }
 
@@ -1507,7 +1529,7 @@ struct CoachTabView: View {
                         .background(overallColor.opacity(0.1), in: Capsule())
                 }
                 if let strength = quality.strengths.first {
-                    Label(strength, systemImage: "checkmark.circle.fill")
+                    Label(coachPlanQualityLine(strength), systemImage: "checkmark.circle.fill")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -1521,6 +1543,16 @@ struct CoachTabView: View {
             RoundedRectangle(cornerRadius: 14)
                 .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
         )
+    }
+
+    private func coachPlanQualityLine(_ raw: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed == "Training load matches your recovery capacity"
+            || trimmed.localizedCaseInsensitiveContains("recovery capacity")
+            || trimmed.localizedCaseInsensitiveContains("Erholungskapazität") {
+            return L10n.tr("Training load fits today's context")
+        }
+        return trimmed
     }
 
     private func sinceLastLine(_ sinceLast: DailyBriefing.SinceLast) -> String {

@@ -400,39 +400,41 @@ struct ReadinessCheckInView: View {
         let readiness = buildReadiness()
         let statusColor = ForgeTheme.color(for: readiness.readinessColorName)
         let adviceColor = ForgeTheme.color(for: response.colorName)
+        let adjustments = readinessAdjustments(for: response, readiness: readiness)
 
         return VStack(spacing: 20) {
-            // Readiness dial
-            VStack(spacing: 14) {
-                ZStack {
-                    Circle()
-                        .stroke(Color.white.opacity(0.06), lineWidth: 8)
-                        .frame(width: 128, height: 128)
-                    Circle()
-                        .trim(from: 0, to: CGFloat(readiness.readinessScore) / 100)
-                        .stroke(
-                            LinearGradient(colors: [statusColor, statusColor.opacity(0.7)], startPoint: .top, endPoint: .bottom),
-                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                        )
-                        .frame(width: 128, height: 128)
-                        .rotationEffect(.degrees(-90))
-                    VStack(spacing: 2) {
-                        Text("\(readiness.readinessScore)")
-                            .font(.system(size: 44, weight: .heavy, design: .rounded).monospacedDigit())
-                        Text(L10n.tr("READINESS"))
-                            .font(.system(size: 9, weight: .bold))
-                            .tracking(0.8)
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .center, spacing: 14) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(statusColor.opacity(0.14))
+                        Image(systemName: readinessStateIcon(for: readiness.readinessScore))
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundStyle(statusColor)
+                    }
+                    .frame(width: 64, height: 64)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .strokeBorder(statusColor.opacity(0.24), lineWidth: 1)
+                    )
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(L10n.tr("TODAY'S STATE"))
+                            .font(.system(size: 10, weight: .black))
+                            .tracking(1.1)
+                            .foregroundStyle(statusColor)
+                        Text(readinessStateLabel(for: readiness.readinessScore))
+                            .font(.system(size: 38, weight: .heavy, design: .rounded))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.78)
+                        Text(L10n.tr("Treat this as context, not a verdict"))
+                            .font(.footnote.weight(.medium))
                             .foregroundStyle(.secondary)
                     }
-                }
 
-                Text(readiness.readinessLabel)
-                    .font(.system(.subheadline, design: .rounded, weight: .bold))
-                    .foregroundStyle(statusColor)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 6)
-                    .background(statusColor.opacity(0.12), in: Capsule())
-                    .overlay(Capsule().strokeBorder(statusColor.opacity(0.3), lineWidth: 0.5))
+                    Spacer(minLength: 0)
+                }
             }
             .padding(.top, 4)
 
@@ -449,24 +451,24 @@ struct ReadinessCheckInView: View {
                         )
 
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(response.trainingAdvice.label.uppercased())
+                        Text(readinessAdviceLabel(response.trainingAdvice).uppercased())
                             .font(.system(size: 9, weight: .bold))
                             .tracking(0.6)
                             .foregroundStyle(adviceColor)
-                        Text(response.headline)
+                        Text(readinessHeadline(for: response, readiness: readiness))
                             .font(.system(.headline, design: .rounded, weight: .bold))
                     }
                     Spacer(minLength: 0)
                 }
 
-                Text(response.message)
+                Text(readinessMessage(for: response, readiness: readiness))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if !response.adjustments.isEmpty {
+                if !adjustments.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        ForEach(response.adjustments, id: \.self) { adj in
+                        ForEach(adjustments, id: \.self) { adj in
                             HStack(alignment: .top, spacing: 10) {
                                 Image(systemName: "arrow.turn.down.right")
                                     .font(.system(size: 10, weight: .bold))
@@ -635,6 +637,80 @@ struct ReadinessCheckInView: View {
     }
 
     // MARK: Helpers
+
+    private func readinessStateLabel(for score: Int) -> String {
+        switch score {
+        case 85...: return L10n.tr("Ready")
+        case 70..<85: return L10n.tr("Steady")
+        case 55..<70: return L10n.tr("Light")
+        case 40..<55: return L10n.tr("Low")
+        default: return L10n.tr("Rest")
+        }
+    }
+
+    private func readinessStateIcon(for score: Int) -> String {
+        switch score {
+        case 85...: return "bolt.fill"
+        case 70..<85: return "checkmark.circle.fill"
+        case 55..<70: return "arrow.down.circle.fill"
+        case 40..<55: return "heart.circle.fill"
+        default: return "bed.double.fill"
+        }
+    }
+
+    private func readinessAdviceLabel(_ advice: TrainingAdvice) -> String {
+        switch advice {
+        case .trainAsPlanned, .pushHard:
+            return L10n.tr("Keep the plan")
+        case .trainButLighter, .shortenSession, .reduceAccessories, .useSaferVariations:
+            return L10n.tr("Keep it controlled")
+        case .restDay:
+            return L10n.tr("Back off today")
+        }
+    }
+
+    private func readinessHeadline(for response: ReadinessCoachResponse, readiness: DailyReadiness) -> String {
+        if readiness.painOrRestriction {
+            return L10n.tr("Keep it controlled")
+        }
+
+        switch response.trainingAdvice {
+        case .restDay:
+            return L10n.tr("Back off today")
+        case .trainButLighter, .shortenSession, .reduceAccessories, .useSaferVariations:
+            return L10n.tr("Keep it controlled")
+        case .trainAsPlanned, .pushHard:
+            return L10n.tr("Keep the plan")
+        }
+    }
+
+    private func readinessMessage(for response: ReadinessCoachResponse, readiness: DailyReadiness) -> String {
+        if readiness.painOrRestriction {
+            return hasWorkoutToday
+                ? L10n.tr("Restriction noted. Keep the work controlled, reduce load, and end sets when form breaks.")
+                : L10n.tr("Restriction noted. Back off today and check in again before the next workout.")
+        }
+
+        return response.message
+    }
+
+    private func readinessAdjustments(for response: ReadinessCoachResponse, readiness: DailyReadiness) -> [String] {
+        guard readiness.painOrRestriction else { return response.adjustments }
+
+        if hasWorkoutToday {
+            return [
+                L10n.tr("Keep load conservative"),
+                L10n.tr("Choose clean, controlled movements"),
+                L10n.tr("End the set when form breaks")
+            ]
+        }
+
+        return [
+            L10n.tr("Light movement only"),
+            L10n.tr("Eat, hydrate, sleep"),
+            L10n.tr("Check in again tomorrow")
+        ]
+    }
 
     private func shortLabel(_ level: ReadinessLevel) -> String {
         switch level {

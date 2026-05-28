@@ -218,7 +218,7 @@ struct PreWorkoutHandoffView: View {
             readinessPill(
                 icon: recoveryIcon,
                 color: recoveryColor,
-                value: "\(briefing.recoveryScore)%",
+                value: recoveryStateLabel(for: briefing.recoveryScore),
                 label: "Recovery"
             )
             readinessPill(
@@ -471,13 +471,7 @@ struct PreWorkoutHandoffView: View {
                 reasonRow(icon: phase.icon, color: ForgeTheme.color(for: phase.colorName),
                          text: "\(phase.displayName): \(phase.description)")
 
-                if recovery >= 80 {
-                    reasonRow(icon: "heart.circle.fill", color: STRQPalette.success,
-                             text: "Recovery is strong — good day to push intensity.")
-                } else if recovery < 60 {
-                    reasonRow(icon: "exclamationmark.heart", color: STRQPalette.danger,
-                             text: "Recovery is low — session adjusted for safer training.")
-                }
+                reasonRow(icon: recoveryIcon, color: recoveryColor, text: recoveryControlText(for: recovery))
 
                 if !vm.profile.focusMuscles.isEmpty {
                     let overlap = day.focusMuscles.filter { vm.profile.focusMuscles.contains($0) }
@@ -576,6 +570,28 @@ struct PreWorkoutHandoffView: View {
         case 80...: return STRQPalette.success
         case 60..<80: return STRQPalette.warning
         default: return STRQPalette.danger
+        }
+    }
+
+    private func recoveryStateLabel(for score: Int) -> String {
+        switch score {
+        case 80...: return L10n.tr("Ready")
+        case 60..<80: return L10n.tr("Steady")
+        case 40..<60: return L10n.tr("Low")
+        default: return L10n.tr("Rest")
+        }
+    }
+
+    private func recoveryControlText(for score: Int) -> String {
+        switch score {
+        case 80...:
+            return L10n.tr("Keep the plan. Only add work if reps stay clean.")
+        case 60..<80:
+            return L10n.tr("Keep the plan. Use the session as written.")
+        case 40..<60:
+            return L10n.tr("Keep it controlled. Trim work before forcing more.")
+        default:
+            return L10n.tr("Back off today. Keep it short and controlled.")
         }
     }
 
