@@ -25,9 +25,7 @@ struct ProfileView: View {
             VStack(spacing: 24) {
                 profileFirstViewport
                 trainingSetup
-                coachingStyleRow
-                bodyNutrition
-                fitnessIdentity
+                coachInputsSection
                 subscriptionSection
                 controlsSection
                 accountSection
@@ -867,102 +865,162 @@ struct ProfileView: View {
         .accessibilityIdentifier("strq.profile.header")
     }
 
-    // MARK: - Body & Recovery
+    // MARK: - Coach & Inputs
 
-    private var fitnessIdentity: some View {
-        VStack(alignment: .leading, spacing: STRQSpacing.sm) {
-            HStack(alignment: .center, spacing: STRQSpacing.sm) {
-                Image(systemName: vm.profile.goal.symbolName)
-                    .font(.system(size: 17, weight: .semibold))
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(STRQColors.primaryText)
-                    .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
-                    .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
-                            .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+    private var coachInputsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            STRQSectionHeader(L10n.tr("profile.coachInputs.section", fallback: "Coach & Inputs"))
+
+            VStack(alignment: .leading, spacing: 0) {
+                coachInputsSummaryBlock
+
+                coachInputsDivider
+
+                coachInputSignals
+
+                coachInputsDivider
+
+                NavigationLink {
+                    CoachingPreferencesView(vm: vm)
+                } label: {
+                    coachInputRouteRow(
+                        systemIcon: "person.bust.fill",
+                        title: L10n.tr("Coaching Style"),
+                        value: coachStyleValue,
+                        detail: coachStyleDetail,
+                        tint: STRQColors.iconSecondary
                     )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("strq.profile.coaching-style")
 
-                VStack(alignment: .leading, spacing: STRQSpacing.px50) {
-                    Text(L10n.tr("profile.bodyRecovery", fallback: "Body & Recovery"))
-                        .font(STRQTypography.labelLarge)
-                        .foregroundStyle(STRQColors.primaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.82)
-                    if !vm.isEarlyStage {
-                        Text(bodyRecoverySummary)
-                            .font(STRQTypography.captionRegular)
-                            .foregroundStyle(STRQColors.secondaryText)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
+                coachInputsDivider
+
+                Button {
+                    showSleepLog = true
+                } label: {
+                    coachInputRouteRow(
+                        systemIcon: "moon.zzz.fill",
+                        title: L10n.tr("Sleep Log"),
+                        value: profileSleepStateLabel,
+                        detail: L10n.tr("profile.coachInputs.sleepLogDetail", fallback: "Manual sleep input when you want it."),
+                        tint: ForgeTheme.sleepColor(for: vm.averageSleepHours)
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("strq.profile.sleep-log")
+
+                coachInputsDivider
+
+                VStack(spacing: 0) {
+                    bodyProfileInputRow
+
+                    coachInputsDivider
+
+                    nutritionTrackingInputRow
+
+                    if vm.profile.nutritionTrackingEnabled {
+                        coachInputsDivider
+
+                        Button {
+                            showNutritionSettings = true
+                        } label: {
+                            coachInputRouteRow(
+                                systemIcon: "slider.horizontal.3",
+                                title: L10n.tr("Edit Targets"),
+                                value: nutritionTargetsSummary,
+                                detail: L10n.tr("profile.coachInputs.targetsDetail", fallback: "Calories and protein live here."),
+                                tint: STRQBrand.steel
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("strq.profile.nutrition-settings")
                     }
                 }
-                Spacer(minLength: 0)
+                .accessibilityIdentifier("strq.profile.body-nutrition")
             }
-
-            Rectangle()
-                .fill(STRQColors.divider)
-                .frame(height: 1)
-
-            HStack(spacing: STRQSpacing.xs) {
-                statusChip(
-                    icon: "heart.fill",
-                    value: profileRecoveryStateLabel,
-                    label: L10n.tr("Recovery"),
-                    color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore)
-                )
-                statusChip(
-                    icon: "moon.zzz.fill",
-                    value: String(format: "%.1fh", vm.averageSleepHours),
-                    label: L10n.tr("Sleep"),
-                    color: ForgeTheme.sleepColor(for: vm.averageSleepHours)
-                )
-                statusChip(
-                    icon: "fork.knife",
-                    value: profileNutritionStateLabel,
-                    label: L10n.tr("Nutrition"),
-                    color: vm.weeklyNutritionAdherence >= 0.8 ? STRQPalette.success : STRQBrand.steel
-                )
-            }
-
-            bodyNutritionActionButton(title: L10n.tr("Sleep Log"), systemIcon: "moon.zzz.fill") {
-                showSleepLog = true
-            }
-            .accessibilityIdentifier("strq.profile.sleep-log")
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: 18, style: .continuous))
+            .clipShape(.rect(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
         }
-        .padding(STRQSpacing.cardPaddingCompact)
-        .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
-        .clipShape(.rect(cornerRadius: STRQRadii.md))
-        .overlay(
-            RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
-        )
+        .accessibilityIdentifier("strq.profile.coach-inputs")
     }
 
-    private func statusChip(icon: String, value: String, label: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
-            Image(systemName: icon)
-                .font(.system(size: 11, weight: .semibold))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(color)
+    private var coachInputsSummaryBlock: some View {
+        HStack(alignment: .center, spacing: STRQSpacing.sm) {
+            coachInputIcon("slider.horizontal.3", tint: STRQColors.primaryText)
 
             VStack(alignment: .leading, spacing: STRQSpacing.px50) {
-                Text(value)
-                    .font(STRQTypography.labelLarge.monospacedDigit())
+                Text(L10n.tr("profile.coachInputs.contextTitle", fallback: "Context for the next lift"))
+                    .font(STRQTypography.labelLarge)
                     .foregroundStyle(STRQColors.primaryText)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.78)
-                Text(label)
+                    .minimumScaleFactor(0.76)
+
+                Text(coachInputsSummaryLine)
+                    .font(STRQTypography.captionRegular)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+        .padding(.vertical, STRQSpacing.sm)
+    }
+
+    private var coachInputSignals: some View {
+        HStack(spacing: STRQSpacing.xs) {
+            coachInputSignalChip(
+                icon: "heart.fill",
+                title: L10n.tr("Recovery"),
+                value: profileRecoveryStateLabel,
+                color: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore)
+            )
+            coachInputSignalChip(
+                icon: "moon.zzz.fill",
+                title: L10n.tr("Sleep"),
+                value: profileSleepStateLabel,
+                color: ForgeTheme.sleepColor(for: vm.averageSleepHours)
+            )
+            coachInputSignalChip(
+                icon: "fork.knife",
+                title: L10n.tr("Nutrition"),
+                value: profileNutritionStateLabel,
+                color: profileNutritionStateColor
+            )
+        }
+        .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+        .padding(.vertical, STRQSpacing.sm)
+    }
+
+    private func coachInputSignalChip(icon: String, title: String, value: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+            HStack(spacing: STRQSpacing.px150) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .semibold))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(color)
+
+                Text(title)
                     .font(STRQTypography.micro)
                     .foregroundStyle(STRQColors.mutedText)
-                    .textCase(.uppercase)
-                    .tracking(STRQTypography.bodyTracking)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
             }
+
+            Text(value)
+                .font(STRQTypography.labelMedium)
+                .foregroundStyle(STRQColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(minHeight: 62)
+        .frame(minHeight: 58)
         .padding(.horizontal, STRQSpacing.xs)
         .padding(.vertical, STRQSpacing.xs)
         .background(STRQColors.insetSurface.opacity(0.52), in: .rect(cornerRadius: STRQRadii.md))
@@ -970,6 +1028,160 @@ struct ProfileView: View {
             RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
                 .strokeBorder(STRQColors.borderMuted.opacity(0.58), lineWidth: 1)
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel([title, value].joined(separator: ", "))
+    }
+
+    private var bodyProfileInputRow: some View {
+        coachInputRowContent(
+            systemIcon: "scalemass.fill",
+            title: L10n.tr("profile.coachInputs.bodyProfile", fallback: "Body Profile"),
+            value: bodyProfileSummary,
+            detail: L10n.tr("profile.coachInputs.bodyProfileDetail", fallback: "Height, weight, and age for plan context."),
+            tint: STRQColors.iconSecondary,
+            showsChevron: false
+        )
+    }
+
+    private var nutritionTrackingInputRow: some View {
+        let on = vm.profile.nutritionTrackingEnabled
+        let tint = on ? STRQPalette.success : STRQColors.iconSecondary
+        return Toggle(isOn: Binding(
+            get: { vm.profile.nutritionTrackingEnabled },
+            set: { newValue in
+                vm.profile.nutritionTrackingEnabled = newValue
+                vm.refreshNutritionInsights()
+                vm.refreshCoachingInsights()
+                vm.refreshDailyState()
+            }
+        )) {
+            HStack(alignment: .center, spacing: STRQSpacing.sm) {
+                coachInputIcon(on ? "checkmark.seal.fill" : "fork.knife", tint: tint)
+
+                VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                    HStack(spacing: STRQSpacing.xs) {
+                        Text(L10n.tr("profile.coachInputs.nutritionCoaching", fallback: "Nutrition Coaching"))
+                            .font(STRQTypography.labelMedium)
+                            .foregroundStyle(STRQColors.primaryText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.78)
+
+                        coachInputStatePill(on ? L10n.tr("On") : L10n.tr("Off"), color: tint)
+                    }
+
+                    Text(on
+                        ? L10n.tr("profile.coachInputs.nutritionOnDetail", fallback: "Targets are available. Food logs stay optional.")
+                        : L10n.tr("profile.coachInputs.nutritionOffDetail", fallback: "Optional. Training coaching stays active."))
+                        .font(STRQTypography.paragraphSmall)
+                        .foregroundStyle(STRQColors.secondaryText)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .tint(on ? STRQPalette.success : STRQColors.secondaryAccent)
+        .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+        .padding(.vertical, STRQSpacing.sm)
+        .background(STRQColors.cardSurface)
+    }
+
+    private func coachInputRouteRow(
+        systemIcon: String,
+        title: String,
+        value: String,
+        detail: String,
+        tint: Color
+    ) -> some View {
+        coachInputRowContent(
+            systemIcon: systemIcon,
+            title: title,
+            value: value,
+            detail: detail,
+            tint: tint,
+            showsChevron: true
+        )
+    }
+
+    private func coachInputRowContent(
+        systemIcon: String,
+        title: String,
+        value: String,
+        detail: String,
+        tint: Color,
+        showsChevron: Bool
+    ) -> some View {
+        HStack(alignment: .center, spacing: STRQSpacing.sm) {
+            coachInputIcon(systemIcon, tint: tint)
+
+            VStack(alignment: .leading, spacing: STRQSpacing.xs) {
+                Text(title)
+                    .font(STRQTypography.labelMedium)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+
+                Text(detail)
+                    .font(STRQTypography.paragraphSmall)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: STRQSpacing.xs)
+
+            Text(value)
+                .font(STRQTypography.labelSmall)
+                .foregroundStyle(STRQColors.secondaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.70)
+                .multilineTextAlignment(.trailing)
+
+            if showsChevron {
+                STRQIconView(.chevronRight, size: STRQSpacing.iconXS, tint: STRQColors.iconMuted)
+            }
+        }
+        .padding(.horizontal, STRQSpacing.cardPaddingCompact)
+        .padding(.vertical, STRQSpacing.sm)
+        .background(STRQColors.cardSurface)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel([title, value, detail].joined(separator: ", "))
+    }
+
+    private func coachInputIcon(_ systemIcon: String, tint: Color) -> some View {
+        Image(systemName: systemIcon)
+            .font(.system(size: 15, weight: .semibold))
+            .symbolRenderingMode(.hierarchical)
+            .foregroundStyle(tint)
+            .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+            .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
+    }
+
+    private func coachInputStatePill(_ value: String, color: Color) -> some View {
+        Text(value)
+            .font(STRQTypography.labelXS)
+            .tracking(STRQTypography.labelXSTracking)
+            .foregroundStyle(color)
+            .lineLimit(1)
+            .minimumScaleFactor(0.78)
+            .padding(.horizontal, STRQSpacing.px150)
+            .padding(.vertical, STRQSpacing.px50)
+            .background(color.opacity(0.10), in: Capsule())
+            .overlay(
+                Capsule()
+                    .strokeBorder(color.opacity(0.22), lineWidth: 1)
+            )
+    }
+
+    private var coachInputsDivider: some View {
+        Rectangle()
+            .fill(STRQColors.divider)
+            .frame(height: 1)
+            .padding(.leading, 68)
     }
 
     // MARK: - Training Setup
@@ -1009,159 +1221,7 @@ struct ProfileView: View {
         .accessibilityIdentifier("strq.profile.training-setup")
     }
 
-    // MARK: - Body & Nutrition
-
-    private var bodyNutrition: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            STRQSectionHeader(L10n.tr("Body & Nutrition"))
-
-            trackingToggleCard
-
-            VStack(spacing: 0) {
-                bodyNutritionInfoRow(L10n.tr("Height"), value: L10n.format("%d cm", Int(vm.profile.heightCm)))
-                bodyNutritionInfoRow(L10n.tr("Weight"), value: L10n.format("%.1f kg", vm.profile.weightKg))
-                bodyNutritionInfoRow(L10n.tr("Age"), value: "\(vm.profile.age)", showsDivider: vm.profile.nutritionTrackingEnabled)
-                if vm.profile.nutritionTrackingEnabled {
-                    bodyNutritionInfoRow(L10n.tr("Calories"), value: L10n.format("%d kcal", vm.nutritionTarget.calories))
-                    bodyNutritionInfoRow(L10n.tr("Protein"), value: L10n.format("%dg", vm.nutritionTarget.proteinGrams))
-                    bodyNutritionInfoRow(L10n.tr("Goal"), value: vm.nutritionTarget.nutritionGoal.displayName, showsDivider: false)
-                }
-            }
-            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
-            .clipShape(.rect(cornerRadius: STRQRadii.md))
-            .overlay(
-                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
-            )
-
-            if vm.profile.nutritionTrackingEnabled {
-                HStack(spacing: 10) {
-                    bodyNutritionActionButton(title: L10n.tr("Edit Targets"), systemIcon: "slider.horizontal.3") {
-                        showNutritionSettings = true
-                    }
-                    .accessibilityIdentifier("strq.profile.nutrition-settings")
-                }
-            }
-        }
-        .accessibilityIdentifier("strq.profile.body-nutrition")
-    }
-
-    private var trackingToggleCard: some View {
-        let on = vm.profile.nutritionTrackingEnabled
-        let activeGreen = Color(red: 0.016, green: 0.471, blue: 0.341)
-        let activeGreenSoft = Color(red: 0.024, green: 0.373, blue: 0.275)
-        let activeGreenDim = Color(red: 0.008, green: 0.173, blue: 0.133)
-        return VStack(alignment: .leading, spacing: STRQSpacing.xs) {
-            Toggle(isOn: Binding(
-                get: { vm.profile.nutritionTrackingEnabled },
-                set: { newValue in
-                    vm.profile.nutritionTrackingEnabled = newValue
-                    vm.refreshNutritionInsights()
-                    vm.refreshCoachingInsights()
-                    vm.refreshDailyState()
-                }
-            )) {
-                HStack(alignment: .center, spacing: STRQSpacing.sm) {
-                    Image(systemName: on ? "checkmark.seal.fill" : "leaf.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(on ? activeGreen : STRQColors.iconSecondary)
-                        .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
-                        .background(on ? activeGreenDim.opacity(0.72) : STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
-                                .strokeBorder(on ? activeGreenSoft.opacity(0.58) : STRQColors.borderMuted, lineWidth: 1)
-                        )
-                    VStack(alignment: .leading, spacing: STRQSpacing.xs) {
-                        Text(L10n.tr("Physique & Nutrition Coaching"))
-                            .font(STRQTypography.labelMedium)
-                            .foregroundStyle(STRQColors.primaryText)
-                        Text(on
-                            ? L10n.tr("STRQ uses weigh-ins and nutrition logs to read body-composition progress.")
-                            : L10n.tr("Optional. Training and recovery coaching stay fully active without food or bodyweight logs."))
-                            .font(STRQTypography.paragraphSmall)
-                            .foregroundStyle(STRQColors.secondaryText)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-            }
-            .tint(on ? activeGreen : STRQColors.secondaryAccent)
-            .padding(.horizontal, STRQSpacing.cardPaddingCompact)
-            .padding(.vertical, STRQSpacing.sm)
-            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
-            .clipShape(.rect(cornerRadius: STRQRadii.md))
-            .overlay(
-                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                    .strokeBorder(on ? activeGreenSoft.opacity(0.42) : STRQColors.borderMuted, lineWidth: 1)
-            )
-        }
-    }
-
     // MARK: - Controls
-
-    private var coachingStyleRow: some View {
-        let prefs = vm.profile.coachingPreferences
-        let summaryItems = [
-            (symbol: prefs.tone.symbolName, label: prefs.tone.displayName),
-            (symbol: prefs.emphasis.symbolName, label: prefs.emphasis.displayName),
-            (symbol: prefs.density.symbolName, label: prefs.density.displayName)
-        ]
-        return NavigationLink {
-            CoachingPreferencesView(vm: vm)
-        } label: {
-            HStack(alignment: .center, spacing: STRQSpacing.sm) {
-                Image(systemName: "person.bust.fill")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(STRQColors.iconSecondary)
-                    .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
-                    .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
-                            .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
-                    )
-
-                VStack(alignment: .leading, spacing: STRQSpacing.xs) {
-                    HStack(spacing: STRQSpacing.xs) {
-                        Text(L10n.tr("Coaching Style"))
-                            .font(STRQTypography.labelMedium)
-                            .foregroundStyle(STRQColors.primaryText)
-                            .lineLimit(1)
-                        Text(L10n.tr("PERSONAL"))
-                            .font(STRQTypography.labelXS)
-                            .tracking(STRQTypography.labelXSTracking)
-                            .foregroundStyle(STRQColors.secondaryText)
-                            .padding(.horizontal, STRQSpacing.px150)
-                            .padding(.vertical, STRQSpacing.px50)
-                            .background(STRQColors.controlSurface, in: Capsule())
-                            .overlay(
-                                Capsule()
-                                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
-                            )
-                    }
-                    Text(coachingStyleSummary(summaryItems))
-                        .font(STRQTypography.paragraphSmall)
-                        .foregroundStyle(STRQColors.secondaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.78)
-                }
-                Spacer(minLength: 0)
-                STRQIconView(.chevronRight, size: STRQSpacing.iconXS, tint: STRQColors.iconMuted)
-            }
-            .padding(.horizontal, STRQSpacing.cardPaddingCompact)
-            .padding(.vertical, STRQSpacing.sm)
-            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
-            .overlay(
-                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier("strq.profile.coaching-style")
-    }
-
-    private func coachingStyleSummary(_ items: [(symbol: String, label: String)]) -> String {
-        items.map { $0.label }.joined(separator: " · ")
-    }
 
     private var controlsSection: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -1303,64 +1363,6 @@ struct ProfileView: View {
     }
 
     // MARK: - Components
-
-    private func bodyNutritionActionButton(title: String, systemIcon: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: STRQSpacing.xs) {
-                Image(systemName: systemIcon)
-                    .font(.system(size: 13, weight: .semibold))
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(STRQColors.iconSecondary)
-
-                Text(title)
-                    .font(STRQTypography.labelMedium)
-                    .foregroundStyle(STRQColors.primaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.82)
-            }
-            .padding(.horizontal, STRQSpacing.sm)
-            .frame(maxWidth: .infinity)
-            .frame(height: 44)
-            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
-            .overlay(
-                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
-            )
-        }
-        .buttonStyle(.strqPressable)
-    }
-
-    private func bodyNutritionInfoRow(_ title: String, value: String, showsDivider: Bool = true) -> some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .firstTextBaseline, spacing: STRQSpacing.sm) {
-                Text(title)
-                    .font(STRQTypography.paragraphSmall)
-                    .foregroundStyle(STRQColors.secondaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.82)
-
-                Spacer(minLength: STRQSpacing.sm)
-
-                Text(value)
-                    .font(STRQTypography.labelMedium)
-                    .foregroundStyle(STRQColors.primaryText)
-                    .multilineTextAlignment(.trailing)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.78)
-            }
-            .padding(.horizontal, STRQSpacing.listItemPadding)
-            .padding(.vertical, STRQSpacing.sm)
-
-            if showsDivider {
-                Rectangle()
-                    .fill(STRQColors.divider)
-                    .frame(height: 1)
-                    .padding(.horizontal, STRQSpacing.listItemPadding)
-            }
-        }
-        .background(STRQColors.cardSurface)
-        .accessibilityLabel([title, value].joined(separator: ", "))
-    }
 
     private func trainingSetupInfoRow(_ title: String, value: String, showsDivider: Bool = true) -> some View {
         VStack(spacing: 0) {
@@ -1546,11 +1548,47 @@ struct ProfileView: View {
         }
     }
 
-    private var bodyRecoverySummary: String {
-        if vm.profile.nutritionTrackingEnabled {
-            return L10n.tr("profile.bodyRecovery.summaryWithNutrition", fallback: "Recovery, sleep, and nutrition signals.")
+    private var coachStyleValue: String {
+        vm.profile.coachingPreferences.tone.displayName
+    }
+
+    private var coachStyleDetail: String {
+        let prefs = vm.profile.coachingPreferences
+        return [
+            prefs.emphasis.displayName,
+            prefs.density.displayName
+        ].joined(separator: " · ")
+    }
+
+    private var coachInputsSummaryLine: String {
+        [
+            L10n.format("profile.coachInputs.recoverySummary", fallback: "%@ recovery", profileRecoveryStateLabel),
+            profileSleepSummaryFragment,
+            vm.profile.nutritionTrackingEnabled
+                ? L10n.tr("profile.coachInputs.nutritionOn", fallback: "Nutrition on")
+                : L10n.tr("profile.coachInputs.nutritionOptional", fallback: "Nutrition optional")
+        ].joined(separator: " · ")
+    }
+
+    private var profileSleepSummaryFragment: String {
+        guard vm.averageSleepHours.isFinite, vm.averageSleepHours > 0 else {
+            return L10n.tr("profile.coachInputs.sleepNotSet", fallback: "Sleep not set")
         }
-        return L10n.tr("profile.bodyRecovery.summary", fallback: "Recovery, sleep, and nutrition status.")
+        return L10n.format("profile.coachInputs.sleepSummary", fallback: "%@ sleep", profileSleepStateLabel)
+    }
+
+    private var bodyProfileSummary: String {
+        L10n.format(
+            "profile.coachInputs.bodySummary",
+            fallback: "%d cm · %.1f kg · %d",
+            Int(vm.profile.heightCm),
+            vm.profile.weightKg,
+            vm.profile.age
+        )
+    }
+
+    private var nutritionTargetsSummary: String {
+        vm.nutritionTarget.nutritionGoal.displayName
     }
 
     private var profileRecoveryStateLabel: String {
@@ -1568,17 +1606,41 @@ struct ProfileView: View {
         }
     }
 
+    private var profileSleepStateLabel: String {
+        guard vm.averageSleepHours.isFinite, vm.averageSleepHours > 0 else {
+            return L10n.tr("profile.coachInputs.sleep.notSet", fallback: "Not set")
+        }
+
+        switch vm.averageSleepHours {
+        case 7...:
+            return L10n.tr("profile.coachInputs.sleep.solid", fallback: "Solid")
+        case 6..<7:
+            return L10n.tr("profile.coachInputs.sleep.light", fallback: "Light")
+        default:
+            return L10n.tr("profile.coachInputs.sleep.short", fallback: "Short")
+        }
+    }
+
     private var profileNutritionStateLabel: String {
         guard vm.profile.nutritionTrackingEnabled else {
-            return L10n.tr("profile.bodyRecovery.nutrition.off", fallback: "Off")
+            return L10n.tr("profile.bodyRecovery.nutrition.off", fallback: "Optional")
         }
 
-        let hasUsableLog = vm.nutritionLogs.contains { log in
-            log.calories > 0 || log.proteinGrams > 0 || log.carbsGrams > 0 || log.fatGrams > 0 || log.waterLiters > 0
-        }
-
-        return hasUsableLog
+        return profileHasUsableNutritionLog
             ? L10n.tr("profile.bodyRecovery.nutrition.logged", fallback: "Logged")
             : L10n.tr("profile.bodyRecovery.nutrition.noLogs", fallback: "No logs")
+    }
+
+    private var profileNutritionStateColor: Color {
+        guard vm.profile.nutritionTrackingEnabled else {
+            return STRQColors.iconSecondary
+        }
+        return profileHasUsableNutritionLog ? STRQPalette.success : STRQBrand.steel
+    }
+
+    private var profileHasUsableNutritionLog: Bool {
+        vm.nutritionLogs.contains { log in
+            log.calories > 0 || log.proteinGrams > 0 || log.carbsGrams > 0 || log.fatGrams > 0 || log.waterLiters > 0
+        }
     }
 }
