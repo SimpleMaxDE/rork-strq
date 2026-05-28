@@ -852,10 +852,13 @@ struct DashboardView: View {
     private func premiumReadinessSeal(accent: Color) -> some View {
         let score = vm.todaysReadiness?.readinessScore ?? vm.effectiveRecoveryScore
         let tint = vm.todaysReadiness.map { ForgeTheme.recoveryColor(for: $0.readinessScore) } ?? accent
+        let state = todayRecoveryStateLabel(for: score)
 
         return HStack(spacing: 7) {
-            Text("\(score)")
-                .font(.system(size: 13, weight: .black).monospacedDigit())
+            Text(state)
+                .font(.system(size: 12, weight: .black))
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
             Text(L10n.tr("Recovery"))
                 .font(.system(size: 10, weight: .bold))
                 .lineLimit(1)
@@ -1064,7 +1067,7 @@ struct DashboardView: View {
                 id: "recovery",
                 icon: vm.hasCheckedInToday ? "checkmark.circle.fill" : "heart.text.clipboard",
                 label: L10n.tr("Recovery"),
-                value: "\(recoveryScore)%",
+                value: todayRecoveryStateLabel(for: recoveryScore),
                 detail: recoveryEvidenceDetail(for: recoveryScore),
                 tint: ForgeTheme.recoveryColor(for: recoveryScore),
                 action: vm.hasCheckedInToday ? nil : { showReadinessCheckIn = true }
@@ -1207,13 +1210,48 @@ struct DashboardView: View {
     }
 
     private func recoveryEvidenceDetail(for score: Int) -> String {
-        if score >= 75 {
-            return todayText(en: "Stable", de: "Stabil")
+        switch score {
+        case 85...:
+            return todayText(en: "Good day to train", de: "Guter Trainingstag")
+        case 70..<85:
+            return todayText(en: "Keep the plan", de: "Plan halten")
+        case 55..<70:
+            return todayText(en: "Keep it controlled", de: "Kontrolliert bleiben")
+        case 40..<55:
+            return todayText(en: "Back off today", de: "Heute rausnehmen")
+        default:
+            return todayText(en: "Recovery first", de: "Erholung zuerst")
         }
-        if score >= 60 {
-            return todayText(en: "Workable", de: "Nutzbar")
+    }
+
+    private func todayRecoveryStateLabel(for score: Int) -> String {
+        switch score {
+        case 85...:
+            return L10n.tr("recovery.state.ready", fallback: "Ready")
+        case 70..<85:
+            return L10n.tr("recovery.state.steady", fallback: "Steady")
+        case 55..<70:
+            return L10n.tr("recovery.state.light", fallback: "Light")
+        case 40..<55:
+            return L10n.tr("recovery.state.low", fallback: "Low")
+        default:
+            return L10n.tr("recovery.state.rest", fallback: "Rest")
         }
-        return todayText(en: "Limited", de: "Begrenzt")
+    }
+
+    private func todayRecoveryStateIcon(for score: Int) -> String {
+        switch score {
+        case 85...:
+            return "checkmark.circle.fill"
+        case 70..<85:
+            return "heart.circle.fill"
+        case 55..<70:
+            return "arrow.down.circle.fill"
+        case 40..<55:
+            return "exclamationmark.circle.fill"
+        default:
+            return "moon.zzz.fill"
+        }
     }
 
     private func plannedExposureReason(for day: WorkoutDay?) -> String {
@@ -1370,21 +1408,18 @@ struct DashboardView: View {
         if let readiness = vm.todaysReadiness {
             let score = readiness.readinessScore
             let color = ForgeTheme.recoveryColor(for: score)
+            let state = todayRecoveryStateLabel(for: score)
             HStack(spacing: 8) {
                 ZStack {
                     Circle()
-                        .stroke(Color.white.opacity(0.08), lineWidth: 3)
-                    Circle()
-                        .trim(from: 0, to: appeared ? Double(score) / 100 : 0)
-                        .stroke(color, style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                        .rotationEffect(.degrees(-90))
-                    Text("\(score)")
-                        .font(.system(size: 11, weight: .black).monospacedDigit())
-                        .foregroundStyle(STRQPalette.textPrimary)
+                        .fill(color.opacity(0.12))
+                    Image(systemName: todayRecoveryStateIcon(for: score))
+                        .font(.system(size: 13, weight: .black))
+                        .foregroundStyle(color)
                 }
                 .frame(width: 34, height: 34)
 
-                Text(L10n.tr("Ready"))
+                Text(state)
                     .font(.system(size: 10, weight: .black))
                     .tracking(0.8)
                     .foregroundStyle(STRQPalette.textSecondary)
@@ -2515,7 +2550,7 @@ struct DashboardView: View {
                         )
                         sandowRowDivider
                         weekPulseDetailRow(
-                            value: "\(vm.effectiveRecoveryScore)%",
+                            value: todayRecoveryStateLabel(for: vm.effectiveRecoveryScore),
                             label: L10n.tr("Recovery"),
                             icon: "waveform.path.ecg",
                             tint: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore)

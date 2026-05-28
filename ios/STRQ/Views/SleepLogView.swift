@@ -33,6 +33,7 @@ struct SleepLogView: View {
         let avgSleep = vm.averageSleepHours
         let recoveryScore = vm.effectiveRecoveryScore
         let recoveryColor: Color = recoveryScore >= 80 ? .green : recoveryScore >= 60 ? .yellow : .red
+        let recoveryState = recoveryStateLabel(for: recoveryScore)
 
         return VStack(spacing: 16) {
             HStack(spacing: 6) {
@@ -44,7 +45,7 @@ struct SleepLogView: View {
                     .foregroundStyle(STRQBrand.steel)
                     .tracking(0.5)
                 Spacer()
-                Text(vm.readinessBasedRecoveryStatus)
+                Text(recoveryState)
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(recoveryColor)
                     .padding(.horizontal, 8)
@@ -56,20 +57,20 @@ struct SleepLogView: View {
                 VStack(spacing: 8) {
                     ZStack {
                         Circle()
-                            .stroke(Color(.separator).opacity(0.3), lineWidth: 4)
+                            .fill(recoveryColor.opacity(0.12))
                             .frame(width: 56, height: 56)
-                        Circle()
-                            .trim(from: 0, to: appeared ? CGFloat(recoveryScore) / 100 : 0)
-                            .stroke(recoveryColor.gradient, style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                            .frame(width: 56, height: 56)
-                            .rotationEffect(.degrees(-90))
-                            .animation(.easeOut(duration: 0.8).delay(0.2), value: appeared)
-                        Text("\(recoveryScore)")
-                            .font(.system(size: 16, weight: .bold, design: .rounded).monospacedDigit())
+                        Image(systemName: recoveryStateIcon(for: recoveryScore))
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(recoveryColor)
                     }
-                    Text(L10n.tr("Recovery"))
-                        .font(.system(size: 9, weight: .medium))
-                        .foregroundStyle(.secondary)
+                    VStack(spacing: 2) {
+                        Text(recoveryState)
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(.primary)
+                        Text(L10n.tr("Recovery"))
+                            .font(.system(size: 9, weight: .medium))
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
@@ -93,7 +94,7 @@ struct SleepLogView: View {
                         VStack(alignment: .leading, spacing: 1) {
                             Text(vm.sleepQualityLabel)
                                 .font(.subheadline.weight(.semibold))
-                            Text(L10n.tr("Sleep quality"))
+                            Text(L10n.tr("sleep.quality.period", fallback: "7-day quality"))
                                 .font(.system(size: 9))
                                 .foregroundStyle(.secondary)
                         }
@@ -107,9 +108,10 @@ struct SleepLogView: View {
                             Text(sleepTrainingImpact)
                                 .font(.subheadline.weight(.semibold))
                                 .lineLimit(1)
-                            Text(L10n.tr("Training impact"))
+                            Text(sleepTrainingDetail)
                                 .font(.system(size: 9))
                                 .foregroundStyle(.secondary)
+                                .lineLimit(2)
                         }
                     }
                 }
@@ -409,9 +411,20 @@ struct SleepLogView: View {
 
     private var sleepTrainingImpact: String {
         let avg = vm.averageSleepHours
-        if avg >= 7.5 { return L10n.tr("Supporting gains") }
-        if avg >= 6.5 { return L10n.tr("Slightly limiting") }
-        return L10n.tr("Hurting recovery")
+        if avg >= 7.5 { return L10n.tr("sleep.trainingImpact.steady", fallback: "Sleep looks steady") }
+        if avg >= 6.5 { return L10n.tr("sleep.trainingImpact.controlled", fallback: "Keep it controlled") }
+        return L10n.tr("sleep.trainingImpact.short", fallback: "Keep it controlled")
+    }
+
+    private var sleepTrainingDetail: String {
+        let avg = vm.averageSleepHours
+        if avg >= 7.5 {
+            return L10n.tr("sleep.trainingDetail.steady", fallback: "Sleep looks steady. Keep the plan.")
+        }
+        if avg >= 6.5 {
+            return L10n.tr("sleep.trainingDetail.controlled", fallback: "Recovery looks limited. Keep the work controlled.")
+        }
+        return L10n.tr("sleep.trainingDetail.short", fallback: "Sleep has been short. Keep the next session controlled.")
     }
 
     private var sleepTrainingInsights: [(icon: String, color: Color, title: String, message: String)] {
@@ -422,28 +435,28 @@ struct SleepLogView: View {
             results.append((
                 icon: "exclamationmark.triangle.fill",
                 color: .red,
-                title: L10n.tr("Muscle Recovery Impaired"),
-                message: L10n.tr("Under 6.5h average sleep significantly reduces muscle protein synthesis and growth hormone release.")
+                title: L10n.tr("sleep.insight.short.title", fallback: "Keep it controlled"),
+                message: L10n.tr("sleep.insight.short.message", fallback: "Sleep has been short. Keep the next session controlled.")
             ))
             results.append((
                 icon: "bolt.slash.fill",
                 color: STRQBrand.steel,
-                title: L10n.tr("Strength Output Reduced"),
-                message: L10n.tr("Sleep debt reduces maximal strength by 5-10%. Consider lighter loads until sleep improves.")
+                title: L10n.tr("sleep.insight.pressure.title", fallback: "Lower the pressure"),
+                message: L10n.tr("sleep.insight.pressure.message", fallback: "Use lighter work today if the warm-up feels heavy.")
             ))
         } else if avg < 7.5 {
             results.append((
                 icon: "exclamationmark.circle.fill",
                 color: .yellow,
-                title: L10n.tr("Recovery Slightly Limited"),
-                message: L10n.tr("Aim for 7.5h+ to fully support your training. Current sleep may slow progress slightly.")
+                title: L10n.tr("sleep.insight.limited.title", fallback: "Recovery looks limited"),
+                message: L10n.tr("sleep.insight.limited.message", fallback: "Keep the work steady and avoid chasing extra volume today.")
             ))
         } else {
             results.append((
                 icon: "checkmark.circle.fill",
                 color: .green,
-                title: L10n.tr("Recovery Well Supported"),
-                message: L10n.tr("Your sleep is supporting muscle recovery and performance. Keep this consistency.")
+                title: L10n.tr("sleep.insight.steady.title", fallback: "Sleep looks steady"),
+                message: L10n.tr("sleep.insight.steady.message", fallback: "Keep the plan. Let the next session confirm it.")
             ))
         }
 
@@ -453,12 +466,42 @@ struct SleepLogView: View {
             results.append((
                 icon: "moon.haze.fill",
                 color: STRQBrand.steel,
-                title: L10n.tr("Sleep Quality Declining"),
-                message: L10n.format("%d poor-quality nights this week. Quality matters as much as duration for recovery.", poorNights)
+                title: L10n.tr("sleep.insight.rough.title", fallback: "A few rough nights"),
+                message: L10n.format("sleep.insight.rough.message", fallback: "%d rough nights this week. Keep the next session honest and controlled.", poorNights)
             ))
         }
 
         return results
+    }
+
+    private func recoveryStateLabel(for score: Int) -> String {
+        switch score {
+        case 85...:
+            return L10n.tr("recovery.state.ready", fallback: "Ready")
+        case 70..<85:
+            return L10n.tr("recovery.state.steady", fallback: "Steady")
+        case 55..<70:
+            return L10n.tr("recovery.state.light", fallback: "Light")
+        case 40..<55:
+            return L10n.tr("recovery.state.low", fallback: "Low")
+        default:
+            return L10n.tr("recovery.state.rest", fallback: "Rest")
+        }
+    }
+
+    private func recoveryStateIcon(for score: Int) -> String {
+        switch score {
+        case 85...:
+            return "checkmark.circle.fill"
+        case 70..<85:
+            return "heart.circle.fill"
+        case 55..<70:
+            return "arrow.down.circle.fill"
+        case 40..<55:
+            return "exclamationmark.circle.fill"
+        default:
+            return "moon.zzz.fill"
+        }
     }
 
     private func saveSleep() {
