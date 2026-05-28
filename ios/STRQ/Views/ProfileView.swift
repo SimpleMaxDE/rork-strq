@@ -26,9 +26,8 @@ struct ProfileView: View {
                 profileFirstViewport
                 trainingSetup
                 coachInputsSection
-                subscriptionSection
+                accountDataSection
                 controlsSection
-                accountSection
                 dangerSection
                 footerSection
             }
@@ -119,171 +118,285 @@ struct ProfileView: View {
         }
     }
 
-    // MARK: - Account
+    // MARK: - Account & Data
 
-    private var accountSection: some View {
+    private var accountDataSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForgeSectionHeader(title: L10n.tr("Sync & Restore"))
+            STRQSectionHeader(L10n.tr("Account & Data"))
 
-            if let account = vm.account.account {
-                VStack(spacing: 0) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "icloud.fill")
-                            .font(.subheadline)
-                            .foregroundStyle(.white)
-                            .frame(width: 34, height: 34)
-                            .background(STRQBrand.steelGradient, in: .rect(cornerRadius: 9))
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(L10n.tr("iCloud Sync"))
-                                .font(.subheadline.weight(.bold))
-                            Text(signedInCloudSummary(name: account.displayName))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        Spacer()
-                        cloudStatusBadge
-                    }
-                    .padding(14)
+            VStack(spacing: 0) {
+                proAccountRows
+                accountDataDivider
+                restorePurchasesRow
+                accountDataDivider
+                accountCloudRows
+            }
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
+            .accessibilityIdentifier("strq.profile.account")
+        }
+        .manageSubscriptionsSheet(isPresented: $showManageSubscription)
+        .accessibilityIdentifier("strq.profile.subscription")
+    }
 
-                    Divider().opacity(0.3).padding(.horizontal, 14)
+    @ViewBuilder
+    private var proAccountRows: some View {
+        if store.isPro {
+            accountDataStatusRow(
+                icon: "sparkles",
+                title: L10n.tr("STRQ Pro"),
+                detail: store.subscriptionStatusText,
+                tint: STRQBrand.steel
+            ) {
+                accountDataStatusPill(store.subscriptionPlanName, tint: STRQBrand.steel)
+            }
 
-                    Button {
-                        showCloudRestoreConfirm = true
-                    } label: {
-                        accountActionRow(
-                            icon: "arrow.clockwise.icloud.fill",
-                            label: L10n.tr("Restore This Device"),
-                            detail: L10n.tr("Replace local data with your latest iCloud snapshot")
-                        )
-                    }
+            accountDataDivider
 
-                    Divider().opacity(0.3).padding(.horizontal, 14)
-
-                    Button {
-                        showSignOutAlert = true
-                    } label: {
-                        accountActionRow(icon: "rectangle.portrait.and.arrow.right", label: L10n.tr("Sign Out"), tint: .red)
-                    }
-                }
-                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(STRQBrand.cardBorder, lineWidth: 1)
-                )
-            } else {
-                VStack(alignment: .leading, spacing: STRQSpacing.sm) {
-                    HStack(alignment: .top, spacing: STRQSpacing.sm) {
-                        Image(systemName: "person.crop.circle.badge.checkmark")
-                            .font(.system(size: 17, weight: .semibold))
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(STRQColors.secondaryText)
-                            .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
-                            .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
-                                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
-                            )
-                        VStack(alignment: .leading, spacing: STRQSpacing.xs) {
-                            Text(L10n.tr("iCloud Sync"))
-                                .font(STRQTypography.labelLarge)
-                                .foregroundStyle(STRQColors.primaryText)
-                            Text(L10n.tr("Sign in with Apple to keep your training backed up in iCloud and ready to restore on another device."))
-                                .font(STRQTypography.paragraphSmall)
-                                .foregroundStyle(STRQColors.secondaryText)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        Spacer(minLength: 0)
-                    }
-
-                    SignInWithAppleButton(.signIn) { request in
-                        vm.account.configureRequest(request)
-                    } onCompletion: { result in
-                        vm.account.handleCompletion(result)
-                        if vm.account.isSignedIn {
-                            if vm.cloudSync.hasRemoteSnapshot, vm.workoutHistory.isEmpty {
-                                _ = vm.restoreFromCloud(force: false)
-                            } else {
-                                vm.uploadToCloud()
-                            }
-                        }
-                    }
-                    .signInWithAppleButtonStyle(.white)
-                    .frame(height: 44)
-                    .clipShape(.rect(cornerRadius: 11))
-
-                    Text(L10n.tr("Your training stays local on this device until you turn sync on."))
-                        .font(STRQTypography.captionRegular)
-                        .foregroundStyle(STRQColors.mutedText)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, STRQSpacing.xs)
-                        .padding(.vertical, STRQSpacing.xs)
-                        .background(STRQColors.insetSurface.opacity(0.52), in: .rect(cornerRadius: STRQRadii.sm))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: STRQRadii.sm, style: .continuous)
-                                .strokeBorder(STRQColors.borderMuted.opacity(0.58), lineWidth: 1)
-                        )
-                }
-                .padding(STRQSpacing.cardPaddingCompact)
-                .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
-                .clipShape(.rect(cornerRadius: STRQRadii.md))
-                .overlay(
-                    RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                        .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            Button {
+                Analytics.shared.track(.manage_subscription_opened)
+                showManageSubscription = true
+            } label: {
+                accountDataActionRow(
+                    icon: "creditcard.fill",
+                    title: L10n.tr("Manage Subscription"),
+                    tint: STRQColors.iconSecondary
                 )
             }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("strq.profile.manage-subscription")
+        } else {
+            Button {
+                Analytics.shared.track(.paywall_viewed, ["source": "profile"])
+                showPaywall = true
+            } label: {
+                accountDataActionRow(
+                    icon: "sparkles",
+                    title: L10n.tr("STRQ Pro"),
+                    detail: L10n.tr("Free plan. Upgrade when ready."),
+                    tint: STRQBrand.steel
+                )
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("strq.profile.pro-preview-card")
         }
-        .accessibilityIdentifier("strq.profile.account")
     }
 
-    private func proPillarChip(icon: String, label: String) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.system(size: 9, weight: .semibold))
-                .foregroundStyle(Color.white.opacity(0.56))
-            Text(label)
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(Color.white.opacity(0.76))
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
+    private var restorePurchasesRow: some View {
+        Button {
+            guard store.isConfigured else {
+                store.restoreMessage = L10n.tr("Subscriptions are not available in this environment.")
+                showRestoreMessage = true
+                return
+            }
+            Task {
+                await store.restore()
+                showRestoreMessage = true
+            }
+        } label: {
+            accountDataActionRow(
+                icon: "arrow.clockwise",
+                title: L10n.tr("Restore Purchases"),
+                detail: L10n.tr("Check App Store purchases"),
+                tint: STRQColors.iconSecondary
+            )
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 5)
-        .frame(maxWidth: .infinity)
-        .background(Color.white.opacity(0.055), in: Capsule())
-        .overlay(
-            Capsule()
-                .strokeBorder(Color.white.opacity(0.085), lineWidth: 0.5)
-        )
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("strq.profile.restore-purchases")
     }
 
-    private func accountActionRow(icon: String, label: String, detail: String? = nil, tint: Color = STRQBrand.steel) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon)
-                .font(.caption)
-                .foregroundStyle(tint)
-                .frame(width: 24)
+    @ViewBuilder
+    private var accountCloudRows: some View {
+        if let account = vm.account.account {
+            accountDataStatusRow(
+                icon: "icloud.fill",
+                title: L10n.tr("iCloud Sync"),
+                detail: signedInCloudSummary(name: account.displayName),
+                tint: STRQBrand.steel
+            ) {
+                cloudStatusBadge
+            }
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(label)
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(label == L10n.tr("Sign Out") ? .red : .primary)
+            accountDataDivider
+
+            Button {
+                showCloudRestoreConfirm = true
+            } label: {
+                accountDataActionRow(
+                    icon: "arrow.clockwise.icloud.fill",
+                    title: L10n.tr("Restore This Device"),
+                    detail: L10n.tr("Replace local data with your latest iCloud snapshot"),
+                    tint: STRQColors.iconSecondary
+                )
+            }
+            .buttonStyle(.plain)
+
+            accountDataDivider
+
+            Button {
+                showSignOutAlert = true
+            } label: {
+                accountDataActionRow(
+                    icon: "rectangle.portrait.and.arrow.right",
+                    title: L10n.tr("Sign Out"),
+                    tint: .red,
+                    titleColor: .red
+                )
+            }
+            .buttonStyle(.plain)
+        } else {
+            accountDataStatusRow(
+                icon: "icloud",
+                title: L10n.tr("iCloud Sync"),
+                detail: L10n.tr("Sign in with Apple to keep your training backed up in iCloud and ready to restore on another device."),
+                tint: STRQColors.iconSecondary
+            ) {
+                accountDataStatusPill(L10n.tr("OFF"), tint: STRQColors.mutedText)
+            }
+
+            accountDataDivider
+
+            VStack(alignment: .leading, spacing: STRQSpacing.sm) {
+                SignInWithAppleButton(.signIn) { request in
+                    vm.account.configureRequest(request)
+                } onCompletion: { result in
+                    vm.account.handleCompletion(result)
+                    if vm.account.isSignedIn {
+                        if vm.cloudSync.hasRemoteSnapshot, vm.workoutHistory.isEmpty {
+                            _ = vm.restoreFromCloud(force: false)
+                        } else {
+                            vm.uploadToCloud()
+                        }
+                    }
+                }
+                .signInWithAppleButtonStyle(.white)
+                .frame(height: 44)
+                .clipShape(.rect(cornerRadius: 11))
+
+                Text(L10n.tr("Your training stays local on this device until you turn sync on."))
+                    .font(STRQTypography.captionRegular)
+                    .foregroundStyle(STRQColors.mutedText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, STRQSpacing.xs)
+                    .padding(.vertical, STRQSpacing.xs)
+                    .background(STRQColors.insetSurface.opacity(0.52), in: .rect(cornerRadius: STRQRadii.sm))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: STRQRadii.sm, style: .continuous)
+                            .strokeBorder(STRQColors.borderMuted.opacity(0.58), lineWidth: 1)
+                    )
+            }
+            .padding(STRQSpacing.cardPaddingCompact)
+        }
+    }
+
+    private func accountDataStatusRow<Accessory: View>(
+        icon: String,
+        title: String,
+        detail: String,
+        tint: Color,
+        @ViewBuilder accessory: () -> Accessory
+    ) -> some View {
+        HStack(spacing: STRQSpacing.sm) {
+            accountDataIcon(icon, tint: tint)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(STRQTypography.labelLarge)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+
+                Text(detail)
+                    .font(STRQTypography.caption)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.78)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: STRQSpacing.sm)
+
+            accessory()
+        }
+        .padding(.horizontal, STRQSpacing.listItemPadding)
+        .padding(.vertical, STRQSpacing.sm)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func accountDataActionRow(
+        icon: String,
+        title: String,
+        detail: String? = nil,
+        tint: Color,
+        titleColor: Color = STRQColors.primaryText
+    ) -> some View {
+        HStack(spacing: STRQSpacing.sm) {
+            accountDataIcon(icon, tint: tint)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(STRQTypography.labelLarge)
+                    .foregroundStyle(titleColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
 
                 if let detail {
                     Text(detail)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .font(STRQTypography.caption)
+                        .foregroundStyle(STRQColors.secondaryText)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
 
-            Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.tertiary)
+            Spacer(minLength: STRQSpacing.sm)
+
+            STRQIconView(.chevronRight, size: STRQSpacing.iconXS, tint: tint.opacity(0.72))
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 11)
+        .padding(.horizontal, STRQSpacing.listItemPadding)
+        .padding(.vertical, STRQSpacing.sm)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+    }
+
+    private func accountDataIcon(_ systemIcon: String, tint: Color) -> some View {
+        Image(systemName: systemIcon)
+            .font(.system(size: 15, weight: .semibold))
+            .symbolRenderingMode(.hierarchical)
+            .foregroundStyle(tint)
+            .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+            .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
+    }
+
+    private func accountDataStatusPill(_ label: String, tint: Color) -> some View {
+        Text(label)
+            .font(.system(size: 10, weight: .bold))
+            .foregroundStyle(tint)
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(tint.opacity(0.10), in: Capsule())
+            .overlay(
+                Capsule()
+                    .strokeBorder(tint.opacity(0.24), lineWidth: 1)
+            )
+    }
+
+    private var accountDataDivider: some View {
+        Rectangle()
+            .fill(STRQColors.divider)
+            .frame(height: 1)
+            .padding(.leading, 68)
     }
 
     private func signedInCloudSummary(name: String?) -> String {
@@ -335,180 +448,6 @@ struct ProfileView: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
             .background(color.opacity(0.8), in: Capsule())
-    }
-
-    // MARK: - Subscription
-
-    private var subscriptionSection: some View {
-        VStack(spacing: 10) {
-            if store.isPro {
-                let proAccent = Color(red: 0.46, green: 0.42, blue: 0.95)
-                let proAccentInk = Color(red: 0.78, green: 0.75, blue: 1.00)
-                let proAccentDim = Color(red: 0.14, green: 0.12, blue: 0.28)
-                VStack(spacing: 0) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "bolt.fill")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(proAccentInk)
-                            .frame(width: 36, height: 36)
-                            .background(proAccentDim.opacity(0.74), in: .rect(cornerRadius: 10))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .strokeBorder(proAccent.opacity(0.36), lineWidth: 1)
-                            )
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(L10n.tr("STRQ Pro"))
-                                .font(.subheadline.weight(.bold))
-                                .foregroundStyle(.white)
-                            Text(store.subscriptionStatusText)
-                                .font(.caption)
-                                .foregroundStyle(Color.white.opacity(0.68))
-                        }
-                        Spacer()
-                        Text(store.subscriptionPlanName)
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(proAccentInk)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(proAccent.opacity(0.14), in: Capsule())
-                            .overlay(
-                                Capsule()
-                                    .strokeBorder(proAccent.opacity(0.34), lineWidth: 1)
-                            )
-                    }
-                    .padding(14)
-
-                    Divider()
-                        .overlay(Color.white.opacity(0.08))
-                        .padding(.horizontal, 14)
-
-                    Button {
-                        Analytics.shared.track(.manage_subscription_opened)
-                        showManageSubscription = true
-                    } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: "creditcard.fill")
-                                .font(.caption)
-                                .foregroundStyle(proAccentInk.opacity(0.82))
-                                .frame(width: 24)
-                            Text(L10n.tr("Manage Subscription"))
-                                .font(.subheadline.weight(.medium))
-                                .foregroundStyle(Color.white.opacity(0.86))
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(Color.white.opacity(0.42))
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 11)
-                    }
-                    .accessibilityIdentifier("strq.profile.manage-subscription")
-                }
-                .background(
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.076, green: 0.081, blue: 0.090),
-                            Color(red: 0.045, green: 0.050, blue: 0.058)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    in: .rect(cornerRadius: 14)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
-                )
-                .overlay(alignment: .topLeading) {
-                    Capsule()
-                        .fill(proAccentInk.opacity(0.74))
-                        .frame(width: 36, height: 2)
-                        .padding(.leading, 16)
-                        .shadow(color: proAccent.opacity(0.24), radius: 4, y: 1)
-                }
-            } else {
-                Button {
-                    Analytics.shared.track(.paywall_viewed, ["source": "profile"])
-                    showPaywall = true
-                } label: {
-                    let proAccent = Color(red: 0.46, green: 0.42, blue: 0.95)
-                    let proAccentInk = Color(red: 0.78, green: 0.75, blue: 1.00)
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "bolt.fill")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(proAccentInk)
-                                .frame(width: 36, height: 36)
-                                .background(proAccent.opacity(0.11), in: .rect(cornerRadius: 10))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                        .strokeBorder(proAccent.opacity(0.34), lineWidth: 1)
-                                )
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(L10n.tr("STRQ Pro"))
-                                    .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(.white)
-                                Text(L10n.tr("Deeper coaching, evolving plans, and richer progress evidence."))
-                                    .font(.caption)
-                                    .foregroundStyle(Color.white.opacity(0.68))
-                                    .lineLimit(2)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                            Spacer(minLength: 0)
-                            Image(systemName: "chevron.right")
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(Color.white.opacity(0.48))
-                                .frame(width: 26, height: 26)
-                                .background(Color.white.opacity(0.055), in: Circle())
-                                .overlay(
-                                    Circle()
-                                        .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
-                                )
-                        }
-
-                        LazyVGrid(
-                            columns: [
-                                GridItem(.flexible(), spacing: 6),
-                                GridItem(.flexible(), spacing: 6)
-                            ],
-                            spacing: 6
-                        ) {
-                            proPillarChip(icon: "brain.head.profile.fill", label: L10n.tr("Adaptive plans"))
-                            proPillarChip(icon: "map.fill", label: L10n.tr("Training Map"))
-                            proPillarChip(icon: "calendar.badge.clock", label: L10n.tr("Weekly review"))
-                            proPillarChip(icon: "chart.line.uptrend.xyaxis", label: L10n.tr("Evidence depth"))
-                        }
-                    }
-                    .padding(14)
-                    .background(
-                        LinearGradient(
-                            colors: [
-                                Color(red: 0.076, green: 0.081, blue: 0.090),
-                                Color(red: 0.045, green: 0.050, blue: 0.058)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        in: .rect(cornerRadius: 14)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
-                    )
-                    .overlay(alignment: .topLeading) {
-                        Capsule()
-                            .fill(proAccentInk.opacity(0.88))
-                            .frame(width: 42, height: 2)
-                            .padding(.leading, 16)
-                            .shadow(color: proAccent.opacity(0.28), radius: 4, y: 1)
-                    }
-                }
-                .accessibilityIdentifier("strq.profile.pro-preview-card")
-                .buttonStyle(.plain)
-            }
-        }
-        .manageSubscriptionsSheet(isPresented: $showManageSubscription)
-        .accessibilityIdentifier("strq.profile.subscription")
     }
 
     // MARK: - Header
@@ -1234,18 +1173,6 @@ struct ProfileView: View {
                     controlsListRowContent(L10n.tr("Notifications"), icon: .bell, opticalEmphasis: .notifications)
                 }
                 .accessibilityIdentifier("strq.profile.notifications")
-                controlsListButtonRow(L10n.tr("Restore Purchases"), icon: .repeatAction) {
-                    guard store.isConfigured else {
-                        store.restoreMessage = L10n.tr("Subscriptions are not available in this environment.")
-                        showRestoreMessage = true
-                        return
-                    }
-                    Task {
-                        await store.restore()
-                        showRestoreMessage = true
-                    }
-                }
-                .accessibilityIdentifier("strq.profile.restore-purchases")
                 controlsListButtonRow(
                     L10n.tr("profile.rebuildTrainingPlan", fallback: "Rebuild Training Plan"),
                     icon: .repeatAction,
