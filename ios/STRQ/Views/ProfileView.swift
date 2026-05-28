@@ -28,8 +28,8 @@ struct ProfileView: View {
                 coachInputsSection
                 accountDataSection
                 controlsSection
-                dangerSection
-                footerSection
+                privacySupportSection
+                lowerFooterSection
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 32)
@@ -1170,11 +1170,17 @@ struct ProfileView: View {
                 NavigationLink {
                     NotificationSettingsView(vm: vm)
                 } label: {
-                    controlsListRowContent(L10n.tr("Notifications"), icon: .bell, opticalEmphasis: .notifications)
+                    controlsListRowContent(
+                        L10n.tr("Notifications"),
+                        detail: L10n.tr("profile.tools.notificationsDetail", fallback: "Training reminders and check-ins."),
+                        icon: .bell,
+                        opticalEmphasis: .notifications
+                    )
                 }
                 .accessibilityIdentifier("strq.profile.notifications")
                 controlsListButtonRow(
                     L10n.tr("profile.rebuildTrainingPlan", fallback: "Rebuild Training Plan"),
+                    detail: L10n.tr("profile.tools.rebuildTrainingPlanDetail", fallback: "Use when your schedule or setup changes."),
                     icon: .repeatAction,
                     showsDivider: controlsSectionShowsDesignSystemLab
                 ) {
@@ -1204,23 +1210,62 @@ struct ProfileView: View {
                 #endif
             }
             .buttonStyle(.plain)
-            .background(STRQColors.cardSurface, in: .rect(cornerRadius: 12))
-            .clipShape(.rect(cornerRadius: 12))
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
                     .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
             )
         }
         .accessibilityIdentifier("strq.profile.controls")
     }
 
-    private var footerSection: some View {
-        VStack(spacing: 10) {
-            legalLinks
+    private var privacySupportSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            STRQSectionHeader(L10n.tr("profile.privacySupport", fallback: "Privacy & Support"))
 
+            VStack(spacing: 0) {
+                privacySupportLinkRow(
+                    systemIcon: "lock.shield.fill",
+                    title: L10n.tr("Privacy Policy"),
+                    detail: L10n.tr("profile.privacySupport.privacyDetail", fallback: "How STRQ handles your data."),
+                    value: L10n.tr("Read"),
+                    destination: STRQLinks.privacy
+                )
+
+                privacySupportLinkRow(
+                    systemIcon: "doc.text.fill",
+                    title: L10n.tr("Terms"),
+                    detail: L10n.tr("profile.privacySupport.termsDetail", fallback: "Usage terms and product rules."),
+                    value: L10n.tr("Read"),
+                    destination: STRQLinks.terms
+                )
+
+                privacySupportLinkRow(
+                    systemIcon: "envelope.fill",
+                    title: L10n.tr("profile.footer.support", fallback: "Support"),
+                    detail: L10n.tr("profile.privacySupport.supportDetail", fallback: "Get help with STRQ."),
+                    value: L10n.tr("Contact"),
+                    destination: STRQLinks.support,
+                    showsDivider: false
+                )
+            }
+            .buttonStyle(.plain)
+            .background(STRQColors.cardSurface, in: .rect(cornerRadius: STRQRadii.md))
+            .clipShape(.rect(cornerRadius: STRQRadii.md))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
+        }
+        .accessibilityIdentifier("strq.profile.privacy-support")
+    }
+
+    private var lowerFooterSection: some View {
+        VStack(spacing: 10) {
+            advancedDataSection
             appVersionFooter
         }
-        .padding(.top, 2)
     }
 
     private var appVersionFooter: some View {
@@ -1241,27 +1286,17 @@ struct ProfileView: View {
         #endif
     }
 
-    private var legalLinks: some View {
-        HStack(spacing: 18) {
-            Link(L10n.tr("Privacy"), destination: STRQLinks.privacy)
-            Text("·").foregroundStyle(.quaternary)
-            Link(L10n.tr("Terms"), destination: STRQLinks.terms)
-            Text("·").foregroundStyle(.quaternary)
-            Link(L10n.tr("profile.footer.support", fallback: "Support"), destination: STRQLinks.support)
-        }
-        .font(.caption.weight(.medium))
-        .foregroundStyle(.secondary)
-        .frame(maxWidth: .infinity)
-    }
-
-    private var dangerSection: some View {
+    private var advancedDataSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            STRQSectionHeader(L10n.tr("profile.dataReset", fallback: "Data & Reset"))
+            STRQSectionHeader(L10n.tr("profile.advancedData", fallback: "Advanced Data"))
 
             VStack(spacing: 0) {
-                controlRow(L10n.tr("Reset All Data"), icon: "trash.fill", color: .red) {
+                Button {
                     showResetAlert = true
+                } label: {
+                    advancedDataResetRow
                 }
+                .buttonStyle(.plain)
                 .accessibilityIdentifier("strq.profile.reset-all-data")
             }
             .buttonStyle(.plain)
@@ -1269,10 +1304,10 @@ struct ProfileView: View {
             .clipShape(.rect(cornerRadius: STRQRadii.md))
             .overlay(
                 RoundedRectangle(cornerRadius: STRQRadii.md, style: .continuous)
-                    .strokeBorder(Color.red.opacity(0.26), lineWidth: 1)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
             )
         }
-        .accessibilityIdentifier("strq.profile.danger")
+        .accessibilityIdentifier("strq.profile.advanced-data")
     }
 
     private var profileHeaderSummary: String {
@@ -1287,6 +1322,146 @@ struct ProfileView: View {
         let version = info?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = info?["CFBundleVersion"] as? String ?? "1"
         return "STRQ v\(version) (\(build))"
+    }
+
+    private func privacySupportLinkRow(
+        systemIcon: String,
+        title: String,
+        detail: String,
+        value: String,
+        destination: URL,
+        showsDivider: Bool = true
+    ) -> some View {
+        Link(destination: destination) {
+            privacySupportRowContent(
+                systemIcon: systemIcon,
+                title: title,
+                detail: detail,
+                value: value,
+                showsDivider: showsDivider
+            )
+        }
+        .accessibilityLabel([title, value, detail].joined(separator: ", "))
+    }
+
+    private func privacySupportRowContent(
+        systemIcon: String,
+        title: String,
+        detail: String,
+        value: String,
+        showsDivider: Bool
+    ) -> some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .center, spacing: STRQSpacing.sm) {
+                privacySupportIcon(systemIcon)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(STRQTypography.labelLarge)
+                        .foregroundStyle(STRQColors.primaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
+
+                    Text(detail)
+                        .font(STRQTypography.caption)
+                        .foregroundStyle(STRQColors.secondaryText)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: STRQSpacing.sm)
+
+                Text(value)
+                    .font(STRQTypography.labelSmall)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.74)
+
+                STRQIconView(.chevronRight, size: STRQSpacing.iconXS, tint: STRQColors.iconMuted)
+            }
+            .padding(.horizontal, STRQSpacing.listItemPadding)
+            .padding(.vertical, STRQSpacing.sm)
+            .contentShape(Rectangle())
+
+            if showsDivider {
+                Rectangle()
+                    .fill(STRQColors.divider)
+                    .frame(height: 1)
+                    .padding(.leading, 68)
+            }
+        }
+        .background(STRQColors.cardSurface)
+    }
+
+    private func privacySupportIcon(_ systemIcon: String) -> some View {
+        Image(systemName: systemIcon)
+            .font(.system(size: 15, weight: .semibold))
+            .symbolRenderingMode(.hierarchical)
+            .foregroundStyle(STRQColors.iconSecondary)
+            .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+            .background(STRQColors.controlSurface, in: .rect(cornerRadius: STRQRadii.iconContainer))
+            .overlay(
+                RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                    .strokeBorder(STRQColors.borderMuted, lineWidth: 1)
+            )
+    }
+
+    private var advancedDataResetRow: some View {
+        let tint = STRQPalette.danger
+        return HStack(alignment: .center, spacing: STRQSpacing.sm) {
+            Image(systemName: "arrow.counterclockwise")
+                .font(.system(size: 15, weight: .semibold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(tint)
+                .frame(width: STRQSpacing.iconContainerMD, height: STRQSpacing.iconContainerMD)
+                .background(tint.opacity(0.08), in: .rect(cornerRadius: STRQRadii.iconContainer))
+                .overlay(
+                    RoundedRectangle(cornerRadius: STRQRadii.iconContainer, style: .continuous)
+                        .strokeBorder(tint.opacity(0.18), lineWidth: 1)
+                )
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(L10n.tr("profile.advancedData.resetData", fallback: "Reset data"))
+                    .font(STRQTypography.labelLarge)
+                    .foregroundStyle(STRQColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+
+                Text(L10n.tr("profile.advancedData.resetDetail", fallback: "Clears data and restarts onboarding."))
+                    .font(STRQTypography.caption)
+                    .foregroundStyle(STRQColors.secondaryText)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.78)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: STRQSpacing.sm)
+
+            advancedDataProtectedPill
+
+            STRQIconView(.chevronRight, size: STRQSpacing.iconXS, tint: tint.opacity(0.58))
+        }
+        .padding(.horizontal, STRQSpacing.listItemPadding)
+        .padding(.vertical, STRQSpacing.sm)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(L10n.tr("profile.advancedData.resetData", fallback: "Reset data"))
+    }
+
+    private var advancedDataProtectedPill: some View {
+        Text(L10n.tr("profile.advancedData.protected", fallback: "Protected"))
+            .font(.system(size: 10, weight: .bold))
+            .foregroundStyle(STRQPalette.danger)
+            .lineLimit(1)
+            .minimumScaleFactor(0.74)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(STRQPalette.danger.opacity(0.10), in: Capsule())
+            .overlay(
+                Capsule()
+                    .strokeBorder(STRQPalette.danger.opacity(0.22), lineWidth: 1)
+            )
     }
 
     // MARK: - Components
@@ -1348,40 +1523,44 @@ struct ProfileView: View {
 
     private func controlsListButtonRow(
         _ label: String,
+        detail: String? = nil,
         icon: STRQIcon,
         showsDivider: Bool = true,
         opticalEmphasis: ControlsRowOpticalEmphasis = .standard,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            controlsListRowContent(label, icon: icon, showsDivider: showsDivider, opticalEmphasis: opticalEmphasis)
+            controlsListRowContent(label, detail: detail, icon: icon, showsDivider: showsDivider, opticalEmphasis: opticalEmphasis)
         }
     }
 
     private func controlsListRowContent(
         _ label: String,
+        detail: String? = nil,
         icon: STRQIcon,
         showsDivider: Bool = true,
         opticalEmphasis: ControlsRowOpticalEmphasis = .standard
     ) -> some View {
-        controlsListRowContent(label, showsDivider: showsDivider, opticalEmphasis: opticalEmphasis) {
+        controlsListRowContent(label, detail: detail, showsDivider: showsDivider, opticalEmphasis: opticalEmphasis) {
             STRQIconContainer(icon: icon, size: .md, tint: STRQColors.iconSecondary)
         }
     }
 
     private func controlsListSymbolRowContent(
         _ label: String,
+        detail: String? = nil,
         systemIcon: String,
         showsDivider: Bool = true,
         opticalEmphasis: ControlsRowOpticalEmphasis = .standard
     ) -> some View {
-        controlsListRowContent(label, showsDivider: showsDivider, opticalEmphasis: opticalEmphasis) {
+        controlsListRowContent(label, detail: detail, showsDivider: showsDivider, opticalEmphasis: opticalEmphasis) {
             controlsListSystemIcon(systemIcon)
         }
     }
 
     private func controlsListRowContent<LeadingIcon: View>(
         _ label: String,
+        detail: String? = nil,
         showsDivider: Bool = true,
         opticalEmphasis: ControlsRowOpticalEmphasis = .standard,
         @ViewBuilder leadingIcon: () -> LeadingIcon
@@ -1390,7 +1569,18 @@ struct ProfileView: View {
             HStack(spacing: STRQSpacing.sm) {
                 leadingIcon()
 
-                controlsListRowTitle(label, opticalEmphasis: opticalEmphasis)
+                VStack(alignment: .leading, spacing: 3) {
+                    controlsListRowTitle(label, opticalEmphasis: opticalEmphasis)
+
+                    if let detail {
+                        Text(detail)
+                            .font(STRQTypography.caption)
+                            .foregroundStyle(STRQColors.secondaryText)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.78)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
 
                 Spacer(minLength: STRQSpacing.sm)
 
