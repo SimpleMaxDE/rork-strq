@@ -4,9 +4,11 @@ Date: 2026-05-27
 
 Post-Profile checkpoint update: 2026-05-28
 
+Post-Recovery Trust checkpoint update: 2026-05-30
+
 Purpose: strict canonical transfer pack for a new ChatGPT/Codex session.
 
-Source status: CURRENT. Built from `AGENTS.md`, `docs/qa/strq-codex-operating-rules-2026-05-24.md`, the Profile and Progress planning docs listed in the task, current Profile/Progress/debug file inventory, `git log --oneline -n 80`, and `git status --short`.
+Source status: CURRENT. Built from `AGENTS.md`, `docs/qa/strq-codex-operating-rules-2026-05-24.md`, the Profile and Progress planning docs listed in the task, current Profile/Progress/debug file inventory, the completed Profile and Recovery Trust checkpoints, `git log --oneline -n 80`, and `git status --short`.
 
 Status labels used in this pack:
 - APPROVED = accepted direction, rule, committed artifact, or explicit current instruction.
@@ -24,11 +26,15 @@ Status labels used in this pack:
 - CURRENT: Forbidden for this task: app source code, Swift files, staging, committing, pushing.
 - CURRENT: `git status --short` shows no tracked dirty app files and no staged files.
 - CURRENT: `git status --short` shows multiple untracked QA/artifact folders plus untracked `docs/qa/profile-v3-concept-brief-2026-05-25.md` and `ios/STRQ/Views/Debug/ProfileV3PrototypeView.swift`.
-- CURRENT: `git diff --name-only` is empty; there is no tracked dirty implementation file in this checkout.
-- CURRENT: Latest commit in `git log --oneline -n 15` is `bbbc2a9 Polish profile automatic split copy`.
+- CURRENT: Before this Recovery Trust documentation update, `git diff --name-only` was empty; there was no tracked dirty implementation file in this checkout.
+- CURRENT: Latest commit in `git log --oneline -n 20` is `55c2ca8 Soften progress balance precision`.
 - CURRENT: Profile checkpoint is complete and pushed to `main` through `bbbc2a9`.
+- CURRENT: Recovery Trust checkpoint is complete and pushed to `main` through Progress P1-B at `55c2ca8`.
 - APPROVED: Profile production direction is approved enough for the current checkpoint.
 - CURRENT: Completed Profile checkpoint slices are `9d85cdb Recovery Trust Display`, `a560c1d Coach & Inputs Restructure`, `bbe5ef0 Account & Data Rehousing`, `4e940f8 Tools / Privacy / Advanced Data`, and `bbbc2a9 Auto split Copy`.
+- CURRENT: Completed Recovery Trust slices are `0bf0454 Reduce recovery score precision in key surfaces`, `1d74450 Reduce recovery precision in coaching flows`, `cbb073b Reduce recovery precision in progress`, and `55c2ca8 Soften progress balance precision`.
+- CURRENT: Today, Sleep & Recovery, Readiness Check-In, Coach, PreWorkout, and Progress have been cleaned up for major recovery/readiness fake precision.
+- BLOCKED: No visible recovery/readiness percent or score-first hero may be reintroduced without explicit approval.
 - BLOCKED: Do not continue Profile polish blindly.
 - BLOCKED: Future Profile work must start from a fresh plan/slice with reconfirmed allowed and forbidden files.
 - BLOCKED: Stage/commit/push remains blocked until the user explicitly grants that permission.
@@ -120,6 +126,7 @@ xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Release -sdk 
 - REJECTED: Academic labels, diagnostic language, vague motivational filler, AI-sounding summaries, inflated precision, and user-facing terms that require explanation.
 - REJECTED: Medical or diagnostic claims.
 - REJECTED: Fake precision.
+- REJECTED: Visible recovery/readiness percent or score-first hero unless explicitly approved for a scoped surface.
 - REJECTED: AI/lab-report wording.
 - REJECTED: Generic analytics dashboard language.
 - REJECTED: Score-first hero patterns unless explicitly approved.
@@ -257,29 +264,37 @@ BLOCKED: Production use of a new custom visual system requires screenshot approv
 | a560c1d | Restructure profile coach inputs section | Profile Production | Coach & Inputs Restructure slice | CURRENT committed Profile checkpoint slice |
 | bbe5ef0 | Rehouse profile account data section | Profile Production | Account & Data Rehousing slice | CURRENT committed Profile checkpoint slice |
 | 4e940f8 | Finish profile tools and advanced data sections | Profile Production | Tools / Privacy / Advanced Data slice | CURRENT committed Profile checkpoint slice |
-| bbbc2a9 | Polish profile automatic split copy | Profile Production | Auto split Copy slice | CURRENT latest committed Profile checkpoint slice |
+| bbbc2a9 | Polish profile automatic split copy | Profile Production | Auto split Copy slice | CURRENT committed Profile checkpoint slice |
+| 0bf0454 | Reduce recovery score precision in key surfaces | Today / Sleep & Recovery / Readiness Check-In | Reduced recovery/readiness score and percent-first presentation in key surfaces | CURRENT committed Recovery Trust P0-A |
+| 1d74450 | Reduce recovery precision in coaching flows | Coach / PreWorkout | Softened recovery/readiness precision and score-led coaching copy | CURRENT committed Recovery Trust P0-B |
+| cbb073b | Reduce recovery precision in progress | Progress | Kept Progress in Training Path mode while reducing recovery/readiness fake precision | CURRENT committed Recovery Trust P1-A |
+| 55c2ca8 | Soften progress balance precision | Progress dormant modules | Preventively softened muscle/movement/volume balance precision that could reappear later | CURRENT latest committed Recovery Trust P1-B |
 
 - CURRENT: `docs/qa/profile-v3-concept-brief-2026-05-25.md` exists but is untracked in this checkout.
 - APPROVED: The current transfer context treats Profile V3 Concept A / Athlete Identity First as the accepted direction that led to Profile V4.1.
 - CURRENT: Profile is checkpoint-complete and pushed to `main` through `bbbc2a9`.
 - APPROVED: Profile production direction is approved enough for the current checkpoint.
 - BLOCKED: Do not continue Profile polish blindly; future Profile work starts from a fresh plan.
+- CURRENT: Recovery Trust checkpoint is complete and pushed to `main` through Progress P1-B at `55c2ca8`.
+- CURRENT: Recovery Trust cleaned up major recovery/readiness fake precision across Today, Sleep & Recovery, Readiness Check-In, Coach, PreWorkout, and Progress.
+- BLOCKED: Do not reintroduce visible recovery/readiness percent or score-first hero without explicit approval.
 
 ## 9. Surface Status Map
 
 | Surface | Status | Strongest Current Parts | Known Weaknesses | Next Likely Slice | Blocked Items |
 |---|---|---|---|---|---|
-| Today | CURRENT committed polish exists | CURRENT Today activation copy and first viewport were rebuilt/polished in recent history | BLOCKED Recovery Trust / Fake Precision audit still needs app-wide pass | CURRENT app-wide trust/copy audit when scoped | BLOCKED broad redesign without plan/screenshots |
+| Today | CURRENT committed polish exists | CURRENT Today activation copy and first viewport were rebuilt/polished in recent history; Recovery Trust P0-A cleaned up major recovery/readiness fake precision | UNCERTAIN latest manual screenshots after Recovery Trust cleanup | CURRENT screenshot QA/copy audit if reopened | BLOCKED broad redesign or score-first recovery/readiness hero without approval |
 | Training tab | CURRENT app surface exists | CURRENT training structure feeds active plan flows | UNCERTAIN current visual/product approval state | UNCERTAIN audit before changes | BLOCKED broad production logic changes |
-| PreWorkout / Handoff | CURRENT committed redesign exists | CURRENT launch/handoff flow has dedicated polish commit | UNCERTAIN latest screenshot quality | UNCERTAIN QA-only pass if user raises issue | BLOCKED behavior changes without scope |
+| PreWorkout / Handoff | CURRENT committed redesign exists | CURRENT launch/handoff flow has dedicated polish commit; Recovery Trust P0-B softened recovery/readiness precision in coaching handoff copy | UNCERTAIN latest screenshot quality | UNCERTAIN QA-only pass if user raises issue | BLOCKED behavior changes or score-first readiness display without scope |
 | ActiveWorkout | CURRENT strongest surface pattern | APPROVED clear action moment, live logging, rest guidance, set table polish | UNCERTAIN residual edge cases need simulator QA | CURRENT small visual/QA slices only | BLOCKED broad workout mutation changes without explicit approval |
 | Rest Overlay | CURRENT polished rest-focus direction | APPROVED focused rest/back-off moment | UNCERTAIN exact latest screenshot state | CURRENT screenshot QA when touched | BLOCKED medical/recovery claims |
 | Completion | CURRENT committed polish | CURRENT PR/Gold reward direction is accepted when backed by real data | UNCERTAIN latest screenshot approval | CURRENT visual QA if reopened | BLOCKED fake PR/gold claims |
-| Progress | CURRENT production P1A/P2 committed | APPROVED Training Path/Progress direction, proof strip, one Next Move, lower sections | BLOCKED no broadening to muscle/PR/recovery without trust gates | CURRENT only planned, trust-gated production slices | BLOCKED node map, analytics dashboard, overclaiming |
-| Coach / More Signals | CURRENT exists | CURRENT Trainer/Coach copy hardening committed | BLOCKED density/alarmism risk remains | CURRENT copy and density audit | BLOCKED alarmist or diagnostic coaching |
-| Weekly Review | CURRENT localization committed | CURRENT localized copy hardening exists | UNCERTAIN latest product screenshots | CURRENT QA/copy audit if reopened | BLOCKED fake precision |
-| Sleep & Recovery | CURRENT daily sleep upsert fixed | CURRENT sleep data write path has recent fix | BLOCKED Recovery Trust / Fake Precision audit still needs app-wide pass | CURRENT trust/data-source audit when scoped | BLOCKED medical recovery diagnosis |
-| Nutrition / Body | CURRENT Profile body/nutrition rows exist | CURRENT nutrition toggle side effects are known/protected | BLOCKED source/precision trust gaps | CURRENT display-only quiet input slice after approval | BLOCKED side-effect changes without explicit scope |
+| Progress | CURRENT production P1A/P2 committed; Recovery Trust P1-A/P1-B complete | APPROVED Training Path/Progress direction, proof strip, one Next Move, lower sections; dormant muscle/movement/volume modules were softened preventively | UNCERTAIN dormant module screenshot quality if reactivated | CURRENT only planned, trust-gated production slices | BLOCKED node map, analytics dashboard, overclaiming, or visible recovery/readiness percent without approval |
+| Coach / More Signals | CURRENT exists | CURRENT Trainer/Coach copy hardening committed; Recovery Trust P0-B cleaned major recovery/readiness fake precision | BLOCKED density/alarmism risk remains | CURRENT copy and density audit | BLOCKED alarmist, diagnostic, or score-first coaching |
+| Weekly Review | CURRENT localization committed | CURRENT localized copy hardening exists | BLOCKED muscle-balance cleanup remains open | CURRENT Weekly Review muscle-balance cleanup when scoped | BLOCKED fake precision |
+| Sleep & Recovery | CURRENT daily sleep upsert fixed | CURRENT sleep data write path has recent fix; Recovery Trust P0-A cleaned major recovery/readiness fake precision | UNCERTAIN latest manual screenshots after Recovery Trust cleanup | CURRENT trust/data-source audit when scoped | BLOCKED medical recovery diagnosis or score-first recovery hero |
+| Readiness Check-In | CURRENT app surface exists | CURRENT Recovery Trust P0-A cleaned major readiness fake precision | UNCERTAIN latest manual screenshots after cleanup | CURRENT screenshot QA/copy audit if reopened | BLOCKED visible readiness percent or score-first hero without approval |
+| Nutrition / Body | CURRENT Profile body/nutrition rows exist | CURRENT nutrition toggle side effects are known/protected | BLOCKED Nutrition Settings / Physique recovery precision cleanup remains open | CURRENT display-only quiet input slice after approval | BLOCKED side-effect changes without explicit scope |
 | Exercise Detail / Prescription | CURRENT prescription consistency commit exists | CURRENT prescription displays aligned with Today target | BLOCKED trust bug remains known | CURRENT bugfix plan/audit | BLOCKED logic changes without diagnosis |
 | Profile | CURRENT checkpoint-complete through `bbbc2a9` | APPROVED Athlete Passport Compact direction; Profile production direction approved enough for checkpoint | BLOCKED do not continue Profile polish blindly | CURRENT no active Profile slice; future work needs fresh plan | BLOCKED future implementation without a new plan/slice |
 | Paywall / Pro | CURRENT release hygiene P0 committed | CURRENT Pro unavailable/internal copy hardened | BLOCKED revenue-sensitive behavior protected | CURRENT visual/copy QA only unless scoped | BLOCKED StoreViewModel/RevenueCat/entitlement changes |
@@ -296,8 +311,12 @@ BLOCKED: Production use of a new custom visual system requires screenshot approv
 - CURRENT: Production Progress file inventory includes tracked `ios/STRQ/Views/ProgressAnalyticsView.swift`.
 - CURRENT: Older production candidate inventory includes tracked `ios/STRQ/Views/ProgressV5ProductionCandidateView.swift`.
 - CURRENT: Production Progress P1A/P2 commits exist: `ffb4871` and `4f85d55`.
+- CURRENT: Recovery Trust Progress P1-A/P1-B commits exist: `cbb073b` and `55c2ca8`.
+- CURRENT: Progress remains Training Path, not an analytics dashboard.
+- CURRENT: Dormant Progress muscle/movement/volume modules were softened preventively during Recovery Trust P1-B, but need screenshots and review if reactivated.
 - BLOCKED: Do not broaden Progress without an explicit production integration plan.
-- BLOCKED: Do not add muscle, PR/best-set, or recovery states to production unless trust gates and screenshot review are explicitly approved.
+- BLOCKED: Do not add or reintroduce muscle, movement, volume, PR/best-set, recovery, or readiness states to production unless trust gates and screenshot review are explicitly approved.
+- BLOCKED: Do not reintroduce visible recovery/readiness percent or a score-first Progress hero without explicit approval.
 - UNCERTAIN: `docs/qa/progress-prototype-brief-v1-2026-05-21.md` references `/Users/simplemax/Documents/progress_reference_matrix_report_full.md`, but that report is not present as a repo file in the searched repo paths.
 
 ## 11. Profile Current State
@@ -329,6 +348,23 @@ BLOCKED: Production use of a new custom visual system requires screenshot approv
 - BLOCKED: Staging, committing, and pushing remain blocked without explicit user approval.
 - CURRENT: Untracked Profile screenshot QA folders must remain untracked unless explicitly requested.
 
+## 11A. Recovery Trust Current State
+
+- CURRENT: Recovery Trust checkpoint is complete and pushed to `main` through Progress P1-B at `55c2ca8`.
+- CURRENT: P0-A is committed at `0bf0454 Reduce recovery score precision in key surfaces`.
+- CURRENT: P0-B is committed at `1d74450 Reduce recovery precision in coaching flows`.
+- CURRENT: P1-A is committed at `cbb073b Reduce recovery precision in progress`.
+- CURRENT: P1-B is committed at `55c2ca8 Soften progress balance precision`.
+- CURRENT: Today, Sleep & Recovery, Readiness Check-In, Coach, PreWorkout, and Progress have been cleaned up for major recovery/readiness fake precision.
+- CURRENT: Progress remains Training Path, not an analytics dashboard.
+- CURRENT: Dormant Progress muscle/movement/volume modules were softened preventively, but need screenshots and product review if reactivated.
+- BLOCKED: No visible recovery/readiness percent or score-first hero may be reintroduced without explicit approval.
+- BLOCKED: Weekly Review muscle-balance cleanup remains a future separate slice.
+- BLOCKED: Nutrition Settings / Physique recovery precision cleanup remains a future separate slice.
+- BLOCKED: English-first / Localization Consistency Audit remains a future separate slice.
+- BLOCKED: Reset Safety / Destructive Action UX remains a future separate slice.
+- BLOCKED: Release / Debug Gating Audit remains a future separate slice before App Store or release work.
+
 ## 12. Rejected Direction Ledger
 
 - REJECTED: Progress abstract node map as the first viewport.
@@ -343,6 +379,7 @@ BLOCKED: Production use of a new custom visual system requires screenshot approv
 - REJECTED: Avatar/companion direction.
 - REJECTED: Medical claims.
 - REJECTED: Fake precision.
+- REJECTED: Visible recovery/readiness percent or score-first hero unless explicitly approved.
 - REJECTED: Scientific UI copy.
 - REJECTED: Release-visible debug tools, internal previews, diagnostics, fixture states, package/build/sandbox copy, or internal labels.
 
@@ -350,8 +387,11 @@ BLOCKED: Production use of a new custom visual system requires screenshot approv
 
 - CURRENT: There is no active Profile implementation slice after the post-Profile checkpoint.
 - CURRENT: Profile is checkpoint-complete and pushed to `main` through `bbbc2a9`.
+- CURRENT: There is no active Recovery Trust implementation slice after Progress P1-B.
+- CURRENT: Recovery Trust checkpoint is complete and pushed to `main` through `55c2ca8`.
 - APPROVED: Profile production direction is approved enough for the current checkpoint.
 - BLOCKED: Do not continue Profile polish blindly.
+- BLOCKED: Do not continue Recovery Trust polish blindly; remaining cleanup needs separately scoped slices.
 - CURRENT: `ProfileView.swift` was not dirty before this documentation update.
 - CURRENT: User captures screenshots manually by default.
 - CURRENT: Default screenshot device is iPhone 17 Pro Max only.
@@ -375,14 +415,17 @@ xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Release -sdk 
 
 - BLOCKED: Stop condition is unclear file scope, build failure, blind Profile polish, or any need to touch forbidden systems.
 - APPROVED: Profile checkpoint success criteria were no behavior changes, no route changes, no debug leak, no Pro hero, no reset hero, clear Athlete Passport first viewport, Pro below setup/body, clean build, and accepted manual screenshot review.
-- CURRENT: Carry forward app-wide Recovery Trust / Fake Precision Audit for Today and Sleep & Recovery.
+- CURRENT: Carry forward Weekly Review muscle-balance cleanup.
+- CURRENT: Carry forward Nutrition Settings / Physique recovery precision cleanup.
+- CURRENT: Carry forward English-first / Localization Consistency Audit.
 - CURRENT: Carry forward Reset Safety / Destructive Action UX as a future separate slice.
 - CURRENT: Carry forward Release / Debug Gating Audit before App Store or release work.
 - CURRENT: Optional future Training Setup concept polish remains possible, but not now.
 
 ## 14. Current Dirty / Untracked State Rules
 
-- CURRENT: Tracked dirty files: none from `git status --short`.
+- CURRENT: Tracked dirty files before this Recovery Trust documentation update: none from `git status --short`.
+- CURRENT: Expected tracked dirty file from this documentation-only task is `docs/qa/strq-master-transfer-pack-v2-2026-05-27.md`.
 - CURRENT: Staged files: none from `git status --short`.
 - CURRENT: Important untracked files/folders from `git status --short`:
 
@@ -414,7 +457,6 @@ xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Release -sdk 
 | `docs/qa/progress-path-v031-2026-05-22/` | QA ARTIFACT | CURRENT: leave untracked unless explicitly requested |
 | `docs/qa/progress-path-v031-polish-2026-05-22/` | QA ARTIFACT | CURRENT: leave untracked unless explicitly requested |
 | `docs/qa/progress-training-map-redesign-plan-2026-05-21.md` | CURRENT DOC ARTIFACT / UNCERTAIN TRACKING | CURRENT: used as source, untracked per status; do not stage without approval |
-| `docs/qa/strq-master-transfer-pack-v2-2026-05-27.md` | CURRENT DOC ARTIFACT | CURRENT: allowed transfer-pack output; do not stage without approval |
 | `docs/qa/strq-new-chat-transfer-2026-05-22.md` | QA / TRANSFER ARTIFACT | CURRENT: leave untracked unless explicitly requested |
 | `docs/qa/strq-screen-map-snapshot-2026-05-21/` | QA ARTIFACT | CURRENT: leave untracked unless explicitly requested |
 | `ios/STRQ/Views/Debug/ProfileV3PrototypeView.swift` | REJECTED / UNCERTAIN SOURCE ARTIFACT | REJECTED: do not use or stage unless explicitly revived |
@@ -428,10 +470,15 @@ xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Release -sdk 
 - BLOCKED: Coach / More Signals has density/alarmism risk.
 - CURRENT: Profile checkpoint is complete; do not continue Profile polish blindly.
 - BLOCKED: Future Profile implementation requires a fresh plan/slice.
-- BLOCKED: App-wide Recovery Trust / Fake Precision Audit remains open for Today and Sleep & Recovery.
+- CURRENT: Recovery Trust checkpoint is complete through Progress P1-B at `55c2ca8`.
+- BLOCKED: No visible recovery/readiness percent or score-first hero may be reintroduced without explicit approval.
+- BLOCKED: Weekly Review muscle-balance cleanup remains open.
+- BLOCKED: Nutrition Settings / Physique recovery precision cleanup remains open.
+- BLOCKED: English-first / Localization Consistency Audit remains open.
 - BLOCKED: Reset Safety / Destructive Action UX remains a future separate slice.
 - BLOCKED: Progress PR/Best Set state is not production-verified.
-- BLOCKED: Muscle coverage and recovery require trust gates before production claims.
+- BLOCKED: Progress dormant muscle/movement/volume modules were softened preventively, but need screenshots and review if reactivated.
+- BLOCKED: Muscle coverage, movement balance, volume balance, and recovery require trust gates before production claims.
 - BLOCKED: Localization is not active except explicit localization slices.
 - BLOCKED: App Store / onboarding / release polish remains open.
 - BLOCKED: Release / Debug Gating Audit remains required before App Store or release work.
@@ -696,8 +743,9 @@ Only after explicit approval:
 | strq_no_commit | git | high | BLOCKED: No stage, commit, or push without explicit approval. |
 | strq_ui_approval | qa | high | APPROVED: Build pass is not approval; UI needs screenshots and user/ChatGPT review. |
 | strq_language | copy | high | APPROVED: English-first; short gym-native copy; no medical, fake precision, AI, or lab wording. |
-| strq_progress_direction | progress | high | APPROVED: Progress Training Path with state headline, proof strip, one Next Move, lower proof sections. |
+| strq_progress_direction | progress | high | APPROVED: Progress Training Path with state headline, proof strip, one Next Move, lower proof sections; not an analytics dashboard. |
 | strq_progress_rejected | progress | high | REJECTED: node map first viewport, analytics dashboard, score-first, avatar, fake precision. |
+| strq_recovery_trust | recovery | high | CURRENT: Recovery Trust checkpoint complete and pushed through Progress P1-B at 55c2ca8; Today, Sleep & Recovery, Readiness Check-In, Coach, PreWorkout, and Progress cleaned up for major recovery/readiness fake precision; no visible recovery/readiness percent or score-first hero without explicit approval. |
 | strq_profile_direction | profile | high | APPROVED: Profile V4.1 Athlete Passport Compact, identity first, Pro below setup, reset isolated; production direction approved enough for checkpoint. |
 | strq_profile_active | profile | high | CURRENT: Profile checkpoint-complete and pushed to main through bbbc2a9; no active Profile implementation slice. |
 | strq_profile_blocked | profile | high | BLOCKED: Do not continue Profile polish blindly; future Profile work requires a fresh plan/slice; no stage/commit/push without explicit approval. |
@@ -706,7 +754,7 @@ Only after explicit approval:
 | strq_build_debug | tooling | medium | CURRENT: xcodebuild Debug generic simulator CODE_SIGNING_ALLOWED=NO build is default compile check. |
 | strq_dirty_rules | git | high | CURRENT: Untracked QA folders are evidence only; leave untracked unless explicitly requested. |
 | strq_screenshot_rule | qa | high | APPROVED: User captures screenshots manually by default; after every UI/implementation change, launch updated app on iPhone 17 Pro Max before asking for screenshots. |
-| strq_future_blockers | roadmap | medium | BLOCKED: prescription trust, Coach density, Today/Sleep Recovery Trust and Fake Precision audit, Reset Safety/Destructive Action UX, Progress PR/muscle/recovery trust gates, Release/Debug Gating Audit. |
+| strq_future_blockers | roadmap | medium | BLOCKED: prescription trust, Coach density, Weekly Review muscle-balance cleanup, Nutrition Settings / Physique recovery precision cleanup, English-first / Localization Consistency Audit, Reset Safety / Destructive Action UX, Progress dormant module screenshots if reactivated, Release / Debug Gating Audit. |
 
 ## 19. New Chat Bootstrap Prompt
 
@@ -737,8 +785,11 @@ STRQ is an iOS fitness/strength app targeting App-of-the-Year-level quality by 2
 Profile checkpoint:
 Profile is checkpoint-complete and pushed to main through bbbc2a9. Completed slices are 9d85cdb Recovery Trust Display, a560c1d Coach & Inputs Restructure, bbe5ef0 Account & Data Rehousing, 4e940f8 Tools / Privacy / Advanced Data, and bbbc2a9 Auto split Copy. Profile production direction is approved enough for the current checkpoint.
 
+Recovery Trust checkpoint:
+Recovery Trust is checkpoint-complete and pushed to main through Progress P1-B at 55c2ca8. Completed slices are 0bf0454 Reduce recovery score precision in key surfaces, 1d74450 Reduce recovery precision in coaching flows, cbb073b Reduce recovery precision in progress, and 55c2ca8 Soften progress balance precision. Today, Sleep & Recovery, Readiness Check-In, Coach, PreWorkout, and Progress have been cleaned up for major recovery/readiness fake precision. No visible recovery/readiness percent or score-first hero should be reintroduced without explicit approval. Progress remains Training Path, not an analytics dashboard. Dormant Progress muscle/movement/volume modules were softened preventively, but need screenshots and product review if reactivated.
+
 Active slice:
-There is no active Profile implementation slice unless the user explicitly creates one. Do not continue Profile polish blindly. Future Profile implementation requires a fresh plan/slice and reconfirmed allowed files.
+There is no active Profile or Recovery Trust implementation slice unless the user explicitly creates one. Do not continue Profile or Recovery Trust polish blindly. Future Profile implementation requires a fresh plan/slice and reconfirmed allowed files. Remaining Recovery Trust carry-forward is Weekly Review muscle-balance cleanup, Nutrition Settings / Physique recovery precision cleanup, English-first / Localization Consistency Audit, Reset Safety / Destructive Action UX, and Release / Debug Gating Audit.
 
 Allowed/forbidden rule:
 Identify allowed and forbidden files before editing. If allowed/forbidden files are unclear, do not edit.
@@ -757,10 +808,12 @@ Current warnings:
 - Do not treat uncommitted work as approved.
 - Do not treat old dirty-slice text as current if git status and git diff disagree.
 - Do not reopen or polish Profile without a fresh plan.
+- Do not reintroduce visible recovery/readiness percent or score-first hero without explicit approval.
+- Keep Progress as Training Path, not an analytics dashboard.
 - Leave untracked QA folders untracked unless explicitly requested.
 - Treat ios/STRQ/Views/Debug/ProfileV3PrototypeView.swift as rejected/untracked residue unless explicitly revived.
 - Do not continue from memory alone; verify source files and status.
-- Carry forward Today/Sleep Recovery Trust and Fake Precision audit, Reset Safety/Destructive Action UX, Release/Debug Gating Audit, and optional future Training Setup concept polish, but do not start them without explicit scope.
+- Carry forward Weekly Review muscle-balance cleanup, Nutrition Settings / Physique recovery precision cleanup, English-first / Localization Consistency Audit, Reset Safety / Destructive Action UX, Release / Debug Gating Audit, and optional future Training Setup concept polish, but do not start them without explicit scope.
 ```
 
 ## 20. Strictness Clause
