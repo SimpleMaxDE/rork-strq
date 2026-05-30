@@ -78,6 +78,14 @@ struct ProgressAnalyticsView: View {
         let state: STRQPalette.State
     }
 
+    private struct ProgressRecoveryContext {
+        let value: String
+        let detail: String
+        let body: String
+        let progress: Double
+        let state: STRQPalette.State
+    }
+
     private struct ProgressP1Snapshot {
         let family: ProgressP1Family
         let headline: String
@@ -1895,7 +1903,7 @@ struct ProgressAnalyticsView: View {
         let consistencyDisplay = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: target)
         let workoutProgress = min(Double(vm.totalCompletedWorkouts) / 4.0, 1)
         let consistencyProgress = min(Double(vm.weeklyStats.sessions) / Double(target), 1)
-        let recoveryProgress = min(Double(vm.effectiveRecoveryScore) / 100.0, 1)
+        let recoveryContext = progressRecoveryContext
         let strengthProgress = vm.hasEnoughDataForStrengthChart ? min(Double(vm.strengthProgress.count) / 8.0, 1) : min(Double(vm.strengthProgress.count) / 4.0, 0.72)
 
         return [
@@ -1925,11 +1933,11 @@ struct ProgressAnalyticsView: View {
             ),
             ProofAxisItem(
                 title: L10n.tr("Context"),
-                value: "\(vm.effectiveRecoveryScore)%",
+                value: recoveryContext.value,
                 detail: L10n.tr("recovery"),
                 icon: "heart.fill",
-                progress: recoveryProgress,
-                state: vm.totalCompletedWorkouts == 0 ? .neutral : (vm.effectiveRecoveryScore >= 70 ? .success : (vm.effectiveRecoveryScore >= 55 ? .warning : .danger))
+                progress: recoveryContext.progress,
+                state: recoveryContext.state
             )
         ]
     }
@@ -2103,7 +2111,7 @@ struct ProgressAnalyticsView: View {
         let consistencyDisplay = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: target)
         let workoutsState: STRQPalette.State = vm.totalCompletedWorkouts >= 4 ? .success : (vm.totalCompletedWorkouts > 0 ? .info : .neutral)
         let consistencyState: STRQPalette.State = vm.weeklyStats.sessions >= target ? .success : (vm.weeklyStats.sessions > 0 ? .warning : .neutral)
-        let recoveryState: STRQPalette.State = vm.totalCompletedWorkouts == 0 ? .neutral : (vm.effectiveRecoveryScore >= 70 ? .success : (vm.effectiveRecoveryScore >= 55 ? .warning : .danger))
+        let recoveryContext = progressRecoveryContext
 
         return [
             ProofTrustItem(
@@ -2122,10 +2130,10 @@ struct ProgressAnalyticsView: View {
             ),
             ProofTrustItem(
                 title: L10n.tr("Recovery"),
-                value: "\(vm.effectiveRecoveryScore)%",
-                detail: vm.totalCompletedWorkouts == 0 ? L10n.tr("Context only") : L10n.tr("Training context"),
+                value: recoveryContext.value,
+                detail: recoveryContext.detail,
                 icon: "heart.fill",
-                state: recoveryState
+                state: recoveryContext.state
             )
         ]
     }
@@ -2276,7 +2284,7 @@ struct ProgressAnalyticsView: View {
 
         return VStack(alignment: .leading, spacing: 11) {
             HStack(spacing: 8) {
-                Text(L10n.tr("SIGNAL READINESS"))
+                Text(L10n.tr("PROOF STATUS"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(1.1)
                     .foregroundStyle(STRQBrand.steel)
@@ -2553,8 +2561,8 @@ struct ProgressAnalyticsView: View {
 
         if vm.effectiveRecoveryScore >= 70 {
             return ImprovementSignal(
-                title: L10n.tr("Recovery is supporting training"),
-                detail: L10n.format("%d%% recovery score", vm.effectiveRecoveryScore),
+                title: L10n.tr("Recovery is steady"),
+                detail: L10n.tr("Use it as context, not a verdict."),
                 icon: "heart.fill",
                 state: .success
             )
@@ -2811,20 +2819,22 @@ struct ProgressAnalyticsView: View {
     private var metricItems: [(icon: String, value: String, label: String, caption: String, color: Color)] {
         let target = max(1, min(3, vm.profile.daysPerWeek))
         let targetDisplay = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: target)
+        let recoveryContext = progressRecoveryContext
+        let recoveryColor = STRQPalette.color(for: recoveryContext.state)
 
         if vm.isEarlyStage {
             return [
                 ("figure.strengthtraining.traditional", "\(vm.totalCompletedWorkouts)", L10n.tr("Logged"), vm.totalCompletedWorkouts == 0 ? L10n.tr("baseline forming") : L10n.tr("first signal"), STRQBrand.steel),
                 ("calendar.badge.clock", targetDisplay.primary, L10n.tr("Target"), targetDisplay.isAtOrAboveTarget ? targetDisplay.compactDetail : L10n.tr("building pattern"), STRQBrand.steel),
                 ("flame.fill", "\(vm.streak)", L10n.tr("Streak"), vm.streak > 0 ? L10n.tr("active") : L10n.tr("not started"), STRQBrand.steel),
-                ("heart.fill", "\(vm.effectiveRecoveryScore)%", L10n.tr("Recovery"), L10n.tr("context"), ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+                ("heart.fill", recoveryContext.value, L10n.tr("Recovery"), L10n.tr("context"), recoveryColor)
             ]
         } else {
             return [
                 ("arrow.up.right", "\(vm.progressingExercises.count)", L10n.tr("Progressing"), vm.progressingExercises.isEmpty ? L10n.tr("watching") : L10n.tr("moving"), STRQPalette.success),
                 ("flame.fill", "\(vm.streak)", L10n.tr("Streak"), vm.streak > 0 ? L10n.tr("current run") : L10n.tr("ready"), STRQBrand.steel),
                 ("figure.strengthtraining.traditional", "\(vm.totalCompletedWorkouts)", L10n.tr("Workouts"), L10n.tr("history"), STRQBrand.steel),
-                ("heart.fill", "\(vm.effectiveRecoveryScore)%", L10n.tr("Recovery"), L10n.tr("context"), ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore))
+                ("heart.fill", recoveryContext.value, L10n.tr("Recovery"), L10n.tr("context"), recoveryColor)
             ]
         }
     }
@@ -4559,58 +4569,110 @@ struct ProgressAnalyticsView: View {
         let data = vm.recoveryTrendData
         if data.count >= 3 {
             let avgScore = data.map(\.score).reduce(0, +) / max(1, data.count)
-            let scoreState: STRQPalette.State = avgScore >= 75 ? .success : avgScore >= 55 ? .warning : .danger
-            let scoreColor = STRQPalette.color(for: scoreState)
+            let context = recoveryContext(for: avgScore, hasTrainingData: vm.totalCompletedWorkouts > 0)
+            let contextColor = STRQPalette.color(for: context.state)
 
-            evidenceModule(border: scoreColor.opacity(0.18)) {
+            evidenceModule(border: contextColor.opacity(0.18)) {
                 VStack(alignment: .leading, spacing: 14) {
                     evidenceHeader(
-                        title: L10n.tr("Recovery Trend"),
-                        trailing: L10n.format("Avg %d", avgScore),
-                        icon: "waveform.path.ecg",
-                        state: scoreState,
-                        subtitle: L10n.tr("Training context, not a medical read")
+                        title: L10n.tr("Recovery Context"),
+                        trailing: context.value,
+                        icon: "heart.fill",
+                        state: context.state,
+                        subtitle: L10n.tr("Use it as context, not a verdict.")
                     )
 
-                    plotShell(height: 132) {
-                        Chart {
-                            ForEach(data, id: \.date) { item in
-                                AreaMark(x: .value("Date", item.date), y: .value("Score", item.score))
-                                    .foregroundStyle(
-                                        LinearGradient(colors: [scoreColor.opacity(0.16), scoreColor.opacity(0.02)], startPoint: .top, endPoint: .bottom)
-                                    )
-                                    .interpolationMethod(.catmullRom)
-                                LineMark(x: .value("Date", item.date), y: .value("Score", item.score))
-                                    .foregroundStyle(scoreColor).interpolationMethod(.catmullRom).lineStyle(StrokeStyle(lineWidth: 2))
-                            }
-                            RuleMark(y: .value("Good", 70))
-                                .foregroundStyle(STRQPalette.success.opacity(0.25))
-                                .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
-                        }
-                        .chartYScale(domain: 30...100)
-                        .chartYAxis {
-                            AxisMarks(position: .leading, values: [40, 60, 80, 100]) { _ in
-                                AxisGridLine(stroke: StrokeStyle(lineWidth: 0.3)).foregroundStyle(Color.white.opacity(0.12))
-                                AxisValueLabel().foregroundStyle(Color.secondary)
-                            }
-                        }
-                        .chartXAxis {
-                            AxisMarks(values: .stride(by: .day, count: 3)) { _ in
-                                AxisValueLabel(format: .dateTime.weekday(.narrow)).foregroundStyle(Color.secondary)
-                            }
-                        }
-                    }
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "line.3.horizontal.decrease")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(contextColor)
+                            .frame(width: 30, height: 30)
+                            .background(contextColor.opacity(0.12), in: .rect(cornerRadius: 10))
 
-                    HStack(spacing: 10) {
-                        evidenceChip(icon: "line.3.horizontal.decrease", text: L10n.tr("70 reference"), state: .success)
-                        Text(L10n.tr("Use this beside training load and sleep, not as a diagnosis."))
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(.tertiary)
-                            .fixedSize(horizontal: false, vertical: true)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(context.body)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.white.opacity(0.88))
+                                .fixedSize(horizontal: false, vertical: true)
+                            Text(L10n.tr("Keep the week controlled and compare it with training load and sleep."))
+                                .font(.caption2.weight(.medium))
+                                .foregroundStyle(.tertiary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        Spacer(minLength: 0)
                     }
+                    .padding(12)
+                    .background(Color.white.opacity(0.03), in: .rect(cornerRadius: 14))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .strokeBorder(contextColor.opacity(0.10), lineWidth: 1)
+                    )
                 }
             }
         }
+    }
+
+    private var progressRecoveryContext: ProgressRecoveryContext {
+        recoveryContext(for: vm.effectiveRecoveryScore, hasTrainingData: vm.totalCompletedWorkouts > 0)
+    }
+
+    private func recoveryContext(for score: Int, hasTrainingData: Bool) -> ProgressRecoveryContext {
+        let context: ProgressRecoveryContext
+
+        if score >= 75 {
+            context = ProgressRecoveryContext(
+                value: L10n.tr("Ready"),
+                detail: L10n.tr("Recovery context"),
+                body: L10n.tr("Recovery looks ready for normal training."),
+                progress: 0.86,
+                state: .success
+            )
+        } else if score >= 65 {
+            context = ProgressRecoveryContext(
+                value: L10n.tr("Steady"),
+                detail: L10n.tr("Recovery context"),
+                body: L10n.tr("Recovery looks steady."),
+                progress: 0.70,
+                state: .success
+            )
+        } else if score >= 55 {
+            context = ProgressRecoveryContext(
+                value: L10n.tr("Light"),
+                detail: L10n.tr("Keep the week controlled."),
+                body: L10n.tr("Recovery looks light. Keep the next move simple."),
+                progress: 0.54,
+                state: .warning
+            )
+        } else if score >= 45 {
+            context = ProgressRecoveryContext(
+                value: L10n.tr("Low"),
+                detail: L10n.tr("Keep the next move simple."),
+                body: L10n.tr("Recovery looks low. Keep the next move simple."),
+                progress: 0.38,
+                state: .danger
+            )
+        } else {
+            context = ProgressRecoveryContext(
+                value: L10n.tr("Rest"),
+                detail: L10n.tr("Keep the week controlled."),
+                body: L10n.tr("Recovery looks low. Keep the week controlled."),
+                progress: 0.24,
+                state: .danger
+            )
+        }
+
+        guard hasTrainingData else {
+            return ProgressRecoveryContext(
+                value: context.value,
+                detail: L10n.tr("Context only"),
+                body: context.body,
+                progress: 0.42,
+                state: .neutral
+            )
+        }
+
+        return context
     }
 
     @ViewBuilder
