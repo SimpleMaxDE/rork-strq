@@ -147,7 +147,7 @@ nonisolated struct DailyBriefingEngine: Sendable {
 
         return WeeklyTargetDisplay(
             primary: primary,
-            inlinePrimary: L10n.format("%@ · +%d zusätzlich", primary, completed - target)
+            inlinePrimary: String(format: "%@ · +%d extra", primary, completed - target)
         )
     }
 
@@ -161,12 +161,12 @@ nonisolated struct DailyBriefingEngine: Sendable {
         case .direct:
             // Strip softeners for a sharper read.
             detail = detail
-                .replacingOccurrences(of: L10n.tr("Lass uns "), with: "")
-                .replacingOccurrences(of: L10n.tr("lass uns "), with: "")
+                .replacingOccurrences(of: "Let's ", with: "")
+                .replacingOccurrences(of: "let's ", with: "")
         case .supportive:
             // Only prepend a soft lead when it reads naturally.
             if p.kind == .trainToday || p.kind == .startFirstSession {
-                detail = L10n.tr("Du hast das im Griff. ") + detail
+                detail = "You've got this. " + detail
             }
         case .balanced:
             break
@@ -175,11 +175,11 @@ nonisolated struct DailyBriefingEngine: Sendable {
         // Emphasis-tuned framing on the primary title for rest-day guidance.
         switch input.emphasis {
         case .recovery where p.kind == .recoveryDay:
-            title = L10n.tr("Erholung bewusst planen")
+            title = "Let recovery lead"
         case .physique where p.kind == .logBodyWeight:
-            title = L10n.tr("Wiegen hält den Trend sauber")
+            title = "Keep the trend honest"
         case .consistency where p.kind == .recoveryDay && input.streak >= 3:
-            title = L10n.tr("Serie ruhig halten")
+            title = "Keep the streak calm"
         case .simplicity:
             // Trim supporting detail to a single clear sentence.
             if let first = detail.split(separator: ".").first {
@@ -206,24 +206,24 @@ nonisolated struct DailyBriefingEngine: Sendable {
         if i.hasActiveWorkout {
             return .init(
                 kind: .resumeWorkout,
-                eyebrow: L10n.tr("AKTIV"),
-                title: L10n.tr("Workout fortsetzen"),
-                detail: L10n.tr("Mach dort weiter, wo du aufgehört hast. Deine geloggten Sätze sind gespeichert."),
+                eyebrow: "ACTIVE",
+                title: "Resume workout",
+                detail: "Pick up where you left off. Your logged sets are saved.",
                 icon: "play.circle.fill",
                 colorName: "blue",
-                ctaTitle: L10n.tr("Fortsetzen")
+                ctaTitle: "Resume"
             )
         }
 
         if !i.hasPlan || !i.hasCompletedOnboarding {
             return .init(
                 kind: .startFirstSession,
-                eyebrow: L10n.tr("START"),
-                title: L10n.tr("Erstes Workout starten"),
-                detail: L10n.tr("STRQ kalibriert sich über deine geloggten Sätze. Nach dem ersten Workout wird der Coach konkreter."),
+                eyebrow: "START",
+                title: "Start workout one",
+                detail: "STRQ starts reading from your logged sets. After the first workout, Coach gets clearer.",
                 icon: "sparkles",
                 colorName: "green",
-                ctaTitle: L10n.tr("Beginnen")
+                ctaTitle: "Begin"
             )
         }
 
@@ -232,45 +232,45 @@ nonisolated struct DailyBriefingEngine: Sendable {
             if i.painOrRestriction {
                 return .init(
                     kind: .recoverToday,
-                    eyebrow: L10n.tr("RUHIGER PLANEN"),
-                    title: L10n.tr("Heute schonen"),
-                    detail: L10n.tr("Du hast Schmerz oder Einschränkung markiert. Schwere Sätze auslassen und Bewegungsqualität priorisieren."),
+                    eyebrow: "KEEP IT LIGHT",
+                    title: "Keep today lighter",
+                    detail: "Restriction noted. Skip heavy sets and keep movement quality first.",
                     icon: "shield.checkered",
                     colorName: "orange",
-                    ctaTitle: L10n.tr("Heute anpassen")
+                    ctaTitle: "Adjust today"
                 )
             }
             if i.hasCheckedInToday && i.effectiveRecoveryScore < 45 {
                 return .init(
                     kind: .recoverToday,
-                    eyebrow: L10n.tr("ERHOLUNG ZUERST"),
-                    title: L10n.tr("Heute leichter"),
-                    detail: L10n.tr("Tagesform ist niedrig. Eine kürzere, leichtere Einheit passt besser als heute hart zu erzwingen."),
+                    eyebrow: "RECOVERY FIRST",
+                    title: "Keep today lighter",
+                    detail: "Today reads low. A shorter, lighter session fits better than forcing it.",
                     icon: "heart.circle.fill",
                     colorName: "orange",
-                    ctaTitle: L10n.tr("Leichtere Einheit öffnen")
+                    ctaTitle: "Open lighter session"
                 )
             }
             if !i.hasCheckedInToday && i.hour < 12 {
                 return .init(
                     kind: .checkInBeforeTraining,
-                    eyebrow: L10n.tr("TRAININGSTAG"),
-                    title: L10n.tr("Check-in, dann Training"),
-                    detail: L10n.format("Ein kurzer Readiness-Check hilft STRQ, %@ an die heutige Lage anzupassen.", name),
+                    eyebrow: "TRAINING DAY",
+                    title: "Check in, then train",
+                    detail: String(format: "A quick readiness check helps STRQ tune %@ for today.", name),
                     icon: "heart.text.clipboard",
                     colorName: "blue",
-                    ctaTitle: L10n.tr("Check-in")
+                    ctaTitle: "Check-in"
                 )
             }
-            let focusBit = i.todaysFocus.map { L10n.format(" — %@", $0.lowercased()) } ?? ""
+            let focusBit = i.todaysFocus.map { String(format: " — %@", $0.lowercased()) } ?? ""
             return .init(
                 kind: .trainToday,
-                eyebrow: L10n.tr("TRAININGSTAG"),
-                title: L10n.format("%@ trainieren", name),
-                detail: L10n.format("Die heutige Einheit ist bereit%@. Gut aufwärmen und mit den Hauptlifts starten.", focusBit),
+                eyebrow: "TRAINING DAY",
+                title: String(format: "Train %@", name),
+                detail: String(format: "Today's workout is ready%@. Warm up well and start with the main lifts.", focusBit),
                 icon: "bolt.fill",
                 colorName: "green",
-                ctaTitle: L10n.tr("Workout starten")
+                ctaTitle: "Start workout"
             )
         }
 
@@ -278,36 +278,36 @@ nonisolated struct DailyBriefingEngine: Sendable {
         if i.missingWeightDays >= 4 {
             return .init(
                 kind: .logBodyWeight,
-                eyebrow: L10n.tr("ERHOLUNGSTAG"),
-                title: L10n.tr("Körpergewicht loggen"),
-                detail: L10n.format("Seit %d Tagen fehlt ein Log. Ein kurzer Eintrag hält die Trendlinie sauber.", i.missingWeightDays),
+                eyebrow: "RECOVERY DAY",
+                title: "Log body weight",
+                detail: String(format: "%d days without a log. One quick entry keeps the trend honest.", i.missingWeightDays),
                 icon: "scalemass.fill",
                 colorName: "blue",
-                ctaTitle: L10n.tr("Gewicht loggen")
+                ctaTitle: "Log weight"
             )
         }
 
         if let next = i.nextWorkoutName, let days = i.nextWorkoutInDays, days <= 2 {
-            let when = days == 0 ? L10n.tr("später heute") : days == 1 ? L10n.tr("morgen") : L10n.format("in %d Tagen", days)
+            let when = days == 0 ? "later today" : days == 1 ? "tomorrow" : String(format: "in %d days", days)
             return .init(
                 kind: .prepNextSession,
-                eyebrow: L10n.tr("ERHOLUNGSTAG"),
-                title: L10n.format("%@ vorbereiten", next),
-                detail: L10n.format("Nächste Einheit: %@. Schlaf, Protein und ein kurzer Spaziergang machen das Workout planbarer.", when),
+                eyebrow: "RECOVERY DAY",
+                title: String(format: "Prep %@", next),
+                detail: String(format: "Next session: %@. Sleep, protein, and an easy walk make the workout more predictable.", when),
                 icon: "calendar.badge.clock",
                 colorName: "blue",
-                ctaTitle: L10n.tr("Workout ansehen")
+                ctaTitle: "View workout"
             )
         }
 
         return .init(
             kind: .recoveryDay,
-            eyebrow: L10n.tr("ERHOLUNGSTAG"),
-            title: L10n.tr("Erholung arbeiten lassen"),
-                detail: L10n.tr("Keine Einheit geplant. Leichte Bewegung, Protein und Schlaf stützen das nächste Workout."),
+            eyebrow: "RECOVERY DAY",
+            title: "Let recovery lead",
+            detail: "No workout planned. Easy movement, protein, and sleep support the next lift.",
             icon: "leaf.fill",
             colorName: "green",
-            ctaTitle: nil != i.lastCompletedSessionName ? L10n.tr("Letztes Workout prüfen") : L10n.tr("Plan ansehen")
+            ctaTitle: nil != i.lastCompletedSessionName ? "Review last workout" : "View plan"
         )
     }
 
@@ -332,11 +332,11 @@ nonisolated struct DailyBriefingEngine: Sendable {
             return DailyBriefing.Momentum(title: title, icon: i.topMomentumIcon ?? "arrow.up.right.circle.fill")
         }
         if i.streak >= 3 {
-            return DailyBriefing.Momentum(title: L10n.format("%d-Tage-Serie hält", i.streak), icon: "flame.fill")
+            return DailyBriefing.Momentum(title: String(format: "%d-day streak holds", i.streak), icon: "flame.fill")
         }
         if i.weeklyPlanned > 0, i.weeklyCompleted >= i.weeklyPlanned {
             let display = weeklyTargetDisplay(completed: i.weeklyCompleted, target: i.weeklyPlanned)
-            return DailyBriefing.Momentum(title: L10n.format("Wochenziel erreicht - %@", display.inlinePrimary), icon: "checkmark.seal.fill")
+            return DailyBriefing.Momentum(title: String(format: "Weekly target hit - %@", display.inlinePrimary), icon: "checkmark.seal.fill")
         }
         return nil
     }
@@ -359,34 +359,34 @@ nonisolated struct DailyBriefingEngine: Sendable {
 
     private func localizedSinceLastEyebrow(_ raw: String) -> String {
         let normalized = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        if normalized.contains("frequency improved") { return L10n.tr("Rhythmus verbessert") }
-        if normalized.contains("workout logged") || normalized.contains("workout geloggt") { return L10n.tr("Workout geloggt") }
-        if normalized.contains("first workout") { return L10n.tr("Erstes Workout") }
-        if normalized.contains("volume up") { return L10n.tr("Volumen höher") }
-        if normalized.contains("volume down") { return L10n.tr("Volumen niedriger") }
-        if normalized.contains("personal record") || normalized.contains("persönlicher rekord") || normalized.contains("pr") { return L10n.tr("Neuer PR") }
-        if normalized.contains("baseline") { return L10n.tr("Ausgangswert") }
+        if normalized.contains("frequency improved") { return "Rhythm improved" }
+        if normalized.contains("workout logged") || normalized.contains("workout geloggt") { return "Workout logged" }
+        if normalized.contains("first workout") { return "First workout" }
+        if normalized.contains("volume up") { return "Volume up" }
+        if normalized.contains("volume down") { return "Volume down" }
+        if normalized.contains("personal record") || normalized.contains("pers\u{00F6}nlicher rekord") || normalized.contains("pr") { return "New PR" }
+        if normalized.contains("baseline") { return "Baseline" }
         return raw
-            .replacingOccurrences(of: "Frequency Improved", with: L10n.tr("Rhythmus verbessert"))
-            .replacingOccurrences(of: "WORKOUT LOGGED", with: L10n.tr("Workout geloggt"))
-            .replacingOccurrences(of: "Workout Logged", with: L10n.tr("Workout geloggt"))
+            .replacingOccurrences(of: "Frequency Improved", with: "Rhythm improved")
+            .replacingOccurrences(of: "WORKOUT LOGGED", with: "Workout logged")
+            .replacingOccurrences(of: "Workout Logged", with: "Workout logged")
     }
 
     private func localizedSinceLastSummary(_ raw: String) -> String {
         let normalized = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if let liftName = prLiftName(from: raw) { return liftName }
-        if normalized.contains("arbeit erledigt") { return L10n.tr("Plan erledigt.") }
-        if normalized.contains("frequency improved") { return L10n.tr("Wochenrhythmus wirkt stabiler.") }
-        if normalized.contains("workout logged") { return L10n.tr("Workout geloggt, Plan erledigt.") }
-        if normalized.contains("baseline set") { return L10n.tr("Ausgangswert gesetzt.") }
-        if normalized.contains("quality over load") { return L10n.tr("Leichterer Tag, Technik vor Gewicht.") }
-        if normalized.contains("ready to push") { return L10n.tr("Technik sauber. Gewicht prüfen.") }
+        if normalized.contains("arbeit erledigt") { return "Plan done." }
+        if normalized.contains("frequency improved") { return "Weekly rhythm looks steadier." }
+        if normalized.contains("workout logged") { return "Workout logged. Plan done." }
+        if normalized.contains("baseline set") { return "Baseline set." }
+        if normalized.contains("quality over load") { return "Lighter day. Technique before load." }
+        if normalized.contains("ready to push") { return "Clean work. Check the load." }
         return raw
-            .replacingOccurrences(of: "Frequency Improved", with: L10n.tr("Rhythmus verbessert"))
-            .replacingOccurrences(of: "Workout Logged", with: L10n.tr("Workout geloggt"))
-            .replacingOccurrences(of: "workout logged", with: L10n.tr("Workout geloggt"))
-            .replacingOccurrences(of: "baseline set", with: L10n.tr("Ausgangswert gesetzt"))
-            .replacingOccurrences(of: "quality over load", with: L10n.tr("Technik vor Gewicht"))
+            .replacingOccurrences(of: "Frequency Improved", with: "Rhythm improved")
+            .replacingOccurrences(of: "Workout Logged", with: "Workout logged")
+            .replacingOccurrences(of: "workout logged", with: "Workout logged")
+            .replacingOccurrences(of: "baseline set", with: "Baseline set")
+            .replacingOccurrences(of: "quality over load", with: "Technique before load")
     }
 
     private func prLiftName(from raw: String) -> String? {
@@ -410,12 +410,12 @@ nonisolated struct DailyBriefingEngine: Sendable {
         guard primaryKind == .recoveryDay || primaryKind == .prepNextSession || primaryKind == .logBodyWeight else { return nil }
         var lines: [(String, String, String)] = []
         if i.missingSleepDays >= 2 {
-            lines.append(("moon.zzz.fill", L10n.tr("Schlaf von letzter Nacht loggen"), L10n.tr("Ein kurzer Schlaf-Log macht das nächste Workout sauberer.")))
+            lines.append(("moon.zzz.fill", "Log last night's sleep", "A quick sleep log makes the next workout clearer."))
         }
         if i.effectiveRecoveryScore < 60 {
-            lines.append(("heart.fill", L10n.tr("Erholung schützen"), L10n.tr("Trinken, Protein treffen und Bewegung heute leicht halten.")))
+            lines.append(("heart.fill", "Protect recovery", "Hydrate, hit protein, and keep movement easy today."))
         } else if let days = i.nextWorkoutInDays, days <= 1 {
-            lines.append(("bolt.fill", L10n.tr("Nächste Einheit vorbereiten"), L10n.tr("Guter Schlaf und Protein heute machen die nächste Einheit planbarer.")))
+            lines.append(("bolt.fill", "Prep the next session", "Good sleep and protein today make the next session more predictable."))
         }
         guard let first = lines.first else { return nil }
         return DailyBriefing.RestPrep(title: first.1, detail: first.2, icon: first.0)

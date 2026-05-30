@@ -60,82 +60,82 @@ struct CoachActionMapper {
             return [
                 CoachAction(
                     type: .addWork,
-                    label: "Volumen ausgleichen",
+                    label: "Balance volume",
                     icon: "arrow.left.arrow.right",
-                    explanation: "Verschiebe in der nächsten passenden Einheit etwas Volumen von sehr stark zu wenig belasteten Bereichen.",
-                    whyItMatters: "Ausgeglicheneres Volumen macht die Woche nachvollziehbarer und hält die Belastung kontrollierter.",
-                    previewText: "Nächste Einheit: 1 Satz weniger im hohen Bereich, 2 Sätze mehr im niedrigen Bereich"
+                    explanation: "Move a little work in the next fitting session from over-covered areas to under-covered ones.",
+                    whyItMatters: "Balanced volume keeps the week clearer and load controlled.",
+                    previewText: "Next session: 1 set less for the high area, 2 more for the low area"
                 )
             ]
         case .progressionSuggestion:
             return [
                 CoachAction(
                     type: .progressWeight,
-                    label: "Gewicht leicht erhöhen",
+                    label: "Add a little load",
                     icon: "arrow.up.right",
-                    explanation: "Plane etwas mehr Gewicht, wenn die Wiederholungen sauber bleiben.",
-                    whyItMatters: "Kleine, saubere Steigerungen sind besser verwertbar als erzwungene Sprünge.",
-                    previewText: "Nächste Einheit: +2,5 kg prüfen, Wiederholungsziel beibehalten"
+                    explanation: "Plan a little more weight if reps stay clean.",
+                    whyItMatters: "Small clean jumps beat forced jumps.",
+                    previewText: "Next session: check +2.5 kg, keep the rep target"
                 )
             ]
         case .recoveryConcern:
             return [
                 CoachAction(
                     type: .restDay,
-                    label: "Heute ruhiger trainieren",
+                    label: "Keep today lighter",
                     icon: "bed.double.fill",
-                    explanation: "Ersetze die nächste harte Einheit durch Pause, Spaziergang oder leichte Mobility.",
-                    whyItMatters: "Bei vielen harten Einheiten ist ein ruhiger Tag oft die bessere Wahl.",
-                    previewText: "Morgen: Pause oder 20 Min. leichte Mobility"
+                    explanation: "Swap the next hard session for rest, a walk, or light mobility.",
+                    whyItMatters: "When hard sessions stack up, an easy day is often the better call.",
+                    previewText: "Tomorrow: rest or 20 min light mobility"
                 ),
                 CoachAction(
                     type: .lighterSession,
-                    label: "Leichter trainieren",
+                    label: "Train lighter",
                     icon: "arrow.down.circle",
-                    explanation: "Reduziere Arbeitsgewichte um 15-20% und halte Tempo und Technik sauber.",
-                    whyItMatters: "Eine leichtere Einheit hält den Rhythmus, ohne noch mehr Druck zu machen.",
-                    previewText: "Nächste Einheit: ca. 20% weniger Gewicht, Fokus auf Kontrolle"
+                    explanation: "Reduce working weights by 15-20% and keep tempo and technique clean.",
+                    whyItMatters: "A lighter session keeps rhythm without adding pressure.",
+                    previewText: "Next session: about 20% less load, focus on control"
                 )
             ]
         case .exerciseSwap:
             return [
                 CoachAction(
                     type: .swapExercise,
-                    label: "Variation prüfen",
+                    label: "Check variation",
                     icon: "arrow.triangle.2.circlepath",
-                    explanation: "Prüfe eine ähnliche Variation, wenn die aktuelle Übung nicht mehr sauber vorankommt.",
-                    whyItMatters: "Eine Variation trifft den Muskel etwas anders, ohne das Trainingsziel zu wechseln.",
-                    previewText: "Nächste Einheit: vorgeschlagene Variation prüfen"
+                    explanation: "Check a similar variation if the current lift is not moving cleanly.",
+                    whyItMatters: "A variation hits the muscle a little differently without changing the goal.",
+                    previewText: "Next session: check the suggested variation"
                 )
             ]
         case .splitSuggestion:
             return [
                 CoachAction(
                     type: .regenerateWeek,
-                    label: "Nächste Woche planen",
+                    label: "Plan next week",
                     icon: "arrow.triangle.2.circlepath.circle.fill",
-                    explanation: "Plane die kommende Woche näher an dem, was du tatsächlich geloggt hast.",
-                    whyItMatters: "Ein Plan, der zu deinem echten Rhythmus passt, verteilt Volumen besser.",
-                    previewText: "Ganze Woche: an echte Frequenz angepasst"
+                    explanation: "Plan the coming week closer to what you actually logged.",
+                    whyItMatters: "Plans that match real rhythm distribute volume better.",
+                    previewText: "Full week: adjusted to real frequency"
                 ),
                 CoachAction(
                     type: .increaseFrequency,
-                    label: "Frequenz prüfen",
+                    label: "Check frequency",
                     icon: "calendar.badge.plus",
-                    explanation: "Prüfe, ob die Planfrequenz noch zu deinen Logs passt.",
-                    whyItMatters: "Eine realistische Frequenz hält die Wochenvorgabe glaubwürdiger.",
-                    previewText: "Planfrequenz aus Logs prüfen"
+                    explanation: "Check whether planned frequency still matches your logs.",
+                    whyItMatters: "A realistic frequency keeps the weekly target believable.",
+                    previewText: "Plan frequency checked against logs"
                 )
             ]
         case .prCongrats:
             return [
                 CoachAction(
                     type: .celebrate,
-                    label: "Kurs halten",
+                    label: "Hold course",
                     icon: "trophy.fill",
-                    explanation: "Die Richtung stimmt. Bestätige den Fortschritt in der nächsten Einheit sauber.",
-                    whyItMatters: "Bestleistungen zählen mehr, wenn der nächste Schritt kontrolliert bleibt.",
-                    previewText: "Aktuelle Struktur beibehalten"
+                    explanation: "Direction is good. Confirm the progress cleanly next session.",
+                    whyItMatters: "PRs count more when the next move stays controlled.",
+                    previewText: "Keep current structure"
                 )
             ]
         case .general:
@@ -148,38 +148,38 @@ struct CoachActionMapper {
             return [
                 CoachAction(
                     type: .regenerateWeek,
-                    label: "Nächste Woche planen",
+                    label: "Plan next week",
                     icon: "arrow.triangle.2.circlepath.circle.fill",
-                    explanation: "Plane die kommende Woche neu, damit Volumen und Übungsauswahl sauberer verteilt sind.",
-                    whyItMatters: "Eine Wochenanpassung ist klarer als mehrere kleine Einzelkorrekturen.",
-                    previewText: "Ganze Woche: Volumen und Übungen neu verteilt"
+                    explanation: "Rebuild the coming week so volume and exercise choices are distributed more cleanly.",
+                    whyItMatters: "A weekly adjustment is clearer than several small fixes.",
+                    previewText: "Full week: volume and exercises redistributed"
                 ),
                 CoachAction(
                     type: .addWork,
-                    label: "Sätze ergänzen",
+                    label: "Add sets",
                     icon: "plus.circle.fill",
-                    explanation: "Ergänze 2-3 Sätze für den niedrig belasteten Bereich, wenn die nächste Einheit es hergibt.",
-                    whyItMatters: "Niedriges Volumen über mehrere Wochen solltest du im Blick behalten.",
-                    previewText: "Nächste Einheit: +2 Sätze für den laggenden Bereich"
+                    explanation: "Add 2-3 sets for the low-work area if the next session has room.",
+                    whyItMatters: "Low volume across multiple weeks is worth watching.",
+                    previewText: "Next session: +2 sets for the lagging area"
                 ),
                 CoachAction(
                     type: .reduceVolume,
-                    label: "Volumen senken",
+                    label: "Lower volume",
                     icon: "minus.circle.fill",
-                    explanation: "Streiche 1-2 Sätze aus dem sehr hoch belasteten Bereich.",
-                    whyItMatters: "Zu viel Zusatzvolumen macht die Woche schwerer lesbar und kann andere Bereiche verdrängen.",
-                    previewText: "Nächste Einheit: 1 Satz weniger im dominanten Bereich"
+                    explanation: "Remove 1-2 sets from the over-covered area.",
+                    whyItMatters: "Too much extra volume makes the week harder to read and can crowd out other areas.",
+                    previewText: "Next session: 1 set less for the dominant area"
                 )
             ]
         }
         return [
             CoachAction(
                 type: .addWork,
-                label: "Volumen beobachten",
+                label: "Watch volume",
                 icon: "eye.fill",
-                explanation: "Behalte den Trend im Blick. Wenn er nächste Woche bleibt, Anpassung prüfen.",
-                whyItMatters: "Kleine Abweichungen sind normal; wiederholte Trends zählen mehr.",
-                previewText: "Noch keine Änderung nötig - nächste Woche neu prüfen"
+                explanation: "Keep the trend in view. If it stays next week, check an adjustment.",
+                whyItMatters: "Small swings are normal; repeated trends matter more.",
+                previewText: "No change needed yet - check again next week"
             )
         ]
     }
@@ -188,11 +188,11 @@ struct CoachActionMapper {
         [
             CoachAction(
                 type: .addWork,
-                label: "Ausgleich ergänzen",
+                label: "Add balance work",
                 icon: "arrow.left.arrow.right",
-                explanation: "Ergänze Sätze für die schwächere Seite am nächsten Oberkörpertag.",
-                whyItMatters: "Ein klareres Push/Pull-Verhältnis macht die Woche besser steuerbar.",
-                previewText: "Nächster Oberkörpertag: +2 Sätze für die schwächere Seite"
+                explanation: "Add sets for the lighter side on the next upper-body day.",
+                whyItMatters: "A clearer push/pull ratio makes the week easier to steer.",
+                previewText: "Next upper-body day: +2 sets for the lighter side"
             )
         ]
     }
@@ -202,30 +202,30 @@ struct CoachActionMapper {
             return [
                 CoachAction(
                     type: .deload,
-                    label: "Deload-Woche starten",
+                    label: "Start deload week",
                     icon: "arrow.down.to.line",
-                    explanation: "Reduziere Volumen und Intensität über die Woche.",
-                    whyItMatters: "Eine leichtere Woche macht den nächsten Block sauberer.",
-                    previewText: "Diese Woche: weniger Sätze, niedrigere RPE, kürzere Einheiten"
+                    explanation: "Reduce volume and intensity across the week.",
+                    whyItMatters: "A lighter week keeps the next block cleaner.",
+                    previewText: "This week: fewer sets, lower RPE, shorter sessions"
                 ),
                 CoachAction(
                     type: .restDay,
-                    label: "Ruhiger Tag",
+                    label: "Easy day",
                     icon: "bed.double.fill",
-                    explanation: "Plane morgen ohne hartes Training.",
-                    whyItMatters: "Wenn die Woche hart war, ist ein ruhiger Tag oft die bessere Wahl.",
-                    previewText: "Morgen: kein hartes Training"
+                    explanation: "Plan tomorrow without hard training.",
+                    whyItMatters: "If the week was hard, an easy day is often the better call.",
+                    previewText: "Tomorrow: no hard training"
                 )
             ]
         }
         return [
             CoachAction(
                 type: .lighterSession,
-                label: "Nächste Einheit leichter",
+                label: "Next session lighter",
                 icon: "arrow.down.circle",
-                explanation: "Reduziere die Intensität in der nächsten Einheit und halte die Wiederholungen kontrolliert.",
-                whyItMatters: "Eine leichtere Einheit hält den Rhythmus, ohne das Training weiter zu drücken.",
-                previewText: "Nächste Einheit: ca. 15% weniger Gewicht, gleiche Übungen"
+                explanation: "Reduce intensity in the next session and keep reps controlled.",
+                whyItMatters: "A lighter session keeps rhythm without pressing harder.",
+                previewText: "Next session: about 15% less load, same exercises"
             )
         ]
     }
@@ -235,22 +235,22 @@ struct CoachActionMapper {
             return [
                 CoachAction(
                     type: .celebrate,
-                    label: "Kurs halten",
+                    label: "Hold course",
                     icon: "star.fill",
-                    explanation: "Die Konstanz sitzt. Behalte die aktuelle Struktur bei.",
-                    whyItMatters: "Ein stabiler Rhythmus macht die nächsten Wochen planbarer.",
-                    previewText: "Aktuelle Routine beibehalten"
+                    explanation: "Consistency is in place. Keep the current structure.",
+                    whyItMatters: "A stable rhythm makes the next weeks easier to plan.",
+                    previewText: "Keep current routine"
                 )
             ]
         }
         return [
             CoachAction(
                 type: .increaseFrequency,
-                label: "Einheiten planen",
+                label: "Plan sessions",
                 icon: "calendar.badge.plus",
-                explanation: "Blocke konkrete Zeitfenster für die nächsten Trainingstage.",
-                whyItMatters: "Konkrete Termine machen den Wochenrhythmus verlässlicher.",
-                previewText: "Reminder für geplante Trainingstage setzen"
+                explanation: "Block concrete time windows for the next training days.",
+                whyItMatters: "Concrete slots make weekly rhythm more reliable.",
+                previewText: "Set reminders for planned training days"
             )
         ]
     }
@@ -259,11 +259,11 @@ struct CoachActionMapper {
         [
             CoachAction(
                 type: .celebrate,
-                label: "Bestleistung sichern",
+                label: "Lock in the PR",
                 icon: "trophy.fill",
-                explanation: "Neue Bestleistung geloggt. Nächste Einheit sauber bestätigen.",
-                whyItMatters: "Ein PR zählt mehr, wenn der nächste Satz wieder sauber sitzt.",
-                previewText: "Meilenstein geloggt - Struktur beibehalten"
+                explanation: "New PR logged. Confirm it cleanly next session.",
+                whyItMatters: "A PR matters more when the next set is clean too.",
+                previewText: "Milestone logged - keep structure"
             )
         ]
     }
@@ -273,22 +273,22 @@ struct CoachActionMapper {
             return [
                 CoachAction(
                     type: .adjustNutrition,
-                    label: "Ernährung prüfen",
+                    label: "Check nutrition",
                     icon: "fork.knife",
-                    explanation: "Der Gewichtstrend passt nicht klar zum Ziel. Ernährung und Aktivität prüfen.",
-                    whyItMatters: "Training und Ernährung sollten in dieselbe Richtung ziehen.",
-                    previewText: "Kalorienziel und Trainingstage prüfen"
+                    explanation: "The weight trend does not clearly match the goal. Check nutrition and activity.",
+                    whyItMatters: "Training and nutrition should point the same direction.",
+                    previewText: "Check calories and training days"
                 )
             ]
         }
         return [
             CoachAction(
                 type: .celebrate,
-                label: "Auf Kurs",
+                label: "On track",
                 icon: "checkmark.circle.fill",
-                explanation: "Der Gewichtstrend passt zum Ziel. Aktuelle Struktur beibehalten.",
-                whyItMatters: "Ein passender Trend spricht dafür, nicht unnötig zu ändern.",
-                previewText: "Keine Änderung nötig - Kurs halten"
+                explanation: "The weight trend fits the goal. Keep current structure.",
+                whyItMatters: "A matching trend means no extra change is needed.",
+                previewText: "No change needed - hold course"
             )
         ]
     }
@@ -297,11 +297,11 @@ struct CoachActionMapper {
         [
             CoachAction(
                 type: .lighterSession,
-                label: "Nächste Einheit anpassen",
+                label: "Adjust next session",
                 icon: "slider.horizontal.3",
-                explanation: "Nimm eine kleine Anpassung an der nächsten Einheit vor.",
-                whyItMatters: "Tagesform ist nur ein Check. Eine kleine Anpassung reicht oft.",
-                previewText: "Nächste Einheit: Intensität bewusst steuern"
+                explanation: "Make one small adjustment to the next session.",
+                whyItMatters: "Readiness is just a check. One small adjustment is often enough.",
+                previewText: "Next session: steer intensity deliberately"
             )
         ]
     }

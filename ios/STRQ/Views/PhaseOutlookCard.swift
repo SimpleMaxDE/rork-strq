@@ -61,7 +61,7 @@ struct PhaseOutlookCard: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
-                    Text(L10n.format("coach.phase.header", fallback: "PHASE · WOCHE %d/%d", outlook.weekInBlock, outlook.typicalWeeks))
+                    Text(String(format: "PHASE · WEEK %d/%d", outlook.weekInBlock, outlook.typicalWeeks))
                         .font(.system(size: 9, weight: .black))
                         .tracking(1.1)
                         .foregroundStyle(STRQBrand.steel)
@@ -102,7 +102,7 @@ struct PhaseOutlookCard: View {
                     .tracking(0.6)
                     .foregroundStyle(.secondary)
                 Spacer()
-                Text(L10n.format("coach.phase.expected", fallback: "Erwartet: %@", outlook.currentPhase.expectedIntensityLabel))
+                Text("Expected: \(outlook.currentPhase.expectedIntensityLabel)")
                     .font(.system(size: 9, weight: .bold))
                     .tracking(0.4)
                     .foregroundStyle(.tertiary)
@@ -135,7 +135,7 @@ struct PhaseOutlookCard: View {
                 .foregroundStyle(STRQPalette.info)
                 .frame(width: 18)
             VStack(alignment: .leading, spacing: 2) {
-                Text(L10n.tr("DIESE WOCHE"))
+                Text("THIS WEEK")
                     .font(.system(size: 9, weight: .black))
                     .tracking(0.8)
                     .foregroundStyle(STRQPalette.info)
@@ -165,7 +165,7 @@ struct PhaseOutlookCard: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
-                    Text(L10n.tr("coach.phase.nextShift", fallback: "NÄCHSTER WECHSEL"))
+                    Text("NEXT SHIFT")
                         .font(.system(size: 9, weight: .black))
                         .tracking(0.8)
                         .foregroundStyle(.secondary)
@@ -199,7 +199,7 @@ struct PhaseOutlookCard: View {
             Image(systemName: outlook.nextShiftDirection.icon)
                 .font(.caption)
                 .foregroundStyle(STRQPalette.color(for: outlook.nextShiftDirection.paletteState))
-            Text(L10n.format("coach.phase.compactNext", fallback: "Weiter → %@", outlook.nextPhase.shortLabel))
+            Text("Next -> \(outlook.nextPhase.shortLabel)")
                 .font(.caption.weight(.bold))
                 .foregroundStyle(.primary)
             Text(outlook.nextShiftReason)

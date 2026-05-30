@@ -107,14 +107,14 @@ struct PhaseOutlookEngine {
 
     private func muscleDisplayName(_ raw: String) -> String {
         switch raw.lowercased() {
-        case "back": return "Rücken"
-        case "chest": return "Brust"
-        case "shoulders": return "Schultern"
-        case "arms": return "Arme"
+        case "back": return "Back"
+        case "chest": return "Chest"
+        case "shoulders": return "Shoulders"
+        case "arms": return "Arms"
         case "quads": return "Quads"
         case "hamstrings": return "Hamstrings"
         case "glutes": return "Glutes"
-        case "calves": return "Waden"
+        case "calves": return "Calves"
         default: return raw
         }
     }
@@ -136,64 +136,64 @@ struct PhaseOutlookEngine {
         for signal in planEvolutionSignals where signal.confidence == .high {
             switch signal.kind {
             case .triggerDeload:
-                return (.deload, .consolidate, .overdue, "Die letzten Wochen waren dicht - Deload prüfen.")
+                return (.deload, .consolidate, .overdue, "Recent weeks were dense. Check deload.")
             case .maintainPush:
-                return (phase.typicalNextPhase, .hold, .settled, "Plan wirkt stabil - Struktur beibehalten.")
+                return (phase.typicalNextPhase, .hold, .settled, "Plan looks stable. Keep the structure.")
             case .rebalanceMuscle(let muscle):
-                return (.rebalance, .rebalance, .likelySoon, "\(muscleDisplayName(muscle)) liegt unter dem Durchschnitt - Rebalance prüfen.")
+                return (.rebalance, .rebalance, .likelySoon, "\(muscleDisplayName(muscle)) is below average. Check rebalance.")
             default: break
             }
         }
 
         // Critical recovery always dominates.
         if recoveryScore < 45 && phase != .deload {
-            return (.deload, .consolidate, .overdue, "Erholung niedrig - Deload für den nächsten Block prüfen.")
+            return (.deload, .consolidate, .overdue, "Recovery is low. Check deload for the next block.")
         }
 
         switch phase {
         case .build:
             if week >= typical && recentRecoveryAvg >= 65 && progressingRatio >= 0.4 {
-                return (.push, .advance, .likelySoon, "Rhythmus sitzt und Lifts bewegen sich - Push-Phase prüfen.")
+                return (.push, .advance, .likelySoon, "Rhythm is in place and lifts are moving. Check push phase.")
             }
             if week < typical {
                 return (.push, .advance, week >= max(1, typical - 1) ? .building : .settled,
-                        "Rhythmus weiter aufbauen - Push-Phase wird um Woche \(typical) relevanter.")
+                        "Keep building rhythm. Push phase gets more relevant around week \(typical).")
             }
-            return (.push, .advance, .overdue, "Aufbau-Fenster ist komplett - Push prüfen.")
+            return (.push, .advance, .overdue, "Build window is complete. Check push.")
 
         case .push:
             if week >= typical || recentRecoveryAvg < 60 {
-                return (.fatigueManagement, .consolidate, .overdue, "Push-Block ist voll - leichtere Woche prüfen.")
+                return (.fatigueManagement, .consolidate, .overdue, "Push block is full. Check a lighter week.")
             }
             if stalledCount >= 2 && week >= max(2, typical - 1) {
-                return (.fatigueManagement, .consolidate, .likelySoon, "\(stalledCount) Lifts stocken - leichtere Woche prüfen.")
+                return (.fatigueManagement, .consolidate, .likelySoon, "\(stalledCount) lifts are stuck. Check a lighter week.")
             }
             if week >= max(2, typical - 1) {
-                return (.fatigueManagement, .consolidate, .building, "Spät in der Push-Phase - bald leichter planen.")
+                return (.fatigueManagement, .consolidate, .building, "Late in the push phase. Plan lighter soon.")
             }
-            return (.fatigueManagement, .consolidate, .settled, "Push beibehalten - Back-off um Woche \(typical) prüfen.")
+            return (.fatigueManagement, .consolidate, .settled, "Keep pushing. Check back-off around week \(typical).")
 
         case .fatigueManagement:
             if week >= typical && recentRecoveryAvg >= 70 {
-                return (.push, .advance, .likelySoon, "Erholung stabilisiert sich - nächster Block kann wieder pushen.")
+                return (.push, .advance, .likelySoon, "Recovery is stabilizing. The next block can push again.")
             }
             if week >= typical && recentRecoveryAvg < 65 {
-                return (.deload, .consolidate, .likelySoon, "Erholung bleibt niedrig - strukturierten Deload prüfen.")
+                return (.deload, .consolidate, .likelySoon, "Recovery stays low. Check a structured deload.")
             }
-            return (.push, .advance, .building, "Woche läuft leichter - Push im nächsten Block prüfen.")
+            return (.push, .advance, .building, "This week is lighter. Check push for the next block.")
 
         case .deload:
             let undertrained = muscleBalance.filter { $0.percentOfAverage < 0.75 }.count
             if undertrained >= 2 {
-                return (.rebalance, .rebalance, .likelySoon, "Nach dem Deload \(undertrained)-Volumenlücke prüfen.")
+                return (.rebalance, .rebalance, .likelySoon, "After deload, check \(undertrained) volume gaps.")
             }
-            return (.build, .advance, .likelySoon, "Deload abgeschlossen - Rhythmus vor dem nächsten Push aufbauen.")
+            return (.build, .advance, .likelySoon, "Deload is done. Build rhythm before the next push.")
 
         case .rebalance:
             if week >= typical {
-                return (.build, .advance, .likelySoon, "Rebalance-Fenster abgeschlossen - zurück in den Aufbau.")
+                return (.build, .advance, .likelySoon, "Rebalance window is done. Back to build.")
             }
-            return (.build, .advance, .building, "Schwachstellen schließen, bevor der nächste Aufbau startet.")
+            return (.build, .advance, .building, "Close weak spots before the next build starts.")
         }
     }
 
@@ -202,15 +202,15 @@ struct PhaseOutlookEngine {
     private func buildBlockIntent(phase: TrainingPhase, profile: UserProfile) -> String {
         switch phase {
         case .build:
-            return "Dieser Block baut Trainingsrhythmus vor dem nächsten Push auf."
+            return "This block builds training rhythm before the next push."
         case .push:
-            return "Dieser Block prüft progressive Steigerungen bei den Hauptlifts."
+            return "This block checks small jumps on the main lifts."
         case .fatigueManagement:
-            return "Dieser Block hält Fitness und senkt vor allem die Intensität."
+            return "This block keeps fitness while lowering intensity."
         case .deload:
-            return "Dieser Block nimmt Druck raus, damit der nächste Push sauber startet."
+            return "This block takes pressure down so the next push starts clean."
         case .rebalance:
-            return "Dieser Block verschiebt Volumen zu Bereichen, die zuletzt weniger abbekommen haben."
+            return "This block moves volume toward areas that have had less work."
         }
     }
 
@@ -218,19 +218,19 @@ struct PhaseOutlookEngine {
         let progressTag = week >= typical ? "late" : (week == 1 ? "first" : "mid")
         switch phase {
         case .build:
-            if progressTag == "first" { return "Woche verankern - geplante Einheiten treffen, keine PRs erzwingen." }
-            if progressTag == "late"  { return "Kapazität sichern - saubere Sätze, ehrliche RPE, kein Grind." }
-            return "Eine Wiederholung oder einen Satz ergänzen, wenn es verdient wirkt - Technik zuerst."
+            if progressTag == "first" { return "Anchor the week. Hit planned sessions, no forced PRs." }
+            if progressTag == "late"  { return "Hold capacity. Clean sets, honest RPE, no grind." }
+            return "Add a rep or set only when it is earned. Technique first."
         case .push:
-            if progressTag == "first" { return "Push öffnen - kleine Gewichtssprünge, Pausen zwischen Sätzen ernst nehmen." }
-            if progressTag == "late"  { return "Top-Sätze schützen - Qualität vor mehr Wiederholungen." }
-            return "Top-Sätze hart, Back-off-Sätze kontrolliert."
+            if progressTag == "first" { return "Open the push. Small load jumps, real rest between sets." }
+            if progressTag == "late"  { return "Protect top sets. Quality before more reps." }
+            return "Hard top sets, controlled back-off sets."
         case .fatigueManagement:
-            return recoveryScore < 60 ? "RPE um 1 senken - Einheiten sollen leichter wirken als im letzten Block." : "Aufwand um RPE 7 deckeln - in den nächsten Push hinein erholen."
+            return recoveryScore < 60 ? "Drop RPE by 1. Sessions should feel lighter than last block." : "Cap effort around RPE 7. Recover into the next push."
         case .deload:
-            return "Leichtere Gewichte, kürzere Einheiten, überall Wiederholungen im Tank lassen."
+            return "Lighter loads, shorter sessions, reps in reserve everywhere."
         case .rebalance:
-            return "Einheiten mit dem laggenden Bereich starten - was läuft, nicht unnötig überziehen."
+            return "Start sessions with the lagging area. Do not overdo what already works."
         }
     }
 
@@ -241,13 +241,13 @@ struct PhaseOutlookEngine {
         planEvolutionSignals: [PlanEvolutionSignal]
     ) -> String? {
         var parts: [String] = []
-        if progressing >= 2 { parts.append("\(progressing) Lifts steigen") }
-        if stalled >= 2 { parts.append("\(stalled) stocken") }
-        if recentRecoveryAvg >= 75 { parts.append("Erholung stabil") }
-        else if recentRecoveryAvg < 60 { parts.append("Erholung sinkt") }
+        if progressing >= 2 { parts.append("\(progressing) lifts rising") }
+        if stalled >= 2 { parts.append("\(stalled) stalled") }
+        if recentRecoveryAvg >= 75 { parts.append("recovery stable") }
+        else if recentRecoveryAvg < 60 { parts.append("recovery dipping") }
         if !planEvolutionSignals.isEmpty {
             let high = planEvolutionSignals.filter { $0.confidence == .high }.count
-            if high > 0 { parts.append("\(high) Plansignal\(high == 1 ? "" : "e")") }
+            if high > 0 { parts.append("\(high) plan signal\(high == 1 ? "" : "s")") }
         }
         guard !parts.isEmpty else { return nil }
         return parts.prefix(3).joined(separator: " · ").capitalizedFirst
@@ -279,10 +279,10 @@ extension PhaseShiftDirection {
 extension PhaseShiftLikelihood {
     var label: String {
         switch self {
-        case .settled: "Stabil"
-        case .building: "Baut auf"
-        case .likelySoon: "Bald"
-        case .overdue: "Bereit"
+        case .settled: "Stable"
+        case .building: "Building"
+        case .likelySoon: "Soon"
+        case .overdue: "Ready"
         }
     }
 }

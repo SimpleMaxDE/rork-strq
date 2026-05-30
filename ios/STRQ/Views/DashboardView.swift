@@ -26,7 +26,7 @@ struct DashboardView: View {
             return WeeklyTargetDisplay(
                 primary: "\(completed)",
                 inlinePrimary: "\(completed)",
-                detail: todayText(en: "Target open", de: "Ziel offen"),
+                detail: todayText(en: "Target open", de: "Target open"),
                 isAtOrAboveTarget: false,
                 isOverflow: false
             )
@@ -41,7 +41,7 @@ struct DashboardView: View {
             return WeeklyTargetDisplay(
                 primary: primary,
                 inlinePrimary: "\(primary) +\(overflow)",
-                detail: todayText(en: "+\(overflow) extra", de: "+\(overflow) zusätzlich"),
+                detail: todayText(en: "+\(overflow) extra", de: "+\(overflow) extra"),
                 isAtOrAboveTarget: true,
                 isOverflow: true
             )
@@ -51,7 +51,7 @@ struct DashboardView: View {
             return WeeklyTargetDisplay(
                 primary: primary,
                 inlinePrimary: primary,
-                detail: todayText(en: "Target met", de: "Ziel erreicht"),
+                detail: todayText(en: "Target met", de: "Target met"),
                 isAtOrAboveTarget: true,
                 isOverflow: false
             )
@@ -60,7 +60,7 @@ struct DashboardView: View {
         return WeeklyTargetDisplay(
             primary: primary,
             inlinePrimary: primary,
-            detail: todayText(en: "Planned slot", de: "Geplante Einheit"),
+            detail: todayText(en: "Planned slot", de: "Planned slot"),
             isAtOrAboveTarget: false,
             isOverflow: false
         )
@@ -82,7 +82,7 @@ struct DashboardView: View {
             )
             .ignoresSafeArea()
         }
-        .navigationTitle(L10n.tr("Today"))
+        .navigationTitle("Today")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             withAnimation(reduceMotion ? .easeOut(duration: 0.12) : .easeOut(duration: 0.5)) { appeared = true }
@@ -176,18 +176,13 @@ struct DashboardView: View {
                         )
 
                         VStack(alignment: .leading, spacing: 5) {
-                            Text(L10n.tr("activationRoadmap.title", fallback: "Your first week"))
+                            Text("Your first week")
                                 .font(.system(size: 17, weight: .black, design: .rounded))
                                 .foregroundStyle(STRQPalette.textPrimary)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.76)
 
-                            Text(L10n.format(
-                                "activationRoadmap.progressDone",
-                                fallback: "%d/%d done",
-                                roadmap.completedCount,
-                                roadmap.steps.count
-                            ))
+                            Text(String(format: "%d/%d done", roadmap.completedCount, roadmap.steps.count))
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(STRQPalette.textSecondary)
                         }
@@ -284,7 +279,7 @@ struct DashboardView: View {
                         .lineLimit(1)
 
                     if step.isActive && !step.isComplete {
-                        Text(L10n.tr("NEXT"))
+                        Text("NEXT")
                             .font(.system(size: 9, weight: .black))
                             .foregroundStyle(STRQBrand.steel)
                             .padding(.horizontal, 6)
@@ -330,7 +325,7 @@ struct DashboardView: View {
 
     private func nextStepLine(for step: ActivationRoadmap.Step) -> String {
         if step.isComplete {
-            return L10n.tr("activationRoadmap.complete", fallback: "Week one is complete.")
+            return "Week one is complete."
         }
         return step.title
     }
@@ -339,9 +334,9 @@ struct DashboardView: View {
         if step.isComplete {
             switch step.kind {
             case .secondSession:
-                return "Fortschrittssignal aktiv"
+                return "Progress signal active"
             case .thirdSession:
-                return "Muster werden lesbar"
+                return "Pattern is getting clearer"
             default:
                 break
             }
@@ -351,7 +346,7 @@ struct DashboardView: View {
 
     private func activationSubheadLine(for roadmap: ActivationRoadmap) -> String {
         if roadmap.completedCount > 3 {
-            return "Wochensignal ist aktiv — dein Trainingsrhythmus wird lesbar."
+            return "Weekly signal is active. Your rhythm is getting clearer."
         }
         return roadmap.subhead
     }
@@ -371,7 +366,7 @@ struct DashboardView: View {
                                 .foregroundStyle(tint)
                                 .lineLimit(1)
 
-                            Text(L10n.format("%dD SINCE LAST WORKOUT", comeback.daysSinceLastWorkout))
+                            Text(String(format: "%dD SINCE LAST WORKOUT", comeback.daysSinceLastWorkout))
                                 .font(.system(size: 10, weight: .black).monospacedDigit())
                                 .foregroundStyle(STRQPalette.textMuted)
                                 .lineLimit(1)
@@ -414,7 +409,7 @@ struct DashboardView: View {
                 if comeback.offersLighterSession || !vm.hasCheckedInToday {
                     HStack(spacing: 10) {
                         if !vm.hasCheckedInToday {
-                            sandowSecondaryButton(icon: "heart.text.clipboard", title: L10n.tr("Check in")) {
+                            sandowSecondaryButton(icon: "heart.text.clipboard", title: "Check in") {
                                 Analytics.shared.track(.comeback_cta_tapped, [
                                     "action": "checkin",
                                     "tier": comeback.tier.rawValue,
@@ -425,7 +420,7 @@ struct DashboardView: View {
                         }
 
                         if comeback.offersLighterSession {
-                            sandowSecondaryButton(icon: "leaf.arrow.triangle.circlepath", title: L10n.tr("Ease next workout"), tint: tint) {
+                            sandowSecondaryButton(icon: "leaf.arrow.triangle.circlepath", title: "Ease next workout", tint: tint) {
                                 Analytics.shared.track(.comeback_cta_tapped, [
                                     "action": "ease",
                                     "tier": comeback.tier.rawValue,
@@ -603,11 +598,11 @@ struct DashboardView: View {
     }
 
     private var premiumTodayHeader: some View {
-        let name = vm.profile.name.isEmpty ? L10n.tr("Athlete") : vm.profile.name
+        let name = vm.profile.name.isEmpty ? "Athlete" : vm.profile.name
 
         return HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(todayText(en: "Next move", de: "Nächster Schritt"))
+                Text(todayText(en: "Next move", de: "Next move"))
                     .font(.system(size: 15, weight: .black))
                     .foregroundStyle(STRQPalette.textPrimary)
                     .lineLimit(1)
@@ -731,18 +726,18 @@ struct DashboardView: View {
     private var premiumLoadingPoster: some View {
         VStack(alignment: .leading, spacing: 14) {
             premiumCommandBadge(
-                title: todayText(en: "Today", de: "Heute"),
+                title: todayText(en: "Today", de: "Today"),
                 icon: "bolt.fill",
                 accent: STRQBrand.steel
             )
 
             Spacer(minLength: 72)
 
-            Text(todayText(en: "STRQ is reading today.", de: "STRQ liest den Tag."))
+            Text(todayText(en: "STRQ is reading today.", de: "STRQ is reading today."))
                 .font(.system(size: 30, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
 
-            Text(todayText(en: "Your training decision will appear here.", de: "Deine Trainingsentscheidung erscheint hier."))
+            Text(todayText(en: "Your training decision will appear here.", de: "Your training decision will appear here."))
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(STRQPalette.textSecondary)
         }
@@ -859,7 +854,7 @@ struct DashboardView: View {
                 .font(.system(size: 12, weight: .black))
                 .lineLimit(1)
                 .minimumScaleFactor(0.78)
-            Text(L10n.tr("Recovery"))
+            Text("Recovery")
                 .font(.system(size: 10, weight: .bold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.78)
@@ -885,7 +880,7 @@ struct DashboardView: View {
                 .background(accent.opacity(0.14), in: .rect(cornerRadius: 9))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(todayText(en: "Why this workout", de: "Warum dieses Workout"))
+                Text(todayText(en: "Why this workout", de: "Why this workout"))
                     .font(.system(size: 10, weight: .black))
                     .tracking(0.8)
                     .foregroundStyle(.white.opacity(0.46))
@@ -959,12 +954,12 @@ struct DashboardView: View {
         switch primary.kind {
         case .checkInBeforeTraining:
             HStack(spacing: 10) {
-                premiumCTA(icon: "heart.text.clipboard", title: L10n.tr("Check in"), tone: .primary) {
+                premiumCTA(icon: "heart.text.clipboard", title: "Check in", tone: .primary) {
                     showReadinessCheckIn = true
                 }
 
                 if let day {
-                    premiumCTA(icon: "bolt.fill", title: L10n.tr("Preview workout"), tone: .secondary) {
+                    premiumCTA(icon: "bolt.fill", title: "Preview workout", tone: .secondary) {
                         vm.prepareWorkoutHandoff(day: day)
                     }
                     .accessibilityIdentifier("strq.today.start-workout")
@@ -975,7 +970,7 @@ struct DashboardView: View {
                 showWeightLog = true
             }
         case .recoveryDay where day == nil:
-            premiumCTA(icon: vm.hasCheckedInToday ? "moon.zzz.fill" : "heart.text.clipboard", title: vm.hasCheckedInToday ? todayText(en: "Log sleep", de: "Schlaf eintragen") : L10n.tr("Check in"), tone: .primary) {
+            premiumCTA(icon: vm.hasCheckedInToday ? "moon.zzz.fill" : "heart.text.clipboard", title: vm.hasCheckedInToday ? todayText(en: "Log sleep", de: "Log sleep") : "Check in", tone: .primary) {
                 if vm.hasCheckedInToday {
                     showSleepLog = true
                 } else {
@@ -989,7 +984,7 @@ struct DashboardView: View {
                 }
                 .accessibilityIdentifier("strq.today.start-workout")
             } else {
-                premiumCTA(icon: "heart.text.clipboard", title: L10n.tr("Check in"), tone: .primary) {
+                premiumCTA(icon: "heart.text.clipboard", title: "Check in", tone: .primary) {
                     showReadinessCheckIn = true
                 }
             }
@@ -1059,14 +1054,14 @@ struct DashboardView: View {
         let rhythmDisplay = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: vm.profile.daysPerWeek)
         let recoveryScore = vm.todaysReadiness?.readinessScore ?? vm.effectiveRecoveryScore
         let sleepValue = vm.averageSleepHours > 0 ? String(format: "%.1fh", vm.averageSleepHours) : "—"
-        let sleepDetail = vm.averageSleepHours > 0 ? todayText(en: "7-day avg", de: "7 Tage Ø") : todayText(en: "Log needed", de: "Eintrag offen")
+        let sleepDetail = vm.averageSleepHours > 0 ? todayText(en: "7-day avg", de: "7-day avg") : todayText(en: "Log needed", de: "Log needed")
         let rhythmDetail = rhythmDisplay.detail
 
         return [
             TodayDecisionSignal(
                 id: "recovery",
                 icon: vm.hasCheckedInToday ? "checkmark.circle.fill" : "heart.text.clipboard",
-                label: L10n.tr("Recovery"),
+                label: "Recovery",
                 value: todayRecoveryStateLabel(for: recoveryScore),
                 detail: recoveryEvidenceDetail(for: recoveryScore),
                 tint: ForgeTheme.recoveryColor(for: recoveryScore),
@@ -1075,7 +1070,7 @@ struct DashboardView: View {
             TodayDecisionSignal(
                 id: "sleep",
                 icon: "moon.zzz.fill",
-                label: L10n.tr("Sleep"),
+                label: "Sleep",
                 value: sleepValue,
                 detail: sleepDetail,
                 tint: ForgeTheme.sleepColor(for: vm.averageSleepHours),
@@ -1084,7 +1079,7 @@ struct DashboardView: View {
             TodayDecisionSignal(
                 id: "week",
                 icon: "calendar.badge.checkmark",
-                label: todayText(en: "Rhythm", de: "Rhythmus"),
+                label: todayText(en: "Rhythm", de: "Rhythm"),
                 value: rhythmDisplay.primary,
                 detail: rhythmDetail,
                 tint: vm.weeklyStats.sessions >= weeklyTarget ? STRQPalette.signalGreen : STRQBrand.steel,
@@ -1107,13 +1102,13 @@ struct DashboardView: View {
         case .trainToday:
             return day.map { localizedWorkoutName($0.name) } ?? primary.title
         case .checkInBeforeTraining:
-            return L10n.tr("Check in, then train")
+            return "Check in, then train"
         case .resumeWorkout:
-            return L10n.tr("Resume Workout")
+            return "Resume Workout"
         case .recoverToday:
-            return L10n.tr("Keep it light today")
+            return "Keep it light today"
         case .startFirstSession:
-            return L10n.tr("Start your first workout")
+            return "Start your first workout"
         case .prepNextSession:
             return day.map { localizedWorkoutName($0.name) } ?? primary.title
         default:
@@ -1124,36 +1119,36 @@ struct DashboardView: View {
     private func premiumDecisionEyebrow(for primary: DailyBriefing.Primary) -> String {
         switch primary.kind {
         case .trainToday:
-            return todayText(en: "TRAIN TODAY", de: "HEUTE TRAINIEREN")
+            return todayText(en: "TRAIN TODAY", de: "TRAIN TODAY")
         case .checkInBeforeTraining:
-            return todayText(en: "READINESS FIRST", de: "ERST CHECK-IN")
+            return todayText(en: "READINESS FIRST", de: "READINESS FIRST")
         case .resumeWorkout:
-            return todayText(en: "IN PROGRESS", de: "LÄUFT")
+            return todayText(en: "IN PROGRESS", de: "IN PROGRESS")
         case .recoverToday, .recoveryDay:
-            return todayText(en: "RECOVERY CALL", de: "ERHOLUNG HEUTE")
+            return todayText(en: "RECOVERY CALL", de: "RECOVERY CALL")
         case .startFirstSession:
-            return todayText(en: "WORKOUT ONE", de: "WORKOUT EINS")
+            return todayText(en: "WORKOUT ONE", de: "WORKOUT ONE")
         case .prepNextSession:
-            return todayText(en: "NEXT SESSION", de: "NÄCHSTE EINHEIT")
+            return todayText(en: "NEXT SESSION", de: "NEXT SESSION")
         case .logBodyWeight:
-            return todayText(en: "QUICK LOG", de: "KURZER LOG")
+            return todayText(en: "QUICK LOG", de: "QUICK LOG")
         case .logCompletion:
-            return todayText(en: "TODAY", de: "HEUTE")
+            return todayText(en: "TODAY", de: "TODAY")
         }
     }
 
     private func premiumCommandBadgeTitle(for primary: DailyBriefing.Primary) -> String {
         switch primary.kind {
         case .trainToday, .checkInBeforeTraining, .resumeWorkout, .recoverToday, .startFirstSession:
-            return L10n.tr("TRAINING DAY")
+            return "TRAINING DAY"
         case .prepNextSession:
-            return todayText(en: "PREP RECOMMENDED", de: "VORBEREITEN")
+            return todayText(en: "PREP RECOMMENDED", de: "PREP RECOMMENDED")
         case .recoveryDay:
-            return L10n.tr("Recovery")
+            return "Recovery"
         case .logBodyWeight:
-            return todayText(en: "BODY DATA", de: "KÖRPERDATEN")
+            return todayText(en: "BODY DATA", de: "BODY DATA")
         case .logCompletion:
-            return todayText(en: "TODAY", de: "HEUTE")
+            return todayText(en: "TODAY", de: "TODAY")
         }
     }
 
@@ -1164,34 +1159,34 @@ struct DashboardView: View {
         case .checkInBeforeTraining:
             return todayText(
                 en: "A quick check-in lets STRQ tune today before the first working set.",
-                de: "Ein kurzer Check-in stimmt STRQ vor dem ersten Arbeitssatz auf heute ab."
+                de: "A quick check-in lets STRQ tune today before the first working set."
             )
         case .resumeWorkout:
             return todayText(
                 en: "The session is already open; finish the signal you started.",
-                de: "Die Einheit läuft bereits; schließe das begonnene Signal sauber ab."
+                de: "The session is already open; finish the signal you started."
             )
         case .recoverToday:
             return todayText(
                 en: "The useful move is lighter work that you can actually absorb.",
-                de: "Der sinnvolle Reiz ist heute leichter und gut verarbeitbar."
+                de: "The useful move is lighter work that you can actually absorb."
             )
         case .startFirstSession:
             return todayText(
                 en: "Workout one gives STRQ the baseline it needs for real coaching.",
-                de: "Workout eins gibt STRQ die Baseline für echtes Coaching."
+                de: "Workout one gives STRQ the baseline it needs for real coaching."
             )
         case .prepNextSession:
             return plannedExposureReason(for: day)
         case .logBodyWeight:
             return todayText(
                 en: "One body-weight entry keeps the trend honest without making it the focus.",
-                de: "Ein Gewichtseintrag hält den Trend ehrlich, ohne ihn zum Fokus zu machen."
+                de: "One body-weight entry keeps the trend honest without making it the focus."
             )
         case .recoveryDay:
             return briefing.restPrep?.detail ?? todayText(
                 en: "No lift today; recovery is the work that protects the next push.",
-                de: "Heute kein schwerer Lift; Erholung schützt den nächsten Push."
+                de: "No lift today; recovery is the work that protects the next push."
             )
         case .logCompletion:
             return primary.detail
@@ -1201,41 +1196,41 @@ struct DashboardView: View {
     private func premiumWorkoutActionTitle(for primary: DailyBriefing.Primary) -> String {
         switch primary.kind {
         case .prepNextSession, .recoveryDay, .logBodyWeight:
-            return L10n.tr("Preview workout")
+            return "Preview workout"
         case .recoverToday:
-            return L10n.tr("Start Light Workout")
+            return "Start Light Workout"
         default:
-            return todayText(en: "Begin workout", de: "Training starten")
+            return todayText(en: "Begin workout", de: "Begin workout")
         }
     }
 
     private func recoveryEvidenceDetail(for score: Int) -> String {
         switch score {
         case 85...:
-            return todayText(en: "Good day to train", de: "Guter Trainingstag")
+            return todayText(en: "Good day to train", de: "Good day to train")
         case 70..<85:
-            return todayText(en: "Keep the plan", de: "Plan halten")
+            return todayText(en: "Keep the plan", de: "Keep the plan")
         case 55..<70:
-            return todayText(en: "Keep it controlled", de: "Kontrolliert bleiben")
+            return todayText(en: "Keep it controlled", de: "Keep it controlled")
         case 40..<55:
-            return todayText(en: "Back off today", de: "Heute rausnehmen")
+            return todayText(en: "Back off today", de: "Back off today")
         default:
-            return todayText(en: "Recovery first", de: "Erholung zuerst")
+            return todayText(en: "Recovery first", de: "Recovery first")
         }
     }
 
     private func todayRecoveryStateLabel(for score: Int) -> String {
         switch score {
         case 85...:
-            return L10n.tr("recovery.state.ready", fallback: "Ready")
+            return "Ready"
         case 70..<85:
-            return L10n.tr("recovery.state.steady", fallback: "Steady")
+            return "Steady"
         case 55..<70:
-            return L10n.tr("recovery.state.light", fallback: "Light")
+            return "Light"
         case 40..<55:
-            return L10n.tr("recovery.state.low", fallback: "Low")
+            return "Low"
         default:
-            return L10n.tr("recovery.state.rest", fallback: "Rest")
+            return "Rest"
         }
     }
 
@@ -1258,15 +1253,11 @@ struct DashboardView: View {
         let recoveryLead: String
         let recoveryScore = vm.todaysReadiness?.readinessScore ?? vm.effectiveRecoveryScore
         if recoveryScore >= 75 {
-            recoveryLead = todayText(en: "Recovery is stable.", de: "Erholung ist stabil.")
+            recoveryLead = todayText(en: "Recovery is stable.", de: "Recovery is stable.")
         } else if recoveryScore >= 60 {
-            recoveryLead = todayText(en: "Recovery is workable.", de: "Erholung ist nutzbar.")
+            recoveryLead = todayText(en: "Recovery is workable.", de: "Recovery is workable.")
         } else {
-            recoveryLead = todayText(en: "Recovery is limited.", de: "Erholung ist begrenzt.")
-        }
-
-        if isGermanToday {
-            return "\(recoveryLead) \(plannedExposureLabel(for: day)) ist als Nächstes geplant."
+            recoveryLead = todayText(en: "Recovery is limited.", de: "Recovery is limited.")
         }
 
         return "\(recoveryLead) \(plannedExposureLabel(for: day)) is the next planned exposure."
@@ -1274,7 +1265,7 @@ struct DashboardView: View {
 
     private func plannedExposureLabel(for day: WorkoutDay?) -> String {
         guard let day else {
-            return todayText(en: "This workout", de: "Diese Einheit")
+            return todayText(en: "This workout", de: "This workout")
         }
 
         let lowerCount = day.focusMuscles.filter { $0.region == .lower }.count
@@ -1282,66 +1273,33 @@ struct DashboardView: View {
         let coreCount = day.focusMuscles.filter { $0.region == .core }.count
 
         if lowerCount > upperCount && lowerCount > coreCount {
-            return todayText(en: "Lower-body work", de: "Unterkörperarbeit")
+            return todayText(en: "Lower-body work", de: "Lower-body work")
         }
         if upperCount > lowerCount && upperCount > coreCount {
-            return todayText(en: "Upper-body work", de: "Oberkörperarbeit")
+            return todayText(en: "Upper-body work", de: "Upper-body work")
         }
         if coreCount > lowerCount && coreCount > upperCount {
-            return todayText(en: "Core work", de: "Rumpfarbeit")
+            return todayText(en: "Core work", de: "Core work")
         }
 
-        return todayText(en: "This workout", de: "Diese Einheit")
+        return todayText(en: "This workout", de: "This workout")
     }
 
     private func premiumFocusLine(for day: WorkoutDay?) -> String? {
         guard let day else { return nil }
         let muscles = day.focusMuscles.prefix(2).map(\.localizedDisplayName)
         guard !muscles.isEmpty else {
-            return L10n.tr("Workouts")
+            return "Workouts"
         }
         return muscles.joined(separator: " · ")
     }
 
     private func localizedWorkoutName(_ name: String) -> String {
-        let localized = L10n.tr(name, fallback: name)
-        guard isGermanToday, localized == name else { return localized }
-
-        let exactGermanNames: [String: String] = [
-            "Upper Strength": "Oberkörper Kraft",
-            "Lower Strength": "Unterkörper Kraft",
-            "Lower Power": "Unterkörper Kraft",
-            "Upper Power": "Oberkörper Kraft",
-            "Pull Volume": "Pull Volumen",
-            "Push Volume": "Push Volumen",
-            "Legs Volume": "Beine Volumen"
-        ]
-
-        if let exact = exactGermanNames[name] {
-            return exact
-        }
-
-        let replacements = [
-            ("Full Body", "Ganzkörper"),
-            ("Upper", "Oberkörper"),
-            ("Lower", "Unterkörper"),
-            ("Strength", "Kraft"),
-            ("Power", "Kraft"),
-            ("Volume", "Volumen"),
-            ("Legs", "Beine")
-        ]
-
-        return replacements.reduce(name) { partial, replacement in
-            partial.replacingOccurrences(of: replacement.0, with: replacement.1)
-        }
+        name
     }
 
-    private var isGermanToday: Bool {
-        Locale.current.language.languageCode?.identifier == "de"
-    }
-
-    private func todayText(en: String, de: String) -> String {
-        isGermanToday ? de : en
+    private func todayText(en: String, de _: String) -> String {
+        en
     }
 
     // MARK: - Today Hero
@@ -1350,7 +1308,7 @@ struct DashboardView: View {
     private var todayHero: some View {
         let primary = vm.dailyBriefing?.primary
         let accent = todayCommandAccent(for: primary)
-        let name = vm.profile.name.isEmpty ? L10n.tr("Athlete") : vm.profile.name
+        let name = vm.profile.name.isEmpty ? "Athlete" : vm.profile.name
 
         return VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top, spacing: 12) {
@@ -1547,7 +1505,7 @@ struct DashboardView: View {
     private func primaryCTA(_ primary: DailyBriefing.Primary) -> some View {
         switch primary.kind {
         case .checkInBeforeTraining:
-            STRQPrimaryCTA(icon: "heart.text.clipboard", title: L10n.tr("Check in")) {
+            STRQPrimaryCTA(icon: "heart.text.clipboard", title: "Check in") {
                 showReadinessCheckIn = true
             }
         case .logBodyWeight:
@@ -1556,14 +1514,14 @@ struct DashboardView: View {
             }
         case .startFirstSession:
             if let day = vm.todaysWorkout ?? vm.nextWorkout {
-                STRQPrimaryCTA(icon: "sparkles", title: L10n.tr("Start Workout 1")) {
+                STRQPrimaryCTA(icon: "sparkles", title: "Start Workout 1") {
                     vm.prepareWorkoutHandoff(day: day)
                 }
                 .accessibilityIdentifier("strq.today.start-workout")
             }
         case .resumeWorkout:
             if let day = vm.todaysWorkout {
-                STRQPrimaryCTA(icon: "play.fill", title: L10n.tr("Resume Workout")) {
+                STRQPrimaryCTA(icon: "play.fill", title: "Resume Workout") {
                     vm.prepareWorkoutHandoff(day: day)
                 }
                 .accessibilityIdentifier("strq.today.start-workout")
@@ -1577,7 +1535,7 @@ struct DashboardView: View {
         HStack(spacing: 4) {
             Image(systemName: "arrow.forward.circle.fill")
                 .font(.system(size: 9, weight: .bold))
-            Text(L10n.tr("START HERE"))
+            Text("START HERE")
                 .font(.system(size: 9, weight: .black))
                 .tracking(0.8)
         }
@@ -1608,7 +1566,7 @@ struct DashboardView: View {
             session: session,
             history: vm.workoutHistory,
             streak: vm.streak,
-            exerciseName: { id in vm.library.exercise(byId: id)?.name ?? L10n.tr("Exercise") }
+            exerciseName: { id in vm.library.exercise(byId: id)?.name ?? "Exercise" }
         )
         let completedExercises = session.distinctCompletedExerciseCount
         let completedSets = session.completedSetCount
@@ -1650,7 +1608,7 @@ struct DashboardView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 7) {
-                            Text(L10n.tr("Workout saved"))
+                            Text("Workout saved")
                                 .font(.system(size: 10, weight: .black))
                                 .foregroundStyle(bridge.accent)
                                 .lineLimit(1)
@@ -1692,7 +1650,7 @@ struct DashboardView: View {
                     .frame(height: 1)
 
                 HStack(alignment: .top, spacing: 10) {
-                    Text(L10n.tr("NEXT ACTION"))
+                    Text("NEXT ACTION")
                         .font(.system(size: 10, weight: .black))
                         .foregroundStyle(STRQPalette.textMuted)
                         .frame(width: 82, alignment: .leading)
@@ -1728,54 +1686,54 @@ struct DashboardView: View {
                 singularFallback: "set",
                 pluralFallback: "sets"
             )
-            outcomes.append(L10n.format("%@ completed", setLabel))
+            outcomes.append(String(format: "%@ completed", setLabel))
         }
 
         if session.totalVolume > 0 && outcomes.count < 2 {
-            outcomes.append(L10n.format("Volume updated: %@", ForgeTheme.formatVolume(session.totalVolume)))
+            outcomes.append("Volume updated: \(ForgeTheme.formatVolume(session.totalVolume))")
         }
 
         if outcomes.isEmpty {
-            outcomes.append(L10n.tr("First signal collected"))
+            outcomes.append("First signal collected")
         }
 
         return Array(outcomes.prefix(2))
     }
 
     private func postWorkoutTimeLabel(_ minutesAgo: Int) -> String {
-        if minutesAgo < 2 { return L10n.tr("JUST NOW") }
-        if minutesAgo < 60 { return L10n.format("%dM AGO", minutesAgo) }
-        return L10n.format("%dH AGO", max(1, minutesAgo / 60))
+        if minutesAgo < 2 { return "JUST NOW" }
+        if minutesAgo < 60 { return String(format: "%dM AGO", minutesAgo) }
+        return String(format: "%dH AGO", max(1, minutesAgo / 60))
     }
 
     private func postWorkoutTakeaway(for kind: SessionVerdict.Kind) -> String {
         switch kind {
         case .firstSession:
-            return L10n.tr("Baseline loads are now tied to what you actually lifted.")
+            return "Baseline loads are now tied to what you actually lifted."
         case .personalRecord:
-            return L10n.tr("That PR gives STRQ room to push the next exposure.")
+            return "That PR gives STRQ room to push the next exposure."
         case .bestSet:
-            return L10n.tr("Your top set moved up, so progression can keep climbing.")
+            return "Your top set moved up, so progression can keep climbing."
         case .volumeUp:
-            return L10n.tr("You handled more work than last time. Capacity is moving up.")
+            return "You handled more work than last time. Capacity is moving up."
         case .volumeDown:
-            return L10n.tr("Today read lighter, which still sharpens STRQ's load pacing.")
+            return "Today read lighter, which still sharpens STRQ's load pacing."
         case .consolidated:
-            return L10n.tr("Execution held steady, so the next call can stay confident.")
+            return "Execution held steady, so the next call can stay confident."
         }
     }
 
     private func postWorkoutNextStep() -> String {
         if vm.dataMaturityTier == .firstSession {
-            return L10n.tr("Come back for Workout 2")
+            return "Come back for Workout 2"
         }
         if let title = vm.dailyBriefing?.primary.title {
             return title
         }
         if let day = nextScheduledDay {
-            return L10n.format("Prep for %@.", day.name)
+            return "Prep for \(day.name)."
         }
-        return L10n.tr("Let recovery carry this forward.")
+        return "Let recovery carry this forward."
     }
 
     private func postWorkoutAccent(for kind: SessionVerdict.Kind) -> Color {
@@ -1854,9 +1812,9 @@ struct DashboardView: View {
     }
 
     private func timeLabel(_ hours: Int) -> String {
-        if hours < 1 { return L10n.tr("JUST NOW") }
-        if hours < 24 { return L10n.format("%dH AGO", hours) }
-        return L10n.tr("YESTERDAY")
+        if hours < 1 { return "JUST NOW" }
+        if hours < 24 { return String(format: "%dH AGO", hours) }
+        return "YESTERDAY"
     }
 
     private var isPostFirstSessionState: Bool {
@@ -1874,7 +1832,7 @@ struct DashboardView: View {
 
                     VStack(alignment: .leading, spacing: 5) {
                         HStack(spacing: 7) {
-                            Text(L10n.tr("CALIBRATING"))
+                            Text("CALIBRATING")
                                 .font(.system(size: 10, weight: .black))
                                 .foregroundStyle(STRQBrand.steel)
                             Text("\(tierIndex + 1)/4")
@@ -1993,19 +1951,19 @@ struct DashboardView: View {
                     HStack(spacing: 8) {
                         workoutMetric(
                             value: "\(day.exercises.count)",
-                            label: L10n.tr("Exercises"),
+                            label: "Exercises",
                             icon: "figure.strengthtraining.traditional",
                             tint: tint
                         )
                         workoutMetric(
                             value: "~\(day.estimatedMinutes)m",
-                            label: L10n.tr("Duration"),
+                            label: "Duration",
                             icon: "clock.fill",
                             tint: STRQPalette.steel
                         )
                         workoutMetric(
                             value: "\(day.exercises.reduce(0) { $0 + $1.sets })",
-                            label: L10n.tr("Total Sets"),
+                            label: "Total Sets",
                             icon: "square.stack.3d.up.fill",
                             tint: STRQPalette.textSecondary
                         )
@@ -2015,11 +1973,11 @@ struct DashboardView: View {
 
                 if primary.kind == .checkInBeforeTraining {
                     HStack(spacing: 10) {
-                        todayCommandCTA(icon: "heart.text.clipboard", title: L10n.tr("Check in"), tint: tint) {
+                        todayCommandCTA(icon: "heart.text.clipboard", title: "Check in", tint: tint) {
                             showReadinessCheckIn = true
                         }
 
-                        todaySecondaryCTA(icon: "bolt.fill", title: L10n.tr("Start Workout")) {
+                        todaySecondaryCTA(icon: "bolt.fill", title: "Start Workout") {
                             vm.prepareWorkoutHandoff(day: day)
                         }
                         .accessibilityIdentifier("strq.today.start-workout")
@@ -2073,13 +2031,13 @@ struct DashboardView: View {
         if vm.isEarlyStage {
             todayPriorityPill
         } else if isRecovery {
-            STRQBadgeChip(label: L10n.tr("Recovery first"), icon: "heart.circle.fill", variant: .warning)
+            STRQBadgeChip(label: "Recovery first", icon: "heart.circle.fill", variant: .warning)
         } else if isFirstSession {
-            STRQBadgeChip(label: L10n.tr("Milestone"), icon: "sparkles", variant: .success)
+            STRQBadgeChip(label: "Milestone", icon: "sparkles", variant: .success)
         } else if let momentum = briefing.momentum {
             STRQBadgeChip(label: momentum.title, icon: momentum.icon, variant: .neutral)
         } else {
-            Text(L10n.tr("TODAY"))
+            Text("TODAY")
                 .font(.system(size: 9, weight: .black))
                 .tracking(1.2)
                 .foregroundStyle(.white.opacity(0.4))
@@ -2210,13 +2168,13 @@ struct DashboardView: View {
     private func workoutPrimaryTitle(for kind: DailyBriefing.PrimaryKind) -> String {
         switch kind {
         case .resumeWorkout:
-            return L10n.tr("Resume Workout")
+            return "Resume Workout"
         case .startFirstSession:
-            return L10n.tr("Start Workout 1")
+            return "Start Workout 1"
         case .recoverToday:
-            return L10n.tr("Start Light Workout")
+            return "Start Light Workout"
         default:
-            return L10n.tr("Start Workout")
+            return "Start Workout"
         }
     }
 
@@ -2232,9 +2190,9 @@ struct DashboardView: View {
             sandowRunwayCard(accent: STRQBrand.steel) {
                 VStack(alignment: .leading, spacing: 14) {
                     lowerSectionHeader(
-                        title: L10n.tr("Training Week"),
-                        subtitle: todayText(en: "Planned rhythm", de: "Geplanter Rhythmus"),
-                        trailing: nextScheduledDay.map { L10n.format("Next: %@", vm.weekdayName($0.scheduledWeekday ?? 0)) },
+                        title: "Training Week",
+                        subtitle: todayText(en: "Planned rhythm", de: "Planned rhythm"),
+                        trailing: nextScheduledDay.map { "Next: \(vm.weekdayName($0.scheduledWeekday ?? 0))" },
                         accent: STRQBrand.steel
                     )
 
@@ -2291,7 +2249,7 @@ struct DashboardView: View {
                 }
             }
 
-            Text(matchingDay.map { shortName($0.name) } ?? (isToday ? L10n.tr("Rest") : ""))
+            Text(matchingDay.map { shortName($0.name) } ?? (isToday ? "Rest" : ""))
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundStyle(isToday ? tint : STRQPalette.textMuted)
                 .lineLimit(1)
@@ -2334,8 +2292,8 @@ struct DashboardView: View {
         sandowRunwayCard(accent: STRQBrand.steel) {
             VStack(alignment: .leading, spacing: 12) {
                 lowerSectionHeader(
-                    title: todayText(en: "Quick logs", de: "Kurz eintragen"),
-                    subtitle: todayText(en: "Support the next call", de: "Stützt die nächste Entscheidung"),
+                    title: todayText(en: "Quick logs", de: "Quick logs"),
+                    subtitle: todayText(en: "Support the next call", de: "Support the next call"),
                     accent: STRQBrand.steel
                 )
 
@@ -2343,7 +2301,7 @@ struct DashboardView: View {
                     if vm.profile.nutritionTrackingEnabled {
                         signalButton(
                             icon: "fork.knife",
-                            label: L10n.tr("Protein"),
+                            label: "Protein",
                             value: "\(Int(vm.todayProteinProgress * 100))%",
                             progress: vm.todayProteinProgress,
                             color: STRQPalette.signalGreen,
@@ -2357,7 +2315,7 @@ struct DashboardView: View {
 
                     signalButton(
                         icon: "moon.zzz.fill",
-                        label: L10n.tr("Sleep"),
+                        label: "Sleep",
                         value: String(format: "%.1fh", vm.averageSleepHours),
                         progress: min(1.0, vm.averageSleepHours / 8.0),
                         color: ForgeTheme.sleepColor(for: vm.averageSleepHours),
@@ -2371,7 +2329,7 @@ struct DashboardView: View {
 
                         signalButton(
                             icon: "scalemass.fill",
-                            label: L10n.tr("Weight"),
+                            label: "Weight",
                             value: vm.latestWeight.map { String(format: "%.1f", $0) } ?? "—",
                             progress: vm.latestWeight != nil ? 1.0 : 0.0,
                             color: STRQBrand.steel,
@@ -2414,11 +2372,11 @@ struct DashboardView: View {
                 )
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(L10n.tr("Weekly review ready"))
+                    Text("Weekly review ready")
                         .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(STRQPalette.textPrimary)
                         .lineLimit(1)
-                    Text(L10n.tr("Review this week and adjust"))
+                    Text("Review this week and adjust")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(STRQPalette.textMuted)
                         .lineLimit(1)
@@ -2492,8 +2450,8 @@ struct DashboardView: View {
             } label: {
                 HStack(spacing: 12) {
                     lowerSectionHeader(
-                        title: L10n.tr("This Week"),
-                        subtitle: todayText(en: "Weekly signal", de: "Wochensignal"),
+                        title: "This Week",
+                        subtitle: todayText(en: "Weekly signal", de: "Weekly signal"),
                         trailing: vm.momentumData?.paceMessage,
                         accent: STRQPalette.signalGreen
                     )
@@ -2537,21 +2495,21 @@ struct DashboardView: View {
                         let weekDisplay = weeklyTargetDisplay(completed: vm.weeklyStats.sessions, target: vm.profile.daysPerWeek)
                         weekPulseDetailRow(
                             value: weekDisplay.inlinePrimary,
-                            label: L10n.tr("Workouts"),
+                            label: "Workouts",
                             icon: "checkmark.seal.fill",
                             tint: STRQPalette.signalGreen
                         )
                         sandowRowDivider
                         weekPulseDetailRow(
                             value: ForgeTheme.formatVolume(vm.weeklyStats.volume),
-                            label: L10n.tr("Volume"),
+                            label: "Volume",
                             icon: "chart.bar.fill",
                             tint: STRQBrand.steel
                         )
                         sandowRowDivider
                         weekPulseDetailRow(
                             value: todayRecoveryStateLabel(for: vm.effectiveRecoveryScore),
-                            label: L10n.tr("Recovery"),
+                            label: "Recovery",
                             icon: "waveform.path.ecg",
                             tint: ForgeTheme.recoveryColor(for: vm.effectiveRecoveryScore)
                         )
@@ -2587,10 +2545,10 @@ struct DashboardView: View {
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
-        case 5..<12: return L10n.tr("Good morning")
-        case 12..<17: return L10n.tr("Good afternoon")
-        case 17..<22: return L10n.tr("Good evening")
-        default: return L10n.tr("Late night")
+        case 5..<12: return "Good morning"
+        case 12..<17: return "Good afternoon"
+        case 17..<22: return "Good evening"
+        default: return "Late night"
         }
     }
 }

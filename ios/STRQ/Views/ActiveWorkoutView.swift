@@ -1905,7 +1905,7 @@ struct ActiveWorkoutView: View {
                 .overlay(Circle().strokeBorder(STRQBrand.steel.opacity(0.22), lineWidth: 1))
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(L10n.tr("Rest"))
+                Text("Rest")
                     .font(.system(size: 12, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white.opacity(0.92))
                     .lineLimit(1)
@@ -1936,14 +1936,14 @@ struct ActiveWorkoutView: View {
     private func afterLogStateLineDetail(_ workout: ActiveWorkoutState) -> String {
         let exerciseIndex = workout.currentExerciseIndex
         guard exerciseIndex < workout.session.exerciseLogs.count else {
-            return L10n.tr("Use the bottom action to move forward when you're ready.")
+            return "Use the bottom action to move forward when you're ready."
         }
         let log = workout.session.exerciseLogs[exerciseIndex]
-        let exerciseName = vm.library.exercise(byId: log.exerciseId)?.name ?? L10n.tr("Exercise")
+        let exerciseName = vm.library.exercise(byId: log.exerciseId)?.name ?? "Exercise"
         if let currentSet = activeSetFor(log: log, workout: workout) {
-            return L10n.format("%@ · Set %d ready", exerciseName, currentSet.setNumber)
+            return "\(exerciseName) · Set \(currentSet.setNumber) ready"
         }
-        return L10n.tr("Use the bottom action to move forward when you're ready.")
+        return "Use the bottom action to move forward when you're ready."
     }
 
     private func undoBanner(prompt: LoggedSetUndoPrompt) -> some View {
@@ -1973,7 +1973,7 @@ struct ActiveWorkoutView: View {
             Button {
                 undoLastCompletedSet()
             } label: {
-                Text(L10n.tr("Undo"))
+                Text("Undo")
                     .font(.system(size: 12, weight: .black))
                     .foregroundStyle(.white.opacity(0.74))
                     .padding(.horizontal, 12)
@@ -1982,7 +1982,7 @@ struct ActiveWorkoutView: View {
                     .overlay(Capsule().strokeBorder(Color.white.opacity(0.09), lineWidth: 1))
             }
             .buttonStyle(.strqPressable)
-            .accessibilityLabel(L10n.tr("Undo last logged set"))
+            .accessibilityLabel("Undo last logged set")
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
@@ -2011,7 +2011,7 @@ struct ActiveWorkoutView: View {
             Group {
                 if allDone {
                     VStack(spacing: 10) {
-                        Text(L10n.tr("All sets are logged. Finish Workout to hand this workout back to Today."))
+                        Text("All sets are logged. Finish Workout to hand this workout back to Today.")
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(.white.opacity(0.7))
                             .multilineTextAlignment(.center)
@@ -2021,7 +2021,7 @@ struct ActiveWorkoutView: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "flag.checkered")
                                     .font(.subheadline)
-                                Text(L10n.tr("Finish Workout"))
+                                Text("Finish Workout")
                                     .font(.body.weight(.bold))
                             }
                             .foregroundStyle(.black)
@@ -2032,7 +2032,7 @@ struct ActiveWorkoutView: View {
                     }
                 } else if allCurrentSetsDone && !isLastExercise {
                     VStack(spacing: 10) {
-                        Text(L10n.tr("Current exercise is complete. Move on when you're ready."))
+                        Text("Current exercise is complete. Move on when you're ready.")
                             .font(.footnote.weight(.semibold))
                             .foregroundStyle(.white.opacity(0.7))
                             .multilineTextAlignment(.center)
@@ -2040,7 +2040,7 @@ struct ActiveWorkoutView: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "arrow.right")
                                     .font(.subheadline)
-                                Text(L10n.tr("Next Exercise"))
+                                Text("Next Exercise")
                                     .font(.body.weight(.bold))
                             }
                             .foregroundStyle(.black)
@@ -2165,7 +2165,7 @@ struct ActiveWorkoutView: View {
             Button {
                 undoLastCompletedSet()
             } label: {
-                Text(L10n.tr("Undo"))
+                Text("Undo")
                     .font(.system(size: 12, weight: .black))
                     .foregroundStyle(.white.opacity(0.66))
                     .padding(.horizontal, 12)
@@ -2174,7 +2174,7 @@ struct ActiveWorkoutView: View {
                     .overlay(Capsule().strokeBorder(Color.white.opacity(0.06), lineWidth: 1))
             }
             .buttonStyle(.strqPressable)
-            .accessibilityLabel(L10n.tr("Undo last logged set"))
+            .accessibilityLabel("Undo last logged set")
         }
         .padding(.horizontal, 10)
         .frame(height: 34)
@@ -2208,7 +2208,7 @@ struct ActiveWorkoutView: View {
                     .overlay(Circle().strokeBorder(summaryTint.opacity(0.24), lineWidth: 1))
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(L10n.tr("Set logged"))
+                    Text("Set logged")
                         .font(.system(size: 9, weight: .black))
                         .tracking(0.8)
                         .foregroundStyle(.white.opacity(0.42))
@@ -2222,13 +2222,13 @@ struct ActiveWorkoutView: View {
                 .layoutPriority(1)
 
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text(L10n.format("Set %d · %@ × %d", loggedSet.setNumber, formatWeight(loggedSet.weight, increment: 0.5), loggedSet.reps))
+                    Text("Set \(loggedSet.setNumber) · \(formatWeight(loggedSet.weight, increment: 0.5)) × \(loggedSet.reps)")
                         .font(.system(size: 13, weight: .black, design: .rounded).monospacedDigit())
                         .foregroundStyle(.white.opacity(0.70))
                         .lineLimit(1)
                         .minimumScaleFactor(0.72)
                     if e1rm > 0 {
-                        Text(L10n.format("e1RM %.0f", e1rm))
+                        Text(String(format: "e1RM %.0f", e1rm))
                             .font(.system(size: 10, weight: .bold).monospacedDigit())
                             .foregroundStyle(.white.opacity(0.34))
                     }
@@ -2265,7 +2265,7 @@ struct ActiveWorkoutView: View {
         setIndex: Int
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(L10n.tr("How did that feel?"))
+            Text("How did that feel?")
                 .font(.system(size: 10, weight: .bold))
                 .foregroundStyle(.white.opacity(0.46))
 
@@ -2324,21 +2324,21 @@ struct ActiveWorkoutView: View {
         }
         .buttonStyle(.strqPressable)
         .accessibilityLabel(restQualityAccessibilityLabel(for: quality))
-        .accessibilityHint(L10n.tr("activeWorkout.rest.quality.accessibilityHint", fallback: "Ändert die Vorgabe nicht."))
+        .accessibilityHint("Does not change the target.")
     }
 
     private func restQualityAccessibilityLabel(for quality: SetQuality) -> String {
         switch quality {
         case .tooEasy:
-            return L10n.tr("activeWorkout.rest.quality.easy.accessibility", fallback: "Easy. Lief leicht. Steigerung möglich.")
+            return "Easy. Felt light. Increase possible."
         case .onTarget:
-            return L10n.tr("activeWorkout.rest.quality.clean.accessibility", fallback: "Clean. Sauber. Vorgabe halten.")
+            return "Clean. Hold the target."
         case .grinder:
-            return L10n.tr("activeWorkout.rest.quality.grind.accessibility", fallback: "Grind. Hart. Last halten.")
+            return "Grind. Hard. Hold load."
         case .formBreakdown:
-            return L10n.tr("activeWorkout.rest.quality.form.accessibility", fallback: "Form. Technik prüfen. Nicht steigern.")
+            return "Form. Check technique. Do not increase."
         case .pain:
-            return L10n.tr("activeWorkout.rest.quality.pain.accessibility", fallback: "Pain. Schmerz notiert. Nicht erzwingen.")
+            return "Pain. Noted. Do not force it."
         }
     }
 
@@ -2354,7 +2354,7 @@ struct ActiveWorkoutView: View {
 
         return VStack(spacing: 13) {
             VStack(spacing: 5) {
-                Text(L10n.tr("REST"))
+                Text("REST")
                     .font(.system(size: 9, weight: .black))
                     .tracking(1.6)
                     .foregroundStyle(.white.opacity(0.46))
@@ -2409,7 +2409,7 @@ struct ActiveWorkoutView: View {
 
     private func restControls() -> some View {
         HStack(spacing: 8) {
-            restTimerAdjustmentButton(title: L10n.tr("-15s")) {
+            restTimerAdjustmentButton(title: "-15s") {
                 let updatedTime = max(0, restTimeRemaining - 15)
                 restTimeRemaining = updatedTime
                 if updatedTime == 0 {
@@ -2419,7 +2419,7 @@ struct ActiveWorkoutView: View {
 
             restContinueButton()
 
-            restTimerAdjustmentButton(title: L10n.tr("+15s")) {
+            restTimerAdjustmentButton(title: "+15s") {
                 restTimeRemaining += 15
             }
         }
@@ -2430,7 +2430,7 @@ struct ActiveWorkoutView: View {
             restTimeRemaining = 0
             restTimerActive = false
         } label: {
-            Text(L10n.tr("Continue Now"))
+            Text("Continue Now")
                 .font(.system(size: 14, weight: .black))
                 .foregroundStyle(STRQPalette.backgroundDeep)
                 .frame(maxWidth: .infinity)
@@ -2446,7 +2446,7 @@ struct ActiveWorkoutView: View {
                 .overlay(Capsule().strokeBorder(Color.white.opacity(0.24), lineWidth: 1))
         }
         .buttonStyle(.strqPressable)
-        .accessibilityLabel(L10n.tr("Continue workout now"))
+        .accessibilityLabel("Continue workout now")
         .accessibilityIdentifier("strq.active-workout.rest-continue")
     }
 
@@ -2467,12 +2467,12 @@ struct ActiveWorkoutView: View {
 
     private func restCountdownHint() -> String {
         if restTimeRemaining <= 10 {
-            return L10n.tr("Get set for the next effort.")
+            return "Get set for the next effort."
         }
         if restTimeRemaining <= 30 {
-            return L10n.tr("Reset, then go again.")
+            return "Reset, then go again."
         }
-        return L10n.tr("activeWorkout.rest.nextQueued", fallback: "Next set is ready.")
+        return "Next set is ready."
     }
 
     private func restNextActionCard(_ nextRec: NextSetRec) -> some View {
@@ -2548,9 +2548,9 @@ struct ActiveWorkoutView: View {
 
         guard let next = activeSetFor(log: activeLog, workout: sourceWorkout) else {
             return NextSetRec(
-                eyebrow: L10n.tr("WORKOUT READY"),
-                primary: L10n.tr("Finish Workout"),
-                detail: L10n.tr("All working sets are logged. Finish when you're ready."),
+                eyebrow: "WORKOUT READY",
+                primary: "Finish Workout",
+                detail: "All working sets are logged. Finish when you're ready.",
                 icon: "flag.checkered",
                 tint: STRQPalette.success,
                 usesMonospacedPrimary: false
@@ -2560,7 +2560,7 @@ struct ActiveWorkoutView: View {
         let planned = last.exerciseIndex < sourceWorkout.plannedExercises.count ? sourceWorkout.plannedExercises[last.exerciseIndex] : nil
         let today = planned.map { vm.todayPrescription(for: $0) }
         let quality = justLogged.quality
-        var guidance = L10n.tr("activeWorkout.rest.guidance.default", fallback: "Nächster Satz bereit.")
+        var guidance = "Next set is ready."
         var icon = "figure.strengthtraining.traditional"
         var tint: Color = STRQBrand.steel
 
@@ -2568,10 +2568,10 @@ struct ActiveWorkoutView: View {
         let increment = weightIncrement(for: exercise)
         let isSameExercise = activeExerciseIndex == last.exerciseIndex
         let todayIsAdjusted = today.map { todayPrescriptionDiffersFromPlan($0, planned: planned, currentSet: next) } ?? false
-        let reducedSetGuidance = L10n.tr("activeWorkout.rest.guidance.todayAdjusted", fallback: "Heute ruhiger halten.")
+        let reducedSetGuidance = "Keep this one lighter."
 
         if !isSameExercise {
-            guidance = L10n.tr("activeWorkout.rest.guidance.nextExercise", fallback: "Nächste Übung bereit.")
+            guidance = "Next exercise is ready."
             icon = "arrow.right.circle.fill"
             tint = STRQBrand.steel
         } else if let q = quality {
@@ -2584,7 +2584,7 @@ struct ActiveWorkoutView: View {
             icon = "heart.circle.fill"
             tint = activeWorkoutSignal
         } else if let today, let targetTopReps = parsePlannedReps(today.suggestedRepRange), justLogged.reps >= targetTopReps {
-            guidance = L10n.tr("activeWorkout.rest.guidance.topOfRange", fallback: "Oberes Ziel getroffen.")
+            guidance = "Top of range hit."
             icon = "arrow.up.right.circle.fill"
             tint = STRQPalette.success
         }
@@ -2597,7 +2597,7 @@ struct ActiveWorkoutView: View {
         }
 
         return NextSetRec(
-            eyebrow: L10n.tr("NEXT SET"),
+            eyebrow: "NEXT SET",
             primary: queuedPrimary,
             detail: guidance,
             icon: icon,
@@ -2610,31 +2610,31 @@ struct ActiveWorkoutView: View {
         switch quality {
         case .tooEasy:
             return (
-                L10n.tr("activeWorkout.rest.guidance.easy", fallback: "Lief leicht. Steigerung möglich."),
+                "Felt light. Increase possible.",
                 "arrow.up.right.circle.fill",
                 STRQPalette.info
             )
         case .onTarget:
             return (
-                L10n.tr("activeWorkout.rest.guidance.clean", fallback: "Sauber. Vorgabe halten."),
+                "Clean. Hold the target.",
                 "checkmark.circle.fill",
                 STRQPalette.success
             )
         case .grinder:
             return (
-                L10n.tr("activeWorkout.rest.guidance.grind", fallback: "Hart. Last halten."),
+                "Hard. Hold load.",
                 "flame.fill",
                 STRQPalette.warning
             )
         case .formBreakdown:
             return (
-                L10n.tr("activeWorkout.rest.guidance.form", fallback: "Technik prüfen. Nicht steigern."),
+                "Check technique. Do not increase.",
                 "exclamationmark.triangle.fill",
                 STRQPalette.warning
             )
         case .pain:
             return (
-                L10n.tr("activeWorkout.rest.guidance.pain", fallback: "Schmerz notiert. Nicht erzwingen."),
+                "Pain noted. Do not force it.",
                 "cross.case.fill",
                 STRQPalette.danger
             )

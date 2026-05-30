@@ -73,10 +73,10 @@ struct ReadinessCheckInView: View {
             }
             Spacer()
             VStack(spacing: 2) {
-                Text(showResult ? L10n.tr("Ready") : L10n.tr("Daily check-in"))
+                Text(showResult ? "Ready" : L10n.tr("Daily check-in"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.primary)
-                Text(showResult ? L10n.tr("Today's plan") : contextLabel)
+                Text(showResult ? "Today's plan" : contextLabel)
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(.secondary)
                     .tracking(0.3)
@@ -419,7 +419,7 @@ struct ReadinessCheckInView: View {
                     )
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(L10n.tr("TODAY'S STATE"))
+                        Text("TODAY'S STATE")
                             .font(.system(size: 10, weight: .black))
                             .tracking(1.1)
                             .foregroundStyle(statusColor)
@@ -428,7 +428,7 @@ struct ReadinessCheckInView: View {
                             .foregroundStyle(.primary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.78)
-                        Text(L10n.tr("Treat this as context, not a verdict"))
+                        Text("Treat this as context, not a verdict")
                             .font(.footnote.weight(.medium))
                             .foregroundStyle(.secondary)
                     }
@@ -506,7 +506,7 @@ struct ReadinessCheckInView: View {
                 HStack(spacing: 8) {
                     Image(systemName: hasWorkoutToday ? "figure.strengthtraining.traditional" : "checkmark")
                         .font(.subheadline.weight(.semibold))
-                    Text(hasWorkoutToday ? L10n.tr("See today's plan") : L10n.tr("Done"))
+                    Text(hasWorkoutToday ? "See today's plan" : "Done")
                         .font(.body.weight(.bold))
                 }
                 .foregroundStyle(.black)
@@ -526,10 +526,10 @@ struct ReadinessCheckInView: View {
                 }
             } label: {
                 HStack {
-                    Text(L10n.tr("common.details", fallback: "Details"))
+                    Text("Details")
                         .font(.caption.weight(.semibold))
                     Spacer()
-                    Text(L10n.tr("readiness.details.summary", fallback: "Sleep, energy, stress, soreness"))
+                    Text("Sleep, energy, stress, soreness")
                         .font(.caption2.weight(.medium))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -543,13 +543,13 @@ struct ReadinessCheckInView: View {
 
             if showReadinessDetails {
                 Divider().overlay(Color.white.opacity(0.05))
-                signalRow(label: L10n.tr("Sleep"), value: readiness.sleepQuality.label, color: readinessColor(readiness.sleepQuality))
+                signalRow(label: "Sleep", value: readinessLevelLabel(readiness.sleepQuality), color: readinessColor(readiness.sleepQuality))
                 Divider().overlay(Color.white.opacity(0.05))
-                signalRow(label: L10n.tr("Energy"), value: readiness.energyLevel.label, color: readinessColor(readiness.energyLevel))
+                signalRow(label: "Energy", value: readinessLevelLabel(readiness.energyLevel), color: readinessColor(readiness.energyLevel))
                 Divider().overlay(Color.white.opacity(0.05))
-                signalRow(label: L10n.tr("Stress"), value: readiness.stressLevel.label, color: readinessColor(readiness.stressLevel, inverted: true))
+                signalRow(label: "Stress", value: readinessLevelLabel(readiness.stressLevel), color: readinessColor(readiness.stressLevel, inverted: true))
                 Divider().overlay(Color.white.opacity(0.05))
-                signalRow(label: L10n.tr("Soreness"), value: readiness.soreness.label, color: sorenessColor(readiness.soreness))
+                signalRow(label: "Soreness", value: sorenessLevelLabel(readiness.soreness), color: sorenessColor(readiness.soreness))
             }
         }
         .padding(.horizontal, 14)
@@ -563,7 +563,7 @@ struct ReadinessCheckInView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.caption.weight(.bold))
                 .foregroundStyle(STRQPalette.danger)
-            Text(readiness.painNote.isEmpty ? L10n.tr("Pain reported") : readiness.painNote)
+            Text(readiness.painNote.isEmpty ? "Pain reported" : readiness.painNote)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(2)
@@ -640,11 +640,11 @@ struct ReadinessCheckInView: View {
 
     private func readinessStateLabel(for score: Int) -> String {
         switch score {
-        case 85...: return L10n.tr("Ready")
-        case 70..<85: return L10n.tr("Steady")
-        case 55..<70: return L10n.tr("Light")
-        case 40..<55: return L10n.tr("Low")
-        default: return L10n.tr("Rest")
+        case 85...: return "Ready"
+        case 70..<85: return "Steady"
+        case 55..<70: return "Light"
+        case 40..<55: return "Low"
+        default: return "Rest"
         }
     }
 
@@ -661,34 +661,34 @@ struct ReadinessCheckInView: View {
     private func readinessAdviceLabel(_ advice: TrainingAdvice) -> String {
         switch advice {
         case .trainAsPlanned, .pushHard:
-            return L10n.tr("Keep the plan")
+            return "Keep the plan"
         case .trainButLighter, .shortenSession, .reduceAccessories, .useSaferVariations:
-            return L10n.tr("Keep it controlled")
+            return "Keep it controlled"
         case .restDay:
-            return L10n.tr("Back off today")
+            return "Back off today"
         }
     }
 
     private func readinessHeadline(for response: ReadinessCoachResponse, readiness: DailyReadiness) -> String {
         if readiness.painOrRestriction {
-            return L10n.tr("Keep it controlled")
+            return "Keep it controlled"
         }
 
         switch response.trainingAdvice {
         case .restDay:
-            return L10n.tr("Back off today")
+            return "Back off today"
         case .trainButLighter, .shortenSession, .reduceAccessories, .useSaferVariations:
-            return L10n.tr("Keep it controlled")
+            return "Keep it controlled"
         case .trainAsPlanned, .pushHard:
-            return L10n.tr("Keep the plan")
+            return "Keep the plan"
         }
     }
 
     private func readinessMessage(for response: ReadinessCoachResponse, readiness: DailyReadiness) -> String {
         if readiness.painOrRestriction {
             return hasWorkoutToday
-                ? L10n.tr("Restriction noted. Keep the work controlled, reduce load, and end sets when form breaks.")
-                : L10n.tr("Restriction noted. Back off today and check in again before the next workout.")
+                ? "Restriction noted. Keep the work controlled, reduce load, and end sets when form breaks."
+                : "Restriction noted. Back off today and check in again before the next workout."
         }
 
         return response.message
@@ -699,26 +699,46 @@ struct ReadinessCheckInView: View {
 
         if hasWorkoutToday {
             return [
-                L10n.tr("Keep load conservative"),
-                L10n.tr("Choose clean, controlled movements"),
-                L10n.tr("End the set when form breaks")
+                "Keep load conservative",
+                "Choose clean, controlled movements",
+                "End the set when form breaks"
             ]
         }
 
         return [
-            L10n.tr("Light movement only"),
-            L10n.tr("Eat, hydrate, sleep"),
-            L10n.tr("Check in again tomorrow")
+            "Light movement only",
+            "Eat, hydrate, sleep",
+            "Check in again tomorrow"
         ]
     }
 
     private func shortLabel(_ level: ReadinessLevel) -> String {
         switch level {
-        case .terrible: L10n.tr("Bad")
-        case .poor: L10n.tr("Low")
-        case .okay: L10n.tr("Ok")
-        case .good: L10n.tr("Good")
-        case .great: L10n.tr("Peak")
+        case .terrible: "Bad"
+        case .poor: "Low"
+        case .okay: "Ok"
+        case .good: "Good"
+        case .great: "Peak"
+        }
+    }
+
+    private func readinessLevelLabel(_ level: ReadinessLevel) -> String {
+        switch level {
+        case .terrible: "Terrible"
+        case .poor: "Poor"
+        case .okay: "Okay"
+        case .good: "Good"
+        case .great: "Great"
+        }
+    }
+
+    private func sorenessLevelLabel(_ level: SorenessLevel) -> String {
+        switch level {
+        case .none: "None"
+        case .mild: "Mild"
+        case .moderate: "Moderate"
+        case .significant: "Significant"
+        case .severe: "Severe"
         }
     }
 
