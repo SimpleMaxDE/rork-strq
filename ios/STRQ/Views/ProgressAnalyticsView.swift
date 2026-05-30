@@ -2220,7 +2220,7 @@ struct ProgressAnalyticsView: View {
                 STRQCelebrationBadge(title: L10n.tr("Streak"), subtitle: L10n.format("%d days", vm.streak), icon: "flame.fill", variant: .gold)
             }
             if volumeLast > 0 && volumeThis > volumeLast {
-                STRQCelebrationBadge(title: L10n.tr("Volume up"), icon: "chart.line.uptrend.xyaxis", variant: .green)
+                STRQCelebrationBadge(title: L10n.tr("Load moved up"), icon: "chart.line.uptrend.xyaxis", variant: .green)
             }
             if vm.weeklyStats.sessions >= consistencyTarget {
                 STRQCelebrationBadge(title: L10n.tr("Consistency"), icon: "checkmark.seal.fill", variant: .green)
@@ -2531,9 +2531,8 @@ struct ProgressAnalyticsView: View {
         }
 
         if volumeLast > 0 && volumeThis > volumeLast {
-            let pct = Int((volumeThis - volumeLast) / volumeLast * 100)
             return ImprovementSignal(
-                title: L10n.format("Volume up %d%%", pct),
+                title: L10n.tr("Workload moved up"),
                 detail: L10n.tr("More work than last week"),
                 icon: "chart.line.uptrend.xyaxis",
                 state: .success
@@ -2632,10 +2631,9 @@ struct ProgressAnalyticsView: View {
             headline = L10n.format(stalled == 1 ? "%d lift flat" : "%d lifts flat", stalled)
             detail = progressing > 0 ? L10n.format("%d still progressing", progressing) : L10n.tr("Consider a variation or reset")
         } else if volumeThis > volumeLast && volumeLast > 0 {
-            let pct = Int((volumeThis - volumeLast) / volumeLast * 100)
             state = .success
             icon = "chart.line.uptrend.xyaxis"
-            headline = L10n.format("Volume up %d%%", pct)
+            headline = L10n.tr("Workload moved up")
             detail = L10n.tr("More work than last week")
         } else if volumeLast > 0 && volumeThis < volumeLast * 0.85 {
             state = .warning
@@ -4750,36 +4748,36 @@ struct ProgressAnalyticsView: View {
 
         if totalSessions <= 1 {
             return VolumeTrendSnapshot(
-                stateLabel: L10n.tr("Baseline forming"),
+                stateLabel: L10n.tr("Too early to call"),
                 state: .warning,
                 activeWeeks: activeWeeks,
                 totalSessions: totalSessions,
                 currentWeekSessions: currentWeekSessions,
                 peakWeekSessions: peakWeekSessions,
-                detail: L10n.tr("One or two sessions start the workload record. Weekly rhythm becomes useful after the same evidence repeats.")
+                detail: L10n.tr("One or two sessions start the workload record. Weekly rhythm gets clearer when the same evidence repeats.")
             )
         }
 
         if activeWeeks >= 2 && totalSessions >= 4 {
             return VolumeTrendSnapshot(
-                stateLabel: L10n.tr("Readable trend"),
+                stateLabel: L10n.tr("Rhythm visible"),
                 state: .info,
                 activeWeeks: activeWeeks,
                 totalSessions: totalSessions,
                 currentWeekSessions: currentWeekSessions,
                 peakWeekSessions: peakWeekSessions,
-                detail: L10n.tr("Completed workouts now span multiple weeks, enough to read load rhythm without guessing at adaptation.")
+                detail: L10n.tr("Completed workouts now span multiple weeks, enough to show weekly rhythm from logged work.")
             )
         }
 
         return VolumeTrendSnapshot(
-            stateLabel: L10n.tr("Early signal"),
+            stateLabel: L10n.tr("Trend forming"),
             state: .warning,
             activeWeeks: activeWeeks,
             totalSessions: totalSessions,
             currentWeekSessions: currentWeekSessions,
             peakWeekSessions: peakWeekSessions,
-            detail: L10n.tr("The workload signal is present, but the weekly pattern is still thin. More completed sessions make the rhythm trustworthy.")
+            detail: L10n.tr("Some work is logged, but the weekly pattern is still thin. More completed sessions make the rhythm easier to trust.")
         )
     }
 
@@ -4787,11 +4785,11 @@ struct ProgressAnalyticsView: View {
     private var volumeSignals: some View {
         if vm.totalCompletedWorkouts < 2 {
             signalRunwayCard(
-                title: L10n.tr("Volume Signals"),
-                trailing: L10n.tr("Baseline forming"),
+                title: L10n.tr("Load Rhythm"),
+                trailing: L10n.tr("Too early to call"),
                 icon: "chart.bar.xaxis",
-                headline: L10n.tr("Training load baseline is forming"),
-                detail: L10n.tr("progress.volume.runway.detail", fallback: "A few completed workouts reveal weekly rhythm and workload before balance becomes trustworthy."),
+                headline: L10n.tr("Load rhythm is forming"),
+                detail: L10n.tr("progress.volume.runway.detail", fallback: "A few completed workouts reveal weekly rhythm before balance becomes trustworthy."),
                 chips: [("figure.strengthtraining.traditional", L10n.tr("Workouts")), ("chart.bar.xaxis", L10n.tr("Weekly rhythm")), ("circle.dashed", L10n.tr("No conclusion"))]
             )
             .opacity(appeared ? 1 : 0)
@@ -4826,11 +4824,11 @@ struct ProgressAnalyticsView: View {
 
         return signalRunwayCard(
             title: L10n.tr("Muscle Balance"),
-            trailing: L10n.tr("Baseline Forming"),
+            trailing: L10n.tr("Needs more data"),
             icon: "arrow.left.arrow.right",
-            headline: L10n.tr("Muscle balance is still forming"),
+            headline: L10n.tr("Muscle balance needs more data"),
             detail: detail,
-            chips: [("square.stack.3d.up.fill", L10n.tr("Current volume")), ("calendar", L10n.tr("4-week average")), ("checkmark.seal", L10n.tr("Trusted read"))]
+            chips: [("square.stack.3d.up.fill", L10n.tr("Current volume")), ("calendar", L10n.tr("4-week average")), ("circle.dashed", L10n.tr("Needs more data"))]
         )
     }
 
@@ -4839,10 +4837,10 @@ struct ProgressAnalyticsView: View {
             VStack(alignment: .leading, spacing: 14) {
                 evidenceHeader(
                     title: L10n.tr("Muscle Balance"),
-                    trailing: L10n.tr("vs 4-Week Avg"),
+                    trailing: L10n.tr("4-week baseline"),
                     icon: "arrow.left.arrow.right",
                     state: .info,
-                    subtitle: L10n.tr("Trusted read after baseline gate")
+                    subtitle: L10n.tr("Current work against recent baseline")
                 )
 
                 VStack(spacing: 10) {
@@ -4874,15 +4872,17 @@ struct ProgressAnalyticsView: View {
                             .frame(height: 14)
 
                             Text(balanceLabel(entry.percentOfAverage))
-                                .font(.system(size: 10, weight: .bold, design: .rounded).monospacedDigit())
+                                .font(.system(size: 10, weight: .bold, design: .rounded))
                                 .foregroundStyle(balanceColor(entry.percentOfAverage))
-                                .frame(width: 42, alignment: .trailing)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.68)
+                                .frame(width: 82, alignment: .trailing)
                         }
                     }
                 }
 
                 HStack(spacing: 10) {
-                    legendDot(color: Color.white.opacity(0.18), label: L10n.tr("100% baseline"))
+                    legendDot(color: Color.white.opacity(0.18), label: L10n.tr("4-week baseline"))
                     legendDot(color: STRQBrand.steel, label: L10n.tr("Current week"))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -5030,14 +5030,17 @@ struct ProgressAnalyticsView: View {
     private var movementBalanceCard: some View {
         evidenceModule {
             VStack(alignment: .leading, spacing: 14) {
+                let data = movementBalanceData
+                let summary = movementBalanceSummary(data)
+                let summaryState: STRQPalette.State = summary == L10n.tr("Needs more data") ? .warning : .info
                 evidenceHeader(
                     title: L10n.tr("Movement Balance"),
+                    trailing: summary,
                     icon: "figure.strengthtraining.traditional",
-                    state: .info,
+                    state: summaryState,
                     subtitle: L10n.tr("Movement mix from current volume")
                 )
 
-                let data = movementBalanceData
                 HStack(spacing: 8) {
                     movementBar(label: "Push", value: data.push, total: data.total, color: Color.white)
                     movementBar(label: "Pull", value: data.pull, total: data.total, color: STRQBrand.steel)
@@ -5056,6 +5059,7 @@ struct ProgressAnalyticsView: View {
 
     private func movementBar(label: String, value: Double, total: Double, color: Color) -> some View {
         let ratio = total > 0 ? value / total : 0
+        let read = movementBalanceLabel(value: value, total: total)
         return VStack(spacing: 5) {
             ZStack(alignment: .bottom) {
                 RoundedRectangle(cornerRadius: 4)
@@ -5067,9 +5071,11 @@ struct ProgressAnalyticsView: View {
             }
             .frame(maxWidth: .infinity)
 
-            Text("\(Int(ratio * 100))%")
-                .font(.system(size: 11, weight: .bold, design: .rounded).monospacedDigit())
+            Text(read)
+                .font(.system(size: 10, weight: .bold, design: .rounded))
                 .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.62)
             Text(label)
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundStyle(.tertiary)
@@ -5085,16 +5091,38 @@ struct ProgressAnalyticsView: View {
     }
 
     private func balanceColor(_ ratio: Double) -> Color {
-        if ratio >= 1.1 { return STRQPalette.success }
         if ratio >= 0.85 { return STRQBrand.steel }
         if ratio >= 0.65 { return STRQPalette.warning }
-        return STRQPalette.danger
+        return Color.white.opacity(0.52)
     }
 
     private func balanceLabel(_ ratio: Double) -> String {
-        let pct = Int((ratio - 1.0) * 100)
-        if pct >= 0 { return "+\(pct)%" }
-        return "\(pct)%"
+        if ratio >= 1.1 { return L10n.tr("Leading") }
+        if ratio >= 0.85 { return L10n.tr("Balanced enough") }
+        if ratio >= 0.65 { return L10n.tr("Light") }
+        return L10n.tr("Quiet")
+    }
+
+    private func movementBalanceLabel(value: Double, total: Double) -> String {
+        guard total > 0, value > 0 else { return L10n.tr("Quiet") }
+        let ratio = value / total
+        if ratio >= 0.38 { return L10n.tr("Leading") }
+        if ratio >= 0.20 { return L10n.tr("Balanced enough") }
+        return L10n.tr("Light")
+    }
+
+    private func movementBalanceSummary(_ data: (push: Double, pull: Double, legs: Double, core: Double, total: Double)) -> String {
+        guard data.total > 0 else { return L10n.tr("Needs more data") }
+        let leaders: [(value: Double, label: String)] = [
+            (data.push, L10n.tr("Push work leading")),
+            (data.pull, L10n.tr("Pull work leading")),
+            (data.legs, L10n.tr("Leg work leading")),
+            (data.core, L10n.tr("Core work leading"))
+        ]
+        guard let top = leaders.max(by: { $0.value < $1.value }), top.value > 0 else {
+            return L10n.tr("Needs more data")
+        }
+        return top.value / data.total >= 0.38 ? top.label : L10n.tr("Balanced enough")
     }
 
     private var movementBalanceData: (push: Double, pull: Double, legs: Double, core: Double, total: Double) {
