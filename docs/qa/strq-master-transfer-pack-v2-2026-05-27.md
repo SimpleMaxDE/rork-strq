@@ -6,9 +6,11 @@ Post-Profile checkpoint update: 2026-05-28
 
 Post-Recovery Trust checkpoint update: 2026-05-30
 
+Post-English-first P0-A checkpoint update: 2026-05-30
+
 Purpose: strict canonical transfer pack for a new ChatGPT/Codex session.
 
-Source status: CURRENT. Built from `AGENTS.md`, `docs/qa/strq-codex-operating-rules-2026-05-24.md`, the Profile and Progress planning docs listed in the task, current Profile/Progress/debug file inventory, the completed Profile and Recovery Trust checkpoints, `git log --oneline -n 80`, and `git status --short`.
+Source status: CURRENT. Built from `AGENTS.md`, `docs/qa/strq-codex-operating-rules-2026-05-24.md`, the Profile and Progress planning docs listed in the task, current Profile/Progress/debug file inventory, the completed Profile, Recovery Trust, and English-first P0-A checkpoints, `git log --oneline -n 80`, and `git status --short`.
 
 Status labels used in this pack:
 - APPROVED = accepted direction, rule, committed artifact, or explicit current instruction.
@@ -26,14 +28,20 @@ Status labels used in this pack:
 - CURRENT: Forbidden for this task: app source code, Swift files, staging, committing, pushing.
 - CURRENT: `git status --short` shows no tracked dirty app files and no staged files.
 - CURRENT: `git status --short` shows multiple untracked QA/artifact folders plus untracked `docs/qa/profile-v3-concept-brief-2026-05-25.md` and `ios/STRQ/Views/Debug/ProfileV3PrototypeView.swift`.
-- CURRENT: Before this Recovery Trust documentation update, `git diff --name-only` was empty; there was no tracked dirty implementation file in this checkout.
-- CURRENT: Latest commit in `git log --oneline -n 20` is `55c2ca8 Soften progress balance precision`.
+- CURRENT: Before this English-first documentation update, `git diff --name-only` was empty; there was no tracked dirty implementation file in this checkout.
+- CURRENT: Latest commit in `git log --oneline -n 20` is `bb85725 Make core daily coach copy English-first`.
 - CURRENT: Profile checkpoint is complete and pushed to `main` through `bbbc2a9`.
 - CURRENT: Recovery Trust checkpoint is complete and pushed to `main` through Progress P1-B at `55c2ca8`.
+- CURRENT: English-first P0-A checkpoint is complete and pushed to `main` through `bb85725`.
+- CURRENT: Core daily/coaching production copy cleanup is committed and pushed.
 - APPROVED: Profile production direction is approved enough for the current checkpoint.
 - CURRENT: Completed Profile checkpoint slices are `9d85cdb Recovery Trust Display`, `a560c1d Coach & Inputs Restructure`, `bbe5ef0 Account & Data Rehousing`, `4e940f8 Tools / Privacy / Advanced Data`, and `bbbc2a9 Auto split Copy`.
 - CURRENT: Completed Recovery Trust slices are `0bf0454 Reduce recovery score precision in key surfaces`, `1d74450 Reduce recovery precision in coaching flows`, `cbb073b Reduce recovery precision in progress`, and `55c2ca8 Soften progress balance precision`.
 - CURRENT: Today, Sleep & Recovery, Readiness Check-In, Coach, PreWorkout, and Progress have been cleaned up for major recovery/readiness fake precision.
+- CURRENT: English-first P0-A cleaned Today, Coach, Daily Briefing, Readiness result, Phase Outlook, and Active Workout Rest fallbacks toward English-first.
+- BLOCKED: German/English mixing remains a carry-forward issue in Weekly Review and deeper localization surfaces.
+- BLOCKED: Do not treat global localization as solved.
+- BLOCKED: German localization remains a later explicit localization strategy/slice.
 - BLOCKED: No visible recovery/readiness percent or score-first hero may be reintroduced without explicit approval.
 - BLOCKED: Do not continue Profile polish blindly.
 - BLOCKED: Future Profile work must start from a fresh plan/slice with reconfirmed allowed and forbidden files.
@@ -122,6 +130,9 @@ xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Release -sdk 
 - APPROVED: English-first for new product surfaces.
 - APPROVED: Use short, direct, human, gym-native product copy.
 - APPROVED: German only for explicit localization slices.
+- APPROVED: German localization remains a later explicit localization strategy/slice.
+- BLOCKED: Do not treat global localization as solved from English-first cleanup work.
+- BLOCKED: Future English-first work must be scoped and reviewed by screenshots.
 - APPROVED: Prefer direct state, concrete training evidence, one clear next action, short labels, confidence only where data supports it, and humility where data is thin.
 - REJECTED: Academic labels, diagnostic language, vague motivational filler, AI-sounding summaries, inflated precision, and user-facing terms that require explanation.
 - REJECTED: Medical or diagnostic claims.
@@ -268,7 +279,8 @@ BLOCKED: Production use of a new custom visual system requires screenshot approv
 | 0bf0454 | Reduce recovery score precision in key surfaces | Today / Sleep & Recovery / Readiness Check-In | Reduced recovery/readiness score and percent-first presentation in key surfaces | CURRENT committed Recovery Trust P0-A |
 | 1d74450 | Reduce recovery precision in coaching flows | Coach / PreWorkout | Softened recovery/readiness precision and score-led coaching copy | CURRENT committed Recovery Trust P0-B |
 | cbb073b | Reduce recovery precision in progress | Progress | Kept Progress in Training Path mode while reducing recovery/readiness fake precision | CURRENT committed Recovery Trust P1-A |
-| 55c2ca8 | Soften progress balance precision | Progress dormant modules | Preventively softened muscle/movement/volume balance precision that could reappear later | CURRENT latest committed Recovery Trust P1-B |
+| 55c2ca8 | Soften progress balance precision | Progress dormant modules | Preventively softened muscle/movement/volume balance precision that could reappear later | CURRENT committed Recovery Trust P1-B |
+| bb85725 | Make core daily coach copy English-first | Today / Coach / Daily Briefing / Readiness result / Phase Outlook / Active Workout Rest | Cleaned core daily/coaching production copy and rest fallbacks toward English-first | CURRENT latest committed and pushed English-first P0-A |
 
 - CURRENT: `docs/qa/profile-v3-concept-brief-2026-05-25.md` exists but is untracked in this checkout.
 - APPROVED: The current transfer context treats Profile V3 Concept A / Athlete Identity First as the accepted direction that led to Profile V4.1.
@@ -278,22 +290,28 @@ BLOCKED: Production use of a new custom visual system requires screenshot approv
 - CURRENT: Recovery Trust checkpoint is complete and pushed to `main` through Progress P1-B at `55c2ca8`.
 - CURRENT: Recovery Trust cleaned up major recovery/readiness fake precision across Today, Sleep & Recovery, Readiness Check-In, Coach, PreWorkout, and Progress.
 - BLOCKED: Do not reintroduce visible recovery/readiness percent or score-first hero without explicit approval.
+- CURRENT: English-first P0-A checkpoint is complete and pushed to `main` through `bb85725`.
+- CURRENT: Core daily/coaching production copy cleanup is committed and pushed.
+- CURRENT: Today, Coach, Daily Briefing, Readiness result, Phase Outlook, and Active Workout Rest fallbacks were cleaned toward English-first.
+- BLOCKED: Weekly Review and deeper localization surfaces still carry German/English mixing risk.
+- BLOCKED: Global localization is not solved; German localization remains a later explicit strategy/slice.
 
 ## 9. Surface Status Map
 
 | Surface | Status | Strongest Current Parts | Known Weaknesses | Next Likely Slice | Blocked Items |
 |---|---|---|---|---|---|
-| Today | CURRENT committed polish exists | CURRENT Today activation copy and first viewport were rebuilt/polished in recent history; Recovery Trust P0-A cleaned up major recovery/readiness fake precision | UNCERTAIN latest manual screenshots after Recovery Trust cleanup | CURRENT screenshot QA/copy audit if reopened | BLOCKED broad redesign or score-first recovery/readiness hero without approval |
+| Today | CURRENT committed polish exists | CURRENT Today activation copy and first viewport were rebuilt/polished in recent history; Recovery Trust P0-A cleaned major recovery/readiness fake precision; English-first P0-A cleaned Today and Daily Briefing copy toward English-first | UNCERTAIN latest manual screenshots after English-first cleanup | CURRENT screenshot QA/copy audit if reopened | BLOCKED broad redesign, score-first recovery/readiness hero, or global localization assumptions without approval |
 | Training tab | CURRENT app surface exists | CURRENT training structure feeds active plan flows | UNCERTAIN current visual/product approval state | UNCERTAIN audit before changes | BLOCKED broad production logic changes |
 | PreWorkout / Handoff | CURRENT committed redesign exists | CURRENT launch/handoff flow has dedicated polish commit; Recovery Trust P0-B softened recovery/readiness precision in coaching handoff copy | UNCERTAIN latest screenshot quality | UNCERTAIN QA-only pass if user raises issue | BLOCKED behavior changes or score-first readiness display without scope |
-| ActiveWorkout | CURRENT strongest surface pattern | APPROVED clear action moment, live logging, rest guidance, set table polish | UNCERTAIN residual edge cases need simulator QA | CURRENT small visual/QA slices only | BLOCKED broad workout mutation changes without explicit approval |
+| Daily Briefing / Phase Outlook | CURRENT committed English-first P0-A cleanup | CURRENT daily/coaching copy and Phase Outlook production copy were cleaned toward English-first in `bb85725` | UNCERTAIN latest manual screenshots after English-first cleanup | CURRENT screenshot QA/copy audit if reopened | BLOCKED fake precision, AI/lab wording, or treating global localization as solved |
+| ActiveWorkout | CURRENT strongest surface pattern | APPROVED clear action moment, live logging, rest guidance, set table polish; English-first P0-A cleaned Active Workout Rest fallbacks toward English-first | UNCERTAIN residual edge cases and rest visuals need simulator QA if reopened | CURRENT Active Workout rest visual spot-check if reopened | BLOCKED broad workout mutation changes without explicit approval |
 | Rest Overlay | CURRENT polished rest-focus direction | APPROVED focused rest/back-off moment | UNCERTAIN exact latest screenshot state | CURRENT screenshot QA when touched | BLOCKED medical/recovery claims |
 | Completion | CURRENT committed polish | CURRENT PR/Gold reward direction is accepted when backed by real data | UNCERTAIN latest screenshot approval | CURRENT visual QA if reopened | BLOCKED fake PR/gold claims |
 | Progress | CURRENT production P1A/P2 committed; Recovery Trust P1-A/P1-B complete | APPROVED Training Path/Progress direction, proof strip, one Next Move, lower sections; dormant muscle/movement/volume modules were softened preventively | UNCERTAIN dormant module screenshot quality if reactivated | CURRENT only planned, trust-gated production slices | BLOCKED node map, analytics dashboard, overclaiming, or visible recovery/readiness percent without approval |
-| Coach / More Signals | CURRENT exists | CURRENT Trainer/Coach copy hardening committed; Recovery Trust P0-B cleaned major recovery/readiness fake precision | BLOCKED density/alarmism risk remains | CURRENT copy and density audit | BLOCKED alarmist, diagnostic, or score-first coaching |
-| Weekly Review | CURRENT localization committed | CURRENT localized copy hardening exists | BLOCKED muscle-balance cleanup remains open | CURRENT Weekly Review muscle-balance cleanup when scoped | BLOCKED fake precision |
+| Coach / More Signals | CURRENT exists | CURRENT Trainer/Coach copy hardening committed; Recovery Trust P0-B cleaned major recovery/readiness fake precision; English-first P0-A cleaned Coach production copy toward English-first | BLOCKED density/alarmism risk remains | CURRENT copy and density audit | BLOCKED alarmist, diagnostic, score-first coaching, or global localization assumptions |
+| Weekly Review | CURRENT localization committed | CURRENT localized copy hardening exists | BLOCKED German/English mixing and Weekly Review English-first cleanup remain open | CURRENT Weekly Review English-first cleanup when scoped | BLOCKED fake precision or treating global localization as solved |
 | Sleep & Recovery | CURRENT daily sleep upsert fixed | CURRENT sleep data write path has recent fix; Recovery Trust P0-A cleaned major recovery/readiness fake precision | UNCERTAIN latest manual screenshots after Recovery Trust cleanup | CURRENT trust/data-source audit when scoped | BLOCKED medical recovery diagnosis or score-first recovery hero |
-| Readiness Check-In | CURRENT app surface exists | CURRENT Recovery Trust P0-A cleaned major readiness fake precision | UNCERTAIN latest manual screenshots after cleanup | CURRENT screenshot QA/copy audit if reopened | BLOCKED visible readiness percent or score-first hero without approval |
+| Readiness Check-In | CURRENT app surface exists | CURRENT Recovery Trust P0-A cleaned major readiness fake precision; English-first P0-A cleaned Readiness result copy toward English-first | UNCERTAIN latest manual screenshots after English-first cleanup | CURRENT screenshot QA/copy audit if reopened | BLOCKED visible readiness percent, score-first hero, or global localization assumptions without approval |
 | Nutrition / Body | CURRENT Profile body/nutrition rows exist | CURRENT nutrition toggle side effects are known/protected | BLOCKED Nutrition Settings / Physique recovery precision cleanup remains open | CURRENT display-only quiet input slice after approval | BLOCKED side-effect changes without explicit scope |
 | Exercise Detail / Prescription | CURRENT prescription consistency commit exists | CURRENT prescription displays aligned with Today target | BLOCKED trust bug remains known | CURRENT bugfix plan/audit | BLOCKED logic changes without diagnosis |
 | Profile | CURRENT checkpoint-complete through `bbbc2a9` | APPROVED Athlete Passport Compact direction; Profile production direction approved enough for checkpoint | BLOCKED do not continue Profile polish blindly | CURRENT no active Profile slice; future work needs fresh plan | BLOCKED future implementation without a new plan/slice |
@@ -361,9 +379,25 @@ BLOCKED: Production use of a new custom visual system requires screenshot approv
 - BLOCKED: No visible recovery/readiness percent or score-first hero may be reintroduced without explicit approval.
 - BLOCKED: Weekly Review muscle-balance cleanup remains a future separate slice.
 - BLOCKED: Nutrition Settings / Physique recovery precision cleanup remains a future separate slice.
-- BLOCKED: English-first / Localization Consistency Audit remains a future separate slice.
+- BLOCKED: Global `Localizable.xcstrings` / `L10n` strategy remains a later explicit localization strategy/slice.
 - BLOCKED: Reset Safety / Destructive Action UX remains a future separate slice.
 - BLOCKED: Release / Debug Gating Audit remains a future separate slice before App Store or release work.
+
+## 11B. English-First P0-A Current State
+
+- CURRENT: English-first P0-A checkpoint is complete and pushed to `main` through `bb85725 Make core daily coach copy English-first`.
+- CURRENT: Core daily/coaching production copy cleanup is committed and pushed.
+- CURRENT: Today, Coach, Daily Briefing, Readiness result, Phase Outlook, and Active Workout Rest fallbacks were cleaned toward English-first.
+- CURRENT: The cleanup was scoped to core daily/coaching production copy and rest fallbacks; it was not a global localization strategy.
+- BLOCKED: German/English mixing remains a carry-forward issue in Weekly Review and deeper localization surfaces.
+- BLOCKED: Do not treat global localization as solved.
+- BLOCKED: German localization remains a later explicit localization strategy/slice.
+- BLOCKED: Future English-first work must be scoped and reviewed by screenshots.
+- CURRENT: Carry forward Weekly Review English-first cleanup.
+- CURRENT: Carry forward Global `Localizable.xcstrings` / `L10n` strategy later.
+- CURRENT: Carry forward Active Workout rest visual spot-check if reopened.
+- CURRENT: Carry forward Release / Debug Gating Audit.
+- CURRENT: Carry forward Reset Safety / Destructive Action UX.
 
 ## 12. Rejected Direction Ledger
 
@@ -389,9 +423,12 @@ BLOCKED: Production use of a new custom visual system requires screenshot approv
 - CURRENT: Profile is checkpoint-complete and pushed to `main` through `bbbc2a9`.
 - CURRENT: There is no active Recovery Trust implementation slice after Progress P1-B.
 - CURRENT: Recovery Trust checkpoint is complete and pushed to `main` through `55c2ca8`.
+- CURRENT: There is no active English-first implementation slice after P0-A.
+- CURRENT: English-first P0-A is complete and pushed to `main` through `bb85725`.
 - APPROVED: Profile production direction is approved enough for the current checkpoint.
 - BLOCKED: Do not continue Profile polish blindly.
 - BLOCKED: Do not continue Recovery Trust polish blindly; remaining cleanup needs separately scoped slices.
+- BLOCKED: Do not continue English-first cleanup blindly; future English-first work must be scoped and reviewed by screenshots.
 - CURRENT: `ProfileView.swift` was not dirty before this documentation update.
 - CURRENT: User captures screenshots manually by default.
 - CURRENT: Default screenshot device is iPhone 17 Pro Max only.
@@ -416,15 +453,17 @@ xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Release -sdk 
 - BLOCKED: Stop condition is unclear file scope, build failure, blind Profile polish, or any need to touch forbidden systems.
 - APPROVED: Profile checkpoint success criteria were no behavior changes, no route changes, no debug leak, no Pro hero, no reset hero, clear Athlete Passport first viewport, Pro below setup/body, clean build, and accepted manual screenshot review.
 - CURRENT: Carry forward Weekly Review muscle-balance cleanup.
+- CURRENT: Carry forward Weekly Review English-first cleanup.
 - CURRENT: Carry forward Nutrition Settings / Physique recovery precision cleanup.
-- CURRENT: Carry forward English-first / Localization Consistency Audit.
+- CURRENT: Carry forward Global `Localizable.xcstrings` / `L10n` strategy later as an explicit localization strategy/slice.
+- CURRENT: Carry forward Active Workout rest visual spot-check if reopened.
 - CURRENT: Carry forward Reset Safety / Destructive Action UX as a future separate slice.
 - CURRENT: Carry forward Release / Debug Gating Audit before App Store or release work.
 - CURRENT: Optional future Training Setup concept polish remains possible, but not now.
 
 ## 14. Current Dirty / Untracked State Rules
 
-- CURRENT: Tracked dirty files before this Recovery Trust documentation update: none from `git status --short`.
+- CURRENT: Tracked dirty files before this English-first documentation update: none from `git status --short`.
 - CURRENT: Expected tracked dirty file from this documentation-only task is `docs/qa/strq-master-transfer-pack-v2-2026-05-27.md`.
 - CURRENT: Staged files: none from `git status --short`.
 - CURRENT: Important untracked files/folders from `git status --short`:
@@ -471,10 +510,15 @@ xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Release -sdk 
 - CURRENT: Profile checkpoint is complete; do not continue Profile polish blindly.
 - BLOCKED: Future Profile implementation requires a fresh plan/slice.
 - CURRENT: Recovery Trust checkpoint is complete through Progress P1-B at `55c2ca8`.
+- CURRENT: English-first P0-A checkpoint is complete through `bb85725`.
 - BLOCKED: No visible recovery/readiness percent or score-first hero may be reintroduced without explicit approval.
+- BLOCKED: Weekly Review English-first cleanup remains open.
 - BLOCKED: Weekly Review muscle-balance cleanup remains open.
 - BLOCKED: Nutrition Settings / Physique recovery precision cleanup remains open.
-- BLOCKED: English-first / Localization Consistency Audit remains open.
+- BLOCKED: German/English mixing in Weekly Review and deeper localization surfaces remains open.
+- BLOCKED: Global `Localizable.xcstrings` / `L10n` strategy remains a later explicit localization strategy/slice.
+- BLOCKED: Do not treat global localization as solved.
+- BLOCKED: Active Workout rest visual spot-check remains open if that surface is reopened.
 - BLOCKED: Reset Safety / Destructive Action UX remains a future separate slice.
 - BLOCKED: Progress PR/Best Set state is not production-verified.
 - BLOCKED: Progress dormant muscle/movement/volume modules were softened preventively, but need screenshots and review if reactivated.
@@ -492,6 +536,7 @@ xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Release -sdk 
 - APPROVED: Use iPhone 17e for small-device screenshots when concrete layout risk exists and the simulator is available.
 - APPROVED: User captures review screenshots manually by default.
 - APPROVED: After every UI or implementation change, launch the updated app on iPhone 17 Pro Max before asking the user for screenshots.
+- APPROVED: Future English-first UI/copy work must be scoped and reviewed by screenshots.
 - APPROVED: Use contact sheets when reviewing many screens/states.
 - CURRENT: Local Mac paths are not reviewable by ChatGPT unless images are uploaded or otherwise made visible in the review context.
 - APPROVED: Screenshots are evidence, not approval.
@@ -742,7 +787,8 @@ Only after explicit approval:
 | strq_role_split | operating | high | APPROVED: User/ChatGPT judge product/design/language; Codex implements/audits/builds/launches for screenshot review; screenshots are user-captured by default. |
 | strq_no_commit | git | high | BLOCKED: No stage, commit, or push without explicit approval. |
 | strq_ui_approval | qa | high | APPROVED: Build pass is not approval; UI needs screenshots and user/ChatGPT review. |
-| strq_language | copy | high | APPROVED: English-first; short gym-native copy; no medical, fake precision, AI, or lab wording. |
+| strq_language | copy | high | APPROVED: English-first; short gym-native copy; no medical, fake precision, AI, or lab wording; German localization remains a later explicit strategy/slice. |
+| strq_english_first_p0a | copy | high | CURRENT: English-first P0-A complete and pushed through bb85725; Today, Coach, Daily Briefing, Readiness result, Phase Outlook, and Active Workout Rest fallbacks cleaned toward English-first; global localization is not solved. |
 | strq_progress_direction | progress | high | APPROVED: Progress Training Path with state headline, proof strip, one Next Move, lower proof sections; not an analytics dashboard. |
 | strq_progress_rejected | progress | high | REJECTED: node map first viewport, analytics dashboard, score-first, avatar, fake precision. |
 | strq_recovery_trust | recovery | high | CURRENT: Recovery Trust checkpoint complete and pushed through Progress P1-B at 55c2ca8; Today, Sleep & Recovery, Readiness Check-In, Coach, PreWorkout, and Progress cleaned up for major recovery/readiness fake precision; no visible recovery/readiness percent or score-first hero without explicit approval. |
@@ -754,7 +800,7 @@ Only after explicit approval:
 | strq_build_debug | tooling | medium | CURRENT: xcodebuild Debug generic simulator CODE_SIGNING_ALLOWED=NO build is default compile check. |
 | strq_dirty_rules | git | high | CURRENT: Untracked QA folders are evidence only; leave untracked unless explicitly requested. |
 | strq_screenshot_rule | qa | high | APPROVED: User captures screenshots manually by default; after every UI/implementation change, launch updated app on iPhone 17 Pro Max before asking for screenshots. |
-| strq_future_blockers | roadmap | medium | BLOCKED: prescription trust, Coach density, Weekly Review muscle-balance cleanup, Nutrition Settings / Physique recovery precision cleanup, English-first / Localization Consistency Audit, Reset Safety / Destructive Action UX, Progress dormant module screenshots if reactivated, Release / Debug Gating Audit. |
+| strq_future_blockers | roadmap | medium | BLOCKED: prescription trust, Coach density, Weekly Review English-first cleanup, Weekly Review muscle-balance cleanup, Global Localizable.xcstrings / L10n strategy later, Active Workout rest visual spot-check if reopened, Nutrition Settings / Physique recovery precision cleanup, Reset Safety / Destructive Action UX, Progress dormant module screenshots if reactivated, Release / Debug Gating Audit. |
 
 ## 19. New Chat Bootstrap Prompt
 
@@ -788,8 +834,11 @@ Profile is checkpoint-complete and pushed to main through bbbc2a9. Completed sli
 Recovery Trust checkpoint:
 Recovery Trust is checkpoint-complete and pushed to main through Progress P1-B at 55c2ca8. Completed slices are 0bf0454 Reduce recovery score precision in key surfaces, 1d74450 Reduce recovery precision in coaching flows, cbb073b Reduce recovery precision in progress, and 55c2ca8 Soften progress balance precision. Today, Sleep & Recovery, Readiness Check-In, Coach, PreWorkout, and Progress have been cleaned up for major recovery/readiness fake precision. No visible recovery/readiness percent or score-first hero should be reintroduced without explicit approval. Progress remains Training Path, not an analytics dashboard. Dormant Progress muscle/movement/volume modules were softened preventively, but need screenshots and product review if reactivated.
 
+English-first P0-A checkpoint:
+English-first P0-A is checkpoint-complete and pushed to main through bb85725 Make core daily coach copy English-first. Core daily/coaching production copy cleanup is committed and pushed. Today, Coach, Daily Briefing, Readiness result, Phase Outlook, and Active Workout Rest fallbacks were cleaned toward English-first. Do not treat global localization as solved. German/English mixing remains a carry-forward issue in Weekly Review and deeper localization surfaces. German localization remains a later explicit localization strategy/slice. Future English-first work must be scoped and reviewed by screenshots.
+
 Active slice:
-There is no active Profile or Recovery Trust implementation slice unless the user explicitly creates one. Do not continue Profile or Recovery Trust polish blindly. Future Profile implementation requires a fresh plan/slice and reconfirmed allowed files. Remaining Recovery Trust carry-forward is Weekly Review muscle-balance cleanup, Nutrition Settings / Physique recovery precision cleanup, English-first / Localization Consistency Audit, Reset Safety / Destructive Action UX, and Release / Debug Gating Audit.
+There is no active Profile, Recovery Trust, or English-first implementation slice unless the user explicitly creates one. Do not continue Profile, Recovery Trust, or English-first polish blindly. Future Profile implementation requires a fresh plan/slice and reconfirmed allowed files. Remaining carry-forward is Weekly Review English-first cleanup, Weekly Review muscle-balance cleanup, Nutrition Settings / Physique recovery precision cleanup, Global Localizable.xcstrings / L10n strategy later, Active Workout rest visual spot-check if reopened, Reset Safety / Destructive Action UX, and Release / Debug Gating Audit.
 
 Allowed/forbidden rule:
 Identify allowed and forbidden files before editing. If allowed/forbidden files are unclear, do not edit.
@@ -810,10 +859,13 @@ Current warnings:
 - Do not reopen or polish Profile without a fresh plan.
 - Do not reintroduce visible recovery/readiness percent or score-first hero without explicit approval.
 - Keep Progress as Training Path, not an analytics dashboard.
+- Do not treat English-first P0-A as global localization completion.
+- Keep German localization for a later explicit localization strategy/slice.
+- Scope and screenshot-review future English-first work.
 - Leave untracked QA folders untracked unless explicitly requested.
 - Treat ios/STRQ/Views/Debug/ProfileV3PrototypeView.swift as rejected/untracked residue unless explicitly revived.
 - Do not continue from memory alone; verify source files and status.
-- Carry forward Weekly Review muscle-balance cleanup, Nutrition Settings / Physique recovery precision cleanup, English-first / Localization Consistency Audit, Reset Safety / Destructive Action UX, Release / Debug Gating Audit, and optional future Training Setup concept polish, but do not start them without explicit scope.
+- Carry forward Weekly Review English-first cleanup, Weekly Review muscle-balance cleanup, Nutrition Settings / Physique recovery precision cleanup, Global Localizable.xcstrings / L10n strategy later, Active Workout rest visual spot-check if reopened, Reset Safety / Destructive Action UX, Release / Debug Gating Audit, and optional future Training Setup concept polish, but do not start them without explicit scope.
 ```
 
 ## 20. Strictness Clause
