@@ -2,9 +2,6 @@ import SwiftUI
 
 private func coachPreviewChangeText(_ raw: String) -> String {
     raw
-        .replacingOccurrences(of: "Reduce load", with: "Gewicht reduzieren")
-        .replacingOccurrences(of: "sets", with: "Sätze")
-        .replacingOccurrences(of: "lower effort", with: "leichtere Ausführung")
 }
 
 struct ExpandableInsightCard: View {
@@ -151,7 +148,7 @@ struct ExpandableInsightCard: View {
         HStack(spacing: 3) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 9))
-            Text(L10n.tr("coach.signal.saved", fallback: "Gespeichert"))
+            Text(verbatim: "Saved")
                 .font(.system(size: 9, weight: .semibold))
         }
         .foregroundStyle(STRQPalette.success)
@@ -169,10 +166,14 @@ struct ExpandableInsightCard: View {
 
             if let firstAction = actions.first {
                 VStack(alignment: .leading, spacing: 6) {
-                    Label(L10n.tr("coach.whyThisMatters", fallback: "Warum das zählt"), systemImage: "info.circle.fill")
+                    Label {
+                        Text(verbatim: "Why this matters")
+                    } icon: {
+                        Image(systemName: "info.circle.fill")
+                    }
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(accentColor)
-                    Text(firstAction.whyItMatters)
+                    Text(verbatim: coachPreviewChangeText(firstAction.whyItMatters))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -192,7 +193,7 @@ struct ExpandableInsightCard: View {
                 Image(systemName: action.icon)
                     .font(.caption)
                     .foregroundStyle(accentColor)
-                Text(action.explanation)
+                Text(verbatim: coachPreviewChangeText(action.explanation))
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.8))
                     .fixedSize(horizontal: false, vertical: true)
@@ -209,7 +210,7 @@ struct ExpandableInsightCard: View {
                     Image(systemName: "eye.fill")
                         .font(.system(size: 9))
                         .foregroundStyle(.white.opacity(0.4))
-                    Text(action.previewText)
+                    Text(verbatim: coachPreviewChangeText(action.previewText))
                         .font(.caption2.weight(.medium))
                         .foregroundStyle(.white.opacity(0.5))
                 }
@@ -235,7 +236,7 @@ struct ExpandableInsightCard: View {
         let isRegen = action.type == .regenerateWeek
         let color: Color = isRegen ? STRQBrand.steel : STRQBrand.slate
         let icon = isRegen ? "calendar.badge.clock" : "arrow.down.to.line"
-        let label = isRegen ? "Anpassung für die Woche" : "Alle Einheiten leichter"
+        let label = isRegen ? "Week adjustment" : "Lighter week"
 
         return HStack(spacing: 8) {
             Image(systemName: icon)
@@ -245,7 +246,7 @@ struct ExpandableInsightCard: View {
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(color.opacity(0.8))
             Spacer()
-            Text(L10n.tr("Wochenebene"))
+            Text(verbatim: "Week-level")
                 .font(.system(size: 9, weight: .bold))
                 .foregroundStyle(color)
                 .padding(.horizontal, 6)
@@ -267,7 +268,7 @@ struct ExpandableInsightCard: View {
                 Image(systemName: "arrow.down.circle.fill")
                     .font(.system(size: 10))
                     .foregroundStyle(STRQBrand.steel)
-                Text("Vorschau: \(preview.dayName)")
+                Text(verbatim: "Preview: \(preview.dayName)")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(STRQBrand.steel)
             }
@@ -280,17 +281,17 @@ struct ExpandableInsightCard: View {
                     Text(reduction.exerciseName)
                         .font(.caption2.weight(.medium))
                     Spacer()
-                    Text("\(reduction.originalSets) → \(reduction.newSets) Sätze")
+                    Text(verbatim: "\(reduction.originalSets) → \(reduction.newSets) sets")
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(STRQBrand.steel)
                 }
             }
 
             HStack {
-                Text("Gesamt: \(preview.originalTotalSets) → \(preview.newTotalSets) Sätze")
+                Text(verbatim: "Total: \(preview.originalTotalSets) → \(preview.newTotalSets) sets")
                     .font(.caption2.weight(.semibold))
                 Spacer()
-                Text("~\(preview.estimatedTimeSaved) Min. kürzer")
+                Text(verbatim: "~\(preview.estimatedTimeSaved) min shorter")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -306,7 +307,7 @@ struct ExpandableInsightCard: View {
                 Image(systemName: "arrow.down.circle.fill")
                     .font(.system(size: 10))
                     .foregroundStyle(STRQBrand.steel)
-                Text("Vorschau: \(preview.dayName)")
+                Text(verbatim: "Preview: \(preview.dayName)")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(STRQBrand.steel)
             }
@@ -327,10 +328,10 @@ struct ExpandableInsightCard: View {
 
             if preview.estimatedTimeSaved > 0 {
                 HStack {
-                    Text(L10n.tr("coach.effortReduced", fallback: "Aufwand reduziert"))
+                    Text(verbatim: "Effort reduced")
                         .font(.caption2.weight(.semibold))
                     Spacer()
-                    Text("~\(preview.estimatedTimeSaved) Min. kürzer")
+                    Text(verbatim: "~\(preview.estimatedTimeSaved) min shorter")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
@@ -347,7 +348,7 @@ struct ExpandableInsightCard: View {
             HStack(spacing: 5) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.caption2)
-                Text(L10n.tr("coach.signal.saved", fallback: "Gespeichert"))
+                Text(verbatim: "Saved")
                     .font(.caption.weight(.semibold))
             }
             .foregroundStyle(STRQPalette.success)
@@ -383,7 +384,7 @@ struct ExpandableInsightCard: View {
         HStack(spacing: 4) {
             Image(systemName: "arrow.uturn.backward")
                 .font(.system(size: 10, weight: .semibold))
-            Text(L10n.tr("Rückgängig"))
+            Text(verbatim: "Undo")
                 .font(.caption2.weight(.semibold))
         }
         .foregroundStyle(.white.opacity(0.6))
@@ -469,7 +470,7 @@ struct ExpandableInsightCard: View {
         HStack(spacing: 6) {
             Image(systemName: action.icon)
                 .font(.caption2.weight(.semibold))
-            Text(action.label)
+            Text(verbatim: coachPreviewChangeText(action.label))
                 .font(.caption.weight(.semibold))
         }
         .frame(maxWidth: .infinity)
@@ -482,7 +483,7 @@ struct ExpandableInsightCard: View {
         HStack(spacing: 6) {
             Image(systemName: action.icon)
                 .font(.caption2.weight(.semibold))
-            Text(action.label)
+            Text(verbatim: coachPreviewChangeText(action.label))
                 .font(.caption.weight(.semibold))
         }
         .frame(maxWidth: .infinity)
@@ -633,7 +634,7 @@ struct ExpandableRecommendationCard: View {
                         HStack(spacing: 3) {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.system(size: 9))
-                            Text(L10n.tr("coach.signal.saved", fallback: "Gespeichert"))
+                            Text(verbatim: "Saved")
                                 .font(.system(size: 9, weight: .semibold))
                         }
                         .foregroundStyle(STRQPalette.success)
@@ -663,10 +664,14 @@ struct ExpandableRecommendationCard: View {
 
             if let firstAction = actions.first {
                 VStack(alignment: .leading, spacing: 6) {
-                    Label(L10n.tr("coach.whyThisMatters", fallback: "Warum das zählt"), systemImage: "info.circle.fill")
+                    Label {
+                        Text(verbatim: "Why this matters")
+                    } icon: {
+                        Image(systemName: "info.circle.fill")
+                    }
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(accentColor)
-                    Text(firstAction.whyItMatters)
+                    Text(verbatim: coachPreviewChangeText(firstAction.whyItMatters))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -686,7 +691,7 @@ struct ExpandableRecommendationCard: View {
                 Image(systemName: action.icon)
                     .font(.caption)
                     .foregroundStyle(accentColor)
-                Text(action.explanation)
+                Text(verbatim: coachPreviewChangeText(action.explanation))
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.8))
                     .fixedSize(horizontal: false, vertical: true)
@@ -703,7 +708,7 @@ struct ExpandableRecommendationCard: View {
                     Image(systemName: "eye.fill")
                         .font(.system(size: 9))
                         .foregroundStyle(.white.opacity(0.4))
-                    Text(action.previewText)
+                    Text(verbatim: coachPreviewChangeText(action.previewText))
                         .font(.caption2.weight(.medium))
                         .foregroundStyle(.white.opacity(0.5))
                 }
@@ -729,7 +734,7 @@ struct ExpandableRecommendationCard: View {
         let isRegen = action.type == .regenerateWeek
         let color: Color = isRegen ? STRQBrand.steel : STRQBrand.slate
         let icon = isRegen ? "calendar.badge.clock" : "arrow.down.to.line"
-        let label = isRegen ? "Anpassung für die Woche" : "Alle Einheiten leichter"
+        let label = isRegen ? "Week adjustment" : "Lighter week"
 
         return HStack(spacing: 8) {
             Image(systemName: icon)
@@ -739,7 +744,7 @@ struct ExpandableRecommendationCard: View {
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(color.opacity(0.8))
             Spacer()
-            Text(L10n.tr("Wochenebene"))
+            Text(verbatim: "Week-level")
                 .font(.system(size: 9, weight: .bold))
                 .foregroundStyle(color)
                 .padding(.horizontal, 6)
@@ -761,7 +766,7 @@ struct ExpandableRecommendationCard: View {
             HStack(spacing: 5) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.caption2)
-                Text(L10n.tr("coach.signal.saved", fallback: "Gespeichert"))
+                Text(verbatim: "Saved")
                     .font(.caption.weight(.semibold))
             }
             .foregroundStyle(STRQPalette.success)
@@ -797,7 +802,7 @@ struct ExpandableRecommendationCard: View {
         HStack(spacing: 4) {
             Image(systemName: "arrow.uturn.backward")
                 .font(.system(size: 10, weight: .semibold))
-            Text(L10n.tr("Rückgängig"))
+            Text(verbatim: "Undo")
                 .font(.caption2.weight(.semibold))
         }
         .foregroundStyle(.white.opacity(0.6))
@@ -880,7 +885,7 @@ struct ExpandableRecommendationCard: View {
         HStack(spacing: 6) {
             Image(systemName: action.icon)
                 .font(.caption2.weight(.semibold))
-            Text(action.label)
+            Text(verbatim: coachPreviewChangeText(action.label))
                 .font(.caption.weight(.semibold))
         }
         .frame(maxWidth: .infinity)
@@ -893,7 +898,7 @@ struct ExpandableRecommendationCard: View {
         HStack(spacing: 6) {
             Image(systemName: action.icon)
                 .font(.caption2.weight(.semibold))
-            Text(action.label)
+            Text(verbatim: coachPreviewChangeText(action.label))
                 .font(.caption.weight(.semibold))
         }
         .frame(maxWidth: .infinity)
@@ -915,7 +920,7 @@ struct ExpandableRecommendationCard: View {
                 Image(systemName: "arrow.down.circle.fill")
                     .font(.system(size: 10))
                     .foregroundStyle(STRQBrand.steel)
-                Text("Vorschau: \(preview.dayName)")
+                Text(verbatim: "Preview: \(preview.dayName)")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(STRQBrand.steel)
             }
@@ -924,15 +929,15 @@ struct ExpandableRecommendationCard: View {
                     Circle().fill(STRQBrand.steel.opacity(0.3)).frame(width: 5, height: 5)
                     Text(reduction.exerciseName).font(.caption2.weight(.medium))
                     Spacer()
-                    Text("\(reduction.originalSets) → \(reduction.newSets) Sätze")
+                    Text(verbatim: "\(reduction.originalSets) → \(reduction.newSets) sets")
                         .font(.caption2.weight(.semibold)).foregroundStyle(STRQBrand.steel)
                 }
             }
             HStack {
-                Text("Gesamt: \(preview.originalTotalSets) → \(preview.newTotalSets) Sätze")
+                Text(verbatim: "Total: \(preview.originalTotalSets) → \(preview.newTotalSets) sets")
                     .font(.caption2.weight(.semibold))
                 Spacer()
-                Text("~\(preview.estimatedTimeSaved) Min. kürzer")
+                Text(verbatim: "~\(preview.estimatedTimeSaved) min shorter")
                     .font(.caption2).foregroundStyle(.secondary)
             }
         }
@@ -946,7 +951,7 @@ struct ExpandableRecommendationCard: View {
                 Image(systemName: "arrow.down.circle.fill")
                     .font(.system(size: 10))
                     .foregroundStyle(STRQBrand.steel)
-                Text("Vorschau: \(preview.dayName)")
+                Text(verbatim: "Preview: \(preview.dayName)")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(STRQBrand.steel)
             }
@@ -961,9 +966,9 @@ struct ExpandableRecommendationCard: View {
             }
             if preview.estimatedTimeSaved > 0 {
                 HStack {
-                    Text(L10n.tr("coach.effortReduced", fallback: "Aufwand reduziert")).font(.caption2.weight(.semibold))
+                    Text(verbatim: "Effort reduced").font(.caption2.weight(.semibold))
                     Spacer()
-                    Text("~\(preview.estimatedTimeSaved) Min. kürzer")
+                    Text(verbatim: "~\(preview.estimatedTimeSaved) min shorter")
                         .font(.caption2).foregroundStyle(.secondary)
                 }
             }

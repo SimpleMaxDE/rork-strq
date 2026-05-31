@@ -20,6 +20,10 @@ struct CoachingEngine {
         }
     }
 
+    private func lowWorkDetail(for rawMuscle: String) -> String {
+        "\(muscleDisplayName(rawMuscle)) work is low. Add a little work when the next session has room."
+    }
+
     private func coachDecimal(_ value: Double) -> String {
         let rounded = (value * 10).rounded() / 10
         let format = abs(rounded.rounded() - rounded) < 0.01 ? "%.0f" : "%.1f"
@@ -205,7 +209,7 @@ struct CoachingEngine {
                     icon: "exclamationmark.triangle.fill",
                     color: "red",
                     title: "\(muscleDisplayName(entry.muscle)) work is low",
-                    message: "\(muscleDisplayName(entry.muscle)) is \(Int((1.0 - ratio) * 100))% below your recent average. Keep volume in view and check the next session.",
+                    message: lowWorkDetail(for: entry.muscle),
                     severity: .high,
                     category: .volumeBalance
                 ))
@@ -214,7 +218,7 @@ struct CoachingEngine {
                     icon: "arrow.down.circle.fill",
                     color: "yellow",
                     title: "\(muscleDisplayName(entry.muscle)) below average",
-                    message: "\(muscleDisplayName(entry.muscle)) is \(Int((1.0 - ratio) * 100))% below the 4-week average. Add work only if the next session fits.",
+                    message: lowWorkDetail(for: entry.muscle),
                     severity: .medium,
                     category: .volumeBalance
                 ))
@@ -836,7 +840,7 @@ struct CoachingEngine {
                 icon: "exclamationmark.circle.fill",
                 color: isFocus ? "red" : "orange",
                 title: "\(muscleDisplayName(lm.muscleGroup)) work is low",
-                message: "\(muscleDisplayName(lm.muscleGroup)) is at \(lm.currentWeeklySets) sets/week. For this goal, that looks low. Check the next session.",
+                message: lowWorkDetail(for: lm.muscleGroup),
                 severity: isFocus ? .high : .medium,
                 category: .volumeBalance
             ))

@@ -1179,10 +1179,10 @@ struct ExerciseLibraryView: View {
                 .background(STRQBrand.steel.opacity(0.12), in: Circle())
 
             VStack(spacing: 4) {
-                Text("Keine Übungen gefunden")
+                Text(verbatim: "No exercises found")
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(STRQPalette.textPrimary)
-                Text("Suche oder Filter zurücksetzen.")
+                Text(verbatim: "Clear search or reset filters.")
                     .font(.subheadline)
                     .foregroundStyle(STRQPalette.textSecondary)
             }
