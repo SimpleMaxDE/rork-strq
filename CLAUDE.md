@@ -47,6 +47,16 @@ Targets: `STRQ` (app), `STRQWatch` (watchOS), `STRQWidget` (widgets + Live Activ
 - **Design system:** `Utilities/STRQDesignSystem.swift` (tokens, components); preview surface in `Views/Debug/STRQDesignSystemPreviewView.swift`.
 - **Localization:** `Localizable.xcstrings` + `Localization/L10n.swift` helpers. Product language is English-first, short gym-native copy; German localization only in explicit localization slices.
 
+## Computer-use discipline (Rive, Figma, design reviews)
+
+Long computer-use sessions degrade hard: every screenshot stays in context permanently, so a marathon session (measured: 950 screenshots, 113 MB) spends minutes per turn on context replay, cache misses, and auto-compaction — the model isn't "thinking slowly", it's re-reading hundreds of images. Rules:
+
+- **Delegate long click-sequences to a subagent** (Agent tool). The screenshots pile up in the agent's disposable context; only the findings return to the main session.
+- **Batch aggressively**: plan the full action sequence and execute it in one `computer_batch` call. Verify with a screenshot at milestones, not after every micro-action.
+- **Prefer keyboard shortcuts** over mouse navigation in Rive/Figma — fewer actions, fewer verification screenshots.
+- **Use `zoom` crops** instead of repeated full-screen captures when checking one detail.
+- **One work block per session.** When a computer-use phase is done, recommend the owner start a fresh session for the next block instead of continuing a heavy one.
+
 ## Hard rules
 
 - **`docs/protected-logic-map.md` lists logic that UI work must not touch**: training/progression algorithms, persistence schema/keys, exercise IDs, analytics event names, RevenueCat/product identifiers, notification routes, HealthKit behavior, app group `group.app.rork.40gfu7dywfru7n82xfoy4`. UI may read state and pass actions through unchanged — never alter the contracts behind them.
