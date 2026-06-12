@@ -10,10 +10,10 @@ STRQ is a native iOS strength-coaching app (SwiftUI, Xcode project at `ios/STRQ.
 
 ## Commands
 
-Compile check (generic simulator build, no signing):
+Compile check (generic simulator build, no signing). Pipe through `xcbeautify --quiet` (installed) so only warnings/errors surface; `pipefail` preserves the exit code:
 
 ```sh
-xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+set -o pipefail && xcodebuild -project ios/STRQ.xcodeproj -scheme STRQ -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build | xcbeautify --quiet
 ```
 
 Unit tests (single test class/method via `-only-testing`):
@@ -35,7 +35,13 @@ scripts/qa/capture_strq_pro_preview.sh      # pro/paywall preview
 
 Device conventions: `iPhone 17 Pro Max` for default work, `iPhone 17e` for small-device checks. Owner review screenshots: iPhone 17 Pro, Dark Mode, `-AppleLanguages "(en)" -AppleLocale en_US`. Always report the exact command used. Use generic builds for compile checks; a concrete simulator only for launch/screenshots/XCTest.
 
-There is no linter configured. CI (`.github/workflows/`) runs the simulator build on push and targeted tests on PRs.
+Launch a DEBUG prototype directly (bundle id `app.rork.40gfu7dywfru7n82xfoy4`; flags are the `STRQ*Launch` ProcessInfo arguments in `STRQApp.swift` / `Views/Debug/`) — much faster than clicking through the app:
+
+```sh
+xcrun simctl launch "iPhone 17 Pro" app.rork.40gfu7dywfru7n82xfoy4 -STRQOnboardingOpeningMotion -AppleLanguages "(en)" -AppleLocale en_US
+```
+
+There is no linter configured (deliberate — SwiftLint default rules produce only style noise on this codebase). CI (`.github/workflows/`) runs the simulator build on push and targeted tests on PRs; inspect runs with `gh run list` / `gh run view` (gh is authenticated).
 
 ## Architecture
 
