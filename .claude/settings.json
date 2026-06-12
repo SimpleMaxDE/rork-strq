@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild *)",
+      "Bash(xcrun simctl *)",
+      "Bash(xcrun xcresulttool *)",
+      "Bash(xcrun --find *)",
+      "Bash(scripts/qa/*)",
+      "Bash(./scripts/qa/*)",
+      "Bash(plutil -lint *)",
+      "mcp__computer-use__screenshot",
+      "mcp__computer-use__zoom",
+      "mcp__computer-use__wait",
+      "mcp__replicate__get_predictions",
+      "mcp__mobbin__search_screens",
+      "mcp__mobbin__search_flows",
+      "mcp__Claude_in_Chrome__tabs_context_mcp"
+    ],
+    "ask": [
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(git reset*)",
+      "Bash(git restore*)",
+      "Bash(git checkout*)"
+    ]
+  },
+  "sandbox": {
+    "network": {
+      "allowMachLookup": [
+        "com.apple.coresimulator.*"
+      ]
+    }
+  }
+}
